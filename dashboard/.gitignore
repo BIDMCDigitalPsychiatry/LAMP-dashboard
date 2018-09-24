@@ -1,0 +1,9 @@
+# gitignore: /dashboard
+
+# NodeJS + React
+node_modules
+npm-debug.log
+build
+
+# AWS S3 Config
+.s3config
