@@ -54,7 +54,7 @@ export class ArrayView extends React.Component {
         <TableHead>
             <TableRow>
             {this.displayKeys().map((key) => (
-                <TableCell tooltip={humanize(key)}>{humanize(key)}</TableCell>
+                <TableCell style={{borderBottom: 0}} tooltip={humanize(key)}>{humanize(key)}</TableCell>
             ))}
             </TableRow>
         </TableHead>
@@ -66,7 +66,7 @@ export class ArrayView extends React.Component {
             ) : (!!row[key]) && (typeof row[key] === 'object') ? (
                 <ArrayView value={[row[key]]} />
             ) : (
-                <TableCell>{row[key]}</TableCell>
+                <TableCell style={{borderBottom: 0}}>{row[key]}</TableCell>
             ))}
             </TableRow>
         ))}

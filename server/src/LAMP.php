@@ -182,9 +182,10 @@ class LAMP {
      * )
      */
     public static function auth_header() {
-        $header = str_replace('Basic ', '', Flight::request()->getVar('Authorization', ''));
-        if (empty($header))
-            $header = Flight::request()->query['auth'];
+        $header = ' : ';
+        if (isset(getallheaders()['Authorization']))
+            $header = str_replace('Basic ', '', getallheaders()['Authorization']);
+        else $header = Flight::request()->query['auth'];
         return explode(':', $header, 2);
     }
 

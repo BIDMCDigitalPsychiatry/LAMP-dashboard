@@ -96,22 +96,23 @@ class NavigationLayout extends React.Component {
 
     render = () =>
     <div>
-        <AppBar position="static">
+        <AppBar position="static" style={{ background: 'transparent', boxShadow: 'none'}}>
             <Toolbar>
                 <IconButton 
                     onClick={this.props.history.goBack}
-                    color="inherit" 
+                    color="default" 
                     aria-label="Menu">
-                    { this.props.history.length > 2 ? 
+                    <ArrowBack />
+                    {/*this.props.history.length > 2 ? 
                         <ArrowBack /> :
                         <MenuIcon />
-                    }
+                    */}
                 </IconButton>
-                <Typography variant="title" color="inherit" style={{flexGrow: 1}}>
+                <Typography variant="title" color="default" style={{flexGrow: 1}}>
                     {this.state.title}
                 </Typography>
                 <div>
-                    <IconButton color="inherit">
+                    <IconButton color="default">
                         <Badge badgeContent={0} color="secondary">
                             <NotificationsIcon />
                         </Badge>
@@ -120,7 +121,7 @@ class NavigationLayout extends React.Component {
                         aria-owns={this.openPopover ? 'menu-appbar' : null}
                         aria-haspopup="true"
                         onClick={this.avatarSelect}
-                        color="inherit">
+                        color="default">
                         <AccountCircle />
                     </IconButton>
                     <Menu
@@ -136,14 +137,9 @@ class NavigationLayout extends React.Component {
                 </div>
             </Toolbar>
         </AppBar>
-        <div style={{ marginTop: 56, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
+        <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
             {this.props.children}
         </div>
-        <Paper square={true} elevation={20} style={{ backgroundColor: lightBlue900, position: 'fixed', bottom: 0, width: '100%' }}>
-            <Typography variant="body2" color="textSecondary" style={{ marginLeft: '8px' }}>
-                {copyright(2018, "Beth Israel Deaconess Medical Center Division of Digital Psychiatry")}
-            </Typography>
-        </Paper>
         <Dialog
             open={this.state.openProfile}
             onClose={this.closeProfile}
