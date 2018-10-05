@@ -50,13 +50,14 @@ class ParticipantList extends React.Component {
     // Go to the drill-down view. (DISABLED)
     rowSelect = (rowNumber) => this.props.history.push(`/participant/${this.state.data[rowNumber].id}`)
 
+    // Shorthand for authentication stuff.
+    _auth = () => (LAMP.auth.id + ':' + LAMP.auth.password)
+
     // Download ALL the data!
     downloadAll = () => {
-        var auth = LAMP.auth.id + ':' + LAMP.auth.password;
-
         var count = this.state.data.length
         var zip = new JSZip()
-        this.state.data.map((r) => ({id: r.id, url: csv_url(r.id, auth, "csv")})).forEach((doc) => {
+        this.state.data.map((r) => ({id: r.id, url: csv_url(r.id, this._auth(), "csv")})).forEach((doc) => {
             JSZipUtils.getBinaryContent(doc.url, (err, dl) => {
                 if(!!err) throw err; count--
                 zip.file(`${doc.id}.csv`, dl, {binary:true})
@@ -128,7 +129,7 @@ class ParticipantList extends React.Component {
                             <TableCell>
                                 <IconButton
                                     aria-label="Download"
-                                    href={csv_url(row.id, "csv")}>
+                                    href={csv_url(row.id, this._auth(), "csv")}>
                                     <AttachmentIcon />
                                 </IconButton>
                             </TableCell>

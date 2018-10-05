@@ -6,11 +6,9 @@ import Login from './pages/login.js';
 import Register from './pages/register.js';
 import ParticipantList from './pages/participantlist.js';
 import Participant from './pages/participant.js';
-import Debug from './pages/debug.js';
 import NavigationLayout from './components/navigation_layout.js';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import createPalette from '@material-ui/core/styles/createPalette';
 import {blue, red} from '@material-ui/core/colors';
 import './index.css';
 
@@ -33,13 +31,14 @@ document.loadCSS = (url) => {
 
 // Configure the UI theme settings.
 const theme = createMuiTheme({
-    palette: createPalette({
+    palette: {
         primary: blue,
         secondary: red,
-    }),
+    },
     appBar: {
         height: 48,
-    }, ripple: {
+    }, 
+    ripple: {
         color: red,
     }
 });
@@ -99,13 +98,6 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                     <NavigationLayout profile={LAMP.get_identity()}>
                         <Participant {...props} />
                     </NavigationLayout>
-                } />
-            
-                {/* DEBUG ONLY! */}
-                <Route exact path="/debug" render={props =>
-                    !LAMP.get_identity() ?
-                    <Redirect to="/login" /> :
-                    <Debug />
                 } />
             </Switch>
         </HashRouter>
