@@ -5,6 +5,7 @@ import Card from '@material-ui/core/Card';
 import LAMP from '../lamp.js';
 import DataTable from '../components/datatable.js'
 import { ArrayView } from '../components/datatable.js'
+import { TransitIcon, HospitalIcon, HomeIcon, OutsideIcon, SchoolIcon, ShoppingIcon, WorkIcon } from '../components/lamp_icons.js'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import Snackbar from '@material-ui/core/Snackbar'
@@ -19,9 +20,9 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import CreateIcon from '@material-ui/icons/Create';
 import AttachmentIcon from '@material-ui/icons/Attachment';
-import HomeIcon from '@material-ui/icons/Home';
-import SchoolIcon from '@material-ui/icons/School';
-import WorkIcon from '@material-ui/icons/Work';
+import HomeIcon2 from '@material-ui/icons/Home';
+import SchoolIcon2 from '@material-ui/icons/School';
+import WorkIcon2 from '@material-ui/icons/Work';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import LocationCityIcon from '@material-ui/icons/LocationCity';
 import RestaurantIcon from '@material-ui/icons/Restaurant';
@@ -35,7 +36,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import EventBus from 'eventing-bus'
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
-// TODO: Use mapbox://styles/mapbox/light-v9 or mapbox://styles/mapbox/dark-v9
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -53,17 +53,17 @@ class Participant extends React.Component {
         selected: [],
 
         ping: null
-    }
+    }                 
 
     iconMap = {
         location: {
-            home: <HomeIcon />, 
-            school: <SchoolIcon />, 
-            work: <WorkIcon />, 
-            hospital: <LocalHospitalIcon />, 
-            outside: <LocationCityIcon />, 
-            shopping: <RestaurantIcon />, 
-            transit: <DirectionsCarIcon />
+            home: <HomeIcon width={64} height={64} />, 
+            school: <SchoolIcon width={64} height={64} />, 
+            work: <WorkIcon width={64} height={64} />, 
+            hospital: <HospitalIcon width={64} height={64} />, 
+            outside: <OutsideIcon width={64} height={64} />, 
+            shopping: <ShoppingIcon width={64} height={64} />, 
+            transit: <TransitIcon width={64} height={64} /> 
         },
         social: {
             alone: <FaceIcon />, 
@@ -240,29 +240,20 @@ class Participant extends React.Component {
                     </Map>
                 )}
                 <List style={{ flex: 0, marginLeft: 10, marginRight: -16 }}>
-                    {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event =>
-                        <Tooltip title={'' + (event.coordinates || 'no location')}>
+                    {[slice.find(x => !!x.location_context)].map(event =>
+                        <Tooltip title={!event ? 'home' : event.location_context}>
                             <ListItem dense disableGutters>
                                 <ListItemIcon style={{fontSize: '64px'}}>
-                                    <PersonPinCircleIcon />
+                                    {this.iconMap.location[!event ? 'home' : event.location_context]}
                                 </ListItemIcon>
                             </ListItem>
                         </Tooltip>
                     )}
-                    {[slice.find(x => !!x.location_context)].filter(x => x).map(event =>
-                        <Tooltip title={event.location_context}>
+                    {[slice.find(x => !!x.social_context)].map(event => 
+                        <Tooltip title={!event ? 'alone' : event.social_context}>
                             <ListItem dense disableGutters>
                                 <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.location[event.location_context]}
-                                </ListItemIcon>
-                            </ListItem>
-                        </Tooltip>
-                    )}
-                    {[slice.find(x => !!x.social_context)].filter(x => x).map(event => 
-                        <Tooltip title={event.social_context}>
-                            <ListItem dense disableGutters>
-                                <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.social[event.social_context]}
+                                    {this.iconMap.social[!event ? 'alone' : event.social_context]}
                                 </ListItemIcon>
                             </ListItem>
                         </Tooltip>

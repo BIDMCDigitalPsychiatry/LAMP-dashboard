@@ -2,3 +2,4 @@
 
 # Sublime Projects
 *.sublime-*
+.idea/
