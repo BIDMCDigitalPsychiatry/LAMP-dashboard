@@ -26,12 +26,17 @@ class LAMP {
                 ->write(json_encode($data, $option))
                 ->send();
         });
-        Flight::map('csv', function($data, $code = 200, $transpose = false) {
-            $name = substr(strtr(strtok(Flight::request()->url, '?'), '/', '_'), 1);
+        Flight::map('yaml', function($data, $code = 200) {
             Flight::response()
                 ->status($code)
-                ->header('Content-Type', 'application/csv; charset=utf8')
-                ->header('Content-Disposition', 'filename=' . $name . '.csv') // TODO: don't do this!
+                ->header('Content-Type', 'text/yaml; charset=utf8')
+                ->write($data)
+                ->send();
+        });
+        Flight::map('csv', function($data, $code = 200, $transpose = false) {
+            Flight::response()
+                ->status($code)
+                ->header('Content-Type', 'text/csv; charset=utf8')
                 ->write(Dynamics::csv_encode(Dynamics::multigroup($data), $transpose))
                 ->send();
         });
@@ -82,8 +87,10 @@ class LAMP {
         Flight::set('flight.views.path', realpath(__DIR__ . '/..') . '/templates');
     	Flight::route('GET /', function() {
             // TODO: Maybe use HTTP: X-Requested-With?
-            if (Flight::request()->query->format === 'json') // TODO: YAML
+            if (Flight::request()->query->format === 'json')
                 return Flight::json(LAMP::$api_index);
+            if (Flight::request()->query->format === 'yaml')
+                return Flight::yaml(LAMP::$api_index->toYaml());
             return Flight::render('api_explorer.template.php', [
                 'document_title' => 'LAMP API Explorer',
                 'document_location' => ('http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/?format=json'),

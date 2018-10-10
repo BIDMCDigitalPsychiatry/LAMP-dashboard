@@ -5,7 +5,8 @@ require_once __DIR__ . '/driver/v0.1/ParticipantDriver.php';
 /**
  * @OA\Schema(
  *   type="string",
- *   enum={"iOS", "Android"}
+ *   enum={"iOS", "Android"},
+ *   description="The kind of device a participant is using.",
  * )
  */
 abstract class DeviceType extends LAMP {
@@ -14,97 +15,113 @@ abstract class DeviceType extends LAMP {
 }
 
 /**
- * @OA\Schema()
+ * @OA\Schema(
+ *   description="The settings or health information about a participant."
+ * )
  */
 class ParticipantSettings extends LAMP {
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The researcher-provided study code for the participant.",
      * )
      */
     public $study_code = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's selected theme for the LAMP app.",
      * )
      */
     public $theme = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's selected language code for the LAMP app.",
      * )
      */
     public $language = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Timestamp"
+     *   ref="#/components/schemas/Timestamp",
+     *   description="The date and time when the participant last used the LAMP app.",
      * )
      */
     public $last_login = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/DeviceType"
+     *   ref="#/components/schemas/DeviceType",
+     *   description="The type of device the participant last used to use to the LAMP app.",
      * )
      */
     public $device_type = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's emergency contact number.",
      * )
      */
     public $emergency_contact = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's selected personal helpline number.",
      * )
      */
     public $helpline = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Timestamp"
+     *   ref="#/components/schemas/Timestamp",
+     *   description="The date and time when the participant last checked the Blogs page.",
      * )
      */
     public $blogs_checked_date = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Timestamp"
+     *   ref="#/components/schemas/Timestamp",
+     *   description="The date and time when the participant last checked the Tips page.",
      * )
      */
     public $tips_checked_date = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Timestamp"
+     *   ref="#/components/schemas/Timestamp",
+     *   description="The participant's date of birth.",
      * )
      */
     public $date_of_birth = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's sex.",
      * )
      */
     public $sex = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The participant's blood type.",
      * )
      */
     public $blood_type = null;
 }
 
 /**
- * @OA\Schema()
+ * @OA\Schema(
+ *   description="A participant within a study; a participant cannot be enrolled in more than one study at a time.",
+ * )
  */
 class Participant extends LAMP {
     use ParticipantDriverGET_v0_1;
@@ -113,20 +130,23 @@ class Participant extends LAMP {
      * @OA\Property(
      *   ref="#/components/schemas/Identifier",
      *   x={"type"="#/components/schemas/Participant"},
+     *   description="The self-referencing identifier to this object.",
      * )
      */
     public $id = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Attachments"
+     *   ref="#/components/schemas/Attachments",
+     *   description="External or out-of-line objects attached to this object.",
      * )
      */
     public $attachments = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/ParticipantSettings"
+     *   ref="#/components/schemas/ParticipantSettings",
+     *   description="The settings and information for the participant.",
      * )
      */
     public $settings = null;
@@ -137,7 +157,8 @@ class Participant extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/Result"},
-     *   )
+     *   ),
+     *   description="The set of all results from the participant.",
      * )
      */
     public $results = null;
@@ -148,7 +169,8 @@ class Participant extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/MetadataEvent"},
-     *   )
+     *   ),
+     *   description="The set of all metadata events from the participant.",
      * )
      */
     public $metadata_events = null;
@@ -159,7 +181,8 @@ class Participant extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/SensorEvent"},
-     *   )
+     *   ),
+     *   description="The set of all sensor events from the participant.",
      * )
      */
     public $sensor_events = null;
@@ -170,7 +193,8 @@ class Participant extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/EnvironmentEvent"},
-     *   )
+     *   ),
+     *   description="The set of all environment events from the participant.",
      * )
      */
     public $environment_events = null;
@@ -181,7 +205,8 @@ class Participant extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/FitnessEvent"},
-     *   )
+     *   ),
+     *   description="The set of all fitness events from the participant.",
      * )
      */
     public $fitness_events = null;
@@ -397,8 +422,8 @@ class Participant extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Participant"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get a single participant, by an identifier.",
+     *   description="Get a single participant, by an identifier.",
      *   @OA\Parameter(
      *     name="participant_id",
      *     in="path",
@@ -441,8 +466,8 @@ class Participant extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Participant"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all participants enrolled in a study, by an identifier.",
+     *   description="Get the set of all participants enrolled in a study, by an identifier.",
      *   @OA\Parameter(
      *     name="study_id",
      *     in="path",
@@ -475,8 +500,8 @@ class Participant extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Participant"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all participants enrolled in any studies conducted by a researcher, by an identifier.",
+     *   description="Get the set of all participants enrolled in any studies conducted by a researcher, by an identifier.",
      *   @OA\Parameter(
      *     name="researcher_id",
      *     in="path",
@@ -513,8 +538,8 @@ class Participant extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Participant"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all participants.",
+     *   description="Get the set of all participants.",
      *   @OA\Parameter(ref="#/components/parameters/Export"),
      *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),

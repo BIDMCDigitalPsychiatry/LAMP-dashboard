@@ -3,7 +3,9 @@ require_once __DIR__ . '/LAMP.php';
 require_once __DIR__ . '/driver/v0.1/StudyDriver.php';
 
 /**
- * @OA\Schema()
+ * @OA\Schema(
+ *   description="A study conducted by a `Researcher`.",
+ * )
  */
 class Study extends LAMP {
     use StudyDriverGET_v0_1;
@@ -12,20 +14,23 @@ class Study extends LAMP {
      * @OA\Property(
      *   ref="#/components/schemas/Identifier",
      *   x={"type"="#/components/schemas/Study"},
+     *   description="The self-referencing identifier to this object.",
      * )
      */
     public $id = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Attachments"
+     *   ref="#/components/schemas/Attachments",
+     *   description="External or out-of-line objects attached to this object.",
      * )
      */
     public $attachments = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The name of the study.",
      * )
      */
     public $name = null;
@@ -36,7 +41,8 @@ class Study extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/Activity"},
-     *   )
+     *   ),
+     *   description="The set of all activities available in the study.",
      * )
      */
     public $activities = null;
@@ -47,7 +53,8 @@ class Study extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/Participant"},
-     *   )
+     *   ),
+     *   description="The set of all enrolled participants in the study.",
      * )
      */
     public $participants = null;
@@ -60,8 +67,8 @@ class Study extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Study"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get a single study, by an identifier.",
+     *   description="Get a single study, by an identifier.",
      *   @OA\Parameter(
      *     name="study_id",
      *     in="path",
@@ -98,8 +105,8 @@ class Study extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Study"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all studies conducted by a single researcher, by an identifier.",
+     *   description="Get the set of all studies conducted by a single researcher, by an identifier.",
      *   @OA\Parameter(
      *     name="researcher_id",
      *     in="path",
@@ -132,8 +139,8 @@ class Study extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Study"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all studies.",
+     *   description="Get the set of all studies.",
      *   @OA\Parameter(ref="#/components/parameters/Export"),
      *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
