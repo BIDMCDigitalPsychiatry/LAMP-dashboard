@@ -27,6 +27,61 @@ trait ResultDriverGET_v0_1 {
         $user_id = LAMP::encrypt($user_id);
         $cond1 = $user_id !== null ? "AND Users.StudyId = '$user_id'" : '';
         $cond2 = $admin_id !== null ? "AND Users.AdminID = '$admin_id'" : '';
+
+        // Helpers go here:
+        $sql_if = function($cond, $x, $y) { return $cond ? $x : $y; };
+	    $sql_iff = function($x, $y) { return $x ?: $y; };
+
+        // Collect the set of legacy Activity tables and stitch the full query.
+	    $tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
+	    $full_q = array_map(function ($entry) use($sql_if, $sql_iff, $cond1, $cond2) { return "
+	    	WITH [{$entry['Name']}](value) AS (
+                SELECT
+                    ({$entry['ActivityIndexID']}) AS ctid,
+                    [{$entry['IndexColumnName']}] AS id,
+                    [{$entry['TableName']}].UserID AS uid,
+                    Users.AdminID AS aid,
+                    (NULL) AS attachments,
+                    (NULL) AS activity,
+                    DATEDIFF_BIG(MS, '1970-01-01', [{$entry['StartTimeColumnName']}]) AS start_time,
+                    DATEDIFF_BIG(MS, '1970-01-01', [{$entry['EndTimeColumnName']}]) AS end_time,
+                    {$sql_if($entry['Slot1Name'] == null, '', 
+                        "[{$entry['Slot1ColumnName']}] AS [static_data.{$entry['Slot1Name']}],")}
+                    {$sql_if($entry['Slot2Name'] == null, '', 
+                        "[{$entry['Slot2ColumnName']}] AS [static_data.{$entry['Slot2Name']}],")}
+                    {$sql_if($entry['Slot3Name'] == null, '', 
+                        "[{$entry['Slot3ColumnName']}] AS [static_data.{$entry['Slot3Name']}],")}
+                    {$sql_if($entry['Slot4Name'] == null, '', 
+                        "[{$entry['Slot4ColumnName']}] AS [static_data.{$entry['Slot4Name']}],")}
+                    {$sql_if($entry['Slot5Name'] == null, '', 
+                        "[{$entry['Slot5ColumnName']}] AS [static_data.{$entry['Slot5Name']}],")}
+                    ({$sql_if($entry['TemporalTableName'] == null, 'NULL', "
+                        SELECT
+                            [{$sql_iff($entry['Temporal1ColumnName'], 'NULL')}] AS item,
+                            [{$sql_iff($entry['Temporal2ColumnName'], 'NULL')}] AS value,
+                            [{$sql_iff($entry['Temporal3ColumnName'], 'NULL')}] AS type,
+                            CAST(CAST([{$sql_iff($entry['Temporal4ColumnName'], 'NULL')}] AS float) * 1000 AS bigint) AS elapsed_time,
+                            ({$sql_iff($entry['Temporal5ColumnName'], 'NULL')}) AS level
+                        FROM [{$entry['TemporalTableName']}]
+                        WHERE [{$entry['TableName']}].[{$entry['IndexColumnName']}] = [{$entry['TemporalTableName']}].[{$entry['IndexColumnName']}]
+                        FOR JSON PATH, INCLUDE_NULL_VALUES
+                    ")}) AS temporal_events
+                FROM [{$entry['TableName']}]
+                LEFT JOIN Users
+                    ON [{$entry['TableName']}].UserID = Users.UserID
+                WHERE 1=1
+                    {$cond1}
+                    {$cond2}
+                FOR JSON PATH, INCLUDE_NULL_VALUES
+            )"; }, $tableset);
+
+	    $usage = "\n            SELECT X.value FROM (\n" .
+	    implode(" UNION ALL\n", array_map(function ($entry) {
+            return "                SELECT value FROM [{$entry['Name']}]";
+        }, $tableset)) . "\n) X;\n";
+
+	    log::sys(implode("", $full_q) . $usage);
+
         $result = self::lookup("
             WITH Surveys(value) AS (
                 SELECT 
