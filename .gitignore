@@ -4,6 +4,7 @@
 *.sublime-*
 
 # IntelliJ IDEA
+.idea/dataSources/
 .idea/workspace.xml
 .idea/usage.statistics.xml
 .idea/tasks.xml
