@@ -81,7 +81,13 @@ class Participant extends React.Component {
     }
 
     componentWillMount() {
-        const { id } = this.props.match.params
+        let { id } = this.props.match.params
+		if (id === 'me' && (LAMP.auth || {type: null}).type === 'participant')
+		    id = LAMP.get_identity().id
+		if (!id || id === 'me') {
+		    this.props.history.replace(`/`)
+			return
+		}
         EventBus.publish("set_title", `Participant ${id}`)
 
         // Load the Leaflet Maps API's CSS.
