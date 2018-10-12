@@ -29,9 +29,7 @@ import JSZipUtils from 'jszip-utils'
 const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
 const csv_url = (id, auth, export_type) => `http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
 
-// TODO: Rename to Researcher:
-
-class ParticipantList extends React.Component {
+class Researcher extends React.Component {
     state = {
         openVizEdit: false,
         scriptText: '',
@@ -40,14 +38,22 @@ class ParticipantList extends React.Component {
         data: []
     }
 
-    componentWillMount() {
-        EventBus.publish("set_title", "Participants")
-        LAMP.Participant.all_by_researcher(LAMP.get_identity().id).then(res => {
-            this.setState({ data: res })
-        })
+    async componentWillMount() {
+		let { id } = this.props.match.params
+        if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
+            id = LAMP.get_identity().id
+        if (!id || id === 'me') {
+            this.props.history.replace(`/`)
+            return
+		}
+
+		let obj = await LAMP.Researcher.view(id)
+        EventBus.publish("set_title", `Researcher ${obj[0].name}`)
+        let res = await LAMP.Participant.all_by_researcher(id)
+		this.setState({ data: res })
     }
 
-    // Go to the drill-down view. (DISABLED)
+    // Go to the drill-down view.
     rowSelect = (rowNumber) => this.props.history.push(`/participant/${this.state.data[rowNumber].id}`)
 
     // Shorthand for authentication stuff.
@@ -71,11 +77,15 @@ class ParticipantList extends React.Component {
     }
 
     saveScript = () => {
+		let { id } = this.props.match.params
+		if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
+		    id = LAMP.get_identity().id
+
         var contents = this.state.scriptText
         var reqs = this.state.scriptReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: ''})
 
-        LAMP.Researcher.set_attachment(LAMP.get_identity()['id'], 'org.bidmc.digitalpsych.lamp.viz1', {
+        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
@@ -186,4 +196,4 @@ class ParticipantList extends React.Component {
     </div>
 }
 
-export default withRouter(ParticipantList)
+export default withRouter(Researcher)

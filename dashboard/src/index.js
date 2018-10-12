@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom';
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Login from './pages/login.js';
 import Register from './pages/register.js';
-import ParticipantList from './pages/participantlist.js';
+import Root from './pages/root.js';
+import Researcher from './pages/researcher.js';
 import Participant from './pages/participant.js';
 import NavigationLayout from './components/navigation_layout.js';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -63,11 +64,13 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/home" render={() =>
-                    (LAMP.get_identity() || {type: null}).type === 'researcher' ?
-                    <Redirect to="/participant" /> :
-                    <Redirect to="/participant" /> 
-                } />
-            
+					(LAMP.auth || {type: null}).type === 'root' ?
+                    <Redirect to="/researcher" /> :
+                    (LAMP.auth || {type: null}).type === 'researcher' ?
+                    <Redirect to="/researcher/me" /> :
+                    <Redirect to="/participant/me" />
+				} />
+
                 {/* Route login, register, and logout. */}
                 <Route exact path="/login" render={props =>
                     !LAMP.get_identity() ?
@@ -83,13 +86,20 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                     LAMP.set_identity()
                     return (<Redirect to="/" />)
                 }} />
-                
+
                 {/* Route authenticated routes. */}
-                <Route exact path="/participant" render={props =>
+				<Route exact path="/researcher" render={props =>
+					!LAMP.get_identity() ?
+                    <Redirect to="/login" /> :
+                    <NavigationLayout profile={LAMP.get_identity()}>
+                        <Root {...props} />
+                    </NavigationLayout>
+				} />
+                <Route exact path="/researcher/:id" render={props =>
                     !LAMP.get_identity() ?
                     <Redirect to="/login" /> :
                     <NavigationLayout profile={LAMP.get_identity()}>
-                        <ParticipantList {...props} />
+                        <Researcher {...props} />
                     </NavigationLayout>
                 } />
                 <Route exact path="/participant/:id" render={props =>

@@ -39,23 +39,23 @@ class Login extends React.Component {
     }
 
     handleChange = (event) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-
-        this.setState({[name]: value});
-
-        if (this.state.errorText) {
+        const target = event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value
+        const name = target.name
+        this.setState({[name]: value})
+        if (this.state.errorText)
             this.setState({errorText: ""})
-        }
     }
 
     handleSubmit = (event) => {
         event.preventDefault()
 
-        LAMP.set_identity('researcher', this.state.id, this.state.password).then(res => {
+        let type = (this.state.id === 'root' ?
+            'root' : (this.state.id.includes('@') ?
+                'researcher' : 'participant'))
+        LAMP.set_identity(type, this.state.id, this.state.password).then(res => {
             EventBus.publish("login", res)
-            this.props.history.replace('/participant')
+            this.props.history.replace('/home')
         }).catch(err => {
             console.warn("error with auth request", err)
             this.setState({
@@ -79,7 +79,7 @@ class Login extends React.Component {
                 <TextField
                     required
                     name="id"
-                    label="Researcher ID"
+                    label="ID"
                     margin="normal"
                     variant="outlined"
                     className={styles.textField}
