@@ -19,6 +19,7 @@
     "react": "^16.5.1",
     "react-animated-tree": "^1.0.8",
     "react-dom": "^16.5.1",
+    "react-emoji-render": "^0.4.6",
     "react-event-timeline": "^1.5.4",
     "react-leaflet": "^2.0.1",
     "react-markdown": "^4.0.3",
