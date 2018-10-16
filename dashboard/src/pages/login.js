@@ -17,9 +17,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
-import Slide from '@material-ui/core/Slide';
 import Card from '@material-ui/core/Card'
-import Splash from "./splash.js";
 
 const inputSubmitStyle = {
     cursor: 'pointer',
@@ -39,34 +37,15 @@ const styles = theme => ({
     },
 });
 
-class Transition extends React.Component {
-    state = { shouldHide: false }
-	componentDidMount() {
-		this.setState({ shouldHide: !this.props.in })
-	}
-	render = () =>
-    <Slide
-        direction="up"
-        onEntering={(x) => this.setState({ shouldHide: false })}
-		onExited={(x) => this.setState({ shouldHide: true })}
-        style={{ display: this.state.shouldHide ? 'none' : undefined }}
-    {...this.props} />
-}
-
 class Login extends React.Component {
     state = {
         id: "",
         password: "",
         errorText: "",
-        helpOpen: true,
     }
 
     componentDidMount() {
-        document.title = "LAMP"
-    }
-
-	componentDidUpdate(prevProps, prevState, snapshot) {
-		document.title = this.state.helpOpen ? "mindLAMP" : "Login"
+        document.title = "Login"
     }
 
     handleChange = (event) => {
@@ -100,8 +79,6 @@ class Login extends React.Component {
     }
 
     render = () =>
-    <div>
-		<Transition in={!this.state.helpOpen}>
         <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
             <Paper square={true} elevation={12} style={{padding: '16px'}}>
                 <h1 style={{ marginTop: '0.67em', marginBottom: 0 }}>Please log in.</h1>
@@ -157,11 +134,6 @@ class Login extends React.Component {
                 />
             </Paper>
         </Grid></Grid>
-        </Transition>
-		<Transition in={this.state.helpOpen}>
-            <Splash onExit={() => this.setState({ helpOpen: false })} />
-		</Transition>
-    </div>
 }
 
 export default withRouter(Login);

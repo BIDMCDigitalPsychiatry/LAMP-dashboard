@@ -12,6 +12,7 @@ import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {blue, red} from '@material-ui/core/colors';
 import './index.css';
+import Splash from "./pages/splash";
 
 // Synchronously load CSS from a remote URL from within JS.
 document.loadCSS = (url) => {
@@ -57,18 +58,25 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
         <HashRouter>
             <Switch>
 
-                {/* Route index => login or home (which redirects based on user type). */}
+                {/* Route index => docs or home (which redirects based on user type). */}
                 <Route exact path="/" render={() =>
                     !LAMP.get_identity() ?
-                    <Redirect to="/login" /> :
+                    <Redirect to="/docs" /> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/home" render={() =>
+					(LAMP.auth || {type: null}).type === null ?
+                    <Redirect to="/login" /> :
 					(LAMP.auth || {type: null}).type === 'root' ?
                     <Redirect to="/researcher" /> :
                     (LAMP.auth || {type: null}).type === 'researcher' ?
                     <Redirect to="/researcher/me" /> :
                     <Redirect to="/participant/me" />
+				} />
+
+                {/* Route /docs/* => dynamically */}
+				<Route path="/docs/:path?" render={props =>
+					<Splash onExit={() => props.history.push('/home')} />
 				} />
 
                 {/* Route login, register, and logout. */}
@@ -84,7 +92,7 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                 } />
                 <Route exact path="/logout" render={() => {
                     LAMP.set_identity()
-                    return (<Redirect to="/" />)
+                    return (<Redirect to="/login" />)
                 }} />
 
                 {/* Route authenticated routes. */}
