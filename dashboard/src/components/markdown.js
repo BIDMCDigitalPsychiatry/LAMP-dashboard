@@ -91,7 +91,7 @@ const renderers = (rootProps) => ({
 			style={{ display: 'inline-block', padding: 4, minHeight: 0, minWidth: 0, textTransform: 'none' }}
 			children={props.children}
 			href={(!rootProps.onPageEnter || props.href.startsWith('http')) ? props.href : undefined}
-			onClick={() => (rootProps.onPageEnter || (x => {}))(props.href)} />,
+			onClick={() => ((!!rootProps.onPageEnter && !props.href.startsWith('http')) ? rootProps.onPageEnter : (x => {}))(props.href)} />,
 	image: props =>
 		<img {...props}
 			 style={{ maxWidth: '100%' }}
