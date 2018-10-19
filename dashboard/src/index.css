@@ -6,7 +6,7 @@
     user-select:none;
     cursor: default;
 }
-input, textarea, .contenteditable {
+input, textarea, .contenteditable, .ory-ui-editor * {
     -webkit-touch-callout:default;
     -webkit-user-select:text;
     -moz-user-select:text;
