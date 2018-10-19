@@ -39,18 +39,31 @@ const renderers = (rootProps) => ({
 	paragraph: props =>
 		<Typography {...props} paragraph />,
 	blockquote: props => // TODO: fix marginBottom + textSecondary!
-		<div {...props} style={{ display: 'inline-block', color: '#eee', borderLeft: '5px solid #eee', paddingLeft: '0.5em' }} />,
+		<div {...props} style={{
+			display: 'inline-block',
+			color: '#eee',
+			borderLeft: '5px solid #eee',
+			paddingLeft: '0.5em' }} />,
 	inlineCode: (props) =>
 		<code
-			style={{ padding: 4, margin: '0px 4px', borderRadius: 4, backgroundColor: '#eee' }}>{props.children}</code>,
+			style={{
+				padding: 4,
+				margin: '0px 4px',
+				borderRadius: 4,
+				backgroundColor: '#eee' }}>
+			{props.children}
+		</code>,
 	code: (props) =>
 		<pre
-			style={{ padding: '1%', borderRadius: 4, backgroundColor: '#eee' }}>
+			style={{
+				padding: '1%',
+				borderRadius: 4,
+				backgroundColor: '#eee'
+			}}>
 			<code>{props.value}</code>
 		</pre>,
 	thematicBreak: (props) =>
-		<Divider
-			style={{ margin: '10px 0' }} />,
+		<Divider style={{ margin: '10px 0' }} />,
 	list: props => props.ordered ?
 		<ol {...props} style={{
 			listStyleType: props.children[0].props.checked !== null ? 'none': undefined,
@@ -74,15 +87,17 @@ const renderers = (rootProps) => ({
 	table: props =>
 		<Table {...props}
 			   style={{ display: 'inline-block' }} />,
-	tableHead: props =>
-		<TableHead {...props} />,
-	tableBody: props =>
-		<TableBody {...props} />,
-	tableRow: props =>
-		<TableRow {...props} hover={!props.isHeader} />,
+	tableHead: TableHead,
+	tableBody: TableBody,
+	tableRow: TableRow,
 	tableCell: props =>
 		<TableCell {...props}
 				   numeric={props.align === 'right'}
+				   style={{
+				   		textAlign: props.isHeader ? 'center' : undefined,
+						padding: '0.5%',
+					   	border: '1px solid #ddd'
+				   }}
 				   padding="checkbox" />,
 	link: props =>
 		<Button

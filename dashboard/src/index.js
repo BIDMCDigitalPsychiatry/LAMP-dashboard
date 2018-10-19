@@ -32,7 +32,7 @@ document.loadCSS = (url) => {
 }
 
 // Configure the UI theme settings.
-const theme = createMuiTheme({
+const theme = {
     palette: {
         primary: blue,
         secondary: red,
@@ -42,19 +42,70 @@ const theme = createMuiTheme({
     }, 
     ripple: {
         color: red,
-    }
-});
+    },
+	typography: {
+		fontSize: 16,
+		display4: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 300,
+			fontSize: "3rem",
+			lineHeight: 1,
+			letterSpacing: "-0.01562em",
+        },
+		display3: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 300,
+			fontSize: "2.5rem",
+			lineHeight: 1,
+			letterSpacing: "-0.00833em",
+		},
+		display2: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "2rem",
+			lineHeight: 1.17,
+			letterSpacing: "0.00735em",
+		},
+		display1: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "1.5rem",
+			lineHeight: 1.33,
+			letterSpacing: "0em",
+		},
+		headline: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "1.25rem",
+			lineHeight: 1.6,
+			letterSpacing: "0.0075em",
+		},
+		subheading: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 500,
+			fontSize: "1rem",
+			lineHeight: 1.6,
+			letterSpacing: "0.0075em",
+		},
+	},
+};
 
 // Connect to the correct LAMP API server.
 LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').then(() => {
 
     // Load the Roboto fonts.
     document.loadCSS('https://fonts.googleapis.com/css?family=Roboto:300,400,500')
-    document.title = 'LAMP'    
+    document.title = 'LAMP'
 
     // Correctly route all pages based on available (LAMP) authorization.
     ReactDOM.render((
-    <MuiThemeProvider theme={theme}>
+    <MuiThemeProvider theme={createMuiTheme(theme)}>
         <HashRouter>
             <Switch>
 
