@@ -10,7 +10,6 @@ import LAMP from '../lamp.js';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
-import EventBus from 'eventing-bus'
 
 class Root extends React.Component {
 	state = {
@@ -18,14 +17,18 @@ class Root extends React.Component {
 	}
 
 	componentWillMount() {
+		this.props.layout.pageLoading(false)
+
 		if ((LAMP.auth || {type: null}).type !== 'root') {
 			this.props.history.replace(`/`)
 			return
 		}
-		EventBus.publish("set_title", `LAMP Administrator`)
+		this.props.layout.setTitle(`Administrator`)
 
 		LAMP.Researcher.all().then(res => {
 			this.setState({ data: res })
+			this.props.layout.pageLoading(true)
+			this.props.layout.showMessage('Proceed with caution: you are logged in as the administrator.')
 		})
 	}
 
@@ -33,7 +36,7 @@ class Root extends React.Component {
 
 	render = () =>
 		<div>
-			<Card style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+			<Card>
 				<Toolbar>
 					<Typography variant="title" color="inherit">
 						All Researchers
@@ -49,7 +52,7 @@ class Root extends React.Component {
 					</TableHead>
 					<TableBody>
 						{this.state.data.map((row, index) => (
-							<TableRow key={index} onClick={(e) => this.rowSelect(index)}>
+							<TableRow hover key={index} onClick={(e) => this.rowSelect(index)}>
 								<TableCell>{row.email}</TableCell>
 								<TableCell>{row.name}</TableCell>
 							</TableRow>

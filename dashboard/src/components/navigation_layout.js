@@ -7,7 +7,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Paper from '@material-ui/core/Paper';
 import MenuIcon from '@material-ui/icons/Menu';
 import Badge from '@material-ui/core/Badge';
+import Popover from '@material-ui/core/Popover';
 import IconButton from '@material-ui/core/IconButton';
+import Snackbar from '@material-ui/core/Snackbar'
 import Menu from '@material-ui/core/Menu';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import AccountCircle from '@material-ui/icons/AccountCircle';
@@ -18,13 +20,10 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Fade from '@material-ui/core/Fade';
 import Button from '@material-ui/core/Button';
-import {ObjectView} from '../components/datatable.js'
-import EventBus from 'eventing-bus'
-
-
-// TODO: Red = root, Blue = researcher, use app color = participant!
-
+import { ObjectView } from '../components/datatable.js'
 
 // Quick util function to generate a copyright notice.
 function copyright(startYear, authors) {
@@ -35,21 +34,30 @@ function copyright(startYear, authors) {
 
 class NavigationLayout extends React.Component {
     state = {
+		loaded: 1.0,
         title: "LAMP",
         openProfile: false,
         openPopover: false,
         anchorElement: null,
         logoutConfirm: false,
-        me: null
+        me: null,
+		snackMessage: null,
     };
-    observer = null;
 
-    constructor(props) {
-        super(props)
-        EventBus.on("set_title", (data) => {
-            document.title = data
-            this.setState({title: data})
-        })
+    anchorEl = null;
+    observer = null;
+    timer = null;
+
+    startLoading = () => {
+		this.timer = setInterval(() => this.setState({
+			loaded: (this.state.loaded == 1.0 ? 0.0 : (this.state.loaded > 0.9 ? this.state.loaded : this.state.loaded + 0.01))
+		}), 100)
+    }
+
+    stopLoading = () => {
+		clearInterval(this.timer)
+		this.timer = null
+		this.setState({ loaded: 1.0 })
     }
 
     avatarSelect = (event) => {
@@ -112,7 +120,7 @@ class NavigationLayout extends React.Component {
                     {this.state.title}
                 </Typography>
                 <div>
-                    <IconButton color="default">
+                    <IconButton color="default" buttonRef={(node) => { this.anchorEl = node }}>
                         <Badge badgeContent={0} color="secondary">
                             <NotificationsIcon />
                         </Badge>
@@ -138,7 +146,28 @@ class NavigationLayout extends React.Component {
             </Toolbar>
         </AppBar>
         <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
-            {this.props.children}
+			<Fade in={this.state.loaded >= 1.0}>
+                <div style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+                    {React.Children.map(this.props.children, child =>
+                        React.cloneElement(child, { layout: {
+                            setTitle: (title) => { document.title = title; this.setState({ title: title }) },
+                            pageLoading: (loaded) => { !loaded ? this.startLoading() : this.stopLoading() },
+                            showMessage: (message, timeout = 3000) => {
+                                this.setState({ snackMessage: message })
+                                setTimeout(() => this.setState({ snackMessage: null }), timeout)
+                            }
+                        }})
+                    )}
+                </div>
+            </Fade>
+			<Fade in={this.state.loaded < 1.0}>
+				<div style={{ position: 'absolute', width: '90%', marginLeft: '5%', marginRight: '5%', top: '50%' }}>
+					<LinearProgress
+                        variant="buffer"
+                        value={this.state.loaded * 100.0}
+                        valueBuffer={(this.state.loaded * 100.0) + (Math.random() * 5) + 2} />
+				</div>
+			</Fade>
         </div>
         <Dialog
             open={this.state.openProfile}
@@ -179,7 +208,20 @@ class NavigationLayout extends React.Component {
                 </Button>
             </DialogActions>
         </Dialog>
+		<Popover
+			open={false}
+			anchorEl={this.anchorEl}
+			anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+			transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
+			<Typography>The content of the Popover.</Typography>
+		</Popover>
+		<Snackbar
+			open={this.state.snackMessage !== null}
+			message={this.state.snackMessage || ''}
+			anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+			autoHideDuration={3000}
+			onRequestClose={() => this.setState({ userMsg: null })} />
     </div>
 }
 
-export default withRouter(NavigationLayout);
+export default withRouter(NavigationLayout)

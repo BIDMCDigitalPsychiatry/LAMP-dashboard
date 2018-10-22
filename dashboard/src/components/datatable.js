@@ -30,7 +30,7 @@ export class ObjectView extends React.Component {
     <Table>
         <TableBody>
             {this.displayKeys().map((key) =>
-                <TableRow key={key}>
+                <TableRow hover key={key}>
                     <TableCell style={{width:'20%'}}>
                         <Typography color="inherit" variant="body2">
                             {humanize(key)}
@@ -60,7 +60,7 @@ export class ArrayView extends React.Component {
         </TableHead>
         <TableBody>
         {this.props.value.map((row, index) => (
-            <TableRow key={index}>
+            <TableRow hover key={index}>
             {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
                 <ArrayView value={row[key]} />
             ) : (!!row[key]) && (typeof row[key] === 'object') ? (
