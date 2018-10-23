@@ -22,8 +22,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {saveAs} from 'file-saver'
 import JSZip from 'jszip'
 import JSZipUtils from 'jszip-utils'
-
-// TEST
+import {plotGallery} from '../components/scripts'
+import {plotArgs} from '../components/scripts'
 
 // The download URL for any given participant.
 const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
@@ -88,13 +88,13 @@ class Researcher extends React.Component {
         })
     }
 
-    saveScript = () => {
+    saveScript = (inputScript = this.state.scriptText, inputReqs = this.state.scriptReqs) => {
 		let { id } = this.props.match.params
 		if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
 		    id = LAMP.get_identity().id
 
-        var contents = this.state.scriptText
-        var reqs = this.state.scriptReqs.split(',')
+        var contents = inputScript
+        var reqs = inputReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: ''})
 
         LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', {
@@ -217,6 +217,37 @@ class Researcher extends React.Component {
                     value={this.state.scriptReqs}
                     onChange={(x) => this.setState({scriptReqs: x.target.value})}
                     autoFocus />
+                <Divider />
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[0],plotArgs)} color="primary">
+                    Game Score Accuracy
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[1],plotArgs)} color="primary">
+                    Game Score Means
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[2],plotArgs)} color="primary">
+                    Game Score Variance
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[3],plotArgs)} color="primary">
+                    Survey Score Means
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[4],plotArgs)} color="primary">
+                    Survey Time Means
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={() => this.saveScript(plotGallery[5],plotArgs)} color="primary">
+                    Correlation Matrix
+                </Button>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => this.setState({openVizEdit: false})} color="primary">
