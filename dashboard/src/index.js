@@ -11,7 +11,6 @@ import NavigationLayout from './components/navigation_layout.js';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {blue, red} from '@material-ui/core/colors';
-import './index.css';
 
 // Synchronously load CSS from a remote URL from within JS.
 document.loadCSS = (url) => {
@@ -124,12 +123,16 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                 {/* Route login, register, and logout. */}
                 <Route exact path="/login" render={props =>
                     !LAMP.get_identity() ?
-                    <Login /> :
+					<NavigationLayout noToolbar>
+						<Login />
+					</NavigationLayout> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/register" render={props =>
                     !LAMP.get_identity() ?
-                    <Register /> :
+					<NavigationLayout noToolbar>
+						<Register />
+					</NavigationLayout> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/logout" render={() => {
@@ -162,5 +165,5 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
             </Switch>
         </HashRouter>
     </MuiThemeProvider>
-    ), document.getElementById('root'))
+    ), document.body)
 })

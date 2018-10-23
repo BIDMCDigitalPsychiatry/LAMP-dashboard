@@ -8,17 +8,6 @@ import Button from '@material-ui/core/Button';
 import LAMP from '../lamp.js';
 import Grid from '@material-ui/core/Grid';
 
-const inputSubmitStyle = {
-    cursor: 'pointer',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    width: '100%',
-    opacity: 0,
-}
-
 const styles = theme => ({
     textField: {
         marginLeft: theme.spacing.unit,
@@ -30,11 +19,10 @@ class Login extends React.Component {
     state = {
         id: "",
         password: "",
-        errorText: ""
     }
 
     componentDidMount() {
-        document.title = "Login"
+		this.props.layout.setTitle('Login')
     }
 
     handleChange = (event) => {
@@ -42,8 +30,6 @@ class Login extends React.Component {
         const value = target.type === 'checkbox' ? target.checked : target.value
         const name = target.name
         this.setState({[name]: value})
-        if (this.state.errorText)
-            this.setState({errorText: ""})
     }
 
     handleSubmit = (event) => {
@@ -56,9 +42,7 @@ class Login extends React.Component {
             this.props.history.replace('/home')
         }).catch(err => {
             console.warn("error with auth request", err)
-            this.setState({
-                errorText: `error: ${err.message}`
-            })
+            this.props.layout.showMessage('' + err.message)
         })
     }
 
@@ -112,14 +96,18 @@ class Login extends React.Component {
                     style={{float: 'right', width: '45%'}}
                     onClick={this.handleSubmit}>
                     Login
-                    <input type="submit" style={inputSubmitStyle}/>
+                    <input type="submit" style={{
+						cursor: 'pointer',
+						position: 'absolute',
+						top: 0,
+						bottom: 0,
+						right: 0,
+						left: 0,
+						width: '100%',
+						opacity: 0,
+					}}/>
                 </Button>
             </form>
-            <Snackbar
-                open={this.state.errorText !== ""}
-                message={this.state.errorText}
-                autoHideDuration={2000}
-            />
         </Paper>
     </Grid></Grid>
 }

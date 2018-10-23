@@ -104,47 +104,51 @@ class NavigationLayout extends React.Component {
 
     render = () =>
     <div>
-        <AppBar position="static" style={{ background: 'transparent', boxShadow: 'none'}}>
-            <Toolbar>
-                <IconButton 
-                    onClick={this.props.history.goBack}
-                    color="default" 
-                    aria-label="Menu">
-                    <ArrowBack />
-                    {/*this.props.history.length > 2 ? 
+		{!!this.props.noToolbar ? <React.Fragment/> :
+			<AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
+				<Toolbar>
+					<IconButton
+						onClick={this.props.history.goBack}
+						color="default"
+						aria-label="Menu">
+						<ArrowBack/>
+						{/*this.props.history.length > 2 ?
                         <ArrowBack /> :
                         <MenuIcon />
-                    */}
-                </IconButton>
-                <Typography variant="title" color="default" style={{flexGrow: 1}}>
-                    {this.state.title}
-                </Typography>
-                <div>
-                    <IconButton color="default" buttonRef={(node) => { this.anchorEl = node }}>
-                        <Badge badgeContent={0} color="secondary">
-                            <NotificationsIcon />
-                        </Badge>
-                    </IconButton>
-                    <IconButton
-                        aria-owns={this.openPopover ? 'menu-appbar' : null}
-                        aria-haspopup="true"
-                        onClick={this.avatarSelect}
-                        color="default">
-                        <AccountCircle />
-                    </IconButton>
-                    <Menu
-                        id="menu-appbar"
-                        anchorEl={this.state.anchorElement}
-                        anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
-                        transformOrigin={{horizontal: 'right', vertical: 'top'}}
-                        open={this.state.openPopover}
-                        onClose={this.avatarClose} >
-                            <MenuItem onClick={this.openProfile}>Profile</MenuItem>
-                            <MenuItem onClick={this.goLogout}>Logout</MenuItem>
-                    </Menu>
-                </div>
-            </Toolbar>
-        </AppBar>
+                    	*/}
+					</IconButton>
+					<Typography variant="title" color="default" style={{flexGrow: 1}}>
+						{this.state.title}
+					</Typography>
+					<div>
+						<IconButton color="default" buttonRef={(node) => {
+							this.anchorEl = node
+						}}>
+							<Badge badgeContent={0} color="secondary">
+								<NotificationsIcon/>
+							</Badge>
+						</IconButton>
+						<IconButton
+							aria-owns={this.openPopover ? 'menu-appbar' : null}
+							aria-haspopup="true"
+							onClick={this.avatarSelect}
+							color="default">
+							<AccountCircle/>
+						</IconButton>
+						<Menu
+							id="menu-appbar"
+							anchorEl={this.state.anchorElement}
+							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+							transformOrigin={{horizontal: 'right', vertical: 'top'}}
+							open={this.state.openPopover}
+							onClose={this.avatarClose}>
+							<MenuItem onClick={this.openProfile}>Profile</MenuItem>
+							<MenuItem onClick={this.goLogout}>Logout</MenuItem>
+						</Menu>
+					</div>
+				</Toolbar>
+			</AppBar>
+		}
         <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
 			<Fade in={this.state.loaded >= 1.0}>
                 <div style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
