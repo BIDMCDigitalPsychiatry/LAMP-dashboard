@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="LAMP_DB" uuid="ef603ce3-f8ac-4958-8666-01ff2a60f5e9">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" family="MSSQL" exact-version="0.0" />
+    </data-source>
+  </component>
+</project>
