@@ -8,17 +8,6 @@ import Button from '@material-ui/core/Button';
 import LAMP from '../lamp.js';
 import Grid from '@material-ui/core/Grid';
 
-const inputSubmitStyle = {
-    cursor: 'pointer',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    width: '100%',
-    opacity: 0,
-}
-
 const styles = theme => ({
     textField: {
         marginLeft: theme.spacing.unit,
@@ -37,13 +26,11 @@ class Register extends React.Component {
         email: "",
         emailErrText: "",
         address: "",
-        addressErrText: "",
-        errorText: "",
-        errors: 0
+        addressErrText: ""
     }
 
     componentDidMount() {
-        document.title = "Register"
+        this.props.layout.setTitle('Register')
     }
 
     validator = {
@@ -97,16 +84,11 @@ class Register extends React.Component {
         if (!errored) {
             this.setState({[name+"ErrText"]: ""})
         }
-
-        if (this.state.errorText) {
-            this.setState({errorText: ""})
-        }
     }
 
     handleSubmit = (event) => {
-        event.preventDefault();
-
-        let errored = false;
+        event.preventDefault()
+        let errored = false
 
         Object.keys(this.validator).forEach((field) => {
             let erroredField = false
@@ -118,12 +100,8 @@ class Register extends React.Component {
                 }
             })
         })
-
-        if (errored) {
-            this.setState({
-                errorText: "Error: Still some fields to attend to"
-            })
-        }
+        if (errored)
+            return this.props.layout.showMessage('Not all fields are filled out!')
 
         LAMP.Participant.add({
             username: this.state.username,
@@ -136,12 +114,9 @@ class Register extends React.Component {
             state: this.state.state,
             zip: this.state.zip
         }).then(res => {
-            if (res['error'] !== undefined) {
-                this.setState({
-                    errorText: `Error: ${res['error']}`
-                })
-            }
-            else if (res['result']){
+            if (!!res['error'])
+                this.props.layout.showMessage(`Error: ${res['error']}`)
+            else if (res['result']) {
                 LAMP.Researcher.login({
                     username: this.state.username,
                     password: this.state.password
@@ -156,12 +131,9 @@ class Register extends React.Component {
                     this.props.history.replace('/login')
                 })
             }
-        })
-        .catch(err => {
+        }).catch(err => {
             console.warn("Error with auth request", err)
-            this.setState({
-                errorText: "Error: Please try again"
-            })
+            this.props.layout.showMessage('Error: please try again: ' + err.message + '.')
         })
     }
 
@@ -170,7 +142,7 @@ class Register extends React.Component {
     render = () => 
     <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
-            <h1 style={{ marginTop: '0.67em', marginBottom: 0 }}>Create an account.</h1>
+            <Typography variant="display4" style={{ fontWeight: 500 }}>Create an account.</Typography>
             <Typography variant="body2" color="primary" style={{ lineHeight: '0.5em', paddingLeft: 0 }}>
                 LAMP Researcher
             </Typography>
@@ -256,14 +228,18 @@ class Register extends React.Component {
                         style={{float: 'right', width: '45%'}}
                         onClick={this.handleSubmit}>
                         Register
-                        <input type="submit" style={inputSubmitStyle}/>
+                        <input type="submit" style={{
+							cursor: 'pointer',
+							position: 'absolute',
+							top: 0,
+							bottom: 0,
+							right: 0,
+							left: 0,
+							width: '100%',
+							opacity: 0,
+						}}/>
                     </Button>
                 </form>
-                <Snackbar
-                    open={this.state.errorText !== ""}
-                    message={this.state.errorText}
-                    autoHideDuration={2000}
-                    />
         </Paper>
     </Grid></Grid>
 }

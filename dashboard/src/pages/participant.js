@@ -33,7 +33,6 @@ import PublicIcon from '@material-ui/icons/Public';
 import PersonPinCircleIcon from '@material-ui/icons/PersonPinCircle';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import EventBus from 'eventing-bus'
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 
@@ -45,6 +44,18 @@ Object.defineProperty(Array.prototype, 'flat', {
       }, []);
     }
 });
+
+Object.defineProperty(Date, 'formatUTC', {
+	value: function(timestampUTC, formatObj) {
+		return (new Date(timestampUTC).toLocaleString('en-US', formatObj))
+	}
+});
+
+const hourOnlyDateFormat = {
+	timeZone: 'America/New_York',
+	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
+}
 
 class Participant extends React.Component {
     state = {
@@ -74,13 +85,9 @@ class Participant extends React.Component {
         }
     }
 
-    dateFormat = { 
-        timeZone: 'America/New_York', 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
-        hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
-    }
-
     componentWillMount() {
+		this.props.layout.pageLoading(false)
+
         let { id } = this.props.match.params
 		if (id === 'me' && (LAMP.auth || {type: null}).type === 'participant')
 		    id = LAMP.get_identity().id
@@ -88,7 +95,7 @@ class Participant extends React.Component {
 		    this.props.history.replace(`/`)
 			return
 		}
-        EventBus.publish("set_title", `Participant ${id}`)
+        this.props.layout.setTitle(`Participant ${id}`)
 
         // Load the Leaflet Maps API's CSS.
         document.loadCSS('https://unpkg.com/leaflet@1.3.4/dist/leaflet.css')
@@ -159,6 +166,7 @@ class Participant extends React.Component {
 
             // Update state now with the fetched & computed objects.
             this.setState({ timeline: timeline })
+			this.props.layout.pageLoading(true)
         })
     }
 
@@ -179,14 +187,12 @@ class Participant extends React.Component {
     requiresDetail = (event) => (event.event_type === 'result' && !!event.detail)
 
     //
-    timeOfDayTheme = (timestamp) => [
-        {palette: {type: 'dark', background: {paper: '#212121'}}},
-        {palette: {type: 'dark', background: {paper: '#303F9F'}}},
-        {palette: {type: 'light', background: {paper: '#FFAB00'}}},
-        {palette: {type: 'light', background: {paper: '#00E5FF'}}},
-        {palette: {type: 'dark', background: {paper: '#FF6D00'}}},
-        {palette: {type: 'dark', background: {paper: '#311B92'}}},
-    ][Math.floor(new Date(timestamp).getHours() / 4)]
+    timeOfDayTheme = (timestamp) => {
+        let hour = Math.floor(new Date(timestamp).getHours())
+        if (hour > 8 && hour < 18)
+            return {palette: {type: 'light', background: {paper: '#FFFFFF'}}}
+        else return {palette: {type: 'dark', background: {paper: '#212121'}}}
+    }
 
     geocode = (address) => {
         if (Array.isArray(address))
@@ -218,7 +224,7 @@ class Participant extends React.Component {
     render = () =>
     <div>
         {!this.state.attachment ? <div /> :
-        <Card style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+        <Card>
             <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
                 <Typography variant="title">Visualization</Typography>
             </Toolbar>
@@ -233,11 +239,11 @@ class Participant extends React.Component {
                 </Document>
             </div>
         </Card>}
+		<br />
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
             <Card style={{ 
-                    display: 'flex', justifyContent: 'space-between', 
-                    width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+                    display: 'flex', justifyContent: 'space-between' }}>
                 {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
                     <Map style={{ flex: 1 }}
                         center={(this.geocode(event.coordinates))} zoom={12}>
@@ -270,7 +276,7 @@ class Participant extends React.Component {
                         <ListItem>
                             <ListItemText 
                                 primaryTypographyProps={{variant: 'title'}}
-                                primary={new Date(event.timestamp).toLocaleString('en-US', this.dateFormat)} 
+                                primary={Date.formatUTC(event.timestamp, hourOnlyDateFormat)}
                                 secondary={
                                     slice.filter(x => x.event_type === 'fitness')
                                         .map(fit => fit.type.replace('_', ' ') + ': ' + fit.value)
@@ -313,9 +319,10 @@ class Participant extends React.Component {
                     ]).flat().filter(x => x)}
                 </List>
             </Card>
+            <br />
             </MuiThemeProvider>
         ])}
     </div>
 }
 
-export default withRouter(Participant);
+export default withRouter(Participant)

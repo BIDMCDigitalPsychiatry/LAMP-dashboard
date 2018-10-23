@@ -11,7 +11,6 @@ import NavigationLayout from './components/navigation_layout.js';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {blue, red} from '@material-ui/core/colors';
-import './index.css';
 
 // Synchronously load CSS from a remote URL from within JS.
 document.loadCSS = (url) => {
@@ -31,7 +30,7 @@ document.loadCSS = (url) => {
 }
 
 // Configure the UI theme settings.
-const theme = createMuiTheme({
+const theme = {
     palette: {
         primary: blue,
         secondary: red,
@@ -41,19 +40,69 @@ const theme = createMuiTheme({
     }, 
     ripple: {
         color: red,
-    }
-});
+    },
+	typography: {
+		display4: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 300,
+			fontSize: "3rem",
+			lineHeight: 1,
+			letterSpacing: "-0.01562em",
+		},
+		display3: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 300,
+			fontSize: "2.5rem",
+			lineHeight: 1,
+			letterSpacing: "-0.00833em",
+		},
+		display2: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "2rem",
+			lineHeight: 1.17,
+			letterSpacing: "0.00735em",
+		},
+		display1: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "1.5rem",
+			lineHeight: 1.33,
+			letterSpacing: "0em",
+		},
+		headline: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 400,
+			fontSize: "1.25rem",
+			lineHeight: 1.6,
+			letterSpacing: "0.0075em",
+		},
+		subheading: {
+			color: "rgba(0, 0, 0, 0.87)",
+			fontFamily: "\"Roboto\", \"Helvetica\", \"Arial\", sans-serif",
+			fontWeight: 500,
+			fontSize: "1rem",
+			lineHeight: 1.6,
+			letterSpacing: "0.0075em",
+		},
+	},
+};
 
 // Connect to the correct LAMP API server.
 LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').then(() => {
 
     // Load the Roboto fonts.
     document.loadCSS('https://fonts.googleapis.com/css?family=Roboto:300,400,500')
-    document.title = 'LAMP'    
+    document.title = 'LAMP'
 
     // Correctly route all pages based on available (LAMP) authorization.
     ReactDOM.render((
-    <MuiThemeProvider theme={theme}>
+    <MuiThemeProvider theme={createMuiTheme(theme)}>
         <HashRouter>
             <Switch>
 
@@ -74,12 +123,16 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
                 {/* Route login, register, and logout. */}
                 <Route exact path="/login" render={props =>
                     !LAMP.get_identity() ?
-                    <Login /> :
+					<NavigationLayout noToolbar>
+						<Login />
+					</NavigationLayout> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/register" render={props =>
                     !LAMP.get_identity() ?
-                    <Register /> :
+					<NavigationLayout noToolbar>
+						<Register />
+					</NavigationLayout> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/logout" render={() => {
@@ -91,26 +144,26 @@ LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').the
 				<Route exact path="/researcher" render={props =>
 					!LAMP.get_identity() ?
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Root {...props} />
                     </NavigationLayout>
 				} />
                 <Route exact path="/researcher/:id" render={props =>
                     !LAMP.get_identity() ?
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Researcher {...props} />
                     </NavigationLayout>
                 } />
                 <Route exact path="/participant/:id" render={props =>
                     !LAMP.get_identity() ? 
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Participant {...props} />
                     </NavigationLayout>
                 } />
             </Switch>
         </HashRouter>
     </MuiThemeProvider>
-    ), document.getElementById('root'))
+    ), document.body)
 })

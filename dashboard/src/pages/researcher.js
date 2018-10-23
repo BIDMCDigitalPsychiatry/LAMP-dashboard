@@ -7,7 +7,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import LAMP from '../lamp.js';
-import Snackbar from '@material-ui/core/Snackbar'
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -20,7 +19,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import EventBus from 'eventing-bus'
 import {saveAs} from 'file-saver'
 import JSZip from 'jszip'
 import JSZipUtils from 'jszip-utils'
@@ -29,16 +27,24 @@ import JSZipUtils from 'jszip-utils'
 const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
 const csv_url = (id, auth, export_type) => `http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
 
+const fullDateFormat = {
+	timeZone: 'America/New_York',
+	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+	hour: 'numeric', minute: 'numeric'
+}
+
 class Researcher extends React.Component {
     state = {
         openVizEdit: false,
         scriptText: '',
         scriptReqs: '',
-        userMsg: null,
-        data: []
+        data: [],
+        activities: null
     }
 
     async componentWillMount() {
+		this.props.layout.pageLoading(false)
+
 		let { id } = this.props.match.params
         if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
             id = LAMP.get_identity().id
@@ -48,9 +54,13 @@ class Researcher extends React.Component {
 		}
 
 		let obj = await LAMP.Researcher.view(id)
-        EventBus.publish("set_title", `Researcher ${obj[0].name}`)
+		this.props.layout.setTitle(`Researcher ${obj[0].name}`)
         let res = await LAMP.Participant.all_by_researcher(id)
 		this.setState({ data: res })
+		let actRes = await LAMP.Activity.all_by_researcher(id)
+		this.setState({ activities: actRes })
+
+		this.props.layout.pageLoading(true)
     }
 
     // Go to the drill-down view.
@@ -94,7 +104,7 @@ class Researcher extends React.Component {
 
     render = () =>
     <div>
-        <div style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+        <div>
             <Toolbar>
                 <Typography variant="body2" color="inherit" style={{flex: 1}}>
                     Visualization Editor
@@ -106,10 +116,10 @@ class Researcher extends React.Component {
                 </Button>
             </Toolbar>
         </div>
-        <Card style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+        <Card>
             <Toolbar>
                 <Typography variant="title" color="inherit" style={{flex: 1}}>
-                    All Participants
+                    Default Study
                 </Typography>
                 <Button
                     variant="outlined"
@@ -131,10 +141,10 @@ class Researcher extends React.Component {
                 </TableHead>
                 <TableBody>
                     {this.state.data.map((row, index) => (
-                        <TableRow key={index} onClick={(e) => this.rowSelect(index)}>
+                        <TableRow hover key={index} onClick={(e) => this.rowSelect(index)}>
                             <TableCell>{row.id}</TableCell>
                             <TableCell>{row.settings.study_code}</TableCell>
-                            <TableCell>{new Date(row.settings.last_login).toString()}</TableCell>
+                            <TableCell>{Date.formatUTC(row.settings.last_login, fullDateFormat)}</TableCell>
                             <TableCell>{row.settings.device_type}</TableCell>
                             <TableCell>
                                 <IconButton
@@ -148,6 +158,31 @@ class Researcher extends React.Component {
                 </TableBody>
             </Table>
         </Card>
+        <br />
+        <Card>
+            <Toolbar>
+                <Typography variant="title" color="inherit" style={{flex: 1}}>
+                    Activities
+                </Typography>
+            </Toolbar>
+            <Divider />
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Type</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {(this.state.activities || []).map((row, index) => (
+                        <TableRow hover key={index}>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell>{row.type}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </Card>
         <Dialog
             fullScreen
             open={this.state.openVizEdit}
@@ -156,28 +191,30 @@ class Researcher extends React.Component {
             <DialogTitle id="form-dialog-title">
                 Visualization Editor
             </DialogTitle>
+            <Divider />
             <DialogContent>
-            <DialogContentText>
-                Enter script contents and (comma-separated) requirements below.
-            </DialogContentText>
-            <TextField
-                id="outlined-multiline-flexible"
-                label="Script Contents"
-                style={{width: '100%', marginTop: '20px'}}
-                variant="outlined"
-                rowsMax="10"
-                value={this.state.scriptText}
-                onChange={(x) => this.setState({scriptText: x.target.value})}
-                autoFocus
-                multiline />
-            <TextField
-                id="outlined-multiline-flexible"
-                label="Script Requirements"
-                style={{width: '100%', marginTop: '20px'}}
-                variant="outlined"
-                value={this.state.scriptReqs}
-                onChange={(x) => this.setState({scriptReqs: x.target.value})}
-                autoFocus />
+                <br />
+                <DialogContentText>
+                    Enter script contents and (comma-separated) requirements below.
+                </DialogContentText>
+                <TextField
+                    id="outlined-multiline-flexible"
+                    label="Script Contents"
+                    style={{width: '100%', marginTop: '20px'}}
+                    variant="outlined"
+                    rowsMax="10"
+                    value={this.state.scriptText}
+                    onChange={(x) => this.setState({scriptText: x.target.value})}
+                    autoFocus
+                    multiline />
+                <TextField
+                    id="outlined-multiline-flexible"
+                    label="Script Requirements"
+                    style={{width: '100%', marginTop: '20px'}}
+                    variant="outlined"
+                    value={this.state.scriptReqs}
+                    onChange={(x) => this.setState({scriptReqs: x.target.value})}
+                    autoFocus />
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => this.setState({openVizEdit: false})} color="primary">
@@ -188,11 +225,6 @@ class Researcher extends React.Component {
                 </Button>
             </DialogActions>
         </Dialog>
-        <Snackbar
-            open={this.state.userMsg != null}
-            message={this.state.userMsg || ''}
-            autoHideDuration={3000}
-            onRequestClose={() => this.setState({userMsg: null})} />
     </div>
 }
 
