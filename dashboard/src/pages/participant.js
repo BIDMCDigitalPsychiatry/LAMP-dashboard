@@ -35,6 +35,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import VariableBarGraph from '../components/variable_bar_graph.js'
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -295,11 +296,11 @@ class Participant extends React.Component {
                                 this.state.selected.includes(event.id) ? 
                                 <ListItemIcon style={{marginRight: 0}}>
                                     <ExpandLessIcon />
-                                </ ListItemIcon> : 
+                                </ListItemIcon> :
                                 (!!event.summary || !!event.detail) ? 
                                 <ListItemIcon style={{marginRight: 0}}>
                                     <ExpandMoreIcon />
-                                </ ListItemIcon>  : 
+                                </ListItemIcon>  :
                                 <div />
                             }
                         </ListItem>, 
@@ -308,14 +309,8 @@ class Participant extends React.Component {
                             in={this.state.selected.includes(event.id)} 
                             timeout="auto" 
                             unmountOnExit>
-                            {
-                                (!!event.summary ? 
-                                <ArrayView value={[event.summary]} /> : 
-                                (!!event.detail ? 
-                                <ArrayView value={event.detail} /> :
-                                <div />))
-                            }
-                        </Collapse>, 
+								<VariableBarGraph />
+                        </Collapse>,
                     ]).flat().filter(x => x)}
                 </List>
             </Card>
