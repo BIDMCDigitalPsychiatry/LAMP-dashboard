@@ -1,0 +1,12 @@
+{
+	"AWSEBDockerrunVersion": 1,
+	"Image": {
+		"privileged": "true"
+	},
+	"Volumes": [
+		{
+			"HostDirectory": "/var/app/current",
+			"ContainerDirectory": "/var/www/html"
+		}
+	]
+}
