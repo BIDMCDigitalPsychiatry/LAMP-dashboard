@@ -15,7 +15,7 @@ trait LAMPDriver_v0_1 {
                 ]);
                 $pdo->exec('SET QUOTED_IDENTIFIER ON');
             } catch (PDOException $e) {
-                throw new LAMPException(log::err($e, 'PDO::__construct'), 500);
+                throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
             }
         }
         return $pdo;

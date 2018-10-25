@@ -259,21 +259,21 @@ class RScriptRunner implements ScriptRunner {
         // Build a new image with an inline Dockerfile unless one already exists.
         if (shell_exec('docker images -q r-lamp:latest 2> /dev/null') == "") {
             $logs .= shell_exec("
-                docker build -t r-lamp - 2>&1 <<- EOF
-                FROM rocker/r-apt:bionic
+				docker build -t r-lamp - 2>&1 <<- EOF
+				FROM rocker/r-apt:bionic
 
-                ## Install some useful prerequisites for most R packages.
-                RUN apt-get update -qq && \
-                    apt-get install -y r-cran-jsonlite libxml2-dev libcairo2-dev libssl-dev libcurl4-openssl-dev && \
-                    apt-get update -qq 
+				## Install some useful prerequisites for most R packages.
+				RUN apt-get update -qq && \
+					apt-get install -y r-cran-jsonlite libxml2-dev libcairo2-dev libssl-dev libcurl4-openssl-dev && \
+					apt-get update -qq 
 
-                ## Move default packages to share apt between containers, relink the installer.
-                RUN mv /usr/local/lib/R/site-library/* /usr/lib/R/library/ && \
-                    mv /usr/lib/R/site-library/* /usr/lib/R/library/ && \
-                    rm -f /usr/local/bin/install2.r && \
-                    ln -s /usr/lib/R/library/littler/examples/install2.r /usr/local/bin/install2.r
-                EOF
-            ");
+				## Move default packages to share apt between containers, relink the installer.
+				RUN mv /usr/local/lib/R/site-library/* /usr/lib/R/library/ && \
+					mv /usr/lib/R/site-library/* /usr/lib/R/library/ && \
+					rm -f /usr/local/bin/install2.r && \
+					ln -s /usr/lib/R/library/littler/examples/install2.r /usr/local/bin/install2.r
+				EOF
+			");
         }
 
         // Assemble list of all non-installed packages to ATTEMPT binary installation.
@@ -289,8 +289,7 @@ class RScriptRunner implements ScriptRunner {
             docker run --rm -dt \
                 --name $container_name \
                 $netstr \
-                --memory=256m \
-                --cpus=\".5\" \
+                --memory=2g \
                 -v $scratch_name:/src \
                 -v /src/lib-packages:/usr/local/lib/R/site-library \
                 -v /src/apt-packages:/usr/lib/R/site-library \
