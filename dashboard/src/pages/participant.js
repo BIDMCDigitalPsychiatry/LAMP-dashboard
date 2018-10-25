@@ -67,7 +67,7 @@ class Participant extends React.Component {
         selected: [],
 
         ping: null
-    }                 
+    }
 
     iconMap = {
         location: {
