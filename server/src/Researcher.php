@@ -3,7 +3,9 @@ require_once __DIR__ . '/LAMP.php';
 require_once __DIR__ . '/driver/v0.1/ResearcherDriver.php';
 
 /**
- * @OA\Schema()
+ * @OA\Schema(
+ *   description="A researcher using the LAMP platform.",
+ * )
  */
 class Researcher extends LAMP {
     use ResearcherDriverGET_v0_1;
@@ -12,34 +14,39 @@ class Researcher extends LAMP {
      * @OA\Property(
      *   ref="#/components/schemas/Identifier",
      *   x={"type"="#/components/schemas/Researcher"},
+     *   description="The self-referencing identifier to this object.",
      * )
      */
     public $id = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Attachments"
+     *   ref="#/components/schemas/Attachments",
+     *   description="External or out-of-line objects attached to this object.",
      * )
      */
     public $attachments = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The name of the researcher.",
      * )
      */
     public $name = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The email address of the researcher.",
      * )
      */
     public $email = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description="The physical address of the researcher.",
      * )
      */
     public $address = null;
@@ -50,7 +57,8 @@ class Researcher extends LAMP {
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
      *     x={"type"="#/components/schemas/Study"},
-     *   )
+     *   ),
+     *   description="The set of all studies conducted by the researcher.",
      * )
      */
     public $studies = null;
@@ -132,8 +140,8 @@ class Researcher extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Researcher"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get a single researcher, by an identifier.",
+     *   description="Get a single researcher, by an identifier.",
      *   @OA\Parameter(
      *     name="researcher_id",
      *     in="path",
@@ -172,8 +180,8 @@ class Researcher extends LAMP {
      *   x={"owner"={
      *     "$ref"="#/components/schemas/Researcher"}
      *   },
-     *   summary="",
-     *   description="",
+     *   summary="Get the set of all researchers.",
+     *   description="Get the set of all researchers.",
      *   @OA\Parameter(ref="#/components/parameters/Export"),
      *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),

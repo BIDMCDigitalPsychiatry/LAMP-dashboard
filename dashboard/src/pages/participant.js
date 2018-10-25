@@ -1,5 +1,7 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom';
+import ContainerDimensions from 'react-container-dimensions';
+import Heatmap from '../components/heatmap.js';
 import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
 import LAMP from '../lamp.js';
@@ -224,7 +226,12 @@ class Participant extends React.Component {
 
     render = () =>
     <div>
-        {!this.state.attachment ? <div /> :
+        <div>
+        <ContainerDimensions >
+            <Heatmap/>
+        </ContainerDimensions>
+        </div>
+            {!this.state.attachment ? <div /> :
         <Card>
             <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
                 <Typography variant="title">Visualization</Typography>
