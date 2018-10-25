@@ -1,7 +1,7 @@
 import React from 'react';
 import { Group } from '@vx/group';
 import { genBins } from '@vx/mock-data';
-import { scaleBand, scaleLinear } from '@vx/scale';
+import { scaleBand, scaleLinear, scaleTime } from '@vx/scale';
 import { HeatmapRect } from '@vx/heatmap';
 import { max } from 'd3-array';
 import { AxisBottom } from '@vx/axis';
@@ -45,7 +45,7 @@ export default withTooltip(({
     }
 
     let axisData = timelineData[1].filter((element, index) => {
-        return index % 5 === 0;
+        return (index % 5 === 0);
     })
 
     // bounds
@@ -55,7 +55,6 @@ export default withTooltip(({
     const bWidth = xMax / timelineData[0].length;
     const height = bWidth*1.5;
     const yMax = height;
-    const bHeight = yMax / maxBucketSize;
     const colorMax = max(timelineData[0], d => max(y(d), z));
 
     // scales
@@ -63,11 +62,16 @@ export default withTooltip(({
         range: [0, xMax],
         domain: [0, timelineData[0].length]
     });
-    const xAxisScale = scaleBand({
+    // const xAxisScale = scaleBand({
+    //     rangeRound: [0, xMax],
+    //     domain: axisData,
+    //     padding: 0.2,
+    //     tickFormat: () => val => new Date(val).toLocaleString('en-US', {weekday: 'short', day: '2-digit', month: '2-digit'})
+    // });
+
+    const xAxisScale = scaleTime({
         rangeRound: [0, xMax],
-        domain: axisData,
-        padding: 0.2,
-        tickFormat: () => val => new Date(val).toLocaleString('en-US', {weekday: 'short', day: '2-digit', month: '2-digit'})
+        domain: [Math.min.apply(null, timelineData[1]), Math.max.apply(null, timelineData[1])],
     });
 
     const yScale = scaleLinear({
@@ -75,7 +79,7 @@ export default withTooltip(({
         domain: [0, maxBucketSize]
     });
     const colorScale = scaleLinear({
-        range: ['#b4fbde', '#122549'],
+        range: ['#bfd5ff', '#122549'],
         domain: [0, colorMax]
     });
     const opacityScale = scaleLinear({
@@ -84,6 +88,7 @@ export default withTooltip(({
     });
 
     return (
+
         <div style={{ position: 'relative', height: '100%' }}>
             <svg width={width} height={'100%'}>
                 <HeatmapRect style={{cursor: 'pointer'}}

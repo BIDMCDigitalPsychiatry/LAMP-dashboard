@@ -89,12 +89,6 @@ class Participant extends React.Component {
         }
     }
 
-    dateFormat = { 
-        timeZone: 'America/New_York', 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
-        hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
-    }
-
     shortDateFormat = {
         timeZone: 'America/New_York',
         year: '2-digit', month: '2-digit', day: '2-digit',
@@ -186,7 +180,7 @@ class Participant extends React.Component {
     }
 
     handleClick = (event) => {
-        if (!this.requiresDetail(event)) 
+        if (!this.requiresDetail(event))
             return
 
         // Toggle the event ID from the state's selected list.
@@ -274,17 +268,12 @@ class Participant extends React.Component {
                 //console.log(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat)),
                 addValueToList(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat), 1),
                 addToDateArray(event.timestamp)
-
-                //console.log(event.timestamp)
             ])])
 
         if (dateArray.length > 0) {
-
             let startDate = new Date(Math.min(...dateArray))
             let endDate = new Date()
             var completeDateArray = getDateArray(startDate, endDate);
-            //console.log(completeDateArray[0].toLocaleString('en-US', this.shortDateFormat))
-
             for (var i = 0; i< completeDateArray.length; i++) {
                 if (completeDateArray[i].toLocaleString('en-US', this.shortDateFormat) in dateObjects) {
                     dataArray[i] = dateObjects[completeDateArray[i].toLocaleString('en-US', this.shortDateFormat)]
@@ -298,7 +287,9 @@ class Participant extends React.Component {
 
 
     render = () =>
+
     <div>
+        <Card style={{position: 'fixed',  width:'80%', zIndex:'99', height: 150, top: 100}}>
         <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
             <Typography variant="title">Timeline</Typography>
         </Toolbar>
@@ -307,6 +298,8 @@ class Participant extends React.Component {
                 <Timeline inputData={this.timelineData()}/>
             </ContainerDimensions>
         </div>
+        </Card>
+        <div style={{marginTop: 200}}/>
         {!this.state.attachment ? <div /> :
         <Card>
             <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
@@ -327,10 +320,11 @@ class Participant extends React.Component {
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
             <Card style={{ 
-                    display: 'flex', justifyContent: 'space-between' }}>
+                    display: 'flex', justifyContent: 'space-between'}}>
                 {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
-                    <Map style={{ flex: 1 }}
-                        center={(this.geocode(event.coordinates))} zoom={12}>
+                    <Map style={{ flex: 1, zIndex: 1 }}
+                        center={(this.geocode(event.coordinates))}
+                        zoom={12}>
                         <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
                         <Marker position={(this.geocode(event.coordinates))} />
                     </Map>
