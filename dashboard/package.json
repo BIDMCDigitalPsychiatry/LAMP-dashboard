@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "deploy": "aws s3 sync build/ `cat .s3config`"
+    "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
+    "deploy": "aws s3 sync build/ `echo $DASHBOARD_DEPLOY_S3_BUCKET`"
   }
 }

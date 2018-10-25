@@ -2,7 +2,14 @@
 <project version="4">
   <component name="dataSourceStorageLocal">
     <data-source name="LAMP_DB" uuid="ef603ce3-f8ac-4958-8666-01ff2a60f5e9">
-      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" family="MSSQL" exact-version="0.0" />
+      <database-info product="Microsoft SQL Server" version="13.00.4422" jdbc-version="4.2" driver-name="Microsoft JDBC Driver 7.0 for SQL Server" driver-version="7.0.0.0" family="MSSQL" exact-version="13.0.442">
+        <extra-name-characters>$#@</extra-name-characters>
+        <identifier-quote-string>&quot;</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="mixed" quoted-identifiers="mixed" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>lampadmin</user-name>
+      <introspection-schemas>LAMP:@|LAMP_Aux:@|LAMP_QA:@</introspection-schemas>
     </data-source>
   </component>
 </project>

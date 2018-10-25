@@ -94,7 +94,7 @@ const theme = {
 };
 
 // Connect to the correct LAMP API server.
-LAMP.connect('http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com').then(() => {
+LAMP.connect('http://lamp-api.us-east-2.elasticbeanstalk.com').then(() => {
 
     // Load the Roboto fonts.
     document.loadCSS('https://fonts.googleapis.com/css?family=Roboto:300,400,500')
