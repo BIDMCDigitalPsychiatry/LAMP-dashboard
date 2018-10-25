@@ -1,7 +1,7 @@
 import React from 'react'
+import Timeline from '../components/timeline.js';
 import { withRouter } from 'react-router-dom';
 import ContainerDimensions from 'react-container-dimensions';
-import Heatmap from '../components/heatmap.js';
 import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
 import LAMP from '../lamp.js';
@@ -38,6 +38,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import VariableBarGraph from '../components/variable_bar_graph.js'
+import Timeline_menu from '../components/timeline_menu';
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -86,6 +87,17 @@ class Participant extends React.Component {
             peers: <GroupIcon />, 
             crowd: <PublicIcon />
         }
+    }
+
+    dateFormat = { 
+        timeZone: 'America/New_York', 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
+        hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
+    }
+
+    shortDateFormat = {
+        timeZone: 'America/New_York',
+        year: '2-digit', month: '2-digit', day: '2-digit',
     }
 
     componentWillMount() {
@@ -224,14 +236,78 @@ class Participant extends React.Component {
         return [0, 0]
     }
 
+    timelineData = () => {
+
+        var dataArray = []
+        var dateArray = []
+        var dateObjects = {}
+
+        function addValueToList(key, value) {
+            //if the list is already created for the "key", then uses it
+            //else creates new list for the "key" to store multiple values in it.
+            dateObjects[key] = dateObjects[key] || [];
+            if (dateObjects[key] >= 1) {
+                dateObjects[key] = dateObjects[key] + value
+            } else {
+                dateObjects[key] = value
+            }
+        }
+
+        var getDateArray = function (start, end) {
+            var arr = new Array();
+            var dt = new Date(start);
+            while (dt <= end) {
+                arr.push(new Date(dt));
+                dt.setDate(dt.getDate() + 1);
+            }
+            return arr;
+        }
+
+        function addToDateArray(date) {
+            //if the list is already created for the "key", then uses it
+            //else creates new list for the "key" to store multiple values in it.
+            dateArray.push(date)
+        }
+
+        this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
+            slice.filter(x => x.event_type === 'result').map(event => [
+                //console.log(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat)),
+                addValueToList(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat), 1),
+                addToDateArray(event.timestamp)
+
+                //console.log(event.timestamp)
+            ])])
+
+        if (dateArray.length > 0) {
+
+            let startDate = new Date(Math.min(...dateArray))
+            let endDate = new Date()
+            var completeDateArray = getDateArray(startDate, endDate);
+            //console.log(completeDateArray[0].toLocaleString('en-US', this.shortDateFormat))
+
+            for (var i = 0; i< completeDateArray.length; i++) {
+                if (completeDateArray[i].toLocaleString('en-US', this.shortDateFormat) in dateObjects) {
+                    dataArray[i] = dateObjects[completeDateArray[i].toLocaleString('en-US', this.shortDateFormat)]
+                } else {
+                    dataArray[i] = 0
+                }
+            }
+        }
+        return [dataArray, completeDateArray]
+    }
+
+
     render = () =>
     <div>
+        <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
+            <Typography variant="title">Timeline</Typography>
+        </Toolbar>
         <div>
-        <ContainerDimensions >
-            <Heatmap/>
-        </ContainerDimensions>
+            <ContainerDimensions >
+                <Timeline inputData={this.timelineData()}/>
+            </ContainerDimensions>
         </div>
-            {!this.state.attachment ? <div /> :
+        {!this.state.attachment ? <div /> :
         <Card>
             <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
                 <Typography variant="title">Visualization</Typography>
