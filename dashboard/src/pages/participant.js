@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Timeline from '../components/timeline.js';
 import { withRouter } from 'react-router-dom';
 import ContainerDimensions from 'react-container-dimensions';
@@ -14,6 +15,7 @@ import Snackbar from '@material-ui/core/Snackbar'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -69,6 +71,8 @@ class Participant extends React.Component {
 
         ping: null
     }
+
+    cardRefs = {}
 
     iconMap = {
         location: {
@@ -180,6 +184,8 @@ class Participant extends React.Component {
             // Update state now with the fetched & computed objects.
             this.setState({ timeline: timeline })
 			this.props.layout.pageLoading(true)
+
+			this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => console.log(new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)))
         })
     }
 
@@ -289,18 +295,18 @@ class Participant extends React.Component {
 
 
     render = () =>
-
     <div>
-        <Card style={{position: 'fixed',  width:'80%', zIndex:'99', height: 150, top: 100}}>
-        <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-            <Typography variant="title">Timeline</Typography>
-        </Toolbar>
-        <div>
-            <ContainerDimensions >
-                <Timeline inputData={this.timelineData()}/>
-            </ContainerDimensions>
-        </div>
-        </Card>
+        <AppBar style={{ background: '#fff' }}>
+            <Timeline
+                style={{ paddingTop: 40 }}
+                inputData={this.timelineData()}
+                onClick={data => event => {
+                    let dateKey = this.timelineData()[1][data.datumIndex].toLocaleString('en-US', this.shortDateFormat);
+                    if (!!this.cardRefs[dateKey])
+                        ReactDOM.findDOMNode(this.cardRefs[dateKey]).scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+                }}
+            />
+        </AppBar>
         <div style={{marginTop: 200}}/>
         {!this.state.attachment ? <div /> :
         <Card>
@@ -321,8 +327,12 @@ class Participant extends React.Component {
 		<br />
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
-            <Card style={{ 
-                    display: 'flex', justifyContent: 'space-between'}}>
+            <Card
+                ref={ref => {
+                    let dateKey = new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)
+                    this.cardRefs[dateKey] = ref
+            }   }
+                style={{ display: 'flex', justifyContent: 'space-between' }}>
                 {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
                     <Map style={{ flex: 1, zIndex: 1 }}
                         center={(this.geocode(event.coordinates))}

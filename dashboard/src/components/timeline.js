@@ -7,6 +7,10 @@ import { max } from 'd3-array';
 import { AxisBottom } from '@vx/axis';
 import { timeParse, timeFormat } from 'd3-time-format';
 import { withTooltip, Tooltip } from '@vx/tooltip';
+import { withParentSize } from '@vx/responsive';
+import Card from '@material-ui/core/Card'
+import Typography from '@material-ui/core/Typography'
+
 
 // accessors
 const y = d => d.bins;
@@ -28,15 +32,19 @@ var defaultDateArray = function(start, end) {
 
 let tooltipTimeout;
 
-export default withTooltip(({
-                                width,
+export default withParentSize(withTooltip(({
+                                style,
+								parentWidth,
                                 inputData = [Array.from({length: 20}, (x,i) => i), defaultDateArray(startDate, endDate)],
+                                onClick,
                                 tooltipOpen,
                                 tooltipLeft,
                                 tooltipTop,
                                 tooltipData,
                                 hideTooltip,
                                 showTooltip}) => {
+
+    let width = parentWidth
 
     var timelineData = [[],[]]
     for (var i =0; i < inputData[0].length; i++) {
@@ -88,8 +96,7 @@ export default withTooltip(({
     });
 
     return (
-
-        <div style={{ position: 'relative', height: '100%' }}>
+        <div style={Object.assign({ ...style, position: 'relative', height: '100%' }, style || {})}>
             <svg width={width} height={'100%'}>
                 <HeatmapRect style={{cursor: 'pointer'}}
                              data={timelineData[0]}
@@ -100,22 +107,15 @@ export default withTooltip(({
                              binWidth={bWidth}
                              binHeight={bWidth}
                              gap={2}
-                             onClick={data => event => {
-                                 alert(`activities: ${JSON.stringify(data.bin['count'])}`);
-                             }}
-                             onMouseLeave={data => event => {
-                                 tooltipTimeout = setTimeout(() => {
-                                     hideTooltip();
-                                 }, 300);
-                             }}
+                             onClick={onClick}
+                             onMouseLeave={data => event => tooltipTimeout = setTimeout(hideTooltip, 300)}
                              onMouseMove={data => event => {
-                                 if (tooltipTimeout) clearTimeout(tooltipTimeout);
-                                 const top = event.clientY - 40 - data.height;
-                                 const left = xScale(data.datumIndex);
+                                 if (tooltipTimeout) clearTimeout(tooltipTimeout)
+                                 let box = event.target.getBoundingClientRect()
                                  showTooltip({
-                                     tooltipData: [timelineData[0][data.datumIndex],timelineData[1][data.datumIndex]],
-                                     tooltipTop: -yMax/2,
-                                     tooltipLeft: left
+                                     tooltipData: [timelineData[0][data.datumIndex], timelineData[1][data.datumIndex]],
+                                     tooltipTop: box.y + box.height,
+                                     tooltipLeft: box.x
                                  });
                              }}
                 />
@@ -133,25 +133,17 @@ export default withTooltip(({
                 />
             </svg>
             {tooltipOpen && (
-                <Tooltip
-                    top={tooltipTop}
-                    left={tooltipLeft}
-                    style={{
-                        minWidth: 60,
-                        backgroundColor: 'rgba(0,0,0,0.9)',
-                        color: 'white'
-                    }}
-                >
-                    <div style={{ color: 'white' }}>
-                        <strong>{`Activities Completed: ${tooltipData[0].bins[0]['count']}`}</strong>
-                    </div>
-                    <div>
-                        <small>{new Date(tooltipData[1]).toLocaleString('en-US', {
+                <Card elevation={20} style={{ position: 'absolute', top: tooltipTop, left: tooltipLeft, padding: '.5rem', minWidth: 60 }}>
+                    <Typography variant="title">
+                        {`Activities Completed: ${tooltipData[0].bins[0]['count']}`}
+                    </Typography>
+                    <Typography variant="body2">
+                        {new Date(tooltipData[1]).toLocaleString('en-US', {
                             timeZone: 'America/New_York', year: '2-digit', month: '2-digit', day: '2-digit',
-                        })}</small>
-                    </div>
-                </Tooltip>
+                        })}
+                    </Typography>
+                </Card>
             )}
         </div>
     );
-});
+}));
