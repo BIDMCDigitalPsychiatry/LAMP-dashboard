@@ -185,7 +185,7 @@ class Participant extends React.Component {
             this.setState({ timeline: timeline })
 			this.props.layout.pageLoading(true)
 
-			this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => console.log(new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)))
+			//this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => console.log(new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)))
         })
     }
 
