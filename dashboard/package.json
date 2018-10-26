@@ -10,11 +10,13 @@
   "dependencies": {
     "@material-ui/core": "^3.0.3",
     "@material-ui/icons": "^3.0.1",
+    "@material-ui/lab": "^3.0.0-alpha.21",
     "eventing-bus": "^1.3.3",
     "file-saver": "^1.3.8",
     "jszip": "^3.1.5",
     "jszip-utils": "0.0.2",
     "leaflet": "^1.3.4",
+    "list-react-files": "^0.2.0",
     "mui-datatables": "^2.0.0-beta-31",
     "react": "^16.5.1",
     "react-animated-tree": "^1.0.8",
@@ -22,7 +24,9 @@
     "react-event-timeline": "^1.5.4",
     "react-leaflet": "^2.0.1",
     "react-pdf": "^3.0.5",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "react-toggle-switch": "^3.0.4",
+    "walk": "^2.3.14"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
