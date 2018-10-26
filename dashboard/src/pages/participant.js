@@ -117,6 +117,7 @@ class Participant extends React.Component {
             this.setState({ attachment: exists ? res.output.replace(/\s/g, '') : null })
         })
 
+
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
         var p2 = LAMP.Result.all_by_participant(id)
@@ -130,6 +131,9 @@ class Participant extends React.Component {
                 event_type: 'result',
                 timestamp: x.start_time,
                 duration: x.end_time - x.start_time,
+                activity_type: (
+                        x.activity === null ? null : res[0].find(y => x.activity === y.id).type
+                ),
                 name: (
                     x.activity === null ? 
                     x.static_data.survey_name :
@@ -258,8 +262,6 @@ class Participant extends React.Component {
         }
 
         function addToDateArray(date) {
-            //if the list is already created for the "key", then uses it
-            //else creates new list for the "key" to store multiple values in it.
             dateArray.push(date)
         }
 
@@ -386,7 +388,7 @@ class Participant extends React.Component {
                             in={this.state.selected.includes(event.id)} 
                             timeout="auto" 
                             unmountOnExit>
-								<VariableBarGraph />
+								<VariableBarGraph data={event}/>
                         </Collapse>,
                     ]).flat().filter(x => x)}
                 </List>
