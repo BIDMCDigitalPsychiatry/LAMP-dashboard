@@ -10,6 +10,7 @@ import LAMP from '../lamp.js';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
+import VisGallery from '../components/vis_gallery'
 import AttachmentIcon from '@material-ui/icons/Attachment';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -23,6 +24,10 @@ import {saveAs} from 'file-saver'
 import JSZip from 'jszip'
 import JSZipUtils from 'jszip-utils'
 
+//
+// import {plotGallery} from '../components/gallery_plots/base_script'
+// import {plotArgs} from '../components/gallery_plots/base_script'
+
 // The download URL for any given participant.
 const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
 const csv_url = (id, auth, export_type) => `http://lampapi-env.persbissfu.us-east-2.elasticbeanstalk.com/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
@@ -33,13 +38,69 @@ const fullDateFormat = {
 	hour: 'numeric', minute: 'numeric'
 }
 
+// Connect to Lamp-scripts
+const rootURL = 'https://api.github.com/repos/BIDMCDigitalPsychiatry/LAMP-scripts/contents'
+const baseURL = 'https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-scripts/master'
+const docPages = async () => {
+    const fetchIndex = async (path) => await (await fetch(rootURL + (!!path ? '/' + path : ''))).json()
+    const fetchPage = async (path) => await (await fetch(baseURL + '/' + path)).text()
+    const recursiveFetchIndex = async (path) => (await Promise.all(
+        (await fetchIndex(path)).map(async x => {
+            if (x.type === 'dir') {
+                return await Promise.all(await recursiveFetchIndex(x.path))
+            } else if (!x.path.endsWith('.md') && x.type === 'file') {
+                return [x]
+            } else return []
+        }).flat(1000)
+    )).flat(1000)
+    const recursiveFetchPage = async (path) => (await Promise.all(
+        (await recursiveFetchIndex(path)).map(async x =>
+            [x.path, await fetchPage(x.path)]
+        )
+    )).reduce((p, c) => {p[c[0]]=c[1];return p;}, {})
+    return recursiveFetchPage()
+}
+
+const plotParse = (script_sources) => {
+    //Create Object mapping plot to [example_image, script, script_reqs]
+    var plot_info = {}
+    for (var key in script_sources) {
+        var split_key = key.split('/')
+        var plot_type = split_key[0]
+        var file_name = split_key[1]
+        //initialize property array
+        if (!(plot_type in plot_info)) {
+            plot_info[plot_type] = [null, null, null]
+        }
+        //Place thing in (plot, script, reqs) order
+        if (file_name.split('.')[1] === ('png')) {
+            plot_info[plot_type][0] = baseURL + '/' + key
+        }
+        else if (file_name.split('.')[1] === ('r')) {
+            plot_info[plot_type][1] = script_sources[key]
+        }
+        else if (file_name.split('.')[1] === ('json')) {
+            plot_info[plot_type][2] = script_sources[key]
+        }
+    }
+    //Convert Object to Array
+    var plot_info_array = []
+    for (var plot in plot_info) {
+        plot_info_array.push(plot_info[plot])
+    }
+    return plot_info_array
+}
+
+//
 class Researcher extends React.Component {
     state = {
         openVizEdit: false,
         scriptText: '',
         scriptReqs: '',
         data: [],
-        activities: null
+        activities: null,
+        plot_toggle: null,
+        plot_sources: null
     }
 
     async componentWillMount() {
@@ -59,6 +120,13 @@ class Researcher extends React.Component {
 		this.setState({ data: res })
 		let actRes = await LAMP.Activity.all_by_researcher(id)
 		this.setState({ activities: actRes })
+
+        const script_sources = await docPages() //Get information from Lamp-scripts
+        const plot_sources = plotParse(script_sources)
+        this.setState({
+            plot_sources: plot_sources,
+            plot_toggle: plot_sources.map((key) => false)
+        })
 
 		this.props.layout.pageLoading(true)
     }
@@ -86,20 +154,41 @@ class Researcher extends React.Component {
         })
     }
 
-    saveScript = () => {
+    //Read Lamp-script and determine script and pictures
+    parseSources = () => {
+
+    }
+
+    saveScript = (inputScript = this.state.scriptText, inputReqs = this.state.scriptReqs) => {
 		let { id } = this.props.match.params
 		if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
 		    id = LAMP.get_identity().id
 
-        var contents = this.state.scriptText
-        var reqs = this.state.scriptReqs.split(',')
-        this.setState({openVizEdit: false, scriptText: '', scriptReqs: ''})
+        var contents = inputScript
+        var reqs = inputReqs.split(',')
+        this.setState({openVizEdit: false, scriptText: '', scriptReqs: '', toggled_scripts:[]})
 
-        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', {
+        //Iterate through selected images in gallery
+        var i = 1; // counter for viz naming
+        var j; // for indexing plot list
+        for (j = 0; j < this.state.plot_toggle.length; j++) {
+            if (this.state.plot_toggle[j]) {
+                // Set attachment
+                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
+                    "script_type": "rscript",
+                    "script_contents": this.state.plot_sources[j][1],
+                    "script_requirements": this.state.plot_sources[j][2].replace(/(\r\n\t|\n|\r\t)/gm,"").split(",")
+                }, {untyped: true})
+
+                i += 1
+            }
+        }
+
+        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
-        }, {untyped: true}).then(x => console.log(x))
+        })
     }
 
     render = () =>
@@ -215,6 +304,19 @@ class Researcher extends React.Component {
                     value={this.state.scriptReqs}
                     onChange={(x) => this.setState({scriptReqs: x.target.value})}
                     autoFocus />
+                <Divider />
+                <div>
+                    <Divider />
+                    <Typography variant="title">
+                        Image Gallery
+                    </Typography>
+                    <Typography gutter variant="body2">
+                        Choose visualizations by toggling buttons
+                    </Typography>
+                    <VisGallery
+                        value={this.state.plot_sources}
+                        onChange={(switch_list) => this.setState({plot_toggle: switch_list})} />
+                </div>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => this.setState({openVizEdit: false})} color="primary">

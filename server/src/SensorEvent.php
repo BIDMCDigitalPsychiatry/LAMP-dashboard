@@ -2,7 +2,9 @@
 require_once __DIR__ . '/LAMP.php';
 
 /**
- * @OA\Schema()
+ * @OA\Schema(
+ *   description=""
+ * )
  */
 class SensorEvent extends LAMP {
     use LAMPDriver_v0_1;
@@ -11,34 +13,39 @@ class SensorEvent extends LAMP {
      * @OA\Property(
      *   ref="#/components/schemas/Identifier",
      *   x={"type"="#/components/schemas/SensorEvent"},
+     *   description=""
      * )
      */
     public $id = null;
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Attachments"
+     *   ref="#/components/schemas/Attachments",
+     *   description=""
      * )
      */
     public $attachments = null;
 
     /** 
      * @OA\Property(
-     *   type="string"
+     *   type="string",
+     *   description=""
      * )
      */
     public $sensor_name = null; 
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/Timestamp"
+     *   ref="#/components/schemas/Timestamp",
+     *   description=""
      * )
      */
     public $timestamp = null;
 
     /** 
      * @OA\Property(
-     *   @OA\Schema(@OA\AdditionalProperties())
+     *   @OA\Schema(@OA\AdditionalProperties()),
+     *   description=""
      * )
      */
     public $data = null;

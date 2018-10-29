@@ -3,6 +3,9 @@
 # Sublime Projects
 *.sublime-*
 
+.DS_Store
+*/.DS_Store
+
 # IntelliJ IDEA
 .idea/dataSources/
 .idea/workspace.xml
