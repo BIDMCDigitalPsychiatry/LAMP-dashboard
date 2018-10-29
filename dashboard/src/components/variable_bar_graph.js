@@ -5,6 +5,7 @@ import { scaleBand, scaleLinear, scaleTime } from '@vx/scale';
 import { extent, max } from 'd3-array';
 import { withParentSize } from '@vx/responsive';
 import { withTooltip } from '@vx/tooltip';
+import { withTheme } from '@material-ui/core';
 import Card from '@material-ui/core/Card'
 import Typography from '@material-ui/core/Typography'
 
@@ -13,7 +14,7 @@ const x = d => d.item;
 
 let tooltipTimeout;
 
-export default withParentSize(withTooltip(props => {
+export default withTheme()(withParentSize(withTooltip(props => {
 	let width = props.width || props.parentWidth
 	let height = props.height || props.parentHeight
 
@@ -52,18 +53,18 @@ export default withParentSize(withTooltip(props => {
 						height={x.y}
 						x={data.slice(0, i).reduce((a, b) => a + b.x + (i > 0 ? padding : 0), 0)}
 						y={(maxValue - x.y)}
-						fill="#b7b7b7"
+						fill={(props.theme.palette.type || 'light') === 'light' ? '#212121' : '#ffffff'}
 						data={x}
 						onClick={data => event => {
 							alert(`clicked: ${JSON.stringify(data)}`)
 						}}
-                        onMouseLeave={data => event => tooltipTimeout = setTimeout(hideTooltip, 300)}
-                        onMouseMove={data => event => {
-                            if (tooltipTimeout) clearTimeout(tooltipTimeout)
+						onMouseLeave={data => event => tooltipTimeout = setTimeout(hideTooltip, 300)}
+						onMouseMove={data => event => {
+							if (tooltipTimeout) clearTimeout(tooltipTimeout)
                             let box = event.target.getBoundingClientRect()
                             showTooltip({
                                 tooltipData: props.data.detail[i].item,
-                                tooltipTop: box.y + box.height,
+                                tooltipTop: box.y + box.height + 16,
                                 tooltipLeft: box.x
                             });
                         }}
@@ -72,15 +73,15 @@ export default withParentSize(withTooltip(props => {
 			</Group>
 		</svg>
     {tooltipOpen && (
-        <Card elevation={20} style={{top: tooltipTop, left: tooltipLeft, padding: '.5rem', minWidth: 60 }}>
+        <Card elevation={20} style={{position: 'fixed', zIndex: 1, top: tooltipTop, left: tooltipLeft, padding: '.3rem', minWidth: 60 }}>
             <Typography variant="title">
-                {`Target/Question: `}
+				{tooltipData}
             </Typography>
             <Typography variant="body2">
-                {tooltipData}
+				{`Target / Question`}
             </Typography>
         </Card>
     )}
 		</div>
 	)
-}))
+})))

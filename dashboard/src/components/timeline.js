@@ -9,6 +9,7 @@ import { timeParse, timeFormat } from 'd3-time-format';
 import { withTooltip, Tooltip } from '@vx/tooltip';
 import { withParentSize } from '@vx/responsive';
 import Card from '@material-ui/core/Card'
+import Divider from '@material-ui/core/Divider'
 import Typography from '@material-ui/core/Typography'
 
 
@@ -43,7 +44,6 @@ export default withParentSize(withTooltip(({
                                 tooltipData,
                                 hideTooltip,
                                 showTooltip}) => {
-
     let width = parentWidth
 
     var timelineData = [[],[]]
@@ -52,36 +52,20 @@ export default withParentSize(withTooltip(({
         timelineData[1][i] = inputData[1][i]
     }
 
-    let axisData = timelineData[1].filter((element, index) => {
-        return (index % 5 === 0);
-    })
-
-    // bounds
-    const size = width;
-    const xMax = size;
-    const maxBucketSize = max(timelineData[0], d => y(d).length);
+    const xMax = width;
     const bWidth = xMax / timelineData[0].length;
-    const height = bWidth*1.5;
-    const yMax = height;
+    const yMax = bWidth * 1.5;
+	const maxBucketSize = max(timelineData[0], d => y(d).length);
     const colorMax = max(timelineData[0], d => max(y(d), z));
 
-    // scales
     const xScale = scaleLinear({
         range: [0, xMax],
         domain: [0, timelineData[0].length]
     });
-    // const xAxisScale = scaleBand({
-    //     rangeRound: [0, xMax],
-    //     domain: axisData,
-    //     padding: 0.2,
-    //     tickFormat: () => val => new Date(val).toLocaleString('en-US', {weekday: 'short', day: '2-digit', month: '2-digit'})
-    // });
-
     const xAxisScale = scaleTime({
         rangeRound: [0, xMax],
         domain: [Math.min.apply(null, timelineData[1]), Math.max.apply(null, timelineData[1])],
     });
-
     const yScale = scaleLinear({
         range: [yMax, 0],
         domain: [0, maxBucketSize]
@@ -96,8 +80,8 @@ export default withParentSize(withTooltip(({
     });
 
     return (
-        <div style={Object.assign({ ...style, position: 'relative', height: '100%' }, style || {})}>
-            <svg width={width} height={'100%'}>
+        <div style={Object.assign({ ...style, position: 'relative', overflow: 'scroll'}, style || {})}>
+            <svg width={width} height={bWidth * 4}>
                 <HeatmapRect style={{cursor: 'pointer'}}
                              data={timelineData[0]}
                              xScale={xScale}
@@ -114,7 +98,7 @@ export default withParentSize(withTooltip(({
                                  let box = event.target.getBoundingClientRect()
                                  showTooltip({
                                      tooltipData: [timelineData[0][data.datumIndex], timelineData[1][data.datumIndex]],
-                                     tooltipTop: box.y + box.height,
+                                     tooltipTop: box.y + box.height + 16,
                                      tooltipLeft: box.x
                                  });
                              }}
@@ -133,7 +117,7 @@ export default withParentSize(withTooltip(({
                 />
             </svg>
             {tooltipOpen && (
-                <Card elevation={20} style={{ position: 'absolute', top: tooltipTop, left: tooltipLeft, padding: '.5rem', minWidth: 60 }}>
+                <Card elevation={20} style={{ position: 'fixed', zIndex: 1, top: tooltipTop, left: tooltipLeft, padding: '.3rem', minWidth: 60 }}>
                     <Typography variant="title">
                         {`Activities Completed: ${tooltipData[0].bins[0]['count']}`}
                     </Typography>

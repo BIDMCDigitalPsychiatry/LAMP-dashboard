@@ -76,20 +76,20 @@ class Participant extends React.Component {
 
     iconMap = {
         location: {
-            home: <HomeIcon width={64} height={64} />, 
-            school: <SchoolIcon width={64} height={64} />, 
-            work: <WorkIcon width={64} height={64} />, 
-            hospital: <HospitalIcon width={64} height={64} />, 
-            outside: <OutsideIcon width={64} height={64} />, 
-            shopping: <ShoppingIcon width={64} height={64} />, 
-            transit: <TransitIcon width={64} height={64} /> 
+            home: <HomeIcon style={{fontSize: '64px'}} />,
+            school: <SchoolIcon style={{fontSize: '64px'}} />,
+            work: <WorkIcon style={{fontSize: '64px'}} />,
+            hospital: <HospitalIcon style={{fontSize: '64px'}} />,
+            outside: <OutsideIcon style={{fontSize: '64px'}} />,
+            shopping: <ShoppingIcon style={{fontSize: '64px'}} />,
+            transit: <TransitIcon style={{fontSize: '64px'}} />
         },
         social: {
-            alone: <FaceIcon />, 
-            friends: <GroupIcon />, 
-            family: <GroupIcon />, 
-            peers: <GroupIcon />, 
-            crowd: <PublicIcon />
+            alone: <FaceIcon style={{fontSize: '64px'}} />,
+            friends: <GroupIcon style={{fontSize: '64px'}} />,
+            family: <GroupIcon style={{fontSize: '64px'}} />,
+            peers: <GroupIcon style={{fontSize: '64px'}} />,
+            crowd: <PublicIcon style={{fontSize: '64px'}} />
         }
     }
 
@@ -296,16 +296,22 @@ class Participant extends React.Component {
 
     render = () =>
     <div>
-        <AppBar style={{ background: '#fff' }}>
-            <Timeline
-                style={{ paddingTop: 40 }}
-                inputData={this.timelineData()}
-                onClick={data => event => {
-                    let dateKey = this.timelineData()[1][data.datumIndex].toLocaleString('en-US', this.shortDateFormat);
-                    if (!!this.cardRefs[dateKey])
-                        ReactDOM.findDOMNode(this.cardRefs[dateKey]).scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
-                }}
-            />
+        <AppBar style={{ background: '#fafafa' }}>
+            <div style={{ padding: '32px 10px 0px 10px' }}>
+                <Timeline
+                    inputData={this.timelineData()}
+                    onClick={data => event => {
+                        let dateKey = this.timelineData()[1][data.datumIndex].toLocaleString('en-US', this.shortDateFormat);
+                        if (!!this.cardRefs[dateKey]) {
+                            let element = ReactDOM.findDOMNode(this.cardRefs[dateKey])
+
+                            // First scroll it into view, then scroll it into the center of the viewport by offset.
+							element.scrollIntoView(true)
+							var viewportH = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+							window.scrollBy(0, (element.getBoundingClientRect().height - viewportH) / 2)
+                        }
+                    }} />
+            </div>
         </AppBar>
         <div style={{marginTop: 200}}/>
         {!this.state.attachment ? <div /> :
@@ -345,18 +351,14 @@ class Participant extends React.Component {
                     {[slice.find(x => !!x.location_context)].map(event =>
                         <Tooltip title={!event ? 'home' : event.location_context}>
                             <ListItem dense disableGutters>
-                                <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.location[!event ? 'home' : event.location_context]}
-                                </ListItemIcon>
+                                <ListItemIcon>{this.iconMap.location[!event ? 'home' : event.location_context]}</ListItemIcon>
                             </ListItem>
                         </Tooltip>
                     )}
                     {[slice.find(x => !!x.social_context)].map(event => 
                         <Tooltip title={!event ? 'alone' : event.social_context}>
                             <ListItem dense disableGutters>
-                                <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.social[!event ? 'alone' : event.social_context]}
-                                </ListItemIcon>
+                                <ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.social_context]}</ListItemIcon>
                             </ListItem>
                         </Tooltip>
                     )}
