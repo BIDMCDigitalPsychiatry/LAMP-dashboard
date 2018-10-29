@@ -2,16 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Timeline from '../components/timeline.js';
 import { withRouter } from 'react-router-dom';
-import ContainerDimensions from 'react-container-dimensions';
-import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
 import LAMP from '../lamp.js';
-import DataTable from '../components/datatable.js'
-import { ArrayView } from '../components/datatable.js'
 import { TransitIcon, HospitalIcon, HomeIcon, OutsideIcon, SchoolIcon, ShoppingIcon, WorkIcon } from '../components/lamp_icons.js'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-import Snackbar from '@material-ui/core/Snackbar'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -22,27 +17,17 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import CreateIcon from '@material-ui/icons/Create';
-import AttachmentIcon from '@material-ui/icons/Attachment';
-import HomeIcon2 from '@material-ui/icons/Home';
-import SchoolIcon2 from '@material-ui/icons/School';
-import WorkIcon2 from '@material-ui/icons/Work';
-import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
-import LocationCityIcon from '@material-ui/icons/LocationCity';
-import RestaurantIcon from '@material-ui/icons/Restaurant';
-import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
 import FaceIcon from '@material-ui/icons/Face';
 import GroupIcon from '@material-ui/icons/Group';
 import PublicIcon from '@material-ui/icons/Public';
-import PersonPinCircleIcon from '@material-ui/icons/PersonPinCircle';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import VariableBarGraph from '../components/variable_bar_graph.js'
-import Timeline_menu from '../components/timeline_menu';
 import Grid from "@material-ui/core/Grid/Grid";
-import Switch from "@material-ui/core/Switch/Switch";
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -71,6 +56,7 @@ class Participant extends React.Component {
         attachments: [],
         selected: [],
 
+		zoomLevel: 4, // default grid setting for plots!
         ping: null
     }
 
@@ -122,10 +108,7 @@ class Participant extends React.Component {
             if (res.hasOwnProperty('log'))
                 console.log(res.log)
             return (exists ? res.output.replace(/\s/g, '') : null)
-        })).then(res => this.setState({attachments:res})).then(res => console.log(this.state.attachments))
-
-
-
+        })).then(res => this.setState({attachments:res}))
 
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
@@ -189,8 +172,6 @@ class Participant extends React.Component {
             // Update state now with the fetched & computed objects.
             this.setState({ timeline: timeline })
 			this.props.layout.pageLoading(true)
-
-			//this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => console.log(new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)))
         })
     }
 
@@ -278,7 +259,6 @@ class Participant extends React.Component {
 
         this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             slice.filter(x => x.event_type === 'result').map(event => [
-                //console.log(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat)),
                 addValueToList(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat), 1),
                 addToDateArray(event.timestamp)
             ])])
@@ -297,7 +277,6 @@ class Participant extends React.Component {
         }
         return [dataArray, completeDateArray]
     }
-
 
     render = () =>
     <div>
@@ -318,29 +297,52 @@ class Participant extends React.Component {
                     }} />
             </div>
         </AppBar>
-        <div style={{marginTop: 200}}/>
-        {!this.state.attachment ? <div /> :
-        <Card>
-            <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-                <Typography variant="title">Visualization</Typography>
-            </Toolbar>
-        {!this.state.attachments ? <div /> : this.state.attachments.filter(Boolean).map(attach => (
-            <Card>
-                <div style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-                    <Document
-                        file={'data:application/pdf;base64,' + attach}
-                        error={<Typography variant="body2" color="error">
-                            Visualization error occurred.
-                        </Typography>}
-                        loading="">
-                        <Page renderMode="svg" pageIndex={0} />
-                    </Document>
-                </div>
-            </Card>)
-            )
-        }
-        </Grid>
-		<br />
+        <div style={{marginTop: 112}} />
+		{!this.state.attachments ? <div/> :
+			<React.Fragment>
+				<Toolbar>
+					<Typography gutterBottom variant="display3">Visualizations</Typography>
+                    <div style={{ flexGrow: 1 }} />
+					<Typography variant="body2" style={{marginRight: 16}}>
+						Zoom
+					</Typography>
+					<ToggleButtonGroup value={this.state.zoomLevel} exclusive onChange={(e, x) => this.setState({ zoomLevel: x })}>
+						<ToggleButton value={3}>1</ToggleButton>
+						<ToggleButton value={4}>2</ToggleButton>
+						<ToggleButton value={6}>3</ToggleButton>
+						<ToggleButton value={12}>4</ToggleButton>
+					</ToggleButtonGroup>
+                </Toolbar>
+				<br />
+                <Grid
+                    container
+                    direction="row"
+                    justify="space-around"
+                    alignItems="stretch"
+                    spacing={32}>
+                    {!this.state.attachments ? <div/> : this.state.attachments.filter(Boolean).map(attach =>
+                        <Grid item xs={this.state.zoomLevel}>
+                            <Card style={{ padding: '.3rem' }}>
+                                <Document
+                                    file={'data:application/pdf;base64,' + attach}
+                                    error={
+                                        <Typography variant="body2" color="error">
+                                            Visualization error occurred.
+                                        </Typography>
+                                    }
+                                    loading="">
+                                    <Page renderMode="svg" pageIndex={0}/>
+                                </Document>
+                            </Card>
+                        </Grid>
+                    )}
+				</ Grid>
+			</React.Fragment>
+		}
+        <Divider style={{ marginTop: 32, marginBottom: 32 }} />
+		<Toolbar>
+			<Typography gutterBottom variant="display3">Timeline</Typography>
+		</Toolbar>
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
             <Card

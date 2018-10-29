@@ -1,8 +1,6 @@
 import React from 'react';
 import { Bar } from '@vx/shape';
 import { Group } from '@vx/group';
-import { scaleBand, scaleLinear, scaleTime } from '@vx/scale';
-import { extent, max } from 'd3-array';
 import { withParentSize } from '@vx/responsive';
 import { withTooltip } from '@vx/tooltip';
 import { withTheme } from '@material-ui/core';

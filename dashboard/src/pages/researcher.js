@@ -121,11 +121,14 @@ class Researcher extends React.Component {
 		let actRes = await LAMP.Activity.all_by_researcher(id)
 		this.setState({ activities: actRes })
 
-		this.props.layout.pageLoading(true)
-
         const script_sources = await docPages() //Get information from Lamp-scripts
-        this.setState({plot_sources:plotParse(script_sources)})
-        this.setState({plot_toggle:this.state.plot_sources.map((key) => false)})
+        const plot_sources = plotParse(script_sources)
+        this.setState({
+            plot_sources: plot_sources,
+            plot_toggle: plot_sources.map((key) => false)
+        })
+
+		this.props.layout.pageLoading(true)
     }
 
     // Go to the drill-down view.
@@ -175,7 +178,7 @@ class Researcher extends React.Component {
                     "script_type": "rscript",
                     "script_contents": this.state.plot_sources[j][1],
                     "script_requirements": this.state.plot_sources[j][2].replace(/(\r\n\t|\n|\r\t)/gm,"").split(",")
-                }, {untyped: true}).then(x => console.log(x))
+                }, {untyped: true})
 
                 i += 1
             }

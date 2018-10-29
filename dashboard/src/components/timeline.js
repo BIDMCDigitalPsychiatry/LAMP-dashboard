@@ -1,17 +1,12 @@
 import React from 'react';
-import { Group } from '@vx/group';
-import { genBins } from '@vx/mock-data';
-import { scaleBand, scaleLinear, scaleTime } from '@vx/scale';
+import { scaleLinear, scaleTime } from '@vx/scale';
 import { HeatmapRect } from '@vx/heatmap';
 import { max } from 'd3-array';
 import { AxisBottom } from '@vx/axis';
-import { timeParse, timeFormat } from 'd3-time-format';
-import { withTooltip, Tooltip } from '@vx/tooltip';
+import { withTooltip } from '@vx/tooltip';
 import { withParentSize } from '@vx/responsive';
 import Card from '@material-ui/core/Card'
-import Divider from '@material-ui/core/Divider'
 import Typography from '@material-ui/core/Typography'
-
 
 // accessors
 const y = d => d.bins;
