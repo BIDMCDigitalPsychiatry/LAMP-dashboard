@@ -41,6 +41,8 @@ import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import VariableBarGraph from '../components/variable_bar_graph.js'
 import Timeline_menu from '../components/timeline_menu';
+import Grid from "@material-ui/core/Grid/Grid";
+import Switch from "@material-ui/core/Switch/Switch";
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -66,7 +68,7 @@ const hourOnlyDateFormat = {
 class Participant extends React.Component {
     state = {
         timeline: [],
-        attachment: null,
+        attachments: [],
         selected: [],
 
         ping: null
@@ -114,12 +116,15 @@ class Participant extends React.Component {
         document.loadCSS('https://unpkg.com/leaflet@1.3.4/dist/leaflet.css')
 
         // Fetch attachments first since they will take the longest.
-        LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', undefined, { untyped: true }).then(res => {
+        Promise.all([...Array(10).keys()].map(async i => {
+            let res = await LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
             var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
             if (res.hasOwnProperty('log'))
-                console.error(res.log)
-            this.setState({ attachment: exists ? res.output.replace(/\s/g, '') : null })
-        })
+                console.log(res.log)
+            return (exists ? res.output.replace(/\s/g, '') : null)
+        })).then(res => this.setState({attachments:res})).then(res => console.log(this.state.attachments))
+
+
 
 
         // Fetch all participant-related data streams.
@@ -319,17 +324,22 @@ class Participant extends React.Component {
             <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
                 <Typography variant="title">Visualization</Typography>
             </Toolbar>
-            <div style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-                <Document 
-                    file={'data:application/pdf;base64,' + this.state.attachment}
-                    error={<Typography variant="body2" color="error">
-                        Visualization error occurred.
-                    </Typography>}
-                    loading="">
-                    <Page renderMode="svg" pageIndex={0} />
-                </Document>
-            </div>
-        </Card>}
+        {!this.state.attachments ? <div /> : this.state.attachments.filter(Boolean).map(attach => (
+            <Card>
+                <div style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
+                    <Document
+                        file={'data:application/pdf;base64,' + attach}
+                        error={<Typography variant="body2" color="error">
+                            Visualization error occurred.
+                        </Typography>}
+                        loading="">
+                        <Page renderMode="svg" pageIndex={0} />
+                    </Document>
+                </div>
+            </Card>)
+            )
+        }
+        </Grid>
 		<br />
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
