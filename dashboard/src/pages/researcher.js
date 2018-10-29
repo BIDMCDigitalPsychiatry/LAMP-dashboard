@@ -126,7 +126,6 @@ class Researcher extends React.Component {
         const script_sources = await docPages() //Get information from Lamp-scripts
         this.setState({plot_sources:plotParse(script_sources)})
         this.setState({plot_toggle:this.state.plot_sources.map((key) => false)})
-        console.log(this.state.plot_toggle)
     }
 
     // Go to the drill-down view.
@@ -166,16 +165,31 @@ class Researcher extends React.Component {
         var reqs = inputReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: '', toggled_scripts:[]})
 
-        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', {
+        //Iterate through selected images in gallery
+        var i = 1; // counter for viz naming
+        var j; // for indexing plot list
+        for (j = 0; j < this.state.plot_toggle.length; j++) {
+            if (this.state.plot_toggle[j]) {
+                // Set attachment
+                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
+                    "script_type": "rscript",
+                    "script_contents": this.state.plot_sources[j][1],
+                    "script_requirements": this.state.plot_sources[j][2].replace(/(\r\n\t|\n|\r\t)/gm,"").split(",")
+                }, {untyped: true}).then(x => console.log(x))
+
+                i += 1
+            }
+        }
+
+        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
-        }, {untyped: true}).then(x => console.log(x))
+        })
     }
 
     render = () =>
     <div>
-        {/*{console.log(this.state.sources)}*/}
         <div>
             <Toolbar>
                 <Typography variant="body2" color="inherit" style={{flex: 1}}>
