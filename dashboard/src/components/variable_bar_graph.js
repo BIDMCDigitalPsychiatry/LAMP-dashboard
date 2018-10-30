@@ -38,7 +38,7 @@ export default withTheme()(withParentSize(withTooltip(props => {
 	let widthScale = !!width ? (width / totalWidth) : 1.0
 	let heightScale = !!height ? (height / maxValue) : 1.0
 
-	data = props.data.activity_type === "game" ? data.map(x => ({ x: x.elapsed_time * widthScale, y: x.item * heightScale })) : data.map(x => ({ x: x.elapsed_time * widthScale, y: x.value * heightScale }))
+	data = props.data.activity_type === "game" ? data.map(x => ({ x: x.elapsed_time * widthScale, y: x.item * heightScale })) : data.map(x => ({ x: x.elapsed_time * widthScale, y: (x.value + 1) * heightScale }))
 	maxValue *= heightScale
 
 	return (
@@ -46,7 +46,7 @@ export default withTheme()(withParentSize(withTooltip(props => {
 		<svg width="100%" height="100%">
 			<Group>
 				{data.map((x, i) =>
-					<Bar
+                    <Bar
 						width={x.x}
 						height={x.y}
 						x={data.slice(0, i).reduce((a, b) => a + b.x + (i > 0 ? padding : 0), 0)}
@@ -54,8 +54,9 @@ export default withTheme()(withParentSize(withTooltip(props => {
 						fill={(props.theme.palette.type || 'light') === 'light' ? '#212121' : '#ffffff'}
 						data={x}
 						onClick={data => event => {
-							alert(`clicked: ${JSON.stringify(data)}`)
-						}}
+                            props.data.activity_type === "game" ? alert(`value: ${JSON.stringify(props.data.detail[i].item)}`) : alert(`value: ${JSON.stringify(props.data.detail[i].value)}`)
+
+                        }}
 						onMouseLeave={data => event => tooltipTimeout = setTimeout(hideTooltip, 300)}
 						onMouseMove={data => event => {
 							if (tooltipTimeout) clearTimeout(tooltipTimeout)
