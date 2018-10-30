@@ -8,6 +8,7 @@ import Root from './pages/root.js';
 import Researcher from './pages/researcher.js';
 import Participant from './pages/participant.js';
 import NavigationLayout from './components/navigation_layout.js';
+import CssBaseline from '@material-ui/core/CssBaseline';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {blue, red} from '@material-ui/core/colors';
@@ -103,6 +104,7 @@ LAMP.connect('http://lamp-api.us-east-2.elasticbeanstalk.com').then(() => {
     // Correctly route all pages based on available (LAMP) authorization.
     ReactDOM.render((
     <MuiThemeProvider theme={createMuiTheme(theme)}>
+		<CssBaseline />
         <HashRouter>
             <Switch>
 

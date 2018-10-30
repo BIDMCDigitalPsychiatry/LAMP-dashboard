@@ -1,40 +1,33 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
+import Timeline from '../components/timeline.js';
 import { withRouter } from 'react-router-dom';
-import classNames from 'classnames';
 import Card from '@material-ui/core/Card';
 import LAMP from '../lamp.js';
-import DataTable from '../components/datatable.js'
-import { ArrayView } from '../components/datatable.js'
 import { TransitIcon, HospitalIcon, HomeIcon, OutsideIcon, SchoolIcon, ShoppingIcon, WorkIcon } from '../components/lamp_icons.js'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-import Snackbar from '@material-ui/core/Snackbar'
 import Typography from '@material-ui/core/Typography'
 import Tooltip from '@material-ui/core/Tooltip';
 import Toolbar from '@material-ui/core/Toolbar';
+import AppBar from '@material-ui/core/AppBar';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
-import CreateIcon from '@material-ui/icons/Create';
-import AttachmentIcon from '@material-ui/icons/Attachment';
-import HomeIcon2 from '@material-ui/icons/Home';
-import SchoolIcon2 from '@material-ui/icons/School';
-import WorkIcon2 from '@material-ui/icons/Work';
-import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
-import LocationCityIcon from '@material-ui/icons/LocationCity';
-import RestaurantIcon from '@material-ui/icons/Restaurant';
-import DirectionsCarIcon from '@material-ui/icons/DirectionsCar';
 import FaceIcon from '@material-ui/icons/Face';
 import GroupIcon from '@material-ui/icons/Group';
 import PublicIcon from '@material-ui/icons/Public';
-import PersonPinCircleIcon from '@material-ui/icons/PersonPinCircle';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Document, Page } from 'react-pdf'
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import VariableBarGraph from '../components/variable_bar_graph.js'
+import Grid from "@material-ui/core/Grid/Grid";
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 
 // FIXME: Stubbed code for .flat() which is a new func...
 Object.defineProperty(Array.prototype, 'flat', {
@@ -60,29 +53,37 @@ const hourOnlyDateFormat = {
 class Participant extends React.Component {
     state = {
         timeline: [],
-        attachment: null,
+        attachments: [],
         selected: [],
 
+		zoomLevel: 4, // default grid setting for plots!
         ping: null
-    }                 
+    }
+
+    cardRefs = {}
 
     iconMap = {
         location: {
-            home: <HomeIcon width={64} height={64} />, 
-            school: <SchoolIcon width={64} height={64} />, 
-            work: <WorkIcon width={64} height={64} />, 
-            hospital: <HospitalIcon width={64} height={64} />, 
-            outside: <OutsideIcon width={64} height={64} />, 
-            shopping: <ShoppingIcon width={64} height={64} />, 
-            transit: <TransitIcon width={64} height={64} /> 
+            home: <HomeIcon style={{fontSize: '64px'}} />,
+            school: <SchoolIcon style={{fontSize: '64px'}} />,
+            work: <WorkIcon style={{fontSize: '64px'}} />,
+            hospital: <HospitalIcon style={{fontSize: '64px'}} />,
+            outside: <OutsideIcon style={{fontSize: '64px'}} />,
+            shopping: <ShoppingIcon style={{fontSize: '64px'}} />,
+            transit: <TransitIcon style={{fontSize: '64px'}} />
         },
         social: {
-            alone: <FaceIcon />, 
-            friends: <GroupIcon />, 
-            family: <GroupIcon />, 
-            peers: <GroupIcon />, 
-            crowd: <PublicIcon />
+            alone: <FaceIcon style={{fontSize: '64px'}} />,
+            friends: <GroupIcon style={{fontSize: '64px'}} />,
+            family: <GroupIcon style={{fontSize: '64px'}} />,
+            peers: <GroupIcon style={{fontSize: '64px'}} />,
+            crowd: <PublicIcon style={{fontSize: '64px'}} />
         }
+    }
+
+    shortDateFormat = {
+        timeZone: 'America/New_York',
+        year: '2-digit', month: '2-digit', day: '2-digit',
     }
 
     componentWillMount() {
@@ -101,12 +102,13 @@ class Participant extends React.Component {
         document.loadCSS('https://unpkg.com/leaflet@1.3.4/dist/leaflet.css')
 
         // Fetch attachments first since they will take the longest.
-        LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', undefined, { untyped: true }).then(res => {
+        Promise.all([...Array(10).keys()].map(async i => {
+            let res = await LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
             var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
             if (res.hasOwnProperty('log'))
-                console.error(res.log)
-            this.setState({ attachment: exists ? res.output.replace(/\s/g, '') : null })
-        })
+                console.log(res.log)
+            return (exists ? res.output.replace(/\s/g, '') : null)
+        })).then(res => this.setState({attachments:res}))
 
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
@@ -121,6 +123,9 @@ class Participant extends React.Component {
                 event_type: 'result',
                 timestamp: x.start_time,
                 duration: x.end_time - x.start_time,
+                activity_type: (
+                        x.activity === null ? null : res[0].find(y => x.activity === y.id).type
+                ),
                 name: (
                     x.activity === null ? 
                     x.static_data.survey_name :
@@ -171,7 +176,7 @@ class Participant extends React.Component {
     }
 
     handleClick = (event) => {
-        if (!this.requiresDetail(event)) 
+        if (!this.requiresDetail(event))
             return
 
         // Toggle the event ID from the state's selected list.
@@ -221,32 +226,135 @@ class Participant extends React.Component {
         return [0, 0]
     }
 
+    timelineData = () => {
+
+        var dataArray = []
+        var dateArray = []
+        var dateObjects = {}
+
+        function addValueToList(key, value) {
+            //if the list is already created for the "key", then uses it
+            //else creates new list for the "key" to store multiple values in it.
+            dateObjects[key] = dateObjects[key] || [];
+            if (dateObjects[key] >= 1) {
+                dateObjects[key] = dateObjects[key] + value
+            } else {
+                dateObjects[key] = value
+            }
+        }
+
+        var getDateArray = function (start, end) {
+            var arr = new Array();
+            var dt = new Date(start);
+            while (dt <= end) {
+                arr.push(new Date(dt));
+                dt.setDate(dt.getDate() + 1);
+            }
+            return arr;
+        }
+
+        function addToDateArray(date) {
+            dateArray.push(date)
+        }
+
+        this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
+            slice.filter(x => x.event_type === 'result').map(event => [
+                addValueToList(new Date(event.timestamp).toLocaleString('en-US', this.shortDateFormat), 1),
+                addToDateArray(event.timestamp)
+            ])])
+
+        if (dateArray.length > 0) {
+            let startDate = new Date(Math.min(...dateArray))
+            let endDate = new Date()
+            var completeDateArray = getDateArray(startDate, endDate);
+            for (var i = 0; i< completeDateArray.length; i++) {
+                if (completeDateArray[i].toLocaleString('en-US', this.shortDateFormat) in dateObjects) {
+                    dataArray[i] = dateObjects[completeDateArray[i].toLocaleString('en-US', this.shortDateFormat)]
+                } else {
+                    dataArray[i] = 0
+                }
+            }
+        }
+        return [dataArray, completeDateArray]
+    }
+
     render = () =>
     <div>
-        {!this.state.attachment ? <div /> :
-        <Card>
-            <Toolbar style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-                <Typography variant="title">Visualization</Typography>
-            </Toolbar>
-            <div style={{ display: 'flex', justifyContent:'center', alignItems:'center' }}>
-                <Document 
-                    file={'data:application/pdf;base64,' + this.state.attachment}
-                    error={<Typography variant="body2" color="error">
-                        Visualization error occurred.
-                    </Typography>}
-                    loading="">
-                    <Page renderMode="svg" pageIndex={0} />
-                </Document>
+        <AppBar style={{ background: '#fafafa' }}>
+            <div style={{ padding: '32px 10px 0px 10px' }}>
+                <Timeline
+                    inputData={this.timelineData()}
+                    onClick={data => event => {
+                        let dateKey = this.timelineData()[1][data.datumIndex].toLocaleString('en-US', this.shortDateFormat);
+                        if (!!this.cardRefs[dateKey]) {
+                            let element = ReactDOM.findDOMNode(this.cardRefs[dateKey])
+
+                            // First scroll it into view, then scroll it into the center of the viewport by offset.
+							element.scrollIntoView(true)
+							var viewportH = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+							window.scrollBy(0, (element.getBoundingClientRect().height - viewportH) / 2)
+                        }
+                    }} />
             </div>
-        </Card>}
-		<br />
+        </AppBar>
+        <div style={{marginTop: 112}} />
+		{!this.state.attachments ? <div/> :
+			<React.Fragment>
+				<Toolbar>
+					<Typography gutterBottom variant="display3">Visualizations</Typography>
+                    <div style={{ flexGrow: 1 }} />
+					<Typography variant="body2" style={{marginRight: 16}}>
+						Zoom
+					</Typography>
+					<ToggleButtonGroup value={this.state.zoomLevel} exclusive onChange={(e, x) => this.setState({ zoomLevel: x })}>
+						<ToggleButton value={3}>1</ToggleButton>
+						<ToggleButton value={4}>2</ToggleButton>
+						<ToggleButton value={6}>3</ToggleButton>
+						<ToggleButton value={12}>4</ToggleButton>
+					</ToggleButtonGroup>
+                </Toolbar>
+				<br />
+                <Grid
+                    container
+                    direction="row"
+                    justify="space-around"
+                    alignItems="stretch"
+                    spacing={32}>
+                    {!this.state.attachments ? <div/> : this.state.attachments.filter(Boolean).map(attach =>
+                        <Grid item xs={this.state.zoomLevel}>
+                            <Card style={{ padding: '.3rem' }}>
+                                <Document
+                                    file={'data:application/pdf;base64,' + attach}
+                                    error={
+                                        <Typography variant="body2" color="error">
+                                            Visualization error occurred.
+                                        </Typography>
+                                    }
+                                    loading="">
+                                    <Page renderMode="svg" pageIndex={0}/>
+                                </Document>
+                            </Card>
+                        </Grid>
+                    )}
+				</ Grid>
+			</React.Fragment>
+		}
+        <Divider style={{ marginTop: 32, marginBottom: 32 }} />
+		<Toolbar>
+			<Typography gutterBottom variant="display3">Timeline</Typography>
+		</Toolbar>
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
-            <Card style={{ 
-                    display: 'flex', justifyContent: 'space-between' }}>
+            <Card
+                ref={ref => {
+                    let dateKey = new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)
+                    this.cardRefs[dateKey] = ref
+            }   }
+                style={{ display: 'flex', justifyContent: 'space-between' }}>
                 {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
-                    <Map style={{ flex: 1 }}
-                        center={(this.geocode(event.coordinates))} zoom={12}>
+                    <Map style={{ flex: 1, zIndex: 1 }}
+                        center={(this.geocode(event.coordinates))}
+                        zoom={12}>
                         <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
                         <Marker position={(this.geocode(event.coordinates))} />
                     </Map>
@@ -255,18 +363,14 @@ class Participant extends React.Component {
                     {[slice.find(x => !!x.location_context)].map(event =>
                         <Tooltip title={!event ? 'home' : event.location_context}>
                             <ListItem dense disableGutters>
-                                <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.location[!event ? 'home' : event.location_context]}
-                                </ListItemIcon>
+                                <ListItemIcon>{this.iconMap.location[!event ? 'home' : event.location_context]}</ListItemIcon>
                             </ListItem>
                         </Tooltip>
                     )}
                     {[slice.find(x => !!x.social_context)].map(event => 
                         <Tooltip title={!event ? 'alone' : event.social_context}>
                             <ListItem dense disableGutters>
-                                <ListItemIcon style={{fontSize: '64px'}}>
-                                    {this.iconMap.social[!event ? 'alone' : event.social_context]}
-                                </ListItemIcon>
+                                <ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.social_context]}</ListItemIcon>
                             </ListItem>
                         </Tooltip>
                     )}
@@ -295,11 +399,11 @@ class Participant extends React.Component {
                                 this.state.selected.includes(event.id) ? 
                                 <ListItemIcon style={{marginRight: 0}}>
                                     <ExpandLessIcon />
-                                </ ListItemIcon> : 
+                                </ListItemIcon> :
                                 (!!event.summary || !!event.detail) ? 
                                 <ListItemIcon style={{marginRight: 0}}>
                                     <ExpandMoreIcon />
-                                </ ListItemIcon>  : 
+                                </ListItemIcon>  :
                                 <div />
                             }
                         </ListItem>, 
@@ -308,14 +412,8 @@ class Participant extends React.Component {
                             in={this.state.selected.includes(event.id)} 
                             timeout="auto" 
                             unmountOnExit>
-                            {
-                                (!!event.summary ? 
-                                <ArrayView value={[event.summary]} /> : 
-                                (!!event.detail ? 
-                                <ArrayView value={event.detail} /> :
-                                <div />))
-                            }
-                        </Collapse>, 
+								<VariableBarGraph data={event}/>
+                        </Collapse>,
                     ]).flat().filter(x => x)}
                 </List>
             </Card>

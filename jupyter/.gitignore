@@ -3,3 +3,6 @@
 # Jupyter
 *.ipynb_checkpoints
 __pycache__
+
+# IntelliJ IDEA
+*.iml

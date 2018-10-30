@@ -7,3 +7,6 @@ build
 
 # AWS S3 Config
 .s3config
+
+# IntelliJ IDEA
+*.iml
