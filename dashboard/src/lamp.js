@@ -66,7 +66,7 @@ export default class LAMP {
         // Parse all remote declared types and transform them into local classes.
         for (let sys in api.components.schemas) {
             let obj = api.components.schemas[sys]
-            let t = eval(`(class ${sys} extends LAMP {})`)
+            let t = eval(`(function() { function ${sys} () {}; ${sys}.prototype = Object.create(LAMP.prototype); return ${sys}; })()`)
 
             // Convert properties to null keys and endpoints to static methods. 
             Object.entries(obj.properties || {}).forEach(prop => {

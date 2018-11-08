@@ -33,7 +33,6 @@ const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),
 const csv_url = (id, auth, export_type) => `http://lamp-api.us-east-2.elasticbeanstalk.com/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
 
 const fullDateFormat = {
-	timeZone: 'America/New_York',
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
 	hour: 'numeric', minute: 'numeric'
 }

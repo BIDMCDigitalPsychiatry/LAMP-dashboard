@@ -167,5 +167,5 @@ LAMP.connect('http://lamp-api.us-east-2.elasticbeanstalk.com').then(() => {
             </Switch>
         </HashRouter>
     </MuiThemeProvider>
-    ), document.body)
+    ), document.getElementById('root'))
 })
