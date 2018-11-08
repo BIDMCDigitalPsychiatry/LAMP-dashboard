@@ -40,12 +40,12 @@ Object.defineProperty(Array.prototype, 'flat', {
 
 Object.defineProperty(Date, 'formatUTC', {
 	value: function(timestampUTC, formatObj) {
+	    formatObj.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 		return (new Date(timestampUTC).toLocaleString('en-US', formatObj))
 	}
 });
 
 const hourOnlyDateFormat = {
-	timeZone: 'America/New_York',
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
 	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
 }
@@ -82,7 +82,6 @@ class Participant extends React.Component {
     }
 
     shortDateFormat = {
-        timeZone: 'America/New_York',
         year: '2-digit', month: '2-digit', day: '2-digit',
     }
 
