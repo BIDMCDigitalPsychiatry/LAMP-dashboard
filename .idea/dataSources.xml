@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="LAMP_DB" read-only="true" uuid="ef603ce3-f8ac-4958-8666-01ff2a60f5e9">
+    <data-source source="LOCAL" name="LAMP_DB" uuid="ef603ce3-f8ac-4958-8666-01ff2a60f5e9">
       <driver-ref>sqlserver.ms</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
