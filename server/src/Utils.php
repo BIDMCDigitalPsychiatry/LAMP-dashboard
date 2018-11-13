@@ -159,7 +159,7 @@ class Dynamics {
         if ($transpose === true) {
             foreach ($list as $key => $value)
                 fputcsv($stream, array_merge([$key], (array)$value));
-        } else {
+        } else if (count($list) > 0) {
 
             // Since un-transposed is actually illogical from PHP's perspective,
             // put the keys row first, and then transpose the values of the list.

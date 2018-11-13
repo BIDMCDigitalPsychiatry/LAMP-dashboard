@@ -93,7 +93,7 @@ class LAMP {
                 return Flight::yaml(LAMP::$api_index->toYaml());
             return Flight::render('api_explorer.template.php', [
                 'document_title' => 'LAMP API Explorer',
-                'document_location' => ('http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . '/?format=json'),
+                'document_location' => ('https://' . $_SERVER['HTTP_HOST'] . '/?format=json'),
             ]);
     	});
 
@@ -196,41 +196,43 @@ class LAMP {
         return explode(':', $header, 2);
     }
 
-    // AES265 encryption using the DB_CRYPT_HIPAA constant, as used by the LAMP DB currently.
-    // If the data could not be encrypted or is invalid, returns `null`.
-    // If default is NOT false, the input data is returned instead of null.
-    // Mode may be 'hipaa' or 'oauth' depending on usage. See docs.
-    // AES256 encryption using DB_CRYPT_OAUTH for passwords; uses CBC+IV instead of ECB.
-    public static function encrypt($data, $default = false, $mode = 'hipaa') {
-        if ($mode === 'hipaa') {
-            if ($data === null) return null;
-            $x = openssl_encrypt($data, 'aes-256-ecb', DB_CRYPT_HIPAA);
-            return $x === false ? ($default === false ? null : $data) : $x; 
-        } else if ($mode === 'oauth') {
-            return null; // TODO
-        } else return null;
-    }
+	// AES265 encryption using the DB_CRYPT_HIPAA constant, as used by the LAMP DB currently.
+	// If the data could not be encrypted or is invalid, returns `null`.
+	// If default is NOT false, the input data is returned instead of null.
+	// Mode may be 'hipaa' or 'oauth' depending on usage. See docs.
+	// AES256 encryption using DB_CRYPT_OAUTH for passwords; uses CBC+IV instead of ECB.
+	public static function encrypt($data, $default = false, $mode = 'hipaa') {
+		if ($mode === 'hipaa' && $data !== null) {
+			$x = openssl_encrypt($data, 'aes-256-ecb', DB_CRYPT_HIPAA);
+			return $x === false ? ($default === false ? null : $data) : $x;
+		} else if ($mode === 'oauth' && $data !== null) {
+			$data = mb_convert_encoding($data, 'utf-16le', 'utf-8');
+			$ivl = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+			$x = openssl_encrypt($data, 'aes-256-cbc', hex2bin(DB_CRYPT_OAUTH),
+				OPENSSL_RAW_DATA, $ivl);
+			$x = base64_encode($ivl . '' . $x);
+			return $x === false ? ($default === false ? null : $data) : $x;
+		} else return null;
+	}
 
-    // AES265 decryption using the DB_CRYPT_HIPAA constant, as used by the LAMP DB currently.
-    // If the data could not be decrypted or is invalid, returns `null`.
-    // If default is NOT false, the input data is returned instead of null.
-    // Mode may be 'hipaa' or 'oauth' depending on usage. See docs.
-    // AES256 decryption using DB_CRYPT_OAUTH for passwords; uses CBC+IV instead of ECB.
-    // Note: seems to cause every other character to be \0 unless removed. PKCS-7?
-    public static function decrypt($data, $default = false, $mode = 'hipaa') {
-        if ($mode === 'hipaa') {
-            if ($data === null) return null;
-            $x = openssl_decrypt($data, 'aes-256-ecb', DB_CRYPT_HIPAA);
-            return $x === false ? ($default === false ? null : $data) : $x; 
-        } else if ($mode === 'oauth') {
-            $data = base64_decode(str_replace(' ', '+', $data));
-            $ivl = openssl_cipher_iv_length('aes-256-cbc');
-            if (strlen($data) <= $ivl) return null;
-            $x = openssl_decrypt(substr($data, $ivl), 'aes-256-cbc', hex2bin(DB_CRYPT_OAUTH), 
-                  OPENSSL_RAW_DATA, substr($data, 0, $ivl));
-            return $x === false ? null : preg_replace('/\\0/', '', $x); 
-        } else return null;
-    }
+	// AES265 decryption using the DB_CRYPT_HIPAA constant, as used by the LAMP DB currently.
+	// If the data could not be decrypted or is invalid, returns `null`.
+	// If default is NOT false, the input data is returned instead of null.
+	// Mode may be 'hipaa' or 'oauth' depending on usage. See docs.
+	// AES256 decryption using DB_CRYPT_OAUTH for passwords; uses CBC+IV instead of ECB.
+	public static function decrypt($data, $default = false, $mode = 'hipaa') {
+		if ($mode === 'hipaa' && $data !== null) {
+			$x = openssl_decrypt($data, 'aes-256-ecb', DB_CRYPT_HIPAA);
+			return $x === false ? ($default === false ? null : $data) : $x;
+		} else if ($mode === 'oauth' && $data !== null) {
+			$data = base64_decode($data);
+			$ivl = openssl_cipher_iv_length('aes-256-cbc');
+			$x = openssl_decrypt(substr($data, $ivl), 'aes-256-cbc', hex2bin(DB_CRYPT_OAUTH),
+				OPENSSL_RAW_DATA, substr($data, 0, $ivl));
+			$x = mb_convert_encoding($x, 'utf-8', 'utf-16le');
+			return $x === false ? ($default === false ? null : $data) : $x;
+		} else return null;
+	}
 }
 
 /**

@@ -3,6 +3,11 @@
 	"Image": {
 		"privileged": "true"
 	},
+	"Ports": [
+		{
+			"ContainerPort": "9000"
+		}
+	],
 	"Volumes": [
 		{
 			"HostDirectory": "/var/app/current",
