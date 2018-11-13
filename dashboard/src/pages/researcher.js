@@ -30,7 +30,7 @@ import JSZipUtils from 'jszip-utils'
 
 // The download URL for any given participant.
 const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
-const csv_url = (id, auth, export_type) => `http://lamp-api.us-east-2.elasticbeanstalk.com/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
+const csv_url = (id, auth, export_type) => `https://api.lamp.digitalpsych.org/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
 
 const fullDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
