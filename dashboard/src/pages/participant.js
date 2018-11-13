@@ -108,6 +108,7 @@ class Participant extends React.Component {
                 console.log(res.log)
             return (exists ? res.output.replace(/\s/g, '') : null)
         })).then(res => this.setState({attachments:res}))
+            .catch(res => console.error(res))
 
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
@@ -411,7 +412,7 @@ class Participant extends React.Component {
                             in={this.state.selected.includes(event.id)} 
                             timeout="auto" 
                             unmountOnExit>
-								<VariableBarGraph data={event}/>
+								<VariableBarGraph data={event} height={400}/>
                         </Collapse>,
                     ]).flat().filter(x => x)}
                 </List>
