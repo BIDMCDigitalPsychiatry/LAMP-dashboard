@@ -194,7 +194,7 @@ class Researcher extends React.Component {
     <div>
         <div>
             <Toolbar>
-                <Typography variant="body2" color="inherit" style={{flex: 1}}>
+                <Typography variant="body1" color="inherit" style={{flex: 1}}>
                     Visualization Editor
                 </Typography>
                 <Button
@@ -206,7 +206,7 @@ class Researcher extends React.Component {
         </div>
         <Card>
             <Toolbar>
-                <Typography variant="title" color="inherit" style={{flex: 1}}>
+                <Typography variant="h6" color="inherit" style={{flex: 1}}>
                     Default Study
                 </Typography>
                 <Button
@@ -249,7 +249,7 @@ class Researcher extends React.Component {
         <br />
         <Card>
             <Toolbar>
-                <Typography variant="title" color="inherit" style={{flex: 1}}>
+                <Typography variant="h6" color="inherit" style={{flex: 1}}>
                     Activities
                 </Typography>
             </Toolbar>
@@ -306,10 +306,10 @@ class Researcher extends React.Component {
                 <Divider />
                 <div>
                     <Divider />
-                    <Typography variant="title">
+                    <Typography variant="h6">
                         Image Gallery
                     </Typography>
-                    <Typography gutter variant="body2">
+                    <Typography gutter variant="body1">
                         Choose visualizations by toggling buttons
                     </Typography>
                     <VisGallery

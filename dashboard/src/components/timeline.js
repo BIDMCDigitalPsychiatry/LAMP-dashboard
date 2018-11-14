@@ -113,10 +113,10 @@ export default withParentSize(withTooltip(({
             </svg>
             {tooltipOpen && (
                 <Card elevation={20} style={{ position: 'fixed', zIndex: 1, top: tooltipTop, left: tooltipLeft, padding: '.3rem', minWidth: 60 }}>
-                    <Typography variant="title">
+                    <Typography variant="h6">
                         {`Activities Completed: ${tooltipData[0].bins[0]['count']}`}
                     </Typography>
-                    <Typography variant="body2">
+                    <Typography variant="body1">
                         {Date.formatUTC(tooltipData[1], {
                             year: '2-digit', month: '2-digit', day: '2-digit',
                         })}
