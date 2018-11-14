@@ -141,8 +141,8 @@ class Register extends React.Component {
     render = () => 
     <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
-            <Typography variant="display4" style={{ fontWeight: 500 }}>Create an account.</Typography>
-            <Typography variant="body2" color="primary" style={{ lineHeight: '0.5em', paddingLeft: 0 }}>
+            <Typography variant="h1" style={{ fontWeight: 500 }}>Create an account.</Typography>
+            <Typography variant="body1" color="primary" style={{ lineHeight: '0.5em', paddingLeft: 0 }}>
                 LAMP Researcher
             </Typography>
                 <form action="" onSubmit={this.handleSubmit}>

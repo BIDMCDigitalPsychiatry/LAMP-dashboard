@@ -55,6 +55,7 @@ class Participant extends React.Component {
         timeline: [],
         attachments: [],
         selected: [],
+        avgData: {detail: []},
 
 		zoomLevel: 4, // default grid setting for plots!
         ping: null
@@ -167,10 +168,11 @@ class Participant extends React.Component {
                 if (i == resT.length - 3)
                     timeline.push(resT.slice(sliceIdx, resT.length))
             }
-            console.debug(timeline)
+
+            let avgData = this.surveyBarPlotData(timeline) || []
 
             // Update state now with the fetched & computed objects.
-            this.setState({ timeline: timeline })
+            this.setState({ timeline: timeline, avgData: {detail: avgData} })
 			this.props.layout.pageLoading(true)
         })
     }
@@ -226,6 +228,57 @@ class Participant extends React.Component {
         return [0, 0]
     }
 
+    surveyBarPlotData = (timeline) => {
+        let surveyData = []
+        timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
+            slice.filter(x => (x.event_type === 'result' && x.activity_type !== 'game')).map(event => [
+                surveyData.push(event)
+        ])])
+
+            let totalAnxietyQuestions = 0, totalMoodQuestions = 0
+            let averageData = [...Array(32).keys()].map(() => 0)
+
+            for(let i = 0; i < surveyData.length; i++) {
+                if (surveyData[i].name.toUpperCase() === 'ANXIETY, PSYCHOSIS, AND SOCIAL') {
+                    for (let j=0; j < surveyData[i].detail.length; j++) {
+                        if (averageData[j] === 0 ) {
+                            averageData[j] = Object.assign({}, surveyData[i].detail[j])
+                        } else {
+                            averageData[j].elapsed_time += surveyData[i].detail[j].elapsed_time
+                            averageData[j].value += surveyData[i].detail[j].value
+                        }
+                    }
+                    totalAnxietyQuestions += 1
+                } else if (surveyData[i].name.toUpperCase() === 'MOOD, SLEEP, AND SOCIAL') {
+                    for (let j=0; j < surveyData[i].detail.length; j++) {
+                        if (averageData[j+16] === 0) {
+                            averageData[j+16] = Object.assign({}, surveyData[i].detail[j])
+                        } else {
+                            averageData[j+16].elapsed_time += surveyData[i].detail[j].elapsed_time
+                            averageData[j+16].value += surveyData[i].detail[j].value
+                        }
+                    }
+                    totalMoodQuestions += 1
+                }
+            }
+
+
+            for (let m = 0; m < averageData.length; m++) {
+                if (averageData[m] != 0) {
+                    if (m <= 15) {
+                        averageData[m].elapsed_time = totalAnxietyQuestions === 0 ? 0 : averageData[m].elapsed_time / totalAnxietyQuestions
+                        averageData[m].value = totalAnxietyQuestions === 0 ? 0 : averageData[m].value / totalAnxietyQuestions
+                    } else {
+                        averageData[m].elapsed_time = totalMoodQuestions === 0 ? 0 : averageData[m].elapsed_time / totalMoodQuestions
+                        averageData[m].value = totalMoodQuestions === 0 ? 0 : averageData[m].value / totalMoodQuestions
+                    }
+                }
+            }
+
+
+    return averageData
+}
+
     timelineData = () => {
 
         var dataArray = []
@@ -275,6 +328,7 @@ class Participant extends React.Component {
                 }
             }
         }
+
         return [dataArray, completeDateArray]
     }
 
@@ -298,12 +352,15 @@ class Participant extends React.Component {
             </div>
         </AppBar>
         <div style={{marginTop: 112}} />
+        {<VariableBarGraph data = {this.state.avgData} height={400}/>}
+
+        <div style={{marginTop: 112}} />
 		{!this.state.attachments ? <div/> :
 			<React.Fragment>
 				<Toolbar>
-					<Typography gutterBottom variant="display3">Visualizations</Typography>
+					<Typography gutterBottom variant="h2">Visualizations</Typography>
                     <div style={{ flexGrow: 1 }} />
-					<Typography variant="body2" style={{marginRight: 16}}>
+					<Typography variant="body1" style={{marginRight: 16}}>
 						Zoom
 					</Typography>
 					<ToggleButtonGroup value={this.state.zoomLevel} exclusive onChange={(e, x) => this.setState({ zoomLevel: x })}>
@@ -326,7 +383,7 @@ class Participant extends React.Component {
                                 <Document
                                     file={'data:application/pdf;base64,' + attach}
                                     error={
-                                        <Typography variant="body2" color="error">
+                                        <Typography variant="body1" color="error">
                                             Visualization error occurred.
                                         </Typography>
                                     }
@@ -341,7 +398,7 @@ class Participant extends React.Component {
 		}
         <Divider style={{ marginTop: 32, marginBottom: 32 }} />
 		<Toolbar>
-			<Typography gutterBottom variant="display3">Timeline</Typography>
+			<Typography gutterBottom variant="h2">Timeline</Typography>
 		</Toolbar>
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>

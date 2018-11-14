@@ -38,7 +38,7 @@ class Root extends React.Component {
 		<div>
 			<Card>
 				<Toolbar>
-					<Typography variant="title" color="inherit">
+					<Typography variant="h6" color="inherit">
 						All Researchers
 					</Typography>
 				</Toolbar>

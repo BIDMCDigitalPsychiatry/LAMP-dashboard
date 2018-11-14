@@ -32,7 +32,7 @@ export class ObjectView extends React.Component {
             {this.displayKeys().map((key) =>
                 <TableRow hover key={key}>
                     <TableCell style={{width:'20%'}}>
-                        <Typography color="inherit" variant="body2">
+                        <Typography color="inherit" variant="body1">
                             {humanize(key)}
                         </Typography>
                     </TableCell>
@@ -158,11 +158,11 @@ class DataTable extends ArrayView {
             })}>
             <div style={{flex: '0 0 auto'}}>
                 {this.state.selected.length > 0 ? (
-                    <Typography color="inherit" variant="subheading">
+                    <Typography color="inherit" variant="subtitle1">
                         {this.state.selected.length} selected
                     </Typography>
                 ) : (
-                    <Typography variant="title" id="tableTitle">
+                    <Typography variant="h6" id="tableTitle">
                         {this.props.title}
                     </Typography>
                 )}

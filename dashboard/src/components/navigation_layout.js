@@ -114,7 +114,7 @@ class NavigationLayout extends React.Component {
                         <MenuIcon />
                     	*/}
 					</IconButton>
-					<Typography variant="title" color="default" style={{flexGrow: 1}}>
+					<Typography variant="h6" color="default" style={{flexGrow: 1}}>
 						{this.state.title}
 					</Typography>
 					<div>
