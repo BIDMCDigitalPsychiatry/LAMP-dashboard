@@ -167,8 +167,6 @@ class Researcher extends React.Component {
         var reqs = inputReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: '', toggled_scripts:[]})
 
-        console.log(this.state.plot_toggle)
-
         for (let i = 0 ; i < 9; i++){
             if (i < this.state.plot_toggle.length && this.state.plot_toggle[i] === true) {
                 LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
