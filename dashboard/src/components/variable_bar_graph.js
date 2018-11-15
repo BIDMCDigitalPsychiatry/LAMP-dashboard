@@ -66,9 +66,6 @@ export default withTheme()(withParentSize(withTooltip(props => {
     let hideTooltip = props.hideTooltip
     let showTooltip = props.showTooltip
 
-    console.log(props.data)
-
-
     let data = (typeof props.data === "undefined") ? [...Array(10).keys()].map(x => ({
             value: Math.floor(Math.random() * 50) + 25,
             elapsed_time: Math.floor(Math.random() * 10000),
