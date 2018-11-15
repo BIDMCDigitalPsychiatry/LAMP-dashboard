@@ -167,27 +167,28 @@ class Researcher extends React.Component {
         var reqs = inputReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: '', toggled_scripts:[]})
 
-        //Iterate through selected images in gallery
-        var i = 1; // counter for viz naming
-        var j; // for indexing plot list
-        for (j = 0; j < this.state.plot_toggle.length; j++) {
-            if (this.state.plot_toggle[j]) {
-                // Set attachment
-                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
+        for (let i = 0 ; i < 9; i++){
+            if (i < this.state.plot_toggle.length && this.state.plot_toggle[i] === true) {
+                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
                     "script_type": "rscript",
-                    "script_contents": this.state.plot_sources[j][1],
-                    "script_requirements": this.state.plot_sources[j][2].replace(/(\r\n\t|\n|\r\t)/gm,"").split(",")
+                    "script_contents": this.state.plot_sources[i][1],
+                    "script_requirements": this.state.plot_sources[i][2].replace(/(\r\n\t|\n|\r\t)/gm, "").split(",")
                 }, {untyped: true})
-
-                i += 1
+            } else {
+                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
+                    "script_type": "rscript",
+                    "script_contents": "",
+                    "script_requirements": ""
+                }, {untyped: true})
             }
         }
 
-        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+i.toString(), {
+        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
         })
+
     }
 
     render = () =>
