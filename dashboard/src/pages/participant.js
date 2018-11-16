@@ -35,6 +35,17 @@ const hourOnlyDateFormat = {
 	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
 }
 
+// Note the surveys we want to use in the average plot with their initial slot number.
+const usableSurveys = {
+	'ANXIETY, PSYCHOSIS, AND SOCIAL': 0,
+	'MOOD, SLEEP, AND SOCIAL': 16,
+	'ANXIETY': 0,
+	'PSYCHOSIS AND SOCIAL': 7,
+	'MOOD': 16,
+	'SLEEP AND SOCIAL': 25,
+}
+
+// Note the short-name mappings for the above survey questions.
 const surveyMap = {
 	"Today I feel anxious": "Anxious",
 	"Today I cannot stop worrying": "Constant Worry",
@@ -249,55 +260,36 @@ class Participant extends React.Component {
     }
 
     surveyBarPlotData = (timeline) => {
+
+    	// Accumulate all survey data into a single object from the timeline.
 		let surveyData = []
 		timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
 			slice.filter(x => (x.event_type === 'result' && x.activity_type !== 'game')).map(event => [
 				surveyData.push(event)
 			])])
-		let totalAnxietyQuestions = 0, totalMoodQuestions = 0
-		let averageData = rangeTo(32).map(() => undefined)
 
-        // Psychosis and Social
-        // Sleep and Social
-        // Mood
-        // Anxiety
-        
+		// Iterate over every survey taken and assort into one average list.
+		// Ignore the survey if we don't mark it in the usableSurveys list.
+		let averageData = rangeTo(32).map(() => [])
 		for (let i = 0; i < surveyData.length; i++) {
-			if (surveyData[i].name.toUpperCase() === 'ANXIETY, PSYCHOSIS, AND SOCIAL') {
-				for (let j = 0; j < surveyData[i].detail.length; j++) {
-					if (averageData[j] === undefined) {
-						averageData[j] = Object.assign({}, surveyData[i].detail[j])
-					} else {
-						averageData[j].elapsed_time += surveyData[i].detail[j].elapsed_time
-						averageData[j].value += surveyData[i].detail[j].value
-					}
-				}
-				totalAnxietyQuestions += 1
-			} else if (surveyData[i].name.toUpperCase() === 'MOOD, SLEEP, AND SOCIAL') {
-				for (let j = 0; j < surveyData[i].detail.length; j++) {
-					if (averageData[j + 16] === undefined) {
-						averageData[j + 16] = Object.assign({}, surveyData[i].detail[j])
-					} else {
-						averageData[j + 16].elapsed_time += surveyData[i].detail[j].elapsed_time
-						averageData[j + 16].value += surveyData[i].detail[j].value
-					}
-				}
-				totalMoodQuestions += 1
-			}
-		}
-		for (let m = 0; m < averageData.length; m++) {
-			if (averageData[m] !== undefined) {
-				if (m <= 15) {
-					averageData[m].elapsed_time = totalAnxietyQuestions === 0 ? 0 : averageData[m].elapsed_time / totalAnxietyQuestions
-					averageData[m].value = totalAnxietyQuestions === 0 ? 0 : averageData[m].value / totalAnxietyQuestions
-				} else {
-					averageData[m].elapsed_time = totalMoodQuestions === 0 ? 0 : averageData[m].elapsed_time / totalMoodQuestions
-					averageData[m].value = totalMoodQuestions === 0 ? 0 : averageData[m].value / totalMoodQuestions
-				}
+			let slot = usableSurveys[surveyData[i].name.toUpperCase()]
+			if (slot === undefined) continue;
+
+			for (let j = 0; j < surveyData[i].detail.length; j++) {
+				averageData[slot + j].push({
+					x: surveyData[i].detail[j].elapsed_time,
+					y: surveyData[i].detail[j].value,
+					z: surveyData[i].detail[j].item
+				})
 			}
 		}
 
-		return this.convertGraphData({activity_type: 'avg', detail: averageData})
+		// Compress the average data arrays (x32) into single event summaries (x32).
+		return this.convertGraphData({ detail: averageData.map(a => ({
+			elapsed_time: a.reduce((a, b) => a + b.x, 0) / a.length,
+			value: a.reduce((a, b) => a + b.y, 0) / a.length,
+			item: a.length > 0 ? a[0].z : ''
+		}))})
     }
 
     timelineData = () => {
