@@ -73,7 +73,7 @@ const surveyMap = {
 	"Today I feel too slow or too restless": "Feel slow",
 	"Today I have thoughts of self-harm": "Self-harm",
 	"Last night I had trouble falling asleep": "Can't fall asleep",
-	"Last night I have had trouble sleeping": "Trouble sleeping",
+	"Last night I have had trouble falling asleep": "Can't fall asleep",
 	"Last night I had trouble staying asleep": "Can't stay asleep",
 	"This morning I was up earlier than I wanted": "Waking up early",
 	"In the last THREE DAYS, I have taken my medications as scheduled": "Medication",
