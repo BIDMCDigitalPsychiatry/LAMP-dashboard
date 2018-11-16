@@ -28,26 +28,58 @@ import VariableBarGraph from '../components/variable_bar_graph.js'
 import Grid from "@material-ui/core/Grid/Grid";
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-
-// FIXME: Stubbed code for .flat() which is a new func...
-Object.defineProperty(Array.prototype, 'flat', {
-    value: function(depth = 1) {
-      return this.reduce(function (flat, toFlatten) {
-        return flat.concat((Array.isArray(toFlatten) && (depth-1)) ? toFlatten.flat(depth-1) : toFlatten);
-      }, []);
-    }
-});
-
-Object.defineProperty(Date, 'formatUTC', {
-	value: function(timestampUTC, formatObj) {
-	    formatObj.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
-		return (new Date(timestampUTC).toLocaleString('en-US', formatObj))
-	}
-});
+import { rangeTo } from '../components/utils'
 
 const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
 	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
+}
+
+// Note the surveys we want to use in the average plot with their initial slot number.
+const usableSurveys = {
+	'ANXIETY, PSYCHOSIS, AND SOCIAL': 0,
+	'MOOD, SLEEP, AND SOCIAL': 16,
+	'ANXIETY': 0,
+	'PSYCHOSIS AND SOCIAL': 7,
+	'MOOD': 16,
+	'SLEEP AND SOCIAL': 25,
+}
+
+// Note the short-name mappings for the above survey questions.
+const surveyMap = {
+	"Today I feel anxious": "Anxious",
+	"Today I cannot stop worrying": "Constant Worry",
+	"Today I am worrying too much about different things": "Many Worries",
+	"Today I have trouble relaxing": "Can't Relax",
+	"Today I feel so restless it's hard to sit still": "Restless",
+	"Today I am easily annoyed or irritable": "Irritable",
+	"Today I feel afraid something awful might happen": "Afraid",
+	"Today I have heard voices or saw things others cannot": "Voices",
+	"Today I have had thoughts racing through my head": "Racing Thoughts",
+	"Today I feel I have special powers": "Special Powers",
+	"Today I feel people are watching me": "People watching me",
+	"Today I feel people are against me": "People against me",
+	"Today I feel confused or puzzled": "Confused",
+	"Today I feel unable to cope and have difficulty with everyday tasks": "Unable to cope",
+	"In the last THREE DAYS, I have had someone to talk to": "Someone to talk to",
+	"In the last THREE DAYS, I have felt uneasy with groups of people": "Uneasy in groups",
+	"Today I feel little interest or pleasure": "Low interest",
+	"Today I feel depressed": "Depressed",
+	"Today I had trouble sleeping": "Trouble Sleeping",
+	"Today I feel tired or have little energy": "Low Energy",
+	"Today I have a poor appetite or am overeating": "Low/High Appetite",
+	"Today I feel bad about myself or that I have let others down": "Poor self-esteem",
+	"Today I have trouble focusing or concentrating": "Can't focus",
+	"Today I feel too slow or too restless": "Feel slow",
+	"Today I have thoughts of self-harm": "Self-harm",
+	"Last night I had trouble falling asleep": "Can't fall asleep",
+	"Last night I have had trouble falling asleep": "Can't fall asleep",
+	"Last night I had trouble staying asleep": "Can't stay asleep",
+	"This morning I was up earlier than I wanted": "Waking up early",
+	"In the last THREE DAYS, I have taken my medications as scheduled": "Medication",
+	"In the last THREE DAYS, during the daytime I have gone outside my home": "Spent time outside",
+	"In the last THREE DAYS, I have preferred to spend time alone": "Prefer to be alone",
+	"In the last THREE DAYS, I have had arguments with other people": "Arguments with others"
 }
 
 class Participant extends React.Component {
@@ -55,7 +87,7 @@ class Participant extends React.Component {
         timeline: [],
         attachments: [],
         selected: [],
-        avgData: {detail: []},
+        avgData: [],
 
 		zoomLevel: 4, // default grid setting for plots!
         ping: null
@@ -102,7 +134,7 @@ class Participant extends React.Component {
         document.loadCSS('https://unpkg.com/leaflet@1.3.4/dist/leaflet.css')
 
         // Fetch attachments first since they will take the longest.
-        Promise.all([...Array(10).keys()].map(async i => {
+        Promise.all(rangeTo(10).map(async i => {
             let res = await LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
             var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
             if (res.hasOwnProperty('log'))
@@ -119,7 +151,7 @@ class Participant extends React.Component {
         Promise.all([p1, p2, p3, p4]).then(res => {
 
             // Flatten all linked activities' names into each Result object.
-            var res1 = res[1].map(x => ({
+            let res1 = res[1].map(x => ({
                 id: x.id,
                 event_type: 'result',
                 timestamp: x.start_time,
@@ -136,7 +168,7 @@ class Participant extends React.Component {
                 detail: x.temporal_events
             }))
 
-            var res2 = res[2].map(x => {
+			let res2 = res[2].map(x => {
                 x.event_type = 'environment'
                 if (!!x.accuracy)
                     x.coordinates = x.coordinates.split(',').map(x => parseFloat(x))
@@ -144,7 +176,7 @@ class Participant extends React.Component {
             })
 
             // Flatten all fitness samples into individual objects.
-            var res3 = res[3].map(x => x.record.map(y => {
+			let res3 = res[3].map(x => x.record.map(y => {
                 var z = Object.assign({ event_type: 'fitness' }, x)
                 delete z.record
                 Object.assign(z, y)
@@ -152,11 +184,11 @@ class Participant extends React.Component {
             })).flat()
 
             // Compute a timeline data stream sorted by timestamp.
-            var resT = [].concat(res1, res2, res3)
+			let resT = [].concat(res1, res2, res3)
                              .sort((a, b) => b.timestamp - a.timestamp)
 
             // Create sub-slices into the timeline grouped by environmental context.
-            var timeline = []
+			let timeline = []
             for (var i = 1, sliceIdx = 0; i <= resT.length - 2; i++) {
                 var diff = resT[i - 1].timestamp - resT[i].timestamp
 
@@ -172,7 +204,7 @@ class Participant extends React.Component {
             let avgData = this.surveyBarPlotData(timeline) || []
 
             // Update state now with the fetched & computed objects.
-            this.setState({ timeline: timeline, avgData: {detail: avgData} })
+            this.setState({ timeline: timeline, avgData: avgData })
 			this.props.layout.pageLoading(true)
         })
     }
@@ -229,55 +261,37 @@ class Participant extends React.Component {
     }
 
     surveyBarPlotData = (timeline) => {
-        let surveyData = []
-        timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
-            slice.filter(x => (x.event_type === 'result' && x.activity_type !== 'game')).map(event => [
-                surveyData.push(event)
-        ])])
 
-            let totalAnxietyQuestions = 0, totalMoodQuestions = 0
-            let averageData = [...Array(32).keys()].map(() => 0)
+    	// Accumulate all survey data into a single object from the timeline.
+		let surveyData = []
+		timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
+			slice.filter(x => (x.event_type === 'result' && x.activity_type !== 'game')).map(event => [
+				surveyData.push(event)
+			])])
 
-            for(let i = 0; i < surveyData.length; i++) {
-                if (surveyData[i].name.toUpperCase() === 'ANXIETY, PSYCHOSIS, AND SOCIAL') {
-                    for (let j=0; j < surveyData[i].detail.length; j++) {
-                        if (averageData[j] === 0 ) {
-                            averageData[j] = Object.assign({}, surveyData[i].detail[j])
-                        } else {
-                            averageData[j].elapsed_time += surveyData[i].detail[j].elapsed_time
-                            averageData[j].value += surveyData[i].detail[j].value
-                        }
-                    }
-                    totalAnxietyQuestions += 1
-                } else if (surveyData[i].name.toUpperCase() === 'MOOD, SLEEP, AND SOCIAL') {
-                    for (let j=0; j < surveyData[i].detail.length; j++) {
-                        if (averageData[j+16] === 0) {
-                            averageData[j+16] = Object.assign({}, surveyData[i].detail[j])
-                        } else {
-                            averageData[j+16].elapsed_time += surveyData[i].detail[j].elapsed_time
-                            averageData[j+16].value += surveyData[i].detail[j].value
-                        }
-                    }
-                    totalMoodQuestions += 1
-                }
-            }
+		// Iterate over every survey taken and assort into one average list.
+		// Ignore the survey if we don't mark it in the usableSurveys list.
+		let averageData = rangeTo(32).map(() => [])
+		for (let i = 0; i < surveyData.length; i++) {
+			let slot = usableSurveys[surveyData[i].name.toUpperCase()]
+			if (slot === undefined) continue;
 
+			for (let j = 0; j < surveyData[i].detail.length; j++) {
+				averageData[slot + j].push({
+					x: surveyData[i].detail[j].elapsed_time,
+					y: surveyData[i].detail[j].value,
+					z: surveyData[i].detail[j].item
+				})
+			}
+		}
 
-            for (let m = 0; m < averageData.length; m++) {
-                if (averageData[m] != 0) {
-                    if (m <= 15) {
-                        averageData[m].elapsed_time = totalAnxietyQuestions === 0 ? 0 : averageData[m].elapsed_time / totalAnxietyQuestions
-                        averageData[m].value = totalAnxietyQuestions === 0 ? 0 : averageData[m].value / totalAnxietyQuestions
-                    } else {
-                        averageData[m].elapsed_time = totalMoodQuestions === 0 ? 0 : averageData[m].elapsed_time / totalMoodQuestions
-                        averageData[m].value = totalMoodQuestions === 0 ? 0 : averageData[m].value / totalMoodQuestions
-                    }
-                }
-            }
-
-
-    return averageData
-}
+		// Compress the average data arrays (x32) into single event summaries (x32).
+		return this.convertGraphData({ detail: averageData.map(a => ({
+			elapsed_time: a.reduce((a, b) => a + b.x, 0) / a.length,
+			value: a.reduce((a, b) => a + b.y, 0) / a.length,
+			item: a.length > 0 ? a[0].z : ''
+		}))})
+    }
 
     timelineData = () => {
 
@@ -332,6 +346,15 @@ class Participant extends React.Component {
         return [dataArray, completeDateArray]
     }
 
+    // Convert a Result timeline event into a VariableBarGraph object.
+    convertGraphData = (e) => !e.detail ? [] : e.detail.map(x => !!x ?
+        ({
+            x: x.elapsed_time || 0,
+            y: (e.activity_type === 'game' ? (parseFloat(x.item) || 0) : x.value),
+            longTitle: x.item,
+            shortTitle: surveyMap[x.item],
+        }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
+
     render = () =>
     <div>
         <AppBar style={{ background: '#fafafa' }}>
@@ -351,10 +374,11 @@ class Participant extends React.Component {
                     }} />
             </div>
         </AppBar>
-        <div style={{marginTop: 112}} />
-        {<VariableBarGraph data = {this.state.avgData} height={400}/>}
-
-        <div style={{marginTop: 112}} />
+        <div style={{marginTop: 60}} />
+        <VariableBarGraph
+            rotateText
+            data={this.state.avgData}
+            height={400}/>
 		{!this.state.attachments ? <div/> :
 			<React.Fragment>
 				<Toolbar>
@@ -469,7 +493,10 @@ class Participant extends React.Component {
                             in={this.state.selected.includes(event.id)} 
                             timeout="auto" 
                             unmountOnExit>
-								<VariableBarGraph data={event} height={400}/>
+								<VariableBarGraph
+                                    data={this.convertGraphData(event)}
+                                    rotateText={event.activity_type !== 'game'}
+                                    height={400}/>
                         </Collapse>,
                     ]).flat().filter(x => x)}
                 </List>
