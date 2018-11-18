@@ -156,22 +156,40 @@ class LAMP {
     /**
      * TODO: XPath Builtins
      */
-    private static function xpath_builtins() {
-        static $builtins = null;
-        if ($builtins === null) $builtins = [
-            'date' => function(array $args) { 
-                $format = isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A';
-                return date($format, $args[0]); 
-            },
-            'split' => function(array $args) { return explode($args[0], $args[1]); },
-            'add' => function(array $args) { return $args[0] + $args[1]; },
-            'sub' => function(array $args) { return $args[0] - $args[1]; },
-            'mul' => function(array $args) { return $args[0] * $args[1]; },
-            'div' => function(array $args) { return $args[0] / $args[1]; },
-            'mod' => function(array $args) { return $args[0] % $args[1]; },
-        ];
-        return $builtins;
-    }
+	private static function xpath_builtins() {
+		static $builtins = null;
+		static $scratch = [];
+		if ($builtins === null) $builtins = [
+			'date' => function(array $args) {
+				$format = isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A';
+				return date($format, $args[0]);
+			},
+			'split' => function(array $args) { return explode($args[0], $args[1]); },
+			'_set' => function(array $args) use(&$scratch) { $scratch[$args[0]] = $args[1]; return null; },
+			'_get' => function(array $args) use(&$scratch) { return $scratch[$args[0]]; },
+
+			'includes' => function(array $args) { return isset($args[0][$args[1]]); },
+			'insert' => function(array $args) { $tmp = $args[0]; $tmp[$args[1]] = $args[2]; return $tmp; },
+			'delete' => function(array $args) { $tmp = $args[0]; if(is_object($tmp)) unset($tmp->{$args[1]}); else unset($tmp[$args[1]]); return $tmp; },
+
+			// to_items({a: b, c: d}) = [[a, b], [c, d]]
+			// from_items([[a, b], [c, d]]) = {a: b, c: d}
+
+			'add' => function(array $args) { return $args[0] + $args[1]; },
+			'sub' => function(array $args) { return $args[0] - $args[1]; },
+			'mul' => function(array $args) { return $args[0] * $args[1]; },
+			'div' => function(array $args) { return $args[0] / $args[1]; },
+			'mod' => function(array $args) { return $args[0] % $args[1]; },
+
+			'split' => function(array $args) { return explode($args[0], $args[1]); },
+			'date' => function(array $args) {
+				return date((isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A'), $args[0]);
+			},
+
+			//'Researcher_all' => function(array $args) { return json_decode(json_encode(Researcher::all())); },
+		];
+		return $builtins;
+	}
 
     /**
      * @OA\SecurityScheme(
