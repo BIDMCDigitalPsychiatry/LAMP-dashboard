@@ -2,7 +2,7 @@
 require_once __DIR__ . '/LAMPDriver.php';
 
 trait ParticipantDriver {
-	use LAMPDriver_v0_1;
+	use LAMPDriver;
 
     /** 
      * Get a set of `Participant`s matching the criteria parameters.

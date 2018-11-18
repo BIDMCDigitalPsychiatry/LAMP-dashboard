@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait StudyDriverGET_v0_1 {
-    use LAMPDriver_v0_1;
+trait StudyDriver {
+    use LAMPDriver;
 
     /** 
      * Get a set of `Study`s matching the criteria parameters.
@@ -70,33 +70,48 @@ trait StudyDriverGET_v0_1 {
             return $obj;
         }, $results);
     }
-}
 
-trait StudyDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
+	/**
+	 * Create a `Study` with a new object.
+	 */
+	private static function _insert(
 
-    /** 
-     * Create or update a `Study` with new fields.
-     */
-    private static function _set(
+		/**
+		 * The new object.
+		 */
+		$insert_object
+	) {
+		return null;
+	}
 
-        /** 
-         * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
-         */
-        $admin_id = null,
+	/**
+	 * Update a `Study` with new fields.
+	 */
+	private static function _update(
 
-        /**
-         * The new object or patch fields of an object.
-         */
-        $update_object = null
-    ) {
-        if ($admin_id === null && $update_object !== null) { /* create */
-            // OUTPUT INSERTED.AdminID
-        } else if ($admin_id !== null && $update_object !== null) { /* update */
-            //
-        } else { /* delete */
-            //
-        }
-        return null;
-    }
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		return null;
+	}
+
+	/**
+	 * Delete a `Study` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id
+	) {
+		return null;
+	}
 }

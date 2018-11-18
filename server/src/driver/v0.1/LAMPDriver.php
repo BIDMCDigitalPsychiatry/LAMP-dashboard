@@ -1,7 +1,11 @@
 <?php
 
-trait LAMPDriver_v0_1 {
-    use LAMPDriver;
+/**
+ * All LAMP API actions are designated from their class definitions to specific
+ * drivers implemented as PHP Traits. If the implementation detail underlying the
+ * API changes, add a new `LAMPDriver` and/or extend it for new functionality.
+ */
+trait LAMPDriver {
 
     /**
      * Return internal access to the underlying MS-SQL DB.
@@ -467,3 +471,13 @@ trait LAMPDriver_v0_1 {
         ");
     }
 }
+
+/*
+-- Utility function that removes keys from FOR JSON output.
+-- i.e. UNWRAP_JSON([{'val':1,{'val':2},{'val':'cell'}], 'val') => [1,2,'cell']
+CREATE OR ALTER FUNCTION FUNCTION
+    dbo.UNWRAP_JSON(@json nvarchar(max), @key nvarchar(400)) RETURNS nvarchar(max)
+AS BEGIN
+    RETURN REPLACE(REPLACE(@json, FORMATMESSAGE('{"%s":', @key),''), '}','')
+END;
+*/

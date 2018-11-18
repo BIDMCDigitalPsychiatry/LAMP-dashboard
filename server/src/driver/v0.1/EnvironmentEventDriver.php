@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait EnvironmentEventDriverGET_v0_1 {
-	use LAMPDriver_v0_1;
+trait EnvironmentEventDriver {
+	use LAMPDriver;
 
     /** 
      * Get a set of `EnvironmentEvent`s matching the criteria parameters.
@@ -105,15 +105,11 @@ trait EnvironmentEventDriverGET_v0_1 {
         }
         return $result;
     }
-}
-
-trait EnvironmentEventDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
     /** 
      * Add a new `EnvironmentEvent` with new fields.
      */
-    private static function _add(
+    private static function _insert(
 
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
@@ -128,4 +124,17 @@ trait EnvironmentEventDriverSET_v0_1 {
         // OUTPUT INSERTED.LocationID
         return null;
     }
+
+	/**
+	 * Deletes a `EnvironmentEvent` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `LocationID` column of the `Locations` table in the LAMP v0.1 DB.
+		 */
+		$event_id = null
+	) {
+		return null;
+	}
 }

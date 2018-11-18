@@ -71,7 +71,7 @@ class TemporalEvent extends LAMP {
  * )
  */
 class ResultEvent extends LAMP {
-    use ResultEventDriverGET_v0_1;
+    use ResultEventDriver;
 
     /**
      * @OA\Property(

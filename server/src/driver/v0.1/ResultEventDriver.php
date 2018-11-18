@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait ResultEventDriverGET_v0_1 {
-	use LAMPDriver_v0_1;
+trait ResultEventDriver {
+	use LAMPDriver;
 
 	/**
 	 * Get a set of `ResultEvent`s matching the criteria parameters.
@@ -140,15 +140,11 @@ trait ResultEventDriverGET_v0_1 {
 			return $raw;
 		}, $result);
 	}
-}
-
-trait ResultEventDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
     /** 
      * Add a new `ResultEvent` with new fields.
      */
-    private static function _add(
+    private static function _insert(
 
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
@@ -178,4 +174,23 @@ trait ResultEventDriverSET_v0_1 {
         // OUTPUT INSERTED.{CTest_*ResultID,SurveyResultID}
         return null;
     }
+
+	/**
+	 * Deletes a `ResultEvent` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `ActivityType` to set (currently only `game` or `survey`).
+		 */
+		$activity_type = null,
+
+		/**
+		 * The `CTestID` column of the `CTest` table or the `SurveyID` column of
+		 * the `Survey` table in the LAMP v0.1 DB.
+		 */
+		$type_id = null
+	) {
+		return null;
+	}
 }

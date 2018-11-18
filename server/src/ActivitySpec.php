@@ -5,7 +5,7 @@ require_once __DIR__ . '/LAMP.php';
  * @OA\Schema()
  */
 class ActivitySpec extends LAMP {
-	use LAMPDriver_v0_1;
+	use LAMPDriver;
 
 	/**
 	 * @OA\Property(

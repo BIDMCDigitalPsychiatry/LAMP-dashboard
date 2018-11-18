@@ -118,7 +118,7 @@ class Question extends LAMP {
  * )
  */
 class Activity extends LAMP {
-    use ActivityDriverGET_v0_1;
+    use ActivityDriver;
 
     /**
      * @OA\Property(

@@ -2,7 +2,7 @@
 require_once __DIR__ . '/LAMPDriver.php';
 
 trait ResearcherDriver {
-    use LAMPDriver_v0_1;
+    use LAMPDriver;
 
     /** 
      * Get a set of `Researcher`s matching the criteria parameters.
@@ -123,6 +123,8 @@ trait ResearcherDriver {
 			array_push($updates, 'FirstName = \'' . LAMP::encrypt($names[0]) . '\'');
 			array_push($updates, 'LastName = \'' . LAMP::encrypt($names[1]) . '\'');
 		}
+		if (count($updates) === 0)
+			return null;
 		$updates = implode(', ', $updates);
 
 		// Update the specified fields on the selected Admin row.

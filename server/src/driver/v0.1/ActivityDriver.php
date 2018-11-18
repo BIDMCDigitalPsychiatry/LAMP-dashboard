@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait ActivityDriverGET_v0_1 {
-	use LAMPDriver_v0_1;
+trait ActivityDriver {
+	use LAMPDriver;
 
     /**
      * Get a set of `Activity`s matching the criteria parameters.
@@ -252,10 +252,6 @@ trait ActivityDriverGET_v0_1 {
             return $obj;
         }, $result);
     }
-}
-
-trait ActivityDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
     /** 
      * Create or update an `Activity` with new fields.

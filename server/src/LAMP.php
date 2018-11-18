@@ -1,5 +1,7 @@
 <?php
 
+class LAMPException extends Exception {}
+
 /**
  * @OA\Info(
  *   title="LAMP Platform", 
@@ -9,7 +11,6 @@
  * )
  */
 class LAMP {
-    use LAMPDriver;
     public static $api_index = null;
 
     /**
@@ -417,27 +418,18 @@ class DurationInterval extends LAMP {
  *     format="int32"
  *   ),
  * )
- * 
- * API should throw this to cleanly transfer any HTTP errors into clients.
- */
-class LAMPException extends Exception {}
-
-/**
+ *
  * @OA\Schema(
  *   schema="Timestamp",
  *   type="integer",
  *   format="int64"
  * )
- */
-
-/**
+ *
  * @OA\Schema(
  *   schema="Attachments",
  *   @OA\AdditionalProperties()
  * )
- */
-
-/**
+ *
  * @OA\Schema(
  *   schema="Response",
  *   @OA\Property(
@@ -451,9 +443,7 @@ class LAMPException extends Exception {}
  *     format="int32",
  *   ),
  * )
- */
-
-/**
+ *
  * @OA\Parameter(
  *   parameter="XPath",
  *   description="See the JMESPath specification for details; prefer applying modifications on the client-side instead of using this query parameter.",
@@ -476,9 +466,7 @@ class LAMPException extends Exception {}
  *     enum={"csv", "csv-transpose"}
  *   ),
  * )
- */
-
-/**
+ *
  * @OA\Response(
  *   response="Success", 
  *   description="Success", 
@@ -503,20 +491,3 @@ class LAMPException extends Exception {}
  *   @OA\JsonContent(ref="#/components/schemas/Error")
  * )
  */
-
-/**
- * All LAMP API actions are designated from their class definitions to specific
- * drivers implemented as PHP Traits. If the implementation detail underlying the
- * API changes, add a new `LAMPDriver` and/or extend it for new functionality.
- */
-trait LAMPDriver {}
-
-/*
--- Utility function that removes keys from FOR JSON output.
--- i.e. UNWRAP_JSON([{'val':1,{'val':2},{'val':'cell'}], 'val') => [1,2,'cell']
-CREATE OR ALTER FUNCTION FUNCTION
-    dbo.UNWRAP_JSON(@json nvarchar(max), @key nvarchar(400)) RETURNS nvarchar(max)
-AS BEGIN
-    RETURN REPLACE(REPLACE(@json, FORMATMESSAGE('{"%s":', @key),''), '}','')
-END;
-*/

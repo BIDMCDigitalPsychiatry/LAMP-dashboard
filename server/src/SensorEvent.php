@@ -7,7 +7,7 @@ require_once __DIR__ . '/LAMP.php';
  * )
  */
 class SensorEvent extends LAMP {
-    use LAMPDriver_v0_1;
+    use LAMPDriver;
 
     /**
      * @OA\Property(

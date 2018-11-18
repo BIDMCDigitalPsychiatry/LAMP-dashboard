@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait FitnessEventDriver_v0_1 {
-	use LAMPDriver_v0_1;
+trait FitnessEventDriver {
+	use LAMPDriver;
 
     /** 
      * Get a set of `FitnessEvent`s matching the criteria parameters.
@@ -122,15 +122,11 @@ trait FitnessEventDriver_v0_1 {
         }
         return $result;
     }
-}
-
-trait FitnessEventDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
     /** 
      * Add a new `FitnessEvent` with new fields.
      */
-    private static function _add(
+    private static function _insert(
 
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
@@ -146,4 +142,17 @@ trait FitnessEventDriverSET_v0_1 {
         // OUTPUT INSERTED.HKDailyValueID
         return null;
     }
+
+	/**
+	 * Deletes a `FitnessEvent` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `HKDailyValueID` column of the `HKDailyValues` table in the LAMP v0.1 DB.
+		 */
+		$event_id = null
+	) {
+		return null;
+	}
 }

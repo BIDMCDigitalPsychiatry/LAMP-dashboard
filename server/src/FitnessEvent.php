@@ -57,7 +57,7 @@ class FitnessSample extends LAMP {
  * )
  */
 class FitnessEvent extends LAMP {
-    use FitnessEventDriver_v0_1;
+    use FitnessEventDriver;
     
     /**
      * @OA\Property(

@@ -40,7 +40,7 @@ abstract class SocialContext extends LAMP {
  * )
  */
 class EnvironmentEvent extends LAMP {
-    use EnvironmentEventDriverGET_v0_1;
+    use EnvironmentEventDriver;
 
     /**
      * @OA\Property(

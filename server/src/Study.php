@@ -8,7 +8,7 @@ require_once __DIR__ . '/driver/v0.1/StudyDriver.php';
  * )
  */
 class Study extends LAMP {
-    use StudyDriverGET_v0_1;
+    use StudyDriver;
 
     /**
      * @OA\Property(
