@@ -112,33 +112,155 @@ trait ParticipantDriverGET_v0_1 {
 trait ParticipantDriverSET_v0_1 {
     use LAMPDriver_v0_1;
 
-    /** 
-     * Create or update a `Participant` with new fields.
-     */
-    private static function _set(
+	/**
+	 * Create a `Participant`.
+	 */
+	private static function _insert(
 
-        /** 
-         * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
-         */
-        $user_id = null, 
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
 
-        /** 
-         * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
-         */
-        $admin_id = null,
+		/**
+		 * The new `settings` object.
+		 */
+		$insert_object
+	) {
+		// RESTRICTED: date_of_birth, sex, blood_type
 
-        /**
-         * The new object or patch fields of an object.
-         */
-        $update_object = null
-    ) {
-        if ($admin_id === null && $update_object !== null) { /* create */
-            // OUTPUT INSERTED.AdminID
-        } else if ($admin_id !== null && $update_object !== null) { /* update */
-            //
-        } else { /* delete */
-            //
-        }
-        return null;
-    }
+		// Prepare the minimal SQL column changes from the provided fields.
+		$insertsA = []; $insertsB = []; $insertsC = [];
+		if ($insert_object->study_code !== null)
+			array_push($insertsA, 'StudyCode = \'' . LAMP::encrypt($insert_object->study_code) . '\'');
+		if ($insert_object->theme !== null)
+			array_push($insertsB, 'AppColor = \'' . LAMP::encrypt($insert_object->theme) . '\'');
+		if ($insert_object->language !== null)
+			array_push($insertsB, 'Language = \'' . $insert_object->language . '\'');
+		if ($insert_object->last_login !== null)
+			array_push($insertsC, 'LastLoginOn = \'' . $insert_object->last_login . '\'');
+		if ($insert_object->device_type !== null)
+			array_push($insertsC, 'DeviceType = \'' . $insert_object->device_type . '\'');
+		if ($insert_object->emergency_contact !== null)
+			array_push($insertsB, '24By7ContactNo = \'' . LAMP::encrypt($insert_object->emergency_contact) . '\'');
+		if ($insert_object->helpline !== null)
+			array_push($insertsB, 'PersonalHelpline = \'' . LAMP::encrypt($insert_object->helpline) . '\'');
+		if ($insert_object->blogs_checked_date !== null)
+			array_push($insertsB, 'BlogsViewedOn = \'' . $insert_object->blogs_checked_date . '\'');
+		if ($insert_object->tips_checked_date !== null)
+			array_push($insertsB, 'TipsViewedOn = \'' . $insert_object->tips_checked_date . '\'');
+		$insertsA = implode(', ', $insertsA);
+		$insertsB = implode(', ', $insertsB);
+		$insertsC = implode(', ', $insertsC);
+
+		// Insert row, returning the generated primary key ID.
+		$result = self::lookup("
+            INSERT INTO Users (
+                Email, 
+                Password, 
+                FirstName, 
+                LastName, 
+                CreatedOn, 
+                AdminType
+            )
+            OUTPUT INSERTED.StudyId AS id
+			VALUES (
+		        '{$email}',
+		        '{$password}',
+		        '{$first_name}',
+		        '{$last_name}',
+		        GETDATE(), 
+		        2
+			);
+        ");
+
+
+
+		// INSERT: Users, UserSettings, UserDevices
+
+
+
+		// Return the new row's ID.
+		return $result;
+	}
+
+	/**
+	 * Update a `Participant` with new fields.
+	 */
+	private static function _update(
+
+		/**
+		 * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
+		 */
+		$user_id,
+
+		/**
+		 * The patch fields of the `settings` object.
+		 */
+		$update_object
+	) {
+		// RESTRICTED: date_of_birth, sex, blood_type
+		$user_id = LAMP::encrypt($user_id);
+
+		// Terminate the operation if no valid string-typed fields are modified.
+		if (!is_string($update_object->study_code) && !is_string($update_object->theme) &&
+			!is_string($update_object->language) && !is_string($update_object->last_login) &&
+			!is_string($update_object->device_type) && !is_string($update_object->emergency_contact) &&
+			!is_string($update_object->helpline) && !is_string($update_object->blogs_checked_date) &&
+			!is_string($update_object->tips_checked_date))
+			return null;
+
+		// Prepare the minimal SQL column changes from the provided fields.
+		$updatesA = []; $updatesB = []; $updatesC = [];
+		if ($update_object->study_code !== null)
+			array_push($updatesA, 'StudyCode = \'' . LAMP::encrypt($update_object->study_code) . '\'');
+		if ($update_object->theme !== null)
+			array_push($updatesB, 'AppColor = \'' . LAMP::encrypt($update_object->theme) . '\'');
+		if ($update_object->language !== null)
+			array_push($updatesB, 'Language = \'' . $update_object->language . '\'');
+		if ($update_object->last_login !== null)
+			array_push($updatesC, 'LastLoginOn = \'' . $update_object->last_login . '\'');
+		if ($update_object->device_type !== null)
+			array_push($updatesC, 'DeviceType = \'' . $update_object->device_type . '\'');
+		if ($update_object->emergency_contact !== null)
+			array_push($updatesB, '24By7ContactNo = \'' . LAMP::encrypt($update_object->emergency_contact) . '\'');
+		if ($update_object->helpline !== null)
+			array_push($updatesB, 'PersonalHelpline = \'' . LAMP::encrypt($update_object->helpline) . '\'');
+		if ($update_object->blogs_checked_date !== null)
+			array_push($updatesB, 'BlogsViewedOn = \'' . $update_object->blogs_checked_date . '\'');
+		if ($update_object->tips_checked_date !== null)
+			array_push($updatesB, 'TipsViewedOn = \'' . $update_object->tips_checked_date . '\'');
+		$updatesA = implode(', ', $updatesA);
+		$updatesB = implode(', ', $updatesB);
+		$updatesC = implode(', ', $updatesC);
+
+		// Update the specified fields on the selected Users, UserSettings, or UserDevices row.
+		$result = self::perform("
+            UPDATE Users SET {$updatesA} WHERE StudyId = {$user_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
+	}
+
+	/**
+	 * Delete a `Participant`.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
+		 */
+		$user_id
+	) {
+		$user_id = LAMP::encrypt($user_id);
+
+		// Set the deletion flag, without actually deleting the row.
+		$result = self::perform("
+            UPDATE Users SET IsDeleted = 1 WHERE StudyId = {$user_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
+	}
 }
