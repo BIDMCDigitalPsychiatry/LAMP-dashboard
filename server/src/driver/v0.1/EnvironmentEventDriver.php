@@ -167,8 +167,6 @@ trait EnvironmentEventDriver {
 	    $long = LAMP::encrypt("" . $new_object->coordinates[1]);
 	    $type = (isset($new_object->location_context) || isset($new_object->social_context)) ? 2 : 1;
 
-	    // TODO: timestamp -> CreatedOn!
-
 	    // Insert row, returning the generated primary key ID.
 	    $result = self::lookup("
             INSERT INTO Locations (
@@ -183,7 +181,7 @@ trait EnvironmentEventDriver {
 			VALUES (
 		        '{$user_id}',
 		        '{$loc_name}',
-		        GETDATE(), 
+		        DATEADD(MS, {$new_object->timestamp}, '1970-01-01'), 
 		        {$type},
 		        '{$lat}',
 		        '{$long}'
@@ -255,6 +253,8 @@ trait EnvironmentEventDriver {
 		if ($loc_name !== 'i am')
 			array_push($updates, 'LocationName = \'' . LAMP::encrypt($loc_name) . '\'');
 		array_push($updates, 'Type = ' . (($loc_name !== 'i am') ? 2 : 1));
+		if ($update_object->timestamp)
+			array_push($updates, "CreatedOn = DATEADD(MS, {$update_object->timestamp}, \'1970-01-01\')");
 		if (isset($update_object->coordinates[0]))
 			array_push($updates, 'Latitude = \'' . LAMP::encrypt("" . $update_object->coordinates[0]) . '\'');
 		if (isset($update_object->coordinates[1]))
@@ -262,8 +262,6 @@ trait EnvironmentEventDriver {
 		if (count($updates) === 0)
 			return null;
 		$updates = implode(', ', $updates);
-
-		// TODO: timestamp -> CreatedOn!
 
 		// Insert row, returning the generated primary key ID.
 		$result = self::lookup("

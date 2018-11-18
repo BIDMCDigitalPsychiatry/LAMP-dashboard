@@ -128,27 +128,74 @@ trait FitnessEventDriver {
      */
     private static function _insert(
 
-        /** 
-         * The `HKDailyValueID` column of the `HKDailyValues` table in the LAMP v0.1 DB.
-         */
-	    $daily_value_id,
+	    /**
+	     * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
+	     */
+	    $user_id,
 
         /**
          * The new object to append.
          */
-        $new_object = null
+        $new_object
     ) {
 
+    	// Append these specific units to each entry.
+    	static $unit_map = [
+		    "height" => " cm",
+		    "weight" => " kg",
+		    "heart_rate" => " bpm",
+		    "blood_pressure" => " mmhg",
+		    "respiratory_rate" => " breaths/min",
+		    "sleep" => "",
+		    "steps" => " steps",
+		    "flights" => " steps",
+		    "segment" => "",
+		    "distance" => " meters",
+	    ];
 
-        // OUTPUT INSERTED.HKDailyValueID
+    	// Convert samples to a suffixed and encrypted dictionary.
+    	$columns = new stdClass();
+    	foreach ($new_object->record as $rec)
+    		$columns->{$rec->type} = LAMP::encrypt($rec->value . '' . $unit_map[$rec->type]);
 
-	    // timestamp -> CreatedOn
-	    // [record] ->
-	    //      -> type = *column name
-	    //      -> value = *column value
-	    // cannot repeat!!
+    	// If the value is not provided, set to NULL (SQL).
+	    $or_null = function($x) { return $x ?: 'NULL'; };
 
-        return null;
+	    // Insert row, returning the generated primary key ID.
+	    $result = self::lookup("
+            INSERT INTO HealthKit_DailyValues (
+                UserID,
+                Height, 
+                Weight, 
+                HeartRate, 
+                BloodPressure, 
+                RespiratoryRate,
+                Sleep, 
+                Steps, 
+                FlightClimbed,
+                CreatedOn, 
+                Segment, 
+                Distance
+            )
+            OUTPUT INSERTED.HKDailyValueID AS id
+			VALUES (
+		        '{$user_id}',
+		        '{$or_null($columns->height)}',
+		        '{$or_null($columns->weight)}',
+		        '{$or_null($columns->heart_rate)}',
+		        '{$or_null($columns->blood_pressure)}',
+		        '{$or_null($columns->respiratory_rate)}',
+		        '{$or_null($columns->sleep)}',
+		        '{$or_null($columns->steps)}',
+		        '{$or_null($columns->flights)}',
+		        DATEADD(MS, {$new_object->timestamp}, '1970-01-01'), 
+		        '{$or_null($columns->segment)}',
+		        '{$or_null($columns->distance)}',
+			);
+        ");
+
+	    // Return the new row's ID.
+	    return $result;
     }
 
 	/**
@@ -167,13 +214,52 @@ trait FitnessEventDriver {
 		$update_object
 	) {
 
-		// timestamp -> CreatedOn
-		// [record] ->
-		//      -> type = *column name
-		//      -> value = *column value
-		// cannot repeat!!
+		// Map between FitnessSampleType to HKDailyValues columns.
+		static $record_map = [
+			"height" => "Height",
+			"weight" => "Weight",
+			"heart_rate" => "HeartRate",
+			"blood_pressure" => "BloodPressure",
+			"respiratory_rate" => "RespiratoryRate",
+			"sleep" => "Sleep",
+			"steps" => "Steps",
+			"flights" => "FlightClimbed",
+			"segment" => "Segment",
+			"distance" => "Distance",
+		];
 
-		return null;
+		// Append these specific units to each entry.
+		static $unit_map = [
+			"height" => " cm",
+			"weight" => " kg",
+			"heart_rate" => " bpm",
+			"blood_pressure" => " mmhg",
+			"respiratory_rate" => " breaths/min",
+			"sleep" => "",
+			"steps" => " steps",
+			"flights" => " steps",
+			"segment" => "",
+			"distance" => " meters",
+		];
+
+		// Prepare the minimal SQL column changes from the provided fields.
+		// Convert samples to a suffixed and encrypted dictionary.
+		$updates = [];
+		foreach ($update_object->record as $rec)
+			array_push($updates, $record_map[$rec->type] . ' = ' . LAMP::encrypt($rec->value . '' . $unit_map[$rec->type]));
+		if ($update_object->timestamp)
+			array_push($updates, "CreatedOn = DATEADD(MS, {$update_object->timestamp}, \'1970-01-01\')");
+		if (count($updates) === 0)
+			return null;
+		$updates = implode(', ', $updates);
+
+		// Insert row, returning the generated primary key ID.
+		$result = self::lookup("
+            UPDATE HealthKit_DailyValues SET {$updates} WHERE HKDailyValueID = {$daily_value_id}; 
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 
 	/**

@@ -81,6 +81,7 @@ trait StudyDriver {
 		 */
 		$insert_object
 	) {
+		// TODO: Studies do not exist! They cannot be modified!
 		return null;
 	}
 
@@ -99,6 +100,7 @@ trait StudyDriver {
 		 */
 		$update_object
 	) {
+		// TODO: Studies do not exist! They cannot be modified!
 		return null;
 	}
 
@@ -112,6 +114,7 @@ trait StudyDriver {
 		 */
 		$admin_id
 	) {
+		// TODO: Studies do not exist! They cannot be modified!
 		return null;
 	}
 }
