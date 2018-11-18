@@ -253,43 +253,47 @@ trait ActivityDriver {
         }, $result);
     }
 
-    /** 
-     * Create or update an `Activity` with new fields.
-     */
-    private static function _set(
+	/**
+	 * Create an `Activity` with a new object.
+	 */
+	private static function _insert(
 
-        /** 
-         * The `ActivityType` to set (currently only `game` or `survey`).
-         */
-        $type = null, 
+		/**
+		 * The new object.
+		 */
+		$insert_object
+	) {
+		return null;
+	}
 
-        /** 
-         * The `CTestID` column of the `CTest` table in the LAMP v0.1 DB.
-         */
-        $ctest_id = null, 
+	/**
+	 * Update an `Activity` with new fields.
+	 */
+	private static function _update(
 
-        /** 
-         * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
-         */
-        $survey_id = null, 
+		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id,
 
-        /** 
-         * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
-         */
-        $admin_id = null,
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		return null;
+	}
 
-        /**
-         * The new object or patch fields of an object.
-         */
-        $update_object = null
-    ) {
-        if ($admin_id === null && $update_object !== null) { /* create */
-            // OUTPUT INSERTED.AdminID
-        } else if ($admin_id !== null && $update_object !== null) { /* update */
-            //
-        } else { /* delete */
-            //
-        }
-        return null;
-    }
+	/**
+	 * Delete an `Activity` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id
+	) {
+		return null;
+	}
 }

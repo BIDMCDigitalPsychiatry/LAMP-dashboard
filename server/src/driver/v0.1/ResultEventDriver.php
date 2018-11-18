@@ -149,31 +149,51 @@ trait ResultEventDriver {
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
          */
-        $user_id = null, 
+        $user_id,
 
         /** 
          * The `ActivityType` to set (currently only `game` or `survey`).
          */
-        $activity_type = null, 
+        $activity_type,
 
-        /** 
-         * The `CTestID` column of the `CTest` table in the LAMP v0.1 DB.
+        /**
+         * The `CTestID` column of the `CTest` table or the `SurveyID` column of
+         * the `Survey` table in the LAMP v0.1 DB.
          */
-        $ctest_id = null, 
-
-        /** 
-         * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
-         */
-        $survey_id = null, 
+        $type_id,
 
         /**
          * The new object to append.
          */
-        $new_object = null
+        $new_object
     ) {
         // OUTPUT INSERTED.{CTest_*ResultID,SurveyResultID}
         return null;
     }
+
+	/**
+	 * Update a `ResultEvent` with new fields.
+	 */
+	private static function _update(
+
+		/**
+		 * The `ActivityType` to set (currently only `game` or `survey`).
+		 */
+		$activity_type,
+
+		/**
+		 * The `CTestID` column of the `CTest` table or the `SurveyID` column of
+		 * the `Survey` table in the LAMP v0.1 DB.
+		 */
+		$type_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		return null;
+	}
 
 	/**
 	 * Deletes a `ResultEvent` row.
@@ -183,13 +203,13 @@ trait ResultEventDriver {
 		/**
 		 * The `ActivityType` to set (currently only `game` or `survey`).
 		 */
-		$activity_type = null,
+		$activity_type,
 
 		/**
 		 * The `CTestID` column of the `CTest` table or the `SurveyID` column of
 		 * the `Survey` table in the LAMP v0.1 DB.
 		 */
-		$type_id = null
+		$type_id
 	) {
 		return null;
 	}

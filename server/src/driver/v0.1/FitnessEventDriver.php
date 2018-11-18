@@ -129,9 +129,9 @@ trait FitnessEventDriver {
     private static function _insert(
 
         /** 
-         * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
+         * The `HKDailyValueID` column of the `HKDailyValues` table in the LAMP v0.1 DB.
          */
-        $user_id,
+	    $daily_value_id,
 
         /**
          * The new object to append.
@@ -144,6 +144,24 @@ trait FitnessEventDriver {
     }
 
 	/**
+	 * Update a `FitnessEvent` with new fields.
+	 */
+	private static function _update(
+
+		/**
+		 * The `HKDailyValueID` column of the `HKDailyValues` table in the LAMP v0.1 DB.
+		 */
+		$daily_value_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		return null;
+	}
+
+	/**
 	 * Deletes a `FitnessEvent` row.
 	 */
 	private static function _delete(
@@ -151,7 +169,7 @@ trait FitnessEventDriver {
 		/**
 		 * The `HKDailyValueID` column of the `HKDailyValues` table in the LAMP v0.1 DB.
 		 */
-		$event_id = null
+		$daily_value_id
 	) {
 		return null;
 	}

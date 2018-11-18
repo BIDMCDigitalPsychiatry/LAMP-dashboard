@@ -114,26 +114,44 @@ trait EnvironmentEventDriver {
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
          */
-        $user_id = null, 
+        $user_id,
 
         /**
          * The new object to append.
          */
-        $new_object = null
+        $new_object
     ) {
         // OUTPUT INSERTED.LocationID
         return null;
     }
 
 	/**
-	 * Deletes a `EnvironmentEvent` row.
+	 * Update an `EnvironmentEvent` with new fields.
+	 */
+	private static function _update(
+
+		/**
+		 * The `LocationID` column of the `Locations` table in the LAMP v0.1 DB.
+		 */
+		$location_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		return null;
+	}
+
+	/**
+	 * Deletes an `EnvironmentEvent` row.
 	 */
 	private static function _delete(
 
 		/**
 		 * The `LocationID` column of the `Locations` table in the LAMP v0.1 DB.
 		 */
-		$event_id = null
+		$location_id
 	) {
 		return null;
 	}
