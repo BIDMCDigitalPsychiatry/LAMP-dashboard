@@ -259,10 +259,18 @@ trait ActivityDriver {
 	private static function _insert(
 
 		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
 		 * The new object.
 		 */
 		$insert_object
 	) {
+
+		// TODO: create surveys!
+
 		return null;
 	}
 
@@ -270,6 +278,11 @@ trait ActivityDriver {
 	 * Update an `Activity` with new fields.
 	 */
 	private static function _update(
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
 
 		/**
 		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
@@ -281,6 +294,61 @@ trait ActivityDriver {
 		 */
 		$update_object
 	) {
+
+		// TODO: update surveys!
+		// TODO: update ctests!
+
+		// 1. lookup activity_id -> settings info
+		// 2. settings info -> table name, slot map (!!!)
+		// 3. update <table name> set <slots*> = <values*> where <admin_id>
+
+		// -> settings.jewelsA or settings.jewelsB:
+
+		// The column map specifies the LAMP object key to DB row column mapping.
+		static $jewels_settings_column_map = [
+			"beginner_seconds" => "NoOfSeconds_Beg",
+			"intermediate_seconds" => "NoOfSeconds_Int",
+			"advanced_seconds" => "NoOfSeconds_Adv",
+			"expert_seconds" => "NoOfSeconds_Exp",
+			"diamond_count" => "NoOfDiamonds",
+			"shape_count" => "NoOfShapes",
+			"bonus_point_count" => "NoOfBonusPoints",
+			"x_changes_in_level_count" => "X_NoOfChangesInLevel",
+			"x_diamond_count" => "X_NoOfDiamonds",
+			"y_changes_in_level_count" => "Y_NoOfChangesInLevel",
+			"y_shape_count" => "Y_NoOfShapes",
+		];
+
+		// The default map specifies the LAMP object's value if none is found.
+		static $jewels_settings_default_map = [
+			"beginner_seconds" => 0,
+			"intermediate_seconds" => 0,
+			"advanced_seconds" => 0,
+			"expert_seconds" => 0,
+			"diamond_count" => 0,
+			"shape_count" => 0,
+			"bonus_point_count" => 0,
+			"x_changes_in_level_count" => 0,
+			"x_diamond_count" => 0,
+			"y_changes_in_level_count" => 0,
+			"y_shape_count" => 0,
+		];
+
+
+
+		// questions
+
+
+
+		// -> schedule
+		//      -> schedule_date
+		//      -> time
+		//      -> repeat_interval
+		//      -> custom_time
+		//          -> t
+
+
+
 		return null;
 	}
 
@@ -290,10 +358,28 @@ trait ActivityDriver {
 	private static function _delete(
 
 		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
 		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
 		 */
 		$activity_id
 	) {
+
+		// TODO: delete surveys!
+
 		return null;
 	}
 }
+
+/*
+-- Utility function that removes keys from FOR JSON output.
+-- i.e. UNWRAP_JSON([{'val':1,{'val':2},{'val':'cell'}], 'val') => [1,2,'cell']
+CREATE OR ALTER FUNCTION FUNCTION
+    dbo.UNWRAP_JSON(@json nvarchar(max), @key nvarchar(400)) RETURNS nvarchar(max)
+AS BEGIN
+    RETURN REPLACE(REPLACE(@json, FORMATMESSAGE('{"%s":', @key),''), '}','')
+END;
+*/

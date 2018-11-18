@@ -121,8 +121,77 @@ trait EnvironmentEventDriver {
          */
         $new_object
     ) {
-        // OUTPUT INSERTED.LocationID
-        return null;
+
+	    // Terminate the operation if no valid coordinates are found.
+	    if (!isset($new_object->coordinates[0]) || !isset($new_object->coordinates[1]) ||
+		    !isset($new_object->accuracy))
+	    	return null;
+
+	    // If a location or social context is provided, map them back to the original strings.
+	    $loc_name = 'i am';
+	    if (isset($new_object->location_context)) {
+		    if ($new_object->location_context == LocationContext::Home) {
+			    $loc_name .= ' home';
+		    } else if ($new_object->location_context == LocationContext::School) {
+			    $loc_name .= ' in school/class';
+		    } else if ($new_object->location_context == LocationContext::Work) {
+			    $loc_name .= ' at work';
+		    } else if ($new_object->location_context == LocationContext::Hospital) {
+			    $loc_name .= ' in clinic/hospital';
+		    } else if ($new_object->location_context == LocationContext::Outside) {
+			    $loc_name .= ' outside';
+		    } else if ($new_object->location_context == LocationContext::Shopping) {
+			    $loc_name .= ' shopping/dining';
+		    } else if ($new_object->location_context == LocationContext::Transit) {
+			    $loc_name .= ' in bus/train/car';
+		    }
+	    }
+	    if (isset($new_object->social_context)) {
+		    if ($new_object->social_context == SocialContext::Alone) {
+			    $loc_name .= ' alone';
+		    } else if ($new_object->social_context == SocialContext::Friends) {
+			    $loc_name .= ' with friends';
+		    } else if ($new_object->social_context == SocialContext::Family) {
+			    $loc_name .= ' with family';
+		    } else if ($new_object->social_context == SocialContext::Peers) {
+			    $loc_name .= ' with peers';
+		    } else if ($new_object->social_context == SocialContext::Crowd) {
+			    $loc_name .= ' in crowd';
+		    }
+	    }
+	    $loc_name = LAMP::encrypt($loc_name);
+
+	    // Prepare the minimal SQL column changes from the provided fields.
+	    $user_id = LAMP::encrypt($user_id);
+	    $lat = LAMP::encrypt("" . $new_object->coordinates[0]);
+	    $long = LAMP::encrypt("" . $new_object->coordinates[1]);
+	    $type = (isset($new_object->location_context) || isset($new_object->social_context)) ? 2 : 1;
+
+	    // TODO: timestamp -> CreatedOn!
+
+	    // Insert row, returning the generated primary key ID.
+	    $result = self::lookup("
+            INSERT INTO Locations (
+                UserID,
+                LocationName, 
+                CreatedOn, 
+                Type, 
+                Latitude, 
+                Longitude
+            )
+            OUTPUT INSERTED.LocationID AS id
+			VALUES (
+		        '{$user_id}',
+		        '{$loc_name}',
+		        GETDATE(), 
+		        {$type},
+		        '{$lat}',
+		        '{$long}'
+			);
+        ");
+
+	    // Return the new row's ID.
+	    return $result;
     }
 
 	/**
@@ -140,7 +209,69 @@ trait EnvironmentEventDriver {
 		 */
 		$update_object
 	) {
-		return null;
+
+		// Terminate the operation if no valid fields are updated.
+		if (!isset($update_object->accuracy) &&
+			!isset($update_object->coordinates[0]) && !isset($update_object->coordinates[1]) &&
+			!isset($update_object->location_context) && !isset($update_object->social_context))
+			return null;
+
+		// If a location or social context is provided, map them back to the original strings.
+		// TODO: Cannot update EITHER location OR social, must update BOTH together!
+		$loc_name = 'i am';
+		if (isset($update_object->location_context)) {
+			if ($update_object->location_context == LocationContext::Home) {
+				$loc_name .= ' home';
+			} else if ($update_object->location_context == LocationContext::School) {
+				$loc_name .= ' in school/class';
+			} else if ($update_object->location_context == LocationContext::Work) {
+				$loc_name .= ' at work';
+			} else if ($update_object->location_context == LocationContext::Hospital) {
+				$loc_name .= ' in clinic/hospital';
+			} else if ($update_object->location_context == LocationContext::Outside) {
+				$loc_name .= ' outside';
+			} else if ($update_object->location_context == LocationContext::Shopping) {
+				$loc_name .= ' shopping/dining';
+			} else if ($update_object->location_context == LocationContext::Transit) {
+				$loc_name .= ' in bus/train/car';
+			}
+		}
+		if (isset($update_object->social_context)) {
+			if ($update_object->social_context == SocialContext::Alone) {
+				$loc_name .= ' alone';
+			} else if ($update_object->social_context == SocialContext::Friends) {
+				$loc_name .= ' with friends';
+			} else if ($update_object->social_context == SocialContext::Family) {
+				$loc_name .= ' with family';
+			} else if ($update_object->social_context == SocialContext::Peers) {
+				$loc_name .= ' with peers';
+			} else if ($update_object->social_context == SocialContext::Crowd) {
+				$loc_name .= ' in crowd';
+			}
+		}
+
+		// Prepare the minimal SQL column changes from the provided fields.
+		$updates = [];
+		if ($loc_name !== 'i am')
+			array_push($updates, 'LocationName = \'' . LAMP::encrypt($loc_name) . '\'');
+		array_push($updates, 'Type = ' . (($loc_name !== 'i am') ? 2 : 1));
+		if (isset($update_object->coordinates[0]))
+			array_push($updates, 'Latitude = \'' . LAMP::encrypt("" . $update_object->coordinates[0]) . '\'');
+		if (isset($update_object->coordinates[1]))
+			array_push($updates, 'Longitude = \'' . LAMP::encrypt("" . $update_object->coordinates[1]) . '\'');
+		if (count($updates) === 0)
+			return null;
+		$updates = implode(', ', $updates);
+
+		// TODO: timestamp -> CreatedOn!
+
+		// Insert row, returning the generated primary key ID.
+		$result = self::lookup("
+            UPDATE Locations SET {$updates} WHERE LocationID = {$location_id}; 
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 
 	/**
@@ -153,6 +284,14 @@ trait EnvironmentEventDriver {
 		 */
 		$location_id
 	) {
-		return null;
+
+		// Set the deletion flag, without actually deleting the row.
+		// TODO: Deletion is not supported! Type is not correctly used here.
+		$result = self::perform("
+            UPDATE Locations SET Type = 0 WHERE LocationID = {$location_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 }

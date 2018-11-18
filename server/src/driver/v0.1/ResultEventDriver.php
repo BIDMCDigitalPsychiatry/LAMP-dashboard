@@ -151,16 +151,10 @@ trait ResultEventDriver {
          */
         $user_id,
 
-        /** 
-         * The `ActivityType` to set (currently only `game` or `survey`).
-         */
-        $activity_type,
-
         /**
-         * The `CTestID` column of the `CTest` table or the `SurveyID` column of
-         * the `Survey` table in the LAMP v0.1 DB.
+         * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
          */
-        $type_id,
+        $activity_id,
 
         /**
          * The new object to append.
@@ -177,9 +171,9 @@ trait ResultEventDriver {
 	private static function _update(
 
 		/**
-		 * The `ActivityType` to set (currently only `game` or `survey`).
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
 		 */
-		$activity_type,
+		$activity_id,
 
 		/**
 		 * The `CTestID` column of the `CTest` table or the `SurveyID` column of
@@ -201,9 +195,9 @@ trait ResultEventDriver {
 	private static function _delete(
 
 		/**
-		 * The `ActivityType` to set (currently only `game` or `survey`).
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
 		 */
-		$activity_type,
+		$activity_id,
 
 		/**
 		 * The `CTestID` column of the `CTest` table or the `SurveyID` column of

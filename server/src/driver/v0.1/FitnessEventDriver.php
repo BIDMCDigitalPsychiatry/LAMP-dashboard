@@ -138,8 +138,16 @@ trait FitnessEventDriver {
          */
         $new_object = null
     ) {
-        // 
+
+
         // OUTPUT INSERTED.HKDailyValueID
+
+	    // timestamp -> CreatedOn
+	    // [record] ->
+	    //      -> type = *column name
+	    //      -> value = *column value
+	    // cannot repeat!!
+
         return null;
     }
 
@@ -158,6 +166,13 @@ trait FitnessEventDriver {
 		 */
 		$update_object
 	) {
+
+		// timestamp -> CreatedOn
+		// [record] ->
+		//      -> type = *column name
+		//      -> value = *column value
+		// cannot repeat!!
+
 		return null;
 	}
 
@@ -171,6 +186,14 @@ trait FitnessEventDriver {
 		 */
 		$daily_value_id
 	) {
-		return null;
+
+		// Set the deletion flag, without actually deleting the row.
+		// TODO: Deletion is not supported! EditedOn is not correctly used here.
+		$result = self::perform("
+            UPDATE HealthKit_DailyValues SET EditedOn = NULL WHERE HKDailyValueID = {$daily_value_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 }

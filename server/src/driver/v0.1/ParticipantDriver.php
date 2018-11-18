@@ -123,7 +123,7 @@ trait ParticipantDriver {
 		 */
 		$insert_object
 	) {
-		// RESTRICTED: date_of_birth, sex, blood_type
+		// TODO: RESTRICTED: date_of_birth, sex, blood_type
 
 		// Prepare the minimal SQL column changes from the provided fields.
 		$insertsA = []; $insertsB = []; $insertsC = [];

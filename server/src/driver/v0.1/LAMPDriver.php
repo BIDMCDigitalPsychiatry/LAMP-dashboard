@@ -471,13 +471,3 @@ trait LAMPDriver {
         ");
     }
 }
-
-/*
--- Utility function that removes keys from FOR JSON output.
--- i.e. UNWRAP_JSON([{'val':1,{'val':2},{'val':'cell'}], 'val') => [1,2,'cell']
-CREATE OR ALTER FUNCTION FUNCTION
-    dbo.UNWRAP_JSON(@json nvarchar(max), @key nvarchar(400)) RETURNS nvarchar(max)
-AS BEGIN
-    RETURN REPLACE(REPLACE(@json, FORMATMESSAGE('{"%s":', @key),''), '}','')
-END;
-*/
