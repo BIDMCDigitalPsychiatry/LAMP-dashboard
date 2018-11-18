@@ -183,7 +183,48 @@ trait LAMPDriver_v0_1 {
             throw new LAMPException("access restricted", 403);
     }
 
-    /**
+	/**
+	 *
+	 */
+	public static function type_parent_of(
+
+		/**
+		 * The origin type in the LAMP v0.1 DB.
+		 */
+		$from,
+
+		/**
+		 * The destination type the LAMP v0.1 DB.
+		 */
+		$to
+	) {
+		static $mapping = null;
+		if ($mapping === null) {
+			$mapping = [
+				ResultEvent::class => [Activity::class, Participant::class, Study::class, Researcher::class],
+				EnvironmentEvent::class => [Participant::class, Study::class, Researcher::class],
+					FitnessEvent::class => [Participant::class, Study::class, Researcher::class],
+					MetadataEvent::class => [Participant::class, Study::class, Researcher::class],
+					SensorEvent::class => [Participant::class, Study::class, Researcher::class],
+					Activity::class => [Study::class, Researcher::class],
+					Participant::class => [Study::class, Researcher::class],
+					Study::class => [Researcher::class],
+					Researcher::class => [],
+				];
+		}
+
+		// Handle early bail-out if no conversion exists or should occur.
+		if (!isset($mapping[$from]))
+			return null;
+
+		// Execute the appropriate conversion.
+		$val = $mapping[$from][$to];
+		if ($val === null)
+			throw new LAMPException("invalid type", 404);
+		return $val;
+	}
+
+	/**
      * Convert an internal ID of one type to the ID of its parent type, if any.
      */
     public static function parent_of(
@@ -282,8 +323,27 @@ trait LAMPDriver_v0_1 {
                             new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
-                ResultEvent::class => [
-                    Participant::class => function($id) { 
+	            MetadataEvent::class => [
+		            Participant::class => function($id) {
+			            return null;
+		            },
+		            Researcher::class => function($id) {
+			            return null;
+		            },
+	            ],
+	            SensorEvent::class => [
+		            Participant::class => function($id) {
+			            return null;
+		            },
+		            Researcher::class => function($id) {
+			            return null;
+		            },
+	            ],
+	            ResultEvent::class => [
+		            Activity::class => function($id) {
+			            return null;
+		            },
+		            Participant::class => function($id) {
                         return null;
                     },
                     Researcher::class => function($id) { 

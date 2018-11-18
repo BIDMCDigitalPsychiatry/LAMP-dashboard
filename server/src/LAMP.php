@@ -236,51 +236,6 @@ class LAMP {
 }
 
 /**
- * @OA\Schema(
- *   type="string",
- *   enum={"root", "researcher", "participant"}
- * )
- */
-abstract class AuthType extends LAMP {
-    const Root = 'root';
-    const Researcher = 'researcher';
-    const Participant = 'participant';
-}
-
-/**
- * @OA\Schema(
- *   schema="Identifier",
- *   type="string",
- *   description="A globally unique reference for objects within the LAMP platform.",
- * )
- * 
- * Use `require()` to restrict the ID to certain prefix(s) and `part()` to 
- * access ID components safely. Note: DO NOT use the reserved character ':' in any 
- * component strings.
- */
-class TypeID implements JsonSerializable {
-    private $components = [];
-    public function __construct($value) {
-        if (is_string($value)) {
-            $this->components = explode(":", base64_decode(strtr($value, '_-~', '+/=')));
-        } else if (is_array($value)) 
-            $this->components = $value;
-        else throw new Exception('invalid LAMP ID value');
-    }
-    public function jsonSerialize() {
-        return strtr(base64_encode(implode(':', $this->components)), '+/=', '_-~');
-    }
-    public function require($match_prefix) {
-        if (!in_array($this->components[0], $match_prefix))
-            throw new LAMPException("invalid identifier", 403); 
-        return $this;
-    }
-    public function part($idx) {
-        return isset($this->components[$idx]) ? $this->components[$idx] : null;
-    }
-}
-
-/**
  * @OA\Schema()
  */
 class CalendarComponents extends LAMP {
