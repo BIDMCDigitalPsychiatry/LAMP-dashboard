@@ -8,7 +8,7 @@ require_once __DIR__ . '/driver/v0.1/ResearcherDriver.php';
  * )
  */
 class Researcher extends LAMP {
-    use ResearcherDriverGET_v0_1;
+    use ResearcherDriver;
 
     /**
      * @OA\Property(
@@ -100,7 +100,7 @@ class Researcher extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Researcher::_get($_id->part(1));
+        return Researcher::_select($_id->part(1));
     }
     
     /** 
@@ -126,6 +126,6 @@ class Researcher extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return Researcher::_get();
+        return Researcher::_select();
     }
 }

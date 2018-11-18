@@ -124,7 +124,7 @@ class ParticipantSettings extends LAMP {
  * )
  */
 class Participant extends LAMP {
-    use ParticipantDriverGET_v0_1;
+    use ParticipantDriver;
 
     /**
      * @OA\Property(
@@ -252,7 +252,7 @@ class Participant extends LAMP {
                 return $value == $participant_id;
             } else return false;
         });
-        return Participant::_get($participant_id, null);
+        return Participant::_select($participant_id, null);
     }
     
     /** 
@@ -324,7 +324,7 @@ class Participant extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Participant::_get(null, $_id->part(1));
+        return Participant::_select(null, $_id->part(1));
     }
 
     /** 
@@ -350,6 +350,6 @@ class Participant extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return Participant::_get();
+        return Participant::_select();
     }
 }

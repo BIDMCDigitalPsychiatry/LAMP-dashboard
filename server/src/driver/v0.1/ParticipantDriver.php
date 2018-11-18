@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait ParticipantDriverGET_v0_1 {
+trait ParticipantDriver {
 	use LAMPDriver_v0_1;
 
     /** 
      * Get a set of `Participant`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.
@@ -107,10 +107,6 @@ trait ParticipantDriverGET_v0_1 {
             return $obj;
         }, $result);
     }
-}
-
-trait ParticipantDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
 	/**
 	 * Create a `Participant`.

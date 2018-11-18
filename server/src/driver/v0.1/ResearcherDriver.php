@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/LAMPDriver.php';
 
-trait ResearcherDriverGET_v0_1 {
+trait ResearcherDriver {
     use LAMPDriver_v0_1;
 
     /** 
      * Get a set of `Researcher`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
         /** 
          * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
@@ -44,10 +44,6 @@ trait ResearcherDriverGET_v0_1 {
             return $obj;
         }, $result);
     }
-}
-
-trait ResearcherDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
 
 	/**
 	 * Create a `Researcher` with a new object.
