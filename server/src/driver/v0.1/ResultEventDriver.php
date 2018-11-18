@@ -107,9 +107,9 @@ trait ResultEventDriverGET_v0_1 {
 			$ctid = array_drop($raw, 'ctid');
 			$uid = array_drop($raw, 'uid');
 			$aid = array_drop($raw, 'aid');
-			$raw->id = new LAMPID([ResultEvent::class, $id, $ctid]);
+			$raw->id = new TypeID([ResultEvent::class, $id, $ctid]);
 			if ($ctid >= 0)
-				$raw->activity = new LAMPID([Activity::class, ActivityType::Game, $ctid, $aid]);
+				$raw->activity = new TypeID([Activity::class, ActivityType::Game, $ctid, $aid]);
 
 			// Decrypt all static data/temporal event properties.
 			if (isset($raw->static_data->survey_name))

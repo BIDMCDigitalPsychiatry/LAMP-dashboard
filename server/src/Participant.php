@@ -523,7 +523,7 @@ class Participant extends LAMP {
      * )
      */
     public static function all_by_researcher($researcher_id) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class, Study::class]);
+        $_id = (new TypeID($researcher_id))->require([Researcher::class, Study::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });

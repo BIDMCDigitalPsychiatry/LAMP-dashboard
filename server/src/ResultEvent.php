@@ -165,7 +165,7 @@ class ResultEvent extends LAMP {
      * )
      */
     public static function view($result_event_id) {
-        $_id = (new LAMPID($result_event_id))->require([ResultEvent::class]);
+        $_id = (new TypeID($result_event_id))->require([ResultEvent::class]);
         self::authorize(function($type, $value) use($_id) {
             if ($_id->part(2) > 0) return true;
                 // CTest shortcut
@@ -216,7 +216,7 @@ class ResultEvent extends LAMP {
      * )
      */
     public static function all_by_participant_activity($participant_id, $activity_id) {
-        $aid = (new LAMPID($activity_id))->require([Activity::class]);
+        $aid = (new TypeID($activity_id))->require([Activity::class]);
         self::authorize(function($type, $value) use($participant_id, $aid) {
             $_id1 = self::parent_of($aid, Activity::class, Researcher::class);
             $_id2 = self::parent_of($participant_id, Participant::class, Researcher::class);
@@ -358,8 +358,8 @@ class ResultEvent extends LAMP {
      * )
      */
     public static function all_by_researcher_activity($researcher_id, $activity_id) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class, Study::class]);
-        $aid = (new LAMPID($activity_id))->require([Activity::class]);
+        $_id = (new TypeID($researcher_id))->require([Researcher::class, Study::class]);
+        $aid = (new TypeID($activity_id))->require([Activity::class]);
         self::authorize(function($type, $value) use($_id, $aid) {
             $_id1 = self::parent_of($aid, Activity::class, Researcher::class);
             return ($type == AuthType::Researcher && 
@@ -400,7 +400,7 @@ class ResultEvent extends LAMP {
      * )
      */
     public static function all_by_activity($activity_id) {
-        $aid = (new LAMPID($activity_id))->require([Activity::class]);
+        $aid = (new TypeID($activity_id))->require([Activity::class]);
         self::authorize(function($type, $value) use($aid) {
             $_id1 = self::parent_of($aid, Activity::class, Researcher::class);
             if ($type == AuthType::Researcher) {
@@ -478,7 +478,7 @@ class ResultEvent extends LAMP {
      * )
      */
     public static function all_by_researcher($researcher_id) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class, Study::class]);
+        $_id = (new TypeID($researcher_id))->require([Researcher::class, Study::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });

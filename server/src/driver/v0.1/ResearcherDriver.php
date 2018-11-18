@@ -35,11 +35,11 @@ trait ResearcherDriverGET_v0_1 {
         // Map from SQL DB to the local Researcher type.
         return array_map(function($raw) {
             $obj = new Researcher();
-            $obj->id = new LAMPID([Researcher::class, $raw->id]);
+            $obj->id = new TypeID([Researcher::class, $raw->id]);
             $obj->name = LAMP::decrypt($raw->name).' '.LAMP::decrypt(array_drop($raw, 'lname'));
             $obj->email = LAMP::decrypt($raw->email);
             $obj->studies = array_map(function($x) {
-                return new LAMPID([Study::class, $x->id]);
+                return new TypeID([Study::class, $x->id]);
             }, $raw->studies);
             return $obj;
         }, $result);

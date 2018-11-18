@@ -123,7 +123,7 @@ class Researcher extends LAMP {
      * )
      */
     public static function set_attachment($researcher_id, $attachment_key, $script_type, $script_contents, $script_requirements) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class]);
+        $_id = (new TypeID($researcher_id))->require([Researcher::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
@@ -165,7 +165,7 @@ class Researcher extends LAMP {
     public static function view($researcher_id) {
         if ($researcher_id === 'me')
              $_id = self::me();
-        else $_id = (new LAMPID($researcher_id))->require([Researcher::class]);
+        else $_id = (new TypeID($researcher_id))->require([Researcher::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });

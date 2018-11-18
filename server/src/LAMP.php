@@ -134,7 +134,7 @@ class LAMP {
                     return $def($fn, $args);
                 });
 
-                $res = json_decode(json_encode($res)); // needed because LAMPID/JsonSerializable
+                $res = json_decode(json_encode($res)); // needed because TypeID/JsonSerializable
                 try {
                     $res = $xp(Flight::request()->query->xpath, $res);
                 } catch (Exception $e) {
@@ -258,7 +258,7 @@ abstract class AuthType extends LAMP {
  * access ID components safely. Note: DO NOT use the reserved character ':' in any 
  * component strings.
  */
-class LAMPID implements JsonSerializable {
+class TypeID implements JsonSerializable {
     private $components = [];
     public function __construct($value) {
         if (is_string($value)) {

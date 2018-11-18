@@ -184,16 +184,16 @@ trait ActivityDriverGET_v0_1 {
             $obj->type = $raw->type;
             $obj->sharing_mode = $raw->sharing_mode;
             if ($obj->type == ActivityType::Game) {
-                $obj->id = new LAMPID([Activity::class, ActivityType::Game, $raw->id, 
+                $obj->id = new TypeID([Activity::class, ActivityType::Game, $raw->id,
                                        array_drop($raw, 'aid')]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->settings;
                 if (isset($obj->settings->distraction_activities))
                     $obj->settings->distraction_activities = array_map(function($x) { 
-                        return new LAMPID([Activity::class, ActivityType::Survey, $x]);
+                        return new TypeID([Activity::class, ActivityType::Survey, $x]);
                     }, $obj->settings->distraction_activities);
             } else if ($obj->type == ActivityType::Survey) {
-                $obj->id = new LAMPID([Activity::class, ActivityType::Survey, $raw->id]);
+                $obj->id = new TypeID([Activity::class, ActivityType::Survey, $raw->id]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->questions;
             }

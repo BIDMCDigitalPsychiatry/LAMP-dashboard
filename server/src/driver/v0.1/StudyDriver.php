@@ -54,17 +54,17 @@ trait StudyDriverGET_v0_1 {
         // Map from SQL DB to the local Study type.
         return array_map(function($raw) {
             $obj = new Study();
-            $obj->id = new LAMPID([Study::class, $raw->id]);
+            $obj->id = new TypeID([Study::class, $raw->id]);
             $obj->name = $raw->name;
             $obj->participants = isset($raw->participants) ? array_map(function($x) { 
                 return LAMP::decrypt($x->id, true); 
             }, $raw->participants) : [];
             $obj->activities = array_merge(
                 isset($raw->surveys) ? array_map(function($x) { 
-                    return new LAMPID([Activity::class, ActivityType::Survey, $x->id]); 
+                    return new TypeID([Activity::class, ActivityType::Survey, $x->id]);
                 }, $raw->surveys) : [], 
                 isset($raw->ctests) ? array_map(function($x) {
-                    return new LAMPID([Activity::class, ActivityType::Game, $x->id, $x->aid]); 
+                    return new TypeID([Activity::class, ActivityType::Game, $x->id, $x->aid]);
                 }, $raw->ctests) : []
             );
             return $obj;

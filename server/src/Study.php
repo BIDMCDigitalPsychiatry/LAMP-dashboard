@@ -90,7 +90,7 @@ class Study extends LAMP {
      * )
      */
     public static function view($study_id) {
-        $_id = (new LAMPID($study_id))->require([Researcher::class, Study::class]);
+        $_id = (new TypeID($study_id))->require([Researcher::class, Study::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });

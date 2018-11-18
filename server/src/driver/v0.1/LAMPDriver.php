@@ -103,7 +103,7 @@ trait LAMPDriver_v0_1 {
                 WHERE IsDeleted = 0 AND Email = '{$value}';
             ");
             if (count($result) == 0) return null;
-            return new LAMPID([Researcher::class, $result[0]['AdminID']]);
+            return new TypeID([Researcher::class, $result[0]['AdminID']]);
 
         // We're a Participant.
         } else if (preg_match('#^G?U#', $parts[0]) === 1) { // UID
@@ -128,7 +128,7 @@ trait LAMPDriver_v0_1 {
 
         /**
          * Function of type `function($type, $value): $is_ok`.
-         * Possible values are `String` if the type is `Participant`, or `LAMPID` otherwise.
+         * Possible values are `String` if the type is `Participant`, or `TypeID` otherwise.
          */
         $callback
     ) {
@@ -159,7 +159,7 @@ trait LAMPDriver_v0_1 {
                     $parts[1] !== LAMP::decrypt($result[0]['Password'], false, 'oauth'))
                 throw new LAMPException("invalid credentials", 403);
             else 
-                $value = (new LAMPID([Researcher::class, $result[0]['AdminID']]))->part(1);
+                $value = (new TypeID([Researcher::class, $result[0]['AdminID']]))->part(1);
             $type = AuthType::Researcher;
 
         // Authenticate as a Participant.
@@ -215,13 +215,13 @@ trait LAMPDriver_v0_1 {
                             WHERE IsDeleted = 0 AND StudyId = '{$id}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
                 Activity::class => [
                     Researcher::class => function($id) { 
                         if ($id->part(1) === ActivityType::Game) {
-                            return new LAMPID([Researcher::class, $id->part(3)]);
+                            return new TypeID([Researcher::class, $id->part(3)]);
                         } else if ($id->part(1) === ActivityType::Survey) {
                             $result = self::lookup("
                                 SELECT AdminID AS value
@@ -229,7 +229,7 @@ trait LAMPDriver_v0_1 {
                                 WHERE IsDeleted = 0 AND SurveyID = '{$id->part(2)}';
                             ");
                             return count($result) === 0 ? null : 
-                                new LAMPID([Researcher::class, $result[0]['value']]);
+                                new TypeID([Researcher::class, $result[0]['value']]);
                         }
                         return null;
                     },
@@ -255,7 +255,7 @@ trait LAMPDriver_v0_1 {
                             WHERE LocationID = '{$id->part(1)}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
                 FitnessEvent::class => [
@@ -279,7 +279,7 @@ trait LAMPDriver_v0_1 {
                             WHERE HKDailyValueID = '{$id->part(1)}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
                 ResultEvent::class => [

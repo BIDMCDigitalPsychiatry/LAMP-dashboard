@@ -64,7 +64,7 @@ trait EnvironmentEventDriverGET_v0_1 {
             $_type = array_drop($obj, 'type');
             $_name = array_drop($obj, 'location_name');
 
-            $obj->id = new LAMPID([EnvironmentEvent::class, $obj->id]);
+            $obj->id = new TypeID([EnvironmentEvent::class, $obj->id]);
             $obj->coordinates = LAMP::decrypt($obj->coordinates, true);
 
             // Extract the location and social contexts from the name.

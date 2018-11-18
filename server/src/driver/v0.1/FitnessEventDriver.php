@@ -86,7 +86,7 @@ trait FitnessEventDriver_v0_1 {
 
         // Map from SQL DB to the local FitnessEvent type.
         foreach ($result as &$obj) {
-            $obj->id = new LAMPID([FitnessEvent::class, $obj->id]);
+            $obj->id = new TypeID([FitnessEvent::class, $obj->id]);
             $obj->attachments = null;
             if (isset($obj->record->height))
                 $obj->record->height = $_convert($_decrypt($obj->record->height), ' cm', 'floatval');

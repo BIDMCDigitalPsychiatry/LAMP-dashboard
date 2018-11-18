@@ -96,10 +96,10 @@ trait ParticipantDriverGET_v0_1 {
             $obj->settings->sex = LAMP::decrypt($obj->settings->sex, true);
             $obj->settings->blood_type = LAMP::decrypt($obj->settings->blood_type, true);
             $obj->fitness_events = isset($raw->hkevents) ? array_map(function($x) { 
-                return new LAMPID([FitnessEvent::class, $x->id]); 
+                return new TypeID([FitnessEvent::class, $x->id]);
             }, $raw->hkevents) : [];
             $obj->environment_events = isset($raw->locations) ? array_map(function($x) { 
-                return new LAMPID([EnvironmentEvent::class, $x->id]); 
+                return new TypeID([EnvironmentEvent::class, $x->id]);
             }, $raw->locations) : [];
             $obj->result_events = [];
             $obj->metadata_events = [];

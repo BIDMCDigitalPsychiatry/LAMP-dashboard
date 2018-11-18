@@ -135,7 +135,7 @@ class EnvironmentEvent extends LAMP {
      * )
      */
     public static function view($environment_event_id) {
-        $_id = (new LAMPID($environment_event_id))->require([EnvironmentEvent::class]);
+        $_id = (new TypeID($environment_event_id))->require([EnvironmentEvent::class]);
         self::authorize(function($type, $value) {
             $_id1 = self::parent_of($environment_event_id, EnvironmentEvent::class, 
                         $type == AuthType::Researcher ? Researcher::class : Participant::class);
@@ -251,7 +251,7 @@ class EnvironmentEvent extends LAMP {
      * )
      */
     public static function all_by_researcher($researcher_id) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class, Study::class]);
+        $_id = (new TypeID($researcher_id))->require([Researcher::class, Study::class]);
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
