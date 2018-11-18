@@ -7,7 +7,7 @@ trait ActivityDriverGET_v0_1 {
     /**
      * Get a set of `Activity`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
     	/** 
     	 * The `ActivityType`s to get (currently only `game` or `survey`).

@@ -7,7 +7,7 @@ trait EnvironmentEventDriverGET_v0_1 {
     /** 
      * Get a set of `EnvironmentEvent`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
         /** 
          * The `StudyId` column of the `Users` table in the LAMP v0.1 DB.

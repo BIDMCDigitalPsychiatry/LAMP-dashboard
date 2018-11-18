@@ -141,7 +141,7 @@ class EnvironmentEvent extends LAMP {
                         $type == AuthType::Researcher ? Researcher::class : Participant::class);
             return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
         });
-        return EnvironmentEvent::_get(null, null, $_id->part(1));
+        return EnvironmentEvent::_select(null, null, $_id->part(1));
     }
 
     /** 
@@ -183,7 +183,7 @@ class EnvironmentEvent extends LAMP {
                 return $value == $participant_id;
             } else return false;
         });
-        return EnvironmentEvent::_get($participant_id);
+        return EnvironmentEvent::_select($participant_id);
     }
 
     /** 
@@ -255,7 +255,7 @@ class EnvironmentEvent extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return EnvironmentEvent::_get(null, $_id->part(1));
+        return EnvironmentEvent::_select(null, $_id->part(1));
     }
 
     /** 
@@ -281,6 +281,6 @@ class EnvironmentEvent extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return EnvironmentEvent::_get();
+        return EnvironmentEvent::_select();
     }
 }

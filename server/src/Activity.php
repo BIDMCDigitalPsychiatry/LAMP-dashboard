@@ -221,7 +221,7 @@ class Activity extends LAMP {
                 return $_id2->part(1) == $_id1->part(1);
             } else return false;
         });
-        return Activity::_get([$_id->part(1)], $_id->part(2), 
+        return Activity::_select([$_id->part(1)], $_id->part(2),
                                $_id->part(2) , $_id->part(3));
     }
 
@@ -294,7 +294,7 @@ class Activity extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Activity::_get([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
+        return Activity::_select([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
     }
     
     /** 
@@ -333,7 +333,7 @@ class Activity extends LAMP {
             return ($type == AuthType::Researcher && $value == $_id->part(1)) ||
                    ($type == AuthType::Participant && $value == $participant_id);
         });
-        return Activity::_get([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
+        return Activity::_select([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
     }
 
     /** 
@@ -359,6 +359,6 @@ class Activity extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return Activity::_get([ActivityType::Game, ActivityType::Survey]);
+        return Activity::_select([ActivityType::Game, ActivityType::Survey]);
     }
 }

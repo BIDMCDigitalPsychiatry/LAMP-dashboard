@@ -7,7 +7,7 @@ trait StudyDriverGET_v0_1 {
     /** 
      * Get a set of `Study`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
         /** 
          * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
