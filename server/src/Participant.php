@@ -156,12 +156,12 @@ class Participant extends LAMP {
      *   type="array",
      *   @OA\Items(
      *     ref="#/components/schemas/Identifier",
-     *     x={"type"="#/components/schemas/Result"},
+     *     x={"type"="#/components/schemas/ResultEvent"},
      *   ),
-     *   description="The set of all results from the participant.",
+     *   description="The set of all result events from the participant.",
      * )
      */
-    public $results = null;
+    public $result_events = null;
 
     /** 
      * @OA\Property(
@@ -245,14 +245,14 @@ class Participant extends LAMP {
 
         // Prepare for a within-subject export document.
         $a = Activity::all_by_participant($participant_id);
-        $r = Result::all_by_participant($participant_id) ?: [];
+        $r = ResultEvent::all_by_participant($participant_id) ?: [];
         $e = EnvironmentEvent::all_by_participant($participant_id) ?: [];
         $f = FitnessEvent::all_by_participant($participant_id) ?: [];
 
         // We have to retrieve all referenced data and synthesize the object.
         foreach ($r as &$res) {
 
-            // Fill in the Activity for all Results.
+            // Fill in the Activity for all ResultEvents.
             if ($res->activity !== null) {
                 $n = array_map(function($x) {
                     return $x->name;
@@ -262,14 +262,14 @@ class Participant extends LAMP {
                 $res->activity = array_shift($n);
             } else $res->activity = array_drop($res->static_data, 'survey_name');
 
-            // Match the result to the correct event(s), if any.
+            // Match the result event to the correct event(s), if any.
             $this_e = array_filter($e, function($x) use($res) {
-                return ($x->timestamp >= $res->start_time - 1800000) && 
-                       ($x->timestamp <= $res->end_time + 300000);
+                return ($x->timestamp >= $res->timestamp - 1800000) &&
+                       ($x->timestamp <= ($res->timestamp + $res->duration) + 300000);
             });
             $this_f = array_filter($f, function($x) use($res) {
-                return ($x->timestamp >= $res->start_time - 1800000) && 
-                       ($x->timestamp <= $res->end_time + 300000);
+                return ($x->timestamp >= $res->timestamp - 1800000) &&
+                       ($x->timestamp <= ($res->timestamp + $res->duration) + 300000);
             });
             $res->environment_event = count($this_e) >= 1 ? reset($this_e) : null;
             $res->fitness_event = count($this_f) >= 1 ? reset($this_f) : null;
@@ -315,12 +315,12 @@ class Participant extends LAMP {
         foreach ($all_p as &$p) {
 
             // We have to retrieve all referenced data and synthesize the object.
-            $p->results = Result::all_by_participant($p->id) ?: [];
+            $p->result_events = ResultEvent::all_by_participant($p->id) ?: [];
             $p->environment_events = EnvironmentEvent::all_by_participant($p->id) ?: [];
             $p->fitness_events = FitnessEvent::all_by_participant($p->id) ?: [];
 
-            // Fill in the Activity for all Results.
-            foreach ($p->results as &$res) {
+            // Fill in the Activity for all ResultEvents.
+            foreach ($p->result_events as &$res) {
                 if ($res->activity !== null) {
                     $n = array_map(function($x) {
                         return $x->name;
@@ -393,8 +393,8 @@ class Participant extends LAMP {
         // Collect input object for the RScript.
         $p = Participant::view($participant_id);
         $a = Activity::all_by_participant($participant_id);
-        $r = Result::all_by_participant($participant_id) ?: [];
-        $p['results'] = $r;
+        $r = ResultEvent::all_by_participant($participant_id) ?: [];
+        $p['result_events'] = $r;
 
         // Execute the Rscript, if any.
         return RScriptRunner::execute(

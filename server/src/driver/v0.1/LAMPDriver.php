@@ -282,7 +282,7 @@ trait LAMPDriver_v0_1 {
                             new LAMPID([Researcher::class, $result[0]['value']]);
                     },
                 ],
-                Result::class => [
+                ResultEvent::class => [
                     Participant::class => function($id) { 
                         return null;
                     },

@@ -227,48 +227,6 @@ class Activity extends LAMP {
 
     /** 
      * @OA\Get(
-     *   path="/study/{study_id}/activity/type/{type}",
-     *   operationId="Activity::all_by_study_type",
-     *   tags={"Activity"},
-     *   x={"owner"={
-     *     "$ref"="#/components/schemas/Activity"}
-     *   },
-     *   summary="Get the set of all activities available to participants of a single study, by activity type and study identifier.",
-     *   description="Get the set of all activities available to participants of a single study, by activity type and study identifier.",
-     *   @OA\Parameter(
-     *     name="study_id",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/Identifier",
-     *       x={"type"={
-     *         "$ref"="#/components/schemas/Study"}
-     *       },
-     *     )
-     *   ),
-     *   @OA\Parameter(
-     *     name="type",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/ActivityType"
-     *     )
-     *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
-     *   @OA\Response(response=200, ref="#/components/responses/Success"),
-     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-     *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
-     * )
-     */
-    public static function all_by_study_type($study_id, $type) {
-        return Activity::all_by_researcher_type($study_id, $type);
-    }
-
-    /** 
-     * @OA\Get(
      *   path="/study/{study_id}/activity",
      *   operationId="Activity::all_by_study",
      *   tags={"Activity"},
@@ -299,52 +257,6 @@ class Activity extends LAMP {
      */
     public static function all_by_study($study_id) {
         return Activity::all_by_researcher($study_id);
-    }
-    
-    /** 
-     * @OA\Get(
-     *   path="/researcher/{researcher_id}/activity/type/{type}",
-     *   operationId="Activity::all_by_researcher_type",
-     *   tags={"Activity"},
-     *   x={"owner"={
-     *     "$ref"="#/components/schemas/Activity"}
-     *   },
-     *   summary="Get the set of all activities available to participants of any study conducted by a researcher, by activity type and researcher identifier.",
-     *   description="Get the set of all activities available to participants of any study conducted by a researcher, by activity type and researcher identifier.",
-     *   @OA\Parameter(
-     *     name="researcher_id",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/Identifier",
-     *       x={"type"={
-     *         "$ref"="#/components/schemas/Researcher"}
-     *       },
-     *     )
-     *   ),
-     *   @OA\Parameter(
-     *     name="type",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/ActivityType",
-     *     )
-     *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
-     *   @OA\Response(response=200, ref="#/components/responses/Success"),
-     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-     *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
-     * )
-     */
-    public static function all_by_researcher_type($researcher_id, $type) {
-        $_id = (new LAMPID($researcher_id))->require([Researcher::class, Study::class]);
-        self::authorize(function($type, $value) use($_id) {
-            return ($type == AuthType::Researcher && $value == $_id->part(1));
-        });
-        return Activity::_get([$type], null, null, $_id->part(1));
     }
     
     /** 
@@ -387,53 +299,6 @@ class Activity extends LAMP {
     
     /** 
      * @OA\Get(
-     *   path="/participant/{participant_id}/activity/type/{type}",
-     *   operationId="Activity::all_by_participant_type",
-     *   tags={"Activity"},
-     *   x={"owner"={
-     *     "$ref"="#/components/schemas/Activity"}
-     *   },
-     *   summary="Get the set of all activities available to a participant, by activity type and participant identifier.",
-     *   description="Get the set of all activities available to a participant, by activity type and participant identifier.",
-     *   @OA\Parameter(
-     *     name="participant_id",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/Identifier",
-     *       x={"type"={
-     *         "$ref"="#/components/schemas/Participant"}
-     *       },
-     *     )
-     *   ),
-     *   @OA\Parameter(
-     *     name="type",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/ActivityType",
-     *     )
-     *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
-     *   @OA\Response(response=200, ref="#/components/responses/Success"),
-     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-     *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
-     * )
-     */
-    public static function all_by_participant_type($participant_id, $type) {
-        $_id = self::parent_of($participant_id, Participant::class, Researcher::class);
-        self::authorize(function($type, $value) use($participant_id, $_id) {
-            return ($type == AuthType::Researcher && $value == $_id->part(1)) ||
-                   ($type == AuthType::Participant && $value == $participant_id);
-        });
-        return Activity::_get([$type], null, null, $_id->part(1));
-    }
-    
-    /** 
-     * @OA\Get(
      *   path="/participant/{participant_id}/activity",
      *   operationId="Activity::all_by_participant",
      *   tags={"Activity"},
@@ -469,40 +334,6 @@ class Activity extends LAMP {
                    ($type == AuthType::Participant && $value == $participant_id);
         });
         return Activity::_get([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
-    }
-
-    /** 
-     * @OA\Get(
-     *   path="/activity/type/{type}",
-     *   operationId="Activity::all_by_type",
-     *   tags={"Activity"},
-     *   x={"owner"={
-     *     "$ref"="#/components/schemas/Activity"}
-     *   },
-     *   summary="Get the set of all activities by activity type.",
-     *   description="Get the set of all activities by activity type.",
-     *   @OA\Parameter(
-     *     name="type",
-     *     in="path",
-     *     required=true,
-     *     @OA\Schema(
-     *       ref="#/components/schemas/ActivityType",
-     *     )
-     *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
-     *   @OA\Response(response=200, ref="#/components/responses/Success"),
-     *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
-     *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
-     *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
-     * )
-     */
-    public static function all_by_type($type) {
-        self::authorize(function($type, $value) {
-            return false;
-        });
-        return Activity::_get([$type]);
     }
 
     /** 

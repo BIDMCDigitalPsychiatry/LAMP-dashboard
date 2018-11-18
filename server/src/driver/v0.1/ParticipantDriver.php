@@ -101,7 +101,7 @@ trait ParticipantDriverGET_v0_1 {
             $obj->environment_events = isset($raw->locations) ? array_map(function($x) { 
                 return new LAMPID([EnvironmentEvent::class, $x->id]); 
             }, $raw->locations) : [];
-            $obj->results = [];
+            $obj->result_events = [];
             $obj->metadata_events = [];
             $obj->sensor_events = [];
             return $obj;
