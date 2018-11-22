@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/LAMP.php';
-require_once __DIR__ . '/driver/v0.1/StudyDriver.php';
+require_once __DIR__ . '/driver/StudyDriver.php';
 
 /**
  * @OA\Schema(
