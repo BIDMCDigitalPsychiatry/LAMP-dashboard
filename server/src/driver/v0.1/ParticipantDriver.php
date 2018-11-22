@@ -27,7 +27,9 @@ trait ParticipantDriver {
 	    $results_list = implode('', array_map(function ($entry) {
 		    return "
 	    	    (
-                    SELECT {$entry['IndexColumnName']} AS id
+                    SELECT 
+                        ({$entry['ActivityIndexID']}) AS ctid,
+                        [{$entry['IndexColumnName']}] AS id
                     FROM {$entry['TableName']}
                     WHERE {$entry['TableName']}.UserID = Users.UserID
                     FOR JSON PATH, INCLUDE_NULL_VALUES
@@ -94,6 +96,14 @@ trait ParticipantDriver {
 
         // Map from SQL DB to the local Participant type.
         return array_map(function($raw) use($activities_list) {
+
+	        // A weird reverse-map + array-splat to group all result rows together.
+	        $rst_grp_all = array_merge(...array_map(function ($entry) use ($raw) {
+	        	$key = 'rst_grp_' . $entry['ActivityIndexID'];
+		        return isset($raw->{$key}) ? $raw->{$key} : [];
+	        }, $activities_list));
+
+	        // Create a new Participant object for type-checking and other facilities.
             $obj = new Participant();
             $obj->settings = $raw->settings;
             $obj->id = LAMP::decrypt($raw->id, true);
@@ -105,17 +115,9 @@ trait ParticipantDriver {
             $obj->environment_events = isset($raw->locations) ? array_map(function($x) {
                 return new TypeID([EnvironmentEvent::class, $x->id]);
             }, $raw->locations) : [];
-
-            // A weird reverse-map + array-splat + forward-map to convert result objects.
 	        $obj->result_events = array_map(function ($x) {
-		        return new TypeID([ResultEvent::class, $x['ctid'], $x['id']]);
-	        }, ...array_map(function ($entry) use ($raw) {
-		        return [
-		        	'ctid' => $entry['ActivityIndexID'],
-			        'id' => $raw->{'rst_grp_' . $entry['ActivityIndexID']}->id
-		        ];
-	        }, $activities_list));
-
+		        return new TypeID([ResultEvent::class, $x->ctid, $x->id]);
+            }, $rst_grp_all);
             $obj->metadata_events = [];
             $obj->sensor_events = [];
             return $obj;

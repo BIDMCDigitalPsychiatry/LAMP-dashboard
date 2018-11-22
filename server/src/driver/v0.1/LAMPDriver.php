@@ -57,7 +57,8 @@ trait LAMPDriver {
                 }, $result)));
             }
         } catch(PDOException $e) {
-            throw new LAMPException(log::err($e, $sql_query), 500);
+	        log::err($e);
+            throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
 
@@ -84,7 +85,8 @@ trait LAMPDriver {
             log::sys('SQL execution took '.$exec_time.' seconds.');
             return $obj;
         } catch(PDOException $e) {
-            throw new LAMPException(log::err($e, $sql_query), 500);
+	        log::err($e);
+            throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
 
