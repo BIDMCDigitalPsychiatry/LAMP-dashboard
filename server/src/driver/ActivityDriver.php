@@ -265,10 +265,8 @@ trait ActivityDriver {
 		 */
 		$insert_object
 	) {
-
-		// TODO: create surveys!
-
-		return null;
+		// TODO: Activities cannot be created!
+		return null; // TODO
 	}
 
 	/**
@@ -364,10 +362,8 @@ trait ActivityDriver {
 		 */
 		$activity_id
 	) {
-
-		// TODO: delete surveys!
-
-		return null;
+		// TODO: Activities cannot be deleted!
+		return null; // TODO
 	}
 }
 

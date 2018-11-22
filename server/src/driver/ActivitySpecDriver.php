@@ -19,13 +19,15 @@ trait ActivitySpecDriver {
 		 */
 		$admin_id = null
 	) {
+		$cond = $index_id !== null ? "WHERE ActivityIndexID = $index_id" : '';
 
 		// Collect the set of legacy Activity tables and stitch the full query.
 		$activities_list = self::lookup("
 			SELECT 
 	        	ActivityIndexID AS id,
 	        	Name AS name
-			FROM LAMP_Aux.dbo.ActivityIndex;
+			FROM LAMP_Aux.dbo.ActivityIndex
+			{$cond};
 		");
 
 		// Convert fields correctly and return the spec objects.
@@ -47,6 +49,7 @@ trait ActivitySpecDriver {
 		 */
 		$insert_object
 	) {
+		// TODO: ActivitySpecs do not exist! They cannot be modified!
 		return null; // TODO
 	}
 
@@ -65,6 +68,7 @@ trait ActivitySpecDriver {
 		 */
 		$update_object
 	) {
+		// TODO: ActivitySpecs do not exist! They cannot be modified!
 		return null; // TODO
 	}
 
@@ -78,6 +82,7 @@ trait ActivitySpecDriver {
 		 */
 		$index_id
 	) {
+		// TODO: ActivitySpecs do not exist! They cannot be modified!
 		return null; // TODO
 	}
 }
