@@ -150,7 +150,19 @@ class LAMP {
                 $trs = substr(Flight::request()->query->export, 4, 9) === 'transpose';
                 $res = array_map(function($x) { return Dynamics::flatten($x, true); }, $res);
                 return Flight::csv($res, 200, $trs);
-            } else return Flight::json(["count" => count($res), "result" => $res]);
+            } else return Flight::json([
+            	"meta" => [
+            		"link" => [
+            			"rel" => "self",
+			            "href" => explode('?', Flight::request()->url)[0] // TODO / FIXME
+		            ],
+		            "access" => [
+			            "on" => 'never',
+			            "by" => 'nobody'
+		            ]
+	            ],
+	            "data" => $res
+            ]);
         }, true);
     }
 
@@ -433,14 +445,34 @@ class DurationInterval extends LAMP {
  * @OA\Schema(
  *   schema="Response",
  *   @OA\Property(
- *     property="result",
+ *     property="data",
  *     type="array",
  *     @OA\Items(),
  *   ),
  *   @OA\Property(
- *     property="count",
- *     type="integer",
- *     format="int32",
+ *     property="meta",
+ *     @OA\Property(
+ *       property="link",
+ *       @OA\Property(
+ *         property="rel",
+ *         type="string"
+ *       ),
+ *       @OA\Property(
+ *         property="href",
+ *         type="string"
+ *       ),
+ *     ),
+ *     @OA\Property(
+ *       property="access",
+ *       @OA\Property(
+ *         property="on",
+ *         type="string"
+ *       ),
+ *       @OA\Property(
+ *         property="by",
+ *         type="string"
+ *       ),
+ *     ),
  *   ),
  * )
  *
