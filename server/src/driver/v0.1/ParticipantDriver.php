@@ -19,9 +19,28 @@ trait ParticipantDriver {
          */
         $admin_id = null
     ) {
+
+	    // Collect the set of legacy Activity tables and stitch the full query.
+	    $activities_list = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
+
+	    // Construct N sub-objects for each of N activities.
+	    $results_list = implode('', array_map(function ($entry) {
+		    return "
+	    	    (
+                    SELECT {$entry['IndexColumnName']} AS id
+                    FROM {$entry['TableName']}
+                    WHERE {$entry['TableName']}.UserID = Users.UserID
+                    FOR JSON PATH, INCLUDE_NULL_VALUES
+                ) AS [rst_grp_{$entry['ActivityIndexID']}],
+	    	";
+	    }, $activities_list));
+
+	    // Configure lookup conditions (by user or admin only).
         $user_id = LAMP::encrypt($user_id);
         $cond1 = $user_id !== null ? "AND Users.StudyId = '{$user_id}'" : '';
         $cond2 = $admin_id !== null ? "AND Users.AdminID = '{$admin_id}'" : '';
+
+        // Perform complex lookup, returning a JSON object set.
         $result = self::lookup("
             SELECT 
                 StudyId AS id, 
@@ -50,18 +69,7 @@ trait ParticipantDriver {
                     SELECT DATEDIFF_BIG(MS, '1970-01-01', TipsViewedOn)
                     WHERE TipsViewedOn IS NOT NULL
                 ) AS [settings.tips_checked_date],
-                (
-                    SELECT DATEDIFF_BIG(MS, '1970-01-01', CONVERT(DATETIME, DateOfBirth))
-                    WHERE DateOfBirth >= CONVERT(DATE, '1900-01-01')
-                ) AS [settings.date_of_birth],
-                (
-                    SELECT Sex
-                    WHERE Sex <> N'' AND Sex <> N'Not set'
-                ) AS [settings.sex], 
-                (
-                    SELECT BloodType
-                    WHERE BloodType <> N'' AND BloodType <> N'Not set'
-                ) AS [settings.blood_type],
+                {$results_list}
                 (
                     SELECT HKDailyValueID AS id
                     FROM HealthKit_DailyValues
@@ -77,8 +85,6 @@ trait ParticipantDriver {
             FROM Users
             FULL OUTER JOIN UserSettings
                 ON UserSettings.UserID = Users.UserID
-            FULL OUTER JOIN HealthKit_BasicInfo
-                ON HealthKit_BasicInfo.UserID = Users.UserID
             FULL OUTER JOIN UserDevices
                 ON UserDevices.UserID = Users.UserID
             WHERE Users.IsDeleted = 0 {$cond1} {$cond2}
@@ -87,21 +93,29 @@ trait ParticipantDriver {
         if (count($result) == 0) return null;
 
         // Map from SQL DB to the local Participant type.
-        return array_map(function($raw) {
+        return array_map(function($raw) use($activities_list) {
             $obj = new Participant();
             $obj->settings = $raw->settings;
             $obj->id = LAMP::decrypt($raw->id, true);
             $obj->settings->study_code = LAMP::decrypt($obj->settings->study_code, true);
             $obj->settings->theme = LAMP::decrypt($obj->settings->theme, true);
-            $obj->settings->sex = LAMP::decrypt($obj->settings->sex, true);
-            $obj->settings->blood_type = LAMP::decrypt($obj->settings->blood_type, true);
-            $obj->fitness_events = isset($raw->hkevents) ? array_map(function($x) { 
+            $obj->fitness_events = isset($raw->hkevents) ? array_map(function($x) {
                 return new TypeID([FitnessEvent::class, $x->id]);
             }, $raw->hkevents) : [];
-            $obj->environment_events = isset($raw->locations) ? array_map(function($x) { 
+            $obj->environment_events = isset($raw->locations) ? array_map(function($x) {
                 return new TypeID([EnvironmentEvent::class, $x->id]);
             }, $raw->locations) : [];
-            $obj->result_events = [];
+
+            // A weird reverse-map + array-splat + forward-map to convert result objects.
+	        $obj->result_events = array_map(function ($x) {
+		        return new TypeID([ResultEvent::class, $x['ctid'], $x['id']]);
+	        }, ...array_map(function ($entry) use ($raw) {
+		        return [
+		        	'ctid' => $entry['ActivityIndexID'],
+			        'id' => $raw->{'rst_grp_' . $entry['ActivityIndexID']}->id
+		        ];
+	        }, $activities_list));
+
             $obj->metadata_events = [];
             $obj->sensor_events = [];
             return $obj;
@@ -123,7 +137,6 @@ trait ParticipantDriver {
 		 */
 		$insert_object
 	) {
-		// TODO: RESTRICTED: date_of_birth, sex, blood_type
 
 		// Prepare the minimal SQL column changes from the provided fields.
 		$insertsA = []; $insertsB = []; $insertsC = [];
@@ -195,7 +208,6 @@ trait ParticipantDriver {
 		 */
 		$update_object
 	) {
-		// RESTRICTED: date_of_birth, sex, blood_type
 		$user_id = LAMP::encrypt($user_id);
 
 		// Terminate the operation if no valid string-typed fields are modified.

@@ -86,6 +86,7 @@ trait ResultEventDriver {
                 FOR JSON PATH, INCLUDE_NULL_VALUES
             )"; }, $tableset);
 
+		// Perform the dynamic SQL lookup.
 		$usage = "\n            SELECT X.value FROM (\n" .
 			implode(" UNION ALL\n", array_map(function ($entry) {
 				return "                SELECT value FROM [{$entry['Name']}]";

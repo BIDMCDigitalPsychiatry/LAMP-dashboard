@@ -92,30 +92,6 @@ class ParticipantSettings extends LAMP {
      * )
      */
     public $tips_checked_date = null;
-
-    /** 
-     * @OA\Property(
-     *   ref="#/components/schemas/Timestamp",
-     *   description="The participant's date of birth.",
-     * )
-     */
-    public $date_of_birth = null;
-
-    /** 
-     * @OA\Property(
-     *   type="string",
-     *   description="The participant's sex.",
-     * )
-     */
-    public $sex = null;
-
-    /** 
-     * @OA\Property(
-     *   type="string",
-     *   description="The participant's blood type.",
-     * )
-     */
-    public $blood_type = null;
 }
 
 /**
