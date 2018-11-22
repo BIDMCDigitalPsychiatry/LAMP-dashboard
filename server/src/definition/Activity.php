@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/LAMP.php';
-require_once __DIR__ . '/driver/ActivityDriver.php';
+require_once __DIR__ . '/../LAMP.php';
+require_once __DIR__ . '/../driver/ActivityDriver.php';
 
 /**
  * @OA\Schema(
