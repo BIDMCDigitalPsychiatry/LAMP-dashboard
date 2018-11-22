@@ -135,64 +135,96 @@ trait ParticipantDriver {
 		$admin_id,
 
 		/**
-		 * The new `settings` object.
+		 * The patch fields of the `Participant` object. Only `settings` and `password` are supported.
 		 */
 		$insert_object
 	) {
+		$insert_password = $insert_object->password;
+		$insert_object = $insert_object->settings;
+
+		// Terminate the operation if any of the required valid string-typed fields are not present.
+		if (!is_string($insert_password))
+			return null;
+
+		// Create a fake email and study ID to allow login on the client app.
+		$_id = 'U' . rand(000000, 999999);
+		$study_id = LAMP::encrypt($_id);
+		$email = LAMP::encrypt(bin2hex(openssl_random_pseudo_bytes(6)) . '@lamp.com');
+
+		// Prepare the likely required SQL column changes as above.
+		$password = LAMP::encrypt($insert_password, null, 'oauth');
+		$study_code = isset($insert_object->study_code) ? LAMP::encrypt($insert_object->study_code) : 'NULL';
 
 		// Prepare the minimal SQL column changes from the provided fields.
-		$insertsA = []; $insertsB = []; $insertsC = [];
-		if ($insert_object->study_code !== null)
-			array_push($insertsA, 'StudyCode = \'' . LAMP::encrypt($insert_object->study_code) . '\'');
-		if ($insert_object->theme !== null)
-			array_push($insertsB, 'AppColor = \'' . LAMP::encrypt($insert_object->theme) . '\'');
-		if ($insert_object->language !== null)
-			array_push($insertsB, 'Language = \'' . $insert_object->language . '\'');
-		if ($insert_object->last_login !== null)
-			array_push($insertsC, 'LastLoginOn = \'' . $insert_object->last_login . '\'');
-		if ($insert_object->device_type !== null)
-			array_push($insertsC, 'DeviceType = \'' . $insert_object->device_type . '\'');
-		if ($insert_object->emergency_contact !== null)
-			array_push($insertsB, '24By7ContactNo = \'' . LAMP::encrypt($insert_object->emergency_contact) . '\'');
-		if ($insert_object->helpline !== null)
-			array_push($insertsB, 'PersonalHelpline = \'' . LAMP::encrypt($insert_object->helpline) . '\'');
-		if ($insert_object->blogs_checked_date !== null)
-			array_push($insertsB, 'BlogsViewedOn = \'' . $insert_object->blogs_checked_date . '\'');
-		if ($insert_object->tips_checked_date !== null)
-			array_push($insertsB, 'TipsViewedOn = \'' . $insert_object->tips_checked_date . '\'');
-		$insertsA = implode(', ', $insertsA);
-		$insertsB = implode(', ', $insertsB);
-		$insertsC = implode(', ', $insertsC);
+		$theme = isset($insert_object->theme) ? LAMP::encrypt($insert_object->theme) : 'NULL';
+		$language = isset($insert_object->language) ? $insert_object->language : 'NULL';
+		$emergency_contact = isset($insert_object->emergency_contact) ? LAMP::encrypt($insert_object->emergency_contact) : 'NULL';
+		$helpline = isset($insert_object->helpline) ? LAMP::encrypt($insert_object->helpline) : 'NULL';
+		$blogs_checked_date = isset($insert_object->blogs_checked_date) ? $insert_object->blogs_checked_date : 'NULL';
+		$tips_checked_date = isset($insert_object->tips_checked_date) ? $insert_object->tips_checked_date : 'NULL';
+		// Part Two: Devices!
+		$last_login = isset($insert_object->last_login) ? $insert_object->last_login : 'NULL';
+		$device_type = isset($insert_object->device_type) ? $insert_object->device_type : 'NULL';
 
 		// Insert row, returning the generated primary key ID.
-		$result = self::lookup("
+		$result1 = self::lookup("
             INSERT INTO Users (
                 Email, 
                 Password, 
-                FirstName, 
-                LastName, 
+                StudyCode, 
+                StudyId, 
                 CreatedOn, 
-                AdminType
+                AdminID
             )
-            OUTPUT INSERTED.StudyId AS id
+            OUTPUT INSERTED.UserID AS id
 			VALUES (
 		        '{$email}',
 		        '{$password}',
-		        '{$first_name}',
-		        '{$last_name}',
+		        '{$study_code}',
+		        '{$study_id}',
 		        GETDATE(), 
-		        2
+		        {$admin_id}
 			);
         ");
 
+		// Bail early if we failed to create a User row.
+		if (!$result1) return null;
 
-
-		// INSERT: Users, UserSettings, UserDevices
-
-
+		$result2 = self::lookup("
+            INSERT INTO UserSettings (
+                UserID, 
+                AppColor, 
+                [24By7ContactNo], 
+                PersonalHelpline,
+                BlogsViewedOn, 
+                TipsViewedOn, 
+                Language
+            )
+			VALUES (
+			    {$result1['id']},
+		        '{$theme}',
+		        '{$emergency_contact}',
+		        '{$helpline}',
+		        '{$blogs_checked_date}',
+		        '{$tips_checked_date}', 
+		        '{$language}'
+			);
+        ");
+		$result3 = self::lookup("
+            INSERT INTO UserDevices (
+                UserID, 
+                DeviceType, 
+                LastLoginOn
+            )
+			VALUES (
+			    {$result1['id']},
+		        '{$device_type}'
+		        '{$last_login}',
+			);
+        ");
 
 		// Return the new row's ID.
-		return $result;
+		return ($result1 && $result2 && $result3) ? ['id' => $_id] : null;
 	}
 
 	/**
@@ -206,10 +238,12 @@ trait ParticipantDriver {
 		$user_id,
 
 		/**
-		 * The patch fields of the `settings` object.
+		 * The patch fields of the `Participant` object. Only `settings` and `password` are supported.
 		 */
 		$update_object
 	) {
+		$update_password = $update_object->password;
+		$update_object = $update_object->settings;
 		$user_id = LAMP::encrypt($user_id);
 
 		// Terminate the operation if no valid string-typed fields are modified.
@@ -217,11 +251,13 @@ trait ParticipantDriver {
 			!is_string($update_object->language) && !is_string($update_object->last_login) &&
 			!is_string($update_object->device_type) && !is_string($update_object->emergency_contact) &&
 			!is_string($update_object->helpline) && !is_string($update_object->blogs_checked_date) &&
-			!is_string($update_object->tips_checked_date))
+			!is_string($update_object->tips_checked_date) && !is_string($update_password))
 			return null;
 
 		// Prepare the minimal SQL column changes from the provided fields.
 		$updatesA = []; $updatesB = []; $updatesC = [];
+		if ($update_password !== null)
+			array_push($updatesA, 'Password = \'' . LAMP::encrypt($update_password, null, 'oauth') . '\'');
 		if ($update_object->study_code !== null)
 			array_push($updatesA, 'StudyCode = \'' . LAMP::encrypt($update_object->study_code) . '\'');
 		if ($update_object->theme !== null)
@@ -245,12 +281,26 @@ trait ParticipantDriver {
 		$updatesC = implode(', ', $updatesC);
 
 		// Update the specified fields on the selected Users, UserSettings, or UserDevices row.
-		$result = self::perform("
-            UPDATE Users SET {$updatesA} WHERE StudyId = {$user_id};
+		$result1 = self::perform("
+            UPDATE Users 
+            SET {$updatesA} 
+            WHERE StudyId = {$user_id};
+        ");
+		$result2 = self::perform("
+            UPDATE UserSettings 
+            SET {$updatesB} 
+            LEFT JOIN Users ON Users.UserID = UserSettings.UserID 
+            WHERE StudyId = {$user_id};
+        ");
+		$result3 = self::perform("
+            UPDATE UserDevices 
+            SET {$updatesC} 
+            LEFT JOIN Users ON Users.UserID = UserDevices.UserID
+            WHERE StudyId = {$user_id};
         ");
 
 		// Return whether the operation was successful.
-		return $result;
+		return ($result1 && $result2 && $result3);
 	}
 
 	/**
