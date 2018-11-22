@@ -37,10 +37,10 @@ trait StudyDriver {
                 ) AS surveys,
                 (
                     SELECT 
-                        CTestID AS id,
+                        ActivityIndexID AS id,
                         Admin.AdminID AS aid
-                    FROM CTest
-                    WHERE IsDeleted = 0
+                    FROM LAMP_Aux.dbo.ActivityIndex
+                    WHERE ActivityIndexID > 1
                     FOR JSON PATH, INCLUDE_NULL_VALUES
                 ) AS ctests
             FROM Admin
@@ -61,10 +61,10 @@ trait StudyDriver {
             }, $raw->participants) : [];
             $obj->activities = array_merge(
                 isset($raw->surveys) ? array_map(function($x) { 
-                    return new TypeID([Activity::class, ActivityType::Survey, $x->id]);
+                    return new TypeID([Activity::class, 1 /* survey */, $x->id]);
                 }, $raw->surveys) : [], 
                 isset($raw->ctests) ? array_map(function($x) {
-                    return new TypeID([Activity::class, ActivityType::Game, $x->id, $x->aid]);
+                    return new TypeID([Activity::class, $x->id, $x->aid]);
                 }, $raw->ctests) : []
             );
             return $obj;

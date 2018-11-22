@@ -266,10 +266,8 @@ trait TypeDriver {
                     },
                 ],
                 Activity::class => [
-                    Researcher::class => function($id) { 
-                        if ($id->part(1) === ActivityType::Game) {
-                            return new TypeID([Researcher::class, $id->part(3)]);
-                        } else if ($id->part(1) === ActivityType::Survey) {
+                    Researcher::class => function($id) {
+	                    if ($id->part(1) === 1 /* survey */) {
                             $result = self::lookup("
                                 SELECT AdminID AS value
                                 FROM Survey
@@ -277,8 +275,17 @@ trait TypeDriver {
                             ");
                             return count($result) === 0 ? null : 
                                 new TypeID([Researcher::class, $result[0]['value']]);
-                        }
-                        return null;
+                        } else {
+
+		                    // Only "Survey" types lack an encoded AdminID; regardless, verify their deletion.
+		                    $result = self::lookup("
+	                            SELECT AdminID AS value
+	                            FROM Admin
+	                            WHERE IsDeleted = 0 AND AdminID = '{$id->part(3)}';
+                        	");
+		                    return count($result) === 0 ? null :
+			                    new TypeID([Researcher::class, $result[0]['value']]);
+	                    }
                     },
                 ],
                 EnvironmentEvent::class => [

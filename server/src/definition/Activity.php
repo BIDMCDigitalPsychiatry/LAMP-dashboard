@@ -5,50 +5,6 @@ require_once __DIR__ . '/../driver/ActivityDriver.php';
 /**
  * @OA\Schema(
  *   type="string",
- *   enum={"game", "survey", "demographics", "batch"},
- *   description="The kind of activities that may be performed."
- * )
- */
-abstract class ActivityType extends LAMP {
-
-    // A game, such as Jewels Trails, or Spatial Span.
-    const Game = "game";
-
-    // A custom survey.
-    const Survey = "survey";
-
-    // An encrypted demographics survey that might be a consent form or similar.
-    const Demographics = "demographics";
-
-    // A batched activity that may not produce any results but allows a sequential or conditional presentation of grouped activities.
-    const Batch = "batch";
-}
-
-/**
- * @OA\Schema(
- *   type="string",
- *   enum={"none", "study", "researcher", "all"},
- *   description="The sharing restriction type for an activity."
- * )
- */
-abstract class ActivitySharingMode extends LAMP {
-
-    // This activity is not shared and can only be used by participants in one study.
-    const None = "none";
-
-    // This activity is shared between all studies conducted by one researcher.
-    const Study = "study";
-
-    //
-    const Researcher = "researcher";
-
-    // This activity is shared across all researchers and studies and can be used by any participant using the LAMP platform.
-    const All = "all";
-}
-
-/**
- * @OA\Schema(
- *   type="string",
  *   enum={"likert", "list", "boolean", "clock", "years", "months", "days"},
  *   description="The kind of response to a question."
  * )
@@ -139,11 +95,11 @@ class Activity extends LAMP {
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/ActivityType",
-     *   description="The type of the activity."
+     *   ref="#/components/schemas/ActivitySpec",
+     *   description="The specification, parameters, and type of the activity."
      * )
      */
-	public $type = null;
+	public $spec = null;
 
     /** 
      * @OA\Property(
@@ -286,7 +242,7 @@ class Activity extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Activity::_select([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
+        return Activity::_select(null, null, $_id->part(1));
     }
     
     /** 
@@ -325,7 +281,7 @@ class Activity extends LAMP {
             return ($type == AuthType::Researcher && $value == $_id->part(1)) ||
                    ($type == AuthType::Participant && $value == $participant_id);
         });
-        return Activity::_select([ActivityType::Game, ActivityType::Survey], null, null, $_id->part(1));
+        return Activity::_select(null, null, $_id->part(1));
     }
 
     /** 
@@ -351,6 +307,6 @@ class Activity extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return Activity::_select([ActivityType::Game, ActivityType::Survey]);
+        return Activity::_select();
     }
 }

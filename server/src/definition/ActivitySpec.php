@@ -23,14 +23,6 @@ class ActivitySpecItem extends LAMP {
 	 *   description="None.",
 	 * )
 	 */
-	public $description = null;
-
-	/**
-	 * @OA\Property(
-	 *   type="string",
-	 *   description="None.",
-	 * )
-	 */
 	public $type = null;
 
 	/**

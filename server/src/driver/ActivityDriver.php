@@ -10,11 +10,6 @@ trait ActivityDriver {
     private static function _select(
 
     	/** 
-    	 * The `ActivityType`s to get (currently only `game` or `survey`).
-    	 */
-    	$types = [], 
-
-    	/** 
     	 * The `CTestID` column of the `CTest` table in the LAMP v0.1 DB.
     	 */
     	$ctest_id = null, 
@@ -29,11 +24,8 @@ trait ActivityDriver {
     	 */
     	$admin_id = null
     ) {
-        if (count($types) == 0) 
-        	return null;
 
-        $cond0a = in_array('game', $types) ? '1' : '0';
-        $cond0b = in_array('survey', $types) ? '1' : '0';
+    	// ...
         $cond1 = $ctest_id !== null ? "AND CTest.id = '$ctest_id'" : '';
         $cond2 = $survey_id !== null ? "AND SurveyID = '$survey_id'" : '';
         $cond3 = $admin_id !== null ? "AND AdminID = '$admin_id'" : '';
@@ -43,14 +35,6 @@ trait ActivityDriver {
                     AdminID AS aid,
                     ('game') AS type,
                     CTest.*,
-                    JSON_QUERY(dbo.UNWRAP_JSON((
-                        SELECT 
-                            SurveyID AS sid
-                        FROM Admin_CTestSurveySettings
-                        WHERE Admin_CTestSurveySettings.AdminID = Admin.AdminID
-                            AND Admin_CTestSurveySettings.CTestID = CTest.id
-                        FOR JSON PATH, INCLUDE_NULL_VALUES
-                    ), 'sid')) AS [settings.distraction_activities],
                     (
                         SELECT 
                             NoOfSeconds_Beg AS beginner_seconds,
@@ -116,8 +100,7 @@ trait ActivityDriver {
                     FROM CTest
                     WHERE IsDeleted = 0
                 ) AS CTest
-                WHERE 1={$cond0a} 
-                    AND isDeleted = 0 
+                WHERE isDeleted = 0 
                     {$cond1}
                     {$cond3}
                 FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
@@ -162,8 +145,7 @@ trait ActivityDriver {
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS schedule
                 FROM Survey
-                WHERE 1={$cond0b} 
-                    AND isDeleted = 0 
+                WHERE isDeleted = 0 
                     {$cond2}
                     {$cond3}
                 FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
@@ -176,6 +158,18 @@ trait ActivityDriver {
         if (count($result) == 0)
         	return null;
 
+
+
+
+        /* TODO
+          SELECT ActivityIndexID AS id
+          FROM LAMP_Aux.dbo.ActivityIndex
+          WHERE ActivityIndexID > 1
+         */
+
+
+
+
         //
         return array_map(function($raw) { 
             $obj = new Activity();
@@ -185,10 +179,6 @@ trait ActivityDriver {
                                        array_drop($raw, 'aid')]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->settings;
-                if (isset($obj->settings->distraction_activities))
-                    $obj->settings->distraction_activities = array_map(function($x) { 
-                        return new TypeID([Activity::class, ActivityType::Survey, $x]);
-                    }, $obj->settings->distraction_activities);
             } else if ($obj->type == ActivityType::Survey) {
                 $obj->id = new TypeID([Activity::class, ActivityType::Survey, $raw->id]);
                 $obj->name = $raw->name;
@@ -265,7 +255,7 @@ trait ActivityDriver {
 		 */
 		$insert_object
 	) {
-		// TODO: Activities cannot be created!
+		// TODO: Activities cannot be created! **EXCEPT SURVEYS
 		return null; // TODO
 	}
 
@@ -289,15 +279,6 @@ trait ActivityDriver {
 		 */
 		$update_object
 	) {
-
-		// TODO: update surveys!
-		// TODO: update ctests!
-
-		// 1. lookup activity_id -> settings info
-		// 2. settings info -> table name, slot map (!!!)
-		// 3. update <table name> set <slots*> = <values*> where <admin_id>
-
-		// -> settings.jewelsA or settings.jewelsB:
 
 		// The column map specifies the LAMP object key to DB row column mapping.
 		static $jewels_settings_column_map = [
@@ -329,21 +310,36 @@ trait ActivityDriver {
 			"y_shape_count" => 0,
 		];
 
+		//
+		// Schedule:
+		//      - Slot
+		//          - SlotName, IsDefault
+		//      - Repeat
+		//          - RepeatInterval, IsDefault, SortOrder, IsDeleted
+		//      - Admin_CTestSchedule, Admin_SurveySchedule
+		//          - AdminID, CTestID/SurveyID, Version*(C), ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+		//      - Admin_CTestScheduleCustomTime, Admin_SurveyScheduleCustomTime, Admin_BatchScheduleCustomTime
+		//          - Time
+		//      - Admin_BatchSchedule
+		//          - AdminID, BatchName, ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+		//      - Admin_BatchScheduleCTest, Admin_BatchScheduleSurvey
+		//          - CTestID/SurveyID, Version*(C), Order
+		//
+		// Settings:
+		//      - Admin_CTestSurveySettings
+		//          - AdminID, CTestID, SurveyID
+		//      - Admin_JewelsTrailsASettings, Admin_JewelsTrailsBSettings
+		//          - AdminID, ... (")
+		//      - SurveyQuestions
+		//          - SurveyID, QuestionText, AnswerType, IsDeleted
+		//      - SurveyQuestionsOptions
+		//          - QuestionID, OptionText
+		//
+
+		// TODO:
 
 
-		// questions
-
-
-
-		// -> schedule
-		//      -> schedule_date
-		//      -> time
-		//      -> repeat_interval
-		//      -> custom_time
-		//          -> t
-
-
-
+		//
 		return null;
 	}
 
@@ -362,7 +358,7 @@ trait ActivityDriver {
 		 */
 		$activity_id
 	) {
-		// TODO: Activities cannot be deleted!
+		// TODO: Activities cannot be deleted! **EXCEPT SURVEYS
 		return null; // TODO
 	}
 }
