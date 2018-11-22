@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/LAMPDriver.php';
+require_once __DIR__ . '/TypeDriver.php';
 
 trait StudyDriver {
-    use LAMPDriver;
+    use TypeDriver;
 
     /** 
      * Get a set of `Study`s matching the criteria parameters.

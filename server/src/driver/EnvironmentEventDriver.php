@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/LAMPDriver.php';
+require_once __DIR__ . '/TypeDriver.php';
 
 trait EnvironmentEventDriver {
-	use LAMPDriver;
+	use TypeDriver;
 
     /** 
      * Get a set of `EnvironmentEvent`s matching the criteria parameters.

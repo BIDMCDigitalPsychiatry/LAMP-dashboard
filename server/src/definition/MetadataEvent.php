@@ -21,7 +21,7 @@ abstract class MetadataEventType extends LAMP {
  * )
  */
 class MetadataEvent extends LAMP {
-    use LAMPDriver;
+    use TypeDriver;
 
     /**
      * @OA\Property(

@@ -3,9 +3,9 @@
 /**
  * All LAMP API actions are designated from their class definitions to specific
  * drivers implemented as PHP Traits. If the implementation detail underlying the
- * API changes, add a new `LAMPDriver` and/or extend it for new functionality.
+ * API changes, add a new `TypeDriver` and/or extend it for new functionality.
  */
-trait LAMPDriver {
+trait TypeDriver {
 
     /**
      * Return internal access to the underlying MS-SQL DB.

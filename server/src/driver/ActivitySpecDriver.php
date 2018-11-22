@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/LAMPDriver.php';
+require_once __DIR__ . '/TypeDriver.php';
 
 trait ActivitySpecDriver {
-	use LAMPDriver;
+	use TypeDriver;
 
 	/**
 	 * Get a set of `ActivitySpec`s matching the criteria parameters.

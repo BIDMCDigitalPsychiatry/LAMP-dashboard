@@ -43,7 +43,7 @@ class TypeID implements JsonSerializable {
  * TODO: parent_of, obj hierarchies, etc.
  */
 class TypeSpec extends LAMP {
-	use LAMPDriver;
+	use TypeDriver;
 
 
 }
@@ -52,7 +52,7 @@ class TypeSpec extends LAMP {
  *
  */
 class TypeAttachment extends LAMP {
-	use LAMPDriver;
+	use TypeDriver;
 
 	/**
 	 * @OA\Get(
@@ -327,7 +327,7 @@ class TypeAttachment extends LAMP {
  * TODO: DELETE!
  */
 class TypeLegacySupport extends LAMP {
-	use LAMPDriver;
+	use TypeDriver;
 
 	/**
 	 * @OA\Get(
