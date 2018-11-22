@@ -29,7 +29,8 @@ trait StudyDriver {
                 ) AS participants,
                 (
                     SELECT 
-                        SurveyID AS id
+                        SurveyID AS id,
+                        Admin.AdminID AS aid
                     FROM Survey
                     WHERE isDeleted = 0 
                         AND Survey.AdminID = Admin.AdminID
@@ -61,10 +62,10 @@ trait StudyDriver {
             }, $raw->participants) : [];
             $obj->activities = array_merge(
                 isset($raw->surveys) ? array_map(function($x) { 
-                    return new TypeID([Activity::class, 1 /* survey */, $x->id]);
+                    return new TypeID([Activity::class, 1 /* survey */, $x->aid, $x->id]);
                 }, $raw->surveys) : [], 
                 isset($raw->ctests) ? array_map(function($x) {
-                    return new TypeID([Activity::class, $x->id, $x->aid]);
+                    return new TypeID([Activity::class, $x->id, $x->aid, 0 /* SurveyID */]);
                 }, $raw->ctests) : []
             );
             return $obj;

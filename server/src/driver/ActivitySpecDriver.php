@@ -51,6 +51,54 @@ trait ActivitySpecDriver {
 	}
 
 	/**
+	 * Produce the internal-only Jewels A/B settings mappings.
+	 * Note: this is not to be exposed externally as an API.
+	 *
+	 * The column map specifies the LAMP object key to DB row column mapping.
+	 * The default map specifies the LAMP object's value if none is found.
+	 */
+	private static function _jewelsMap(
+
+		/**
+		 * The settings key to produce detail on.
+		 */
+		$key,
+
+		/**
+		 * Either null, for column mapping, or non-null, for defaults mapping.
+		 */
+		$variety = null
+	) {
+		static $column_map = [
+			"beginner_seconds" => "NoOfSeconds_Beg",
+			"intermediate_seconds" => "NoOfSeconds_Int",
+			"advanced_seconds" => "NoOfSeconds_Adv",
+			"expert_seconds" => "NoOfSeconds_Exp",
+			"diamond_count" => "NoOfDiamonds",
+			"shape_count" => "NoOfShapes",
+			"bonus_point_count" => "NoOfBonusPoints",
+			"x_changes_in_level_count" => "X_NoOfChangesInLevel",
+			"x_diamond_count" => "X_NoOfDiamonds",
+			"y_changes_in_level_count" => "Y_NoOfChangesInLevel",
+			"y_shape_count" => "Y_NoOfShapes",
+		];
+		static $default_map = [
+			"beginner_seconds" => 0,
+			"intermediate_seconds" => 0,
+			"advanced_seconds" => 0,
+			"expert_seconds" => 0,
+			"diamond_count" => 0,
+			"shape_count" => 0,
+			"bonus_point_count" => 0,
+			"x_changes_in_level_count" => 0,
+			"x_diamond_count" => 0,
+			"y_changes_in_level_count" => 0,
+			"y_shape_count" => 0,
+		];
+		return ($variety === null ? $column_map : $default_map)[$key];
+	}
+
+	/**
 	 * Get a set of `ActivitySpec`s matching the criteria parameters.
 	 */
 	private static function _select(

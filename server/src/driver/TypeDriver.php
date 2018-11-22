@@ -1,5 +1,11 @@
 <?php
 
+abstract class AuthType {
+	const Root = 'root';
+	const Researcher = 'researcher';
+	const Participant = 'participant';
+}
+
 /**
  * All LAMP API actions are designated from their class definitions to specific
  * drivers implemented as PHP Traits. If the implementation detail underlying the

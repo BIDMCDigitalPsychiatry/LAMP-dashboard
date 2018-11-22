@@ -99,6 +99,7 @@ trait ParticipantDriver {
 
 	        // A weird reverse-map + array-splat to group all result rows together.
 	        $rst_grp_all = array_merge(...array_map(function ($entry) use ($raw) {
+	        	// FIXME: SurveyID is missing!
 	        	$key = 'rst_grp_' . $entry['ActivityIndexID'];
 		        return isset($raw->{$key}) ? $raw->{$key} : [];
 	        }, $activities_list));

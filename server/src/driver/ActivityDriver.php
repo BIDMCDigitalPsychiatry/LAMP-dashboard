@@ -1,6 +1,34 @@
 <?php
 require_once __DIR__ . '/TypeDriver.php';
 
+
+//
+// Schedule:
+//      - Slot
+//          - SlotName, IsDefault
+//      - Repeat
+//          - RepeatInterval, IsDefault, SortOrder, IsDeleted
+//      - Admin_CTestSchedule, Admin_SurveySchedule
+//          - AdminID, CTestID/SurveyID, Version*(C), ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+//      - Admin_CTestScheduleCustomTime, Admin_SurveyScheduleCustomTime, Admin_BatchScheduleCustomTime
+//          - Time
+//      - Admin_BatchSchedule
+//          - AdminID, BatchName, ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+//      - Admin_BatchScheduleCTest, Admin_BatchScheduleSurvey
+//          - CTestID/SurveyID, Version*(C), Order
+//
+// Settings:
+//      - Admin_CTestSurveySettings
+//          - AdminID, CTestID, SurveyID
+//      - Admin_JewelsTrailsASettings, Admin_JewelsTrailsBSettings
+//          - AdminID, ... (")
+//      - SurveyQuestions
+//          - SurveyID, QuestionText, AnswerType, IsDeleted
+//      - SurveyQuestionsOptions
+//          - QuestionID, OptionText
+//
+
+
 trait ActivityDriver {
 	use TypeDriver;
 
@@ -33,7 +61,7 @@ trait ActivityDriver {
             WITH A(value) AS (
                 SELECT 
                     AdminID AS aid,
-                    ('game') AS type,
+                    ('ctest') AS type,
                     CTest.*,
                     (
                         SELECT 
@@ -50,7 +78,7 @@ trait ActivityDriver {
                             Y_NoOfShapes AS y_shape_count
                         FROM Admin_JewelsTrailsASettings
                         WHERE Admin_JewelsTrailsASettings.AdminID = Admin.AdminID
-                            AND CTest.id = 17
+                            AND CTest.lid = 17
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS [settings.jewelsA],
                     (
@@ -68,7 +96,7 @@ trait ActivityDriver {
                             Y_NoOfShapes AS y_shape_count
                         FROM Admin_JewelsTrailsBSettings
                         WHERE Admin_JewelsTrailsBSettings.AdminID = Admin.AdminID
-                            AND CTest.id = 18
+                            AND CTest.lid = 18
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS [settings.jewelsB],
                     (
@@ -86,7 +114,7 @@ trait ActivityDriver {
                             ), 't')) AS custom_time
                         FROM Admin_CTestSchedule
                         WHERE Admin_CTestSchedule.AdminID = Admin.AdminID
-                            AND Admin_CTestSchedule.CTestID = CTest.id
+                            AND Admin_CTestSchedule.CTestID = CTest.lid
                             AND Admin_CTestSchedule.IsDeleted = 0
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS schedule
@@ -94,11 +122,11 @@ trait ActivityDriver {
                 CROSS APPLY 
                 (
                     SELECT 
-                        CTestID AS id,
-                        CTestName AS name,
-                        MaxVersions AS [settings.max_versions]
-                    FROM CTest
-                    WHERE IsDeleted = 0
+                        ActivityIndexID AS id,
+                        LegacyCTestID AS lid,
+                        Name AS name
+                    FROM LAMP_Aux.dbo.ActivityIndex
+                    WHERE LegacyCTestID NOT NULL
                 ) AS CTest
                 WHERE isDeleted = 0 
                     {$cond1}
@@ -107,6 +135,7 @@ trait ActivityDriver {
             ), B(value) AS (
                 SELECT 
                     SurveyID AS id, 
+                    AdminID AS aid,
                     SurveyName AS name, 
                     ('survey') AS type,
                     (
@@ -158,29 +187,17 @@ trait ActivityDriver {
         if (count($result) == 0)
         	return null;
 
-
-
-
-        /* TODO
-          SELECT ActivityIndexID AS id
-          FROM LAMP_Aux.dbo.ActivityIndex
-          WHERE ActivityIndexID > 1
-         */
-
-
-
-
         //
         return array_map(function($raw) { 
             $obj = new Activity();
-            $obj->type = $raw->type;
-            if ($obj->type == ActivityType::Game) {
-                $obj->id = new TypeID([Activity::class, ActivityType::Game, $raw->id,
-                                       array_drop($raw, 'aid')]);
+            if ($raw->type === 'ctest') {
+                $obj->id = new TypeID([Activity::class, $raw->id, array_drop($raw, 'aid'), 0 /* SurveyID */]);
+	            $obj->spec = new TypeID([ActivitySpec::class, $raw->id]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->settings;
-            } else if ($obj->type == ActivityType::Survey) {
-                $obj->id = new TypeID([Activity::class, ActivityType::Survey, $raw->id]);
+            } else if ($raw->type === 'survey') {
+                $obj->id = new TypeID([Activity::class, 1 /* survey */, array_drop($raw, 'aid'), $raw->id]);
+	            $obj->spec = new TypeID([ActivitySpec::class, 1 /* survey */]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->questions;
             }
@@ -255,7 +272,17 @@ trait ActivityDriver {
 		 */
 		$insert_object
 	) {
-		// TODO: Activities cannot be created! **EXCEPT SURVEYS
+		// Terminate the operation if any of the required string-typed fields are not present.
+		if (!is_string($insert_object->spec) || !is_string($insert_object->name))
+			return null;
+
+		// Non-Survey Activities cannot be created!
+		$_specID = (new TypeID($insert_object->spec))->require([ActivitySpec::class]);
+		if ($_specID->part(1) !== 1 /* survey */)
+			return null;
+
+		// ...
+
 		return null; // TODO
 	}
 
@@ -280,67 +307,16 @@ trait ActivityDriver {
 		$update_object
 	) {
 
-		// The column map specifies the LAMP object key to DB row column mapping.
-		static $jewels_settings_column_map = [
-			"beginner_seconds" => "NoOfSeconds_Beg",
-			"intermediate_seconds" => "NoOfSeconds_Int",
-			"advanced_seconds" => "NoOfSeconds_Adv",
-			"expert_seconds" => "NoOfSeconds_Exp",
-			"diamond_count" => "NoOfDiamonds",
-			"shape_count" => "NoOfShapes",
-			"bonus_point_count" => "NoOfBonusPoints",
-			"x_changes_in_level_count" => "X_NoOfChangesInLevel",
-			"x_diamond_count" => "X_NoOfDiamonds",
-			"y_changes_in_level_count" => "Y_NoOfChangesInLevel",
-			"y_shape_count" => "Y_NoOfShapes",
-		];
+		// Terminate the operation if none of the possible string-typed fields are present.
+		if (!is_string($update_object->spec) && !is_string($update_object->name) &&
+			!is_array($update_object->schedule) && !is_array($update_object->settings))
+			return null;
 
-		// The default map specifies the LAMP object's value if none is found.
-		static $jewels_settings_default_map = [
-			"beginner_seconds" => 0,
-			"intermediate_seconds" => 0,
-			"advanced_seconds" => 0,
-			"expert_seconds" => 0,
-			"diamond_count" => 0,
-			"shape_count" => 0,
-			"bonus_point_count" => 0,
-			"x_changes_in_level_count" => 0,
-			"x_diamond_count" => 0,
-			"y_changes_in_level_count" => 0,
-			"y_shape_count" => 0,
-		];
+		// TODO: ActivitySpec::_jewelsMap('key', null)
 
-		//
-		// Schedule:
-		//      - Slot
-		//          - SlotName, IsDefault
-		//      - Repeat
-		//          - RepeatInterval, IsDefault, SortOrder, IsDeleted
-		//      - Admin_CTestSchedule, Admin_SurveySchedule
-		//          - AdminID, CTestID/SurveyID, Version*(C), ScheduleDate, SlotID, Time, RepeatID, IsDeleted
-		//      - Admin_CTestScheduleCustomTime, Admin_SurveyScheduleCustomTime, Admin_BatchScheduleCustomTime
-		//          - Time
-		//      - Admin_BatchSchedule
-		//          - AdminID, BatchName, ScheduleDate, SlotID, Time, RepeatID, IsDeleted
-		//      - Admin_BatchScheduleCTest, Admin_BatchScheduleSurvey
-		//          - CTestID/SurveyID, Version*(C), Order
-		//
-		// Settings:
-		//      - Admin_CTestSurveySettings
-		//          - AdminID, CTestID, SurveyID
-		//      - Admin_JewelsTrailsASettings, Admin_JewelsTrailsBSettings
-		//          - AdminID, ... (")
-		//      - SurveyQuestions
-		//          - SurveyID, QuestionText, AnswerType, IsDeleted
-		//      - SurveyQuestionsOptions
-		//          - QuestionID, OptionText
-		//
+		// ...
 
-		// TODO:
-
-
-		//
-		return null;
+		return null; // TODO
 	}
 
 	/**
@@ -358,7 +334,12 @@ trait ActivityDriver {
 		 */
 		$activity_id
 	) {
-		// TODO: Activities cannot be deleted! **EXCEPT SURVEYS
+		// Non-Survey Activities cannot be created!
+		if ($activity_id !== 1 /* survey */)
+			return null;
+
+		// ...
+
 		return null; // TODO
 	}
 }

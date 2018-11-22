@@ -108,8 +108,8 @@ trait ResultEventDriver {
 			$ctid = array_drop($raw, 'ctid');
 			$uid = array_drop($raw, 'uid');
 			$aid = array_drop($raw, 'aid');
-			$raw->id = new TypeID([ResultEvent::class, $id, $ctid]);
-			$raw->activity = new TypeID([Activity::class, $ctid, $aid, 0 /* TODO: survey only */]);
+			$raw->id = new TypeID([ResultEvent::class, $ctid, $id]);
+			$raw->activity = new TypeID([Activity::class, $ctid, $aid, 0 /* TODO: SurveyID */]);
 
 			// Decrypt all static data/temporal event properties.
 			if (isset($raw->static_data->survey_name))
