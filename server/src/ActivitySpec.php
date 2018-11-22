@@ -1,13 +1,84 @@
 <?php
 require_once __DIR__ . '/LAMP.php';
+require_once __DIR__ . '/driver/v0.1/ActivitySpecDriver.php';
 
-// TODO: Another goal is to introspect which temporal event fields contain what type of data!! (incl. defaults, encryption, summary, JSON type)
+/**
+ * @OA\Schema(
+ *   description="The parameters of a setting, static data, or temporal event key, for an ActivitySpec."
+ * )
+ */
+class ActivitySpecItem extends LAMP {
+
+	/**
+	 * @OA\Property(
+	 *   type="string",
+	 *   description="None.",
+	 * )
+	 */
+	public $name = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string",
+	 *   description="None.",
+	 * )
+	 */
+	public $description = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string",
+	 *   description="None.",
+	 * )
+	 */
+	public $type = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string",
+	 *   description="None.",
+	 * )
+	 */
+	public $default = null;
+}
+
+/**
+ * @OA\Schema(
+ *   description="The definition of an Activity's ResultEvents."
+ * )
+ */
+class ActivityDefinition extends LAMP {
+
+	/**
+	 * @OA\Property(
+	 *   type="array",
+	 *   @OA\Items(ref="#/components/schemas/ActivitySpecItem")
+	 * )
+	 */
+	public $static_data = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="array",
+	 *   @OA\Items(ref="#/components/schemas/ActivitySpecItem")
+	 * )
+	 */
+	public $temporal_event = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="array",
+	 *   @OA\Items(ref="#/components/schemas/ActivitySpecItem")
+	 * )
+	 */
+	public $settings = null;
+}
 
 /**
  * @OA\Schema()
  */
 class ActivitySpec extends LAMP {
-	use LAMPDriver;
+	use ActivitySpecDriver;
 
 	/**
 	 * @OA\Property(
@@ -26,10 +97,31 @@ class ActivitySpec extends LAMP {
 
 	/**
 	 * @OA\Property(
-	 *   ref="#/components/schemas/ActivitySpecType"
+	 *   type="string"
 	 * )
 	 */
-	public $type = null;
+	public $name = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string"
+	 * )
+	 */
+	public $help_contents = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string"
+	 * )
+	 */
+	public $script_contents = null;
+
+	/**
+	 * @OA\Property(
+	 *   ref="#/components/schemas/ActivityDefinition"
+	 * )
+	 */
+	public $definition = null;
 
 	/**
 	 * @OA\Get(
@@ -62,10 +154,11 @@ class ActivitySpec extends LAMP {
 	 * )
 	 */
 	public static function view($activity_spec_id) {
+		$_id = (new TypeID($activity_spec_id))->require([ActivitySpec::class]);
 		self::authorize(function($type, $value) {
-			return false; // TODO
+			return true; // TODO
 		});
-		return null;
+		return ActivitySpec::_select($_id->part(1));
 	}
 
 	/**
@@ -99,10 +192,11 @@ class ActivitySpec extends LAMP {
 	 * )
 	 */
 	public static function all_by_participant($participant_id) {
+		$_id = (new TypeID($participant_id))->require([Participant::class]);
 		self::authorize(function($type, $value) use($participant_id) {
-			return false; // TODO
+			return true; // TODO
 		});
-		return null;
+		return ActivitySpec::_select(null, $_id->part(1));
 	}
 
 	/**
@@ -170,10 +264,11 @@ class ActivitySpec extends LAMP {
 	 * )
 	 */
 	public static function all_by_researcher($researcher_id) {
+		$_id = (new TypeID($researcher_id))->require([Researcher::class, Study::class]);
 		self::authorize(function($type, $value) {
-			return false; // TODO
+			return true; // TODO
 		});
-		return null;
+		return ActivitySpec::_select(null, $_id->part(1));
 	}
 
 	/**
@@ -199,6 +294,6 @@ class ActivitySpec extends LAMP {
 		self::authorize(function($type, $value) {
 			return true;
 		});
-		return null;
+		return ActivitySpec::_select();
 	}
 }

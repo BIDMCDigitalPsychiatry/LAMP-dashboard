@@ -42,7 +42,6 @@ trait ActivityDriver {
                 SELECT 
                     AdminID AS aid,
                     ('game') AS type,
-                    ('none') AS sharing_mode,
                     CTest.*,
                     JSON_QUERY(dbo.UNWRAP_JSON((
                         SELECT 
@@ -127,7 +126,6 @@ trait ActivityDriver {
                     SurveyID AS id, 
                     SurveyName AS name, 
                     ('survey') AS type,
-                    ('none') AS sharing_mode,
                     (
                         SELECT 
                             QuestionText AS text, 
@@ -182,7 +180,6 @@ trait ActivityDriver {
         return array_map(function($raw) { 
             $obj = new Activity();
             $obj->type = $raw->type;
-            $obj->sharing_mode = $raw->sharing_mode;
             if ($obj->type == ActivityType::Game) {
                 $obj->id = new TypeID([Activity::class, ActivityType::Game, $raw->id,
                                        array_drop($raw, 'aid')]);

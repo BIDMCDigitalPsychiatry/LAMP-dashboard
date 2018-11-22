@@ -147,14 +147,6 @@ class Activity extends LAMP {
 
     /** 
      * @OA\Property(
-     *   ref="#/components/schemas/ActivitySharingMode",
-     *   description="The sharing mode of the activity."
-     * )
-     */
-    public $sharing_mode = null;
-
-    /** 
-     * @OA\Property(
      *   type="string",
      *   description="The name of the activity."
      * )
