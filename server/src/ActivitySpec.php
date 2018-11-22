@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/LAMP.php';
 
+// TODO: Another goal is to introspect which temporal event fields contain what type of data!! (incl. defaults, encryption, summary, JSON type)
+
 /**
  * @OA\Schema()
  */

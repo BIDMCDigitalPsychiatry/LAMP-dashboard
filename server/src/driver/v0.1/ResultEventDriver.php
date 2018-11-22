@@ -161,8 +161,72 @@ trait ResultEventDriver {
          */
         $new_object
     ) {
-        // OUTPUT INSERTED.{CTest_*ResultID,SurveyResultID}
-        return null;
+	    // Collect the set of legacy Activity tables and stitch the full query.
+	    $tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
+	    $tablerow = array_filter($tableset, function ($x) use ($activity_id) {
+		    return $x['ActivityIndexID'] === $activity_id;
+	    })[0];
+
+	    // First consume the timestamp + duration fields that are always present.
+	    // TODO: convert time!
+	    $columns = [];
+	    $columns[$tablerow['StartTimeColumnName']] = $new_object->static_data->timestamp;
+	    $columns[$tablerow['EndTimeColumnName']] = $new_object->static_data->timestamp + $new_object->static_data->duration;
+
+	    // We only support 5 static slots; check if they're used by the activity first.
+	    foreach ([1, 2, 3, 4, 5] as $x) {
+		    if ($tablerow['Slot' . $x . 'Name'] !== null) {
+		    	$sql_name = $tablerow['Slot' . $x . 'ColumnName'];
+		    	$obj_name = $tablerow['Slot' . $x . 'Name'];
+			    $columns[$sql_name] = $new_object->static_data->{$obj_name};
+		    }
+	    }
+
+	    // Convert the static array into SQL strings.
+	    $static_keys = implode(', ', array_keys($columns));
+	    $static_values = implode(', ', array_values($columns));
+
+	    // Insert row, returning the generated primary key ID.
+	    $result = self::lookup("
+            INSERT INTO {$tablerow['TableName']} (
+                {$static_keys}
+            )
+            OUTPUT INSERTED.{$tablerow['IndexColumnName']} AS id
+			VALUES (
+		        {$static_values}
+			);
+        ");
+
+	    // Bail early if there was a failure to record the parent event row.
+	    if (!result) return null;
+	    if ($tablerow['TemporalTableName'] === null) return $result;
+
+	    // Now the temporal fields are mapped for each sub-event.
+	    $temporals = array_map(function ($event) use($result, $tablerow) {
+		    return [
+			    $tablerow['TemporalIndexColumnName'] => $result['id'],
+			    $tablerow['Temporal1ColumnName'] => $event->item,
+			    $tablerow['Temporal2ColumnName'] => $event->value,
+			    $tablerow['Temporal3ColumnName'] => $event->type,
+			    $tablerow['Temporal4ColumnName'] => $event->duration,
+			    $tablerow['Temporal5ColumnName'] => $event->level,
+		    ];
+	    }, $new_object->temporal_events);
+
+	    // Convert the  temporal arrays into SQL strings.
+	    $temporal_keys = '(' . implode(', ', array_keys($temporals[0])) . ')';
+	    $temporal_values =  implode(', ', array_map(function($x) {
+		    return '(' . implode(', ', array_values($x)) . ')';
+	    }, $temporals));
+
+	    // Insert sub-rows, without returning anything.
+	    $result2 = self::lookup("
+            INSERT INTO {$tablerow['TemporalTableName']} {$temporal_keys}
+			VALUES {$temporal_values};
+        ");
+
+	    // Return the new parent row's ID.
+	    return $result2 ? $result : null;
     }
 
 	/**
@@ -186,7 +250,21 @@ trait ResultEventDriver {
 		 */
 		$update_object
 	) {
-		return null;
+		return null; // FIXME
+
+		// Collect the set of legacy Activity tables and stitch the full query.
+		$tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
+		$tablerow = array_filter($tableset, function ($x) use ($activity_id) {
+			return $x['ActivityIndexID'] === $activity_id;
+		})[0];
+
+		// Insert row, returning the generated primary key ID.
+		$result = self::lookup("
+            UPDATE NULL SET NULL WHERE NULL = NULL; 
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 
 	/**
@@ -205,6 +283,19 @@ trait ResultEventDriver {
 		 */
 		$type_id
 	) {
-		return null;
+		// Collect the set of legacy Activity tables and stitch the full query.
+		$tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
+		$tablerow = array_filter($tableset, function ($x) use ($activity_id) {
+			return $x['ActivityIndexID'] === $activity_id;
+		})[0];
+
+		// Set the deletion flag, without actually deleting the row.
+		// TODO: Deletion is not supported! CreatedOn is not correctly used here.
+		$result = self::perform("
+            UPDATE {$tablerow['TableName']} SET CreatedOn = NULL WHERE {$tablerow['IndexColumnName']} = {$type_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
 	}
 }
