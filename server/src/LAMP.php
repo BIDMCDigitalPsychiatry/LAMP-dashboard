@@ -227,6 +227,24 @@ class LAMP {
         return explode(':', $header, 2);
     }
 
+	/**
+	 * Return internal access to the underlying MS-SQL DB.
+	 */
+	public static function db() {
+		static $pdo = null;
+		if ($pdo === null) {
+			try {
+				$pdo = new PDO('sqlsrv:server='.DB_HOST.';database='.DB_NAME, DB_USER, DB_PASS, [
+					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+				]);
+				$pdo->exec('SET QUOTED_IDENTIFIER ON');
+			} catch (PDOException $e) {
+				throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
+			}
+		}
+		return $pdo;
+	}
+
 	// AES265 encryption using the DB_CRYPT_HIPAA constant, as used by the LAMP DB currently.
 	// If the data could not be encrypted or is invalid, returns `null`.
 	// If default is NOT false, the input data is returned instead of null.

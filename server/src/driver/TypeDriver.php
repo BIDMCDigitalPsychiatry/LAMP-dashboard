@@ -14,24 +14,6 @@ abstract class AuthType {
 trait TypeDriver {
 
     /**
-     * Return internal access to the underlying MS-SQL DB.
-     */
-    private static function db() {
-        static $pdo = null;
-        if ($pdo === null) {
-            try {
-                $pdo = new PDO('sqlsrv:server='.DB_HOST.';database='.DB_NAME, DB_USER, DB_PASS, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
-                ]);
-                $pdo->exec('SET QUOTED_IDENTIFIER ON');
-            } catch (PDOException $e) {
-                throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
-            }
-        }
-        return $pdo;
-    }
-
-    /**
      * Access the LAMP v0.1 DB with an arbitrary Transact-SQL statement.
      */
     public static function lookup(
@@ -49,7 +31,7 @@ trait TypeDriver {
         if ($sql_query === null) return null;
         try {
             $pre_exec = microtime(true);
-            $result = self::db()->query($sql_query)->fetchAll(PDO::FETCH_ASSOC);
+            $result = LAMP::db()->query($sql_query)->fetchAll(PDO::FETCH_ASSOC);
             $exec_time = microtime(true) - $pre_exec;
             log::sys('SQL execution took '.$exec_time.' seconds.');
 
@@ -86,7 +68,7 @@ trait TypeDriver {
         if ($sql_query === null) return null;
         try {
             $pre_exec = microtime(true);
-            $obj = self::db()->prepare($sql_query)->execute($substitutions);
+            $obj = LAMP::db()->prepare($sql_query)->execute($substitutions);
             $exec_time = microtime(true) - $pre_exec;
             log::sys('SQL execution took '.$exec_time.' seconds.');
             return $obj;
@@ -457,7 +439,7 @@ trait TypeDriver {
          */
         $packages
     ) {
-        $script = self::db()->quote($script);
+        $script = LAMP::db()->quote($script);
         $packages = json_encode($packages);
         return self::perform("
             MERGE INTO LAMP_Aux.dbo.OOLAttachmentLinker 
