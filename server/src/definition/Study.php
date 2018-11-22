@@ -94,7 +94,7 @@ class Study extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Study::_select($_id->part(1));
+        return self::_select($_id->part(1));
     }
     
     /** 
@@ -154,6 +154,6 @@ class Study extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-    	return Study::_select();
+    	return self::_select();
     }
 }

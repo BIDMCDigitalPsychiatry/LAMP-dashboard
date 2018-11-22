@@ -268,7 +268,7 @@ class ResultEvent extends LAMP {
                 return $value == $participant_id;
             } else return false;
         });
-    	return ResultEvent::_select(null, $participant_id);
+    	return self::_select(null, $participant_id);
     }
     
     /** 
@@ -482,7 +482,7 @@ class ResultEvent extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return ResultEvent::_select(null, null, $_id->part(1));
+        return self::_select(null, null, $_id->part(1));
     }
 
     /** 
@@ -508,6 +508,6 @@ class ResultEvent extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return ResultEvent::_select();
+        return self::_select();
     }
 }

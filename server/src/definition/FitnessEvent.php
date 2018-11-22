@@ -132,7 +132,7 @@ class FitnessEvent extends LAMP {
                         $type == AuthType::Researcher ? Researcher::class : Participant::class);
             return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
         });
-        return FitnessEvent::_select(null, null, $_id->part(1));
+        return self::_select(null, null, $_id->part(1));
     }
 
     /** 
@@ -174,7 +174,7 @@ class FitnessEvent extends LAMP {
                 return $value == $participant_id;
             } else return false;
         });
-        return FitnessEvent::_select($participant_id);
+        return self::_select($participant_id);
     }
 
     /** 
@@ -246,7 +246,7 @@ class FitnessEvent extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return FitnessEvent::_select(null, $_id->part(1));
+        return self::_select(null, $_id->part(1));
     }
 
     /** 
@@ -272,6 +272,6 @@ class FitnessEvent extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return FitnessEvent::_select();
+        return self::_select();
     }
 }

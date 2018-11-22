@@ -228,7 +228,7 @@ class Participant extends LAMP {
                 return $value == $participant_id;
             } else return false;
         });
-        return Participant::_select($participant_id, null);
+        return self::_select($participant_id, null);
     }
     
     /** 
@@ -300,7 +300,7 @@ class Participant extends LAMP {
         self::authorize(function($type, $value) use($_id) {
             return ($type == AuthType::Researcher && $value == $_id->part(1));
         });
-        return Participant::_select(null, $_id->part(1));
+        return self::_select(null, $_id->part(1));
     }
 
     /** 
@@ -326,6 +326,6 @@ class Participant extends LAMP {
         self::authorize(function($type, $value) {
             return false;
         });
-        return Participant::_select();
+        return self::_select();
     }
 }

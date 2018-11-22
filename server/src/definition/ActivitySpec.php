@@ -150,7 +150,7 @@ class ActivitySpec extends LAMP {
 		self::authorize(function($type, $value) {
 			return true; // TODO
 		});
-		return ActivitySpec::_select($_id->part(1));
+		return self::_select($_id->part(1));
 	}
 
 	/**
@@ -188,7 +188,7 @@ class ActivitySpec extends LAMP {
 		self::authorize(function($type, $value) use($participant_id) {
 			return true; // TODO
 		});
-		return ActivitySpec::_select(null, $_id->part(1));
+		return self::_select(null, $_id->part(1));
 	}
 
 	/**
@@ -260,7 +260,7 @@ class ActivitySpec extends LAMP {
 		self::authorize(function($type, $value) {
 			return true; // TODO
 		});
-		return ActivitySpec::_select(null, $_id->part(1));
+		return self::_select(null, $_id->part(1));
 	}
 
 	/**
@@ -286,6 +286,6 @@ class ActivitySpec extends LAMP {
 		self::authorize(function($type, $value) {
 			return true;
 		});
-		return ActivitySpec::_select();
+		return self::_select();
 	}
 }
