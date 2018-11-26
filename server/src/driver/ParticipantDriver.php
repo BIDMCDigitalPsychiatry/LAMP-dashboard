@@ -46,7 +46,7 @@ trait ParticipantDriver {
         $result = self::lookup("
             SELECT 
                 StudyId AS id, 
-                StudyCode AS [settings.study_code], 
+                StudyCode AS study_code, 
                 AppColor AS [settings.theme], 
                 Language AS [settings.language], 
                 DATEDIFF_BIG(MS, '1970-01-01', LastLoginOn) AS [settings.last_login],
@@ -108,7 +108,7 @@ trait ParticipantDriver {
             $obj = new Participant();
             $obj->settings = $raw->settings;
             $obj->id = LAMP::decrypt($raw->id, true);
-            $obj->settings->study_code = LAMP::decrypt($obj->settings->study_code, true);
+            $obj->study_code = LAMP::decrypt($raw->study_code, true);
             $obj->settings->theme = LAMP::decrypt($obj->settings->theme, true);
             $obj->fitness_events = isset($raw->hkevents) ? array_map(function($x) {
                 return new TypeID([FitnessEvent::class, $x->id]);
@@ -141,6 +141,7 @@ trait ParticipantDriver {
 		$insert_object
 	) {
 		$insert_password = $insert_object->password;
+		$insert_code = $insert_object->study_code;
 		$insert_object = $insert_object->settings;
 
 		// Terminate the operation if any of the required valid string-typed fields are not present.
@@ -154,7 +155,7 @@ trait ParticipantDriver {
 
 		// Prepare the likely required SQL column changes as above.
 		$password = LAMP::encrypt($insert_password, null, 'oauth');
-		$study_code = isset($insert_object->study_code) ? LAMP::encrypt($insert_object->study_code) : 'NULL';
+		$study_code = isset($insert_code) ? LAMP::encrypt($insert_code) : 'NULL';
 
 		// Prepare the minimal SQL column changes from the provided fields.
 		$theme = isset($insert_object->theme) ? LAMP::encrypt($insert_object->theme) : 'NULL';
@@ -244,11 +245,12 @@ trait ParticipantDriver {
 		$update_object
 	) {
 		$update_password = $update_object->password;
+		$update_code = $update_object->study_code;
 		$update_object = $update_object->settings;
 		$user_id = LAMP::encrypt($user_id);
 
 		// Terminate the operation if no valid string-typed fields are modified.
-		if (!is_string($update_object->study_code) && !is_string($update_object->theme) &&
+		if (!is_string($update_code) && !is_string($update_object->theme) &&
 			!is_string($update_object->language) && !is_string($update_object->last_login) &&
 			!is_string($update_object->device_type) && !is_string($update_object->emergency_contact) &&
 			!is_string($update_object->helpline) && !is_string($update_object->blogs_checked_date) &&
@@ -259,8 +261,8 @@ trait ParticipantDriver {
 		$updatesA = []; $updatesB = []; $updatesC = [];
 		if ($update_password !== null)
 			array_push($updatesA, 'Password = \'' . LAMP::encrypt($update_password, null, 'oauth') . '\'');
-		if ($update_object->study_code !== null)
-			array_push($updatesA, 'StudyCode = \'' . LAMP::encrypt($update_object->study_code) . '\'');
+		if ($update_code !== null)
+			array_push($updatesA, 'StudyCode = \'' . LAMP::encrypt($update_code) . '\'');
 		if ($update_object->theme !== null)
 			array_push($updatesB, 'AppColor = \'' . LAMP::encrypt($update_object->theme) . '\'');
 		if ($update_object->language !== null)

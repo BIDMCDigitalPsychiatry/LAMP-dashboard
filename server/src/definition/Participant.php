@@ -24,14 +24,6 @@ class ParticipantSettings extends LAMP {
     /** 
      * @OA\Property(
      *   type="string",
-     *   description="The researcher-provided study code for the participant.",
-     * )
-     */
-    public $study_code = null;
-
-    /** 
-     * @OA\Property(
-     *   type="string",
      *   description="The participant's selected theme for the LAMP app.",
      * )
      */
@@ -118,6 +110,14 @@ class Participant extends LAMP {
      * )
      */
     public $attachments = null;
+
+	/**
+	 * @OA\Property(
+	 *   type="string",
+	 *   description="The researcher-provided study code for the participant.",
+	 * )
+	 */
+	public $study_code = null;
 
     /** 
      * @OA\Property(

@@ -39,7 +39,6 @@ trait ResultEventDriver {
                 SELECT
                     ({$entry['ActivityIndexID']}) AS ctid,
                     [{$entry['IndexColumnName']}] AS id,
-                    [{$entry['TableName']}].UserID AS uid,
                     Users.AdminID AS aid,
                     (NULL) AS attachments,
                     (NULL) AS activity,
@@ -104,12 +103,13 @@ trait ResultEventDriver {
 
 		// Map from SQL DB to the local ResultEvent type.
 		return array_map(function($raw) {
-			$id = $raw->id;
+
+			// Map internal ID sub-components into the single mangled ID form.
+			// FIXME: Currently it's not feasible to map SurveyID from SurveyName.
 			$ctid = array_drop($raw, 'ctid');
-			$uid = array_drop($raw, 'uid');
 			$aid = array_drop($raw, 'aid');
-			$raw->id = new TypeID([ResultEvent::class, $ctid, $id]);
-			$raw->activity = new TypeID([Activity::class, $ctid, $aid, 0 /* TODO: SurveyID */]);
+			$raw->id = new TypeID([ResultEvent::class, $ctid, $raw->id]);
+			$raw->activity = new TypeID([Activity::class, $ctid, $aid, 0 /* SurveyID */]);
 
 			// Decrypt all static data/temporal event properties.
 			if (isset($raw->static_data->survey_name))
@@ -122,19 +122,23 @@ trait ResultEventDriver {
 				$raw->static_data->total_bonus_collected = LAMP::decrypt($raw->static_data->total_bonus_collected, true);
 			if (isset($raw->static_data->score))
 				$raw->static_data->score = LAMP::decrypt($raw->static_data->score, true);
-			if ($ctid < 0) foreach (($raw->temporal_events ?: []) as &$x) {
-				$x->item = LAMP::decrypt($x->item, true);
-				$x->value = LAMP::decrypt($x->value, true);
 
-				// Adjust the Likert scaled values to numbers.
-				if (in_array($x->value, ["Not at all", "12:00AM - 06:00AM", "0-3"])) {
-					$x->value = 0;
-				} else if (in_array($x->value, ["Several Times", "06:00AM - 12:00PM", "3-6"])) {
-					$x->value = 1;
-				} else if (in_array($x->value, ["More than Half the Time", "12:00PM - 06:00PM", "6-9"])) {
-					$x->value = 2;
-				} else if (in_array($x->value, ["Nearly All the Time", "06:00PM - 12:00AM", ">9"])) {
-					$x->value = 3;
+			// Special treatment for surveys with encrypted answers.
+			if ($ctid === 1 /* survey */) {
+				foreach (($raw->temporal_events ?: []) as &$x) {
+					$x->item = LAMP::decrypt($x->item, true);
+					$x->value = LAMP::decrypt($x->value, true);
+
+					// Adjust the Likert scaled values to numbers.
+					if (in_array($x->value, ["Not at all", "12:00AM - 06:00AM", "0-3"])) {
+						$x->value = 0;
+					} else if (in_array($x->value, ["Several Times", "06:00AM - 12:00PM", "3-6"])) {
+						$x->value = 1;
+					} else if (in_array($x->value, ["More than Half the Time", "12:00PM - 06:00PM", "6-9"])) {
+						$x->value = 2;
+					} else if (in_array($x->value, ["Nearly All the Time", "06:00PM - 12:00AM", ">9"])) {
+						$x->value = 3;
+					}
 				}
 			}
 			return $raw;

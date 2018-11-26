@@ -127,14 +127,16 @@ trait ActivitySpecDriver {
 		");
 
 		// Convert fields correctly and return the spec objects.
-		return array_merge([
-			self::_batchSpec() // don't forget!
-		], array_map(function($x) {
-			$obj = new ActivitySpec();
-			$obj->id = new TypeID([ActivitySpec::class, $x['id']]);
-			$obj->name = $x['name'];
-			return $obj;
-		}, $activities_list));
+		// Include the batchSpec only if a non-specific lookup was made.
+		return array_merge(
+			($index_id === null ? [self::_batchSpec()] : []),
+			array_map(function($x) {
+				$obj = new ActivitySpec();
+				$obj->id = new TypeID([ActivitySpec::class, $x['id']]);
+				$obj->name = $x['name'];
+				return $obj;
+			}, $activities_list)
+		);
 	}
 
 	/**
