@@ -482,37 +482,22 @@ class DurationInterval extends LAMP {
  *     @OA\Property(
  *       property="access",
  *       @OA\Property(
- *         property="on",
+ *         property="in",
  *         type="string"
+ *       ),
+ *       @OA\Property(
+ *         property="at",
+ *         type="string"
+ *       ),
+ *       @OA\Property(
+ *         property="on",
+ *         ref="#/components/schemas/Timestamp"
  *       ),
  *       @OA\Property(
  *         property="by",
  *         type="string"
  *       ),
  *     ),
- *   ),
- * )
- *
- * @OA\Parameter(
- *   parameter="XPath",
- *   description="See the JMESPath specification for details; prefer applying modifications on the client-side instead of using this query parameter.",
- *   name="xpath",
- *   in="query",
- *   required=false,
- *   @OA\Schema(
- *     type="string",
- *   ),
- * )
- * 
- * @OA\Parameter(
- *   parameter="Export",
- *   description="Switch from raw JSON output to a 2D CSV dataframe, optionally column-transposed.",
- *   name="export",
- *   in="query",
- *   required=false,
- *   @OA\Schema(
- *     type="string",
- *     enum={"csv", "csv-transpose"}
  *   ),
  * )
  *
@@ -538,5 +523,29 @@ class DurationInterval extends LAMP {
  *   response="ServerFault", 
  *   description="ServerFault", 
  *   @OA\JsonContent(ref="#/components/schemas/Error")
+ * )
+ *
+ * @OA\Get(
+ *   path="/type/{type_id}",
+ *   operationId="Type::reflect",
+ *   tags={"Type"},
+ *   x={"owner"={
+ *     "$ref"="#/components/schemas/Identifier"}
+ *   },
+ *   summary="Get the runtime type of the data structure referenced by the identifier.",
+ *   description="Get the runtime type of the data structure referenced by the identifier.",
+ *   @OA\Parameter(
+ *     name="type_id",
+ *     in="path",
+ *     required=true,
+ *     @OA\Schema(
+ *       ref="#/components/schemas/Identifier"
+ *     )
+ *   ),
+ *   @OA\Response(response=200, ref="#/components/responses/Success"),
+ *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+ *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+ *   security={{"Authorization": {}}},
  * )
  */

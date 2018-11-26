@@ -81,7 +81,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function get_attachment($type_id, $attachment_key) {
@@ -127,7 +127,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function set_attachment($type_id, $attachment_key, $attachment_value) {
@@ -172,7 +172,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function delete_attachment($type_id, $attachment_key) {
@@ -209,7 +209,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function get_dynamic_attachment($type_id, $attachment_key) {
@@ -275,7 +275,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function set_dynamic_attachment($type_id, $attachment_key, $from, $to, $type, $contents, $requirements) {
@@ -312,7 +312,7 @@ class TypeAttachment extends LAMP {
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function delete_dynamic_attachment($type_id, $attachment_key) {
@@ -358,13 +358,11 @@ class TypeLegacySupport extends LAMP {
 	 *       type="string",
 	 *     )
 	 *   ),
-	 *   @OA\Parameter(ref="#/components/parameters/Export"),
-	 *   @OA\Parameter(ref="#/components/parameters/XPath"),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function get_attachment($participant_id, $attachment_key) {
@@ -459,13 +457,11 @@ class TypeLegacySupport extends LAMP {
 	 *       ),
 	 *     ),
 	 *   ),
-	 *   @OA\Parameter(ref="#/components/parameters/Export"),
-	 *   @OA\Parameter(ref="#/components/parameters/XPath"),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function set_attachment($researcher_id, $attachment_key, $script_type, $script_contents, $script_requirements) {
@@ -499,13 +495,11 @@ class TypeLegacySupport extends LAMP {
 	 *       },
 	 *     )
 	 *   ),
-	 *   @OA\Parameter(ref="#/components/parameters/Export"),
-	 *   @OA\Parameter(ref="#/components/parameters/XPath"),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function export($participant_id) {
@@ -565,13 +559,11 @@ class TypeLegacySupport extends LAMP {
 	 *       },
 	 *     )
 	 *   ),
-	 *   @OA\Parameter(ref="#/components/parameters/Export"),
-	 *   @OA\Parameter(ref="#/components/parameters/XPath"),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
 	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
 	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
 	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-	 *   security={{"AuthorizationLegacy": {}}},
+	 *   security={{"Authorization": {}}},
 	 * )
 	 */
 	public static function export_all($researcher_id) {

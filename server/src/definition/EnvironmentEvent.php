@@ -125,13 +125,11 @@ class EnvironmentEvent extends LAMP {
      *       },
      *     )
      *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
+     *   security={{"Authorization": {}}},
      * )
      */
     public static function view($environment_event_id) {
@@ -165,13 +163,11 @@ class EnvironmentEvent extends LAMP {
      *       },
      *     )
      *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
+     *   security={{"Authorization": {}}},
      * )
      */
     public static function all_by_participant($participant_id) {
@@ -207,13 +203,11 @@ class EnvironmentEvent extends LAMP {
      *       },
      *     )
      *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
+     *   security={{"Authorization": {}}},
      * )
      */
     public static function all_by_study($study_id) {
@@ -241,13 +235,11 @@ class EnvironmentEvent extends LAMP {
      *       },
      *     )
      *   ),
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
+     *   security={{"Authorization": {}}},
      * )
      */
     public static function all_by_researcher($researcher_id) {
@@ -268,13 +260,11 @@ class EnvironmentEvent extends LAMP {
      *   },
      *   summary="Get the set of all environment events.",
      *   description="Get the set of all environment events.",
-     *   @OA\Parameter(ref="#/components/parameters/Export"),
-     *   @OA\Parameter(ref="#/components/parameters/XPath"),
      *   @OA\Response(response=200, ref="#/components/responses/Success"),
      *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
      *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
-     *   security={{"AuthorizationLegacy": {}}},
+     *   security={{"Authorization": {}}},
      * )
      */
     public static function all() {

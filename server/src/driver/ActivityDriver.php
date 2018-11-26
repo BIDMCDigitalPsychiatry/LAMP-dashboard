@@ -194,7 +194,12 @@ trait ActivityDriver {
                 $obj->id = new TypeID([Activity::class, $raw->id, array_drop($raw, 'aid'), 0 /* SurveyID */]);
 	            $obj->spec = new TypeID([ActivitySpec::class, $raw->id]);
                 $obj->name = $raw->name;
-                $obj->settings = $raw->settings;
+
+                // Merge both Jewels A/B into one settings object; only one should be non-null at a time anyway.
+                $obj->settings = (object)array_merge(
+                	(array)(!isset($raw->settings->jewelsA) ? [] : $raw->settings->jewelsA[0]),
+	                (array)(!isset($raw->settings->jewelsB) ? [] : $raw->settings->jewelsB[0])
+                );
             } else if ($raw->type === 'survey') {
                 $obj->id = new TypeID([Activity::class, 1 /* survey */, array_drop($raw, 'aid'), $raw->id]);
 	            $obj->spec = new TypeID([ActivitySpec::class, 1 /* survey */]);
