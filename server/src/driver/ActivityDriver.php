@@ -2,12 +2,7 @@
 require_once __DIR__ . '/TypeDriver.php';
 
 
-//
 // Schedule:
-//      - Slot
-//          - SlotName, IsDefault
-//      - Repeat
-//          - RepeatInterval, IsDefault, SortOrder, IsDeleted
 //      - Admin_CTestSchedule, Admin_SurveySchedule
 //          - AdminID, CTestID/SurveyID, Version*(C), ScheduleDate, SlotID, Time, RepeatID, IsDeleted
 //      - Admin_CTestScheduleCustomTime, Admin_SurveyScheduleCustomTime, Admin_BatchScheduleCustomTime
@@ -26,7 +21,6 @@ require_once __DIR__ . '/TypeDriver.php';
 //          - SurveyID, QuestionText, AnswerType, IsDeleted
 //      - SurveyQuestionsOptions
 //          - QuestionID, OptionText
-//
 
 
 trait ActivityDriver {
@@ -206,13 +200,17 @@ trait ActivityDriver {
                 $obj->name = $raw->name;
                 $obj->settings = $raw->questions;
             }
+
+			//
+
+            /* FIXME:
             $obj->schedule = isset($raw->schedule) ? array_merge(...array_map(function($x) {
                 $duration = new DurationInterval(); $ri = $x->repeat_interval;
-                if ($ri >= 0 && $ri <= 4) { /* hourly */
+                if ($ri >= 0 && $ri <= 4) { // hourly
                     $h = ($ri == 4 ? 12 : ($ri == 3 ? 6 : ($ri == 2 ? 3 : 1)));
                     $duration->interval = new CalendarComponents();
                     $duration->interval->hour = $h;
-                } else if ($ri >= 5 && $ri <= 10) { /* weekly+ */
+                } else if ($ri >= 5 && $ri <= 10) { // weekly+
                     if ($ri == 6) {
                         $duration = [
                             new DurationInterval(strtotime($x->time) * 1000, new CalendarComponents()), 
@@ -237,10 +235,10 @@ trait ActivityDriver {
                         $duration[0]->interval->week_of_month = ($ri == 9 ? 2 : ($ri == 8 ? 1 : null));
                         $duration[0]->interval->month = ($ri == 10 ? 1 : null);
                     }
-                } else if ($ri == 11 && count($x->custom_time) == 1) { /* custom+ */
+                } else if ($ri == 11 && count($x->custom_time) == 1) { // custom+
                     $duration->start = strtotime($x->custom_time[0]) * 1000;
                     $duration->repeat_count = 1;
-                } else if ($ri == 11 && count($x->custom_time) > 2) { /* custom* */
+                } else if ($ri == 11 && count($x->custom_time) > 2) { // custom*
                     $int_comp = (new DateTime($x->custom_time[0]))
                                     ->diff(new DateTime($x->custom_time[1]));
                     $duration->start = strtotime($x->custom_time[0]) * 1000;
@@ -252,12 +250,14 @@ trait ActivityDriver {
                     $duration->interval->minute = ($int_comp->i == 0 ? null : $int_comp->i);
                     $duration->interval->second = ($int_comp->s == 0 ? null : $int_comp->s);
                     $duration->repeat_count = count($x->custom_time) - 1;
-                } else if ($ri == 12) { /* none */
+                } else if ($ri == 12) { // none
                     $duration->start = strtotime($x->time) * 1000;
                     $duration->repeat_count = 1;
                 }
                 return is_array($duration) ? $duration : [$duration];
             }, $raw->schedule)) : null;
+            */
+
             return $obj;
         }, $result);
     }

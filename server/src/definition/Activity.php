@@ -113,7 +113,7 @@ class Activity extends LAMP {
      * @OA\Property(
      *   type="array",
      *   @OA\Items(
-     *     ref="#/components/schemas/DurationInterval"
+     *     ref="#/components/schemas/DurationIntervalLegacy"
      *   ),
      *   description="The notification schedule for the activity."
      * )

@@ -254,21 +254,8 @@ trait ResultEventDriver {
 		 */
 		$update_object
 	) {
-		return null; // FIXME
-
-		// Collect the set of legacy Activity tables and stitch the full query.
-		$tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
-		$tablerow = array_filter($tableset, function ($x) use ($activity_id) {
-			return $x['ActivityIndexID'] === $activity_id;
-		})[0];
-
-		// Insert row, returning the generated primary key ID.
-		$result = self::lookup("
-            UPDATE NULL SET NULL WHERE NULL = NULL; 
-        ");
-
-		// Return whether the operation was successful.
-		return $result;
+		// TODO: ResultEvents cannot be updated... (yet?)
+		return null;
 	}
 
 	/**
