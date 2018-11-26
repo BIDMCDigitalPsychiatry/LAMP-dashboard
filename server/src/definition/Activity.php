@@ -169,8 +169,7 @@ class Activity extends LAMP {
                 return $_id2->part(1) == $_id1->part(1);
             } else return false;
         });
-        return self::_select([$_id->part(1)], $_id->part(2),
-                               $_id->part(2) , $_id->part(3));
+        return self::_select($_id->part(1), $_id->part(3) , $_id->part(2));
     }
 
     /** 

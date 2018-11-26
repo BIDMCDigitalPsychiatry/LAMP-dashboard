@@ -259,7 +259,7 @@ trait TypeDriver {
                             $result = self::lookup("
                                 SELECT AdminID AS value
                                 FROM Survey
-                                WHERE IsDeleted = 0 AND SurveyID = '{$id->part(2)}';
+                                WHERE IsDeleted = 0 AND SurveyID = '{$id->part(3)}';
                             ");
                             return count($result) === 0 ? null : 
                                 new TypeID([Researcher::class, $result[0]['value']]);
@@ -269,7 +269,7 @@ trait TypeDriver {
 		                    $result = self::lookup("
 	                            SELECT AdminID AS value
 	                            FROM Admin
-	                            WHERE IsDeleted = 0 AND AdminID = '{$id->part(3)}';
+	                            WHERE IsDeleted = 0 AND AdminID = '{$id->part(2)}';
                         	");
 		                    return count($result) === 0 ? null :
 			                    new TypeID([Researcher::class, $result[0]['value']]);

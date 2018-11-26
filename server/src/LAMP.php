@@ -82,9 +82,17 @@ class LAMP {
                     LAMP::dynamic_route($route, $defn['operationId']);
             }
         }
+
+        // Facility to retrieve the runtime type of the data structure represented by an ID.
+	    Flight::route('GET /type/@id', function($id) {
+	    	$_id = (new TypeID($id))->part(0);
+	    	return Flight::json([
+	    		"type" => $_id,
+			    "link" => '/' . strtolower($_id) . '/' . $id . '/'
+		    ]);
+	    });
         
         // Route the index or API explorer correctly.
-        ini_set('short_open_tag', false);
         Flight::set('flight.views.path', realpath(__DIR__ . '/..') . '/templates');
     	Flight::route('GET /', function() {
             // TODO: Maybe use HTTP: X-Requested-With?
@@ -120,7 +128,7 @@ class LAMP {
                 throw new LAMPException("missing paramter $name", 400);
             });
 
-            // TODO: Make sure `null` is different than `[]`.
+            // TODO / FIXME: Make sure `null` is different than `[]`.
             // If nothing is there, return `[]`, but if the object is invalid, return `null`.
             if ($res === null) 
                 $res = [];
@@ -152,13 +160,11 @@ class LAMP {
                 return Flight::csv($res, 200, $trs);
             } else return Flight::json([
             	"meta" => [
-            		"link" => [
-            			"rel" => "self",
-			            "href" => explode('?', Flight::request()->url)[0] // TODO / FIXME
-		            ],
 		            "access" => [
-			            "on" => 'never',
-			            "by" => 'nobody'
+		            	"in" => $_SERVER['HTTP_HOST'],
+			            "at" => explode('?', Flight::request()->url)[0], // TODO / FIXME
+			            "on" => (int)(microtime(true) * 1000),
+			            "by" => LAMP::auth_header()[0] ?: 'nobody',
 		            ]
 	            ],
 	            "data" => $res
@@ -210,13 +216,6 @@ class LAMP {
      *   name="Authorization",
      *   type="apiKey",
      *   in="header",
-     * )
-     * 
-     * @OA\SecurityScheme(
-     *   securityScheme="AuthorizationLegacy",
-     *   name="auth",
-     *   type="apiKey",
-     *   in="query",
      * )
      */
     public static function auth_header() {

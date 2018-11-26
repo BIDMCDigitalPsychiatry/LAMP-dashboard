@@ -126,7 +126,7 @@ trait ActivityDriver {
                         LegacyCTestID AS lid,
                         Name AS name
                     FROM LAMP_Aux.dbo.ActivityIndex
-                    WHERE LegacyCTestID NOT NULL
+                    WHERE LegacyCTestID IS NOT NULL
                 ) AS CTest
                 WHERE isDeleted = 0 
                     {$cond1}
@@ -281,7 +281,7 @@ trait ActivityDriver {
 		if ($_specID->part(1) !== 1 /* survey */)
 			return null;
 
-		// ...
+		// ... use schedule + settings for survey config!
 
 		return null; // TODO
 	}
@@ -292,14 +292,19 @@ trait ActivityDriver {
 	private static function _update(
 
 		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id,
+
+		/**
 		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
 		 */
 		$admin_id,
 
 		/**
-		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
 		 */
-		$activity_id,
+		$survey_id,
 
 		/**
 		 * The replacement object or specific fields within.
@@ -311,10 +316,10 @@ trait ActivityDriver {
 		if (!is_string($update_object->spec) && !is_string($update_object->name) &&
 			!is_array($update_object->schedule) && !is_array($update_object->settings))
 			return null;
-
 		// TODO: ActivitySpec::_jewelsMap('key', null)
 
-		// ...
+		// ... use name for rename activity only
+		// ... use schedule + settings for survey config!
 
 		return null; // TODO
 	}
@@ -325,22 +330,31 @@ trait ActivityDriver {
 	private static function _delete(
 
 		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id,
+
+		/**
 		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
 		 */
 		$admin_id,
 
 		/**
-		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
 		 */
-		$activity_id
+		$survey_id
 	) {
 		// Non-Survey Activities cannot be created!
-		if ($activity_id !== 1 /* survey */)
+		if ($activity_id !== 1 /* survey */ && $survey_id != null)
 			return null;
 
-		// ...
+		// Set the deletion flag, without actually deleting the row.
+		$result = self::perform("
+            UPDATE Survey SET IsDeleted = 1 WHERE SurveyID = {$survey_id};
+        ");
 
-		return null; // TODO
+		// Return whether the operation was successful.
+		return $result;
 	}
 }
 
