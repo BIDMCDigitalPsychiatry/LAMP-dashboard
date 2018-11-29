@@ -1,13 +1,13 @@
 <?php
-require_once __DIR__ . '/LAMPDriver.php';
+require_once __DIR__ . '/TypeDriver.php';
 
-trait StudyDriverGET_v0_1 {
-    use LAMPDriver_v0_1;
+trait StudyDriver {
+    use TypeDriver;
 
     /** 
      * Get a set of `Study`s matching the criteria parameters.
      */
-    private static function _get(
+    private static function _select(
 
         /** 
          * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
@@ -29,7 +29,8 @@ trait StudyDriverGET_v0_1 {
                 ) AS participants,
                 (
                     SELECT 
-                        SurveyID AS id
+                        SurveyID AS id,
+                        Admin.AdminID AS aid
                     FROM Survey
                     WHERE isDeleted = 0 
                         AND Survey.AdminID = Admin.AdminID
@@ -37,10 +38,10 @@ trait StudyDriverGET_v0_1 {
                 ) AS surveys,
                 (
                     SELECT 
-                        CTestID AS id,
+                        ActivityIndexID AS id,
                         Admin.AdminID AS aid
-                    FROM CTest
-                    WHERE IsDeleted = 0
+                    FROM LAMP_Aux.dbo.ActivityIndex
+                    WHERE ActivityIndexID > 1
                     FOR JSON PATH, INCLUDE_NULL_VALUES
                 ) AS ctests
             FROM Admin
@@ -48,55 +49,73 @@ trait StudyDriverGET_v0_1 {
                 ON Admin_Settings.AdminID = Admin.AdminID
             WHERE isDeleted = 0 {$cond}
             FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ", true);
+        ", 'json');
         if (count($results) == 0) return null;
         
         // Map from SQL DB to the local Study type.
         return array_map(function($raw) {
             $obj = new Study();
-            $obj->id = new LAMPID([Study::class, $raw->id]);
+            $obj->id = new TypeID([Study::class, $raw->id]);
             $obj->name = $raw->name;
             $obj->participants = isset($raw->participants) ? array_map(function($x) { 
                 return LAMP::decrypt($x->id, true); 
             }, $raw->participants) : [];
             $obj->activities = array_merge(
                 isset($raw->surveys) ? array_map(function($x) { 
-                    return new LAMPID([Activity::class, ActivityType::Survey, $x->id]); 
+                    return new TypeID([Activity::class, 1 /* survey */, $x->aid, $x->id]);
                 }, $raw->surveys) : [], 
                 isset($raw->ctests) ? array_map(function($x) {
-                    return new LAMPID([Activity::class, ActivityType::Game, $x->id, $x->aid]); 
+                    return new TypeID([Activity::class, $x->id, $x->aid, 0 /* SurveyID */]);
                 }, $raw->ctests) : []
             );
             return $obj;
         }, $results);
     }
-}
 
-trait StudyDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
+	/**
+	 * Create a `Study` with a new object.
+	 */
+	private static function _insert(
 
-    /** 
-     * Create or update a `Study` with new fields.
-     */
-    private static function _set(
+		/**
+		 * The new object.
+		 */
+		$insert_object
+	) {
+		// TODO: Studies do not exist! They cannot be modified!
+		return null; // TODO
+	}
 
-        /** 
-         * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
-         */
-        $admin_id = null,
+	/**
+	 * Update a `Study` with new fields.
+	 */
+	private static function _update(
 
-        /**
-         * The new object or patch fields of an object.
-         */
-        $update_object = null
-    ) {
-        if ($admin_id === null && $update_object !== null) { /* create */
-            // OUTPUT INSERTED.AdminID
-        } else if ($admin_id !== null && $update_object !== null) { /* update */
-            //
-        } else { /* delete */
-            //
-        }
-        return null;
-    }
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+		// TODO: Studies do not exist! They cannot be modified!
+		return null; // TODO
+	}
+
+	/**
+	 * Delete a `Study` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id
+	) {
+		// TODO: Studies do not exist! They cannot be modified!
+		return null; // TODO
+	}
 }

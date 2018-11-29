@@ -1,25 +1,47 @@
 <?php
 
-trait LAMPDriver_v0_1 {
-    use LAMPDriver;
+/**
+ * ...
+ */
+abstract class AuthType {
+	const Root = 'root';
+	const Researcher = 'researcher';
+	const Participant = 'participant';
+}
 
-    /**
-     * Return internal access to the underlying MS-SQL DB.
-     */
-    private static function db() {
-        static $pdo = null;
-        if ($pdo === null) {
-            try {
-                $pdo = new PDO('sqlsrv:server='.DB_HOST.';database='.DB_NAME, DB_USER, DB_PASS, [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
-                ]);
-                $pdo->exec('SET QUOTED_IDENTIFIER ON');
-            } catch (PDOException $e) {
-                throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
-            }
-        }
-        return $pdo;
-    }
+/**
+ * Use `require()` to restrict the ID to certain prefix(s) and `part()` to
+ * access ID components safely. Note: DO NOT use the reserved character ':' in any
+ * component strings.
+ */
+class TypeID implements JsonSerializable {
+	private $components = [];
+	public function __construct($value) {
+		if (is_string($value)) {
+			$this->components = explode(":", base64_decode(strtr($value, '_-~', '+/=')));
+		} else if (is_array($value))
+			$this->components = $value;
+		else throw new Exception('invalid LAMP ID value');
+	}
+	public function jsonSerialize() {
+		return strtr(base64_encode(implode(':', $this->components)), '+/=', '_-~');
+	}
+	public function require($match_prefix) {
+		if (!in_array($this->components[0], $match_prefix))
+			throw new LAMPException("invalid identifier", 403);
+		return $this;
+	}
+	public function part($idx) {
+		return isset($this->components[$idx]) ? $this->components[$idx] : null;
+	}
+}
+
+/**
+ * All LAMP API actions are designated from their class definitions to specific
+ * drivers implemented as PHP Traits. If the implementation detail underlying the
+ * API changes, add a new `TypeDriver` and/or extend it for new functionality.
+ */
+trait TypeDriver {
 
     /**
      * Access the LAMP v0.1 DB with an arbitrary Transact-SQL statement.
@@ -32,20 +54,21 @@ trait LAMPDriver_v0_1 {
         $sql_query, 
 
         /**
-         * If the SQL query is to return a single JSON object, mark this as `true`.
+         * Supports 'obj', 'assoc', and 'json' currently.
+         * If the SQL query is to return a single JSON object, mark this as `json`.
          */
-        $use_json = false
+        $fetch_mode = 'assoc'
     ) {
         if ($sql_query === null) return null;
         try {
             $pre_exec = microtime(true);
-            $result = self::db()->query($sql_query)->fetchAll(PDO::FETCH_ASSOC);
+            $result = LAMP::db()->query($sql_query)->fetchAll($fetch_mode === 'obj' ? PDO::FETCH_OBJ : PDO::FETCH_ASSOC);
             $exec_time = microtime(true) - $pre_exec;
-            log::sys('SQL execution took '.$exec_time.' seconds.');
+            LAMP::log('SQL execution took '.$exec_time.' seconds.');
 
             if (count($result) === 0)
                 return [];
-            if ($use_json === false) {
+            if ($fetch_mode !== 'json') {
                 return $result;
             } else {
                 return json_decode(implode('', array_map(function($a) {
@@ -53,7 +76,8 @@ trait LAMPDriver_v0_1 {
                 }, $result)));
             }
         } catch(PDOException $e) {
-            throw new LAMPException(log::err($e, $sql_query), 500);
+	        LAMP::log($e);
+            throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
 
@@ -75,12 +99,13 @@ trait LAMPDriver_v0_1 {
         if ($sql_query === null) return null;
         try {
             $pre_exec = microtime(true);
-            $obj = self::db()->prepare($sql_query)->execute($substitutions);
+            $obj = LAMP::db()->prepare($sql_query)->execute($substitutions);
             $exec_time = microtime(true) - $pre_exec;
-            log::sys('SQL execution took '.$exec_time.' seconds.');
+            LAMP::log('SQL execution took '.$exec_time.' seconds.');
             return $obj;
         } catch(PDOException $e) {
-            throw new LAMPException(log::err($e, $sql_query), 500);
+	        LAMP::log($e);
+            throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
 
@@ -103,7 +128,7 @@ trait LAMPDriver_v0_1 {
                 WHERE IsDeleted = 0 AND Email = '{$value}';
             ");
             if (count($result) == 0) return null;
-            return new LAMPID([Researcher::class, $result[0]['AdminID']]);
+            return new TypeID([Researcher::class, $result[0]['AdminID']]);
 
         // We're a Participant.
         } else if (preg_match('#^G?U#', $parts[0]) === 1) { // UID
@@ -128,7 +153,7 @@ trait LAMPDriver_v0_1 {
 
         /**
          * Function of type `function($type, $value): $is_ok`.
-         * Possible values are `String` if the type is `Participant`, or `LAMPID` otherwise.
+         * Possible values are `String` if the type is `Participant`, or `TypeID` otherwise.
          */
         $callback
     ) {
@@ -159,7 +184,7 @@ trait LAMPDriver_v0_1 {
                     $parts[1] !== LAMP::decrypt($result[0]['Password'], false, 'oauth'))
                 throw new LAMPException("invalid credentials", 403);
             else 
-                $value = (new LAMPID([Researcher::class, $result[0]['AdminID']]))->part(1);
+                $value = (new TypeID([Researcher::class, $result[0]['AdminID']]))->part(1);
             $type = AuthType::Researcher;
 
         // Authenticate as a Participant.
@@ -183,7 +208,50 @@ trait LAMPDriver_v0_1 {
             throw new LAMPException("access restricted", 403);
     }
 
-    /**
+	/**
+	 *
+	 */
+	public static function type_parent_of(
+
+		/**
+		 * The origin type in the LAMP v0.1 DB.
+		 */
+		$from,
+
+		/**
+		 * The destination type the LAMP v0.1 DB.
+		 */
+		$to = null
+	) {
+		static $mapping = null;
+		if ($mapping === null) {
+			$mapping = [
+				ResultEvent::class => [Activity::class, Participant::class, Study::class, Researcher::class],
+				EnvironmentEvent::class => [Participant::class, Study::class, Researcher::class],
+				FitnessEvent::class => [Participant::class, Study::class, Researcher::class],
+				MetadataEvent::class => [Participant::class, Study::class, Researcher::class],
+				SensorEvent::class => [Participant::class, Study::class, Researcher::class],
+				Activity::class => [Study::class, Researcher::class],
+				Participant::class => [Study::class, Researcher::class],
+				Study::class => [Researcher::class],
+				Researcher::class => [],
+			];
+		}
+
+		// Handle early bail-out if no conversion exists or if we want the whole parent tree.
+		if (!isset($mapping[$from]))
+			return null;
+		if ($to === null)
+			return $mapping[$from];
+
+		// Execute the appropriate conversion.
+		$val = $mapping[$from][$to];
+		if ($val === null)
+			throw new LAMPException("invalid type", 404);
+		return $val;
+	}
+
+	/**
      * Convert an internal ID of one type to the ID of its parent type, if any.
      */
     public static function parent_of(
@@ -215,23 +283,30 @@ trait LAMPDriver_v0_1 {
                             WHERE IsDeleted = 0 AND StudyId = '{$id}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
                 Activity::class => [
-                    Researcher::class => function($id) { 
-                        if ($id->part(1) === ActivityType::Game) {
-                            return new LAMPID([Researcher::class, $id->part(3)]);
-                        } else if ($id->part(1) === ActivityType::Survey) {
+                    Researcher::class => function($id) {
+	                    if ($id->part(1) === 1 /* survey */) {
                             $result = self::lookup("
                                 SELECT AdminID AS value
                                 FROM Survey
-                                WHERE IsDeleted = 0 AND SurveyID = '{$id->part(2)}';
+                                WHERE IsDeleted = 0 AND SurveyID = '{$id->part(3)}';
                             ");
                             return count($result) === 0 ? null : 
-                                new LAMPID([Researcher::class, $result[0]['value']]);
-                        }
-                        return null;
+                                new TypeID([Researcher::class, $result[0]['value']]);
+                        } else {
+
+		                    // Only "Survey" types lack an encoded AdminID; regardless, verify their deletion.
+		                    $result = self::lookup("
+	                            SELECT AdminID AS value
+	                            FROM Admin
+	                            WHERE IsDeleted = 0 AND AdminID = '{$id->part(2)}';
+                        	");
+		                    return count($result) === 0 ? null :
+			                    new TypeID([Researcher::class, $result[0]['value']]);
+	                    }
                     },
                 ],
                 EnvironmentEvent::class => [
@@ -255,7 +330,7 @@ trait LAMPDriver_v0_1 {
                             WHERE LocationID = '{$id->part(1)}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
                 FitnessEvent::class => [
@@ -279,11 +354,30 @@ trait LAMPDriver_v0_1 {
                             WHERE HKDailyValueID = '{$id->part(1)}';
                         ");
                         return count($result) === 0 ? null : 
-                            new LAMPID([Researcher::class, $result[0]['value']]);
+                            new TypeID([Researcher::class, $result[0]['value']]);
                     },
                 ],
-                Result::class => [
-                    Participant::class => function($id) { 
+	            MetadataEvent::class => [
+		            Participant::class => function($id) {
+			            return null;
+		            },
+		            Researcher::class => function($id) {
+			            return null;
+		            },
+	            ],
+	            SensorEvent::class => [
+		            Participant::class => function($id) {
+			            return null;
+		            },
+		            Researcher::class => function($id) {
+			            return null;
+		            },
+	            ],
+	            ResultEvent::class => [
+		            Activity::class => function($id) {
+			            return null;
+		            },
+		            Participant::class => function($id) {
                         return null;
                     },
                     Researcher::class => function($id) { 
@@ -294,6 +388,7 @@ trait LAMPDriver_v0_1 {
         }
 
         // The Study type is virtualized atop Researcher.
+	    $reconv = $to === Study::class;
         if ($from === Study::class)
             $from = Researcher::class;
         if ($to === Study::class)
@@ -307,10 +402,12 @@ trait LAMPDriver_v0_1 {
         if (!isset($mapping[$from][$to]))
             return null;
 
-        // Execute the appropriate conversion.
+        // Execute the appropriate conversion (and remap to Study if needed).
         $val = $mapping[$from][$to]($id);
         if ($val === null)
             throw new LAMPException("invalid identifier", 404);
+        if ($reconv)
+	        $val = new TypeID([Study::class, $val->part(1)]);
         return $val;
     }
 
@@ -378,7 +475,7 @@ trait LAMPDriver_v0_1 {
          */
         $packages
     ) {
-        $script = self::db()->quote($script);
+        $script = LAMP::db()->quote($script);
         $packages = json_encode($packages);
         return self::perform("
             MERGE INTO LAMP_Aux.dbo.OOLAttachmentLinker 

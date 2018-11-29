@@ -1,18 +1,35 @@
 <?php
-require_once __DIR__ . '/LAMPDriver.php';
+require_once __DIR__ . '/TypeDriver.php';
 
-trait ActivityDriverGET_v0_1 {
-	use LAMPDriver_v0_1;
+
+// Schedule:
+//      - Admin_CTestSchedule, Admin_SurveySchedule
+//          - AdminID, CTestID/SurveyID, Version*(C), ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+//      - Admin_CTestScheduleCustomTime, Admin_SurveyScheduleCustomTime, Admin_BatchScheduleCustomTime
+//          - Time
+//      - Admin_BatchSchedule
+//          - AdminID, BatchName, ScheduleDate, SlotID, Time, RepeatID, IsDeleted
+//      - Admin_BatchScheduleCTest, Admin_BatchScheduleSurvey
+//          - CTestID/SurveyID, Version*(C), Order
+//
+// Settings:
+//      - Admin_CTestSurveySettings
+//          - AdminID, CTestID, SurveyID
+//      - Admin_JewelsTrailsASettings, Admin_JewelsTrailsBSettings
+//          - AdminID, ... (")
+//      - SurveyQuestions
+//          - SurveyID, QuestionText, AnswerType, IsDeleted
+//      - SurveyQuestionsOptions
+//          - QuestionID, OptionText
+
+
+trait ActivityDriver {
+	use TypeDriver;
 
     /**
      * Get a set of `Activity`s matching the criteria parameters.
      */
-    private static function _get(
-
-    	/** 
-    	 * The `ActivityType`s to get (currently only `game` or `survey`).
-    	 */
-    	$types = [], 
+    private static function _select(
 
     	/** 
     	 * The `CTestID` column of the `CTest` table in the LAMP v0.1 DB.
@@ -29,11 +46,8 @@ trait ActivityDriverGET_v0_1 {
     	 */
     	$admin_id = null
     ) {
-        if (count($types) == 0) 
-        	return null;
 
-        $cond0a = in_array('game', $types) ? '1' : '0';
-        $cond0b = in_array('survey', $types) ? '1' : '0';
+    	// ...
         $cond1 = $ctest_id !== null ? "AND CTest.id = '$ctest_id'" : '';
         $cond2 = $survey_id !== null ? "AND SurveyID = '$survey_id'" : '';
         $cond3 = $admin_id !== null ? "AND AdminID = '$admin_id'" : '';
@@ -41,17 +55,8 @@ trait ActivityDriverGET_v0_1 {
             WITH A(value) AS (
                 SELECT 
                     AdminID AS aid,
-                    ('game') AS type,
-                    ('none') AS sharing_mode,
+                    ('ctest') AS type,
                     CTest.*,
-                    JSON_QUERY(dbo.UNWRAP_JSON((
-                        SELECT 
-                            SurveyID AS sid
-                        FROM Admin_CTestSurveySettings
-                        WHERE Admin_CTestSurveySettings.AdminID = Admin.AdminID
-                            AND Admin_CTestSurveySettings.CTestID = CTest.id
-                        FOR JSON PATH, INCLUDE_NULL_VALUES
-                    ), 'sid')) AS [settings.distraction_activities],
                     (
                         SELECT 
                             NoOfSeconds_Beg AS beginner_seconds,
@@ -67,7 +72,7 @@ trait ActivityDriverGET_v0_1 {
                             Y_NoOfShapes AS y_shape_count
                         FROM Admin_JewelsTrailsASettings
                         WHERE Admin_JewelsTrailsASettings.AdminID = Admin.AdminID
-                            AND CTest.id = 17
+                            AND CTest.lid = 17
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS [settings.jewelsA],
                     (
@@ -85,7 +90,7 @@ trait ActivityDriverGET_v0_1 {
                             Y_NoOfShapes AS y_shape_count
                         FROM Admin_JewelsTrailsBSettings
                         WHERE Admin_JewelsTrailsBSettings.AdminID = Admin.AdminID
-                            AND CTest.id = 18
+                            AND CTest.lid = 18
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS [settings.jewelsB],
                     (
@@ -103,7 +108,7 @@ trait ActivityDriverGET_v0_1 {
                             ), 't')) AS custom_time
                         FROM Admin_CTestSchedule
                         WHERE Admin_CTestSchedule.AdminID = Admin.AdminID
-                            AND Admin_CTestSchedule.CTestID = CTest.id
+                            AND Admin_CTestSchedule.CTestID = CTest.lid
                             AND Admin_CTestSchedule.IsDeleted = 0
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS schedule
@@ -111,23 +116,22 @@ trait ActivityDriverGET_v0_1 {
                 CROSS APPLY 
                 (
                     SELECT 
-                        CTestID AS id,
-                        CTestName AS name,
-                        MaxVersions AS [settings.max_versions]
-                    FROM CTest
-                    WHERE IsDeleted = 0
+                        ActivityIndexID AS id,
+                        LegacyCTestID AS lid,
+                        Name AS name
+                    FROM LAMP_Aux.dbo.ActivityIndex
+                    WHERE LegacyCTestID IS NOT NULL
                 ) AS CTest
-                WHERE 1={$cond0a} 
-                    AND isDeleted = 0 
+                WHERE isDeleted = 0 
                     {$cond1}
                     {$cond3}
                 FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
             ), B(value) AS (
                 SELECT 
                     SurveyID AS id, 
+                    AdminID AS aid,
                     SurveyName AS name, 
                     ('survey') AS type,
-                    ('none') AS sharing_mode,
                     (
                         SELECT 
                             QuestionText AS text, 
@@ -164,8 +168,7 @@ trait ActivityDriverGET_v0_1 {
                         FOR JSON PATH, INCLUDE_NULL_VALUES
                     ) AS schedule
                 FROM Survey
-                WHERE 1={$cond0b} 
-                    AND isDeleted = 0 
+                WHERE isDeleted = 0 
                     {$cond2}
                     {$cond3}
                 FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
@@ -174,36 +177,40 @@ trait ActivityDriverGET_v0_1 {
                 WHEN LEN(A.value) > 0 AND LEN(B.value) > 0 THEN ',' ELSE '' 
             END, B.value, ']')
             FROM A, B;
-        ", true);
+        ", 'json');
         if (count($result) == 0)
         	return null;
 
         //
         return array_map(function($raw) { 
             $obj = new Activity();
-            $obj->type = $raw->type;
-            $obj->sharing_mode = $raw->sharing_mode;
-            if ($obj->type == ActivityType::Game) {
-                $obj->id = new LAMPID([Activity::class, ActivityType::Game, $raw->id, 
-                                       array_drop($raw, 'aid')]);
+            if ($raw->type === 'ctest') {
+                $obj->id = new TypeID([Activity::class, $raw->id, array_drop($raw, 'aid'), 0 /* SurveyID */]);
+	            $obj->spec = new TypeID([ActivitySpec::class, $raw->id]);
                 $obj->name = $raw->name;
-                $obj->settings = $raw->settings;
-                if (isset($obj->settings->distraction_activities))
-                    $obj->settings->distraction_activities = array_map(function($x) { 
-                        return new LAMPID([Activity::class, ActivityType::Survey, $x]);
-                    }, $obj->settings->distraction_activities);
-            } else if ($obj->type == ActivityType::Survey) {
-                $obj->id = new LAMPID([Activity::class, ActivityType::Survey, $raw->id]);
+
+                // Merge both Jewels A/B into one settings object; only one should be non-null at a time anyway.
+                $obj->settings = (object)array_merge(
+                	(array)(!isset($raw->settings->jewelsA) ? [] : $raw->settings->jewelsA[0]),
+	                (array)(!isset($raw->settings->jewelsB) ? [] : $raw->settings->jewelsB[0])
+                );
+            } else if ($raw->type === 'survey') {
+                $obj->id = new TypeID([Activity::class, 1 /* survey */, array_drop($raw, 'aid'), $raw->id]);
+	            $obj->spec = new TypeID([ActivitySpec::class, 1 /* survey */]);
                 $obj->name = $raw->name;
                 $obj->settings = $raw->questions;
             }
+
+			//
+
+            /* FIXME:
             $obj->schedule = isset($raw->schedule) ? array_merge(...array_map(function($x) {
                 $duration = new DurationInterval(); $ri = $x->repeat_interval;
-                if ($ri >= 0 && $ri <= 4) { /* hourly */
+                if ($ri >= 0 && $ri <= 4) { // hourly
                     $h = ($ri == 4 ? 12 : ($ri == 3 ? 6 : ($ri == 2 ? 3 : 1)));
                     $duration->interval = new CalendarComponents();
                     $duration->interval->hour = $h;
-                } else if ($ri >= 5 && $ri <= 10) { /* weekly+ */
+                } else if ($ri >= 5 && $ri <= 10) { // weekly+
                     if ($ri == 6) {
                         $duration = [
                             new DurationInterval(strtotime($x->time) * 1000, new CalendarComponents()), 
@@ -228,10 +235,10 @@ trait ActivityDriverGET_v0_1 {
                         $duration[0]->interval->week_of_month = ($ri == 9 ? 2 : ($ri == 8 ? 1 : null));
                         $duration[0]->interval->month = ($ri == 10 ? 1 : null);
                     }
-                } else if ($ri == 11 && count($x->custom_time) == 1) { /* custom+ */
+                } else if ($ri == 11 && count($x->custom_time) == 1) { // custom+
                     $duration->start = strtotime($x->custom_time[0]) * 1000;
                     $duration->repeat_count = 1;
-                } else if ($ri == 11 && count($x->custom_time) > 2) { /* custom* */
+                } else if ($ri == 11 && count($x->custom_time) > 2) { // custom*
                     $int_comp = (new DateTime($x->custom_time[0]))
                                     ->diff(new DateTime($x->custom_time[1]));
                     $duration->start = strtotime($x->custom_time[0]) * 1000;
@@ -243,57 +250,125 @@ trait ActivityDriverGET_v0_1 {
                     $duration->interval->minute = ($int_comp->i == 0 ? null : $int_comp->i);
                     $duration->interval->second = ($int_comp->s == 0 ? null : $int_comp->s);
                     $duration->repeat_count = count($x->custom_time) - 1;
-                } else if ($ri == 12) { /* none */
+                } else if ($ri == 12) { // none
                     $duration->start = strtotime($x->time) * 1000;
                     $duration->repeat_count = 1;
                 }
                 return is_array($duration) ? $duration : [$duration];
             }, $raw->schedule)) : null;
+            */
+
             return $obj;
         }, $result);
     }
+
+	/**
+	 * Create an `Activity` with a new object.
+	 */
+	private static function _insert(
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
+		 * The new object.
+		 */
+		$insert_object
+	) {
+		// Terminate the operation if any of the required string-typed fields are not present.
+		if (!is_string($insert_object->spec) || !is_string($insert_object->name))
+			return null;
+
+		// Non-Survey Activities cannot be created!
+		$_specID = (new TypeID($insert_object->spec))->require([ActivitySpec::class]);
+		if ($_specID->part(1) !== 1 /* survey */)
+			return null;
+
+		// ... use schedule + settings for survey config!
+
+		return null; // TODO
+	}
+
+	/**
+	 * Update an `Activity` with new fields.
+	 */
+	private static function _update(
+
+		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id,
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
+		 * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
+		 */
+		$survey_id,
+
+		/**
+		 * The replacement object or specific fields within.
+		 */
+		$update_object
+	) {
+
+		// Terminate the operation if none of the possible string-typed fields are present.
+		if (!is_string($update_object->spec) && !is_string($update_object->name) &&
+			!is_array($update_object->schedule) && !is_array($update_object->settings))
+			return null;
+		// TODO: ActivitySpec::_jewelsMap('key', null)
+
+		// ... use name for rename activity only
+		// ... use schedule + settings for survey config!
+
+		return null; // TODO
+	}
+
+	/**
+	 * Delete an `Activity` row.
+	 */
+	private static function _delete(
+
+		/**
+		 * The `ActivityID` column of the `ActivityIndex` table in the LAMP v0.1 DB.
+		 */
+		$activity_id,
+
+		/**
+		 * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
+		 */
+		$admin_id,
+
+		/**
+		 * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
+		 */
+		$survey_id
+	) {
+		// Non-Survey Activities cannot be created!
+		if ($activity_id !== 1 /* survey */ && $survey_id != null)
+			return null;
+
+		// Set the deletion flag, without actually deleting the row.
+		$result = self::perform("
+            UPDATE Survey SET IsDeleted = 1 WHERE SurveyID = {$survey_id};
+        ");
+
+		// Return whether the operation was successful.
+		return $result;
+	}
 }
 
-trait ActivityDriverSET_v0_1 {
-    use LAMPDriver_v0_1;
-
-    /** 
-     * Create or update an `Activity` with new fields.
-     */
-    private static function _set(
-
-        /** 
-         * The `ActivityType` to set (currently only `game` or `survey`).
-         */
-        $type = null, 
-
-        /** 
-         * The `CTestID` column of the `CTest` table in the LAMP v0.1 DB.
-         */
-        $ctest_id = null, 
-
-        /** 
-         * The `SurveyID` column of the `Survey` table in the LAMP v0.1 DB.
-         */
-        $survey_id = null, 
-
-        /** 
-         * The `AdminID` column of the `Admin` table in the LAMP v0.1 DB.
-         */
-        $admin_id = null,
-
-        /**
-         * The new object or patch fields of an object.
-         */
-        $update_object = null
-    ) {
-        if ($admin_id === null && $update_object !== null) { /* create */
-            // OUTPUT INSERTED.AdminID
-        } else if ($admin_id !== null && $update_object !== null) { /* update */
-            //
-        } else { /* delete */
-            //
-        }
-        return null;
-    }
-}
+/*
+-- Utility function that removes keys from FOR JSON output.
+-- i.e. UNWRAP_JSON([{'val':1,{'val':2},{'val':'cell'}], 'val') => [1,2,'cell']
+CREATE OR ALTER FUNCTION FUNCTION
+    dbo.UNWRAP_JSON(@json nvarchar(max), @key nvarchar(400)) RETURNS nvarchar(max)
+AS BEGIN
+    RETURN REPLACE(REPLACE(@json, FORMATMESSAGE('{"%s":', @key),''), '}','')
+END;
+*/
