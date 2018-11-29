@@ -132,8 +132,8 @@ trait ActivitySpecDriver {
 			($index_id === null ? [self::_batchSpec()] : []),
 			array_map(function($x) {
 				$obj = new ActivitySpec();
-				$obj->id = new TypeID([ActivitySpec::class, $x['id']]);
-				$obj->name = $x['name'];
+				$obj->id = new TypeID([ActivitySpec::class, $x->id]);
+				$obj->name = $x->name;
 				return $obj;
 			}, $activities_list)
 		);

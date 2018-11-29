@@ -25,124 +25,150 @@ trait ResultEventDriver {
 		$admin_id = null
 	) {
 		$user_id = LAMP::encrypt($user_id);
-		$cond1 = $user_id !== null ? "AND Users.StudyId = '$user_id'" : '';
-		$cond2 = $admin_id !== null ? "AND Users.AdminID = '$admin_id'" : '';
-
-		// Helpers go here:
-		$sql_if = function($cond, $x, $y) { return $cond ? $x : $y; };
-		$sql_iff = function($x, $y) { return $x ?: $y; };
+		$conds = 'WHERE ' . implode(' AND ', array_filter([
+				$user_id !== null ? "Users.StudyId = '$user_id'" : null,
+				$admin_id !== null ? "Users.AdminID = '$admin_id'" : null
+			]));
+		$conds = $conds == 'WHERE ' ? '' : $conds;
 
 		// Collect the set of legacy Activity tables and stitch the full query.
-		$tableset = self::lookup("SELECT * FROM LAMP_Aux.dbo.ActivityIndex;");
-		$full_q = array_map(function ($entry) use($sql_if, $sql_iff, $cond1, $cond2) { return
-			"[{$entry['Name']}](value) AS (
-                SELECT
-                    ({$entry['ActivityIndexID']}) AS ctid,
-                    [{$entry['IndexColumnName']}] AS id,
-                    Users.AdminID AS aid,
-                    (NULL) AS attachments,
-                    (NULL) AS activity,
-                    DATEDIFF_BIG(MS, '1970-01-01', [{$entry['StartTimeColumnName']}]) AS timestamp,
-                    DATEDIFF_BIG(MS, '1970-01-01', [{$entry['EndTimeColumnName']}]) - 
-                        DATEDIFF_BIG(MS, '1970-01-01', [{$entry['StartTimeColumnName']}]) AS duration,
-                    {$sql_if($entry['Slot1Name'] == null, '', 
-                        "[{$entry['Slot1ColumnName']}] AS [static_data.{$entry['Slot1Name']}],")}
-                    {$sql_if($entry['Slot2Name'] == null, '', 
-                        "[{$entry['Slot2ColumnName']}] AS [static_data.{$entry['Slot2Name']}],")}
-                    {$sql_if($entry['Slot3Name'] == null, '', 
-                        "[{$entry['Slot3ColumnName']}] AS [static_data.{$entry['Slot3Name']}],")}
-                    {$sql_if($entry['Slot4Name'] == null, '', 
-                        "[{$entry['Slot4ColumnName']}] AS [static_data.{$entry['Slot4Name']}],")}
-                    {$sql_if($entry['Slot5Name'] == null, '', 
-                        "[{$entry['Slot5ColumnName']}] AS [static_data.{$entry['Slot5Name']}],")}
-                    ({$sql_if($entry['TemporalTableName'] == null, 'NULL', "
-                        SELECT
-                            {$sql_if($entry['Temporal1ColumnName'] != null, 
-                                '[' . $entry['Temporal1ColumnName'] . ']', 
-                                '(NULL)')} AS item,
-                            {$sql_if($entry['Temporal2ColumnName'] != null, 
-                                '[' . $entry['Temporal2ColumnName'] . ']', 
-                                '(NULL)')} AS value,
-                            {$sql_if($entry['Temporal3ColumnName'] != null, 
-                                '[' . $entry['Temporal3ColumnName'] . ']', 
-                                '(NULL)')} AS type,
-                            {$sql_if($entry['Temporal4ColumnName'] != null, 
-                                'CAST(CAST([' . $entry['Temporal4ColumnName'] . '] AS float) * 1000 AS bigint)', 
-                                '(NULL)')} AS duration,
-                            {$sql_if($entry['Temporal5ColumnName'] != null, 
-                                '[' . $entry['Temporal5ColumnName'] . ']', 
-                                '(NULL)')} AS level
-                        FROM [{$entry['TemporalTableName']}]
-                        WHERE [{$entry['TableName']}].[{$entry['IndexColumnName']}] = [{$entry['TemporalTableName']}].[{$entry['IndexColumnName']}]
-                        FOR JSON PATH, INCLUDE_NULL_VALUES
-                    ")}) AS temporal_events
-                FROM [{$entry['TableName']}]
-                LEFT JOIN Users
-                    ON [{$entry['TableName']}].UserID = Users.UserID
-                WHERE 1=1
-                    {$cond1}
-                    {$cond2}
-                FOR JSON PATH, INCLUDE_NULL_VALUES
-            )"; }, $tableset);
+		$result = array_merge(...array_map(function($entry) use($conds) {
+			$sql_if = function ($cond, $x, $y) { return $cond ? $x : $y; };
 
-		// Perform the dynamic SQL lookup.
-		$usage = "\n            SELECT X.value FROM (\n" .
-			implode(" UNION ALL\n", array_map(function ($entry) {
-				return "                SELECT value FROM [{$entry['Name']}]";
-			}, $tableset)) . "\n) X;\n";
-		$dynamicSQL = 'WITH ' . implode(", ", $full_q) . $usage;
-		$result = self::lookup($dynamicSQL);
+			// Perform the result lookup for every Activity table.
+			$events = self::lookup("
+				SELECT
+	                [{$entry->IndexColumnName}] AS id,
+	                DATEDIFF_BIG(MS, '1970-01-01', [{$entry->StartTimeColumnName}]) AS timestamp,
+	                DATEDIFF_BIG(MS, [{$entry->StartTimeColumnName}], [{$entry->EndTimeColumnName}]) AS duration,
+	                {$sql_if($entry->Slot1Name == null, '', 
+	                    "[{$entry->Slot1ColumnName}] AS [static_data.{$entry->Slot1Name}],")}
+	                {$sql_if($entry->Slot2Name == null, '', 
+	                    "[{$entry->Slot2ColumnName}] AS [static_data.{$entry->Slot2Name}],")}
+	                {$sql_if($entry->Slot3Name == null, '', 
+	                    "[{$entry->Slot3ColumnName}] AS [static_data.{$entry->Slot3Name}],")}
+	                {$sql_if($entry->Slot4Name == null, '', 
+	                    "[{$entry->Slot4ColumnName}] AS [static_data.{$entry->Slot4Name}],")}
+	                {$sql_if($entry->Slot5Name == null, '', 
+	                    "[{$entry->Slot5ColumnName}] AS [static_data.{$entry->Slot5Name}],")}
+	                Users.AdminID AS aid
+	            FROM [{$entry->TableName}]
+	            LEFT JOIN Users
+	                ON [{$entry->TableName}].UserID = Users.UserID
+	            {$conds};
+			");
+			if (count($events) === 0)
+				return [];
 
-		// We need to do some pre-processing because the JSON we get from
-		// SQL Server is just frankly way too massive.
-		$result = array_merge(...array_map(function($x) {
-			return json_decode($x['value']) ?: []; // inner JSON
-		}, $result)); // unpack and flatten all sub-arrays
-		if (count($result) === 0)
-			return null;
-
-		// Map from SQL DB to the local ResultEvent type.
-		return array_map(function($raw) {
-
-			// Map internal ID sub-components into the single mangled ID form.
-			// FIXME: Currently it's not feasible to map SurveyID from SurveyName.
-			$ctid = array_drop($raw, 'ctid');
-			$aid = array_drop($raw, 'aid');
-			$raw->id = new TypeID([ResultEvent::class, $ctid, $raw->id]);
-			$raw->activity = new TypeID([Activity::class, $ctid, $aid, 0 /* SurveyID */]);
-
-			// Decrypt all static data/temporal event properties.
-			if (isset($raw->static_data->survey_name))
-				$raw->static_data->survey_name = LAMP::decrypt($raw->static_data->survey_name, true);
-			if (isset($raw->static_data->drawn_fig_file_name))
-				$raw->static_data->drawn_fig_file_name = DEPLOY_ROOT . '/Games/User3DFigures/' . LAMP::decrypt($raw->static_data->drawn_fig_file_name, true);
-			if (isset($raw->static_data->total_jewels_collected))
-				$raw->static_data->total_jewels_collected = LAMP::decrypt($raw->static_data->total_jewels_collected, true);
-			if (isset($raw->static_data->total_bonus_collected))
-				$raw->static_data->total_bonus_collected = LAMP::decrypt($raw->static_data->total_bonus_collected, true);
-			if (isset($raw->static_data->score))
-				$raw->static_data->score = LAMP::decrypt($raw->static_data->score, true);
-
-			// Special treatment for surveys with encrypted answers.
-			if ($ctid === 1 /* survey */) {
-				foreach (($raw->temporal_events ?: []) as &$x) {
-					$x->item = LAMP::decrypt($x->item, true);
-					$x->value = LAMP::decrypt($x->value, true);
-
-					// Adjust the Likert scaled values to numbers.
-					if (in_array($x->value, ["Not at all", "12:00AM - 06:00AM", "0-3"])) {
-						$x->value = 0;
-					} else if (in_array($x->value, ["Several Times", "06:00AM - 12:00PM", "3-6"])) {
-						$x->value = 1;
-					} else if (in_array($x->value, ["More than Half the Time", "12:00PM - 06:00PM", "6-9"])) {
-						$x->value = 2;
-					} else if (in_array($x->value, ["Nearly All the Time", "06:00PM - 12:00AM", ">9"])) {
-						$x->value = 3;
-					}
-				}
+			// If temporal events are recorded by the activity, look all of them up as well.
+			$slices = null;
+			if ($entry->TemporalTableName !== null) {
+				$slices = self::lookup("
+	                SELECT
+	                    [{$entry->TemporalTableName}].[{$entry->IndexColumnName}] AS parent_id,
+	                    {$sql_if($entry->Temporal1ColumnName != null, 
+	                        '[' . $entry->TemporalTableName. '].[' . $entry->Temporal1ColumnName . ']', 
+	                        '(NULL)')} AS item,
+	                    {$sql_if($entry->Temporal2ColumnName != null, 
+	                        '[' . $entry->TemporalTableName. '].[' . $entry->Temporal2ColumnName . ']', 
+	                        '(NULL)')} AS value,
+	                    {$sql_if($entry->Temporal3ColumnName != null, 
+	                        '[' . $entry->TemporalTableName. '].[' . $entry->Temporal3ColumnName . ']', 
+	                        '(NULL)')} AS type,
+	                    {$sql_if($entry->Temporal4ColumnName != null, 
+	                        'CAST(CAST([' . $entry->TemporalTableName. '].[' . $entry->Temporal4ColumnName . '] AS float) * 1000 AS bigint)', 
+	                        '(NULL)')} AS duration,
+	                    {$sql_if($entry->Temporal5ColumnName != null, 
+	                        '[' . $entry->TemporalTableName. '].[' . $entry->Temporal5ColumnName . ']', 
+	                        '(NULL)')} AS level
+	                FROM [{$entry->TemporalTableName}]
+	                LEFT JOIN [{$entry->TableName}]
+	                    ON [{$entry->TableName}].[{$entry->IndexColumnName}] = [{$entry->TemporalTableName}].[{$entry->IndexColumnName}]
+		            LEFT JOIN Users
+		                ON [{$entry->TableName}].UserID = Users.UserID
+	                {$conds};
+				");
 			}
-			return $raw;
-		}, $result);
+
+			// Map from SQL DB to the local ResultEvent type.
+			return array_map(function ($row) use ($entry, $slices) {
+				$result_event = new ResultEvent();
+
+				// Map internal ID sub-components into the single mangled ID form.
+				// FIXME: Currently it's not feasible to map SurveyID from SurveyName.
+				$result_event->id = new TypeID([ResultEvent::class, $entry->ActivityIndexID, $row->id]);
+				$result_event->activity = new TypeID([Activity::class, $entry->ActivityIndexID, $row->aid, 0 /* SurveyID */]);
+				$result_event->timestamp = intval($row->timestamp);
+				$result_event->duration = intval($row->duration);
+
+				// Copy static data fields if declared.
+				$result_event->static_data = new stdClass();
+				if ($entry->Slot1ColumnName != null)
+					$result_event->static_data->{$entry->Slot1Name} = $row->{"static_data.{$entry->Slot1Name}"};
+				if ($entry->Slot2ColumnName != null)
+					$result_event->static_data->{$entry->Slot2Name} = $row->{"static_data.{$entry->Slot2Name}"};
+				if ($entry->Slot3ColumnName != null)
+					$result_event->static_data->{$entry->Slot3Name} = $row->{"static_data.{$entry->Slot3Name}"};
+				if ($entry->Slot4ColumnName != null)
+					$result_event->static_data->{$entry->Slot4Name} = $row->{"static_data.{$entry->Slot4Name}"};
+				if ($entry->Slot5ColumnName != null)
+					$result_event->static_data->{$entry->Slot5Name} = $row->{"static_data.{$entry->Slot5Name}"};
+
+				// Decrypt all static data properties if known to be encrypted.
+				// TODO: Encryption of fields should also be found in the ActivityIndex table!
+				if (isset($result_event->static_data->survey_name))
+					$result_event->static_data->survey_name = LAMP::decrypt($result_event->static_data->survey_name, true);
+				if (isset($result_event->static_data->drawn_fig_file_name))
+					$result_event->static_data->drawn_fig_file_name = 'https://psych.digital/LampWeb/Games/User3DFigures/' . LAMP::decrypt($result_event->static_data->drawn_fig_file_name, true);
+				if (isset($raw->static_data->total_jewels_collected))
+					$result_event->static_data->total_jewels_collected = LAMP::decrypt($result_event->static_data->total_jewels_collected, true);
+				if (isset($result_event->static_data->total_bonus_collected))
+					$result_event->static_data->total_bonus_collected = LAMP::decrypt($result_event->static_data->total_bonus_collected, true);
+				if (isset($result_event->static_data->score))
+					$result_event->static_data->score = LAMP::decrypt($result_event->static_data->score, true);
+
+				// Copy all temporal events for this result event by matching parent ID.
+				$result_event->temporal_events = $slices === null ? null : [];
+				if ($slices !== null) {
+					$result_event->temporal_events = array_values(array_map(function($slice_row) use($entry) {
+						$temporal_event = new TemporalEvent();
+						$temporal_event->item = $slice_row->item;
+						$temporal_event->value = $slice_row->value;
+						$temporal_event->type = $slice_row->type;
+						$temporal_event->duration = intval($slice_row->duration);
+						$temporal_event->level = $slice_row->level;
+
+						// Special treatment for surveys with encrypted answers.
+						if ($entry->ActivityIndexID === '1' /* survey */) {
+							$temporal_event->item = LAMP::decrypt($temporal_event->item, true);
+							$temporal_event->value = LAMP::decrypt($temporal_event->value, true);
+							$temporal_event->type = strtolower($temporal_event->type);
+
+							// Adjust the Likert scaled values to numbers.
+							if (in_array($temporal_event->value, ["Not at all", "12:00AM - 06:00AM", "0-3"])) {
+								$temporal_event->value = 0;
+							} else if (in_array($temporal_event->value, ["Several Times", "06:00AM - 12:00PM", "3-6"])) {
+								$temporal_event->value = 1;
+							} else if (in_array($temporal_event->value, ["More than Half the Time", "12:00PM - 06:00PM", "6-9"])) {
+								$temporal_event->value = 2;
+							} else if (in_array($temporal_event->value, ["Nearly All the Time", "06:00PM - 12:00AM", ">9"])) {
+								$temporal_event->value = 3;
+							}
+						}
+						return $temporal_event;
+					}, array_filter($slices, function($slice_row) use ($row) {
+						return $slice_row->parent_id === $row->id;
+					})));
+				}
+
+				// Finally return the newly created event.
+				return $result_event;
+			}, $events);
+		}, self::lookup("
+			SELECT * 
+			FROM LAMP_Aux.dbo.ActivityIndex;
+		")));
+		return count($result) === 0 ? null : $result;
 	}
 
     /** 
@@ -202,7 +228,7 @@ trait ResultEventDriver {
         ");
 
 	    // Bail early if there was a failure to record the parent event row.
-	    if (!result) return null;
+	    if (!$result) return null;
 	    if ($tablerow['TemporalTableName'] === null) return $result;
 
 	    // Now the temporal fields are mapped for each sub-event.

@@ -233,10 +233,9 @@ class LAMP {
 		static $pdo = null;
 		if ($pdo === null) {
 			try {
-				$pdo = new PDO('sqlsrv:server='.DB_HOST.';database='.DB_NAME, DB_USER, DB_PASS, [
+				$pdo = new PDO('sqlsrv:Server='.DB_HOST.','.DB_PORT.';Database='.DB_NAME.';ConnectionPooling=1;QuotedId=1', DB_USER, DB_PASS, [
 					PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 				]);
-				$pdo->exec('SET QUOTED_IDENTIFIER ON');
 			} catch (PDOException $e) {
 				throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
 			}

@@ -136,7 +136,7 @@ class ResultEvent extends LAMP {
 
     /** 
      * @OA\Get(
-     *   path="/result/{result_event_id}",
+     *   path="/result_event/{result_event_id}",
      *   operationId="ResultEvent::view",
      *   tags={"ResultEvent"},
      *   x={"owner"={

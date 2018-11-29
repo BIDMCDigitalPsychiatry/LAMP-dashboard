@@ -31,7 +31,7 @@ trait TypeDriver {
         if ($sql_query === null) return null;
         try {
             $pre_exec = microtime(true);
-            $result = LAMP::db()->query($sql_query)->fetchAll(PDO::FETCH_ASSOC);
+            $result = LAMP::db()->query($sql_query)->fetchAll(PDO::FETCH_OBJ);
             $exec_time = microtime(true) - $pre_exec;
             LAMP::log('SQL execution took '.$exec_time.' seconds.');
 
