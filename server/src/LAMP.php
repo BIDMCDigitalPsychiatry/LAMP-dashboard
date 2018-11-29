@@ -80,15 +80,6 @@ class LAMP {
                     LAMP::dynamic_route($route, $defn['operationId']);
             }
         }
-
-        // Facility to retrieve the runtime type of the data structure represented by an ID.
-	    Flight::route('GET /type/@id', function($id) {
-	    	$_id = (new TypeID($id))->part(0);
-	    	return Flight::json([
-	    		"type" => $_id,
-			    "link" => '/' . strtolower($_id) . '/' . $id . '/'
-		    ]);
-	    });
         
         // Route the index or API explorer correctly.
         Flight::set('flight.views.path', realpath(__DIR__ . '/..') . '/templates');

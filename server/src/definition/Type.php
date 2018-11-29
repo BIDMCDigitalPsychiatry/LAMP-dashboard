@@ -14,10 +14,11 @@ require_once __DIR__ . '/../LAMP.php';
  *   description="Runtime type specification for each object in the LAMP platform.",
  * )
  */
-class TypeSpec extends LAMP {
+class Type extends LAMP {
 	use TypeDriver;
 
 	// TODO: parent_of, obj hierarchies, etc.
+	// Facility to retrieve the runtime type of the data structure represented by an ID.
 
 	/**
 	 * @OA\Get(
@@ -44,8 +45,13 @@ class TypeSpec extends LAMP {
 	 *   security={{"Authorization": {}}},
 	 * )
 	 */
-	public static function reflect($id) {
-		return null;
+	public static function reflect($type_id) {
+		// FIXME: Does not support Participant.
+		$_id = (new TypeID($type_id))->part(0);
+		return [
+			"type" => $_id,
+			"link" => '/' . strtolower($_id) . '/' . $type_id . '/'
+		];
 	}
 }
 
