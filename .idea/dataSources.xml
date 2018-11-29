@@ -5,7 +5,7 @@
       <driver-ref>sqlserver.ms</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
-      <jdbc-url>jdbc:sqlserver://lamp.cixffjkwwv1h.us-east-2.rds.amazonaws.com:1433;database=LAMP</jdbc-url>
+      <jdbc-url>jdbc:sqlserver://api.lamp.digitalpsych.org:143;database=LAMP</jdbc-url>
       <driver-properties>
         <property name="applicationName" value="DataGrip" />
       </driver-properties>
