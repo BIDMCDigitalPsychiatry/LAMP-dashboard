@@ -9,7 +9,8 @@
  * )
  */
 class LAMP {
-    public static $api_index = null;
+    public static $api_index = [];
+	public static $op_index = [];
 
     /**
      * Bootstraps the entire server with all subclasses acting as API endpoints.
@@ -17,7 +18,7 @@ class LAMP {
     public static function start() {
         LAMP::$api_index = \OpenApi\scan(__DIR__);
 
-        // Replace Flight's with our default return methods.
+        // Replace Flight's with our default return methods along with CORS support.
         Flight::map('json', function($data, $code = 200, $option = JSON_PRETTY_PRINT) {
             Flight::response()
                 ->status($code)
@@ -25,22 +26,6 @@ class LAMP {
                 ->write(json_encode($data, $option))
                 ->send();
         });
-        Flight::map('yaml', function($data, $code = 200) {
-            Flight::response()
-                ->status($code)
-                ->header('Content-Type', 'text/yaml; charset=utf8')
-                ->write($data)
-                ->send();
-        });
-        Flight::map('csv', function($data, $code = 200, $transpose = false) {
-            Flight::response()
-                ->status($code)
-                ->header('Content-Type', 'text/csv; charset=utf8')
-                ->write(Dynamics::csv_encode(Dynamics::multigroup($data), $transpose))
-                ->send();
-        });
-
-        // Add CORS support.
         Flight::before('json', function() {
             $h = getallheaders();
             $origin_header = isset($h['Origin']) ? $h['Origin'] : '*';
@@ -71,15 +56,50 @@ class LAMP {
             throw new LAMPException("api endpoint does not exist", 404);
         });
 
-        // Crawl all routes and set them up.
+        // Crawl all routes and set them up while indexing all operations.
         $api = json_decode(json_encode(LAMP::$api_index), true);
         foreach ($api['paths'] as $path => $methods) {
             foreach ($methods as $method => $defn) {
                 $route = strtoupper($method).' '.preg_replace('/{([\w_]+)}/', '@$1', $path);
-                if (is_callable(explode('::', $defn['operationId'])))
+                $op = explode('::', $defn['operationId']);
+                if (is_callable($op)) {
+	                if(!isset(LAMP::$op_index[$op[0]]))
+	                	LAMP::$op_index[$op[0]] = [];
+	                LAMP::$op_index[$op[0]][$op[1]] = $route;
                     LAMP::dynamic_route($route, $defn['operationId']);
+                }
             }
         }
+
+        //
+	    Flight::route('POST /query', function() {
+
+	    	// Extract and sanitize the different queries separated by a semicolon-newline.
+		    $xpath = Flight::request()->getBody();
+		    if (strlen($xpath) == 0)
+		    	return Flight::json(new stdClass(), 200);
+		    $xpath = array_filter(array_map(function($x) {
+		    	return trim($x, " \t\n\r\0\x0B;");
+		    }, explode(";", $xpath)));
+
+		    // Configure JMESPath builtins.
+		    $def = new JmesPath\FnDispatcher();
+		    $xp = new JmesPath\AstRuntime(null, function ($fn, array $args) use ($def) {
+			    if (isset(self::xpath_builtins()[$fn]))
+				    return self::xpath_builtins()[$fn]($args);
+			    return $def($fn, $args);
+		    });
+
+		    // Run the XPath on an empty object (functions are used to insert data). Only the last one is returned.
+		    try {
+		    	$output = null;
+		    	foreach ($xpath as $script)
+				    $output = $xp($script, new stdClass());
+			    return Flight::json($output);
+		    } catch (Exception $e) {
+			    throw new LAMPException("invalid xpath query: '{$e->getMessage()}'", 500);
+		    }
+	    });
         
         // Route the index or API explorer correctly.
         Flight::set('flight.views.path', realpath(__DIR__ . '/..') . '/templates');
@@ -87,8 +107,6 @@ class LAMP {
             // TODO: Maybe use HTTP: X-Requested-With?
             if (Flight::request()->query->format === 'json')
                 return Flight::json(LAMP::$api_index);
-            if (Flight::request()->query->format === 'yaml')
-                return Flight::yaml(LAMP::$api_index->toYaml());
             return Flight::render('api_explorer.template.php', [
                 'document_title' => 'LAMP API Explorer',
                 'document_location' => ('https://' . $_SERVER['HTTP_HOST'] . '/?format=json'),
@@ -123,31 +141,9 @@ class LAMP {
                 $res = [];
                 //throw new LAMPException("no such objects", 404);
 
-            // Filter the result using an optional JSON XPath (jmespath.org).
-            if (Flight::request()->query->xpath != null) {
-                $def = new JmesPath\FnDispatcher();
-                $xp = new JmesPath\AstRuntime(null, function ($fn, array $args) use ($def) {
-                    if (isset(self::xpath_builtins()[$fn]))
-                        return self::xpath_builtins()[$fn]($args);
-                    return $def($fn, $args);
-                });
-
-                $res = json_decode(json_encode($res)); // needed because TypeID/JsonSerializable
-                try {
-                    $res = $xp(Flight::request()->query->xpath, $res);
-                } catch (Exception $e) {
-                    throw new LAMPException("invalid xpath query: '{$e->getMessage()}'", 500);
-                }
-            }
-
             // Return a "result" JSON string from the result value of the call.
-            // If export options (CSV, XML) are provided, export in those formats.
-            $res = (is_array($res) ? $res : [$res]);
-            if (substr(Flight::request()->query->export ?: '', 0, 3) === 'csv') {
-                $trs = substr(Flight::request()->query->export, 4, 9) === 'transpose';
-                $res = array_map(function($x) { return Dynamics::flatten($x, true); }, $res);
-                return Flight::csv($res, 200, $trs);
-            } else return Flight::json([
+	        $res = (is_array($res) ? $res : [$res]);
+            return Flight::json([
             	"meta" => [
 		            "access" => [
 		            	"in" => $_SERVER['HTTP_HOST'],
@@ -167,35 +163,51 @@ class LAMP {
 	private static function xpath_builtins() {
 		static $builtins = null;
 		static $scratch = [];
-		if ($builtins === null) $builtins = [
-			'date' => function(array $args) {
-				$format = isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A';
-				return date($format, $args[0]);
-			},
-			'split' => function(array $args) { return explode($args[0], $args[1]); },
-			'_set' => function(array $args) use(&$scratch) { $scratch[$args[0]] = $args[1]; return null; },
-			'_get' => function(array $args) use(&$scratch) { return $scratch[$args[0]]; },
+		if ($builtins === null) {
+			$builtins = [
+				'date' => function(array $args) {
+					$format = isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A';
+					return date($format, $args[0]);
+				},
+				'split' => function(array $args) { return explode($args[0], $args[1]); },
+				'_set' => function(array $args) use(&$scratch) { $scratch[$args[0]] = $args[1]; return null; },
+				'_get' => function(array $args) use(&$scratch) { return $scratch[$args[0]]; },
 
-			'includes' => function(array $args) { return isset($args[0][$args[1]]); },
-			'insert' => function(array $args) { $tmp = $args[0]; $tmp[$args[1]] = $args[2]; return $tmp; },
-			'delete' => function(array $args) { $tmp = $args[0]; if(is_object($tmp)) unset($tmp->{$args[1]}); else unset($tmp[$args[1]]); return $tmp; },
+				'includes' => function(array $args) { return isset($args[0][$args[1]]); },
+				'insert' => function(array $args) { $tmp = $args[0]; $tmp[$args[1]] = $args[2]; return $tmp; },
+				'delete' => function(array $args) { $tmp = $args[0]; if(is_object($tmp)) unset($tmp->{$args[1]}); else unset($tmp[$args[1]]); return $tmp; },
 
-			// to_items({a: b, c: d}) = [[a, b], [c, d]]
-			// from_items([[a, b], [c, d]]) = {a: b, c: d}
+				// to_items({a: b, c: d}) = [[a, b], [c, d]]
+				// from_items([[a, b], [c, d]]) = {a: b, c: d}
 
-			'add' => function(array $args) { return $args[0] + $args[1]; },
-			'sub' => function(array $args) { return $args[0] - $args[1]; },
-			'mul' => function(array $args) { return $args[0] * $args[1]; },
-			'div' => function(array $args) { return $args[0] / $args[1]; },
-			'mod' => function(array $args) { return $args[0] % $args[1]; },
+				'add' => function(array $args) { return $args[0] + $args[1]; },
+				'sub' => function(array $args) { return $args[0] - $args[1]; },
+				'mul' => function(array $args) { return $args[0] * $args[1]; },
+				'div' => function(array $args) { return $args[0] / $args[1]; },
+				'mod' => function(array $args) { return $args[0] % $args[1]; },
 
-			'split' => function(array $args) { return explode($args[0], $args[1]); },
-			'date' => function(array $args) {
-				return date((isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A'), $args[0]);
-			},
+				'split' => function(array $args) { return explode($args[0], $args[1]); },
+				'date' => function(array $args) {
+					return date((isset($args[1]) && !empty($args[1]) ? $args[1] : 'l\, F jS\, Y h:i:s A'), $args[0]);
+				},
 
-			//'Researcher_all' => function(array $args) { return json_decode(json_encode(Researcher::all())); },
-		];
+				'csv_encode' => function(array $args) {
+					$data = array_map(function($x) {
+						return Dynamics::flatten($x, true);
+					}, (is_array($args[0]) ? $args[0] : [$args[0]]));
+					return Dynamics::csv_encode(Dynamics::multigroup($data), isset($args[1]));
+				}
+			];
+
+			// Now add all the operation functions.
+			foreach (array_keys(LAMP::$op_index) as $x) {
+				foreach (array_keys(LAMP::$op_index[$x]) as $y) {
+					$builtins[$x . '_' . $y] = function(array $args) use($x, $y) {
+						return json_decode(json_encode(call_user_func_array([$x, $y], $args)));
+					};
+				}
+			}
+		}
 		return $builtins;
 	}
 
@@ -284,6 +296,30 @@ class LAMP {
 		} else return null;
 	}
 }
+
+/**
+ * @OA\Post(
+ *   path="/query",
+ *   operationId="Type::query",
+ *   tags={"Type"},
+ *   x={"owner"={
+ *     "$ref"="#/components/schemas/Type"}
+ *   },
+ *   summary="Query with JMESPath.",
+ *   description="Query with JMESPath.",
+ *   @OA\RequestBody(
+ *     required=true,
+ *     @OA\JsonContent(
+ *       type="string"
+ *     ),
+ *   ),
+ *   @OA\Response(response=200, ref="#/components/responses/Success"),
+ *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+ *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+ *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+ *   security={{"Authorization": {}}},
+ * )
+ */
 
 /**
  * @OA\Schema(

@@ -17,9 +17,6 @@ require_once __DIR__ . '/../LAMP.php';
 class Type {
 	use TypeDriver;
 
-	// TODO: parent_of, obj hierarchies, etc.
-	// Facility to retrieve the runtime type of the data structure represented by an ID.
-
 	/**
 	 * @OA\Get(
 	 *   path="/type/{type_id}/reflect",
@@ -86,11 +83,11 @@ class Type {
 	 * )
 	 */
 	public static function parent($type_id) {
-		// FIXME: Study overlap with Researcher, and mapping out the types too.
 		$from_type = (preg_match('#^G?U#', $type_id) === 1) ? Participant::class : (new TypeID($type_id))->part(0);
-		return array_map(function ($parent_type) use ($type_id, $from_type) {
+		$to_types = self::type_parent_of($from_type);
+		return array_combine($to_types, array_map(function ($parent_type) use ($type_id, $from_type) {
 			return self::parent_of($type_id, $from_type, $parent_type);
-		}, self::type_parent_of($from_type));
+		}, $to_types));
 	}
 }
 

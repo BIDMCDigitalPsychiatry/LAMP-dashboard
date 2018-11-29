@@ -388,6 +388,7 @@ trait TypeDriver {
         }
 
         // The Study type is virtualized atop Researcher.
+	    $reconv = $to === Study::class;
         if ($from === Study::class)
             $from = Researcher::class;
         if ($to === Study::class)
@@ -401,10 +402,12 @@ trait TypeDriver {
         if (!isset($mapping[$from][$to]))
             return null;
 
-        // Execute the appropriate conversion.
+        // Execute the appropriate conversion (and remap to Study if needed).
         $val = $mapping[$from][$to]($id);
         if ($val === null)
             throw new LAMPException("invalid identifier", 404);
+        if ($reconv)
+	        $val = new TypeID([Study::class, $val->part(1)]);
         return $val;
     }
 
