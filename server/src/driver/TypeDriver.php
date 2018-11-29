@@ -221,26 +221,28 @@ trait TypeDriver {
 		/**
 		 * The destination type the LAMP v0.1 DB.
 		 */
-		$to
+		$to = null
 	) {
 		static $mapping = null;
 		if ($mapping === null) {
 			$mapping = [
 				ResultEvent::class => [Activity::class, Participant::class, Study::class, Researcher::class],
 				EnvironmentEvent::class => [Participant::class, Study::class, Researcher::class],
-					FitnessEvent::class => [Participant::class, Study::class, Researcher::class],
-					MetadataEvent::class => [Participant::class, Study::class, Researcher::class],
-					SensorEvent::class => [Participant::class, Study::class, Researcher::class],
-					Activity::class => [Study::class, Researcher::class],
-					Participant::class => [Study::class, Researcher::class],
-					Study::class => [Researcher::class],
-					Researcher::class => [],
-				];
+				FitnessEvent::class => [Participant::class, Study::class, Researcher::class],
+				MetadataEvent::class => [Participant::class, Study::class, Researcher::class],
+				SensorEvent::class => [Participant::class, Study::class, Researcher::class],
+				Activity::class => [Study::class, Researcher::class],
+				Participant::class => [Study::class, Researcher::class],
+				Study::class => [Researcher::class],
+				Researcher::class => [],
+			];
 		}
 
-		// Handle early bail-out if no conversion exists or should occur.
+		// Handle early bail-out if no conversion exists or if we want the whole parent tree.
 		if (!isset($mapping[$from]))
 			return null;
+		if ($to === null)
+			return $mapping[$from];
 
 		// Execute the appropriate conversion.
 		$val = $mapping[$from][$to];

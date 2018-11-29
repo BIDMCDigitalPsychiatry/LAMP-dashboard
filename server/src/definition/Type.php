@@ -22,7 +22,7 @@ class Type {
 
 	/**
 	 * @OA\Get(
-	 *   path="/type/{type_id}",
+	 *   path="/type/{type_id}/reflect",
 	 *   operationId="Type::reflect",
 	 *   tags={"Type"},
 	 *   x={"owner"={
@@ -46,12 +46,51 @@ class Type {
 	 * )
 	 */
 	public static function reflect($type_id) {
-		// FIXME: Does not support Participant.
-		$_id = (new TypeID($type_id))->part(0);
-		return [
-			"type" => $_id,
-			"link" => '/' . strtolower($_id) . '/' . $type_id . '/'
-		];
+		if (preg_match('#^G?U#', $type_id) === 1) {
+			return [
+				"type" => Participant::class,
+				"link" => '/' . strtolower(Participant::class) . '/' . $type_id . '/'
+			];
+		} else {
+			$_id = (new TypeID($type_id))->part(0);
+			return [
+				"type" => $_id,
+				"link" => '/' . strtolower($_id) . '/' . $type_id . '/'
+			];
+		}
+	}
+
+	/**
+	 * @OA\Get(
+	 *   path="/type/{type_id}/parent",
+	 *   operationId="Type::parent",
+	 *   tags={"Type"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Identifier"}
+	 *   },
+	 *   summary="Get the parent type identifier of the data structure referenced by the identifier.",
+	 *   description="Get the parent type identifier of the data structure referenced by the identifier.",
+	 *   @OA\Parameter(
+	 *     name="type_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier"
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function parent($type_id) {
+		// FIXME: Study overlap with Researcher, and mapping out the types too.
+		$from_type = (preg_match('#^G?U#', $type_id) === 1) ? Participant::class : (new TypeID($type_id))->part(0);
+		return array_map(function ($parent_type) use ($type_id, $from_type) {
+			return self::parent_of($type_id, $from_type, $parent_type);
+		}, self::type_parent_of($from_type));
 	}
 }
 
