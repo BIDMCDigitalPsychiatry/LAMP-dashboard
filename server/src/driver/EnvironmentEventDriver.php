@@ -55,7 +55,7 @@ trait EnvironmentEventDriver {
                 {$cond2}
                 {$cond3}
             FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ", true);
+        ", 'json');
         if (count($result) == 0) 
             return null;
         

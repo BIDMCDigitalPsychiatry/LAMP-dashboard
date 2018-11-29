@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * @OA\Schema(
+ *   schema="Timestamp",
+ *   type="integer",
+ *   format="int64"
+ * )
+ */
+
+/**
  * @OA\Schema()
  */
 class CalendarComponents extends LAMP {

@@ -21,7 +21,7 @@ abstract class MetadataEventType extends LAMP {
  * )
  */
 class MetadataEvent extends LAMP {
-    use TypeDriver;
+    use MetadataEventDriver;
 
     /**
      * @OA\Property(
@@ -63,6 +63,123 @@ class MetadataEvent extends LAMP {
      * )
      */
     public $item = null;
+
+	/**
+	 * @OA\Post(
+	 *   path="/participant/{participant_id}/metadata_event/",
+	 *   operationId="MetadataEvent::create",
+	 *   tags={"MetadataEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/MetadataEvent"}
+	 *   },
+	 *   summary="Get a single metadata event, by identifier.",
+	 *   description="Get a single metadata event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/MetadataEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($participant_id, $metadata_event) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_insert(null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/metadata_event/{metadata_event_id}",
+	 *   operationId="MetadataEvent::view",
+	 *   tags={"MetadataEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/MetadataEvent"}
+	 *   },
+	 *   summary="Get a single metadata event, by identifier.",
+	 *   description="Get a single metadata event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="metadata_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/MetadataEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/MetadataEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($metadata_event_id, $metadata_event) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/metadata_event/{metadata_event_id}",
+	 *   operationId="MetadataEvent::delete",
+	 *   tags={"MetadataEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/MetadataEvent"}
+	 *   },
+	 *   summary="Get a single metadata event, by identifier.",
+	 *   description="Get a single metadata event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="metadata_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/MetadataEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($metadata_event_id) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_delete(null);
+	}
 
     /** 
      * @OA\Get(

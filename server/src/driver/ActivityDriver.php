@@ -177,7 +177,7 @@ trait ActivityDriver {
                 WHEN LEN(A.value) > 0 AND LEN(B.value) > 0 THEN ',' ELSE '' 
             END, B.value, ']')
             FROM A, B;
-        ", true);
+        ", 'json');
         if (count($result) == 0)
         	return null;
 

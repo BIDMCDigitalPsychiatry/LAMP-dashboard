@@ -124,7 +124,7 @@ trait ActivitySpecDriver {
 	        	Name AS name
 			FROM LAMP_Aux.dbo.ActivityIndex
 			{$cond};
-		");
+		", 'obj');
 
 		// Convert fields correctly and return the spec objects.
 		// Include the batchSpec only if a non-specific lookup was made.

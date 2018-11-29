@@ -91,7 +91,7 @@ trait ParticipantDriver {
                 ON UserDevices.UserID = Users.UserID
             WHERE Users.IsDeleted = 0 {$cond1} {$cond2}
             FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ", true);
+        ", 'json');
         if (count($result) == 0) return null;
 
         // Map from SQL DB to the local Participant type.

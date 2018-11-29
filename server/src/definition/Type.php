@@ -7,49 +7,53 @@ require_once __DIR__ . '/../LAMP.php';
  *   type="string",
  *   description="A globally unique reference for objects within the LAMP platform.",
  * )
- *
- * Use `require()` to restrict the ID to certain prefix(s) and `part()` to
- * access ID components safely. Note: DO NOT use the reserved character ':' in any
- * component strings.
  */
-class TypeID implements JsonSerializable {
-	private $components = [];
-	public function __construct($value) {
-		if (is_string($value)) {
-			$this->components = explode(":", base64_decode(strtr($value, '_-~', '+/=')));
-		} else if (is_array($value))
-			$this->components = $value;
-		else throw new Exception('invalid LAMP ID value');
-	}
-	public function jsonSerialize() {
-		return strtr(base64_encode(implode(':', $this->components)), '+/=', '_-~');
-	}
-	public function require($match_prefix) {
-		if (!in_array($this->components[0], $match_prefix))
-			throw new LAMPException("invalid identifier", 403);
-		return $this;
-	}
-	public function part($idx) {
-		return isset($this->components[$idx]) ? $this->components[$idx] : null;
+
+/**
+ * @OA\Schema(
+ *   description="Runtime type specification for each object in the LAMP platform.",
+ * )
+ */
+class TypeSpec extends LAMP {
+	use TypeDriver;
+
+	// TODO: parent_of, obj hierarchies, etc.
+
+	/**
+	 * @OA\Get(
+	 *   path="/type/{type_id}",
+	 *   operationId="Type::reflect",
+	 *   tags={"Type"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Identifier"}
+	 *   },
+	 *   summary="Get the runtime type of the data structure referenced by the identifier.",
+	 *   description="Get the runtime type of the data structure referenced by the identifier.",
+	 *   @OA\Parameter(
+	 *     name="type_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier"
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function reflect($id) {
+		return null;
 	}
 }
 
 /**
  * @OA\Schema(
- *   schema="TypeSpec",
- *   description="Runtime type specification for each object in the LAMP platform.",
+ *   schema="Attachments",
+ *   @OA\AdditionalProperties()
  * )
- *
- * TODO: parent_of, obj hierarchies, etc.
- */
-class TypeSpec extends LAMP {
-	use TypeDriver;
-
-
-}
-
-/**
- *
  */
 class TypeAttachment extends LAMP {
 	use TypeDriver;
@@ -131,14 +135,6 @@ class TypeAttachment extends LAMP {
 	 * )
 	 */
 	public static function set_attachment($type_id, $attachment_key, $attachment_value) {
-		$_id = (new TypeID($researcher_id))->require([Researcher::class]);
-		self::authorize(function($type, $value) use($_id) {
-			return ($type == AuthType::Researcher && $value == $_id->part(1));
-		});
-		$_id = $_id->jsonSerialize();
-
-		return Researcher::_setX($_id, Participant::class, $attachment_key, $script_contents, $script_requirements);
-
 		self::authorize(function($type, $value) {
 			return false; // TODO
 		});

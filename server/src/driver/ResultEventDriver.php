@@ -56,7 +56,7 @@ trait ResultEventDriver {
 	            LEFT JOIN Users
 	                ON [{$entry->TableName}].UserID = Users.UserID
 	            {$conds};
-			");
+			", 'obj');
 			if (count($events) === 0)
 				return [];
 
@@ -87,7 +87,7 @@ trait ResultEventDriver {
 		            LEFT JOIN Users
 		                ON [{$entry->TableName}].UserID = Users.UserID
 	                {$conds};
-				");
+				", 'obj');
 			}
 
 			// Map from SQL DB to the local ResultEvent type.
@@ -167,7 +167,7 @@ trait ResultEventDriver {
 		}, self::lookup("
 			SELECT * 
 			FROM LAMP_Aux.dbo.ActivityIndex;
-		")));
+		", 'obj')));
 		return count($result) === 0 ? null : $result;
 	}
 

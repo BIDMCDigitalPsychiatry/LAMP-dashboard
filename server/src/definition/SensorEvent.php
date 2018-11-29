@@ -7,7 +7,7 @@ require_once __DIR__ . '/../LAMP.php';
  * )
  */
 class SensorEvent extends LAMP {
-    use TypeDriver;
+    use SensorEventDriver;
 
     /**
      * @OA\Property(
@@ -49,6 +49,123 @@ class SensorEvent extends LAMP {
      * )
      */
     public $data = null;
+
+	/**
+	 * @OA\Post(
+	 *   path="/participant/{participant_id}/sensor_event/",
+	 *   operationId="SensorEvent::create",
+	 *   tags={"SensorEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/SensorEvent"}
+	 *   },
+	 *   summary="Get a single sensor event, by identifier.",
+	 *   description="Get a single sensor event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/SensorEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($participant_id, $sensor_event) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_insert(null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/sensor_event/{sensor_event_id}",
+	 *   operationId="SensorEvent::view",
+	 *   tags={"SensorEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/SensorEvent"}
+	 *   },
+	 *   summary="Get a single sensor event, by identifier.",
+	 *   description="Get a single sensor event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="sensor_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/SensorEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/SensorEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($sensor_event_id, $sensor_event) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/sensor_event/{sensor_event_id}",
+	 *   operationId="SensorEvent::delete",
+	 *   tags={"SensorEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/SensorEvent"}
+	 *   },
+	 *   summary="Get a single sensor event, by identifier.",
+	 *   description="Get a single sensor event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="sensor_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/SensorEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($sensor_event_id) {
+		self::authorize(function($type, $value) {
+			return false; // TODO
+		});
+		return self::_delete(null);
+	}
 
     /** 
      * @OA\Get(

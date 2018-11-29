@@ -187,6 +187,144 @@ class Participant extends LAMP {
      */
     public $fitness_events = null;
 
+	/**
+	 * @OA\Post(
+	 *   path="/study/{study_id}/participant",
+	 *   operationId="Participant::create",
+	 *   tags={"Participant"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Participant"}
+	 *   },
+	 *   summary="Get a single participant, by an identifier.",
+	 *   description="Get a single participant, by an identifier.",
+	 *   @OA\Parameter(
+	 *     name="study_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Study"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/Participant"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($study_id, $participant) {
+		if ($study_id === 'me')
+			$study_id = self::me();
+		self::authorize(function($type, $value) use($study_id) {
+			if ($type == AuthType::Researcher) {
+				$_id = self::parent_of($study_id, Participant::class, Researcher::class);
+				return $value == $_id->part(1);
+			} else if ($type == AuthType::Participant) {
+				return $value == $study_id;
+			} else return false;
+		});
+		return self::_insert(null, null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/participant/{participant_id}",
+	 *   operationId="Participant::update",
+	 *   tags={"Participant"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Participant"}
+	 *   },
+	 *   summary="Get a single participant, by an identifier.",
+	 *   description="Get a single participant, by an identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/Participant"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($participant_id, $participant) {
+		if ($participant_id === 'me')
+			$participant_id = self::me();
+		self::authorize(function($type, $value) use($participant_id) {
+			if ($type == AuthType::Researcher) {
+				$_id = self::parent_of($participant_id, Participant::class, Researcher::class);
+				return $value == $_id->part(1);
+			} else if ($type == AuthType::Participant) {
+				return $value == $participant_id;
+			} else return false;
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/participant/{participant_id}",
+	 *   operationId="Participant::delete",
+	 *   tags={"Participant"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Participant"}
+	 *   },
+	 *   summary="Get a single participant, by an identifier.",
+	 *   description="Get a single participant, by an identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($participant_id) {
+		if ($participant_id === 'me')
+			$participant_id = self::me();
+		self::authorize(function($type, $value) use($participant_id) {
+			if ($type == AuthType::Researcher) {
+				$_id = self::parent_of($participant_id, Participant::class, Researcher::class);
+				return $value == $_id->part(1);
+			} else if ($type == AuthType::Participant) {
+				return $value == $participant_id;
+			} else return false;
+		});
+		return self::_delete(null);
+	}
+
     /** 
      * @OA\Get(
      *   path="/participant/{participant_id}",

@@ -29,7 +29,7 @@ trait ResearcherDriver {
             FROM Admin
             WHERE isDeleted = 0 {$cond}
             FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ", true);
+        ", 'json');
         if (count($result) === 0) return null;
         
         // Map from SQL DB to the local Researcher type.

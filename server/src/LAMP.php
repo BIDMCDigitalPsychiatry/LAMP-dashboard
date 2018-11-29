@@ -1,7 +1,5 @@
 <?php
 
-class LAMPException extends Exception {}
-
 /**
  * @OA\Info(
  *   title="LAMP Platform", 
@@ -298,30 +296,6 @@ class LAMP {
 
 /**
  * @OA\Schema(
- *   schema="Error",
- *   @OA\Property(
- *     property="message",
- *     type="string"
- *   ),
- *   @OA\Property(
- *     property="code",
- *     type="integer",
- *     format="int32"
- *   ),
- * )
- *
- * @OA\Schema(
- *   schema="Timestamp",
- *   type="integer",
- *   format="int64"
- * )
- *
- * @OA\Schema(
- *   schema="Attachments",
- *   @OA\AdditionalProperties()
- * )
- *
- * @OA\Schema(
  *   schema="Response",
  *   @OA\Property(
  *     property="data",
@@ -362,52 +336,41 @@ class LAMP {
  *     ),
  *   ),
  * )
- *
  * @OA\Response(
- *   response="Success", 
- *   description="Success", 
+ *   response="Success",
+ *   description="Success",
  *   @OA\JsonContent(ref="#/components/schemas/Response")
  * )
- * 
- * @OA\Response(
- *   response="Forbidden", 
- *   description="Forbidden", 
- *   @OA\JsonContent(ref="#/components/schemas/Error")
- * )
- * 
- * @OA\Response(
- *   response="NotFound", 
- *   description="NotFound", 
- *   @OA\JsonContent(ref="#/components/schemas/Error")
- * )
- * 
- * @OA\Response(
- *   response="ServerFault", 
- *   description="ServerFault", 
- *   @OA\JsonContent(ref="#/components/schemas/Error")
- * )
- *
- * @OA\Get(
- *   path="/type/{type_id}",
- *   operationId="Type::reflect",
- *   tags={"Type"},
- *   x={"owner"={
- *     "$ref"="#/components/schemas/Identifier"}
- *   },
- *   summary="Get the runtime type of the data structure referenced by the identifier.",
- *   description="Get the runtime type of the data structure referenced by the identifier.",
- *   @OA\Parameter(
- *     name="type_id",
- *     in="path",
- *     required=true,
- *     @OA\Schema(
- *       ref="#/components/schemas/Identifier"
- *     )
+ */
+class LAMPResponse {}
+
+/**
+ * @OA\Schema(
+ *   schema="Error",
+ *   @OA\Property(
+ *     property="message",
+ *     type="string"
  *   ),
- *   @OA\Response(response=200, ref="#/components/responses/Success"),
- *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
- *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
- *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
- *   security={{"Authorization": {}}},
+ *   @OA\Property(
+ *     property="code",
+ *     type="integer",
+ *     format="int32"
+ *   ),
+ * )
+ * @OA\Response(
+ *   response="Forbidden",
+ *   description="Forbidden",
+ *   @OA\JsonContent(ref="#/components/schemas/Error")
+ * )
+ * @OA\Response(
+ *   response="NotFound",
+ *   description="NotFound",
+ *   @OA\JsonContent(ref="#/components/schemas/Error")
+ * )
+ * @OA\Response(
+ *   response="ServerFault",
+ *   description="ServerFault",
+ *   @OA\JsonContent(ref="#/components/schemas/Error")
  * )
  */
+class LAMPException extends Exception {}

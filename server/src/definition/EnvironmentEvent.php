@@ -104,6 +104,132 @@ class EnvironmentEvent extends LAMP {
      */
     public $social_context = null;
 
+	/**
+	 * @OA\Post(
+	 *   path="/participant/{participant_id}/environment_event",
+	 *   operationId="EnvironmentEvent::create",
+	 *   tags={"EnvironmentEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/EnvironmentEvent"}
+	 *   },
+	 *   summary="Get a single environment event, by identifier.",
+	 *   description="Get a single environment event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/EnvironmentEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($participant_id, $environment_event) {
+		$_id = (new TypeID($participant_id))->require([EnvironmentEvent::class]);
+		self::authorize(function($type, $value) use($participant_id) {
+			$_id1 = self::parent_of($participant_id, EnvironmentEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_insert(null, null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/environment_event/{environment_event_id}",
+	 *   operationId="EnvironmentEvent::update",
+	 *   tags={"EnvironmentEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/EnvironmentEvent"}
+	 *   },
+	 *   summary="Get a single environment event, by identifier.",
+	 *   description="Get a single environment event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="environment_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/EnvironmentEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/EnvironmentEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($environment_event_id, $environment_event) {
+		$_id = (new TypeID($environment_event_id))->require([EnvironmentEvent::class]);
+		self::authorize(function($type, $value) use($environment_event_id) {
+			$_id1 = self::parent_of($environment_event_id, EnvironmentEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/environment_event/{environment_event_id}",
+	 *   operationId="EnvironmentEvent::delete",
+	 *   tags={"EnvironmentEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/EnvironmentEvent"}
+	 *   },
+	 *   summary="Get a single environment event, by identifier.",
+	 *   description="Get a single environment event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="environment_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/EnvironmentEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($environment_event_id) {
+		$_id = (new TypeID($environment_event_id))->require([EnvironmentEvent::class]);
+		self::authorize(function($type, $value) use($environment_event_id) {
+			$_id1 = self::parent_of($environment_event_id, EnvironmentEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_delete(null);
+	}
+
     /** 
      * @OA\Get(
      *   path="/environment_event/{environment_event_id}",

@@ -182,6 +182,126 @@ class ActivitySpec extends LAMP {
 	public $definition = null;
 
 	/**
+	 * @OA\Post(
+	 *   path="/study/{study_id}/activity_spec",
+	 *   operationId="ActivitySpec::create",
+	 *   tags={"ActivitySpec"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ActivitySpec"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="study_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Study"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/ActivitySpec"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($study_id, $activity_spec) {
+		$_id = (new TypeID($study_id))->require([ActivitySpec::class]);
+		self::authorize(function($type, $value) {
+			return true; // TODO
+		});
+		return self::_insert(null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/activity_spec/{activity_spec_id}",
+	 *   operationId="ActivitySpec::update",
+	 *   tags={"ActivitySpec"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ActivitySpec"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="activity_spec_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/ActivitySpec"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/ActivitySpec"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($activity_spec_id, $activity_spec) {
+		$_id = (new TypeID($activity_spec_id))->require([ActivitySpec::class]);
+		self::authorize(function($type, $value) {
+			return true; // TODO
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/activity_spec/{activity_spec_id}",
+	 *   operationId="ActivitySpec::delete",
+	 *   tags={"ActivitySpec"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ActivitySpec"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="activity_spec_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/ActivitySpec"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($activity_spec_id) {
+		$_id = (new TypeID($activity_spec_id))->require([ActivitySpec::class]);
+		self::authorize(function($type, $value) {
+			return true; // TODO
+		});
+		return self::_delete(null);
+	}
+
+	/**
 	 * @OA\Get(
 	 *   path="/activity_spec/{activity_spec_id}",
 	 *   operationId="ActivitySpec::view",

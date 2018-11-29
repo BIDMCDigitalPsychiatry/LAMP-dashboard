@@ -71,7 +71,7 @@ trait FitnessEventDriver {
                 {$cond2} 
                 {$cond3}
             FOR JSON PATH;
-        ", true);
+        ", 'json');
         if (count($result) == 0) 
             return null;
         

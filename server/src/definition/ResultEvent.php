@@ -134,6 +134,132 @@ class ResultEvent extends LAMP {
      */
     public $temporal_events = null;
 
+	/**
+	 * @OA\Post(
+	 *   path="/participant/{participant_id}/result_event/",
+	 *   operationId="ResultEvent::create",
+	 *   tags={"ResultEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ResultEvent"}
+	 *   },
+	 *   summary="Get a single result event, by identifier.",
+	 *   description="Get a single result event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/ResultEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($participant_id, $result_event) {
+		$_id = (new TypeID($participant_id))->require([ResultEvent::class]);
+		self::authorize(function($type, $value) use($_id) {
+			if ($_id->part(2) > 0) return true;
+			// CTest shortcut
+			return false; // TODO surveys
+		});
+		return null;
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/result_event/{result_event_id}",
+	 *   operationId="ResultEvent::update",
+	 *   tags={"ResultEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ResultEvent"}
+	 *   },
+	 *   summary="Get a single result event, by identifier.",
+	 *   description="Get a single result event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="result_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/ResultEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/ResultEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($result_event_id, $result_event) {
+		$_id = (new TypeID($result_event_id))->require([ResultEvent::class]);
+		self::authorize(function($type, $value) use($_id) {
+			if ($_id->part(2) > 0) return true;
+			// CTest shortcut
+			return false; // TODO surveys
+		});
+		return null;
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/result_event/{result_event_id}",
+	 *   operationId="ResultEvent::delete",
+	 *   tags={"ResultEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/ResultEvent"}
+	 *   },
+	 *   summary="Get a single result event, by identifier.",
+	 *   description="Get a single result event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="result_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/ResultEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($result_event_id) {
+		$_id = (new TypeID($result_event_id))->require([ResultEvent::class]);
+		self::authorize(function($type, $value) use($_id) {
+			if ($_id->part(2) > 0) return true;
+			// CTest shortcut
+			return false; // TODO surveys
+		});
+		return null;
+	}
+
     /** 
      * @OA\Get(
      *   path="/result_event/{result_event_id}",

@@ -49,7 +49,7 @@ trait StudyDriver {
                 ON Admin_Settings.AdminID = Admin.AdminID
             WHERE isDeleted = 0 {$cond}
             FOR JSON PATH, INCLUDE_NULL_VALUES;
-        ", true);
+        ", 'json');
         if (count($results) == 0) return null;
         
         // Map from SQL DB to the local Study type.

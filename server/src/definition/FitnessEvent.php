@@ -95,6 +95,132 @@ class FitnessEvent extends LAMP {
      */
     public $record = null;
 
+	/**
+	 * @OA\Post(
+	 *   path="/participant/{participant_id}/fitness_event",
+	 *   operationId="FitnessEvent::create",
+	 *   tags={"FitnessEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/FitnessEvent"}
+	 *   },
+	 *   summary="Get a single fitness event, by identifier.",
+	 *   description="Get a single fitness event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="participant_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Participant"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/FitnessEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($participant_id, $fitness_event) {
+		$_id = (new TypeID($participant_id))->require([FitnessEvent::class]);
+		self::authorize(function($type, $value) use($participant_id) {
+			$_id1 = self::parent_of($participant_id, FitnessEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_insert(null, null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/fitness_event/{fitness_event_id}",
+	 *   operationId="FitnessEvent::update",
+	 *   tags={"FitnessEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/FitnessEvent"}
+	 *   },
+	 *   summary="Get a single fitness event, by identifier.",
+	 *   description="Get a single fitness event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="fitness_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/FitnessEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/FitnessEvent"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($fitness_event_id, $fitness_event) {
+		$_id = (new TypeID($fitness_event_id))->require([FitnessEvent::class]);
+		self::authorize(function($type, $value) use($fitness_event_id) {
+			$_id1 = self::parent_of($fitness_event_id, FitnessEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_update(null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/fitness_event/{fitness_event_id}",
+	 *   operationId="FitnessEvent::delete",
+	 *   tags={"FitnessEvent"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/FitnessEvent"}
+	 *   },
+	 *   summary="Get a single fitness event, by identifier.",
+	 *   description="Get a single fitness event, by identifier.",
+	 *   @OA\Parameter(
+	 *     name="fitness_event_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/FitnessEvent"}
+	 *       },
+	 *     )
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($fitness_event_id) {
+		$_id = (new TypeID($fitness_event_id))->require([FitnessEvent::class]);
+		self::authorize(function($type, $value) use($fitness_event_id) {
+			$_id1 = self::parent_of($fitness_event_id, FitnessEvent::class,
+				$type == AuthType::Researcher ? Researcher::class : Participant::class);
+			return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);
+		});
+		return self::_delete(null);
+	}
+
     /** 
      * @OA\Get(
      *   path="/fitness_event/{fitness_event_id}",
@@ -125,7 +251,7 @@ class FitnessEvent extends LAMP {
      */
     public static function view($fitness_event_id) {
         $_id = (new TypeID($fitness_event_id))->require([FitnessEvent::class]);
-        self::authorize(function($type, $value) {
+        self::authorize(function($type, $value) use($fitness_event_id) {
             $_id1 = self::parent_of($fitness_event_id, FitnessEvent::class, 
                         $type == AuthType::Researcher ? Researcher::class : Participant::class);
             return $value == ($type == AuthType::Researcher ? $_id1->part(1) : $_id1);

@@ -62,6 +62,144 @@ class Activity extends LAMP {
      */
     public $settings = null;
 
+	/**
+	 * @OA\Post(
+	 *   path="/study/{study_id}/activity",
+	 *   operationId="Activity::create",
+	 *   tags={"Activity"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Activity"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="study_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Study"}
+	 *       },
+	 *     ),
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/Activity"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function create($study_id, $activity) {
+		$_id = (new TypeID($study_id))->require([Activity::class]);
+		self::authorize(function($type, $value) use($_id) {
+			$_id1 = self::parent_of($_id, Activity::class, Researcher::class);
+			if ($type == AuthType::Researcher) {
+				return $value == $_id1->part(1);
+			} else if ($type == AuthType::Participant) {
+				$_id2 = self::parent_of($value, Participant::class, Researcher::class);
+				return $_id2->part(1) == $_id1->part(1);
+			} else return false;
+		});
+		return self::_insert(null, null);
+	}
+
+	/**
+	 * @OA\Put(
+	 *   path="/activity/{activity_id}/activity",
+	 *   operationId="Activity::update",
+	 *   tags={"Activity"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Activity"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="activity_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Activity"}
+	 *       },
+	 *     ),
+	 *   ),
+	 *   @OA\RequestBody(
+	 *     required=true,
+	 *     @OA\JsonContent(
+	 *       ref="#/components/responses/Activity"
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function update($activity_id, $activity) {
+		$_id = (new TypeID($activity_id))->require([Activity::class]);
+		self::authorize(function($type, $value) use($_id) {
+			$_id1 = self::parent_of($_id, Activity::class, Researcher::class);
+			if ($type == AuthType::Researcher) {
+				return $value == $_id1->part(1);
+			} else if ($type == AuthType::Participant) {
+				$_id2 = self::parent_of($value, Participant::class, Researcher::class);
+				return $_id2->part(1) == $_id1->part(1);
+			} else return false;
+		});
+		return self::_update(null, null, null, null);
+	}
+
+	/**
+	 * @OA\Delete(
+	 *   path="/activity/{activity_id}/activity",
+	 *   operationId="Activity::delete",
+	 *   tags={"Activity"},
+	 *   x={"owner"={
+	 *     "$ref"="#/components/schemas/Activity"}
+	 *   },
+	 *   summary="",
+	 *   description="",
+	 *   @OA\Parameter(
+	 *     name="activity_id",
+	 *     in="path",
+	 *     required=true,
+	 *     @OA\Schema(
+	 *       ref="#/components/schemas/Identifier",
+	 *       x={"type"={
+	 *         "$ref"="#/components/schemas/Activity"}
+	 *       },
+	 *     ),
+	 *   ),
+	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
+	 *   @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+	 *   @OA\Response(response=404, ref="#/components/responses/NotFound"),
+	 *   @OA\Response(response=500, ref="#/components/responses/ServerFault"),
+	 *   security={{"Authorization": {}}},
+	 * )
+	 */
+	public static function delete($activity_id) {
+		$_id = (new TypeID($activity_id))->require([Activity::class]);
+		self::authorize(function($type, $value) use($_id) {
+			$_id1 = self::parent_of($_id, Activity::class, Researcher::class);
+			if ($type == AuthType::Researcher) {
+				return $value == $_id1->part(1);
+			} else if ($type == AuthType::Participant) {
+				$_id2 = self::parent_of($value, Participant::class, Researcher::class);
+				return $_id2->part(1) == $_id1->part(1);
+			} else return false;
+		});
+		return self::_delete(null, null, null);
+	}
+
     /** 
      * @OA\Get(
      *   path="/activity/{activity_id}",
