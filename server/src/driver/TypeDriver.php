@@ -33,7 +33,7 @@ trait TypeDriver {
             $pre_exec = microtime(true);
             $result = LAMP::db()->query($sql_query)->fetchAll(PDO::FETCH_ASSOC);
             $exec_time = microtime(true) - $pre_exec;
-            log::sys('SQL execution took '.$exec_time.' seconds.');
+            LAMP::log('SQL execution took '.$exec_time.' seconds.');
 
             if (count($result) === 0)
                 return [];
@@ -45,7 +45,7 @@ trait TypeDriver {
                 }, $result)));
             }
         } catch(PDOException $e) {
-	        log::err($e);
+	        LAMP::log($e);
             throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
@@ -70,10 +70,10 @@ trait TypeDriver {
             $pre_exec = microtime(true);
             $obj = LAMP::db()->prepare($sql_query)->execute($substitutions);
             $exec_time = microtime(true) - $pre_exec;
-            log::sys('SQL execution took '.$exec_time.' seconds.');
+            LAMP::log('SQL execution took '.$exec_time.' seconds.');
             return $obj;
         } catch(PDOException $e) {
-	        log::err($e);
+	        LAMP::log($e);
             throw new LAMPException("{$e->getMessage()}\n{$e->getTraceAsString()}", 500);
         }
     }
