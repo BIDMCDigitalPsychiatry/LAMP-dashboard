@@ -41,7 +41,7 @@ class LAMP {
         });
 
         // Add CORS support.
-        Flight::before('json', function() { 
+        Flight::before('json', function() {
             $h = getallheaders();
             $origin_header = isset($h['Origin']) ? $h['Origin'] : '*';
             header('Access-Control-Allow-Origin: '.$origin_header);

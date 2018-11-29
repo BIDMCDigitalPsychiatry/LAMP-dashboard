@@ -7,7 +7,7 @@ require_once __DIR__ . '/../driver/ResearcherDriver.php';
  *   description="A researcher using the LAMP platform.",
  * )
  */
-class Researcher extends LAMP {
+class Researcher {
     use ResearcherDriver;
 
     /**
@@ -76,7 +76,7 @@ class Researcher extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/SensorEvent"
+	 *       ref="#/components/schemas/SensorEvent"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -117,7 +117,7 @@ class Researcher extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Researcher"
+	 *       ref="#/components/schemas/Researcher"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),

@@ -14,7 +14,7 @@ require_once __DIR__ . '/../LAMP.php';
  *   description="Runtime type specification for each object in the LAMP platform.",
  * )
  */
-class Type extends LAMP {
+class Type {
 	use TypeDriver;
 
 	// TODO: parent_of, obj hierarchies, etc.
@@ -61,7 +61,7 @@ class Type extends LAMP {
  *   @OA\AdditionalProperties()
  * )
  */
-class TypeAttachment extends LAMP {
+class TypeAttachment {
 	use TypeDriver;
 
 	/**
@@ -328,7 +328,7 @@ class TypeAttachment extends LAMP {
 /**
  * TODO: DELETE!
  */
-class TypeLegacySupport extends LAMP {
+class TypeLegacySupport {
 	use TypeDriver;
 
 	/**

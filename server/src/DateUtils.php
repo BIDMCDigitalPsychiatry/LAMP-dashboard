@@ -11,7 +11,7 @@
 /**
  * @OA\Schema()
  */
-class CalendarComponents extends LAMP {
+class CalendarComponents {
 
 	/**
 	 * @OA\Property(
@@ -122,7 +122,7 @@ class CalendarComponents extends LAMP {
 /**
  * @OA\Schema()
  */
-class DurationInterval extends LAMP {
+class DurationInterval {
 
 	/**
 	 * @OA\Property(
@@ -185,7 +185,7 @@ class DurationInterval extends LAMP {
  *   description="The repeat type of a schedule.",
  * )
  */
-abstract class RepeatTypeLegacy extends LAMP {
+abstract class RepeatTypeLegacy {
 	const hourly = 'hourly';
 	const every3h = 'every3h';
 	const every6h = 'every6h';
@@ -203,7 +203,7 @@ abstract class RepeatTypeLegacy extends LAMP {
 /**
  * @OA\Schema()
  */
-class DurationIntervalLegacy extends LAMP {
+class DurationIntervalLegacy {
 
 	/**
 	 * @OA\Property(

@@ -9,7 +9,7 @@ require_once __DIR__ . '/../driver/ActivitySpecDriver.php';
  *   description="The kind of response to a question."
  * )
  */
-abstract class QuestionType extends LAMP {
+abstract class QuestionType {
 
 	// A five-point likert scale. The `options` field will be `null`.
 	const Likert = "likert";
@@ -38,7 +38,7 @@ abstract class QuestionType extends LAMP {
  *   description="A question within a survey-type `Activity`."
  * )
  */
-class Question extends LAMP {
+class Question {
 
 	/**
 	 * @OA\Property(
@@ -73,7 +73,7 @@ class Question extends LAMP {
  *   description="The parameters of a setting, static data, or temporal event key, for an ActivitySpec."
  * )
  */
-class ActivitySpecItem extends LAMP {
+class ActivitySpecItem {
 
 	/**
 	 * @OA\Property(
@@ -105,7 +105,7 @@ class ActivitySpecItem extends LAMP {
  *   description="The definition of an Activity's ResultEvents."
  * )
  */
-class ActivityDefinition extends LAMP {
+class ActivityDefinition {
 
 	/**
 	 * @OA\Property(
@@ -135,7 +135,7 @@ class ActivityDefinition extends LAMP {
 /**
  * @OA\Schema()
  */
-class ActivitySpec extends LAMP {
+class ActivitySpec {
 	use ActivitySpecDriver;
 
 	/**
@@ -205,7 +205,7 @@ class ActivitySpec extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/ActivitySpec"
+	 *       ref="#/components/schemas/ActivitySpec"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -247,7 +247,7 @@ class ActivitySpec extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/ActivitySpec"
+	 *       ref="#/components/schemas/ActivitySpec"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),

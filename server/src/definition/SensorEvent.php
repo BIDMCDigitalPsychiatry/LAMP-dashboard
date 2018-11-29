@@ -6,7 +6,7 @@ require_once __DIR__ . '/../LAMP.php';
  *   description=""
  * )
  */
-class SensorEvent extends LAMP {
+class SensorEvent {
     use SensorEventDriver;
 
     /**
@@ -74,7 +74,7 @@ class SensorEvent extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/SensorEvent"
+	 *       ref="#/components/schemas/SensorEvent"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -115,7 +115,7 @@ class SensorEvent extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/SensorEvent"
+	 *       ref="#/components/schemas/SensorEvent"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),

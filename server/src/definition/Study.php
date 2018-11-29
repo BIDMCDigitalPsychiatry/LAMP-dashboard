@@ -7,7 +7,7 @@ require_once __DIR__ . '/../driver/StudyDriver.php';
  *   description="A study conducted by a `Researcher`.",
  * )
  */
-class Study extends LAMP {
+class Study {
     use StudyDriver;
 
     /**
@@ -83,7 +83,7 @@ class Study extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Study"
+	 *       ref="#/components/schemas/Study"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -125,7 +125,7 @@ class Study extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Study"
+	 *       ref="#/components/schemas/Study"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),

@@ -7,7 +7,7 @@ require_once __DIR__ . '/../driver/ActivityDriver.php';
  *   description="An activity that may be performed by a participant in a study."
  * )
  */
-class Activity extends LAMP {
+class Activity {
     use ActivityDriver;
 
     /**
@@ -86,7 +86,7 @@ class Activity extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Activity"
+	 *       ref="#/components/schemas/Activity"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -134,7 +134,7 @@ class Activity extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Activity"
+	 *       ref="#/components/schemas/Activity"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),

@@ -9,7 +9,7 @@ require_once __DIR__ . '/../driver/ParticipantDriver.php';
  *   description="The kind of device a participant is using.",
  * )
  */
-abstract class DeviceType extends LAMP {
+abstract class DeviceType {
     const iOS = 'iOS';
     const Android = 'Android';
 }
@@ -19,7 +19,7 @@ abstract class DeviceType extends LAMP {
  *   description="The settings or health information about a participant."
  * )
  */
-class ParticipantSettings extends LAMP {
+class ParticipantSettings {
 
     /** 
      * @OA\Property(
@@ -91,7 +91,7 @@ class ParticipantSettings extends LAMP {
  *   description="A participant within a study; a participant cannot be enrolled in more than one study at a time.",
  * )
  */
-class Participant extends LAMP {
+class Participant {
     use ParticipantDriver;
 
     /**
@@ -211,7 +211,7 @@ class Participant extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Participant"
+	 *       ref="#/components/schemas/Participant"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
@@ -259,7 +259,7 @@ class Participant extends LAMP {
 	 *   @OA\RequestBody(
 	 *     required=true,
 	 *     @OA\JsonContent(
-	 *       ref="#/components/responses/Participant"
+	 *       ref="#/components/schemas/Participant"
 	 *     ),
 	 *   ),
 	 *   @OA\Response(response=200, ref="#/components/responses/Success"),
