@@ -169,13 +169,13 @@ class Researcher extends React.Component {
 
         for (let i = 0 ; i < 9; i++){
             if (i < this.state.plot_toggle.length && this.state.plot_toggle[i] === true) {
-                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
+                LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
                     "script_type": "rscript",
                     "script_contents": this.state.plot_sources[i][1],
                     "script_requirements": this.state.plot_sources[i][2].replace(/(\r\n\t|\n|\r\t)/gm, "").split(",")
                 }, {untyped: true})
             } else {
-                LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
+                LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
                     "script_type": "rscript",
                     "script_contents": "",
                     "script_requirements": ""
@@ -183,7 +183,7 @@ class Researcher extends React.Component {
             }
         }
 
-        LAMP.Researcher.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
+        LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs

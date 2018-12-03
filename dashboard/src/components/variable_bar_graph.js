@@ -1,4 +1,5 @@
 import React from 'react'
+import LAMP from '../lamp.js'
 import { Bar, Line} from '@vx/shape'
 import { Group } from '@vx/group'
 import { withParentSize } from '@vx/responsive'
@@ -94,7 +95,7 @@ export default withTheme()(withParentSize(withTooltip(props => {
 										<text
 											transform={`translate(${tick.to.x}, ${tickY}) rotate(${(props.rotateText || false) ? 60 : 0})`}
 											fontSize={11}
-											textAnchor={data.activity_type === "game" ? "middle" : "start"}
+											textAnchor={data.activity_type !== LAMP.SURVEY_SPEC ? "middle" : "start"}
 											fill={fillColor}
 											fontFamily="Roboto">
 											{data[i].shortTitle || data[i].longTitle || ''}

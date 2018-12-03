@@ -3,17 +3,31 @@
 // The root type in LAMP. You must use `LAMP.connect(...)` to begin using any LAMP classes.
 export default class LAMP {
 
+    // ActivitySpecID for anything that is a survey
+    static get SURVEY_SPEC() {
+        return 'QWN0aXZpdHlTcGVjOjEK';
+    }
+
+    // ActivitySpecID for anything that is a batch
+    static get BATCH_SPEC() {
+        return 'QWN0aXZpdHlTcGVjOjAK';
+    }
+
     // Connect to an instance of a server hosting the LAMP API and mirror it locally.
     static async connect(root_url) {
 
         // Convenience method to wrap most of the Fetch API's nuances away.
         async function _fetch(method, base, route, data) {
-            const options = { method: method }
+            const options = {
+                method: method,
+                headers: new Headers({
+                    'Authorization': `Basic ${LAMP.auth.id}:${LAMP.auth.password}`,
+                })
+            }
             if (data !== undefined)
                 options.body = JSON.stringify(data)
-            
-            var auth = encodeURIComponent(`${LAMP.auth.id}:${LAMP.auth.password}`)
-            var res = await (await fetch(`${base}${route}?auth=${auth}`, options)).json()
+
+            var res = await (await fetch(`${base}${route}`, options)).json()
 
             if (res['fatal'] !== undefined)
                 throw new Error('SERVER: ' + res['fatal']['message'] + '\n' + res['fatal']['trace'])
@@ -26,7 +40,8 @@ export default class LAMP {
         // Get the JSON from the remote server and convert it into LAMP objects. [Runtime]
         // This is invoked at runtime via `LAMP.Study.view('...')`, etc.
         async function _get_rest(sys, http_method, base, args) {
-
+            console.log(sys)
+            console.log(base)
             // Parse the base url and replace URL components. [Runtime]
             let frags = base.replace(/({[a-zA-Z0-9_]+})/g, (x) => {
                 let y = args.shift()
@@ -43,15 +58,15 @@ export default class LAMP {
 
             // Obtain JSON and throw an error if that was the case. [Runtime]
             let data = await _fetch(http_method, root_url, frags, body)
-            if (data.result === undefined)
+            if (data.data === undefined)
                 throw new Error('no data returned')
 
             // If the API hints includes `untyped`, don't typecast it!
             if (hints !== undefined && hints.untyped === true)
-                return data.result
+                return data.data
 
             // If not error, map each result to an object. [Runtime]
-            return data.result.map(x => Object.assign(new LAMP.types[sys](), x))
+            return data.data.map(x => Object.assign(new LAMP.types[sys](), x))
         }
 
         // Download the API definition from the server at root_url.
@@ -73,7 +88,7 @@ export default class LAMP {
                 t.prototype[prop] = null
             })
             Object.entries(api.paths)
-                .filter(x => Object.values(x[1])[0].operationId.startsWith(sys))
+                .filter(x => Object.values(x[1])[0].operationId.startsWith(sys + '::'))
                 .forEach(endpoint => {
                     var method = Object.keys(endpoint[1])[0].toUpperCase();
                     var func = Object.values(endpoint[1])[0].operationId.split('::')[1];
