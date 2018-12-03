@@ -79,7 +79,17 @@ const surveyMap = {
 	"In the last THREE DAYS, I have taken my medications as scheduled": "Medication",
 	"In the last THREE DAYS, during the daytime I have gone outside my home": "Spent time outside",
 	"In the last THREE DAYS, I have preferred to spend time alone": "Prefer to be alone",
-	"In the last THREE DAYS, I have had arguments with other people": "Arguments with others"
+	"In the last THREE DAYS, I have had arguments with other people": "Arguments with others",
+    "I trust this app to guide me towards my personal goals" : "Goals",
+    "I believe this app's tasks will help me to address my problem" : "Tasks",
+    "This app encourages me to accomplish tasks and make progress" : "Encouragement",
+    "I agree that the tasks within this app are important for my goals" : "Tasks match goals",
+    "This app is easy to use and operate" : "Usability",
+    "This app supports me to overcome challenges" : "Support",
+    "When I see others who are doing better than I am, I realize it's possible to improve" : "Can improve",
+    "When I see others who are doing better than I am, I feel frustrated about my own situation" : "Frustrated",
+    "When I see others who are doing worse than I am, I feel fear that my future will be similar to them" : "Similar future",
+    "When I see others who are doing worse than I am, I feel relieved about my own situation" : "Relieved"
 }
 
 class Participant extends React.Component {
@@ -135,7 +145,7 @@ class Participant extends React.Component {
 
         // Fetch attachments first since they will take the longest.
         Promise.all(rangeTo(10).map(async i => {
-            let res = await LAMP.Participant.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
+            let res = await LAMP.TypeLegacy.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
             var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
             if (res.hasOwnProperty('log'))
                 console.log(res.log)
@@ -145,7 +155,7 @@ class Participant extends React.Component {
 
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
-        var p2 = LAMP.Result.all_by_participant(id)
+        var p2 = LAMP.ResultEvent.all_by_participant(id)
         var p3 = LAMP.EnvironmentEvent.all_by_participant(id)
         var p4 = LAMP.FitnessEvent.all_by_participant(id)
         Promise.all([p1, p2, p3, p4]).then(res => {
@@ -154,10 +164,12 @@ class Participant extends React.Component {
             let res1 = res[1].map(x => ({
                 id: x.id,
                 event_type: 'result',
-                timestamp: x.start_time,
-                duration: x.end_time - x.start_time,
+                timestamp: x.timestamp,
+                duration: x.duration,
                 activity_type: (
-                        x.activity === null ? null : res[0].find(y => x.activity === y.id).type
+                        x.activity === null ? null : res[0].find(y => {
+                            return x.activity === y.id
+                        }).spec
                 ),
                 name: (
                     x.activity === null ? 
@@ -265,7 +277,7 @@ class Participant extends React.Component {
     	// Accumulate all survey data into a single object from the timeline.
 		let surveyData = []
 		timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
-			slice.filter(x => (x.event_type === 'result' && x.activity_type !== 'game')).map(event => [
+			slice.filter(x => (x.event_type === 'result' && x.activity_type == null)).map(event => [
 				surveyData.push(event)
 			])])
 
@@ -278,19 +290,19 @@ class Participant extends React.Component {
 
 			for (let j = 0; j < surveyData[i].detail.length; j++) {
 				averageData[slot + j].push({
-					x: surveyData[i].detail[j].elapsed_time,
+					x: surveyData[i].detail[j].duration,
 					y: surveyData[i].detail[j].value,
 					z: surveyData[i].detail[j].item
 				})
 			}
-		}
+        }
 
-		// Compress the average data arrays (x32) into single event summaries (x32).
-		return this.convertGraphData({ detail: averageData.map(a => ({
-			elapsed_time: a.reduce((a, b) => a + b.x, 0) / a.length,
-			value: a.reduce((a, b) => a + b.y, 0) / a.length,
-			item: a.length > 0 ? a[0].z : ''
-		}))})
+        // Compress the average data arrays (x32) into single event summaries (x32).
+        return this.convertGraphData({ detail: averageData.map(a => ({
+                duration: a.reduce((a, b) => a + b.x, 0) / a.length,
+                value: a.reduce((a, b) => a + b.y, 0) / a.length,
+                item: a.length > 0 ? a[0].z : ''
+            }))})
     }
 
     timelineData = () => {
@@ -349,8 +361,8 @@ class Participant extends React.Component {
     // Convert a Result timeline event into a VariableBarGraph object.
     convertGraphData = (e) => !e.detail ? [] : e.detail.map(x => !!x ?
         ({
-            x: x.elapsed_time || 0,
-            y: (e.activity_type === 'game' ? (parseFloat(x.item) || 0) : x.value),
+            x: x.duration || 0,
+            y: (e.activity_type != null ? (parseFloat(x.item) || 0) : x.value),
             longTitle: x.item,
             shortTitle: surveyMap[x.item],
         }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
@@ -495,7 +507,7 @@ class Participant extends React.Component {
                             unmountOnExit>
 								<VariableBarGraph
                                     data={this.convertGraphData(event)}
-                                    rotateText={event.activity_type !== 'game'}
+                                    rotateText={event.activity_type == null}
                                     height={400}/>
                         </Collapse>,
                     ]).flat().filter(x => x)}
