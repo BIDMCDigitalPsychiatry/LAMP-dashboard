@@ -95,7 +95,7 @@ export default withTheme()(withParentSize(withTooltip(props => {
 										<text
 											transform={`translate(${tick.to.x}, ${tickY}) rotate(${(props.rotateText || false) ? 60 : 0})`}
 											fontSize={11}
-											textAnchor={data.activity_type !== LAMP.SURVEY_SPEC ? "middle" : "start"}
+											textAnchor={data.activity_type != null ? "middle" : "start"}
 											fill={fillColor}
 											fontFamily="Roboto">
 											{data[i].shortTitle || data[i].longTitle || ''}

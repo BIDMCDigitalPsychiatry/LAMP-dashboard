@@ -40,8 +40,6 @@ export default class LAMP {
         // Get the JSON from the remote server and convert it into LAMP objects. [Runtime]
         // This is invoked at runtime via `LAMP.Study.view('...')`, etc.
         async function _get_rest(sys, http_method, base, args) {
-            console.log(sys)
-            console.log(base)
             // Parse the base url and replace URL components. [Runtime]
             let frags = base.replace(/({[a-zA-Z0-9_]+})/g, (x) => {
                 let y = args.shift()
