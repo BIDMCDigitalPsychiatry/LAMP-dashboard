@@ -245,33 +245,6 @@ class Participant extends React.Component {
         else return {palette: {type: 'dark', background: {paper: '#212121'}}}
     }
 
-    geocode = (address) => {
-        if (Array.isArray(address))
-            return address
-
-        // Return cached coordinates if available.
-        if (!localStorage.geoCoords)
-            localStorage.geoCoords = JSON.stringify({})
-        var geoCoords = JSON.parse(localStorage.geoCoords)
-        if (!!geoCoords[address])
-            return geoCoords[address]
-
-        // Request the coordinates from Nominatim/OSM.
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`
-        fetch(url).then(x => x.json()).then(result => {
-
-            // Cache and return the coordinates.
-            var geoCoords = JSON.parse(localStorage.geoCoords)
-            geoCoords[address] = [
-                parseFloat((result[0] || {}).lat) || 0.0, 
-                parseFloat((result[0] || {}).lon) || 0.0
-            ]
-            localStorage.geoCoords = JSON.stringify(geoCoords)
-            this.setState({ ping: address })
-        })
-        return [0, 0]
-    }
-
     surveyBarPlotData = (timeline) => {
 
     	// Accumulate all survey data into a single object from the timeline.
@@ -446,10 +419,10 @@ class Participant extends React.Component {
                 style={{ display: 'flex', justifyContent: 'space-between' }}>
                 {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
                     <Map style={{ flex: 1, zIndex: 1 }}
-                        center={(this.geocode(event.coordinates))}
+                        center={event.coordinates}
                         zoom={12}>
                         <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
-                        <Marker position={(this.geocode(event.coordinates))} />
+                        <Marker position={event.coordinates} />
                     </Map>
                 )}
                 <List style={{ flex: 0, marginLeft: 10, marginRight: -16 }}>
