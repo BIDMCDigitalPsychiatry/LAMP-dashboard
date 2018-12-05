@@ -35,14 +35,14 @@ const hourOnlyDateFormat = {
 	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
 }
 
-// Note the surveys we want to use in the average plot with their initial slot number.
+// Note the surveys we want to use in the average plot with their initial slot number as well as expected length.
 const usableSurveys = {
-	'ANXIETY, PSYCHOSIS, AND SOCIAL': 0,
-	'MOOD, SLEEP, AND SOCIAL': 16,
-	'ANXIETY': 0,
-	'PSYCHOSIS AND SOCIAL': 7,
-	'MOOD': 16,
-	'SLEEP AND SOCIAL': 25,
+	'ANXIETY, PSYCHOSIS, AND SOCIAL': [0, 16],
+	'MOOD, SLEEP, AND SOCIAL': [16, 16],
+	'ANXIETY': [0, 7],
+	'PSYCHOSIS AND SOCIAL': [7, 9],
+	'MOOD': [16, 9],
+	'SLEEP AND SOCIAL': [25, 7],
 }
 
 // Note the short-name mappings for the above survey questions.
@@ -184,6 +184,7 @@ class Participant extends React.Component {
                 x.event_type = 'environment'
                 if (!!x.accuracy)
                     x.coordinates = x.coordinates.split(',').map(x => parseFloat(x))
+				else x.coordinates = [0, 0]
                 return x
             })
 
@@ -261,8 +262,8 @@ class Participant extends React.Component {
 			let slot = usableSurveys[surveyData[i].name.toUpperCase()]
 			if (slot === undefined) continue;
 
-			for (let j = 0; j < surveyData[i].detail.length; j++) {
-				averageData[slot + j].push({
+			for (let j = 0; j < surveyData[i].detail.length && j < slot[1]; j++) {
+				averageData[slot[0] + j].push({
 					x: surveyData[i].detail[j].duration,
 					y: surveyData[i].detail[j].value,
 					z: surveyData[i].detail[j].item
@@ -389,17 +390,17 @@ class Participant extends React.Component {
                     {!this.state.attachments ? <div/> : this.state.attachments.filter(Boolean).map(attach =>
                         <Grid item xs={this.state.zoomLevel}>
                             <Card style={{ padding: '.3rem' }}>
-                                <Document
-                                    file={'data:application/pdf;base64,' + attach}
-                                    error={
-                                        <Typography variant="body1" color="error">
-                                            Visualization error occurred.
-                                        </Typography>
-                                    }
-                                    loading="">
-                                    <Page renderMode="svg" pageIndex={0}/>
-                                </Document>
-                            </Card>
+								<Document
+									file={'data:application/pdf;base64,' + attach}
+									error={
+										<Typography variant="body1" color="error">
+											Visualization error occurred.
+										</Typography>
+									}
+									loading="">
+									<Page renderMode="svg" pageIndex={0}/>
+								</Document>
+							</Card>
                         </Grid>
                     )}
 				</ Grid>
@@ -411,80 +412,94 @@ class Participant extends React.Component {
 		</Toolbar>
         {this.state.timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
             <MuiThemeProvider theme={createMuiTheme(this.timeOfDayTheme(slice[0].timestamp))}>
-            <Card
-                ref={ref => {
-                    let dateKey = new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)
-                    this.cardRefs[dateKey] = ref
-            }   }
-                style={{ display: 'flex', justifyContent: 'space-between' }}>
-                {[slice.find(x => x.event_type === 'environment' && x.coordinates !== undefined)].filter(x => x).map(event => 
-                    <Map style={{ flex: 1, zIndex: 1 }}
-                        center={event.coordinates}
-                        zoom={12}>
-                        <TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
-                        <Marker position={event.coordinates} />
-                    </Map>
-                )}
-                <List style={{ flex: 0, marginLeft: 10, marginRight: -16 }}>
-                    {[slice.find(x => !!x.location_context)].map(event =>
-                        <Tooltip title={!event ? 'home' : event.location_context}>
-                            <ListItem dense disableGutters>
-                                <ListItemIcon>{this.iconMap.location[!event ? 'home' : event.location_context]}</ListItemIcon>
-                            </ListItem>
-                        </Tooltip>
-                    )}
-                    {[slice.find(x => !!x.social_context)].map(event => 
-                        <Tooltip title={!event ? 'alone' : event.social_context}>
-                            <ListItem dense disableGutters>
-                                <ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.social_context]}</ListItemIcon>
-                            </ListItem>
-                        </Tooltip>
-                    )}
-                </List>
-                <List style={{ flex: 2 }}>
-                    {[slice.find(x => x.event_type === 'environment')].filter(x => x).map(event => 
-                        <ListItem>
-                            <ListItemText 
-                                primaryTypographyProps={{variant: 'title'}}
-                                primary={Date.formatUTC(event.timestamp, hourOnlyDateFormat)}
-                                secondary={
-                                    slice.filter(x => x.event_type === 'fitness')
-                                        .map(fit => fit.type.replace('_', ' ') + ': ' + fit.value)
-                                        .join(', ')
-                                } />
-                        </ListItem>
-                    )}
-                    {slice.filter(x => x.event_type === 'result').map(event => [
-                        <ListItem dense
-                            button={this.requiresDetail(event)}
-                            onClick={() => this.handleClick(event)}>
-                            <ListItemText 
-                                primaryTypographyProps={{variant: 'body2'}}
-                                primary={event.name} />
-                            {
-                                this.state.selected.includes(event.id) ? 
-                                <ListItemIcon style={{marginRight: 0}}>
-                                    <ExpandLessIcon />
-                                </ListItemIcon> :
-                                (!!event.summary || !!event.detail) ? 
-                                <ListItemIcon style={{marginRight: 0}}>
-                                    <ExpandMoreIcon />
-                                </ListItemIcon>  :
-                                <div />
-                            }
-                        </ListItem>, 
-                        <Collapse 
-                            style={{ width: '90%', marginBottom: 10, marginLeft: 'auto', marginRight: 'auto' }}
-                            in={this.state.selected.includes(event.id)} 
-                            timeout="auto" 
-                            unmountOnExit>
-								<VariableBarGraph
-                                    data={this.convertGraphData(event)}
-                                    rotateText={event.activity_type == null}
-                                    height={400}/>
-                        </Collapse>,
-                    ]).flat().filter(x => x)}
-                </List>
+            <Card ref={ref => {
+				let dateKey = new Date(slice[0].timestamp).toLocaleString('en-US', this.shortDateFormat)
+				this.cardRefs[dateKey] = ref
+			}}>
+				<Grid
+					container
+					direction="row"
+					justify="space-between"
+					alignItems="stretch"
+					spacing={8}>
+					<Grid item xs={3}>
+						{[slice.find(x => x.event_type === 'environment' && !!x.coordinates)].filter(x => x).map(event =>
+							<Map style={{width: '100%', height: '100%'}}
+								 center={event.coordinates}
+								 zoom={12}>
+								<TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
+								<Marker position={event.coordinates} />
+							</Map>
+						)}
+					</Grid>
+					<Grid container item
+						  xs={1}
+						  direction="column"
+						  justify="space-around"
+						  alignItems="stretch"
+						  spacing={8}>
+						<Grid item xs={6}>
+							{[slice.find(x => !!x.location_context)].map(event =>
+								<Tooltip title={!event ? 'home' : event.location_context}>
+									<ListItemIcon>{this.iconMap.location[!event ? 'home' : event.location_context]}</ListItemIcon>
+								</Tooltip>
+							)}
+						</Grid>
+						<Grid item xs={6}>
+							{[slice.find(x => !!x.social_context)].map(event =>
+								<Tooltip title={!event ? 'alone' : event.social_context}>
+									<ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.social_context]}</ListItemIcon>
+								</Tooltip>
+							)}
+						</Grid>
+					</Grid>
+					<Grid item xs={8}>
+						<List>
+							{[slice.find(x => x.event_type === 'environment')].filter(x => x).map(event =>
+								<ListItem>
+									<ListItemText
+										primaryTypographyProps={{variant: 'title'}}
+										primary={Date.formatUTC(event.timestamp, hourOnlyDateFormat)}
+										secondary={
+											slice.filter(x => x.event_type === 'fitness')
+												.map(fit => fit.type.replace('_', ' ') + ': ' + fit.value)
+												.join(', ')
+										} />
+								</ListItem>
+							)}
+							{slice.filter(x => x.event_type === 'result').map(event => [
+								<ListItem dense
+										  button={this.requiresDetail(event)}
+										  onClick={() => this.handleClick(event)}>
+									<ListItemText
+										primaryTypographyProps={{variant: 'body2'}}
+										primary={event.name} />
+									{
+										this.state.selected.includes(event.id) ?
+											<ListItemIcon style={{marginRight: 0}}>
+												<ExpandLessIcon />
+											</ListItemIcon> :
+											(!!event.summary || !!event.detail) ?
+												<ListItemIcon style={{marginRight: 0}}>
+													<ExpandMoreIcon />
+												</ListItemIcon>  :
+												<div />
+									}
+								</ListItem>,
+								<Collapse
+									style={{ width: '90%', marginBottom: 10, marginLeft: 'auto', marginRight: 'auto' }}
+									in={this.state.selected.includes(event.id)}
+									timeout="auto"
+									unmountOnExit>
+									<VariableBarGraph
+										data={this.convertGraphData(event)}
+										rotateText={event.activity_type == null}
+										height={400}/>
+								</Collapse>,
+							]).flat().filter(x => x)}
+						</List>
+					</Grid>
+				</Grid>
             </Card>
             <br />
             </MuiThemeProvider>
