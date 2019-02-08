@@ -47,9 +47,9 @@ export default withParentSize(withTooltip(({
         timelineData[1][i] = inputData[1][i]
     }
 
-    const xMax = width;
-    const bWidth = xMax / timelineData[0].length;
-    const yMax = bWidth * 1.5;
+    const xMax = 25*timelineData[0].length;
+    const bWidth = 25;
+    const yMax = bWidth * 1.2;
 	const maxBucketSize = max(timelineData[0], d => y(d).length);
     const colorMax = max(timelineData[0], d => max(y(d), z));
 
@@ -76,7 +76,7 @@ export default withParentSize(withTooltip(({
 
     return (
         <div style={Object.assign({ ...style, position: 'relative', overflow: 'scroll'}, style || {})}>
-            <svg width={width} height={bWidth * 4}>
+            <svg width={xMax} height={bWidth * 4}>
                 <HeatmapRect style={{cursor: 'pointer'}}
                              data={timelineData[0]}
                              xScale={xScale}
