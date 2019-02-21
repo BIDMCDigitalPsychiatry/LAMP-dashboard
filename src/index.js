@@ -7,6 +7,7 @@ import Register from './pages/register.js';
 import Root from './pages/root.js';
 import Researcher from './pages/researcher.js';
 import Participant from './pages/participant.js';
+import ParticipantView from './pages/participant_view.js'
 import NavigationLayout from './components/navigation_layout.js';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -45,7 +46,7 @@ const theme = {
 };
 
 // Connect to the correct LAMP API server.
-LAMP.connect('https://api.lamp.digitalpsych.org').then(() => {
+LAMP.connect('https://api.lamp.digital').then(() => {
 
     // Load the Roboto fonts.
     document.loadCSS('https://fonts.googleapis.com/css?family=Roboto:300,400,500')
@@ -111,7 +112,7 @@ LAMP.connect('https://api.lamp.digitalpsych.org').then(() => {
                     !LAMP.get_identity() ? 
                     <Redirect to="/login" /> :
                     <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
-                        <Participant {...props} />
+                        <ParticipantView {...props} />
                     </NavigationLayout>
                 } />
             </Switch>

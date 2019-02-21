@@ -1,13 +1,12 @@
-# gitignore: /
+# gitignore: /dashboard
 
-# Sublime Projects
-*.sublime-*
+# NodeJS + React
+node_modules
+npm-debug.log
+build
 
-.DS_Store
-*/.DS_Store
+# AWS S3 Config
+.s3config
 
 # IntelliJ IDEA
-.idea/dataSources/
-.idea/workspace.xml
-.idea/usage.statistics.xml
-.idea/tasks.xml
+*.iml
