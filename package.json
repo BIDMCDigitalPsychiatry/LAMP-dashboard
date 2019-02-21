@@ -25,7 +25,8 @@
     "react-event-timeline": "^1.6.3",
     "react-leaflet": "^2.2.0",
     "react-pdf": "^3.0.6",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "react-scroll-horizontal": "^1.6.2"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",

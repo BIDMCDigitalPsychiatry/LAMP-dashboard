@@ -29,6 +29,7 @@ import Grid from "@material-ui/core/Grid/Grid";
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { rangeTo } from '../components/utils'
+import HorizontalScroll from 'react-scroll-horizontal'
 
 const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -316,9 +317,12 @@ class Participant extends React.Component {
                 addToDateArray(event.timestamp)
             ])])
 
-        if (dateArray.length > 0) {
+        if (dateArray.length > 0 && !!dateObjects) {
             let startDate = new Date(Math.min(...dateArray))
-            let endDate = new Date()
+            let dateObjectsArray = Object.entries(dateObjects)
+            let lastDate = dateObjectsArray[0][0]
+            let endDate = new Date(lastDate)
+            endDate.setDate(endDate.getDate() + 1);
             var completeDateArray = getDateArray(startDate, endDate);
             for (var i = 0; i< completeDateArray.length; i++) {
                 if (completeDateArray[i].toLocaleString('en-US', this.shortDateFormat) in dateObjects) {
@@ -328,7 +332,6 @@ class Participant extends React.Component {
                 }
             }
         }
-
         return [dataArray, completeDateArray]
     }
 
@@ -344,7 +347,7 @@ class Participant extends React.Component {
     render = () =>
     <div>
         <AppBar style={{ background: '#fafafa' }}>
-            <div style={{ padding: '32px 10px 0px 10px' }}>
+            <div style={{ padding: '32px 10px 0px 10px', overflow: 'scroll'}}>
                 <Timeline
                     inputData={this.timelineData()}
                     onClick={data => event => {
@@ -360,7 +363,7 @@ class Participant extends React.Component {
                     }} />
             </div>
         </AppBar>
-        <div style={{marginTop: 60}} />
+        <div style={{marginTop: 100}} />
         <VariableBarGraph
             rotateText
             data={this.state.avgData}
