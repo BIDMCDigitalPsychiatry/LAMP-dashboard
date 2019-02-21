@@ -69,7 +69,7 @@ export default class LAMP {
 
         // Download the API definition from the server at root_url.
         LAMP.auth = {type: null, id: null, password: null}
-        let api = await (await fetch(`${root_url}/?format=json`, {method: 'GET'})).json()
+        let api = await (await fetch(`${root_url}`, {method: 'GET'})).json()
         LAMP.typedef = api
 
         // Registry of all generated remote types available on the LAMP API server.
@@ -87,12 +87,13 @@ export default class LAMP {
             })
             Object.entries(api.paths)
                 .filter(x => Object.values(x[1])[0].operationId.startsWith(sys + '::'))
-                .forEach(endpoint => {
-                    var method = Object.keys(endpoint[1])[0].toUpperCase();
-                    var func = Object.values(endpoint[1])[0].operationId.split('::')[1];
-                    t[func] = async function() {
-                        return await _get_rest(sys, method, endpoint[0], Array.from(arguments))
-                    }
+                .forEach(endpoint => {                    
+                    Object.entries(endpoint[1]).forEach(x => {
+                        var method = x[0].toUpperCase()
+                        t[x[1].operationId.split('::')[1]] = async function() {
+                            return await _get_rest(sys, method, endpoint[0], Array.from(arguments))
+                        }
+                    })
                 })
 
             // Make the new class accessible under LAMP as static properties.
