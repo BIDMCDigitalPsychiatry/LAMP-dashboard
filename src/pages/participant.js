@@ -130,37 +130,24 @@ class Participant extends React.Component {
     }
 
     componentWillMount() {
-		this.props.layout.pageLoading(false)
+        this.props.layout.pageLoading(false)
 
         let { id } = this.props.match.params
-		if (id === 'me' && (LAMP.auth || {type: null}).type === 'participant')
-		    id = LAMP.get_identity().id
-		if (!id || id === 'me') {
-		    this.props.history.replace(`/`)
-			return
-		}
+        if (id === 'me' && (LAMP.auth || {type: null}).type === 'participant')
+            id = LAMP.get_identity().id
+
+        if (!id || id === 'me') {
+            this.props.history.replace(`/`)
+            return
+        }
         this.props.layout.setTitle(`Participant ${id}`)
 
-        // Load the Leaflet Maps API's CSS.
-        document.loadCSS('https://unpkg.com/leaflet@1.3.4/dist/leaflet.css')
-
-        // Fetch attachments first since they will take the longest.
-        Promise.all(rangeTo(10).map(async i => {
-            let res = await LAMP.TypeLegacy.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i + 1), undefined, {untyped: true})
-            var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
-            if (res.hasOwnProperty('log'))
-                console.log(res.log)
-            return (exists ? res.output.replace(/\s/g, '') : null)
-        })).then(res => this.setState({attachments:res}))
-            .catch(res => console.error(res))
-
+        console.log('EEE')
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
         var p2 = LAMP.ResultEvent.all_by_participant(id)
-        var p3 = LAMP.EnvironmentEvent.all_by_participant(id)
-        var p4 = LAMP.FitnessEvent.all_by_participant(id)
-        Promise.all([p1, p2, p3, p4]).then(res => {
-
+        var p3 = LAMP.SensorEvent.all_by_participant(id)
+        Promise.all([p1, p2, p3]).then(res => {
             // Flatten all linked activities' names into each Result object.
             let res1 = res[1].map(x => ({
                 id: x.id,
@@ -168,41 +155,33 @@ class Participant extends React.Component {
                 timestamp: x.timestamp,
                 duration: x.duration,
                 activity_type: (
-                        x.activity === null ? null : res[0].find(y => {
+                        !!x.activity ? null : res[0].find(y => {
                             return x.activity === y.id
                         }).spec
                 ),
                 name: (
-                    x.activity === null ? 
+                    !x.activity ? 
                     x.static_data.survey_name :
-                   res[0].find(y => x.activity === y.id).name
+                   (res[0].find(y => x.activity === y.id) || {}).name
                 ),
                 summary: x.activity === null ? null : x.static_data,
                 detail: x.temporal_events
             }))
 
-			let res2 = res[2].map(x => {
-                x.event_type = 'environment'
+            let res2 = res[2].map(x => {
+                x.event_type = 'sensor'
                 if (!!x.accuracy)
                     x.coordinates = x.coordinates.split(',').map(x => parseFloat(x))
-				else x.coordinates = [0, 0]
+                else x.coordinates = [0, 0]
                 return x
             })
 
-            // Flatten all fitness samples into individual objects.
-			let res3 = res[3].map(x => x.record.map(y => {
-                var z = Object.assign({ event_type: 'fitness' }, x)
-                delete z.record
-                Object.assign(z, y)
-                return z
-            })).flat()
-
             // Compute a timeline data stream sorted by timestamp.
-			let resT = [].concat(res1, res2, res3)
+            let resT = [].concat(res1, res2)
                              .sort((a, b) => b.timestamp - a.timestamp)
 
             // Create sub-slices into the timeline grouped by environmental context.
-			let timeline = []
+            let timeline = []
             for (var i = 1, sliceIdx = 0; i <= resT.length - 2; i++) {
                 var diff = resT[i - 1].timestamp - resT[i].timestamp
 
@@ -219,9 +198,10 @@ class Participant extends React.Component {
 
             // Update state now with the fetched & computed objects.
             this.setState({ timeline: timeline, avgData: avgData })
-			this.props.layout.pageLoading(true)
+            this.props.layout.pageLoading(true)
         })
     }
+
 
     handleClick = (event) => {
         if (!this.requiresDetail(event))
@@ -259,18 +239,22 @@ class Participant extends React.Component {
 		// Iterate over every survey taken and assort into one average list.
 		// Ignore the survey if we don't mark it in the usableSurveys list.
 		let averageData = rangeTo(32).map(() => [])
+        
 		for (let i = 0; i < surveyData.length; i++) {
-			let slot = usableSurveys[surveyData[i].name.toUpperCase()]
-			if (slot === undefined) continue;
-
-			for (let j = 0; j < surveyData[i].detail.length && j < slot[1]; j++) {
-				averageData[slot[0] + j].push({
-					x: surveyData[i].detail[j].duration,
-					y: surveyData[i].detail[j].value,
-					z: surveyData[i].detail[j].item
-				})
-			}
+            if(!!surveyData[i].summary.survey_name) {
+    			let slot = usableSurveys[surveyData[i].summary.survey_name.toUpperCase()]
+    			if (slot === undefined) continue;
+                
+    			for (let j = 0; j < surveyData[i].detail.length && j < slot[1]; j++) {
+    				averageData[slot[0] + j].push({
+    					x: surveyData[i].detail[j].duration,
+    					y: surveyData[i].detail[j].value,
+    					z: surveyData[i].detail[j].item
+    				})
+    			}
+            }
         }
+        
 
         // Compress the average data arrays (x32) into single event summaries (x32).
         return this.convertGraphData({ detail: averageData.map(a => ({
