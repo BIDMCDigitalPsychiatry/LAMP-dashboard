@@ -108,6 +108,16 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                         <Researcher {...props} />
                     </NavigationLayout>
                 } />
+
+                <Route exact path="/researcher/participant/:id" render={props =>
+                    !LAMP.get_identity() ?
+                    <Redirect to="/login" /> :
+                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
+                        <Participant {...props} />
+                    </NavigationLayout>
+                } />
+
+
                 <Route exact path="/participant/:id" render={props =>
                     !LAMP.get_identity() ? 
                     <Redirect to="/login" /> :
