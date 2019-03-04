@@ -131,7 +131,7 @@ class Researcher extends React.Component {
     }
 
     // Go to the drill-down view.
-    rowSelect = (rowNumber) => this.props.history.push(`/participant/${this.state.data[rowNumber].id}`)
+    rowSelect = (rowNumber) => this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
 
     // Shorthand for authentication stuff.
     _auth = () => (LAMP.auth.id + ':' + LAMP.auth.password)
