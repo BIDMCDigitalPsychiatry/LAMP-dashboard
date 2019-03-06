@@ -11,6 +11,14 @@ import { scaleTime, scaleLinear } from '@vx/scale';
 import { extent } from 'd3-array';
 import { curveMonotoneX } from '@vx/curve';
 
+//standard surveys ranges
+const survey_ranges = {
+  'Social': 6,
+  'Anxiety': 10,
+  'Psychosis': 10,
+  'Mood': 10,
+  'Sleep': 10
+}
 
 // accessors
 const x = d => d.date;
@@ -35,7 +43,7 @@ export default (props) => {
   let height = props.height
   let margin = props.margin 
 
-  console.log(data)
+  //console.log(data)
 
   // bounds
   const xMax = width - margin.left - margin.right;
@@ -51,11 +59,12 @@ export default (props) => {
     range: [0, xMax],
     domain: [Math.min(...data.map(x)), Math.max(...data.map(x))]
   });
-  console.dir(data)
+  //console.dir(data)
 
   const yScale2 = scaleLinear({
     range: [yMax, 0],
-    domain: [0, Math.max(...data.map(y))],
+    domain: [0, Math.max(survey_ranges[data[0].category], ...data.map(y))],
+    //domain: [0, Math.max(...data.map(y))],
     nice: true
   });
 
