@@ -21,7 +21,7 @@ class Login extends React.Component {
     }
 
     componentDidMount() {
-		this.props.layout.setTitle('Login')
+        this.props.layout.setTitle('Login')
     }
 
     handleChange = (event) => {
@@ -49,13 +49,14 @@ class Login extends React.Component {
         this.props.history.push('/register')
     }
 
+    handleDemo = (event) => {
+        window.location.href='https://www.digitalpsych.org/demo-lamp.html'
+    }
+
     render = () =>
     <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
-            <Typography variant="h3" style={{ fontWeight: 500 }}>Please log in.</Typography>
-            <Typography variant="body1" color="primary" style={{ lineHeight: '0.5em', paddingLeft: 0 }}>
-                LAMP Researcher
-            </Typography>
+            <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10 }}>Log in</Typography>
             <form action="" onSubmit={this.handleSubmit}>
                 <TextField
                     required
@@ -96,15 +97,23 @@ class Login extends React.Component {
                     onClick={this.handleSubmit}>
                     Login
                     <input type="submit" style={{
-						cursor: 'pointer',
-						position: 'absolute',
-						top: 0,
-						bottom: 0,
-						right: 0,
-						left: 0,
-						width: '100%',
-						opacity: 0,
-					}}/>
+                        cursor: 'pointer',
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        width: '100%',
+                        opacity: 0,
+                    }}/>
+                </Button>
+                <br />
+                <Button
+                    variant="outlined"
+                    color="default"
+                    style={{width: '100%', marginTop: 20}}
+                    onClick={this.handleDemo}>
+                    Click here to demo the app
                 </Button>
             </form>
         </Paper>

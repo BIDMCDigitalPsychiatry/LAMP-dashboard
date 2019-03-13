@@ -172,7 +172,10 @@ class DataTable extends ArrayView {
                 {this.state.selected.length > 0 ? (
                     <Tooltip title="Delete">
                         <IconButton aria-label="Delete">
-                            <DeleteIcon />
+                            <DeleteIcon onClick={() => {
+                                this.props.deleteHandler(this.state.selected)
+                                this.setState({ selected: []})
+                            }}/>
                         </IconButton>
                     </Tooltip>
                 ) : (
