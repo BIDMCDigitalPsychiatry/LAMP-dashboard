@@ -1,31 +1,58 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { render } from "react-dom";
 import { withRouter } from 'react-router-dom';
+import { createStyles, withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import LAMP from '../lamp.js';
 import Grid from '@material-ui/core/Grid';
-
+import Fade from '@material-ui/core/Fade';
+import SurveyScheduler from '../components/survey_scheduler'
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+ 
 const styles = theme => ({
     textField: {
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
     },
+    formControl: {
+        margin: theme.spacing.unit,
+        minWidth: 400,
+    }, 
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+});
+
+const formStyles = theme => createStyles({
+  field: {
+    paddingLeft: theme.spacing.unit * 4,
+  },
+  formButtons: {
+    order: 2,
+  },
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    padding: theme.spacing.unit,
+  },
 });
 
 class Register extends React.Component {
     state = {
-        password: "",
-        passwordErrText: "",
-        password2: "",
-        password2ErrText: "",
         name: "",
         nameErrText: "",
         email: "",
         emailErrText: "",
-        address: "",
-        addressErrText: ""
+        studyName: "",
+        open: false,
     }
 
     componentDidMount() {
@@ -33,35 +60,44 @@ class Register extends React.Component {
     }
 
     validator = {
-        password: [{
+        name: [{
             test: (val) => val !== "",
-            msg: "This field is required"
-        }, {
-            test: (val) => val.length >= 8,
-            msg: "Password must be 8 characters or more"
-        }],
-        password2: [{
-            test: (val) => val !== "",
-            msg: "This field is required"
-        }, {
-            test: (val) => val === this.state.password,
-            msg: "Passwords does not match"
+            msg: "Name field is required"
         }],
         email: [{
             test: (val) => val !== "",
-            msg: "This field is required"
+            msg: "Email field is required"
         }, {
             test: (val) => val.match(/^.+@.+$/) !== null,
             msg: "Must be a valid email"
         }],
-        address: [{
-            test: (val) => val !== "",
-            msg: "This field is required"
+        studyName: [{
+            test: (val) => true,
+            msg: ""
         }],
-        name: [{
-            test: (val) => val !== "",
-            msg: "This field is required"
-        }],
+    }
+
+    validateForm = () => {
+        let errored = false
+        let errorMsg = ""
+
+        Object.keys(this.validator).forEach((field) => {
+            let erroredField = false
+            this.validator[field].forEach(({test, msg}) => {
+                if (!erroredField && !test(this.state[field])) {
+                    this.setState({[field+"ErrText"]: msg})
+                    errorMsg = msg
+                    erroredField = true
+                    errored = true;
+                }
+            })
+        })
+
+        if (errored) {
+            this.props.layout.showMessage(errorMsg)
+        }
+
+        return !errored
     }
 
     handleChange = (event) => {
@@ -70,85 +106,78 @@ class Register extends React.Component {
         const name = target.name;
 
         this.setState({[name]: value});
-
-        let errored = false;
-
-        this.validator[name].forEach(({test, msg}) => {
-            if (!errored && !test(value)) {
-                this.setState({[name+"ErrText"]: msg})
-                errored = true;
-            }
-        })
-
-        if (!errored) {
-            this.setState({[name+"ErrText"]: ""})
-        }
     }
 
-    handleSubmit = (event) => {
+    handleBack = (event) => {
         event.preventDefault()
-        let errored = false
+        this.setState(state => ({ open: false }))
+    }
 
-        Object.keys(this.validator).forEach((field) => {
-            let erroredField = false
-            this.validator[field].forEach(({test, msg}) => {
-                if (!erroredField && !test(this.state[field])) {
-                    this.setState({[field+"ErrText"]: msg})
-                    erroredField = true
-                    errored = true;
-                }
+    handleNext = (event) => {
+        event.preventDefault()
+
+        if (!this.validateForm())
+            return
+
+        this.setState(state => ({ open: true }))
+    }
+
+    handleSubmit = (payload) => {
+
+        let msgContents = JSON.stringify({
+            researcher: {
+                name: this.state.name,
+                email: this.state.email,
+                'study name': this.state.studyName
+            },
+            surveys: Object.values(payload.customSurveys),
+            schedules: payload.customSchedules
+        }, null, 4)
+
+    // Sending email to team@digitalpsych.org -> 
+    console.log("Register")
+    console.log(JSON.stringify({
+                subject: "New LAMP Registration", 
+                contents: msgContents}))
+
+    /*fetch("https://api.lamp.digital/internal/sysmsg", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                subject: "New LAMP Registration", 
+                contents: msgContents}), 
             })
+        .then(response => response.json())
+        .then(data => {
+            console.log(JSON.stringify(data))
+            this.props.layout.showMessage("Success! The system will process your request and notify you within 24 hours.")
         })
-        if (errored)
-            return this.props.layout.showMessage('Not all fields are filled out!')
+        .catch(error => {
+            console.error(error)
+            this.props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
+        })*/
 
-        LAMP.Participant.add({
-            username: this.state.username,
-            password: this.state.password,
-            first: this.state.firstname,
-            last: this.state.lastname,
-            email: this.state.email,
-            address: this.state.address,
-            city: this.state.city,
-            state: this.state.state,
-            zip: this.state.zip
-        }).then(res => {
-            if (!!res['error'])
-                this.props.layout.showMessage(`Error: ${res['error']}`)
-            else if (res['result']) {
-                LAMP.Researcher.login({
-                    username: this.state.username,
-                    password: this.state.password
-                }).then(res => {
-                    if (res['error'] !== undefined) {
-                        this.props.history.replace('/login')
-                    }
-                    else if (res['result']){
-                        this.props.history.replace('/participant')
-                    }
-                }).catch(err => {
-                    this.props.history.replace('/login')
-                })
-            }
-        }).catch(err => {
-            console.warn("Error with auth request", err)
-            this.props.layout.showMessage('Error: please try again: ' + err.message + '.')
-        })
+
+    this.setState(state => ({ open: false }))
+
     }
 
     handleLogin = (event) => this.props.history.replace('/login')
 
+    handleForms = (event) => this.props.history.replace('/forms')
+
     render = () => 
-    <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
+    <React.Fragment>
+    <Grid container justify="space-around" direction="column" alignItems="center" spacing={24} style={{marginTop: '48px'}}>
+    <Grid item xs={5}>
+    <div>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
-            <Typography variant="h1" style={{ fontWeight: 500 }}>Create an account.</Typography>
-            <Typography variant="body1" color="primary" style={{ lineHeight: '0.5em', paddingLeft: 0 }}>
-                LAMP Researcher
-            </Typography>
-                <form action="" onSubmit={this.handleSubmit}>
+            <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Register</Typography>
+                <form action="" >
                     <TextField
                         required
-                        hintText="John Torous"
                         label="Name"
                         style={{width: '100%'}}
                         margin="normal"
@@ -161,7 +190,6 @@ class Register extends React.Component {
                         />
                     <TextField
                         required
-                        hintText="john@torous.com"
                         label="Email"
                         style={{width: '100%'}}
                         margin="normal"
@@ -173,43 +201,13 @@ class Register extends React.Component {
                         onChange={this.handleChange}
                         />
                     <TextField
-                        hintText="75 Fenwood Rd, Boston, MA 02118"
-                        label="Address"
+                        label="Study Name"
                         style={{width: '100%'}}
                         margin="normal"
                         variant="outlined"
-                        name="address"
-                        value={this.state.address}
+                        name="studyName"
+                        value={this.state.studyName}
                         className={styles.textField}
-                        errorText={this.state.addressErrText}
-                        onChange={this.handleChange}
-                        />
-                    <TextField
-                        required
-                        hintText="********"
-                        label="Password"
-                        type="password"
-                        style={{width: '100%'}}
-                        margin="normal"
-                        variant="outlined"
-                        name="password"
-                        value={this.state.password}
-                        className={styles.textField}
-                        errorText={this.state.passwordErrText}
-                        onChange={this.handleChange}
-                        />
-                    <TextField
-                        required
-                        hintText="********"
-                        label="Renter Password"
-                        type="password"
-                        style={{width: '100%'}}
-                        margin="normal"
-                        variant="outlined"
-                        name="password2"
-                        value={this.state.password2}
-                        className={styles.textField}
-                        errorText={this.state.password2ErrText}
                         onChange={this.handleChange}
                         />
                     <br />
@@ -225,22 +223,50 @@ class Register extends React.Component {
                         color="primary"
                         className="submit"
                         style={{float: 'right', width: '45%'}}
-                        onClick={this.handleSubmit}>
-                        Register
+                        onClick={this.handleNext}>
+                        Next
                         <input type="submit" style={{
-							cursor: 'pointer',
-							position: 'absolute',
-							top: 0,
-							bottom: 0,
-							right: 0,
-							left: 0,
-							width: '100%',
-							opacity: 0,
-						}}/>
+                            cursor: 'pointer',
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            width: '100%',
+                            opacity: 0,
+                            marginTop: 20,
+                        }}/>
                     </Button>
+                    <br />
+                    {/*<Button
+                        variant="outlined"
+                        color="default"
+                        style={{width: '100%', marginTop: 20}}
+                        onClick={this.handleForms}>
+                        Skip Register and Take Me to Forms
+                    </Button>*/}
                 </form>
         </Paper>
-    </Grid></Grid>
+        </div>
+    </Grid>
+    </Grid>
+        <Dialog 
+            fullWidth={true}
+            maxWidth="lg"
+            open={this.state.open}
+            onClose={this.handleClose}
+            >
+            <DialogContent>
+            <SurveyScheduler 
+                onSubmit = {this.handleSubmit}
+                onCancel = {this.handleBack}
+                onError = {this.props.layout.showMessage}
+                />
+            </DialogContent>
+        </Dialog>
+    </React.Fragment>
+
 }
 
-export default withRouter(Register);
+export default withStyles(formStyles)(withRouter(Register));
+

@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Login from './pages/login.js';
 import Register from './pages/register.js';
+import Forms from './pages/forms.js';
 import Root from './pages/root.js';
 import Researcher from './pages/researcher.js';
 import Participant from './pages/participant.js';
@@ -33,6 +34,9 @@ document.loadCSS = (url) => {
 
 // Configure the UI theme settings.
 const theme = {
+    typography: {
+    useNextVariants: true,
+  },
     palette: {
         primary: blue,
         secondary: red,
@@ -86,6 +90,13 @@ LAMP.connect('https://api.lamp.digital').then(() => {
 					<NavigationLayout noToolbar>
 						<Register />
 					</NavigationLayout> :
+                    <Redirect to="/home" />
+                } />
+                <Route exact path="/forms" render={props =>
+                    !LAMP.get_identity() ?
+                    <NavigationLayout noToolbar>
+                        <Forms />
+                    </NavigationLayout> :
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/logout" render={() => {
