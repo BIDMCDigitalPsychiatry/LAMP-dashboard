@@ -12,6 +12,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import VisGallery from '../components/vis_gallery'
 import AttachmentIcon from '@material-ui/icons/Attachment';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
 import Dialog from '@material-ui/core/Dialog';
@@ -23,14 +24,17 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import {saveAs} from 'file-saver'
 import JSZip from 'jszip'
 import JSZipUtils from 'jszip-utils'
+import DataTable from '../components/datatable'
+import MaterialTable from 'material-table'
+import Popover from '@material-ui/core/Popover';
+import json2csv from 'json2csv'
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import jsonexport from 'jsonexport'
 
 //
 // import {plotGallery} from '../components/gallery_plots/base_script'
 // import {plotArgs} from '../components/gallery_plots/base_script'
-
-// The download URL for any given participant.
-const xpath = "[*].{activity:activity,start_time:date(div(start_time,\`1000\`)),end_time:date(div(end_time,\`1000\`)),summary:static_data,detail:temporal_events[*].{target:item,value:value,correct:!starts_with(to_string(type), \`\"false\"\`),elapsed_time:div(elapsed_time,\`1000.0\`),level:level},environment_location:environment_event.coordinates,location_context:environment_event.location_context,social_context:environment_event.social_context,fitness_event:fitness_event.record}"
-const csv_url = (id, auth, export_type) => `https://api.lamp.digitalpsych.org/participant/${id}/export?auth=${auth}&xpath=${xpath}&export=${export_type}`
 
 const fullDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -93,13 +97,18 @@ const plotParse = (script_sources) => {
 //
 class Researcher extends React.Component {
     state = {
+        researcher: "",
         openVizEdit: false,
         scriptText: '',
         scriptReqs: '',
         data: [],
         activities: null,
         plot_toggle: null,
-        plot_sources: null
+        plot_sources: null,
+        popoverAttachElement: null,
+        selectedIcon: null,
+        newCount: 1,
+        selectedRows: []
     }
 
     async componentWillMount() {
@@ -113,18 +122,20 @@ class Researcher extends React.Component {
             return
 		}
 
+
 		let obj = await LAMP.Researcher.view(id)
 		this.props.layout.setTitle(`Researcher ${obj[0].name}`)
         let res = await LAMP.Participant.all_by_researcher(id)
-		this.setState({ data: res })
 		let actRes = await LAMP.Activity.all_by_researcher(id)
-		this.setState({ activities: actRes })
 
         const script_sources = await docPages() //Get information from Lamp-scripts
         const plot_sources = plotParse(script_sources)
         this.setState({
             plot_sources: plot_sources,
-            plot_toggle: plot_sources.map((key) => false)
+            plot_toggle: plot_sources.map((key) => false),
+            researcher: obj[0],
+            data: res,
+            activities: actRes
         })
 
 		this.props.layout.pageLoading(true)
@@ -133,24 +144,74 @@ class Researcher extends React.Component {
     // Go to the drill-down view.
     rowSelect = (rowNumber) => this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
 
-    // Shorthand for authentication stuff.
-    _auth = () => (LAMP.auth.id + ':' + LAMP.auth.password)
+    addParticipant = async () => {
+        let newCount = this.state.newCount
+        this.setState({popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: []})
 
-    // Download ALL the data!
-    downloadAll = () => {
-        var count = this.state.data.length
-        var zip = new JSZip()
-        this.state.data.map((r) => ({id: r.id, url: csv_url(r.id, this._auth(), "csv")})).forEach((doc) => {
-            JSZipUtils.getBinaryContent(doc.url, (err, dl) => {
-                if(!!err) throw err; count--
-                zip.file(`${doc.id}.csv`, dl, {binary:true})
-                if (count === 0) {
-                    zip.generateAsync({type:'blob'}).then((content) => {
-                        saveAs(content, "export.zip")
-                    })
-                }
+        let ids = []
+        for (let i = 0; i < newCount; i ++) {
+            let newID = await LAMP.Participant.create(this.state.researcher.studies[0], {
+                study_code: "001"
+            }, {
+                untyped: true
             })
+            ids = [...ids, newID]
+        }
+        this.setState({data: [...this.state.data, ...ids]})
+    }
+
+    downloadFiles = async (filetype) => {
+
+        let selectedRows = this.state.selectedRows
+
+        this.setState({popoverAttachElement: null, selectedIcon: "", selectedRows: []})
+
+        let zip = new JSZip()
+
+        for (let row of selectedRows) {
+            let sensorEvents = await LAMP.SensorEvent.all_by_participant(row.id)
+            let resultEvents = await LAMP.ResultEvent.all_by_participant(row.id)
+
+            if (filetype === "json") {
+                zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
+                zip.file(`${row.id}/result_event.json`, JSON.stringify(resultEvents))
+            } else if (filetype === "csv") {
+
+            let jsonexport = require('jsonexport')
+
+            jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function(err, csv) {
+                if(err) return console.log(err)
+                console.log(csv)
+                zip.file(`${row.id}/sensor_event.csv`, csv)
+            })
+
+            jsonexport(JSON.parse(JSON.stringify(resultEvents)), function(err, csv) {
+                if(err) return console.log(err)
+                console.log(csv)
+                zip.file(`${row.id}/result_event.csv`, csv)
+            })
+
+            }
+        }
+         zip.generateAsync({type:'blob'}).then((content) => {
+            saveAs(content, "export.zip")
         })
+    }
+
+    deleteParticipants = async () => {
+
+        let selectedRows = this.state.selectedRows
+
+        this.setState({popoverAttachElement: null, selectedIcon: "", selectedRows: []})
+
+        for (let row of selectedRows) {
+            await LAMP.Participant.delete(row.id, {}, {untyped: true})
+        }
+
+        let tempRows = selectedRows.map(y => y.id)
+        let tempData = this.state.data.filter((x) => !tempRows.includes(x.id))
+
+        this.setState({ data:  tempData})
     }
 
     //Read Lamp-script and determine script and pictures
@@ -210,42 +271,112 @@ class Researcher extends React.Component {
                 <Typography variant="h6" color="inherit" style={{flex: 1}}>
                     Default Study
                 </Typography>
-                <Button
-                    variant="outlined"
-                    onClick={this.downloadAll}>
-                    Download All
-                    <AttachmentIcon style={{marginLeft: '8px'}} />
-                </Button>
             </Toolbar>
             <Divider />
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Study ID</TableCell>
-                        <TableCell>Study Code</TableCell>
-                        <TableCell>Last Login</TableCell>
-                        <TableCell>Device Type</TableCell>
-                        <TableCell>Download CSV</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {this.state.data.map((row, index) => (
-                        <TableRow hover key={index} onClick={(e) => this.rowSelect(index)}>
-                            <TableCell>{row.id}</TableCell>
-                            <TableCell>{row.settings.study_code}</TableCell>
-                            <TableCell>{Date.formatUTC(row.settings.last_login, fullDateFormat)}</TableCell>
-                            <TableCell>{row.settings.device_type}</TableCell>
-                            <TableCell>
-                                <IconButton
-                                    aria-label="Download"
-                                    href={csv_url(row.id, this._auth(), "csv")}>
-                                    <AttachmentIcon />
-                                </IconButton>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+        {this.state.data.length > 0 ? 
+            <MaterialTable 
+                columns={[{ title: 'Participant ID', field: 'id' }]}
+                data = {this.state.data} 
+                title = "Study Participants"
+                detailPanel={rowData => {
+                    return (
+                      <div style={{background: "white", width: "100%", height: "150px"}} />
+                    )
+                  }}
+                onRowClick={(event, rowData, togglePanel) => this.rowSelect(rowData.tableData.id)}
+                actions={[
+                    {
+                        icon: 'add_box',
+                        tooltip: 'Add Participant',
+                        isFreeAction: true,
+                        onClick: (event, rows) => this.setState({
+                            popoverAttachElement: event.currentTarget,
+                            selectedIcon: "add",
+                            selectedRows: []
+                        })
+                    },
+                    {
+                        icon: 'arrow_downward',
+                        tooltip: 'Download',
+                        onClick: (event, rows) => this.setState({
+                            popoverAttachElement: event.currentTarget,
+                            selectedIcon: "download",
+                            selectedRows: rows
+                        })
+                    },
+                    {
+                        icon: 'delete_forever',
+                        tooltip: 'Delete',
+                        onClick: (event, rows) => this.setState({
+                            popoverAttachElement: event.currentTarget,
+                            selectedIcon: "delete",
+                            selectedRows: rows
+                        })
+                    },
+                ]}
+                options={{
+                    selection: true,
+                    actionsColumnIndex: -1,
+                    pageSize: 10,
+                    pageSizeOptions: [10, 25, 50, 100]
+
+                }}
+            /> : 
+            <React.Fragment/>
+        }
+            <Popover
+              id="simple-popper"
+              open={!!this.state.popoverAttachElement}
+              anchorEl={this.state.popoverAttachElement}
+              onClose={() => this.setState({popoverAttachElement: null})}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+            >
+            {this.state.selectedIcon === "download" &&
+                <React.Fragment>
+                <MenuItem onClick={() => this.downloadFiles("csv")}>CSV</MenuItem>
+                <MenuItem onClick={() => this.downloadFiles("json")}>JSON</MenuItem>
+                </React.Fragment>
+            || this.state.selectedIcon === "add" &&
+                <div style = {{ padding: "20px" }}>
+                <TextField
+                  label="Number of participants to add:"
+                  value={this.state.newCount}
+                  onChange={(event) => this.setState({ newCount: event.target.value })}
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  margin="normal"
+                />
+
+              <IconButton 
+                aria-label = "Create" 
+                color = "primary"
+                onClick = {() => this.addParticipant()}
+                >
+                <CheckCircleIcon />
+              </IconButton>
+            </div>
+            || this.state.selectedIcon === "delete" &&
+                <div style = {{ padding: "20px" }}>
+                    <Button 
+                        variant = "raised" 
+                        color = "secondary"
+                        onClick={() => this.deleteParticipants()}
+                        >
+                        Are you sure you want to delete these participants?
+                    </Button>
+            </div>
+
+        }
+            </Popover>
         </Card>
         <br />
         <Card>

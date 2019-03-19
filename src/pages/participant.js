@@ -142,7 +142,6 @@ class Participant extends React.Component {
         }
         this.props.layout.setTitle(`Participant ${id}`)
 
-        console.log('EEE')
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
         var p2 = LAMP.ResultEvent.all_by_participant(id)

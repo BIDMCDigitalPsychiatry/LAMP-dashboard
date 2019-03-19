@@ -24,7 +24,7 @@ const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && ' ') 
 export class ObjectView extends React.Component {
 
     // Get all the keys we'll be displaying from the array.
-    displayKeys = () => Object.keys(this.props.value || {}).filter(x => !['id', 'attachments'].includes(x))
+    displayKeys = () => Object.keys(this.props.value || {}).filter(x => !((this.props.hiddenKeys || []).includes(x)))
 
     render = () =>
     <Table>
@@ -47,7 +47,7 @@ export class ObjectView extends React.Component {
 export class ArrayView extends React.Component {
 
     // Get all the keys we'll be displaying from the array.
-    displayKeys = () => Object.keys(this.props.value[0] || {}).filter(x => !['id', 'attachments'].includes(x))
+    displayKeys = () => Object.keys(this.props.value[0] || {}).filter(x => !((this.props.hiddenKeys || []).includes(x)))
 
     render = () => 
     <Table>
@@ -169,6 +169,7 @@ class DataTable extends ArrayView {
             </div>
             <div style={{flex: '1 1 100%'}} />
             <div color="secondary">
+                {this.props.additionalButtons}
                 {this.state.selected.length > 0 ? (
                     <Tooltip title="Delete">
                         <IconButton aria-label="Delete">

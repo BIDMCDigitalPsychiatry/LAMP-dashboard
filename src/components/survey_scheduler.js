@@ -232,7 +232,6 @@ export default class SurveyScheduler extends React.Component {
         <div style={{marginTop: 20}} />
         {this.state.customSchedules.length > 0 ? 
             <DataTable style={{width: "50%"}} value = {this.state.customSchedules} deleteHandler = {(buttonIds)=>{
-                console.log("deleting")
                 let tmp = this.state.customSchedules
                 for (let i=buttonIds.length - 1; i >= 0 ; i--) {
                    tmp.splice(buttonIds[i], 1)
