@@ -61,11 +61,11 @@ const surveyCatMap = {'Today I feel little interest or pleasure':'Mood',
                       'Last night I had trouble falling asleep':'Sleep',
                       'This morning I was up earlier than I wanted':'Sleep',
                       'In the last THREE DAYS, I have taken my medications as scheduled':'Medication',
-                      'In the last THREE DAYS, during the daytime I have gone outside my home':'Social',
-                      'In the last THREE DAYS, I have had someone to talk to':'Social',
-                      'In the last THREE DAYS, I have preferred to spend time alone':'Social_Reverse',
-                      'In the last THREE DAYS, I have felt uneasy with groups of people':'Social_Reverse',
-                      'In the last THREE DAYS, I have had arguments with other people':'Social_Reverse',
+                      'In the last THREE DAYS, during the daytime I have gone outside my home':'Social_Reverse',
+                      'In the last THREE DAYS, I have had someone to talk to':'Social_Reverse',
+                      'In the last THREE DAYS, I have preferred to spend time alone':'Social',
+                      'In the last THREE DAYS, I have felt uneasy with groups of people':'Social',
+                      'In the last THREE DAYS, I have had arguments with other people':'Social',
                       'Today I feel anxious':'Anxiety',
                       'Today I cannot stop worrying':'Anxiety',
                       'Today I am worrying too much about different things':'Anxiety',
@@ -176,7 +176,6 @@ class ParticipantView extends React.Component {
 		}
         this.props.layout.setTitle(`Participant ${id}`)
 
-        console.log('EEE')
         // Fetch all participant-related data streams.
         var p1 = LAMP.Activity.all_by_participant(id)
         var p2 = LAMP.ResultEvent.all_by_participant(id)
@@ -228,12 +227,13 @@ class ParticipantView extends React.Component {
                     timeline.push(resT.slice(sliceIdx, resT.length))
             }
 
-            //let surveyData = this.surveyLongitudinalPlotData(timeline)
+            let surveyData = this.surveyLongitudinalPlotData(timeline)
 
             // Update state now with the fetched & computed objects.
             
-            this.setState({ timeline: timeline})//, surveyData: surveyData})
+            this.setState({ timeline: timeline, surveyData: surveyData})
 			this.props.layout.pageLoading(true)
+            
         })
     }
 
@@ -265,14 +265,14 @@ class ParticipantView extends React.Component {
 
         //Split surveys results based on category
         let surveyCategories = Object.values(surveyCatMap).filter((value, index, self) => self.indexOf(value) === index)
-        console.log(surveyCategories)
+        
         let surveyDataDict = {}
         let result_events_slice = timeline.filter(x => !!x.find(y => y.event_type === 'result'))
         for (var i = 0; i < result_events_slice.length; i++) {
             let slice = result_events_slice[i]
             for (var j = 0; j < slice.length; j++) {
                 let event = slice[j]
-                console.log(event)
+                
                 if (event.event_type === "result") {
                     if (!!event.summary.survey_name) {
 
@@ -280,13 +280,34 @@ class ParticipantView extends React.Component {
                         let eventDataDict = {}
                         event.detail.map(question => {
                             if (question.item in surveyCatMap) {
-                                surveyCatMap[question.item] in eventDataDict ? eventDataDict[surveyCatMap[question.item]].push(question) : surveyDataDict[surveyCatMap[question.item]] = [event]
-                            }})
+                                let category = surveyCatMap[question.item]
+                                //Flip social score
+                                if (category == 'Social_Reverse') { 
+                                    question.value = 3 - question.value
+                                    category = 'Social'
+                                }
+
+                                if (category in eventDataDict) {
+                                    eventDataDict[category].push(question) 
+                                }
+                                else { 
+                                    eventDataDict[category] = [question] 
+                                }
+                            }
+                        })
+
                         Object.keys(eventDataDict).map(surveyCat => {
                             let event_copy = JSON.parse(JSON.stringify(event))
                             event_copy.detail = eventDataDict[surveyCat]
                             event_copy.summary = {survey_name: surveyCat}
-                            return event_copy
+                            if (!(surveyCat in surveyDataDict)) {
+                                surveyDataDict[surveyCat] = [event_copy]
+                            }
+
+                            else {
+                                surveyDataDict[surveyCat].push(event_copy)
+                            }
+
                         })
                     } 
                 }           
@@ -294,17 +315,29 @@ class ParticipantView extends React.Component {
         }
         
         //Sort survey groups by time
-        let sortedSurveyDataDict = {}
-        let sortedSurveys = Object.keys(surveyDataDict).map(cat => surveyDataDict[cat].sort(
+        Object.keys(surveyDataDict).map(cat => surveyDataDict[cat].sort(
             function timestamp_compare(res1, res2) {
                 if (res1['timestamp'] < res2['timestamp']) {
                     return -1}
                 return 1
-            }).map(event => ({date: new Date(event.timestamp), value: event.detail.map(ques => ques.value).reduce((val, total_val) => val + total_val)}))
+            })
         )
-        
-        Object.keys(surveyDataDict).forEach((key, i) => sortedSurveyDataDict[key] = sortedSurveys[i])
 
+        let sortedSurveyDataDict = Object.entries(surveyDataDict).reduce((cur, prev) => {
+            cur[prev[0]] = []; return cur
+        }, {})
+
+
+        Object.keys(sortedSurveyDataDict).map(cat => surveyDataDict[cat].map(
+            event => event.summary.survey_name == 'Social'? sortedSurveyDataDict[cat].push(
+                {category: cat, date: new Date(event.timestamp), value: event.detail.map(ques => ques.value).reduce((val, total_val) => val + total_val) / event.detail.length}       
+                )
+                : sortedSurveyDataDict[cat].push(
+                {category: cat, date: new Date(event.timestamp), value: event.detail.map(ques => ques.value).reduce((val, total_val) => val + total_val)}       
+                )
+            )
+        )
+        console.log(sortedSurveyDataDict)
         return sortedSurveyDataDict
     }
 
@@ -364,7 +397,7 @@ class ParticipantView extends React.Component {
     render = () =>
     <div>
         <React.Fragment>
-            {/*{Object.keys(this.state.surveyData).map(cat => 
+            {Object.keys(this.state.surveyData).map(cat =>
             <Card>
                 <Typography component="h5" variant="h5">
                     {cat}
@@ -377,7 +410,7 @@ class ParticipantView extends React.Component {
                     height={400}/>
             </Card>
                 )
-            }*/}
+            }
             
         </React.Fragment>
     </div>
