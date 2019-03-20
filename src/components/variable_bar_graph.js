@@ -18,6 +18,12 @@ export default withTheme()(withParentSize(withTooltip(props => {
 	if (!props.data || props.data.length === 0) return null;
 	let data = props.data
 
+	//Change y if trails/jewels
+	data = data.map((x, i) => ({
+		...x,
+		y: x.y == null ? parseInt(x.longTitle) : x.y
+	}))	
+
 	// Set the fill color based on the current material UI theme.
 	let fillColor = (props.theme.palette.type || 'light') === 'light' ? '#212121' : '#ffffff'
 
