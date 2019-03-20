@@ -23,13 +23,16 @@ import PublicIcon from '@material-ui/icons/Public';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Document, Page } from 'react-pdf'
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import VariableBarGraph from '../components/variable_bar_graph.js'
 import Grid from "@material-ui/core/Grid/Grid";
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { rangeTo } from '../components/utils'
 import HorizontalScroll from 'react-scroll-horizontal'
+import Map from 'pigeon-maps'
+import Marker from 'pigeon-marker'
+import Overlay from 'pigeon-overlay'
+
 
 const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -149,7 +152,6 @@ class Participant extends React.Component {
         Promise.all([p1, p2, p3]).then(res => {
             // Flatten all linked activities' names into each Result object.
             let res1 = res[1].map(x => ({
-                id: x.id,
                 event_type: 'result',
                 timestamp: x.timestamp,
                 duration: x.duration,
@@ -159,7 +161,7 @@ class Participant extends React.Component {
                         }).spec
                 ),
                 name: (
-                    !x.activity ? 
+                    !!x.static_data.survey_name ? 
                     x.static_data.survey_name :
                    (res[0].find(y => x.activity === y.id) || {}).name
                 ),
@@ -169,9 +171,6 @@ class Participant extends React.Component {
 
             let res2 = res[2].map(x => {
                 x.event_type = 'sensor'
-                if (!!x.accuracy)
-                    x.coordinates = x.coordinates.split(',').map(x => parseFloat(x))
-                else x.coordinates = [0, 0]
                 return x
             })
 
@@ -208,9 +207,10 @@ class Participant extends React.Component {
 
         // Toggle the event ID from the state's selected list.
         var array = this.state.selected
-        if (!array.includes(event.id))
-            array.push(event.id)
-        else array = array.filter(x => x !== event.id)
+
+        if (!array.includes(event.timestamp))
+            array.push(event.timestamp)
+        else array = array.filter(x => x !== event.timestamp)        
 
         this.setState({ selected: array })
     }
@@ -409,13 +409,13 @@ class Participant extends React.Component {
 					alignItems="stretch"
 					spacing={8}>
 					<Grid item xs={3}>
-						{[slice.find(x => x.event_type === 'environment' && !!x.coordinates)].filter(x => x).map(event =>
-							<Map style={{width: '100%', height: '100%'}}
-								 center={event.coordinates}
-								 zoom={12}>
-								<TileLayer url="https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYXZhaWR5YW0iLCJhIjoiY2ptdXgxYnRsMDBsNjNwczljamFqcGhlbCJ9.i83hpdMr12ylrgJGAWsjWw" />
-								<Marker position={event.coordinates} />
-							</Map>
+						{[slice.find(x => x.event_type === 'sensor' && x.sensor === 'lamp.gps.contextual')].filter(x => x).map(event =>
+                            <Map center={[event.data.latitude, event.data.longitude]} zoom={12}>
+                                <Marker anchor={[event.data.latitude, event.data.longitude]} payload={1} onClick={({ event, anchor, payload }) => {} } />
+                                    <Overlay anchor={[event.data.latitude, event.data.longitude]} offset={[120, 79]}>
+                                      <img src='pigeon.jpg' width={240} height={158} alt='' />
+                                    </Overlay>
+                            </Map>                   
 						)}
 					</Grid>
 					<Grid container item
@@ -425,32 +425,33 @@ class Participant extends React.Component {
 						  alignItems="stretch"
 						  spacing={8}>
 						<Grid item xs={6}>
-							{[slice.find(x => !!x.location_context)].map(event =>
-								<Tooltip title={!event ? 'home' : event.location_context}>
-									<ListItemIcon>{this.iconMap.location[!event ? 'home' : event.location_context]}</ListItemIcon>
+							{[slice.find(x => x.event_type === 'sensor' && x.sensor === 'lamp.gps.contextual')].map(event =>
+								<Tooltip title={!event ? 'home' : event.data.context.environment}>
+									<ListItemIcon>{this.iconMap.location[!event ? 'home' : event.data.context.environment]}</ListItemIcon>
 								</Tooltip>
 							)}
 						</Grid>
 						<Grid item xs={6}>
-							{[slice.find(x => !!x.social_context)].map(event =>
-								<Tooltip title={!event ? 'alone' : event.social_context}>
-									<ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.social_context]}</ListItemIcon>
+							{[slice.find(x => x.event_type === 'sensor' && x.sensor === 'lamp.gps.contextual')].map(event =>
+								<Tooltip title={!event ? 'alone' : event.data.context.social}>
+									<ListItemIcon>{this.iconMap.social[!event ? 'alone' : event.data.context.social]}</ListItemIcon>
 								</Tooltip>
 							)}
 						</Grid>
 					</Grid>
 					<Grid item xs={8}>
 						<List>
-							{[slice.find(x => x.event_type === 'environment')].filter(x => x).map(event =>
+							{[slice.find(x => x.event_type === 'sensor')].filter(x => x).map(event =>
 								<ListItem>
 									<ListItemText
 										primaryTypographyProps={{variant: 'title'}}
-										primary={Date.formatUTC(event.timestamp, hourOnlyDateFormat)}
+										primary={(Date.formatUTC(parseInt(event.timestamp), hourOnlyDateFormat))}
 										secondary={
-											slice.filter(x => x.event_type === 'fitness')
-												.map(fit => fit.type.replace('_', ' ') + ': ' + fit.value)
+											slice.filter(x => !x.sensor === 'lamp.gps.contextual')
+												.map(fit => fit.sensor.replace('_', ' ').replace('lamp.', '') + ': ' + fit.data.value)
 												.join(', ')
 										} />
+                                    }
 								</ListItem>
 							)}
 							{slice.filter(x => x.event_type === 'result').map(event => [
@@ -461,7 +462,7 @@ class Participant extends React.Component {
 										primaryTypographyProps={{variant: 'body2'}}
 										primary={event.name} />
 									{
-										this.state.selected.includes(event.id) ?
+										this.state.selected.includes(event.timestamp) ?
 											<ListItemIcon style={{marginRight: 0}}>
 												<ExpandLessIcon />
 											</ListItemIcon> :
@@ -474,7 +475,7 @@ class Participant extends React.Component {
 								</ListItem>,
 								<Collapse
 									style={{ width: '90%', marginBottom: 10, marginLeft: 'auto', marginRight: 'auto' }}
-									in={this.state.selected.includes(event.id)}
+									in={this.state.selected.includes(event.timestamp)}
 									timeout="auto"
 									unmountOnExit>
 									<VariableBarGraph
