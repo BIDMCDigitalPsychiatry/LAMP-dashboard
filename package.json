@@ -21,20 +21,23 @@
     "json2csv": "^4.3.5",
     "jsonexport": "^2.4.1",
     "jsonschema-form-for-material-ui": "^1.4.0",
-    "jszip": "^3.1.5",
+    "jszip": "^3.2.0",
     "jszip-utils": "0.0.2",
     "leaflet": "^1.4.0",
     "material-table": "^1.23.6",
     "material-ui-pickers": "^2.2.4",
-    "mui-datatables": "^2.0.0-beta-54",
-    "react": "^16.8.1",
+    "mui-datatables": "^2.0.0-beta-9",
+    "pigeon-maps": "^0.11.11",
+    "pigeon-marker": "^0.3.4",
+    "pigeon-overlay": "^0.2.3",
+    "react": "^16.8.4",
     "react-animated-tree": "^1.0.10",
-    "react-dom": "^16.8.1",
+    "react-dom": "^16.8.4",
     "react-dropzone": "^10.0.0",
     "react-event-timeline": "^1.6.3",
     "react-jsonschema-form": "^1.3.0",
     "react-jsonschema-materialui-forms": "0.0.17",
-    "react-leaflet": "^2.2.0",
+    "react-leaflet": "^2.2.1",
     "react-pdf": "^3.0.6",
     "react-router-dom": "^4.3.1",
     "react-scroll-horizontal": "^1.6.2"
@@ -43,5 +46,11 @@
     "start": "BROWSER=none react-scripts start",
     "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
     "deploy": "aws s3 sync build/ `echo $DASHBOARD_DEPLOY_S3_BUCKET`"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
