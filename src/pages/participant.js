@@ -451,7 +451,7 @@ class Participant extends React.Component {
 												.map(fit => fit.sensor.replace('_', ' ').replace('lamp.', '') + ': ' + fit.data.value)
 												.join(', ')
 										} />
-                                    }
+                                    
 								</ListItem>
 							)}
 							{slice.filter(x => x.event_type === 'result').map(event => [
