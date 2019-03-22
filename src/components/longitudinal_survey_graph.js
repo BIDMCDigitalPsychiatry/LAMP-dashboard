@@ -48,7 +48,7 @@ function numTicksForWidth(width) {
 }
 
 export default withParentSize((props) => {
-  console.log(props)
+  
   let data = props.data
   // If no width or height is manually provided, take the parent element's.
   // Adjust the width and height to support axes and 1% padding.
@@ -56,7 +56,6 @@ export default withParentSize((props) => {
   let height = props.height || props.parentHeight
   let margin = props.margin 
 
-  console.log(margin)
 
   // bounds
   const xMax = width - margin.left - margin.right;
@@ -72,7 +71,6 @@ export default withParentSize((props) => {
     range: [0, xMax],
     domain: [Math.min(...data.map(x)), Math.max(...data.map(x))]
   });
-  //console.dir(data)
 
   const yScale2 = scaleLinear({
     range: [yMax, 0],

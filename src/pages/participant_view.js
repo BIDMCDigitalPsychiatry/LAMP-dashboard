@@ -334,7 +334,7 @@ class ParticipantView extends React.Component {
                 )
             )
         )
-        console.log(sortedSurveyDataDict)
+        
         return sortedSurveyDataDict
     }
 
