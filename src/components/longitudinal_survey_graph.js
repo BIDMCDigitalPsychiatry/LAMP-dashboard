@@ -10,6 +10,7 @@ import { GlyphDot } from '@vx/glyph';
 import { scaleTime, scaleLinear } from '@vx/scale';
 import { extent } from 'd3-array';
 import { curveMonotoneX } from '@vx/curve';
+import { withParentSize } from '@vx/responsive'
 
 //standard surveys ranges
 const survey_ranges = {
@@ -18,6 +19,15 @@ const survey_ranges = {
   'Psychosis': 10,
   'Mood': 10,
   'Sleep': 10
+}
+
+const survey_colors = {
+  'Social': '#a442f4',
+  'Anxiety': '#f49841',
+  'Psychosis': '#f44141',
+  'Mood':'#41f44f',
+  'Sleep':'#416df4',
+  'Medication':'#dcf441'
 }
 
 // accessors
@@ -37,13 +47,16 @@ function numTicksForWidth(width) {
   return 10;
 }
 
-export default (props) => {
+export default withParentSize((props) => {
+  console.log(props)
   let data = props.data
-  let width = props.width
-  let height = props.height
+  // If no width or height is manually provided, take the parent element's.
+  // Adjust the width and height to support axes and 1% padding.
+  let width = props.width || props.parentWidth
+  let height = props.height || props.parentHeight
   let margin = props.margin 
 
-  //console.log(data)
+  console.log(margin)
 
   // bounds
   const xMax = width - margin.left - margin.right;
@@ -63,7 +76,7 @@ export default (props) => {
 
   const yScale2 = scaleLinear({
     range: [yMax, 0],
-    domain: [0, Math.max(survey_ranges[data[0].category], ...data.map(y))],
+    domain: [0, 3],
     //domain: [0, Math.max(...data.map(y))],
     nice: true
   });
@@ -91,7 +104,7 @@ export default (props) => {
           y={y}
           xScale={xScale2}
           yScale={yScale2}
-          stroke={primary}
+          stroke={survey_colors[data[0].category]}
           strokeWidth={3}
           curve={curveMonotoneX}
         />
@@ -112,11 +125,11 @@ export default (props) => {
           scale={yScale2}
           hideZero
           numTicks={numTicksForHeight(height)}
-          label="Score"
+          label="Mean Question Score"
           labelProps={{
             fill: '#333333',
             textAnchor: 'middle',
-            fontSize: 28,
+            fontSize: 14,
             fontFamily: 'Arial'
           }}
           stroke="#1a1a1a"
@@ -139,6 +152,12 @@ export default (props) => {
           scale={xScale2}
           numTicks={numTicksForWidth(width)}
           label="Day"
+          labelProps={{
+            fill: '#333333',
+            textAnchor: 'middle',
+            fontSize: 14,
+            fontFamily: 'Arial'
+          }}
         >
           {axis => {
             const tickLabelSize = 10;
@@ -175,4 +194,4 @@ export default (props) => {
       </Group>
     </svg>
   );
-};
+});

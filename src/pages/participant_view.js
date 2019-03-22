@@ -329,11 +329,8 @@ class ParticipantView extends React.Component {
 
 
         Object.keys(sortedSurveyDataDict).map(cat => surveyDataDict[cat].map(
-            event => event.summary.survey_name == 'Social'? sortedSurveyDataDict[cat].push(
+            event => sortedSurveyDataDict[cat].push(
                 {category: cat, date: new Date(event.timestamp), value: event.detail.map(ques => ques.value).reduce((val, total_val) => val + total_val) / event.detail.length}       
-                )
-                : sortedSurveyDataDict[cat].push(
-                {category: cat, date: new Date(event.timestamp), value: event.detail.map(ques => ques.value).reduce((val, total_val) => val + total_val)}       
                 )
             )
         )
@@ -395,25 +392,41 @@ class ParticipantView extends React.Component {
     }
 
     render = () =>
-    <div>
-        <React.Fragment>
-            {Object.keys(this.state.surveyData).map(cat =>
-            <Card>
-                <Typography component="h5" variant="h5">
-                    {cat}
-                </Typography>
-                <LongitudinalSurveyGraph
-                    rotateText
-                    data={this.state.surveyData[cat]}
-                    width = {1000}
-                    margin = {{left:100, right:100, top:100, bottom:100}}
-                    height={400}/>
-            </Card>
-                )
-            }
-            
-        </React.Fragment>
-    </div>
+    <React.Fragment>
+    {Object.keys(this.state.surveyData).map(cat =>
+        <Card key={cat} style={{ marginBottom: 20, paddingTop: 20 }}>
+            <Grid container
+                  direction="column"
+                  justify="space-around"
+                  alignItems="center"
+                  spacing={8}>
+                <Grid item xs={8}>
+                    <Typography variant="h3">
+                        {cat}
+                    </Typography>
+                </Grid>
+            </Grid>
+            <Grid container
+                  direction="row"
+                  justify="space-around"
+                  alignItems="center"
+                  spacing={8}>
+                <Grid item>
+                        <LongitudinalSurveyGraph
+                            rotateText
+                            data={this.state.surveyData[cat]}
+                            height={400}
+                            width={800}
+                            margin = {{left: 60, right:60, top:60, bottom:60}} />
+                        <p style={{color: 'white'}}>
+                        .
+                        </p>
+                    
+                </Grid>
+            </Grid>
+        </Card>
+    )}
+    </React.Fragment>
 }
 
 export default withRouter(ParticipantView)
