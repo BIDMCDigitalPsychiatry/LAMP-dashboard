@@ -124,6 +124,7 @@ class Researcher extends React.Component {
 
 
 		let obj = await LAMP.Researcher.view(id)
+        console.log(obj)
 		this.props.layout.setTitle(`Researcher ${obj[0].name}`)
         let res = await LAMP.Participant.all_by_researcher(id)
 		let actRes = await LAMP.Activity.all_by_researcher(id)
@@ -142,8 +143,15 @@ class Researcher extends React.Component {
     }
 
     // Go to the drill-down view.
-    rowSelect = (rowNumber) => this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
+    rowSelect = (rowNumber) => {
+        if (this.state.researcher.id == 'UmVzZWFyY2hlcjo3Mw~~') {
+            this.props.history.push(`/researcher/neuropsych_participant/${this.state.data[rowNumber].id}`)    
+        }
 
+        else {
+            this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
+        }
+    }
     addParticipant = async () => {
         let newCount = this.state.newCount
         this.setState({popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: []})

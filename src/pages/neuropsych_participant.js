@@ -29,6 +29,7 @@ import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
 import { rangeTo } from '../components/utils'
 import HorizontalScroll from 'react-scroll-horizontal'
+import LongitudinalSurveyGraphNP from '../components/longitudinal_survey_graph_np.js'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
 import Overlay from 'pigeon-overlay'
@@ -97,13 +98,13 @@ const surveyMap = {
     "When I see others who are doing worse than I am, I feel relieved about my own situation" : "Relieved"
 }
 
-class Participant extends React.Component {
+class NeuroPsychParticipant extends React.Component {
     state = {
         timeline: [],
         attachments: [],
         selected: [],
         avgData: [],
-
+        surveyData: [],
 		zoomLevel: 4, // default grid setting for plots!
         ping: null
     }
@@ -194,14 +195,14 @@ class Participant extends React.Component {
             }
 
             let avgData = this.surveyBarPlotData(timeline) || []
-
-            console.log(avgData)
-
+            let surveyData = this.surveyQuestionPlotData(timeline)
+            //console.log(avgData)
             // Update state now with the fetched & computed objects.
-            this.setState({ timeline: timeline, avgData: avgData })
+            this.setState({ timeline: timeline, avgData: avgData, surveyData: surveyData })            
             this.props.layout.pageLoading(true)
         })
     }
+
 
 
     handleClick = (event) => {
@@ -229,42 +230,59 @@ class Participant extends React.Component {
         else return {palette: {type: 'dark', background: {paper: '#212121'}}}
     }
 
+    surveyQuestionPlotData = (timeline) => {
+        let allSurveyData = Array.from(new Set(timeline.map(slice => slice.filter(event => !!event.name && event.name.toUpperCase() == "DAILY PATIENT SUMMARY")).reduce((prev, curr) => { return prev.concat(curr)}))).sort((a, b) => a.timestamp - b.timestamp)
+        let questionDict = {}
+        
+        allSurveyData.map(event => {
+            event.detail.map(question => {
+                !!questionDict[question.item] ? questionDict[question.item].push({'category':question.item, 'value':parseInt(question.value), 'date':new Date(event.timestamp)}) : questionDict[question.item] = [{'category':question.item, 'value':parseInt(question.value), 'date':new Date(event.timestamp)}]
+            })
+        })
+
+        return questionDict
+    }
+
     surveyBarPlotData = (timeline) => {
 
     	// Accumulate all survey data into a single object from the timeline.
 		let surveyData = []
 		timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
-			slice.filter(x => (x.event_type === 'result' && x.activity_type == null)).map(event => [
+			slice.filter(x => (x.event_type === 'result' && !!x.summary)).filter(x => (!!x.summary.survey_name)).map(event => [
 				surveyData.push(event)
 			])])
 
-		// Iterate over every survey taken and assort into one average list.
-		// Ignore the survey if we don't mark it in the usableSurveys list.
-		let averageData = rangeTo(32).map(() => [])
+        let questions = surveyData[0].detail.map(question => question.item)
+
+
+
         
-		for (let i = 0; i < surveyData.length; i++) {
-            if(!!surveyData[i].summary.survey_name) {
-    			let slot = usableSurveys[surveyData[i].summary.survey_name.toUpperCase()]
-    			if (slot === undefined) continue;
-                
-    			for (let j = 0; j < surveyData[i].detail.length && j < slot[1]; j++) {
-    				averageData[slot[0] + j].push({
-    					x: surveyData[i].detail[j].duration,
-    					y: surveyData[i].detail[j].value,
-    					z: surveyData[i].detail[j].item
-    				})
-    			}
+        let averageData = []
+        questions.map(question => {
+            let subAvgData = []
+            for (let i = 0; i < surveyData.length; i++) {
+                for (let j = 0; j < surveyData[i].detail.length; j++) {
+                    if (surveyData[i].detail[j].item == question) {
+                        subAvgData.push({
+                            x: surveyData[i].detail[j].duration,
+                            y: surveyData[i].detail[j].value,
+                            z: surveyData[i].detail[j].item
+                        })
+                    }
+                }
             }
-        }
-        
+            averageData.push(subAvgData)
+        })
+        console.log(averageData)
 
         // Compress the average data arrays (x32) into single event summaries (x32).
         return this.convertGraphData({ detail: averageData.map(a => ({
                 duration: a.reduce((a, b) => a + b.x, 0) / a.length,
-                value: a.reduce((a, b) => a + b.y, 0) / a.length,
+                value: a.reduce((a, b) => a + parseInt(b.y), 0) / a.length,
                 item: a.length > 0 ? a[0].z : ''
             }))})
     }
+
 
     timelineData = () => {
 
@@ -354,47 +372,25 @@ class Participant extends React.Component {
             rotateText
             data={this.state.avgData}
             height={400}/>
-		{!this.state.attachments ? <div/> :
-			<React.Fragment>
-				<Toolbar>
-					<Typography gutterBottom variant="h2">Visualizations</Typography>
-                    <div style={{ flexGrow: 1 }} />
-					<Typography variant="body1" style={{marginRight: 16}}>
-						Zoom
-					</Typography>
-					<ToggleButtonGroup value={this.state.zoomLevel} exclusive onChange={(e, x) => this.setState({ zoomLevel: x })}>
-						<ToggleButton value={3}>1</ToggleButton>
-						<ToggleButton value={4}>2</ToggleButton>
-						<ToggleButton value={6}>3</ToggleButton>
-						<ToggleButton value={12}>4</ToggleButton>
-					</ToggleButtonGroup>
-                </Toolbar>
-				<br />
-                <Grid
-                    container
-                    direction="row"
-                    justify="space-around"
-                    alignItems="stretch"
-                    spacing={32}>
-                    {!this.state.attachments ? <div/> : this.state.attachments.filter(Boolean).map(attach =>
-                        <Grid item xs={this.state.zoomLevel}>
-                            <Card style={{ padding: '.3rem' }}>
-								<Document
-									file={'data:application/pdf;base64,' + attach}
-									error={
-										<Typography variant="body1" color="error">
-											Visualization error occurred.
-										</Typography>
-									}
-									loading="">
-									<Page renderMode="svg" pageIndex={0}/>
-								</Document>
-							</Card>
-                        </Grid>
-                    )}
-				</ Grid>
-			</React.Fragment>
-		}
+        <div>
+            <React.Fragment>
+                <Typography gutterBottom variant="h2">Visualizations</Typography>
+                {Object.keys(this.state.surveyData).map(cat =>
+                    <Card>
+                        <Typography component="h5" variant="h5">
+                            {cat}
+                        </Typography>
+                        <LongitudinalSurveyGraphNP
+                            rotateText
+                            data={this.state.surveyData[cat]}
+                            width = {1000}
+                            margin = {{left:100, right:100, top:100, bottom:100}}
+                            height={400}/>
+            </Card>
+                )}
+            </React.Fragment>
+        </div>
+
         <Divider style={{ marginTop: 32, marginBottom: 32 }} />
 		<Toolbar>
 			<Typography gutterBottom variant="h2">Timeline</Typography>
@@ -444,7 +440,7 @@ class Participant extends React.Component {
 					</Grid>
 					<Grid item xs={8}>
 						<List>
-							{[slice.find(x => x.event_type === 'sensor')].filter(x => x).map(event =>
+							{[slice[0]].map(event =>
 								<ListItem>
 									<ListItemText
 										primaryTypographyProps={{variant: 'title'}}
@@ -497,4 +493,4 @@ class Participant extends React.Component {
     </div>
 }
 
-export default withRouter(Participant)
+export default withRouter(NeuroPsychParticipant)
