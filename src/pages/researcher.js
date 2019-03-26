@@ -273,7 +273,6 @@ class Researcher extends React.Component {
                 </Typography>
             </Toolbar>
             <Divider />
-        {this.state.data.length > 0 ? 
             <MaterialTable 
                 columns={[{ title: 'Participant ID', field: 'id' }]}
                 data = {this.state.data} 
@@ -321,8 +320,7 @@ class Researcher extends React.Component {
                     pageSizeOptions: [10, 25, 50, 100]
 
                 }}
-            /> : 
-            <React.Fragment/>
+            /> 
         }
             <Popover
               id="simple-popper"

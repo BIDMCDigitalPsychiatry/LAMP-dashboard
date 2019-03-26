@@ -175,6 +175,7 @@ class Register extends React.Component {
     <div>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Register</Typography>
+                <Typography variant="caption" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Sign up to start customizing your study.</Typography>
                 <form action="" >
                     <TextField
                         required
@@ -201,7 +202,7 @@ class Register extends React.Component {
                         onChange={this.handleChange}
                         />
                     <TextField
-                        label="Study Name"
+                        label="Study Name (Optional)"
                         style={{width: '100%'}}
                         margin="normal"
                         variant="outlined"
@@ -252,7 +253,7 @@ class Register extends React.Component {
     </Grid>
         <Dialog 
             fullWidth={true}
-            maxWidth="lg"
+            maxWidth="md"
             open={this.state.open}
             onClose={this.handleClose}
             >
