@@ -134,7 +134,7 @@ class NeuroPsychParticipant extends React.Component {
         year: '2-digit', month: '2-digit', day: '2-digit',
     }
 
-    componentWillMount() {
+    async componentWillMount() {
         this.props.layout.pageLoading(false)
 
         let { id } = this.props.match.params
@@ -148,62 +148,104 @@ class NeuroPsychParticipant extends React.Component {
         this.props.layout.setTitle(`Participant ${id}`)
 
         // Fetch all participant-related data streams.
-        var p1 = LAMP.Activity.all_by_participant(id)
-        var p2 = LAMP.ResultEvent.all_by_participant(id)
-        var p3 = LAMP.SensorEvent.all_by_participant(id)
-        Promise.all([p1, p2, p3]).then(res => {
-            // Flatten all linked activities' names into each Result object.
-            let res1 = res[1].map(x => ({
-                event_type: 'result',
-                timestamp: x.timestamp,
-                duration: x.duration,
-                activity_type: (
-                        !!x.activity ? null : res[0].find(y => {
-                            return x.activity === y.id
-                        }).spec
-                ),
-                name: (
-                    !!x.static_data.survey_name ? 
-                    x.static_data.survey_name :
-                   (res[0].find(y => x.activity === y.id) || {}).name
-                ),
-                summary: x.activity === null ? null : x.static_data,
-                detail: x.temporal_events
-            }))
+        const [activities, result_events, sensor_events] = await Promise.all([
+            LAMP.Activity.all_by_participant(id), 
+            LAMP.ResultEvent.all_by_participant(id), 
+            LAMP.SensorEvent.all_by_participant(id)
+        ])
 
-            let res2 = res[2].map(x => {
-                x.event_type = 'sensor'
-                return x
-            })
+        // Flatten all linked activities' names into each Result object.
+        let res1 = result_events.map(x => ({
+            event_type: 'result',
+            timestamp: x.timestamp,
+            duration: x.duration,
+            activity_type: (
+                    !!x.activity ? null : activities.find(y => {
+                        return x.activity === y.id
+                    }).spec
+            ),
+            name: (
+                !!x.static_data.survey_name ? 
+                x.static_data.survey_name :
+               (activities.find(y => x.activity === y.id) || {}).name
+            ),
+            summary: x.activity === null ? null : x.static_data,
+            detail: x.temporal_events
+        }))
 
-            // Compute a timeline data stream sorted by timestamp.
-            let resT = [].concat(res1, res2)
-                             .sort((a, b) => b.timestamp - a.timestamp)
-
-            // Create sub-slices into the timeline grouped by environmental context.
-            let timeline = []
-            for (var i = 1, sliceIdx = 0; i <= resT.length - 2; i++) {
-                var diff = resT[i - 1].timestamp - resT[i].timestamp
-
-                // Determine whether this is a new sub-slice point (or the end of the timeline).
-                if (Math.floor(diff / (60 * 60 * 1000)) > 0) {
-                    timeline.push(resT.slice(sliceIdx, i))
-                    sliceIdx = i
-                }
-                if (i == resT.length - 3)
-                    timeline.push(resT.slice(sliceIdx, resT.length))
-            }
-
-            let avgData = this.surveyBarPlotData(timeline) || []
-            let surveyData = this.surveyQuestionPlotData(timeline)
-            //console.log(avgData)
-            // Update state now with the fetched & computed objects.
-            this.setState({ timeline: timeline, avgData: avgData, surveyData: surveyData })            
-            this.props.layout.pageLoading(true)
+        let res2 = sensor_events.map(x => {
+            x.event_type = 'sensor'
+            return x
         })
+
+        // Compute a timeline data stream sorted by timestamp.
+        let resT = [].concat(res1, res2)
+                         .sort((a, b) => b.timestamp - a.timestamp)
+
+        // Create sub-slices into the timeline grouped by environmental context.
+        let timeline = []
+        for (var i = 1, sliceIdx = 0; i <= resT.length - 2; i++) {
+            var diff = resT[i - 1].timestamp - resT[i].timestamp
+
+            // Determine whether this is a new sub-slice point (or the end of the timeline).
+            if (Math.floor(diff / (60 * 60 * 1000)) > 0) {
+                timeline.push(resT.slice(sliceIdx, i))
+                sliceIdx = i
+            }
+            if (i == resT.length - 3)
+                timeline.push(resT.slice(sliceIdx, resT.length))
+        }
+
+        // Accumulate the uniqued set of questions for every survey for this study.
+        // This represents every possible question a participant might have.
+        let questions = activities
+                            .filter(x => x.spec === 'QWN0aXZpdHlTcGVjOjE~')
+                            .map(x => x.settings)
+                            .reduce((prev, curr) => prev.concat(curr), [])
+                            .map(x => x.text)
+
+        // Accumulate the set of responses to every question in this study.
+        // This represents every possible answer a participant may have given.
+        let answers = result_events
+                        .filter(x => !!x.static_data && !!x.static_data.survey_name)
+                        .map(x => x.temporal_events.map(y => ({ ...y, timestamp: x.timestamp })))
+                        .reduce((prev, curr) => prev.concat(curr), [])
+
+        // Zip-reduce every answer with its matching question and convert format.
+        // This represents the X->Y map with optional bar width.
+        let data = questions
+                      .reduce((prev, curr) => ({
+                          ...prev,
+                          [curr]: answers.filter(a => a.item === curr)
+                      }), {})
+
+        // Average each question's answer array and convert it to the right format.
+        // This produces an average whole-study event for every answer given.
+        let avgData = Object.values(data).map(a => ({
+            item: a.length > 0 ? a[0].item : '',
+            value: a.reduce((a, b) => a + parseInt(b.value), 0) / a.length,
+            duration: Math.floor(a.reduce((a, b) => a + b.duration, 0) / a.length)
+        }))
+
+        // "Rephrase" the zippered data for the mini sparkline plots.
+        let surveyData = Object.entries(data)
+                            .map(x => [x[0], x[1]
+                                .map(y => ({
+                                    category: y.item,
+                                    value: parseInt(y.value),
+                                    date: new Date(y.timestamp)
+                                })
+                            )])
+                            .reduce((prev, curr) => ({ ...prev, [curr[0]]: curr[1] }), {})
+
+        // Update state now with the new fetched & computed objects.
+        this.setState({ 
+            timeline: timeline, 
+            avgData: this.convertGraphData({ detail: avgData }), 
+            surveyData: surveyData 
+        })            
+        this.props.layout.pageLoading(true)
     }
-
-
 
     handleClick = (event) => {
         if (!this.requiresDetail(event))
@@ -230,62 +272,7 @@ class NeuroPsychParticipant extends React.Component {
         else return {palette: {type: 'dark', background: {paper: '#212121'}}}
     }
 
-    surveyQuestionPlotData = (timeline) => {
-        let allSurveyData = Array.from(new Set(timeline.map(slice => slice.filter(event => !!event.name && event.name.toUpperCase() == "DAILY PATIENT SUMMARY")).reduce((prev, curr) => { return prev.concat(curr)}))).sort((a, b) => a.timestamp - b.timestamp)
-        let questionDict = {}
-        
-        allSurveyData.map(event => {
-            event.detail.map(question => {
-                !!questionDict[question.item] ? questionDict[question.item].push({'category':question.item, 'value':parseInt(question.value), 'date':new Date(event.timestamp)}) : questionDict[question.item] = [{'category':question.item, 'value':parseInt(question.value), 'date':new Date(event.timestamp)}]
-            })
-        })
-
-        return questionDict
-    }
-
-    surveyBarPlotData = (timeline) => {
-
-    	// Accumulate all survey data into a single object from the timeline.
-		let surveyData = []
-		timeline.filter(x => !!x.find(y => y.event_type === 'result')).map(slice => [
-			slice.filter(x => (x.event_type === 'result' && !!x.summary)).filter(x => (!!x.summary.survey_name)).map(event => [
-				surveyData.push(event)
-			])])
-
-        let questions = surveyData[0].detail.map(question => question.item)
-
-
-
-        
-        let averageData = []
-        questions.map(question => {
-            let subAvgData = []
-            for (let i = 0; i < surveyData.length; i++) {
-                for (let j = 0; j < surveyData[i].detail.length; j++) {
-                    if (surveyData[i].detail[j].item == question) {
-                        subAvgData.push({
-                            x: surveyData[i].detail[j].duration,
-                            y: surveyData[i].detail[j].value,
-                            z: surveyData[i].detail[j].item
-                        })
-                    }
-                }
-            }
-            averageData.push(subAvgData)
-        })
-        console.log(averageData)
-
-        // Compress the average data arrays (x32) into single event summaries (x32).
-        return this.convertGraphData({ detail: averageData.map(a => ({
-                duration: a.reduce((a, b) => a + b.x, 0) / a.length,
-                value: a.reduce((a, b) => a + parseInt(b.y), 0) / a.length,
-                item: a.length > 0 ? a[0].z : ''
-            }))})
-    }
-
-
     timelineData = () => {
-
         var dataArray = []
         var dateArray = []
         var dateObjects = {}
@@ -367,30 +354,32 @@ class NeuroPsychParticipant extends React.Component {
                     }} />
             </div>
         </AppBar>
-        <div style={{marginTop: 100}} />
-        <VariableBarGraph
-            rotateText
-            data={this.state.avgData}
-            height={400}/>
+        <div style={{ marginTop: 100 }} />
         <div>
-            <React.Fragment>
-                <Typography gutterBottom variant="h2">Visualizations</Typography>
-                {Object.keys(this.state.surveyData).map(cat =>
-                    <Card>
-                        <Typography component="h5" variant="h5">
-                            {cat}
-                        </Typography>
-                        <LongitudinalSurveyGraphNP
-                            rotateText
-                            data={this.state.surveyData[cat]}
-                            width = {1000}
-                            margin = {{left:100, right:100, top:100, bottom:100}}
-                            height={400}/>
+            <Typography gutterBottom variant="h2">Visualizations</Typography>
+            <Card style={{ marginTop: 50, marginBotton: 50, paddingLeft: 25, paddingRight: 25 }}>
+                <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center' }}>
+                    Average survey responses:
+                </Typography>
+                <VariableBarGraph
+                    rotateText
+                    data={this.state.avgData}
+                    height={400} />
             </Card>
-                )}
-            </React.Fragment>
+            {Object.keys(this.state.surveyData).map(cat =>
+                <Card style={{ marginTop: 50, marginBotton: 50 }}>
+                    <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center' }}>
+                        {cat}
+                    </Typography>
+                    <LongitudinalSurveyGraphNP
+                        rotateText
+                        data={this.state.surveyData[cat]}
+                        width={1000}
+                        height={200}
+                        margin = {{ left: 70, right: 20, top: 20, bottom: 40 }} />
+                </Card>
+            )}
         </div>
-
         <Divider style={{ marginTop: 32, marginBottom: 32 }} />
 		<Toolbar>
 			<Typography gutterBottom variant="h2">Timeline</Typography>
@@ -416,6 +405,11 @@ class NeuroPsychParticipant extends React.Component {
                                     </Overlay>
                             </Map>                   
 						)}
+                        {!!slice.find(x => x.event_type === 'sensor' && x.sensor === 'lamp.gps.contextual') ? <React.Fragment /> :
+                            <Typography variant="h6" style={{ height: '100%', textAlign: 'center' }}>
+                                No location available.
+                            </Typography>
+                        }
 					</Grid>
 					<Grid container item
 						  xs={1}
