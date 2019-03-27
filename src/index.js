@@ -8,8 +8,6 @@ import Forms from './pages/forms.js';
 import Root from './pages/root.js';
 import Researcher from './pages/researcher.js';
 import Participant from './pages/participant.js';
-import ParticipantView from './pages/participant_view.js'
-import NeuroPsychParticipant from './pages/neuropsych_participant.js'
 import NavigationLayout from './components/navigation_layout.js';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -121,29 +119,11 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                     </NavigationLayout>
                 } />
 
-                <Route exact path="/researcher/participant/:id" render={props =>
-                    !LAMP.get_identity() ?
-                    <Redirect to="/login" /> :
-                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
-                        <Participant {...props} />
-                    </NavigationLayout>
-                } />
-
-
-                <Route exact path="/researcher/neuropsych_participant/:id" render={props =>
-                    !LAMP.get_identity() ?
-                    <Redirect to="/login" /> :
-                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
-                        <NeuroPsychParticipant {...props} />
-                    </NavigationLayout>
-                } />
-
-
                 <Route exact path="/participant/:id" render={props =>
                     !LAMP.get_identity() ? 
                     <Redirect to="/login" /> :
                     <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
-                        <ParticipantView {...props} />
+                        <Participant {...props} />
                     </NavigationLayout>
                 } />
             </Switch>

@@ -151,13 +151,7 @@ class Researcher extends React.Component {
 
     // Go to the drill-down view.
     rowSelect = (rowNumber) => {
-        if (this.state.researcher.id == 'UmVzZWFyY2hlcjo3Mw~~') {
-            this.props.history.push(`/researcher/neuropsych_participant/${this.state.data[rowNumber].id}`)    
-        }
-
-        else {
-            this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
-        }
+        this.props.history.push(`/participant/${this.state.data[rowNumber].id}`)
     }
     addParticipant = async () => {
         let newCount = this.state.newCount

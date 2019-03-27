@@ -10,6 +10,27 @@ const usableSurveys = {
     'SLEEP AND SOCIAL': [25, 7],
 }
 
+// //Create new categories based on individuals questions
+// let eventDataDict = {}
+// event.detail.map(question => {
+// if (question.item in surveyCatMap) {
+//     let category = surveyCatMap[question.item]
+//     //Flip social score
+//     if (category == 'Social_Reverse') { 
+//         question.value = 3 - question.value
+//         category = 'Social'
+//     }
+
+//     if (category in eventDataDict) {
+//         eventDataDict[category].push(question) 
+//     }
+//     else { 
+//         eventDataDict[category] = [question] 
+//     }
+// }
+// })
+
+
 // Note the short-name mappings for the above survey questions.
 const surveyCatMap = {'Today I feel little interest or pleasure':'Mood',
                       'Today I feel depressed':'Mood',
@@ -118,6 +139,11 @@ export async function downloadStudyEvents(id) {
 export function participantTimeline(inputData, catMap) {
         const [activities, result_events, sensor_events] = inputData
 
+        // If a category map is not specified, use our default map.
+        // Alternatively, if it is `true`, we could substitute it then.
+        if (!catMap) // FIXME, TODO
+            catMap = surveyCatMap
+
         // Flatten all linked activities' names into each Result object.
         let res1 = result_events.map(x => ({
             event_type: 'result',
@@ -167,6 +193,8 @@ export function participantTimeline(inputData, catMap) {
                             .map(x => x.settings)
                             .reduce((prev, curr) => prev.concat(curr), [])
                             .map(x => x.text)
+        if (!!catMap)
+            questions = questions.map(x => (!!catMap ? (catMap[x] || x) : x))
 
         // Accumulate the set of responses to every question in this study.
         // This represents every possible answer a participant may have given.
@@ -180,10 +208,8 @@ export function participantTimeline(inputData, catMap) {
         let data = questions
                       .reduce((prev, curr) => ({
                           ...prev,
-                          [curr]: answers.filter(a => a.item === curr)
+                          [curr]: answers.filter(a => (!!catMap ? (catMap[a.item] || a.item) : a.item) === curr)
                       }), {})
-
-                    console.log(data)
 
         // Average each question's answer array and convert it to the right format.
         // This produces an average whole-study event for every answer given.
@@ -195,14 +221,22 @@ export function participantTimeline(inputData, catMap) {
 
         // "Rephrase" the zippered data for the mini sparkline plots.
         let surveyData = Object.entries(data)
-                            .map(x => [x[0], x[1]
-                                .map(y => ({
-                                    category: y.item,
-                                    value: parseInt(y.value),
-                                    date: new Date(y.timestamp)
-                                })
-                            )])
+                            .map(x => [x[0], Object.values(x[1]
+                                .reduce((prev, curr) => {
+                                    prev[curr.timestamp] = [...(prev[curr.timestamp] || []), curr]
+                                    return prev
+                                }, {}))
+                            ])
+                            .map(x => { console.log(JSON.stringify(x[1], 0, 4)); return x })
+                            .map(x => [x[0], x[1].map(y => ({
+                                    category: x[0],
+                                    value: y.reduce((a, b) => a + b.value, 0) / y.length,
+                                    date: new Date(y[0].timestamp)
+                                }))
+                            ])
                             .reduce((prev, curr) => ({ ...prev, [curr[0]]: curr[1] }), {})
+
+                            console.log(surveyData)
 
     return {timeline, avgData, surveyData}
 }
@@ -211,9 +245,9 @@ export function participantTimeline(inputData, catMap) {
     export function convertGraphData(e) { 
         return !e ? [] : e.map(x => !!x ?
         ({
-            x: x.duration || 0,
-            y: (e.activity_type != null ? (parseFloat(x.item) || 0) : x.value),
-            longTitle: x.item,
-            shortTitle: surveyMap[x.item],
+            x: isNaN(x.duration) ? 0 : x.duration || 0,
+            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(x.value) ? 0 : x.value || 0),
+            longTitle: x.item || '',
+            shortTitle: surveyMap[x.item] || '',
         }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
     }
