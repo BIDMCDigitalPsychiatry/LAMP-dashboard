@@ -10,6 +10,7 @@ import { scaleBand } from '@vx/scale'
 import Card from '@material-ui/core/Card'
 import Typography from '@material-ui/core/Typography'
 import { rangeTo } from '../components/utils'
+import { Text } from '@vx/text'
 
 // Only one tooltip may be present on-screen at a time; this holds its timeout info.
 let tooltipTimeout;
@@ -98,14 +99,16 @@ export default withTheme()(withParentSize(withTooltip(props => {
 								return (
 									<Group key={`vx-tick-${tick.value}-${i}`}>
 										<Line from={tick.from} to={tick.to} stroke={fillColor}/>
-										<text
+										<Text
 											transform={`translate(${tick.to.x}, ${tickY}) rotate(${(props.rotateText || false) ? 60 : 0})`}
 											fontSize={11}
-											textAnchor={data.activity_type != null ? "middle" : "start"}
+											textAnchor={"middle"}
+											verticalAnchor={"start"}
+											width={data[i].barWidth}
 											fill={fillColor}
 											fontFamily="Roboto">
 											{data[i].shortTitle || data[i].longTitle || ''}
-										</text>
+										</Text>
 									</Group>
 								)
 							})}

@@ -32,69 +32,11 @@ import HorizontalScroll from 'react-scroll-horizontal'
 import Map from 'pigeon-maps'
 import Marker from 'pigeon-marker'
 import Overlay from 'pigeon-overlay'
-
+import {participantTimeline, downloadParticipantEvents, convertGraphData} from '../components/processing_pipeline'
 
 const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
 	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
-}
-
-
-// Note the surveys we want to use in the average plot with their initial slot number as well as expected length.
-const usableSurveys = {
-	'ANXIETY, PSYCHOSIS, AND SOCIAL': [0, 16],
-	'MOOD, SLEEP, AND SOCIAL': [16, 16],
-	'ANXIETY': [0, 7],
-	'PSYCHOSIS AND SOCIAL': [7, 9],
-	'MOOD': [16, 9],
-	'SLEEP AND SOCIAL': [25, 7],
-}
-
-// Note the short-name mappings for the above survey questions.
-const surveyMap = {
-	"Today I feel anxious": "Anxious",
-	"Today I cannot stop worrying": "Constant Worry",
-	"Today I am worrying too much about different things": "Many Worries",
-	"Today I have trouble relaxing": "Can't Relax",
-	"Today I feel so restless it's hard to sit still": "Restless",
-	"Today I am easily annoyed or irritable": "Irritable",
-	"Today I feel afraid something awful might happen": "Afraid",
-	"Today I have heard voices or saw things others cannot": "Voices",
-	"Today I have had thoughts racing through my head": "Racing Thoughts",
-	"Today I feel I have special powers": "Special Powers",
-	"Today I feel people are watching me": "People watching me",
-	"Today I feel people are against me": "People against me",
-	"Today I feel confused or puzzled": "Confused",
-	"Today I feel unable to cope and have difficulty with everyday tasks": "Unable to cope",
-	"In the last THREE DAYS, I have had someone to talk to": "Someone to talk to",
-	"In the last THREE DAYS, I have felt uneasy with groups of people": "Uneasy in groups",
-	"Today I feel little interest or pleasure": "Low interest",
-	"Today I feel depressed": "Depressed",
-	"Today I had trouble sleeping": "Trouble Sleeping",
-	"Today I feel tired or have little energy": "Low Energy",
-	"Today I have a poor appetite or am overeating": "Low/High Appetite",
-	"Today I feel bad about myself or that I have let others down": "Poor self-esteem",
-	"Today I have trouble focusing or concentrating": "Can't focus",
-	"Today I feel too slow or too restless": "Feel slow",
-	"Today I have thoughts of self-harm": "Self-harm",
-	"Last night I had trouble falling asleep": "Can't fall asleep",
-	"Last night I have had trouble falling asleep": "Can't fall asleep",
-	"Last night I had trouble staying asleep": "Can't stay asleep",
-	"This morning I was up earlier than I wanted": "Waking up early",
-	"In the last THREE DAYS, I have taken my medications as scheduled": "Medication",
-	"In the last THREE DAYS, during the daytime I have gone outside my home": "Spent time outside",
-	"In the last THREE DAYS, I have preferred to spend time alone": "Prefer to be alone",
-	"In the last THREE DAYS, I have had arguments with other people": "Arguments with others",
-    "I trust this app to guide me towards my personal goals" : "Goals",
-    "I believe this app's tasks will help me to address my problem" : "Tasks",
-    "This app encourages me to accomplish tasks and make progress" : "Encouragement",
-    "I agree that the tasks within this app are important for my goals" : "Tasks match goals",
-    "This app is easy to use and operate" : "Usability",
-    "This app supports me to overcome challenges" : "Support",
-    "When I see others who are doing better than I am, I realize it's possible to improve" : "Can improve",
-    "When I see others who are doing better than I am, I feel frustrated about my own situation" : "Frustrated",
-    "When I see others who are doing worse than I am, I feel fear that my future will be similar to them" : "Similar future",
-    "When I see others who are doing worse than I am, I feel relieved about my own situation" : "Relieved"
 }
 
 class Participant extends React.Component {
@@ -238,6 +180,7 @@ class Participant extends React.Component {
 				surveyData.push(event)
 			])])
 
+        const usableSurveys = {}
 		// Iterate over every survey taken and assort into one average list.
 		// Ignore the survey if we don't mark it in the usableSurveys list.
 		let averageData = rangeTo(32).map(() => [])
@@ -259,7 +202,7 @@ class Participant extends React.Component {
         
 
         // Compress the average data arrays (x32) into single event summaries (x32).
-        return this.convertGraphData({ detail: averageData.map(a => ({
+        return convertGraphData({ detail: averageData.map(a => ({
                 duration: a.reduce((a, b) => a + b.x, 0) / a.length,
                 value: a.reduce((a, b) => a + b.y, 0) / a.length,
                 item: a.length > 0 ? a[0].z : ''
@@ -320,15 +263,6 @@ class Participant extends React.Component {
         }
         return [dataArray, completeDateArray]
     }
-
-    // Convert a Result timeline event into a VariableBarGraph object.
-    convertGraphData = (e) => !e.detail ? [] : e.detail.map(x => !!x ?
-        ({
-            x: x.duration || 0,
-            y: (e.activity_type != null ? (parseFloat(x.item) || 0) : x.value),
-            longTitle: x.item,
-            shortTitle: surveyMap[x.item],
-        }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
 
     render = () =>
     <div>
@@ -482,7 +416,7 @@ class Participant extends React.Component {
 									timeout="auto"
 									unmountOnExit>
 									<VariableBarGraph
-										data={this.convertGraphData(event)}
+										data={convertGraphData(event.detail)}
 										rotateText={event.activity_type == null}
 										height={400}/>
 								</Collapse>,
