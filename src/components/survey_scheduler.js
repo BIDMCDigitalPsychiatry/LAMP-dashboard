@@ -17,6 +17,8 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+import MaterialTable from 'material-table'
+import MultipleSelect from '../components/multiple_select'
 
 const days = [
   'Monday',
@@ -123,6 +125,213 @@ const schema =
   }
 }
 
+const defaultSurveys = [
+{
+	surveyName: "Anxiety (GAD-7)",
+	type: "Survey",
+	questions: [
+		{ 
+			question: "Today I feel anxious",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I cannot stop worrying",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I am worrying too much about different things",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I have trouble relaxing",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel so restless it's hard to sit still",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel anxToday I am easily annoyed or irritableious",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel afraid something awful might happen",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		}
+	],
+	schedule: {
+		day: [],
+		time: new Date('2019-03-13T10:00:00')
+	}
+	},
+	{
+		surveyName: "Mood (PHQ-9)", 
+		type: "Survey",
+		questions: [
+		{ 
+			question: "Today I feel little interest or pleasure",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel depressed",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I had trouble sleeping",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel tired or have little energy",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I have a poor appetite or am overeating",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel bad about myself or that I have let others down",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I have trouble focusing or concentrating",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I feel too slow or too restless",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Today I have thoughts of self-harm",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		}
+	],
+	
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},
+	{
+		surveyName: "Sleep",
+		type: "Survey",
+		questions: [
+		{ 
+			question: "Last night I had troulbe falling asleep",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "Last night I had trouble staying asleep",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		},
+		{ 
+			question: "This morning I was up earlier than I wanted",
+			answerType: "Likert (0-3)",
+			notes: "" 
+		}],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},
+	{
+		surveyName: "Psychosis",
+		type: "Survey",
+		questions: [
+		{
+			question: "Today I feel anxious",
+			answerType: "Likert (0-3)",
+			notes: ""
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},
+	{
+		surveyName: "Medication",
+		type: "Survey",
+		questions: [
+		{
+			question: "In the last THREE DAYS, I have taken my medications as scheduled",
+			answerType: "Yes/No",
+			notes: ""
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},
+	{ 
+		surveyName: "Jewels Trails A",
+		type: "Game",
+		questions: [
+		{
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		},
+		notes: ""
+	},
+	{ 
+		surveyName: "Jewels Trails B",
+		type: "Game",
+		questions: [
+		{
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},	
+	{ 
+		surveyName: "Spatial Span",
+		type: "Game",
+		questions: [
+		{
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	},
+	{
+		surveyName: "Cats and Dogs",
+		type: "Game",
+		questions: [
+		{
+		}
+		],
+		schedule: {
+			day: [],
+			time: new Date('2019-03-13T10:00:00')
+		}
+	}
+]
+
 const uiSchema = {}
 const initialFormData = {
 	"surveyName": "",
@@ -138,6 +347,7 @@ export default class SurveyScheduler extends React.Component {
             time: new Date('2019-03-13T10:00:00'),
         },
         customSchedules: [],
+        surveys: defaultSurveys,
         customSurveys: {},
     }
 
@@ -155,79 +365,107 @@ export default class SurveyScheduler extends React.Component {
 
     render = () =>
     <React.Fragment>
-            <Typography variant="h4" style={{ fontWeight: 400, paddingBottom: 10 }}>
-            Study Setup
-            </Typography>
-            <br />
-            <SchemaForm
-            	submitText="Add Survey"
-                classes={this.props.classes}
-                schema={schema}
-                uiSchema={uiSchema}
-                formData={initialFormData}
-                onCancel={(event) => {}}
-                onSubmit={(event) => {
-        			this.setState({ customSurveys: {...this.state.customSurveys, [event.formData.surveyName]: event.formData}})
-    			}}
-                onChange={(event) => {}}
-            />
-            <form action="" onSubmit={() => this.props.onSubmit(this.state)}>
+            <MaterialTable 
+                columns={[
+                	{ title: 'Survey Name', field: 'surveyName' },
+                	{ 
+                		title: 'Schedule Day(s)',
+                		field: 'day',
+                		emptyValue: "No Day(s) Scheduled",
+                		render: rowData => { return(<MultipleSelect/>) }
+                		},
+                	{ title: 'Schedule Time', field: 'time', type: 'time', emptyValue: "No Time Scheduled" }
+                ]}
+                data = {this.state.surveys} 
+                title = "Activity Scheduler"
+                detailPanel = {
+				[
+				{
+                	render: rowData => rowData.type === "Survey" ? (
+                   
+             <MaterialTable
+				columns={[
+					{title: 'Question', field: 'question' }, 
+					{title: 'Answer Type', field: 'answerType', lookup: 
+					{
+						"Likert (0-3)": "Likert (0-3)",
+						"Yes/No": "Yes/No",
+						"Scroll Wheel": "Scroll Wheel"
+					}
+				},
+				{notes: 'Notes', field: 'notes'}
 
-        <br />
-            <Typography variant="h6" align="left" style={{ fontWeight: 400, paddingBottom: 10}}>
-            Survey Scheduling
-            </Typography>
-            <FormControl className={this.props.formControl}>
-            <InputLabel htmlFor="survey-native-helper">Survey Name</InputLabel>
-            <NativeSelect
-                value={this.state.editSchedule.name}
-            onChange={(event)=>this.setState({editSchedule: {...this.state.editSchedule, name: event.target.value}})}
-                input={<Input name="survey" id="survey-native-helper" />}
-            >
-            <option value="" />
-            {["PHQ-9", "GAD-7", "Psychosis", "Sleep", ...Object.keys(this.state.customSurveys)].map(x => (
-                <option value={x}>{x}</option>
-                ))}
+					]}
+                data = {rowData.questions}  
+                title = "Questions"            
+	            editable={{
+				    onRowAdd: newData => 
+				    	new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].questions.push(newData)
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				    }),
+				    onRowUpdate: (newData, oldData) =>
+				      new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].questions[oldData.tableData.id] = newData
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				      }),
+				    onRowDelete: oldData =>
+				      new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].questions.splice(oldData.tableData.id, 1)
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				      }),
+				  }}
+                options={{
+                    actionsColumnIndex: -1,
+                    pageSize: 5,
+                    pageSizeOptions: [5, 10, 15, 20],
+                    maxBodyHeight: 500
 
-          </NativeSelect>
-        </FormControl>
+                }}
+                />
 
-        <FormControl className={this.props.formControl}>
-          <InputLabel htmlFor="select-multiple" style={{marginLeft: 20}} >Day</InputLabel>
-          <Select
-            multiple
-            value={this.state.editSchedule.day}
-            style={{marginLeft: 20}}
-            onChange={(event)=>this.setState({editSchedule: {...this.state.editSchedule, day: event.target.value}})}
-            input={<Input id="select-multiple" />}
-            MenuProps={MenuProps}
-          >
-            {days.map(day => (
-              <MenuItem key={day} value={day} style={getStyles(day, this)}>
-                {day}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <TimePicker
-        label="Time"
-        value={this.state.editSchedule.time}
-        style={{marginLeft: 20}}
-        onChange={(date)=>this.setState({editSchedule: {...this.state.editSchedule, time: date}})}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
-      </MuiPickersUtilsProvider>
-        <Button 
-        variant="contained" 
-        size="large" 
-        color="primary"
-        onClick={this.addToSchedule}
-        >
-          <AddIcon />
-        </Button>
+                    ) : (<Typography variant="h5">This activity cannot be customized.</Typography>)
+                  }]}
+                editable={{
+				    onRowAdd: async newData => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys.push({...newData, questions: [
+				    		{
+								question: "Sample Question",
+								answerType: "Likert (0-3)"
+							},
+				    		],
+				    			type: "Survey"
+
+				    	})
+				    	this.setState({ surveys: tempSurveys })
+				    },
+				    onRowUpdate: async (newData, oldData) => {
+				      	console.log(newData, oldData)
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[oldData.tableData.id] = newData
+				    	this.setState({ surveys: tempSurveys })
+				    },
+				    onRowDelete: async oldData => {
+				      	console.log(oldData)
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys.splice(oldData.tableData.id, 1)
+				    	this.setState({ surveys: tempSurveys })
+				      },
+				  }}
+
+                options={{
+                    actionsColumnIndex: -1,
+                    pageSize: 10,
+                    pageSizeOptions: [5, 10, 15, 20],
+                    maxBodyHeight: 500
+
+                }}
+            />  
+
 
         <div style={{marginTop: 20}} />
         {this.state.customSchedules.length > 0 ? 
@@ -267,7 +505,6 @@ export default class SurveyScheduler extends React.Component {
                     opacity: 0,
                 }}/>
             </Button>
-                </form>
     </React.Fragment>
 
 }

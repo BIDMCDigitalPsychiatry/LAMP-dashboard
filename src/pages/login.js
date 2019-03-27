@@ -49,10 +49,6 @@ class Login extends React.Component {
         this.props.history.push('/register')
     }
 
-    handleDemo = (event) => {
-        window.location.href='https://www.digitalpsych.org/demo-lamp.html'
-    }
-
     render = () =>
     <Grid container justify="space-around" alignItems="center" style={{marginTop: '48px'}}><Grid item xs={4}>
         <Paper square={true} elevation={12} style={{padding: '16px'}}>
@@ -106,14 +102,6 @@ class Login extends React.Component {
                         width: '100%',
                         opacity: 0,
                     }}/>
-                </Button>
-                <br />
-                <Button
-                    variant="outlined"
-                    color="default"
-                    style={{width: '100%', marginTop: 20}}
-                    onClick={this.handleDemo}>
-                    Click here to demo the app
                 </Button>
             </form>
         </Paper>

@@ -56,6 +56,8 @@ export default withTheme()(withParentSize(withTooltip(props => {
 
 	maxValue *= heightScale
 
+	console.log(data)
+
 	// Customize the X and Y positions, adding 0.25 to offset all values.
 	data = data.map((x, i) => ({
 		...x,
