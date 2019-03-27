@@ -13,6 +13,7 @@
     "@material-ui/icons": "^3.0.2",
     "@material-ui/lab": "^3.0.0-alpha.30",
     "@vx/grid": "0.0.184",
+    "@vx/text": "0.0.183",
     "@vx/vx": "^0.0.179",
     "bootstrap": "^3.3.6",
     "date-fns": "^2.0.0-alpha.27",

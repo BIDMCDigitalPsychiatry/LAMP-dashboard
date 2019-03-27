@@ -5,11 +5,12 @@ import { Group } from '@vx/group'
 import { withParentSize } from '@vx/responsive'
 import { withTooltip } from '@vx/tooltip'
 import { withTheme } from '@material-ui/core'
-import { AxisBottom } from '@vx/axis'
-import { scaleBand } from '@vx/scale'
+import { AxisBottom, AxisLeft } from '@vx/axis'
+import { scaleBand, scaleLinear } from '@vx/scale'
 import Card from '@material-ui/core/Card'
 import Typography from '@material-ui/core/Typography'
 import { rangeTo } from '../components/utils'
+import { Text } from '@vx/text'
 
 // Only one tooltip may be present on-screen at a time; this holds its timeout info.
 let tooltipTimeout;
@@ -32,18 +33,27 @@ export default withTheme()(withParentSize(withTooltip(props => {
 	let width = props.width || props.parentWidth
 	let height = props.height || props.parentHeight
     let originalHeight = height
-    height -= 120
+    height -= 120 + 30
     let originalWidth = width
     width -= 55
     let padding = (0.01 * width)
     width -= ((data.length - 1) * padding)
 
+
 	// Determine the maximum X and Y values possible in the provided data.
 	// Using both, convert them into a scaling value to preserve aspect ratio.
     let maxValue = data.reduce((a, b) => Math.max(a, b.y), 0)
-	let totalWidth = data.reduce((a, b) => a + b.x, 0)
+	let totalWidth = data.reduce((a, b) => a + b.x, 0) - 70
 	let widthScale = !!width ? (width / totalWidth) : 1.0
 	let heightScale = !!height ? (height / maxValue) : 1.0
+
+  const yScale2 = scaleLinear({
+    range: [height+20, 0],
+    domain: [0, maxValue],
+    //domain: [0, Math.max(...data.map(y))],
+    nice: true
+  });
+
 	maxValue *= heightScale
 
 	// Customize the X and Y positions, adding 0.25 to offset all values.
@@ -51,8 +61,8 @@ export default withTheme()(withParentSize(withTooltip(props => {
 		...x,
 		barWidth: x.x * widthScale,
 		barHeight: (x.y + 0.25) * heightScale,
-		barX: data.slice(0, i).reduce((a, b) => a + (b.x * widthScale) + (i > 0 ? padding : 0), 0),
-		barY: maxValue - ((x.y + 0.25) * heightScale)
+		barX: data.slice(0, i).reduce((a, b) => a + (b.x * widthScale) + (i > 0 ? padding : 0), 0) + 70,
+		barY: maxValue - ((x.y + 0.25) * heightScale) + 30
 	}))
 
 	return (
@@ -82,30 +92,59 @@ export default withTheme()(withParentSize(withTooltip(props => {
 							}}
 						/>
 					)}
+					<AxisLeft
+				          top={10}
+				          left={55}
+				          scale={yScale2}
+				          numTicks={5}
+				          stroke={fillColor}
+				          tickStroke={fillColor}
+				          label={props.yLabel || "Value"}
+				          labelProps={{
+				            fill: '#333333',
+				            textAnchor: 'middle',
+				            fontSize: 14,
+				            fontFamily: 'Arial'
+				          }}
+				          tickLabelProps={(value, index) => ({
+				            fill: fillColor,
+				            textAnchor: 'end',
+				            fontSize: 10,
+				            fontFamily: 'Arial',
+				            dx: '-0.25em',
+				            dy: '0.25em'
+				          })}
+				          tickComponent={({ formattedValue, ...tickProps }) => (
+				            <text {...tickProps}>{formattedValue}</text>
+				          )}
+				        />
+
 					<AxisBottom
 						scale={scaleBand({
 							rangeRound: [0, width],
 							domain: rangeTo(data.length)
 						})}
-						top={maxValue}
+						top={maxValue+30}
 						stroke={fillColor}
 						tickStroke={fillColor}>
 						{tickProps => (data.length >= 0) && (<g>
 							{tickProps.ticks.map((tick, i) => {
-								const tickX = data.slice(0, i).reduce((a, b) => a + b.barWidth + (i > 0 ? padding : 0), 0) + (data[i].barWidth / 2)
+								const tickX = data.slice(0, i).reduce((a, b) => a + b.barWidth + (i > 0 ? padding : 0), 0) + (data[i].barWidth / 2) + 70
 								const tickY = tick.to.y + tickProps.tickLength + 5
 								tick.from.x = tickX; tick.to.x = tickX
 								return (
 									<Group key={`vx-tick-${tick.value}-${i}`}>
 										<Line from={tick.from} to={tick.to} stroke={fillColor}/>
-										<text
+										<Text
 											transform={`translate(${tick.to.x}, ${tickY}) rotate(${(props.rotateText || false) ? 60 : 0})`}
 											fontSize={11}
-											textAnchor={data.activity_type != null ? "middle" : "start"}
+											textAnchor={"middle"}
+											verticalAnchor={"start"}
+											width={data[i].barWidth}
 											fill={fillColor}
 											fontFamily="Roboto">
 											{data[i].shortTitle || data[i].longTitle || ''}
-										</text>
+										</Text>
 									</Group>
 								)
 							})}

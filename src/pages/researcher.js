@@ -31,6 +31,8 @@ import json2csv from 'json2csv'
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import jsonexport from 'jsonexport'
+import VariableBarGraph from '../components/variable_bar_graph.js'
+import {participantTimeline, downloadStudyEvents, convertGraphData} from '../components/processing_pipeline'
 
 //
 // import {plotGallery} from '../components/gallery_plots/base_script'
@@ -108,7 +110,8 @@ class Researcher extends React.Component {
         popoverAttachElement: null,
         selectedIcon: null,
         newCount: 1,
-        selectedRows: []
+        selectedRows: [],
+        avgData: []
     }
 
     async componentWillMount() {
@@ -128,6 +131,10 @@ class Researcher extends React.Component {
         let res = await LAMP.Participant.all_by_researcher(id)
 		let actRes = await LAMP.Activity.all_by_researcher(id)
 
+        const {timeline, avgData, surveyData} = participantTimeline(await downloadStudyEvents(obj[0].studies[0]))
+
+        console.dir(avgData)
+
         const script_sources = await docPages() //Get information from Lamp-scripts
         const plot_sources = plotParse(script_sources)
         this.setState({
@@ -135,15 +142,17 @@ class Researcher extends React.Component {
             plot_toggle: plot_sources.map((key) => false),
             researcher: obj[0],
             data: res,
-            activities: actRes
+            activities: actRes,
+            avgData: convertGraphData(avgData)
         })
 
 		this.props.layout.pageLoading(true)
     }
 
     // Go to the drill-down view.
-    rowSelect = (rowNumber) => this.props.history.push(`/researcher/participant/${this.state.data[rowNumber].id}`)
-
+    rowSelect = (rowNumber) => {
+        this.props.history.push(`/participant/${this.state.data[rowNumber].id}`)
+    }
     addParticipant = async () => {
         let newCount = this.state.newCount
         this.setState({popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: []})
@@ -273,6 +282,18 @@ class Researcher extends React.Component {
                 </Typography>
             </Toolbar>
             <Divider />
+
+            <Toolbar>
+                <Typography variant="h6" color="inherit" style={{flex: 1}}>
+                    Study Summary
+                </Typography>
+            </Toolbar>
+            <Divider />
+                <VariableBarGraph
+                    rotateText={false}
+                    data={this.state.avgData}
+                    height={400} />
+
         {this.state.data.length > 0 ? 
             <MaterialTable 
                 columns={[{ title: 'Participant ID', field: 'id' }]}
