@@ -135,12 +135,7 @@ class Register extends React.Component {
         }, null, 4)
 
     // Sending email to team@digitalpsych.org -> 
-    console.log("Register")
-    console.log(JSON.stringify({
-                subject: "New LAMP Registration", 
-                contents: msgContents}))
-
-    /*fetch("https://api.lamp.digital/internal/sysmsg", {
+    fetch("https://api.lamp.digital/internal/sysmsg", {
             method: "POST", 
             headers: {
                 "Content-Type": "application/json",
@@ -157,7 +152,7 @@ class Register extends React.Component {
         .catch(error => {
             console.error(error)
             this.props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
-        })*/
+        })
 
 
     this.setState(state => ({ open: false }))
