@@ -227,9 +227,9 @@ export default class SurveyScheduler extends React.Component {
                 		color: this.state.surveys.filter(x => x.surveyName == data).map(x => x.schedule.length).filter(x => x > 0).length > 0 ? 'green' : undefined,
                 		fontWeight: this.state.surveys.filter(x => x.surveyName == data).map(x => x.type == 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
                 	}) },
-                	{ title: 'Type', field: 'type' },
-                	{ title: 'Notes', field: 'notes', lookup: 
-                		{ 'Survey': 'Survey', 'Game': 'Game' }
+                	{ title: 'Type', field: 'type', lookup: 
+                		{ 'Survey': 'Survey', 'Game': 'Game' } },
+                	{ title: 'Notes', field: 'notes'
                 	}
                 ]}
                 localization={{
@@ -249,7 +249,7 @@ export default class SurveyScheduler extends React.Component {
 					tooltip: 'Questions',
                 	render: rowData => rowData.type === "Survey" ? (
                    
-             <div style={{ margin: '0 48px' }}>
+             <div style={{ margin: '0 48px', width: '100%' }}>
              <MaterialTable
 				columns={[
 					{title: 'Question', field: 'question' }, 
@@ -260,7 +260,7 @@ export default class SurveyScheduler extends React.Component {
 						"Scroll Wheel": "Scroll Wheel"
 					}
 				},
-				{notes: 'Notes', field: 'notes'}
+				{title: 'Notes', field: 'notes'}
 
 					]}
                 localization={{
@@ -378,7 +378,6 @@ export default class SurveyScheduler extends React.Component {
 				    	this.setState({ surveys: tempSurveys })
 				    },
 				    onRowDelete: async oldData => {
-				      	console.log(oldData)
 				    	let tempSurveys = this.state.surveys
 				    	tempSurveys.splice(oldData.tableData.id, 1)
 				    	this.setState({ surveys: tempSurveys })

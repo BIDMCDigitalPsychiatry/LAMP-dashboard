@@ -130,8 +130,7 @@ class Register extends React.Component {
                 email: this.state.email,
                 'study name': this.state.studyName
             },
-            surveys: Object.values(payload.customSurveys),
-            schedules: payload.customSchedules
+            activities: payload
         }, null, 4)
 
     // Sending email to team@digitalpsych.org -> 
@@ -142,7 +141,7 @@ class Register extends React.Component {
             },
             body: JSON.stringify({
                 subject: "New LAMP Registration", 
-                contents: msgContents}), 
+                contents: msgContents}, 0, 4), 
             })
         .then(response => response.json())
         .then(data => {
