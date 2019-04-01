@@ -56,7 +56,6 @@ class Register extends React.Component {
     }
 
     componentDidMount() {
-        this.props.layout.setTitle('Register')
     }
 
     validator = {
@@ -130,24 +129,18 @@ class Register extends React.Component {
                 email: this.state.email,
                 'study name': this.state.studyName
             },
-            surveys: Object.values(payload.customSurveys),
-            schedules: payload.customSchedules
+            activities: payload
         }, null, 4)
 
     // Sending email to team@digitalpsych.org -> 
-    console.log("Register")
-    console.log(JSON.stringify({
-                subject: "New LAMP Registration", 
-                contents: msgContents}))
-
-    /*fetch("https://api.lamp.digital/internal/sysmsg", {
+    fetch("https://api.lamp.digital/internal/sysmsg", {
             method: "POST", 
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 subject: "New LAMP Registration", 
-                contents: msgContents}), 
+                contents: msgContents}, 0, 4), 
             })
         .then(response => response.json())
         .then(data => {
@@ -157,7 +150,7 @@ class Register extends React.Component {
         .catch(error => {
             console.error(error)
             this.props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
-        })*/
+        })
 
 
     this.setState(state => ({ open: false }))
@@ -169,7 +162,7 @@ class Register extends React.Component {
     handleForms = (event) => this.props.history.replace('/forms')
 
     render = () => 
-    <React.Fragment>
+                        <Paper square={true} elevation={12} style={{padding: '16px', position: 'absolute'}}>
     <Grid container justify="space-around" direction="column" alignItems="center" spacing={24} style={{marginTop: '48px'}}>
     <Grid item xs={5}>
     <div>
@@ -239,13 +232,6 @@ class Register extends React.Component {
                         }}/>
                     </Button>
                     <br />
-                    {/*<Button
-                        variant="outlined"
-                        color="default"
-                        style={{width: '100%', marginTop: 20}}
-                        onClick={this.handleForms}>
-                        Skip Register and Take Me to Forms
-                    </Button>*/}
                 </form>
         </Paper>
         </div>
@@ -265,7 +251,7 @@ class Register extends React.Component {
                 />
             </DialogContent>
         </Dialog>
-    </React.Fragment>
+    </Paper>
 
 }
 

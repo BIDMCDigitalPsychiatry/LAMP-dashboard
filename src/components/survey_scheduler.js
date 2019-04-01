@@ -19,111 +19,7 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import MaterialTable from 'material-table'
 import MultipleSelect from '../components/multiple_select'
-
-const days = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
-
-const getStyles = (name, that) => {
-  return {
-    fontWeight:
-      that.state.editSchedule.day.indexOf(name) === -1
-        ? 300
-        : 500,
-  }
-}
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-// Using schema form from here: https://github.com/TwoAbove/jsonschema-form-for-material-ui
-// TODO: find schema form that supports dependencies
-
-const schema = 
-{
-  "title": "Create a New Survey",
-  "description": "",
-  "type": "object",
-  "properties": {
-    "surveyName": {
-        "title": "Survey Name",
-        "type": "string"
-    },
-    "questions": {
-      "title": "Questions",
-      "type": "array",
-      "items": {
-      "title": "Question",
-      "type": "object",
-      "properties": {
-        "Question Text": {
-          "type": "string"
-        },
-        "Answer Type": {
-          "type": "string",
-          "enum": [
-            "Likert (0-3)",
-            "Scroll Wheel",
-            "Date",
-            "Yes/No"
-          ],
-          "default": "Likert (0-3)"
-        },
-        "Optional Notes": {
-          "type": "string",
-          "title": "Optional Notes (e.g. if using scroll wheel)"
-        }
-      },
-      "required": [
-        "Answer Type"
-      ],
-      "dependencies": {
-        "Answer Type": {
-          "oneOf": [
-            {
-              "properties": {
-                "Answer Type": {
-                  "enum": [
-                    "Likert (0-3)",
-                    "Date",
-                    "Yes/No"
-                  ]
-                }
-              }
-            },
-            {
-              "properties": {
-                "Answer Type": {
-                  "enum": [
-                    "Scroll Wheel"
-                  ]
-                },
-                "Range": {
-                  "type": "string"
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-    }
-  }
-}
+import Grid from '@material-ui/core/Grid';
 
 const defaultSurveys = [
 {
@@ -156,7 +52,7 @@ const defaultSurveys = [
 			notes: "" 
 		},
 		{ 
-			question: "Today I feel anxToday I am easily annoyed or irritableious",
+			question: "Today I am easily annoyed or irritableious",
 			answerType: "Likert (0-3)",
 			notes: "" 
 		},
@@ -166,10 +62,7 @@ const defaultSurveys = [
 			notes: "" 
 		}
 	],
-	schedule: {
-		day: [],
-		time: new Date('2019-03-13T10:00:00')
-	}
+	schedule: []
 	},
 	{
 		surveyName: "Mood (PHQ-9)", 
@@ -222,10 +115,7 @@ const defaultSurveys = [
 		}
 	],
 	
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},
 	{
 		surveyName: "Sleep",
@@ -246,10 +136,7 @@ const defaultSurveys = [
 			answerType: "Likert (0-3)",
 			notes: "" 
 		}],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},
 	{
 		surveyName: "Psychosis",
@@ -261,10 +148,7 @@ const defaultSurveys = [
 			notes: ""
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},
 	{
 		surveyName: "Medication",
@@ -276,10 +160,7 @@ const defaultSurveys = [
 			notes: ""
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},
 	{ 
 		surveyName: "Jewels Trails A",
@@ -288,10 +169,7 @@ const defaultSurveys = [
 		{
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		},
+		schedule: [],
 		notes: ""
 	},
 	{ 
@@ -301,10 +179,7 @@ const defaultSurveys = [
 		{
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},	
 	{ 
 		surveyName: "Spatial Span",
@@ -313,10 +188,7 @@ const defaultSurveys = [
 		{
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	},
 	{
 		surveyName: "Cats and Dogs",
@@ -325,64 +197,59 @@ const defaultSurveys = [
 		{
 		}
 		],
-		schedule: {
-			day: [],
-			time: new Date('2019-03-13T10:00:00')
-		}
+		schedule: []
 	}
 ]
 
-const uiSchema = {}
-const initialFormData = {
-	"surveyName": "",
-	"questions": [],
-}
-
 export default class SurveyScheduler extends React.Component {
-
-    state = {
-        editSchedule : {
-            name:"",
-            day: [],
-            time: new Date('2019-03-13T10:00:00'),
-        },
-        customSchedules: [],
-        surveys: defaultSurveys,
-        customSurveys: {},
-    }
-
-    addToSchedule = (event) => {
-        if (this.state.editSchedule.name == "" || this.state.editSchedule.day.length === 0)
-            return
-        let sched = this.state.editSchedule
-        sched.day = sched.day.join(", ")
-        sched.time = sched.time.toLocaleTimeString()
-        this.setState({
-            customSchedules: [...this.state.customSchedules, sched],
-            editSchedule: {name:"", day: [], time: new Date('2019-03-13T10:00:00'),}
-        })
-    }
-
+    state = { surveys: [] }
     render = () =>
-    <React.Fragment>
+    <div>
+    	<div style={{ flexGrow: 1, marginBottom: 10 }}>
+    		<Grid container spacing={24}>
+	    		<Grid item xs>
+		    		<Typography variant="h6">
+		    			To finish creating your study, add some activities (surveys or cognitive tests) below.
+		    		</Typography>
+	    		</Grid>
+	    		<Grid item xs={3}>
+			    	<Button 
+			    		variant="outlined" 
+			    		onClick={() => this.setState({ surveys: [...this.state.surveys, ...defaultSurveys] })}>
+			    		Load Preset Activities
+					</Button>
+				</Grid>
+			</Grid>
+		</div>
             <MaterialTable 
                 columns={[
-                	{ title: 'Survey Name', field: 'surveyName' },
-                	{ 
-                		title: 'Schedule Day(s)',
-                		field: 'day',
-                		emptyValue: "No Day(s) Scheduled",
-                		render: rowData => { return(<MultipleSelect/>) }
-                		},
-                	{ title: 'Schedule Time', field: 'time', type: 'time', emptyValue: "No Time Scheduled" }
+                	{ title: 'Name', field: 'surveyName', cellStyle: (data, idx) => ({
+                		color: this.state.surveys.filter(x => x.surveyName == data).map(x => x.schedule.length).filter(x => x > 0).length > 0 ? 'green' : undefined,
+                		fontWeight: this.state.surveys.filter(x => x.surveyName == data).map(x => x.type == 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
+                	}) },
+                	{ title: 'Type', field: 'type', lookup: 
+                		{ 'Survey': 'Survey', 'Game': 'Game' } },
+                	{ title: 'Notes', field: 'notes'
+                	}
                 ]}
+                localization={{
+                	body: {
+                		emptyDataSourceMessage: 'Press the [+] button to begin adding activities to your study, or press "Load Preset Activities" above to see some examples.',
+                		editRow: {
+                			deleteText: 'Are you sure you want to delete this activity?'
+                		}
+                	}
+                }}
                 data = {this.state.surveys} 
-                title = "Activity Scheduler"
+                title = "Activities"
                 detailPanel = {
 				[
 				{
+                  	icon: 'settings',
+					tooltip: 'Questions',
                 	render: rowData => rowData.type === "Survey" ? (
                    
+             <div style={{ margin: '0 48px', width: '100%' }}>
              <MaterialTable
 				columns={[
 					{title: 'Question', field: 'question' }, 
@@ -393,9 +260,17 @@ export default class SurveyScheduler extends React.Component {
 						"Scroll Wheel": "Scroll Wheel"
 					}
 				},
-				{notes: 'Notes', field: 'notes'}
+				{title: 'Notes', field: 'notes'}
 
 					]}
+                localization={{
+                	body: {
+                		emptyDataSourceMessage: 'Press the [+] button to begin adding questions to this survey.',
+                		editRow: {
+                			deleteText: 'Are you sure you want to delete this question?'
+                		}
+                	}
+                }}
                 data = {rowData.questions}  
                 title = "Questions"            
 	            editable={{
@@ -425,22 +300,75 @@ export default class SurveyScheduler extends React.Component {
                     maxBodyHeight: 500
 
                 }}
-                />
+                /></div>
 
-                    ) : (<Typography variant="h5">This activity cannot be customized.</Typography>)
+                    ) : (<Typography style={{ margin: '0 48px' }} variant="h6">This activity cannot be customized.</Typography>)
+                  }, {
+                  	icon: 'calendar_today',
+                  	tooltip: 'Schedule',
+                	render: rowData => (
+                   
+             <div style={{ margin: '0 48px' }}>
+             <MaterialTable
+				columns={[
+                	{ title: 'Day', field: 'day', lookup: 
+						{
+							"Sunday": "Sunday",
+							"Monday": "Monday",
+							"Tuesday": "Tuesday",
+							"Wednesday": "Wednesday",
+							"Thursday": "Thursday",
+							"Friday": "Friday",
+							"Saturday": "Saturday"
+						}
+					},
+                	{ title: 'Time', field: 'time', type: 'time' }
+				]}
+                localization={{
+                	body: {
+                		emptyDataSourceMessage: 'Press the [+] button to begin scheduling this activity.',
+                		editRow: {
+                			deleteText: 'Are you sure you want to delete this schedule item?'
+                		}
+                	}
+                }}
+                data = {rowData.schedule}  
+                title = "Schedule"            
+	            editable={{
+				    onRowAdd: newData => 
+				    	new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].schedule.push(newData)
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				    }),
+				    onRowUpdate: (newData, oldData) =>
+				      new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].schedule[oldData.tableData.id] = newData
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				      }),
+				    onRowDelete: oldData =>
+				      new Promise((resolve, reject) => {
+				    	let tempSurveys = this.state.surveys
+				    	tempSurveys[rowData.tableData.id].schedule.splice(oldData.tableData.id, 1)
+				    	this.setState({ surveys: tempSurveys }, () => resolve())
+				      }),
+				  }}
+                options={{
+                    actionsColumnIndex: -1,
+                    pageSize: 5,
+                    pageSizeOptions: [5, 10, 15, 20],
+                    maxBodyHeight: 500
+
+                }}
+                /></div>
+
+                    )
                   }]}
                 editable={{
 				    onRowAdd: async newData => {
 				    	let tempSurveys = this.state.surveys
-				    	tempSurveys.push({...newData, questions: [
-				    		{
-								question: "Sample Question",
-								answerType: "Likert (0-3)"
-							},
-				    		],
-				    			type: "Survey"
-
-				    	})
+				    	tempSurveys.push({...newData, questions: [], schedule: [], type: "Survey" })
 				    	this.setState({ surveys: tempSurveys })
 				    },
 				    onRowUpdate: async (newData, oldData) => {
@@ -450,7 +378,6 @@ export default class SurveyScheduler extends React.Component {
 				    	this.setState({ surveys: tempSurveys })
 				    },
 				    onRowDelete: async oldData => {
-				      	console.log(oldData)
 				    	let tempSurveys = this.state.surveys
 				    	tempSurveys.splice(oldData.tableData.id, 1)
 				    	this.setState({ surveys: tempSurveys })
@@ -465,27 +392,13 @@ export default class SurveyScheduler extends React.Component {
 
                 }}
             />  
-
-
         <div style={{marginTop: 20}} />
-        {this.state.customSchedules.length > 0 ? 
-            <DataTable style={{width: "50%"}} value = {this.state.customSchedules} deleteHandler = {(buttonIds)=>{
-                let tmp = this.state.customSchedules
-                for (let i=buttonIds.length - 1; i >= 0 ; i--) {
-                   tmp.splice(buttonIds[i], 1)
-                }
-                this.setState({ customSchedules: tmp })
-            }
-
-            }/> : 
-            <React.Fragment/>
-        }
             <Button
                 variant="outlined"
                 color="default"
                 style={{width: '35%'}}
                 onClick={this.props.onCancel}>
-                Back
+                Cancel
             </Button>
             <Button
                 variant="raised"
@@ -505,6 +418,5 @@ export default class SurveyScheduler extends React.Component {
                     opacity: 0,
                 }}/>
             </Button>
-    </React.Fragment>
-
+    </div>
 }
