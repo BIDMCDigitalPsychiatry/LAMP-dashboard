@@ -56,7 +56,6 @@ class Register extends React.Component {
     }
 
     componentDidMount() {
-        this.props.layout.setTitle('Register')
     }
 
     validator = {
@@ -163,7 +162,7 @@ class Register extends React.Component {
     handleForms = (event) => this.props.history.replace('/forms')
 
     render = () => 
-    <React.Fragment>
+                        <Paper square={true} elevation={12} style={{padding: '16px', position: 'absolute'}}>
     <Grid container justify="space-around" direction="column" alignItems="center" spacing={24} style={{marginTop: '48px'}}>
     <Grid item xs={5}>
     <div>
@@ -233,13 +232,6 @@ class Register extends React.Component {
                         }}/>
                     </Button>
                     <br />
-                    {/*<Button
-                        variant="outlined"
-                        color="default"
-                        style={{width: '100%', marginTop: 20}}
-                        onClick={this.handleForms}>
-                        Skip Register and Take Me to Forms
-                    </Button>*/}
                 </form>
         </Paper>
         </div>
@@ -259,7 +251,7 @@ class Register extends React.Component {
                 />
             </DialogContent>
         </Dialog>
-    </React.Fragment>
+    </Paper>
 
 }
 

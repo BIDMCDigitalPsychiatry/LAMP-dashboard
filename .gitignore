@@ -10,3 +10,4 @@ build
 
 # IntelliJ IDEA
 *.iml
+.DS_Store

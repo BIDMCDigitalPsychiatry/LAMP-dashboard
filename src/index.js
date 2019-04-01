@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
 import Login from './pages/login.js';
-import Register from './pages/register.js';
+import Register from './components/register.js';
 import Forms from './pages/forms.js';
 import Root from './pages/root.js';
 import Researcher from './pages/researcher.js';
