@@ -204,7 +204,7 @@ class Login extends React.Component {
 
             <Slide direction="right" in={!this.state.slide} mountOnEnter unmountOnExit appear>
 
-        <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width:'33vw', left:'33vw'}}>
+        <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width:'25vw', left:'37.5vw'}}>
                 <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
             <Grid container justify="space-evenly" style={{textAlign: "center", height: 100}}>

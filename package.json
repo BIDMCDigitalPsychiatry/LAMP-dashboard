@@ -27,6 +27,7 @@
     "leaflet": "^1.4.0",
     "material-table": "^1.28.2",
     "material-ui-pickers": "^2.2.4",
+    "moment": "^2.24.0",
     "mui-datatables": "^2.0.0-beta-9",
     "pigeon-maps": "^0.11.11",
     "pigeon-marker": "^0.3.4",
