@@ -89,6 +89,13 @@ class NeuroPsychParticipant extends React.Component {
         }
         this.props.layout.setTitle(`Participant ${id}`)
 
+        await LAMP.Type.get_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', undefined, { untyped: true }).then(res => {
+            var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
+            if (res.hasOwnProperty('log'))
+                console.error(res.log)
+            this.setState({ attachment: exists ? res.output.replace(/\s/g, '') : null })
+        })
+
         const {timeline, avgData, surveyData} = participantTimeline(await downloadParticipantEvents(id))
 
         console.log(avgData, convertGraphData(avgData))

@@ -133,8 +133,6 @@ class Researcher extends React.Component {
 
         const {timeline, avgData, surveyData} = participantTimeline(await downloadStudyEvents(obj[0].studies[0]))
 
-        console.dir(avgData)
-
         const script_sources = await docPages() //Get information from Lamp-scripts
         const plot_sources = plotParse(script_sources)
         this.setState({
@@ -191,13 +189,11 @@ class Researcher extends React.Component {
 
             jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function(err, csv) {
                 if(err) return console.log(err)
-                console.log(csv)
                 zip.file(`${row.id}/sensor_event.csv`, csv)
             })
 
             jsonexport(JSON.parse(JSON.stringify(resultEvents)), function(err, csv) {
                 if(err) return console.log(err)
-                console.log(csv)
                 zip.file(`${row.id}/result_event.csv`, csv)
             })
 
@@ -229,7 +225,7 @@ class Researcher extends React.Component {
 
     }
 
-    saveScript = (inputScript = this.state.scriptText, inputReqs = this.state.scriptReqs) => {
+    saveScript = async (inputScript = this.state.scriptText, inputReqs = this.state.scriptReqs) => {
 		let { id } = this.props.match.params
 		if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
 		    id = LAMP.get_identity().id
@@ -238,27 +234,28 @@ class Researcher extends React.Component {
         var reqs = inputReqs.split(',')
         this.setState({openVizEdit: false, scriptText: '', scriptReqs: '', toggled_scripts:[]})
 
+
         for (let i = 0 ; i < 9; i++){
             if (i < this.state.plot_toggle.length && this.state.plot_toggle[i] === true) {
-                LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
+                await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
                     "script_type": "rscript",
                     "script_contents": this.state.plot_sources[i][1],
                     "script_requirements": this.state.plot_sources[i][2].replace(/(\r\n\t|\n|\r\t)/gm, "").split(",")
-                }, {untyped: true})
+                }, undefined, {untyped: true})
             } else {
-                LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
+                await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
                     "script_type": "rscript",
                     "script_contents": "",
                     "script_requirements": ""
-                }, {untyped: true})
+                }, undefined, {untyped: true})
             }
         }
 
-        LAMP.TypeLegacy.set_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
+        await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
-        })
+        }, undefined, {untyped: true})
 
     }
 
