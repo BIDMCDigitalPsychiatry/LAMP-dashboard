@@ -159,6 +159,7 @@ class Researcher extends React.Component {
 
         let ids = []
         for (let i = 0; i < newCount; i ++) {
+            console.log(this.state.researcher.studies)
             let newID = await LAMP.Participant.create(this.state.researcher.studies[0], {
                 study_code: "001"
             }, {
@@ -294,9 +295,17 @@ class Researcher extends React.Component {
                     data={this.state.avgData}
                     height={400} />
 
-        {this.state.data.length > 0 ? 
             <MaterialTable 
                 columns={[{ title: 'Participant ID', field: 'id' }]}
+                localization={{
+                    body: {
+                        emptyDataSourceMessage: 'No participants. Add participants by clicking the [+] button above.',
+                        editRow: {
+                            deleteText: 'Are you sure you want to delete this participant?'
+                        }
+                    }
+                }}
+
                 data = {this.state.data} 
                 title = "Study Participants"
                 detailPanel={rowData => {
@@ -342,9 +351,8 @@ class Researcher extends React.Component {
                     pageSizeOptions: [10, 25, 50, 100]
 
                 }}
-            /> : 
-            <React.Fragment/>
-        }
+            />
+        
             <Popover
               id="simple-popper"
               open={!!this.state.popoverAttachElement}

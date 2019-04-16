@@ -124,13 +124,33 @@ export async function downloadParticipantEvents(id) {
 }
 
 export async function downloadStudyEvents(id) {
-     // Fetch all participant-related data streams.
-    let res = await Promise.all([
-                LAMP.Activity.all_by_study(id), 
-                LAMP.ResultEvent.all_by_study(id, undefined, {untyped: true}), 
-                LAMP.SensorEvent.all_by_study(id, undefined, {untyped: true})
-            ])
 
+    async function downloadEvents(ids) {
+        let resultEvents = []
+        let sensorEvents = []
+
+        for (var i = 0; i < ids.length; i++) {
+            try {
+                resultEvents.push(await LAMP.ResultEvent.all_by_participant(ids[i], undefined, {untyped: true}))
+                sensorEvents.push(await LAMP.SensorEvent.all_by_participant(ids[i], undefined, {untyped: true}))
+            }
+            catch {}
+        }
+        return [resultEvents, sensorEvents]
+     }
+
+     // Fetch all participant-related data streams.
+     let test = await Promise.all([LAMP.Study.view(id)])
+     let participants = []
+     if (!!test) {
+        participants = test[0][0].participants
+     }
+    
+    let activities = await LAMP.Activity.all_by_study(id)
+
+    let res = await downloadEvents(participants)
+
+    res.unshift(activities)
     res[1] = [].concat(...Object.values(res[1]))
     res[2] = [].concat(...Object.values(res[2]))
     return res
@@ -236,7 +256,6 @@ export function participantTimeline(inputData, catMap) {
                             ])
                             .reduce((prev, curr) => ({ ...prev, [curr[0]]: curr[1] }), {})
 
-                            console.log(surveyData)
 
     return {timeline, avgData, surveyData}
 }
