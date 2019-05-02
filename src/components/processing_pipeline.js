@@ -209,7 +209,7 @@ export function participantTimeline(inputData, catMap) {
         // Accumulate the uniqued set of questions for every survey for this study.
         // This represents every possible question a participant might have.
         let questions = activities
-                            .filter(x => x.spec === 'QWN0aXZpdHlTcGVjOjE~')
+                            .filter(x => x.spec === 'lamp.survey')
                             .map(x => x.settings)
                             .reduce((prev, curr) => prev.concat(curr), [])
                             .map(x => x.text)
@@ -247,7 +247,7 @@ export function participantTimeline(inputData, catMap) {
                                     return prev
                                 }, {}))
                             ])
-                            .map(x => { console.log(JSON.stringify(x[1], 0, 4)); return x })
+                            .map(x => { JSON.stringify(x[1], 0, 4); return x })
                             .map(x => [x[0], x[1].map(y => ({
                                     category: x[0],
                                     value: y.reduce((a, b) => a + b.value, 0) / y.length,
@@ -265,7 +265,7 @@ export function participantTimeline(inputData, catMap) {
         return !e ? [] : e.map(x => !!x ?
         ({
             x: isNaN(x.duration) ? 0 : x.duration || 0,
-            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(x.value) ? 0 : x.value || 0),
+            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(parseFloat(x.value)) ? parseFloat(x.item) : x.value || 0),
             longTitle: x.item || '',
             shortTitle: surveyMap[x.item] || '',
         }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
