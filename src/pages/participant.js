@@ -97,8 +97,6 @@ class NeuroPsychParticipant extends React.Component {
         const {timeline, avgData, surveyData} = participantTimeline(await downloadParticipantEvents(id))
 
         // Update state now with the new fetched & computed objects.
-        console.log(avgData)
-        console.log(convertGraphData(avgData))
         this.setState({ 
             timeline: timeline, 
             avgData: convertGraphData(avgData), 
