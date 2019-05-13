@@ -47,7 +47,7 @@ class NeuroPsychParticipant extends React.Component {
         selected: [],
         avgData: [],
         surveyData: [],
-		zoomLevel: 4, // default grid setting for plots!
+		zoomLevel: 12, // default grid setting for plots!
         ping: null
     }
 
@@ -89,12 +89,10 @@ class NeuroPsychParticipant extends React.Component {
         }
         this.props.layout.setTitle(`Participant ${id}`)
 
-        // await LAMP.Type.get_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz1', undefined, { untyped: true }).then(res => {
-        //     var exists = (res.hasOwnProperty('output') && (typeof res.output === 'string'));
-        //     if (res.hasOwnProperty('log'))
-        //         console.error(res.log)
-        //     this.setState({ attachment: exists ? res.output.replace(/\s/g, '') : null })
-        // })
+
+        LAMP.Type.get_dynamic_attachment(id, 'lamp.beta_values', undefined, { untyped: true }).then(res => {
+            this.setState({ attachments: [JSON.parse(res.data)] })
+        }).catch(() => {})
 
         const {timeline, avgData, surveyData} = participantTimeline(await downloadParticipantEvents(id))
 
@@ -231,6 +229,8 @@ class NeuroPsychParticipant extends React.Component {
                     {!this.state.attachments ? <div/> : this.state.attachments.filter(Boolean).map(attach =>
                         <Grid item xs={this.state.zoomLevel}>
                             <Card style={{ padding: '.3rem' }}>
+                            <img src={'data:image/png;base64,' + attach} />
+                            {/*
                                 <Document
                                     file={'data:application/pdf;base64,' + attach}
                                     error={
@@ -240,7 +240,7 @@ class NeuroPsychParticipant extends React.Component {
                                     }
                                     loading="">
                                     <Page renderMode="svg" pageIndex={0}/>
-                                </Document>
+                                </Document>*/}
                             </Card>
                         </Grid>
                     )}

@@ -265,7 +265,7 @@ export function participantTimeline(inputData, catMap) {
         return !e ? [] : e.map(x => !!x ?
         ({
             x: isNaN(x.duration) ? 0 : x.duration || 0,
-            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(parseFloat(x.value)) ? parseFloat(x.item) : x.value || 0),
+            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(parseFloat(x.value)) ? ((isNaN(parseFloat(x.item)) | x.item.length==0) ? 0 : parseFloat(x.item) ) : x.value || 0),
             longTitle: x.item || '',
             shortTitle: surveyMap[x.item] || '',
         }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
