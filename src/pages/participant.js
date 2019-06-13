@@ -253,10 +253,15 @@ class NeuroPsychParticipant extends React.Component {
                 <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center' }}>
                     Average survey responses:
                 </Typography>
+                {this.state.avgData.filter( (x) => x.x > 0).length === 0 ?
+                    <Typography variant="h6" color="inherit" style={{flex: 1}}>
+                    No Survey Data Available
+                </Typography> :
                 <VariableBarGraph
                     rotateText={false}
                     data={this.state.avgData}
                     height={400} />
+                }
             </Card>
             {Object.keys(this.state.surveyData).map(cat =>
                 <Card style={{ marginTop: 50, marginBotton: 50 }}>

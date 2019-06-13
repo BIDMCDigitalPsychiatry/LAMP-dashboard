@@ -287,10 +287,15 @@ class Researcher extends React.Component {
                 </Typography>
             </Toolbar>
             <Divider />
+                {this.state.avgData.filter( (x) => x.x > 0).length === 0 ?
+                    <Typography variant="h6" color="inherit" style={{flex: 1}}>
+                    No Survey Data Available
+                </Typography> :
                 <VariableBarGraph
                     rotateText={false}
                     data={this.state.avgData}
                     height={400} />
+                }
 
             <MaterialTable 
                 columns={[{ title: 'Participant ID', field: 'id' }]}
