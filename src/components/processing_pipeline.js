@@ -234,8 +234,8 @@ export function participantTimeline(inputData, catMap) {
         // Average each question's answer array and convert it to the right format.
         // This produces an average whole-study event for every answer given.
         let avgData = Object.values(data).map(a => ({
-            item: a.length > 0 ? a[0].item : '',
-            value: a.reduce((a, b) => a + parseInt(b.value), 0) / a.length,
+            item: a.length > 0 ? (!!catMap ? (catMap[a[0].item] || a[0].item) : a[0].item) : '',
+            value: a.reduce((a, b) => a + smartParseInt(b.value), 0) / a.length,
             duration: Math.floor(a.reduce((a, b) => a + b.duration, 0) / a.length)
         }))
 
@@ -260,12 +260,40 @@ export function participantTimeline(inputData, catMap) {
     return {timeline, avgData, surveyData}
 }
 
+// Fix for LA County Demo
+function smartParseInt(val) {
+
+  if (!!val.toLowerCase && val.toLowerCase() === "no") {
+    return 0
+  } else if (!!val.toLowerCase && val.toLowerCase() === "maybe") {
+    return 1
+  } else if (!!val.toLowerCase && val.toLowerCase() === "yes") {
+    return 2
+  } else {
+      return (isNaN(parseInt(val)) ? 0 : parseInt(val))
+  }
+}
+
+function smartParseFloat(val) {
+
+  if (!!val.toLowerCase && val.toLowerCase() === "no") {
+    return 0
+  } else if (!!val.toLowerCase && val.toLowerCase() === "maybe") {
+    return 1
+  } else if (!!val.toLowerCase && val.toLowerCase() === "yes") {
+    return 2
+  } else {
+      return (isNaN(parseFloat(val)) ? 0 : parseFloat(val) || 0)
+  }
+}
+
+
 // Convert a Result timeline event into a VariableBarGraph object.
     export function convertGraphData(e) { 
         return !e ? [] : e.map(x => !!x ?
         ({
             x: isNaN(x.duration) ? 0 : x.duration || 0,
-            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(parseFloat(x.value)) ? ((isNaN(parseFloat(x.item)) | x.item.length==0) ? 0 : parseFloat(x.item) ) : x.value || 0),
+            y: (e.activity_type != null ? (isNaN(parseFloat(x.item)) ? 0 : parseFloat(x.item)  || 0) : isNaN(parseFloat(x.value)) ? ((isNaN(parseFloat(x.item)) | x.item.length==0) ? smartParseFloat(x.value) : parseFloat(x.item) ) : x.value || 0),
             longTitle: x.item || '',
             shortTitle: surveyMap[x.item] || '',
         }) : ({ x: 0, y: 0, longTitle: '', shortTitle: '' }))
