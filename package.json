@@ -42,7 +42,12 @@
     "react-leaflet": "^2.2.1",
     "react-pdf": "^3.0.6",
     "react-router-dom": "^4.3.1",
-    "react-scroll-horizontal": "^1.6.2"
+    "react-scroll-horizontal": "^1.6.2",
+    "swagger-ui-react": "^3.22.3"
+  },
+  "resolutions": {
+    "browserslist": "4.6.2",
+    "caniuse-lite": "1.0.30000974"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",

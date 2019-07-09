@@ -13,6 +13,10 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import {blue, red} from '@material-ui/core/colors';
+import Fab from '@material-ui/core/Fab'
+import Icon from '@material-ui/core/Icon'
+import SwaggerUI from 'swagger-ui-react'
+import 'swagger-ui-react/swagger-ui.css'
 
 // Synchronously load CSS from a remote URL from within JS.
 document.loadCSS = (url) => {
@@ -80,6 +84,10 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                 <Route exact path="/login" render={props =>
                     !LAMP.get_identity() ?
 					<NavigationLayout noToolbar>
+                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                            <Icon>memory</Icon>
+                            API
+                        </Fab>
 						<Login />
 					</NavigationLayout> :
                     <Redirect to="/home" />
@@ -125,6 +133,18 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                     <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Participant {...props} />
                     </NavigationLayout>
+                } />
+
+                {/* Route API documentation ONLY. */}
+                <Route exact path="/api" render={props =>
+                    <div>
+                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => props.history.replace('/')}>
+                            <Icon>arrow_back</Icon>
+                            Back
+                        </Fab>
+                        <div style={{height: 56}}></div>
+                        <SwaggerUI url="https://api.lamp.digital/" docExpansion="list" />
+                    </div>
                 } />
             </Switch>
         </HashRouter>
