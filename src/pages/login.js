@@ -4,7 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import LAMP from '../lamp.js';
+import LAMP from '../lamp';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import mindLAMPLogo from '../logo.png'
@@ -133,7 +133,7 @@ class Login extends React.Component {
         let type = (this.state.id === 'root' ?
             'root' : (this.state.id.includes('@') ?
                 'researcher' : 'participant'))
-        LAMP.set_identity(type, this.state.id, this.state.password).then(res => {
+        LAMP.set_identity({ type: type, id: this.state.id, password: this.state.password}).then(res => {
             this.props.history.replace('/home')
         }).catch(err => {
             console.warn("error with auth request", err)
@@ -290,7 +290,7 @@ class Login extends React.Component {
                             Back
                         </Button>
                         <Button
-                            variant="raised"
+                            variant="contained"
                             color="primary"
                             className="submit"
                             style={{float: 'right', width: '45%'}}
@@ -352,7 +352,7 @@ class Login extends React.Component {
                     Back
                 </Button>
                 <Button
-                    variant="raised"
+                    variant="contained"
                     color="primary"
                     type="submit"
                     style={{float: 'right', width: '45%'}}

@@ -6,7 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LAMP from '../lamp.js';
+import LAMP from '../lamp';
 import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -19,7 +19,7 @@ class Root extends React.Component {
 	componentWillMount() {
 		this.props.layout.pageLoading(false)
 
-		if ((LAMP.auth || {type: null}).type !== 'root') {
+		if ((LAMP._auth || {type: null}).type !== 'root') {
 			this.props.history.replace(`/`)
 			return
 		}

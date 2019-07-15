@@ -1,4 +1,4 @@
-import LAMP from './lamp.js';
+import LAMP from './lamp';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
@@ -73,9 +73,9 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                     <Redirect to="/home" />
                 } />
                 <Route exact path="/home" render={() =>
-					(LAMP.auth || {type: null}).type === 'root' ?
+					(LAMP._auth || {type: null}).type === 'root' ?
                     <Redirect to="/researcher" /> :
-                    (LAMP.auth || {type: null}).type === 'researcher' ?
+                    (LAMP._auth || {type: null}).type === 'researcher' ?
                     <Redirect to="/researcher/me" /> :
                     <Redirect to="/participant/me" />
 				} />
@@ -115,14 +115,14 @@ LAMP.connect('https://api.lamp.digital').then(() => {
 				<Route exact path="/researcher" render={props =>
 					!LAMP.get_identity() ?
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP._auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Root {...props} />
                     </NavigationLayout>
 				} />
                 <Route exact path="/researcher/:id" render={props =>
                     !LAMP.get_identity() ?
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP._auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Researcher {...props} />
                     </NavigationLayout>
                 } />
@@ -130,7 +130,7 @@ LAMP.connect('https://api.lamp.digital').then(() => {
                 <Route exact path="/participant/:id" render={props =>
                     !LAMP.get_identity() ? 
                     <Redirect to="/login" /> :
-                    <NavigationLayout profile={(LAMP.auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
+                    <NavigationLayout profile={(LAMP._auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                         <Participant {...props} />
                     </NavigationLayout>
                 } />

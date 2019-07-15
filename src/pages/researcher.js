@@ -6,7 +6,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableHead from '@material-ui/core/TableHead';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
-import LAMP from '../lamp.js';
+import LAMP from '../lamp';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -118,7 +118,7 @@ class Researcher extends React.Component {
 		this.props.layout.pageLoading(false)
 
 		let { id } = this.props.match.params
-        if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
+        if (id === 'me' && (LAMP._auth || {type: null}).type === 'researcher')
             id = LAMP.get_identity().id
         if (!id || id === 'me') {
             this.props.history.replace(`/`)
@@ -127,18 +127,18 @@ class Researcher extends React.Component {
 
 
 		let obj = await LAMP.Researcher.view(id)
-		this.props.layout.setTitle(`Researcher ${obj[0].name}`)
-        let res = await LAMP.Participant.all_by_researcher(id)
-		let actRes = await LAMP.Activity.all_by_researcher(id)
+		this.props.layout.setTitle(`Researcher ${obj.name}`)
+        let res = await LAMP.Participant.allByResearcher(id)
+		let actRes = await LAMP.Activity.allByResearcher(id)
 
-        const {timeline, avgData, surveyData} = participantTimeline(await downloadStudyEvents(obj[0].studies[0]))
+        const {timeline, avgData, surveyData} = participantTimeline(await downloadStudyEvents(obj.studies[0]))
 
         const script_sources = await docPages() //Get information from Lamp-scripts
         const plot_sources = plotParse(script_sources)
         this.setState({
             plot_sources: plot_sources,
             plot_toggle: plot_sources.map((key) => false),
-            researcher: obj[0],
+            researcher: obj,
             data: res,
             activities: actRes,
             avgData: convertGraphData(avgData)
@@ -177,8 +177,8 @@ class Researcher extends React.Component {
         let zip = new JSZip()
 
         for (let row of selectedRows) {
-            let sensorEvents = await LAMP.SensorEvent.all_by_participant(row.id)
-            let resultEvents = await LAMP.ResultEvent.all_by_participant(row.id)
+            let sensorEvents = await LAMP.SensorEvent.allByParticipant(row.id)
+            let resultEvents = await LAMP.ResultEvent.allByParticipant(row.id)
 
             if (filetype === "json") {
                 zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
@@ -211,7 +211,7 @@ class Researcher extends React.Component {
         this.setState({popoverAttachElement: null, selectedIcon: "", selectedRows: []})
 
         for (let row of selectedRows) {
-            await LAMP.Participant.delete(row.id, {}, {untyped: true})
+            await LAMP.Participant.delete(row.id)
         }
 
         let tempRows = selectedRows.map(y => y.id)
@@ -227,7 +227,7 @@ class Researcher extends React.Component {
 
     saveScript = async (inputScript = this.state.scriptText, inputReqs = this.state.scriptReqs) => {
 		let { id } = this.props.match.params
-		if (id === 'me' && (LAMP.auth || {type: null}).type === 'researcher')
+		if (id === 'me' && (LAMP._auth || {type: null}).type === 'researcher')
 		    id = LAMP.get_identity().id
 
         var contents = inputScript
@@ -237,25 +237,25 @@ class Researcher extends React.Component {
 
         for (let i = 0 ; i < 9; i++){
             if (i < this.state.plot_toggle.length && this.state.plot_toggle[i] === true) {
-                await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
+                await LAMP.Type.setDynamicAttachment(id, 'org.bidmc.digitalpsych.lamp.viz' + (i+1), {
                     "script_type": "rscript",
                     "script_contents": this.state.plot_sources[i][1],
                     "script_requirements": this.state.plot_sources[i][2].replace(/(\r\n\t|\n|\r\t)/gm, "").split(",")
-                }, undefined, {untyped: true})
+                })
             } else {
-                await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
+                await LAMP.Type.setDynamicAttachment(id, 'org.bidmc.digitalpsych.lamp.viz'+(i+1), {
                     "script_type": "rscript",
                     "script_contents": "",
                     "script_requirements": ""
-                }, undefined, {untyped: true})
+                })
             }
         }
 
-        await LAMP.Type.set_dynamic_attachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
+        await LAMP.Type.setDynamicAttachment(id, 'org.bidmc.digitalpsych.lamp.viz10', {
             "script_type": "rscript",
             "script_contents": contents,
             "script_requirements": reqs
-        }, undefined, {untyped: true})
+        })
 
     }
 
@@ -398,7 +398,7 @@ class Researcher extends React.Component {
             || this.state.selectedIcon === "delete" &&
                 <div style = {{ padding: "20px" }}>
                     <Button 
-                        variant = "raised" 
+                        variant = "contained" 
                         color = "secondary"
                         onClick={() => this.deleteParticipants()}
                         >

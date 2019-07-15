@@ -1,5 +1,5 @@
 import React from 'react'
-import LAMP from '../lamp.js'
+import LAMP from '../lamp'
 import { Bar, Line} from '@vx/shape'
 import { Group } from '@vx/group'
 import { withParentSize } from '@vx/responsive'
