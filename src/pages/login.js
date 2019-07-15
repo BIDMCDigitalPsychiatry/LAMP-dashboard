@@ -130,6 +130,12 @@ class Login extends React.Component {
 
     handleLogin = (event) => {
         event.preventDefault()
+        
+        //
+        if (!!this.state.serverAddress)
+            LAMP.connect(this.state.serverAddress, false)
+
+        //
         let type = (this.state.id === 'root' ?
             'root' : (this.state.id.includes('@') ?
                 'researcher' : 'participant'))
@@ -207,19 +213,29 @@ class Login extends React.Component {
         <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width:'25vw', left:'37.5vw'}}>
                 <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
-            <Grid container justify="space-evenly" style={{textAlign: "center", height: 100}}>
+            <Grid container justify="space-evenly" style={{textAlign: "center", height: 250}}>
 
+                <TextField
+                    margin="normal"
+                    variant="outlined"
+                    style={{width: '80%', height: 92}}
+                    label="Server Address"
+                    placeholder="https://api.lamp.digital"
+                    helperText="Don't enter a server location if you're not sure what this option does."
+                    value={this.state.serverAddress || ''}
+                    onChange={event => this.setState({ serverAddress: event.target.value })}
+                />
                 <Button
                     variant="contained"
                     color="primary"
-                    style={{width: '80%', height: '40%'}}
+                    style={{width: '80%', height: 36}}
                     onClick={this.handleSlideLogin}>
                     Login
                 </Button>
                 <Button
                     variant="outlined"
                     color="default"
-                    style={{width: '80%', height: '40%'}}
+                    style={{width: '80%', height: 36}}
                     onClick={this.handleSlideRegister}>
                     Sign Up
                 </Button>

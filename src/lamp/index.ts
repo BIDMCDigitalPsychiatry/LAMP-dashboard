@@ -63,9 +63,10 @@ export default class LAMP {
      * Load a session-stored authorization token if available.
      * Deletes any existing identity/credential if previously specified.
      */
-    public static async connect(base: string) {
+    public static async connect(base: string, restore: boolean = true) {
         LAMP.configuration = { base }
-        LAMP.refresh_identity()
+        if (restore)
+            LAMP.refresh_identity()
     }
 
 
