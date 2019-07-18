@@ -1,4 +1,5 @@
 import LAMP from './lamp';
+import AppHome from './appUI/home';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom';
@@ -133,6 +134,11 @@ ReactDOM.render((
                 <NavigationLayout profile={(LAMP._auth || {type: null}).type === 'root' ? {} : LAMP.get_identity()}>
                     <Participant {...props} />
                 </NavigationLayout>
+            } />
+
+            {/* Route to the app home screen. [TODO] */}
+            <Route exact path="/app" render={() =>
+                <AppHome />
             } />
 
             {/* Route API documentation ONLY. */}
