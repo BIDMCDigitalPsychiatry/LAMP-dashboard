@@ -1,4 +1,4 @@
-import LAMP from '../lamp.js';
+import LAMP from '../lamp';
 
 // Note the surveys we want to use in the average plot with their initial slot number as well as expected length.
 const usableSurveys = {
@@ -116,9 +116,9 @@ const surveyMap = {
 export async function downloadParticipantEvents(id) {
                 // Fetch all participant-related data streams.
         return await Promise.all([
-            LAMP.Activity.all_by_participant(id), 
-            LAMP.ResultEvent.all_by_participant(id), 
-            LAMP.SensorEvent.all_by_participant(id)
+            LAMP.Activity.allByParticipant(id), 
+            LAMP.ResultEvent.allByParticipant(id), 
+            LAMP.SensorEvent.allByParticipant(id)
         ])
 
 }
@@ -131,8 +131,8 @@ export async function downloadStudyEvents(id) {
 
         for (var i = 0; i < ids.length; i++) {
             try {
-                resultEvents.push(await LAMP.ResultEvent.all_by_participant(ids[i], undefined, {untyped: true}))
-                sensorEvents.push(await LAMP.SensorEvent.all_by_participant(ids[i], undefined, {untyped: true}))
+                resultEvents.push(await LAMP.ResultEvent.allByParticipant(ids[i]))
+                sensorEvents.push(await LAMP.SensorEvent.allByParticipant(ids[i]))
             }
             catch {}
         }
@@ -143,10 +143,10 @@ export async function downloadStudyEvents(id) {
      let test = await Promise.all([LAMP.Study.view(id)])
      let participants = []
      if (!!test) {
-        participants = test[0][0].participants
+        participants = test[0].participants
      }
     
-    let activities = await LAMP.Activity.all_by_study(id)
+    let activities = await LAMP.Activity.allByStudy(id)
 
     let res = await downloadEvents(participants)
 

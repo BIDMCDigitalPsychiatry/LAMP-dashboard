@@ -368,7 +368,7 @@ export default class SurveyScheduler extends React.Component {
 				                 Surveys that have been successfully scheduled will be <Typography variant="h6" style={{fontWeight: 'bold', color: 'green'}}>bold and green</Typography>.
 				                 </li>
 				                 <li>
-				                 When you're done, click <Button variant="raised" color="primary">Register</Button>.
+				                 When you're done, click <Button variant="contained" color="primary">Register</Button>.
 				                 </li>
 				                 </ol>
 				            </DialogContentText>
@@ -458,7 +458,7 @@ export default class SurveyScheduler extends React.Component {
                 Cancel
             </Button>
             <Button
-                variant="raised"
+                variant="contained"
                 color="primary"
                 className="submit"
                 style={{float: 'right', width: '35%'}}

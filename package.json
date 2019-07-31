@@ -5,13 +5,16 @@
   "description": "LAMP Portal",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^2.0.0"
+    "react-scripts": "^2.0.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
     "@date-io/date-fns": "^1.1.0",
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
     "@material-ui/lab": "^3.0.0-alpha.30",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.4",
     "@vx/grid": "0.0.184",
     "@vx/text": "0.0.183",
     "@vx/vx": "^0.0.179",
@@ -54,10 +57,19 @@
     "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
     "deploy": "aws s3 sync build/ `echo $DASHBOARD_DEPLOY_S3_BUCKET`"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }

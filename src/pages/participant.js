@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import Timeline from '../components/timeline.js';
 import { withRouter } from 'react-router-dom';
 import Card from '@material-ui/core/Card';
-import LAMP from '../lamp.js';
+import LAMP from '../lamp';
 import { TransitIcon, HospitalIcon, HomeIcon, OutsideIcon, SchoolIcon, ShoppingIcon, WorkIcon } from '../components/lamp_icons.js'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -80,7 +80,7 @@ class NeuroPsychParticipant extends React.Component {
         this.props.layout.pageLoading(false)
 
         let { id } = this.props.match.params
-        if (id === 'me' && (LAMP.auth || {type: null}).type === 'participant')
+        if (id === 'me' && (LAMP._auth || {type: null}).type === 'participant')
             id = LAMP.get_identity().id
 
         if (!id || id === 'me') {
@@ -90,7 +90,7 @@ class NeuroPsychParticipant extends React.Component {
         this.props.layout.setTitle(`Participant ${id}`)
 
 
-        LAMP.Type.get_dynamic_attachment(id, 'lamp.beta_values', undefined, { untyped: true }).then(res => {
+        LAMP.Type.getDynamicAttachment(id, 'lamp.beta_values').then(res => {
             this.setState({ attachments: [JSON.parse(res.data)] })
         }).catch(() => {})
 
