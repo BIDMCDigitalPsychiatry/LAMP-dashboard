@@ -1,34 +1,31 @@
-import React from 'react'
-import { withRouter } from 'react-router-dom';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import MenuItem from '@material-ui/core/MenuItem';
-import Badge from '@material-ui/core/Badge';
-import Popover from '@material-ui/core/Popover';
-import IconButton from '@material-ui/core/IconButton';
-import Snackbar from '@material-ui/core/Snackbar'
-import Menu from '@material-ui/core/Menu';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import { lightBlue900 } from '@material-ui/core/colors';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
-import LinearProgress from '@material-ui/core/LinearProgress';
-import Fade from '@material-ui/core/Fade';
-import Button from '@material-ui/core/Button';
-import { ObjectView } from '../components/datatable.js'
 
-// Quick util function to generate a copyright notice.
-function copyright(startYear, authors) {
-    var thisYear = new Date().getFullYear()
-    var years = (thisYear > startYear ? startYear + '-' + thisYear : startYear)
-    return `Copyright © ${years} ${authors}`
-}
+// Core Imports 
+import React from 'react'
+import { withRouter } from 'react-router-dom'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import MenuItem from '@material-ui/core/MenuItem'
+import Badge from '@material-ui/core/Badge'
+import Popover from '@material-ui/core/Popover'
+import IconButton from '@material-ui/core/IconButton'
+import Snackbar from '@material-ui/core/Snackbar'
+import Menu from '@material-ui/core/Menu'
+import ArrowBack from '@material-ui/icons/ArrowBack'
+import AccountCircle from '@material-ui/icons/AccountCircle'
+import NotificationsIcon from '@material-ui/icons/Notifications'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogActions from '@material-ui/core/DialogActions'
+import LinearProgress from '@material-ui/core/LinearProgress'
+import Fade from '@material-ui/core/Fade'
+import Button from '@material-ui/core/Button'
+import red from '@material-ui/core/colors/red'
+
+// Local Imports 
+import { ObjectView } from './DataTable'
 
 class NavigationLayout extends React.Component {
     state = {
@@ -48,7 +45,7 @@ class NavigationLayout extends React.Component {
 
     startLoading = () => {
 		this.timer = setInterval(() => this.setState({
-			loaded: (this.state.loaded == 1.0 ? 0.0 : (this.state.loaded > 0.9 ? this.state.loaded : this.state.loaded + 0.01))
+			loaded: (this.state.loaded === 1.0 ? 0.0 : (this.state.loaded > 0.9 ? this.state.loaded : this.state.loaded + 0.01))
 		}), 100)
     }
 
@@ -114,7 +111,7 @@ class NavigationLayout extends React.Component {
                         <MenuIcon />
                     	*/}
 					</IconButton>
-					<Typography variant="h6" color="default" style={{flexGrow: 1}}>
+					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
 						{this.state.title}
 					</Typography>
 					<div>
@@ -156,7 +153,8 @@ class NavigationLayout extends React.Component {
                             showMessage: (message, timeout = 3000) => {
                                 this.setState({ snackMessage: message })
                                 setTimeout(() => this.setState({ snackMessage: null }), timeout)
-                            }
+                            },
+                            showAlert: (message) => this.setState({ alertMessage: message })
                         }})
                     )}
                 </div>
@@ -190,8 +188,8 @@ class NavigationLayout extends React.Component {
             open={this.state.logoutConfirm}
             onClose={this.cancelLogout}
             aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description">
-
+            aria-describedby="alert-dialog-description"
+        >
             <DialogTitle id="alert-dialog-title">
                 Are you sure you want to log out of LAMP right now?
             </DialogTitle>
@@ -207,6 +205,27 @@ class NavigationLayout extends React.Component {
                 <Button onClick={this.confirmLogout} color="primary" autoFocus>
                     Logout
                 </Button>
+            </DialogActions>
+        </Dialog>
+        <Dialog
+            open={!!this.state.alertMessage}
+            onClose={() => this.setState({ alertMessage: undefined })}
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+            PaperProps={{style: { backgroundColor: red[900] }}}
+        >
+            <DialogTitle id="alert-dialog-slide-title">
+                <span style={{color: 'white'}}>That action could not be completed. Please try again later. (Error code: -16003.)</span>
+            </DialogTitle>
+            <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                    <span style={{color: 'white'}}>{this.state.alertMessage}</span>
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => this.setState({ alertMessage: undefined })} color="primary">
+                  <span style={{color: 'white'}}>OK</span>
+              </Button>
             </DialogActions>
         </Dialog>
 		<Popover

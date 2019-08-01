@@ -1,55 +1,41 @@
-import React from 'react'
-import { withRouter } from 'react-router-dom';
-import Paper from '@material-ui/core/Paper';
-import Card from '@material-ui/core/Card';
-import Grid from '@material-ui/core/Grid';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableHead from '@material-ui/core/TableHead';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import Toolbar from '@material-ui/core/Toolbar';
-import { withStyles } from '@material-ui/core/styles';
-import BottomNavigation from '@material-ui/core/BottomNavigation';
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import ButtonBase from '@material-ui/core/ButtonBase'
-import Icon from '@material-ui/core/Icon';
-import RestoreIcon from '@material-ui/icons/Restore';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
-import HomeIcon from '@material-ui/icons/Home';
-import Slide from '@material-ui/core/Slide';
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
-import Tooltip from '@material-ui/core/Tooltip';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
 
-import Jewels from './Jewels'
+// Core Imports
+import React from 'react'
+import { withRouter } from 'react-router-dom'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
+import Toolbar from '@material-ui/core/Toolbar'
+import BottomNavigation from '@material-ui/core/BottomNavigation'
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import ButtonBase from '@material-ui/core/ButtonBase'
+import Icon from '@material-ui/core/Icon'
+import RestoreIcon from '@material-ui/icons/Restore'
+import FavoriteIcon from '@material-ui/icons/Favorite'
+import LocationOnIcon from '@material-ui/icons/LocationOn'
+import Button from '@material-ui/core/Button'
+import Dialog from '@material-ui/core/Dialog'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogActions from '@material-ui/core/DialogActions'
+import IconButton from '@material-ui/core/IconButton'
+import CloseIcon from '@material-ui/icons/Close'
+import Slide from '@material-ui/core/Slide'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
+
+// Local Imports
+import Jewels from '../components/Jewels'
+
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
 function SlideDown(props) { return <Slide direction="down" {...props} /> }
 function SlideLeft(props) { return <Slide direction="left" {...props} /> }
 function SlideRight(props) { return <Slide direction="right" {...props} /> }
 
-class AppHome extends React.Component {
+class Home extends React.Component {
 	state = {
 		onboarding: true,
 		homeOpen: false,
@@ -354,4 +340,4 @@ class AppHome extends React.Component {
 		</div>
 }
 
-export default withRouter(AppHome)
+export default withRouter(Home)

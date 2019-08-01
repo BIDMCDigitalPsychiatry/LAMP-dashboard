@@ -58,16 +58,12 @@ export default class LAMP {
     }
 
     /**
-     * Connect to an instance of a server hosting the LAMP API and mirror it locally.
-     * Download the API definition from the server at root_url.
-     * Load a session-stored authorization token if available.
-     * Deletes any existing identity/credential if previously specified.
+     * Connect to an instance of a server hosting the LAMP API.
      */
-    public static async connect(base: string, restore: boolean = true) {
+    public static connect(base: string = 'https://api.lamp.digital') {
         LAMP.configuration = { base }
-        if (restore)
-            LAMP.refresh_identity()
     }
+
 
 
     //
@@ -75,60 +71,62 @@ export default class LAMP {
     //
 
 
-    public static _auth: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null }
 
-    private static _me: any | null
+    public static Auth = class {
+        public static _auth: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null }
+        private static _me: any | null
 
-    /**
-     * Authenticate/authorize as a user of a given `type`.
-     * If all values are null (especially `type`), the authorization is cleared.
-     */
-    public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null}) {
+        /**
+         * Authenticate/authorize as a user of a given `type`.
+         * If all values are null (especially `type`), the authorization is cleared.
+         */
+        public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null}) {
 
-        // Ensure there's actually a change to process.
-        let l = LAMP._auth || {type: null, id: null, password: null}
-        if (l.type === identity.type && l.id === identity.id && l.password === identity.password)
-            return
+            // Ensure there's actually a change to process.
+            let l = LAMP.Auth._auth || {type: null, id: null, password: null}
+            if (l.type === identity.type && l.id === identity.id && l.password === identity.password)
+                return
 
-        // Propogate the authorization.
-        LAMP._auth = {type: identity.type, id: identity.id, password: identity.password}
-        if (!!LAMP.configuration)
-            LAMP.configuration.authorization = !!LAMP._auth.id ? `${LAMP._auth.id}:${LAMP._auth.password}` : undefined
-
-        try {
-
-            // If we aren't clearing the credential, get the "self" identity.
-            if (!!identity.type && !!identity.id && !!identity.password)
-                LAMP._me = await (identity.type === 'root' ? 
-                    LAMP.Researcher.all() : (identity.type === 'researcher' ? 
-                        LAMP.Researcher.view('me') : 
-                        LAMP.Participant.view('me')))
-        } catch(err) {
-
-            // We failed: clear and propogate the authorization.
-            LAMP._auth = { type: null, id: null, password: null }
+            // Propogate the authorization.
+            LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password}
             if (!!LAMP.configuration)
-                LAMP.configuration.authorization = undefined
+                LAMP.configuration.authorization = !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined
 
-            // Delete the "self" identity and throw the error we received.
-            LAMP._me = null
-            throw err
-        } finally {
+            try {
 
-            // Save the authorization in sessionStorage for later.
-            sessionStorage.setItem('LAMP._auth', JSON.stringify(LAMP._auth))
+                // If we aren't clearing the credential, get the "self" identity.
+                if (!!identity.type && !!identity.id && !!identity.password)
+                    LAMP.Auth._me = await (identity.type === 'root' ? 
+                        LAMP.Researcher.all() : (identity.type === 'researcher' ? 
+                            LAMP.Researcher.view('me') : 
+                            LAMP.Participant.view('me')))
+            } catch(err) {
+
+                // We failed: clear and propogate the authorization.
+                LAMP.Auth._auth = { type: null, id: null, password: null }
+                if (!!LAMP.configuration)
+                    LAMP.configuration.authorization = undefined
+
+                // Delete the "self" identity and throw the error we received.
+                LAMP.Auth._me = null
+                throw err
+            } finally {
+
+                // Save the authorization in sessionStorage for later.
+                sessionStorage.setItem('LAMP._auth', JSON.stringify(LAMP.Auth._auth))
+            }
         }
-    }
 
-    /**
-     * 
-     */
-    public static get_identity(): Researcher | Participant | null | undefined {
-        return LAMP._me
-    }
+        /**
+         * 
+         */
+        public static get_identity(): Researcher | Participant | null | undefined {
+            return LAMP.Auth._me
+        }
 
-    private static async refresh_identity() {
-        let _saved = JSON.parse(sessionStorage.getItem('LAMP._auth') || 'null') || LAMP._auth
-        await LAMP.set_identity({ type: _saved.type, id: _saved.id, password: _saved.password })
+        private static async refresh_identity() {
+            let _saved = JSON.parse(sessionStorage.getItem('LAMP._auth') || 'null') || LAMP.Auth._auth
+            await LAMP.Auth.set_identity({ type: _saved.type, id: _saved.id, password: _saved.password })
+        }
     }
 }

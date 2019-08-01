@@ -1,66 +1,69 @@
+
+// Core Imports
 import React from 'react'
-import { withRouter } from 'react-router-dom';
-import Card from '@material-ui/core/Card';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableHead from '@material-ui/core/TableHead';
-import TableCell from '@material-ui/core/TableCell';
-import TableRow from '@material-ui/core/TableRow';
-import LAMP from '../lamp';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
-import Toolbar from '@material-ui/core/Toolbar';
+import { withRouter } from 'react-router-dom'
+import MaterialTable from 'material-table'
+
+// Local Imports
+//import LAMP from '../lamp'
+
+// TODO: Researcher: Create, Update, Delete
 
 class Root extends React.Component {
-	state = {
-		data: []
-	}
-
-	componentWillMount() {
+	state = {}
+	async componentWillMount() {
 		this.props.layout.pageLoading(false)
 
-		if ((LAMP._auth || {type: null}).type !== 'root') {
+		if ((this.props.auth.auth || {type: null}).type !== 'root') {
 			this.props.history.replace(`/`)
 			return
 		}
 		this.props.layout.setTitle(`Administrator`)
 
-		LAMP.Researcher.all().then(res => {
-			this.setState({ data: res })
-			this.props.layout.pageLoading(true)
-			this.props.layout.showMessage('Proceed with caution: you are logged in as the administrator.')
-		})
+        this.setState({ data: this.props.auth.identity })
+        this.props.layout.pageLoading(true)
+        this.props.layout.showMessage('Proceed with caution: you are logged in as the administrator.')
 	}
 
-	rowSelect = (rowNumber) => this.props.history.push(`/researcher/${this.state.data[rowNumber].id}`)
-
 	render = () =>
-		<div>
-			<Card>
-				<Toolbar>
-					<Typography variant="h6" color="inherit">
-						All Researchers
-					</Typography>
-				</Toolbar>
-				<Divider />
-				<Table>
-					<TableHead>
-						<TableRow>
-							<TableCell>Email</TableCell>
-							<TableCell>Name</TableCell>
-						</TableRow>
-					</TableHead>
-					<TableBody>
-						{this.state.data.map((row, index) => (
-							<TableRow hover key={index} onClick={(e) => this.rowSelect(index)}>
-								<TableCell>{row.email}</TableCell>
-								<TableCell>{row.name}</TableCell>
-							</TableRow>
-						))}
-					</TableBody>
-				</Table>
-			</Card>
-		</div>
+    <MaterialTable 
+        title="Researchers"
+        data={(this.state.data || [])} 
+        columns={[
+            { title: 'Name', field: 'name' }, 
+            { title: 'Email', field: 'email' }
+        ]}
+        onRowClick={(event, rowData, togglePanel) => 
+            this.props.history.push(`/researcher/${this.state.data[rowData.tableData.id].id}`)}
+        actions={[
+            {
+                icon: 'add_box',
+                tooltip: 'Add Researcher',
+                isFreeAction: true,
+                onClick: (event, rows) => this.props.layout.showAlert('Creating a new Researcher.')
+            }, {
+                icon: 'edit',
+                tooltip: 'Edit Researcher',
+                onClick: (event, rows) => this.props.layout.showAlert('Editing a Researcher.')
+            }, {
+                icon: 'delete_forever',
+                tooltip: 'Delete Researcher(s)',
+                onClick: (event, rows) => this.props.layout.showAlert('Deleting a Researcher.')
+            },
+        ]}
+        localization={{
+            body: {
+                emptyDataSourceMessage: 'No Researchers. Add Researchers by clicking the [+] button above.',
+                editRow: { deleteText: 'Are you sure you want to delete this Researcher?' }
+            }
+        }}
+        options={{
+            selection: true,
+            actionsColumnIndex: -1,
+            pageSize: 10,
+            pageSizeOptions: [10, 25, 50, 100]
+        }}
+    />
 }
 
 export default withRouter(Root)

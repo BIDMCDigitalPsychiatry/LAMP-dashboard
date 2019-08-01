@@ -1,8 +1,8 @@
 {
-  "name": "lamp_portal",
-  "version": "0.1.0",
+  "name": "lamp_dashboard",
+  "version": "1.0.0",
   "author": "BIDMC Division of Digital Psychiatry",
-  "description": "LAMP Portal",
+  "description": "LAMP Dashboard",
   "private": true,
   "devDependencies": {
     "react-scripts": "^2.0.0",
@@ -11,48 +11,47 @@
   "dependencies": {
     "@data-ui/sparkline": "0.0.79",
     "@data-ui/xy-chart": "0.0.79",
-    "@date-io/date-fns": "^1.1.0",
-    "@material-ui/core": "^3.9.3",
-    "@material-ui/icons": "^3.0.2",
-    "@material-ui/lab": "^3.0.0-alpha.30",
-    "@types/react": "^16.8.23",
-    "@types/react-dom": "^16.8.4",
+    "@date-io/date-fns": "^1.3.8",
+    "@material-ui/core": "^4.3.0",
+    "@material-ui/icons": "^4.2.1",
+    "@material-ui/lab": "^4.0.0-alpha.21",
+    "@material-ui/pickers": "^3.2.1",
+    "@material-ui/styles": "^4.3.0",
+    "@types/react": "^16.8.24",
+    "@types/react-dom": "^16.8.5",
+    "@types/react-router-dom": "^4.3.4",
     "@vx/grid": "0.0.184",
     "@vx/text": "0.0.183",
     "@vx/vx": "^0.0.179",
     "bootstrap": "^3.3.6",
-    "date-fns": "^2.0.0-alpha.27",
+    "date-fns": "^2.0.0-beta.3",
     "eventing-bus": "^1.3.3",
     "file-saver": "^1.3.8",
-    "json2csv": "^4.4.1",
+    "json2csv": "^4.5.2",
     "jsonexport": "^2.4.1",
     "jsonschema-form-for-material-ui": "^1.4.2",
-    "jszip": "^3.2.1",
+    "jszip": "^3.2.2",
     "jszip-utils": "0.0.2",
-    "leaflet": "^1.4.0",
-    "material-table": "^1.28.2",
-    "material-ui-pickers": "^2.2.4",
+    "leaflet": "^1.5.1",
+    "material-table": "^1.42.0",
     "moment": "^2.24.0",
-    "mui-datatables": "^2.0.0-beta-9",
+    "mui-datatables": "^2.7.0",
     "pigeon-maps": "^0.11.11",
     "pigeon-marker": "^0.3.4",
     "pigeon-overlay": "^0.2.3",
     "react": "^16.8.6",
     "react-animated-tree": "^1.0.10",
     "react-dom": "^16.8.6",
-    "react-dropzone": "^10.0.6",
+    "react-dropzone": "^10.1.7",
     "react-event-timeline": "^1.6.3",
-    "react-jsonschema-form": "^1.3.0",
+    "react-jsonschema-form": "^1.7.0",
     "react-jsonschema-materialui-forms": "0.0.17",
-    "react-leaflet": "^2.2.1",
+    "react-leaflet": "^2.4.0",
     "react-pdf": "^3.0.6",
     "react-router-dom": "^4.3.1",
     "react-scroll-horizontal": "^1.6.2",
-    "swagger-ui-react": "^3.22.3"
-  },
-  "resolutions": {
-    "browserslist": "4.6.2",
-    "caniuse-lite": "1.0.30000974"
+    "swagger-ui-react": "^3.23.3",
+    "typeface-roboto": "0.0.75"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
@@ -62,16 +61,10 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

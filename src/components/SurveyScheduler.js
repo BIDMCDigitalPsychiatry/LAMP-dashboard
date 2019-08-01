@@ -1,37 +1,22 @@
-import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import MenuItem from '@material-ui/core/MenuItem';
-import SchemaForm from 'jsonschema-form-for-material-ui';
-import AddIcon from '@material-ui/icons/Add';
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, TimePicker } from 'material-ui-pickers';
-import DataTable from '../components/datatable'
-import React, { Component } from 'react';
-import { render } from "react-dom";
-import ReactDOMServer from 'react-dom/server';
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import MaterialTable from 'material-table'
-import MultipleSelect from '../components/multiple_select'
-import Grid from '@material-ui/core/Grid';
+
+// Core Imports
+import React from 'react'
+import Button from '@material-ui/core/Button'
+import Typography from '@material-ui/core/Typography'
+import Grid from '@material-ui/core/Grid'
 import ReorderIcon from '@material-ui/icons/Reorder'
 import HelpIcon from '@material-ui/icons/Help'
 import EditIcon from '@material-ui/icons/Edit'
 import CalendarIcon from '@material-ui/icons/CalendarToday'
 import SettingsIcon from '@material-ui/icons/Settings'
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import IconButton from '@material-ui/core/IconButton';
-import moment from 'moment'
+import Dialog from '@material-ui/core/Dialog'
+import DialogActions from '@material-ui/core/DialogActions'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogTitle from '@material-ui/core/DialogTitle'
+import IconButton from '@material-ui/core/IconButton'
+import AddIcon from '@material-ui/icons/Add'
+import MaterialTable from 'material-table'
 
 const defaultSurveys = [{
         surveyName: "Anxiety (GAD-7)",
@@ -389,8 +374,8 @@ export default class SurveyScheduler extends React.Component {
             <MaterialTable 
                 columns={[
                 	{ title: 'Name', field: 'surveyName', cellStyle: (data, idx) => ({
-                		color: this.state.surveys.filter(x => x.surveyName == data).map(x => x.schedule.length).filter(x => x > 0).length > 0 ? 'green' : undefined,
-                		fontWeight: this.state.surveys.filter(x => x.surveyName == data).map(x => x.type == 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
+                		color: this.state.surveys.filter(x => x.surveyName === data).map(x => x.schedule.length).filter(x => x > 0).length > 0 ? 'green' : undefined,
+                		fontWeight: this.state.surveys.filter(x => x.surveyName == data).map(x => x.type === 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
                 	}) },
                 	{ title: 'Type', field: 'type', readonly: true},
                 	{ title: 'Notes', field: 'notes'},

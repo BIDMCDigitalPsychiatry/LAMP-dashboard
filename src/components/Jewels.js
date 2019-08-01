@@ -1,7 +1,13 @@
+
+// Core Imports
 import React from 'react'
-import Activity from './Activity'
 import Typography from '@material-ui/core/Typography'
 import ButtonBase from '@material-ui/core/ButtonBase'
+
+// Local Imports
+import Activity from '../lamp/Activity'
+
+// TODO: Settings!
 
 export default class Jewels extends React.Component {
   state = {
@@ -50,5 +56,3 @@ export default class Jewels extends React.Component {
     ))}
   </div>
 }
-
-// TODO: Settings!

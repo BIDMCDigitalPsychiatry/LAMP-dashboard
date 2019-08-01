@@ -1,28 +1,26 @@
-import React from 'react';
-import { withRouter } from 'react-router-dom';
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import LAMP from '../lamp';
-import Grid from '@material-ui/core/Grid';
-import Avatar from '@material-ui/core/Avatar';
+
+// Core Imports
+import React from 'react'
+import { withRouter } from 'react-router-dom'
+import Typography from '@material-ui/core/Typography'
+import Paper from '@material-ui/core/Paper'
+import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
+import Grid from '@material-ui/core/Grid'
+import Avatar from '@material-ui/core/Avatar'
+import Slide from '@material-ui/core/Slide'
+import { createStyles, withStyles } from '@material-ui/core/styles'
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import Radio from '@material-ui/core/Radio'
+import RadioGroup from '@material-ui/core/RadioGroup'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
+import FormControl from '@material-ui/core/FormControl'
+import FormLabel from '@material-ui/core/FormLabel'
+
+// Local Imports
 import mindLAMPLogo from '../logo.png'
-import Slide from '@material-ui/core/Slide';
-import RegistrationForm from '../components/register'
-import { createStyles, withStyles } from '@material-ui/core/styles';
-import SurveyScheduler from '../components/survey_scheduler'
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
+import SurveyScheduler from '../components/SurveyScheduler'
 
 const styles = theme => ({
     textField: {
@@ -130,16 +128,14 @@ class Login extends React.Component {
 
     handleLogin = (event) => {
         event.preventDefault()
-        
-        //
-        if (!!this.state.serverAddress)
-            LAMP.connect(this.state.serverAddress, false)
-
-        //
-        let type = (this.state.id === 'root' ?
-            'root' : (this.state.id.includes('@') ?
-                'researcher' : 'participant'))
-        LAMP.set_identity({ type: type, id: this.state.id, password: this.state.password}).then(res => {
+        this.props.setIdentity({ 
+                type: (this.state.id === 'root' ?
+                        'root' : (this.state.id.includes('@') ?
+                            'researcher' : 'participant')), 
+                id: this.state.id, 
+                password: this.state.password
+            }, this.state.serverAddress
+        ).then(res => {
             this.props.history.replace('/home')
         }).catch(err => {
             console.warn("error with auth request", err)
@@ -202,7 +198,6 @@ class Login extends React.Component {
         event.preventDefault()
         this.setState(state => ({ slide: !state.slide }))
         this.setState(state => ({ slideRegister: !state.slideRegister }))
-        //this.props.history.push('/register')
     }
 
     render = () =>
