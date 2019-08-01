@@ -10,7 +10,12 @@ export const shortDateFormat = {
 // 
 export const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-	hour: 'numeric', /*minute: 'numeric', second: 'numeric', */
+	hour: 'numeric'
+}
+
+//
+export const mediumDateFormat = {
+    year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'
 }
 
 //

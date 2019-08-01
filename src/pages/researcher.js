@@ -3,12 +3,20 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import IconButton from '@material-ui/core/IconButton'
+import Card from '@material-ui/core/Card'
+import Icon from '@material-ui/core/Icon'
 import Button from '@material-ui/core/Button'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
 import MenuItem from '@material-ui/core/MenuItem'
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import DialogContentText from '@material-ui/core/DialogContentText'
+import DialogActions from '@material-ui/core/DialogActions'
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
 import MaterialTable from 'material-table'
 
 // External Imports 
@@ -18,6 +26,8 @@ import jsonexport from 'jsonexport'
 
 // Local Imports
 import LAMP from '../lamp'
+import Messages from '../components/Messages'
+import { fullDateFormat } from '../components/Utils'
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Activity settings & schedule + Blogs/Tips/AppHelp
@@ -125,7 +135,7 @@ class Researcher extends React.Component {
     }
 
     render = () =>
-    <div>
+    <React.Fragment>
         <Typography variant="h4" color="inherit" style={{ flex: 1 }}>
             Default Study
         </Typography>
@@ -139,6 +149,16 @@ class Researcher extends React.Component {
                 { title: 'Device Type', field: 'device_type' },
                 { title: 'Data Health', field: 'data_health', render: (rowData) => 
                     <div style={{ width: 32, height: 32, background: '#f00', borderRadius: '50%' }} />
+                }, { title: 'Messages', field: '__messages', render: (rowData) => 
+                    <IconButton
+                        onClick={(event) => {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            this.setState({ openMessaging: rowData.id })
+                        }}
+                    >
+                        <Icon>chat</Icon>
+                    </IconButton>
                 }
             ]}
             onRowClick={(event, rowData, togglePanel) => this.props.history.push(`/participant/${this.state.data[rowData.tableData.id].id}`)}
@@ -225,7 +245,7 @@ class Researcher extends React.Component {
                 </div>
             }*/}
         <div style={{ height: 16 }} />
-        <MaterialTable 
+        {/*<MaterialTable 
             title="Activities"
             data={this.state.activities.map(x => ({ ...x, type: x.spec === 'lamp.survey' ? 'Survey' : 'Cognitive Test' }))} 
             columns={[
@@ -263,7 +283,7 @@ class Researcher extends React.Component {
                 pageSize: 10,
                 pageSizeOptions: [10, 25, 50, 100]
             }}
-        />
+        />*/}
         <Popover
           id="simple-popper"
           open={!!this.state.popoverAttachElement}
@@ -316,7 +336,22 @@ class Researcher extends React.Component {
             <div />
         ))}
         </Popover>
-    </div>
+        <Dialog
+            open={!!this.state.openMessaging}
+            onClose={() => this.setState({ openMessaging: undefined })}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogContent>
+                <Messages participant={this.state.openMessaging} />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => this.setState({ openMessaging: undefined })} color="primary" autoFocus>
+                    Close
+                </Button>
+            </DialogActions>
+        </Dialog>
+    </React.Fragment>
 }
 
 export default withRouter(Researcher)
