@@ -27,7 +27,15 @@ class Sparkline extends React.PureComponent {
       {(!series || Object.keys(series).length === 0) && <div style={{ fontFamily: 'Roboto' }}>{datum.y}</div>}
     </div>
     <br />
-    {this.props.data.map(
+    {[{
+      seriesKey: this.props.YAxisLabel || 'Data',
+      key: this.props.YAxisLabel || 'Data',
+      data: this.props.data.map(x => ({...x, color: this.props.color})),
+      stroke: this.props.color,
+      strokeDasharray: this.props.lineProps.dashArray || '3 1',
+      dashType: this.props.lineProps.dashType || 'dotted',
+      strokeLinecap: this.props.lineProps.cap || 'butt'
+    }].map(
       ({ seriesKey, stroke: color, dashType }) =>
         series &&
         series[seriesKey] && (

@@ -10,39 +10,23 @@ import Select from '@material-ui/core/Select'
 import Checkbox from '@material-ui/core/Checkbox'
 import Chip from '@material-ui/core/Chip'
 
-// TODO: Selected should switch fontWeightRegular vs fontWeightMedium
-
 export default class MultipleSelect extends React.Component {
   render = () =>
-  <FormControl style={{ width: '100%' }}>
-    <InputLabel htmlFor="select-multiple-chip">{this.props.title}</InputLabel>
-    <Select
-      multiple
-      value={this.props.selected || []}
-      onChange={event => this.props.onChange(event.target.value)}
-      input={<Input id="select-multiple-chip" />}
-      renderValue={selected => (
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {selected.map(value => (
-            <Chip key={value} label={value} />
-          ))}
-        </div>
-      )}
-      MenuProps={{
-          PaperProps: {
-            style: {
-              maxHeight: 48 * 4.5 + 8,
-              width: 250,
-            },
-          },
-        }}
-    >
-      {(this.props.items || []).map(item => (
-        <MenuItem key={item} value={item}>
-          <Checkbox checked={this.props.selected.indexOf(item) > -1} />
-          <ListItemText primary={item} />
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
+  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+  {(this.props.items || []).map(item => (
+      <Chip 
+        key={item} label={item} 
+        style={{ margin: 4 }}
+        color={(this.props.selected || []).indexOf(item) >= 0 ? 'primary' : undefined}
+        onClick={
+          (this.props.selected || []).indexOf(item) >= 0 ? () => {} :
+          () => this.props.onChange(!!this.props.singleSelect ? [item] : [...(this.props.selected || []), item])
+        }
+        onDelete={
+          (this.props.selected || []).indexOf(item) < 0 ? undefined :
+          () => this.props.onChange((this.props.selected || []).filter(x => x !== item))
+        }
+      />
+  ))}
+  </div>
 }

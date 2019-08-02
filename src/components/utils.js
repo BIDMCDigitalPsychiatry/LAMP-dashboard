@@ -1,6 +1,25 @@
 
+// Core Imports 
+import React from 'react'
+import Dialog from '@material-ui/core/Dialog'
+import { useTheme } from '@material-ui/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+
+// 
+export const ResponsiveMargin = ({ ...props }) => {
+    let sm = useMediaQuery(useTheme().breakpoints.down('sm'))
+    return <div {...props} style={{ ...props.style, width: sm ? '100%' : '80%' }} />
+}
+
+// 
+export const ResponsiveDialog = ({ ...props }) => 
+    <Dialog fullScreen={useMediaQuery(useTheme().breakpoints.down('sm'))} {...props} />
+
 // Produces an array of integers from 0 until the specified max number.
 export const rangeTo = (max) => [...Array(max).keys()]
+
+// 
+export const groupBy = (items, key) => items.reduce((result, item) => ({ ...result, [item[key]]: [...(result[item[key]] || []), item]}), {})
 
 //
 export const shortDateFormat = {

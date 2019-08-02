@@ -50,6 +50,9 @@ export default class App extends React.Component {
             palette: {
                 primary: blue,
                 secondary: red,
+                background: {
+                  default: "#fff"
+                }
             },
             appBar: {
                 height: 48,

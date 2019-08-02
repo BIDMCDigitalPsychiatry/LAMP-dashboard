@@ -11,13 +11,15 @@ import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
 import MenuItem from '@material-ui/core/MenuItem'
-import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
 import MaterialTable from 'material-table'
+import red from '@material-ui/core/colors/red'
+import yellow from '@material-ui/core/colors/yellow'
+import green from '@material-ui/core/colors/green'
 
 // External Imports 
 import { saveAs } from 'file-saver'
@@ -27,7 +29,9 @@ import jsonexport from 'jsonexport'
 // Local Imports
 import LAMP from '../lamp'
 import Messages from '../components/Messages'
-import { fullDateFormat } from '../components/Utils'
+import Sparkchips from '../components/Sparkchips'
+import MultipleSelect from '../components/MultipleSelect'
+import { ResponsiveDialog, fullDateFormat } from '../components/Utils'
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Activity settings & schedule + Blogs/Tips/AppHelp
@@ -136,7 +140,7 @@ class Researcher extends React.Component {
 
     render = () =>
     <React.Fragment>
-        <Typography variant="h4" color="inherit" style={{ flex: 1 }}>
+        <Typography variant="h5" color="inherit" style={{ flex: 1 }}>
             Default Study
         </Typography>
         <div style={{ height: 16 }} />
@@ -148,7 +152,15 @@ class Researcher extends React.Component {
                 { title: 'Last Login', field: 'last_login' },
                 { title: 'Device Type', field: 'device_type' },
                 { title: 'Data Health', field: 'data_health', render: (rowData) => 
-                    <div style={{ width: 32, height: 32, background: '#f00', borderRadius: '50%' }} />
+                    <div style={{ 
+                        width: 32, 
+                        height: 32, 
+                        background: (rowData.id.length % 3 === 0 ? 
+                                        red[500] : (rowData.id.length % 3 === 1 ? 
+                                            yellow[500] : 
+                                                green[500])), 
+                        borderRadius: '50%' 
+                    }} />
                 }, { title: 'Messages', field: '__messages', render: (rowData) => 
                     <IconButton
                         onClick={(event) => {
@@ -161,6 +173,21 @@ class Researcher extends React.Component {
                     </IconButton>
                 }
             ]}
+            detailPanel={rowData => 
+                <div style={{ margin: 8 }}>
+                    <Typography style={{ width: '100%', textAlign: 'center' }}>
+                        <b>Patient activity heads-up indicators (red requires clinical attention):</b>
+                    </Typography>
+                    <Sparkchips items={(this.state.activities || []).map(x => ({ 
+                        name: x.name, 
+                        color: (x.name.length % 3 === 0 ? 
+                            red[500] : (x.name.length % 3 === 1 ? 
+                                yellow[500] : 
+                                    green[500])), 
+                        textColor: (x.name.length % 3 === 1) ? '#000' : '#fff' 
+                    }))} />
+                </div>
+            }
             onRowClick={(event, rowData, togglePanel) => this.props.history.push(`/participant/${this.state.data[rowData.tableData.id].id}`)}
             actions={[
                 {
@@ -206,44 +233,6 @@ class Researcher extends React.Component {
 
             }}
         />
-            {/*detailPanel={rowData => 
-                <div style={{background: "white", width: "100%", height: "150px"}}>
-                    <MultipleSelect 
-                      title="Selected Charts"
-                      selected={(this.state.selectedCharts || {})[rowData.id] || []}
-                      items={(this.state.activities || []).map(x => x.name)}
-                      onChange={x => this.setState({ selectedCharts: { ...(this.state.selectedCharts || {}), [rowData.id]: x } })}
-                    />
-                    {((this.state.selectedCharts || {})[rowData.id] || []).length === 0 && 
-                        <Typography>No charts selected.</Typography>}
-                    {(this.state.activities || []).filter(x => ((this.state.selectedCharts || {})[rowData.id] || []).includes(x.name)).map(activity =>
-                        <div key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
-                            <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center' }}>
-                                {activity.name}
-                            </Typography>
-                            <Sparkline 
-                                minWidth={250}
-                                minHeight={250}
-                                XAxisLabel="Time"
-                                YAxisLabel="Score"
-                                color="#ffa94d" // #3bc9db
-                                data={(this.state.activity_events || [])
-                                      .filter(x => x.activity === activity.id || 
-                                          (!!x.static_data.survey_name && 
-                                              x.static_data.survey_name.toLowerCase() === activity.name.toLowerCase()))
-                                      .map(d => ({ 
-                                          x: new Date(d.timestamp), 
-                                          y: d.temporal_events.reduce((prev, curr) => prev + (parseInt(curr.value) || (curr.value === 'Yes' ? 1 : 0)), 0) / 1000
-                                      }))}
-                                lineProps={{
-                                  dashArray: '3 1',
-                                  dashType: 'dotted',
-                                  cap: 'butt'
-                                }} />
-                        </div>
-                    )}
-                </div>
-            }*/}
         <div style={{ height: 16 }} />
         {/*<MaterialTable 
             title="Activities"
@@ -336,7 +325,7 @@ class Researcher extends React.Component {
             <div />
         ))}
         </Popover>
-        <Dialog
+        <ResponsiveDialog
             open={!!this.state.openMessaging}
             onClose={() => this.setState({ openMessaging: undefined })}
             aria-labelledby="alert-dialog-title"
@@ -350,7 +339,7 @@ class Researcher extends React.Component {
                     Close
                 </Button>
             </DialogActions>
-        </Dialog>
+        </ResponsiveDialog>
     </React.Fragment>
 }
 

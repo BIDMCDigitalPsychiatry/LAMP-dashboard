@@ -26,6 +26,7 @@ import red from '@material-ui/core/colors/red'
 
 // Local Imports 
 import { ObjectView } from './DataTable'
+import { ResponsiveMargin } from './Utils'
 
 class NavigationLayout extends React.Component {
     state = {
@@ -145,7 +146,7 @@ class NavigationLayout extends React.Component {
 		}
         <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
 			<Fade in={this.state.loaded >= 1.0}>
-                <div style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+                <ResponsiveMargin style={{ marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
                     {React.Children.map(this.props.children, child =>
                         React.cloneElement(child, { layout: {
                             setTitle: (title) => { document.title = title; this.setState({ title: title }) },
@@ -157,7 +158,7 @@ class NavigationLayout extends React.Component {
                             showAlert: (message) => this.setState({ alertMessage: message })
                         }})
                     )}
-                </div>
+                </ResponsiveMargin>
             </Fade>
 			<Fade in={this.state.loaded < 1.0}>
 				<div style={{ position: 'absolute', width: '90%', marginLeft: '5%', marginRight: '5%', top: '50%' }}>
