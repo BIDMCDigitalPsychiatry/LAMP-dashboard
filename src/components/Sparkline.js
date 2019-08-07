@@ -69,7 +69,7 @@ class Sparkline extends React.PureComponent {
         eventTrigger={'container'}
         eventTriggerRefs={this.eventTriggerRefs}
         margin={{ top: 4, left: !!this.props.YAxisLabel ? 8 : 0 }}
-        onClick={this.handleClick}
+        onClick={({ datum }) => this.props.onClick(datum)}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         renderTooltip={null}

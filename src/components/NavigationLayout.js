@@ -241,7 +241,7 @@ class NavigationLayout extends React.Component {
 			message={this.state.snackMessage || ''}
 			anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 			autoHideDuration={3000}
-			onRequestClose={() => this.setState({ userMsg: null })} />
+			onClose={() => this.setState({ userMsg: null })} />
     </div>
 }
 

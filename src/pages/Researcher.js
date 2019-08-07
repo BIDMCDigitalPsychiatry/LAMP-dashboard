@@ -3,8 +3,10 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import IconButton from '@material-ui/core/IconButton'
-import Card from '@material-ui/core/Card'
+import Box from '@material-ui/core/Box'
 import Icon from '@material-ui/core/Icon'
+import Checkbox from '@material-ui/core/Checkbox'
+import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Button from '@material-ui/core/Button'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import Typography from '@material-ui/core/Typography'
@@ -12,14 +14,15 @@ import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
 import MenuItem from '@material-ui/core/MenuItem'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
 import DialogActions from '@material-ui/core/DialogActions'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
+import Divider from '@material-ui/core/Divider'
+import Chip from '@material-ui/core/Chip'
+import Tooltip from '@material-ui/core/Tooltip'
 import MaterialTable from 'material-table'
 import red from '@material-ui/core/colors/red'
 import yellow from '@material-ui/core/colors/yellow'
 import green from '@material-ui/core/colors/green'
+import grey from '@material-ui/core/colors/grey'
 
 // External Imports 
 import { saveAs } from 'file-saver'
@@ -30,8 +33,7 @@ import jsonexport from 'jsonexport'
 import LAMP from '../lamp'
 import Messages from '../components/Messages'
 import Sparkchips from '../components/Sparkchips'
-import MultipleSelect from '../components/MultipleSelect'
-import { ResponsiveDialog, fullDateFormat } from '../components/Utils'
+import { ResponsiveDialog } from '../components/Utils'
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Activity settings & schedule + Blogs/Tips/AppHelp
@@ -73,94 +75,98 @@ class Researcher extends React.Component {
 
     addParticipant = async () => {
         let newCount = this.state.newCount
-        this.setState({popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: []})
-
+        this.setState({ popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: [] })
         let ids = []
         for (let i = 0; i < newCount; i ++) {
-            console.log(this.state.researcher.studies)
-            let newID = await LAMP.Participant.create(this.state.researcher.studies[0], {
-                study_code: "001"
-            }, {
-                untyped: true
-            })
+            let newID = await LAMP.Participant.create(this.state.researcher.studies[0], { study_code: '001' })
             ids = [...ids, newID]
         }
-        this.setState({data: [...this.state.data, ...ids]})
+        this.setState({ data: [...this.state.data, ...ids] })
     }
 
     downloadFiles = async (filetype) => {
-
         let selectedRows = this.state.selectedRows
-
-        this.setState({popoverAttachElement: null, selectedIcon: "", selectedRows: []})
-
+        this.setState({ popoverAttachElement: null, selectedIcon: "", selectedRows: [] })
         let zip = new JSZip()
-
         for (let row of selectedRows) {
             let sensorEvents = await LAMP.SensorEvent.allByParticipant(row.id)
             let resultEvents = await LAMP.ResultEvent.allByParticipant(row.id)
-
             if (filetype === "json") {
                 zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
                 zip.file(`${row.id}/result_event.json`, JSON.stringify(resultEvents))
             } else if (filetype === "csv") {
-
-            jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function(err, csv) {
-                if(err) return console.log(err)
-                zip.file(`${row.id}/sensor_event.csv`, csv)
-            })
-
-            jsonexport(JSON.parse(JSON.stringify(resultEvents)), function(err, csv) {
-                if(err) return console.log(err)
-                zip.file(`${row.id}/result_event.csv`, csv)
-            })
-
+                jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function(err, csv) {
+                    if(err) return console.log(err)
+                    zip.file(`${row.id}/sensor_event.csv`, csv)
+                })
+                jsonexport(JSON.parse(JSON.stringify(resultEvents)), function(err, csv) {
+                    if(err) return console.log(err)
+                    zip.file(`${row.id}/result_event.csv`, csv)
+                })
             }
         }
-         zip.generateAsync({type:'blob'}).then((content) => {
-            saveAs(content, "export.zip")
-        })
+        zip.generateAsync({type:'blob'}).then(x => saveAs(x, 'export.zip'))
     }
 
     deleteParticipants = async () => {
-
-        let selectedRows = this.state.selectedRows
-
-        this.setState({popoverAttachElement: null, selectedIcon: "", selectedRows: []})
-
-        for (let row of selectedRows) {
+        let selectedRows = this.state.selectedRows, tempRows = selectedRows.map(y => y.id)
+        this.setState({ popoverAttachElement: null, selectedIcon: "", selectedRows: [] })
+        for (let row of selectedRows)
             await LAMP.Participant.delete(row.id)
-        }
-
-        let tempRows = selectedRows.map(y => y.id)
-        let tempData = this.state.data.filter((x) => !tempRows.includes(x.id))
-
-        this.setState({ data:  tempData})
+        this.setState({ data: this.state.data.filter((x) => !tempRows.includes(x.id)) })
     }
 
     render = () =>
     <React.Fragment>
-        <Typography variant="h5" color="inherit" style={{ flex: 1 }}>
-            Default Study
-        </Typography>
-        <div style={{ height: 16 }} />
+        <Box mb="16px" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="h5" color="inherit">
+                Default Study
+            </Typography>
+            <FormControlLabel
+              control={<Checkbox checked={this.state.showUnscheduled} onChange={() => this.setState({ showUnscheduled: !this.state.showUnscheduled})} />}
+              label="Show Unscheduled Activities"
+            />
+        </Box>
         <MaterialTable 
             title="Participants"
-            data={this.state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown', data_health: 0 }))} 
+            data={this.state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
             columns={[
                 { title: 'Participant ID', field: 'id' },
                 { title: 'Last Login', field: 'last_login' },
                 { title: 'Device Type', field: 'device_type' },
-                { title: 'Data Health', field: 'data_health', render: (rowData) => 
-                    <div style={{ 
-                        width: 32, 
-                        height: 32, 
-                        background: (rowData.id.length % 3 === 0 ? 
-                                        red[500] : (rowData.id.length % 3 === 1 ? 
-                                            yellow[500] : 
-                                                green[500])), 
-                        borderRadius: '50%' 
-                    }} />
+                { title: 'Indicators', field: 'data_health', render: (rowData) => 
+                    <div>
+                        <Tooltip title={(rowData.id.length % 3 === 0 ? 
+                                            'Data health is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
+                                                'Data health is inconsistent and requires attention.' : 
+                                                    'Data health is optimal.'))}>
+                          <Chip 
+                              label="Data Health"
+                              style={{ 
+                                  margin: 4, 
+                                  backgroundColor: (rowData.id.length % 3 === 0 ? 
+                                                        red[500] : (rowData.id.length % 3 === 1 ? 
+                                                            yellow[500] : 
+                                                                green[500])), 
+                                  color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
+                            }} />
+                        </Tooltip>
+                        <Tooltip title={(rowData.id.length % 3 === 0 ? 
+                                            'Patient health is optimal.' : (rowData.id.length % 3 === 1 ? 
+                                                'Patient health may require clinical monitoring.' : 
+                                                    'Patient health may require clinical attention.'))}>
+                          <Chip 
+                              label="Patient Health"
+                              style={{ 
+                                  margin: 4, 
+                                  backgroundColor: (rowData.id.length % 3 === 0 ? 
+                                                        green[500] : (rowData.id.length % 3 === 1 ? 
+                                                            yellow[500] : 
+                                                                red[500])), 
+                                  color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
+                            }} />
+                        </Tooltip>
+                    </div>
                 }, { title: 'Messages', field: '__messages', render: (rowData) => 
                     <IconButton
                         onClick={(event) => {
@@ -176,16 +182,27 @@ class Researcher extends React.Component {
             detailPanel={rowData => 
                 <div style={{ margin: 8 }}>
                     <Typography style={{ width: '100%', textAlign: 'center' }}>
-                        <b>Patient activity heads-up indicators (red requires clinical attention):</b>
+                        <b>Patient Health</b>
                     </Typography>
-                    <Sparkchips items={(this.state.activities || []).map(x => ({ 
-                        name: x.name, 
-                        color: (x.name.length % 3 === 0 ? 
-                            red[500] : (x.name.length % 3 === 1 ? 
-                                yellow[500] : 
-                                    green[500])), 
-                        textColor: (x.name.length % 3 === 1) ? '#000' : '#fff' 
-                    }))} />
+                    <Divider style={{ margin: 8 }} />
+                    <Sparkchips items={
+                        [ ...(this.state.activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
+                            .filter(x => (x.spec !== 'lamp.survey' && !!this.state.showUnscheduled) || (x.spec === 'lamp.survey'))
+                            .map(x => ({ 
+                                name: x.name, 
+                                color: (x.spec !== 'lamp.survey' ? 
+                                    grey[700] : (x.name.length % 3 === 0 ? 
+                                        red[500] : (x.name.length % 3 === 1 ? 
+                                            yellow[500] : 
+                                                green[500]))), 
+                                textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
+                                tooltip: (x.spec !== 'lamp.survey' ? 
+                                    'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
+                                        'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
+                                            'Monitor health status for changes.' : 
+                                                'Health status is okay.')))
+                            }))
+                    } />
                 </div>
             }
             onRowClick={(event, rowData, togglePanel) => this.props.history.push(`/participant/${this.state.data[rowData.tableData.id].id}`)}
