@@ -21,6 +21,7 @@ class MultiPieChart extends React.PureComponent {
   render = () =>
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: -50 }}>
       <RadialChart
+        ariaLabel="radial-left"
         width={400}
         height={400}
         margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
@@ -57,6 +58,7 @@ class MultiPieChart extends React.PureComponent {
         labelFormat={label => label}
       />
       <RadialChart
+        ariaLabel="radial-right"
         width={400}
         height={400}
         margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
