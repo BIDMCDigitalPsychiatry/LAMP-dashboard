@@ -4,6 +4,7 @@ import React from 'react'
 import { withRouter } from 'react-router-dom'
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
+import Switch from '@material-ui/core/Switch'
 import Icon from '@material-ui/core/Icon'
 import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
@@ -65,7 +66,12 @@ class Participant extends React.Component {
                 activity: activities.find(y => x.activity === y.id || 
                               (!!x.static_data.survey_name && 
                                   x.static_data.survey_name.toLowerCase() === y.name.toLowerCase()))
-            })).map(x => ({ ...x,
+            }))
+            .map(x => {
+                console.dir(x)
+                return x
+            })
+            .map(x => ({ ...x,
                 activity: (x.activity || {name: ''}).name,
                 activity_spec: (x.activity || {spec: ''}).spec || ''
             })), 'activity'),
@@ -84,12 +90,24 @@ class Participant extends React.Component {
     render = () =>
     <React.Fragment>   
         <Box border={1} borderColor="grey.300" borderRadius={4} p={2} mx="10%">
-            <Typography variant="subtitle2">
-                Activity
-            </Typography>
+            <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="subtitle2">
+                    Activity
+                </Typography>
+                <Box>
+                    <Typography variant="subtitle" color="inherit">
+                        Show All
+                    </Typography>
+                    <Switch 
+                        size="small"
+                        checked={this.state.showAll} 
+                        onChange={() => this.setState({ showAll: !this.state.showAll, selectedCharts: undefined })} 
+                    />
+                </Box>
+            </Box>
             <MultipleSelect 
                 selected={this.state.selectedCharts || []}
-                items={(this.state.activities || []).map(x => `${x.name}`)}
+                items={(this.state.activities || []).filter(x => x.spec === 'lamp.survey' || !!this.state.showAll).map(x => `${x.name}`)}
                 showZeroBadges={false}
                 badges={this.state.activity_counts}
                 onChange={x => this.setState({ selectedCharts: x })}

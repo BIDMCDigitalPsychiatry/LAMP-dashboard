@@ -5,8 +5,7 @@ import { withRouter } from 'react-router-dom'
 import IconButton from '@material-ui/core/IconButton'
 import Box from '@material-ui/core/Box'
 import Icon from '@material-ui/core/Icon'
-import Checkbox from '@material-ui/core/Checkbox'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Switch from '@material-ui/core/Switch'
 import Button from '@material-ui/core/Button'
 import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import Typography from '@material-ui/core/Typography'
@@ -122,10 +121,16 @@ class Researcher extends React.Component {
             <Typography variant="h5" color="inherit">
                 Default Study
             </Typography>
-            <FormControlLabel
-              control={<Checkbox checked={this.state.showUnscheduled} onChange={() => this.setState({ showUnscheduled: !this.state.showUnscheduled})} />}
-              label="Show Unscheduled Activities"
-            />
+            <Box>
+                <Typography variant="subtitle" color="inherit">
+                    Show Unscheduled Activities
+                </Typography>
+                <Switch 
+                    size="small"
+                    checked={this.state.showUnscheduled} 
+                    onChange={() => this.setState({ showUnscheduled: !this.state.showUnscheduled })} 
+                />
+            </Box>
         </Box>
         <MaterialTable 
             title="Participants"
