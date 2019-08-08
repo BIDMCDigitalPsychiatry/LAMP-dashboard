@@ -66,8 +66,8 @@ class Participant extends React.Component {
                               (!!x.static_data.survey_name && 
                                   x.static_data.survey_name.toLowerCase() === y.name.toLowerCase()))
             })).map(x => ({ ...x,
-                activity: x.activity.name,
-                activity_spec: x.activity.spec
+                activity: (x.activity || {name: ''}).name,
+                activity_spec: (x.activity || {spec: ''}).spec || ''
             })), 'activity'),
             sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(id), 'sensor'),
         })
