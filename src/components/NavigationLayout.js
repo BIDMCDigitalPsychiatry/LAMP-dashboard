@@ -30,7 +30,6 @@ import { ResponsiveMargin } from './Utils'
 
 class NavigationLayout extends React.Component {
     state = {
-		loaded: 1.0,
         title: "LAMP",
         openProfile: false,
         openPopover: false,
@@ -43,18 +42,6 @@ class NavigationLayout extends React.Component {
     anchorEl = null;
     observer = null;
     timer = null;
-
-    startLoading = () => {
-		this.timer = setInterval(() => this.setState({
-			loaded: (this.state.loaded === 1.0 ? 0.0 : (this.state.loaded > 0.9 ? this.state.loaded : this.state.loaded + 0.01))
-		}), 100)
-    }
-
-    stopLoading = () => {
-		clearInterval(this.timer)
-		this.timer = null
-		this.setState({ loaded: 1.0 })
-    }
 
     avatarSelect = (event) => {
         this.setState({
@@ -145,36 +132,25 @@ class NavigationLayout extends React.Component {
 			</AppBar>
 		}
         <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
-			<Fade in={this.state.loaded >= 1.0}>
-                <ResponsiveMargin style={{ marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
-                    {React.Children.map(this.props.children, child =>
-                        React.cloneElement(child, { layout: {
-                            setTitle: (title) => { document.title = title; this.setState({ title: title }) },
-                            pageLoading: (loaded) => { !loaded ? this.startLoading() : this.stopLoading() },
-                            showMessage: (message, timeout = 3000) => {
-                                this.setState({ snackMessage: message })
-                                setTimeout(() => this.setState({ snackMessage: null }), timeout)
-                            },
-                            showAlert: (message) => this.setState({ alertMessage: message })
-                        }})
-                    )}
-                </ResponsiveMargin>
-            </Fade>
-			<Fade in={this.state.loaded < 1.0}>
-				<div style={{ position: 'absolute', width: '90%', marginLeft: '5%', marginRight: '5%', top: '50%' }}>
-					<LinearProgress
-                        variant="buffer"
-                        value={this.state.loaded * 100.0}
-                        valueBuffer={(this.state.loaded * 100.0) + (Math.random() * 5) + 2} />
-				</div>
-			</Fade>
+            <ResponsiveMargin style={{ marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+                {React.Children.map(this.props.children, child =>
+                    React.cloneElement(child, { layout: {
+                        setTitle: (title) => { document.title = title; this.setState({ title: title }) },
+                        pageLoading: (loaded) => {},
+                        showMessage: (message, timeout = 3000) => {
+                            this.setState({ snackMessage: message })
+                            setTimeout(() => this.setState({ snackMessage: null }), timeout)
+                        },
+                        showAlert: (message) => this.setState({ alertMessage: message })
+                    }})
+                )}
+            </ResponsiveMargin>
         </div>
         <Dialog
             open={this.state.openProfile}
             onClose={this.closeProfile}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
-
             <DialogTitle id="alert-dialog-title">Profile</DialogTitle>
             <DialogContent>
                 <ObjectView value={this.props.profile} />
