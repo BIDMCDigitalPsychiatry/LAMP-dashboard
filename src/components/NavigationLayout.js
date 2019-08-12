@@ -132,7 +132,7 @@ class NavigationLayout extends React.Component {
 			</AppBar>
 		}
         <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
-            <ResponsiveMargin style={{ marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+            <ResponsiveMargin style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
                 {React.Children.map(this.props.children, child =>
                     React.cloneElement(child, { layout: {
                         setTitle: (title) => { document.title = title; this.setState({ title: title }) },

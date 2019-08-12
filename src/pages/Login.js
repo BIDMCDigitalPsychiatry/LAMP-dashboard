@@ -3,7 +3,6 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
 import Typography from '@material-ui/core/Typography'
-import Paper from '@material-ui/core/Paper'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
@@ -21,6 +20,7 @@ import FormLabel from '@material-ui/core/FormLabel'
 // Local Imports
 import mindLAMPLogo from '../logo.png'
 import SurveyScheduler from '../components/SurveyScheduler'
+import { ResponsivePaper, ResponsiveMargin } from '../components/Utils'
 
 const styles = theme => ({
     textField: {
@@ -205,7 +205,8 @@ class Login extends React.Component {
 
             <Slide direction="right" in={!this.state.slide} mountOnEnter unmountOnExit appear>
 
-        <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width:'25vw', left:'37.5vw'}}>
+        <ResponsiveMargin style={{ position: 'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
+        <ResponsivePaper elevation={12} style={{padding: '16px'}}>
                 <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
             <Grid container justify="space-evenly" style={{textAlign: "center", height: 250}}>
@@ -213,7 +214,7 @@ class Login extends React.Component {
                 <TextField
                     margin="normal"
                     variant="outlined"
-                    style={{width: '80%', height: 92}}
+                    style={{width: '100%', height: 92}}
                     label="Server Address"
                     placeholder="https://api.lamp.digital"
                     helperText="Don't enter a server location if you're not sure what this option does."
@@ -223,23 +224,25 @@ class Login extends React.Component {
                 <Button
                     variant="contained"
                     color="primary"
-                    style={{width: '80%', height: 36}}
+                    style={{width: '100%', height: 36}}
                     onClick={this.handleSlideLogin}>
                     Login
                 </Button>
                 <Button
                     variant="outlined"
                     color="default"
-                    style={{width: '80%', height: 36}}
+                    style={{width: '100%', height: 36}}
                     onClick={this.handleSlideRegister}>
                     Sign Up
                 </Button>
                 </Grid>
   
-        </Paper>
+        </ResponsivePaper>
+        </ResponsiveMargin>
         </Slide>
         <Slide direction="left" in={this.state.slide && this.state.slideRegister} mountOnEnter unmountOnExit>
-                    <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width: '33vw', left:'33vw'}}>
+                    <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
+                    <ResponsivePaper elevation={12} style={{padding: '16px'}}>
                         <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
 
                     <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Sign Up</Typography>
@@ -321,10 +324,12 @@ class Login extends React.Component {
                         </Button>
                         <br />
                     </form>
-                    </Paper>
+                    </ResponsivePaper>
+                    </ResponsiveMargin>
         </Slide>
             <Slide direction="left" in={this.state.slide && !this.state.slideRegister} mountOnEnter unmountOnExit>
-            <Paper square={true} elevation={12} style={{padding: '16px', position:'absolute', width: '33vw', left:'33vw'}}>
+            <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
+            <ResponsivePaper elevation={12} style={{padding: '16px'}}>
                 <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin:'auto'}} />
 
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
@@ -382,7 +387,8 @@ class Login extends React.Component {
                 </Button>
                 </div>
             </form>
-            </Paper>
+            </ResponsivePaper>
+            </ResponsiveMargin>
                 </Slide>
         <Dialog 
                 fullWidth={true}

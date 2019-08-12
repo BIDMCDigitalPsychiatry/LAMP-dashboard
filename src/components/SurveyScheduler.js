@@ -18,6 +18,9 @@ import IconButton from '@material-ui/core/IconButton'
 import AddIcon from '@material-ui/icons/Add'
 import MaterialTable from 'material-table'
 
+// Local Imports
+import { ResponsivePaper } from '../components/Utils'
+
 const defaultSurveys = [{
         surveyName: "Anxiety (GAD-7)",
         type: "Survey",
@@ -371,6 +374,7 @@ export default class SurveyScheduler extends React.Component {
 
 					</Grid>
 		</div>
+            <ResponsivePaper elevation={4}>
             <MaterialTable 
                 columns={[
                 	{ title: 'Name', field: 'surveyName', cellStyle: (data, idx) => ({
@@ -433,7 +437,9 @@ export default class SurveyScheduler extends React.Component {
                     search: false
 
                 }}
-            />  
+                components={{ Container: props => <div {...props} /> }}
+            /> 
+            </ResponsivePaper> 
         <div style={{marginTop: 20}} />
             <Button
                 variant="outlined"
@@ -470,6 +476,7 @@ export default class SurveyScheduler extends React.Component {
 				        >
 				          <DialogContent>
 				            <DialogContentText id="alert-dialog-description">
+             <ResponsivePaper elevation={4}>
              <MaterialTable
 				columns={[
 					{title: 'Question', field: 'question' }, 
@@ -521,8 +528,9 @@ export default class SurveyScheduler extends React.Component {
                     search: false
 
                 }}
+                components={{ Container: props => <div {...props} /> }}
                 />
-  
+                </ResponsivePaper>
 				     </DialogContentText>
 				          </DialogContent>
 				          <DialogActions>
@@ -541,7 +549,8 @@ export default class SurveyScheduler extends React.Component {
 				        >
 				          <DialogContent>
 				            <DialogContentText id="alert-dialog-description">
-				                            <MaterialTable
+            <ResponsivePaper elevation={4}>
+            <MaterialTable
 				columns={[
                 	{ title: 'Day', field: 'day', lookup: 
 						{
@@ -594,7 +603,9 @@ export default class SurveyScheduler extends React.Component {
                     search: false
 
                 }}
+                components={{ Container: props => <div {...props} /> }}
                 />
+                </ResponsivePaper>
 				       </DialogContentText>
 				          </DialogContent>
 				          <DialogActions>

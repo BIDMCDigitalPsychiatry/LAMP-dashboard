@@ -1,15 +1,21 @@
 
 // Core Imports 
 import React from 'react'
+import Paper from '@material-ui/core/Paper'
 import Dialog from '@material-ui/core/Dialog'
 import { useTheme } from '@material-ui/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 
 // 
-export const ResponsiveMargin = ({ ...props }) => {
+export const ResponsiveMargin = React.forwardRef((props, ref) => {
     let sm = useMediaQuery(useTheme().breakpoints.down('sm'))
-    return <div {...props} style={{ ...props.style, width: sm ? '100%' : '80%' }} />
-}
+    return <div {...props} style={{ ...props.style, width: sm ? '100%' : props.style.width }} ref={ref} />
+})
+
+export const ResponsivePaper = React.forwardRef((props, ref) => {
+    let sm = useMediaQuery(useTheme().breakpoints.down('sm'))
+    return <Paper {...props} elevation={sm ? 0 : props.elevation} ref={ref} />
+})
 
 // 
 export const ResponsiveDialog = ({ ...props }) => 

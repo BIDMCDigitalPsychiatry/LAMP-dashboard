@@ -32,7 +32,7 @@ import jsonexport from 'jsonexport'
 import LAMP from '../lamp'
 import Messages from '../components/Messages'
 import Sparkchips from '../components/Sparkchips'
-import { ResponsiveDialog } from '../components/Utils'
+import { ResponsiveDialog, ResponsivePaper } from '../components/Utils'
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Activity settings & schedule + Blogs/Tips/AppHelp
@@ -132,6 +132,7 @@ class Researcher extends React.Component {
                 />
             </Box>
         </Box>
+        <ResponsivePaper elevation={4}>
         <MaterialTable 
             title="Participants"
             data={this.state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
@@ -254,7 +255,9 @@ class Researcher extends React.Component {
                 pageSizeOptions: [10, 25, 50, 100]
 
             }}
+            components={{ Container: props => <div {...props} /> }}
         />
+        </ResponsivePaper>
         <div style={{ height: 16 }} />
         {/*<MaterialTable 
             title="Activities"
@@ -294,6 +297,7 @@ class Researcher extends React.Component {
                 pageSize: 10,
                 pageSizeOptions: [10, 25, 50, 100]
             }}
+            components={{ Container: props => <div {...props} /> }}
         />*/}
         <Popover
           id="simple-popper"
