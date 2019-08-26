@@ -1,7 +1,6 @@
 
 // Core Imports
-import React from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
@@ -42,11 +41,8 @@ const styles = theme => ({
     },
 });
 
-const formStyles = theme => createStyles({});
-
-
-class Login extends React.Component {
-    state = {
+export default function Login({ ...props }) {
+    const [ state, setState ] = useState({
         id: "",
         password: "",
         slide: false,
@@ -58,27 +54,27 @@ class Login extends React.Component {
         studyName: "",
         open: false,
         role: 'researcher',
-    }
+    })
 
-    componentDidMount() {
-        this.props.layout.setTitle('Login')
-    }
+    useEffect(() => {
+        props.layout.setTitle('Login')
+    }, [])
 
-    handleChange = (event) => {
+    let handleChange = (event) => {
         const target = event.target
         const value = target.type === 'checkbox' ? target.checked : target.value
         const name = target.name
-        this.setState({
+        setState({ ...state,
             [name]: value
         })
     }
 
-    handleSlideLogin = (event) => {
+    let handleSlideLogin = (event) => {
         event.preventDefault()
-        this.setState(state => ({ slide: !state.slide }))
+        setState({ ...state, slide: !state.slide })
     }
 
-    validator = {
+    let validator = {
         name: [{
             test: (val) => val !== "",
             msg: "Name field is required"
@@ -96,15 +92,15 @@ class Login extends React.Component {
         }],
     }
 
-    validateForm = () => {
+    let validateForm = () => {
         let errored = false
         let errorMsg = ""
 
-        Object.keys(this.validator).forEach((field) => {
+        Object.keys(validator).forEach((field) => {
             let erroredField = false
-            this.validator[field].forEach(({ test, msg }) => {
-                if (!erroredField && !test(this.state[field])) {
-                    this.setState({
+            validator[field].forEach(({ test, msg }) => {
+                if (!erroredField && !test(state[field])) {
+                    setState({ ...state,
                         [field + "ErrText"]: msg
                     })
                     errorMsg = msg
@@ -115,45 +111,45 @@ class Login extends React.Component {
         })
 
         if (errored) {
-            this.props.layout.showMessage(errorMsg)
+            props.layout.showMessage(errorMsg)
         }
 
         return !errored
     }
 
-    handleBack = (event) => {
+    let handleBack = (event) => {
         event.preventDefault()
-        this.setState(state => ({ open: false }))
+        setState({ ...state, open: false })
     }
 
-    handleLogin = (event) => {
+    let handleLogin = (event) => {
         event.preventDefault()
-        this.props.setIdentity({ 
-                type: (this.state.id === 'root' ?
-                        'root' : (this.state.id.includes('@') ?
+        props.setIdentity({ 
+                type: (state.id === 'root' ?
+                        'root' : (state.id.includes('@') ?
                             'researcher' : 'participant')), 
-                id: this.state.id, 
-                password: this.state.password
-            }, this.state.serverAddress
+                id: state.id, 
+                password: state.password
+            }, state.serverAddress
         ).then(res => {
-            this.props.history.replace('/home')
+            props.history.replace('/home')
         }).catch(err => {
             console.warn("error with auth request", err)
-            this.props.layout.showMessage('' + err.message)
+            props.layout.showMessage('' + err.message)
         })
     }
 
-    handleChangeRole = event => {
-        this.setState({ role: event.target.value });
+    let handleChangeRole = event => {
+        setState({ ...state, role: event.target.value });
     };
 
-    handleRegister = (payload) => {
+    let handleRegister = (payload) => {
 
         let msgContents = JSON.stringify({
             researcher: {
-                name: this.state.name,
-                email: this.state.email,
-                'study name': this.state.studyName
+                name: state.name,
+                email: state.email,
+                'study name': state.studyName
             },
             activities: payload
         }, 0, 4)
@@ -172,42 +168,44 @@ class Login extends React.Component {
             .then(response => response.json())
             .then(data => {
                 console.log(JSON.stringify(data))
-                this.props.layout.showMessage("Success! The system will process your request and notify you within 24 hours.")
+                props.layout.showMessage("Success! The system will process your request and notify you within 24 hours.")
             })
             .catch(error => {
                 console.error(error)
-                this.props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
+                props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
             })
 
 
-        this.setState(state => ({ open: false }))
+        setState({ ...state, open: false })
 
     }
 
 
-    handleNext = (event) => {
+    let handleNext = (event) => {
         event.preventDefault()
 
-        if (!this.validateForm())
+        if (!validateForm())
             return
 
-        this.setState(state => ({ open: true }))
+        setState({ ...state, open: true })
     }
 
-    handleSlideRegister = (event) => {
+    let handleSlideRegister = (event) => {
         event.preventDefault()
-        this.setState(state => ({ slide: !state.slide }))
-        this.setState(state => ({ slideRegister: !state.slideRegister }))
+        setState({ ...state, 
+            slide: !state.slide, 
+            slideRegister: !state.slideRegister 
+        })
     }
 
-    render = () =>
+    return (
     <React.Fragment>
 
-            <Slide direction="right" in={!this.state.slide} mountOnEnter unmountOnExit appear>
+            <Slide direction="right" in={!state.slide} mountOnEnter unmountOnExit appear>
 
         <ResponsiveMargin style={{ position: 'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
         <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
+                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin: 'auto'}}/>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
             <Grid container justify="space-evenly" style={{textAlign: "center", height: 250}}>
 
@@ -218,21 +216,21 @@ class Login extends React.Component {
                     label="Server Address"
                     placeholder="https://api.lamp.digital"
                     helperText="Don't enter a server location if you're not sure what this option does."
-                    value={this.state.serverAddress || ''}
-                    onChange={event => this.setState({ serverAddress: event.target.value })}
+                    value={state.serverAddress || ''}
+                    onChange={event => setState({ ...state, serverAddress: event.target.value })}
                 />
                 <Button
                     variant="contained"
                     color="primary"
                     style={{width: '100%', height: 36}}
-                    onClick={this.handleSlideLogin}>
+                    onClick={handleSlideLogin}>
                     Login
                 </Button>
                 <Button
                     variant="outlined"
                     color="default"
                     style={{width: '100%', height: 36}}
-                    onClick={this.handleSlideRegister}>
+                    onClick={handleSlideRegister}>
                     Sign Up
                 </Button>
                 </Grid>
@@ -240,10 +238,10 @@ class Login extends React.Component {
         </ResponsivePaper>
         </ResponsiveMargin>
         </Slide>
-        <Slide direction="left" in={this.state.slide && this.state.slideRegister} mountOnEnter unmountOnExit>
+        <Slide direction="left" in={state.slide && state.slideRegister} mountOnEnter unmountOnExit>
                     <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
                     <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                        <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin: 'auto'}}/>
+                        <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin: 'auto'}}/>
 
                     <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Sign Up</Typography>
                     <Typography variant="caption" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Start customizing your study.</Typography>
@@ -255,10 +253,10 @@ class Login extends React.Component {
                             margin="normal"
                             variant="outlined"
                             name="name"
-                            value={this.state.name}
+                            value={state.name}
                             className={styles.textField}
-                            errorText={this.state.nameErrText}
-                            onChange={this.handleChange}
+                            errorText={state.nameErrText}
+                            onChange={handleChange}
                             />
                         <TextField
                             required
@@ -267,18 +265,18 @@ class Login extends React.Component {
                             margin="normal"
                             variant="outlined"
                             name="email"
-                            value={this.state.email}
+                            value={state.email}
                             className={styles.textField}
-                            errorText={this.state.emailErrText}
-                            onChange={this.handleChange}
+                            errorText={state.emailErrText}
+                            onChange={handleChange}
                             />
                         <FormControl component="fieldset" style={{marginTop: 10}}>
                           <FormLabel component="legend">I am a...</FormLabel>
                           <RadioGroup
                             aria-label="Role"
                             name="role1"
-                            value={this.state.role}
-                            onChange={this.handleChangeRole}
+                            value={state.role}
+                            onChange={handleChangeRole}
                           >
                             <FormControlLabel value="researcher" control={<Radio />} label="Researcher" />
                             <FormControlLabel value="participant" control={<Radio />} label="Participant" />
@@ -287,20 +285,20 @@ class Login extends React.Component {
 
                         <TextField
                             label="Study Name (Optional)"
-                            style={{width: '100%', display: this.state.role === "participant" ? "none" : undefined}}
+                            style={{width: '100%', display: state.role === "participant" ? "none" : undefined}}
                             margin="normal"
                             variant="outlined"
                             name="studyName"
-                            value={this.state.studyName}
+                            value={state.studyName}
                             className={styles.textField}
-                            onChange={this.handleChange}
+                            onChange={handleChange}
                             />
                         <br />
                         <Button
                             variant="outlined"
                             color="default"
                             style={{width: '45%'}}
-                            onClick={this.handleSlideRegister}>
+                            onClick={handleSlideRegister}>
                             Back
                         </Button>
                         <Button
@@ -308,7 +306,7 @@ class Login extends React.Component {
                             color="primary"
                             className="submit"
                             style={{float: 'right', width: '45%'}}
-                            onClick={this.handleNext}>
+                            onClick={handleNext}>
                             Next
                             <input type="submit" style={{
                                 cursor: 'pointer',
@@ -327,14 +325,14 @@ class Login extends React.Component {
                     </ResponsivePaper>
                     </ResponsiveMargin>
         </Slide>
-            <Slide direction="left" in={this.state.slide && !this.state.slideRegister} mountOnEnter unmountOnExit>
+            <Slide direction="left" in={state.slide && !state.slideRegister} mountOnEnter unmountOnExit>
             <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
             <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={this.props.bigAvatar} style={{margin:'auto'}} />
+                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin:'auto'}} />
 
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
 
-            <form action="" onSubmit={this.handleLogin}>
+            <form action="" onSubmit={handleLogin}>
             <div >
                 <TextField
                     required 
@@ -344,8 +342,8 @@ class Login extends React.Component {
                     variant="outlined"
                     className={styles.textField}
                     style={{width: '100%'}}
-                    value={this.state.id}
-                    onChange={this.handleChange}
+                    value={state.id}
+                    onChange={handleChange}
                 />
                 <TextField
                     required
@@ -356,15 +354,15 @@ class Login extends React.Component {
                     variant="outlined"
                     className={styles.textField}
                     style={{width: '100%'}}
-                    value={this.state.password}
-                    onChange={this.handleChange}
+                    value={state.password}
+                    onChange={handleChange}
                 />
                 <br />
                 <Button
                     variant="outlined"
                     color="default"
                     style={{width: '45%'}}
-                    onClick={this.handleSlideLogin}>
+                    onClick={handleSlideLogin}>
                     Back
                 </Button>
                 <Button
@@ -372,7 +370,7 @@ class Login extends React.Component {
                     color="primary"
                     type="submit"
                     style={{float: 'right', width: '45%'}}
-                    onClick={this.handleLogin}>
+                    onClick={handleLogin}>
                     Login
                     <input type="submit" style={{
                         cursor: 'pointer',
@@ -393,19 +391,18 @@ class Login extends React.Component {
         <Dialog 
                 fullWidth={true}
                 maxWidth="md"
-                open={this.state.open}
-                onClose={this.handleClose}
+                open={state.open || false}
+                onClose={handleBack}
                 >
                 <DialogContent>
                 <SurveyScheduler 
-                    onSubmit = {this.handleRegister}
-                    onCancel = {this.handleBack}
-                    onError = {this.props.layout.showMessage}
+                    onSubmit = {handleRegister}
+                    onCancel = {handleBack}
+                    onError = {props.layout.showMessage}
                     />
                 </DialogContent>
             </Dialog>
 
             </React.Fragment>
+    )
 }
-
-export default withStyles(formStyles)(withRouter(Login));
