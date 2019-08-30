@@ -1,10 +1,82 @@
 
 // Core Imports 
-import React from 'react'
+import React, { useEffect } from 'react'
 import Paper from '@material-ui/core/Paper'
 import Dialog from '@material-ui/core/Dialog'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableHead from '@material-ui/core/TableHead'
+import TableCell from '@material-ui/core/TableCell'
+import TableRow from '@material-ui/core/TableRow'
+import TablePagination from '@material-ui/core/TablePagination'
+import TableSortLabel from '@material-ui/core/TableSortLabel'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import Checkbox from '@material-ui/core/Checkbox'
+import Tooltip from '@material-ui/core/Tooltip'
+import IconButton from '@material-ui/core/IconButton'
+import DeleteIcon from '@material-ui/icons/Delete'
+import FilterListIcon from '@material-ui/icons/FilterList'
+import Divider from '@material-ui/core/Divider'
 import { useTheme } from '@material-ui/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+
+// Convert underscore case into human-readable strings.
+const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && ' ') + $2.toUpperCase())
+
+// See below.
+export class ObjectView extends React.Component {
+
+    // Get all the keys we'll be displaying from the array.
+    displayKeys = () => Object.keys(this.props.value || {}).filter(x => !((this.props.hiddenKeys || []).includes(x)))
+
+    render = () =>
+    <Table>
+        <TableBody>
+            {this.displayKeys().map((key) =>
+                <TableRow hover key={key}>
+                    <TableCell style={{width:'20%'}}>
+                        <Typography color="inherit" variant="body1">
+                            {humanize(key)}
+                        </Typography>
+                    </TableCell>
+                    <TableCell>{this.props.value[key]}</TableCell>
+                </TableRow>
+            )}
+        </TableBody>
+    </Table>
+}
+
+// Expects a homogenous array (!!) and produces a Table.
+export class ArrayView extends React.Component {
+
+    // Get all the keys we'll be displaying from the array.
+    displayKeys = () => Object.keys(this.props.value[0] || {}).filter(x => !((this.props.hiddenKeys || []).includes(x)))
+
+    render = () => 
+    <Table>
+        <TableHead>
+            <TableRow>
+            {this.displayKeys().map((key) => (
+                <TableCell key={key} style={{borderBottom: 0}} tooltip={humanize(key)}>{humanize(key)}</TableCell>
+            ))}
+            </TableRow>
+        </TableHead>
+        <TableBody>
+        {this.props.value.map((row, index) => (
+            <TableRow hover key={index}>
+            {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
+                <ArrayView value={row[key]} />
+            ) : (!!row[key]) && (typeof row[key] === 'object') ? (
+                <ArrayView value={[row[key]]} />
+            ) : (
+                <TableCell key={row[key]} style={{borderBottom: 0}}>{row[key]}</TableCell>
+            ))}
+            </TableRow>
+        ))}
+        </TableBody>
+    </Table>
+}
 
 // 
 export const ResponsiveMargin = React.forwardRef((props, ref) => {
@@ -20,6 +92,12 @@ export const ResponsivePaper = React.forwardRef((props, ref) => {
 // 
 export const ResponsiveDialog = ({ ...props }) => 
     <Dialog fullScreen={useMediaQuery(useTheme().breakpoints.down('sm'))} {...props} />
+
+// 
+export function PageTitle({ children, ...props }) {
+    useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
+    return <React.Fragment />
+}
 
 // Produces an array of integers from 0 until the specified max number.
 export const rangeTo = (max) => [...Array(max).keys()]

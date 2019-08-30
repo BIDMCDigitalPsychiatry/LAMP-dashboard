@@ -1,7 +1,6 @@
 
 // Core Imports
-import React from 'react'
-import { withRouter } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
@@ -35,8 +34,8 @@ function SlideDown(props) { return <Slide direction="down" {...props} /> }
 function SlideLeft(props) { return <Slide direction="left" {...props} /> }
 function SlideRight(props) { return <Slide direction="right" {...props} /> }
 
-class Home extends React.Component {
-	state = {
+export default function Home({ ...props }) {
+    const [ state, setState ] = useState({
 		onboarding: true,
 		homeOpen: false,
 		homeHintOpen: false,
@@ -92,9 +91,9 @@ class Home extends React.Component {
 				name: 'Prize Wheel'
 			}]
 		}
-	}
+	})
 
-	theme = createMuiTheme({ 
+	let theme = createMuiTheme({ 
 		palette: {
 			type: 'dark',
 			background: {
@@ -103,32 +102,32 @@ class Home extends React.Component {
 		} 
 	})
 
-	componentDidMount() {
+    useEffect(() => {
 		document.addEventListener('contextmenu', event => {
 			event.preventDefault()
-			this.setState({ 
+			setState({ ...state, 
 				menuAnchor: event.target, 
 				menuPosition: { left: event.clientX, top: event.clientY}
 			})
 		})
 		setTimeout(() => {
-			this.setState({ notification: true })
+			setState({ ...state, notification: true })
 			setTimeout(() => {
-				this.setState({ notification: false })
+				setState({ ...state, notification: false })
 			}, 5000)
 		}, 5000)
-	}
+    }, [])
 
-	render = () =>
+	return (
 		<div>
-          	<IconButton style={{ position: 'fixed', right: 8, top: 8, background: '#ffffff66', webkitBackdropFilter: 'blur(5px)' }} color="inherit" onClick={() => this.setState({ profileOpen: true })} aria-label="Close">
+          	<IconButton style={{ position: 'fixed', right: 8, top: 8, background: '#ffffff66', webkitBackdropFilter: 'blur(5px)' }} color="inherit" onClick={() => setState({ ...state, profileOpen: true })} aria-label="Close">
             	<Icon>settings</Icon>
           	</IconButton>
-        	<MuiThemeProvider theme={this.theme}>
+        	<MuiThemeProvider theme={theme}>
 			<CssBaseline />
-			{this.state.value !== 'assess' ? 
-				this.state.data[this.state.value].map((row, index) => (
-					<Button variant="outlined" key={index} style={{ margin: '5% 5% 0% 5%', width: '90%', height: '90%', lineHeight: 1, justifyContent: 'left', textTransform: 'none' }} onClick={() => this.setState({ displayed: row })}>
+			{state.value !== 'assess' ? 
+				state.data[state.value].map((row, index) => (
+					<Button variant="outlined" key={index} style={{ margin: '5% 5% 0% 5%', width: '90%', height: '90%', lineHeight: 1, justifyContent: 'left', textTransform: 'none' }} onClick={() => setState({ ...state, displayed: row })}>
 						<span style={{ fontSize: 96 }}>{row.icon}</span>
 						<div style={{ width: 32 }} />
 						<Typography variant="h6" style={{ fontSize: 32 }}>{row.name}</Typography>
@@ -138,13 +137,13 @@ class Home extends React.Component {
 		      	<Typography variant="h6" style={{ marginTop: 12 }}>Assess</Typography>
 		        <Grid container direction="row" item xs={12}>
 			        <Grid item xs={6}>
-						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => this.setState({ value: 'surveys' })}>
+						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, value: 'surveys' })}>
 			          		<span style={{ fontSize: '96px' }}>📝</span><br />
 			          		Check-In
 		          		</Button>
 			        </Grid>
 			        <Grid item xs={6}>
-						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => this.setState({ value: 'games' })}>
+						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, value: 'games' })}>
 			          		<span style={{ fontSize: '96px' }}>🎮</span><br />
 			          		Brain Games
 		          		</Button>
@@ -153,15 +152,15 @@ class Home extends React.Component {
 		      	<Typography variant="h6">Favorites</Typography>
 		        <Grid container direction="row" item xs={12}>
 			        <Grid item xs={6}>
-						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => this.setState({ displayed: undefined, presented: this.state.data.games[3] })}>
-			          		<span style={{ fontSize: '96px' }}>{this.state.data.games[3].icon}</span><br />
-			          		{this.state.data.games[3].name}
+						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, displayed: undefined, presented: state.data.games[3] })}>
+			          		<span style={{ fontSize: '96px' }}>{state.data.games[3].icon}</span><br />
+			          		{state.data.games[3].name}
 		          		</Button>
 			        </Grid>
 			        <Grid item xs={6}>
-						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => this.setState({ displayed: undefined, presented: this.state.data.surveys[2] })}>
-			          		<span style={{ fontSize: '96px' }}>{this.state.data.surveys[2].icon}</span><br />
-			          		{this.state.data.surveys[2].name}
+						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, displayed: undefined, presented: state.data.surveys[2] })}>
+			          		<span style={{ fontSize: '96px' }}>{state.data.surveys[2].icon}</span><br />
+			          		{state.data.surveys[2].name}
 		          		</Button>
 			        </Grid>
 		        </Grid>
@@ -184,7 +183,7 @@ class Home extends React.Component {
 			}
 			<div style={{ height: 100 }} />
 			</MuiThemeProvider>
-			<SlideDown in={this.state.notification}>
+			<SlideDown in={state.notification}>
           	<ButtonBase 
           		style={{ 
 		          	position: 'fixed', 
@@ -198,7 +197,7 @@ class Home extends React.Component {
 		          	justifyContent: 'left'
           		}} 
           		color="inherit" 
-          		onClick={() => this.setState({ homeOpen: true })} 
+          		onClick={() => setState({ ...state, homeOpen: true })} 
           		aria-label="Close"
           	>
 	            <Typography variant="h6">
@@ -212,7 +211,7 @@ class Home extends React.Component {
 				width: '100%'
 			}}>
 				<Paper elevation={15}>
-				    <BottomNavigation value={this.state.value} onChange={(event, value) => this.setState({ value })}>
+				    <BottomNavigation value={state.value} onChange={(event, value) => setState({ ...state, value })}>
 				        <BottomNavigationAction label="Learn" value="learn" icon={<RestoreIcon />} />
 				        <BottomNavigationAction label="Assess" value="assess" icon={<FavoriteIcon />} />
 				        <BottomNavigationAction label="Manage" value="manage" icon={<LocationOnIcon />} />
@@ -221,11 +220,11 @@ class Home extends React.Component {
 			    </Paper>
 	    	</div>
 	        <Dialog
-	          open={!!this.state.displayed}
-	          onClose={() => this.setState({ displayed: undefined })}
+	          open={!!state.displayed}
+	          onClose={() => setState({ ...state, displayed: undefined })}
 	        >
 	            <DialogTitle disableTypography>
-			      <Typography variant="h6">{!!this.state.displayed ? (this.state.displayed.icon + ' ' + this.state.displayed.name) : ''}</Typography>
+			      <Typography variant="h6">{!!state.displayed ? (state.displayed.icon + ' ' + state.displayed.name) : ''}</Typography>
 			    </DialogTitle>
 	          <DialogContent>
 	            <Typography gutterBottom>
@@ -239,21 +238,21 @@ class Home extends React.Component {
 	            </Typography>
 	          </DialogContent>
 	          <DialogActions>
-	            <Button variant="outlined" style={{float: 'left'}} onClick={() => this.setState({ helped: this.state.displayed })} color="primary">
+	            <Button variant="outlined" style={{float: 'left'}} onClick={() => setState({ ...state, helped: state.displayed })} color="primary">
 	              Help
 	            </Button>
-	            <Button variant="contained" onClick={() => this.setState({ displayed: undefined, presented: this.state.displayed })} color="primary">
+	            <Button variant="contained" onClick={() => setState({ ...state, displayed: undefined, presented: state.displayed })} color="primary">
 	              Start
 	            </Button>
 	          </DialogActions>
 	        </Dialog>
 	        <Dialog
 	          fullScreen
-	          open={!!this.state.helped}
-	          onClose={() => this.setState({ helped: undefined })}
+	          open={!!state.helped}
+	          onClose={() => setState({ ...state, helped: undefined })}
 	          TransitionComponent={SlideUp}
 	        >
-	              <IconButton style={{ position: 'fixed', left: 16, top: 16, background: '#ffffff66', webkitBackdropFilter: 'blur(5px)' }} color="inherit" onClick={() => this.setState({ helped: undefined })} aria-label="Close">
+	              <IconButton style={{ position: 'fixed', left: 16, top: 16, background: '#ffffff66', webkitBackdropFilter: 'blur(5px)' }} color="inherit" onClick={() => setState({ ...state, helped: undefined })} aria-label="Close">
 	                <CloseIcon />
 	              </IconButton>
 	          	<video style={{ objectFit: 'cover' }} autoPlay="true" loop>
@@ -262,24 +261,24 @@ class Home extends React.Component {
 	        </Dialog>
 	        <Dialog
 	          fullScreen
-	          open={!!this.state.presented}
-	          onClose={() => this.setState({ presented: undefined })}
+	          open={!!state.presented}
+	          onClose={() => setState({ ...state, presented: undefined })}
 	          TransitionComponent={SlideUp}
 	        >
 	            <Toolbar>
-	              <IconButton color="inherit" onClick={() => this.setState({ presented: undefined })} aria-label="Close">
+	              <IconButton color="inherit" onClick={() => setState({ ...state, presented: undefined })} aria-label="Close">
 	                <CloseIcon />
 	              </IconButton>
 	              <Typography variant="h6" color="inherit">
-	                {!!this.state.presented ? (this.state.presented.icon + ' ' + this.state.presented.name) : ''}
+	                {!!state.presented ? (state.presented.icon + ' ' + state.presented.name) : ''}
 	              </Typography>
 	            </Toolbar>
-	          <Jewels onComplete={(x) => { console.dir(x); this.setState({ presented: undefined }) }} />
+	          <Jewels onComplete={(x) => { console.dir(x); setState({ ...state, presented: undefined }) }} />
 	        </Dialog>
 	        <Dialog
 	          fullScreen
-	          open={this.state.onboarding}
-	          onClose={() => this.setState({ onboarding: false })}
+	          open={state.onboarding}
+	          onClose={() => setState({ ...state, onboarding: false })}
 	          TransitionComponent={SlideRight}
 	        >
 	          <div style={{ width: '100%', height: '50%', top: '0%' }}>
@@ -296,17 +295,17 @@ class Home extends React.Component {
               <IconButton style={{ position: 'fixed', float: 'left', bottom: 16, left: 16 }} color="inherit" onClick={() => {}} aria-label="Close">
                 <Icon>cancel</Icon>
               </IconButton>
-              <IconButton style={{ position: 'fixed', float: 'right', bottom: 16, right: 16 }} color="inherit" onClick={() => this.setState({ onboarding: false })} aria-label="Close">
+              <IconButton style={{ position: 'fixed', float: 'right', bottom: 16, right: 16 }} color="inherit" onClick={() => setState({ ...state, onboarding: false })} aria-label="Close">
                 <Icon>arrow_forward</Icon>
               </IconButton>
 	        </Dialog>
 	        <Dialog
 	          fullScreen
-	          open={this.state.profileOpen}
-	          onClose={() => this.setState({ profileOpen: false })}
+	          open={state.profileOpen}
+	          onClose={() => setState({ ...state, profileOpen: false })}
 	          TransitionComponent={SlideDown}
 	        >
-              <IconButton style={{ position: 'fixed', float: 'right', top: 8, right: 8 }} color="inherit" onClick={() => this.setState({ profileOpen: false })} aria-label="Close">
+              <IconButton style={{ position: 'fixed', float: 'right', top: 8, right: 8 }} color="inherit" onClick={() => setState({ ...state, profileOpen: false })} aria-label="Close">
                 <CloseIcon />
               </IconButton>
 	          <Grid container direction="column" alignItems="center" spacing={8} style={{ marginTop: 16 }}>
@@ -328,16 +327,15 @@ class Home extends React.Component {
               </Grid>
 	        </Dialog>
 	      <Menu
-	        anchorEl={this.state.menuAnchor}
+	        anchorEl={state.menuAnchor}
 	        anchorReference="anchorPosition"
-	        anchorPosition={this.state.menuPosition}
+	        anchorPosition={state.menuPosition}
 	        keepMounted
-	        open={!!this.state.menuAnchor}
-	        onClose={() => this.setState({ menuAnchor: undefined })}
+	        open={!!state.menuAnchor}
+	        onClose={() => setState({ ...state, menuAnchor: undefined })}
 	      >
-	        <MenuItem onClick={() => this.setState({ menuAnchor: undefined })}>No menu items available.</MenuItem>
+	        <MenuItem onClick={() => setState({ ...state, menuAnchor: undefined })}>No menu items available.</MenuItem>
 	      </Menu>
 		</div>
+	)
 }
-
-export default withRouter(Home)
