@@ -22,27 +22,18 @@ import blue from '@material-ui/core/colors/blue'
 
 // Local Imports
 import LAMP from '../lamp'
+import ActivityCard from '../components/ActivityCard'
 import MultipleSelect from '../components/MultipleSelect'
 import Sparkline from '../components/Sparkline'
 import MultiPieChart from '../components/MultiPieChart'
 import Messages from '../components/Messages'
 import MenuButton from '../components/MenuButton'
-import { ArrayView } from '../components/DataTable'
 import { ResponsiveDialog, groupBy } from '../components/Utils'
 import Survey from '../components/Survey'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
 
 // TODO: all SensorEvents?
-
-const strategies = {
-    'lamp.survey': (slices) => slices
-        .map(x => (parseInt(x.value) || (['Yes', 'True'].includes(x.value) ? 1 : 0)))
-        .reduce((prev, curr) => prev + curr, 0),
-    'lamp.jewels_a': (slices) => slices
-        .map(x => (parseInt(x.item) || 0))
-        .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
-}
 
 export default function Participant({ participant, ...props }) {
     const [ state, setState ] = useState({})
@@ -167,33 +158,7 @@ export default function Participant({ participant, ...props }) {
             }
             {(state.activities || []).filter(x => (state.selectedCharts || []).includes(x.name)).map(activity =>
                 <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Box m={2} style={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center' }}>
-                        <Typography variant="h6" style={{ width: '100%', textAlign: 'center' }}>
-                            {activity.name}
-                        </Typography>
-                        <IconButton onClick={event => setState({ ...state, helpAnchor: event.currentTarget, helpActivity: activity })}>
-                            <Icon>help</Icon>
-                        </IconButton>
-                    </Box>
-                    <Divider style={{ marginBottom: 16 }} />
-                    <Sparkline 
-                        minWidth={250}
-                        minHeight={250}
-                        XAxisLabel="Time"
-                        YAxisLabel="Score"
-                        color={blue[500]}
-                        data={((state.activity_events || {})[activity.name] || [])
-                              .map(d => ({ 
-                                  x: new Date(d.timestamp), 
-                                  y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events),
-                                  slice: d.temporal_events
-                              }))}
-                        onClick={(datum) => setState({ ...state, visibleSlice: datum.slice })}
-                        lineProps={{
-                          dashArray: '3 1',
-                          dashType: 'dotted',
-                          cap: 'butt'
-                        }} />
+                    <ActivityCard activity={activity} events={((state.activity_events || {})[activity.name] || [])} />
                 </Card>
             )}
             {!(state.selectedPassive || []).includes('Environmental Context') ? <React.Fragment /> : 
@@ -333,49 +298,6 @@ export default function Participant({ participant, ...props }) {
                     onClick={y => setActivities((state.activities || []).filter(x => x.name === y))}
                 />
             </Box>
-            <Popover
-                open={!!state.helpAnchor}
-                anchorEl={state.helpAnchor}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                onClose={event => setState({ ...state, helpAnchor: undefined, helpActivity: undefined })}
-                disableRestoreFocus
-            >
-                {!!state.helpActivity && 
-                    (state.helpActivity.spec === 'lamp.survey' ? 
-                    <img style={{ width: 300, height: 600}} src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/survey.png`} /> :
-                    <img style={{ width: 300, height: 600}} src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${state.helpActivity.name.toLowerCase().replace(/[^0-9a-z]/gi, '')}.png`} />)
-                }
-            </Popover>
-            <ResponsiveDialog
-                open={!!state.visibleSlice}
-                onClose={() => setState({ ...state, visibleSlice: undefined })}
-            >
-                <DialogContent>
-                    {(state.visibleSlice || []).length === 0 ?
-                        <Typography variant="subtitle2" style={{ margin: 16 }}>
-                            No detail view available.
-                        </Typography> :
-                        <ArrayView 
-                            value={(state.visibleSlice || []).map(x => ({ 
-                                item: x.item, value: x.value, 
-                                time_taken: (x.duration / 1000).toFixed(1) + 's' 
-                            }))} 
-                        />
-                    }
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setState({ ...state, visibleSlice: undefined })} color="primary" autoFocus>
-                        Close
-                    </Button>
-                </DialogActions>
-            </ResponsiveDialog>
             <ResponsiveDialog
                 open={!!state.openMessaging}
                 onClose={() => setState({ ...state, openMessaging: undefined })}

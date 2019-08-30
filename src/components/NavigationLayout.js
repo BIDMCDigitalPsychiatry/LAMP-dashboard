@@ -25,8 +25,7 @@ import Button from '@material-ui/core/Button'
 import red from '@material-ui/core/colors/red'
 
 // Local Imports 
-import { ObjectView } from './DataTable'
-import { ResponsiveMargin } from './Utils'
+import { ObjectView, ResponsiveMargin } from './Utils'
 
 class NavigationLayout extends React.Component {
     state = {
