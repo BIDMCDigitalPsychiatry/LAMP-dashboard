@@ -36,14 +36,13 @@ import { ResponsiveDialog, ResponsivePaper } from '../components/Utils'
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Activity settings & schedule + Blogs/Tips/AppHelp
 
-export default function Researcher({ ...props }) {
+export default function Researcher({ researcher, onParticipantSelect, ...props }) {
     const [ state, setState ] = useState({
-        researcher: "",
-        openVizEdit: false,
-        scriptText: '',
-        scriptReqs: '',
         data: [],
         activities: [],
+
+        // 
+
         popoverAttachElement: null,
         selectedIcon: null,
         newCount: 1,
@@ -52,23 +51,10 @@ export default function Researcher({ ...props }) {
 
     useEffect(() => {
         (async function() {
-            let { id } = props.match.params
-            if (id === 'me' && (props.auth.auth || {type: null}).type === 'researcher')
-                id = props.auth.identity.id
-            if (!id || id === 'me') {
-                props.history.replace(`/`)
-                return
-            }
-
-            //
-
-            let obj = await LAMP.Researcher.view(id)
             setState({ ...state, 
-                researcher: obj, 
-                data: await LAMP.Participant.allByResearcher(id), 
-                activities: await LAMP.Activity.allByResearcher(id) 
+                data: await LAMP.Participant.allByResearcher(researcher.id), 
+                activities: await LAMP.Activity.allByResearcher(researcher.id) 
             })
-            props.layout.setTitle(`Researcher ${obj.name}`)
         })()
     }, [])
 
@@ -77,7 +63,7 @@ export default function Researcher({ ...props }) {
         setState({ ...state, popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: [] })
         let ids = []
         for (let i = 0; i < newCount; i ++) {
-            let newID = await LAMP.Participant.create(state.researcher.studies[0], { study_code: '001' })
+            let newID = await LAMP.Participant.create(researcher.studies[0], { study_code: '001' })
             ids = [...ids, newID]
         }
         setState({ ...state, data: [...state.data, ...ids] })
@@ -211,7 +197,7 @@ export default function Researcher({ ...props }) {
                         } />
                     </div>
                 }
-                onRowClick={(event, rowData, togglePanel) => props.history.push(`/participant/${state.data[rowData.tableData.id].id}`)}
+                onRowClick={(event, rowData, togglePanel) => onParticipantSelect(state.data[rowData.tableData.id].id)}
                 actions={[
                     {
                         icon: 'add_box',

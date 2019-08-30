@@ -33,10 +33,9 @@ export default class LAMP {
     public static SensorSpec = new SensorSpecService()
     public static Study = new StudyService()
     public static Type = new TypeService()
-
-    /**
-     * 
-     */
+    private static get configuration(): Configuration | undefined {
+        return LAMP.Type.configuration
+    }
     private static set configuration(configuration: Configuration | undefined) {
         LAMP.Activity.configuration = configuration
         LAMP.ActivitySpec.configuration = configuration
@@ -49,21 +48,7 @@ export default class LAMP {
         LAMP.Study.configuration = configuration
         LAMP.Type.configuration = configuration
     }
-
-    /**
-     * 
-     */
-    private static get configuration(): Configuration | undefined {
-        return LAMP.Type.configuration
-    }
-
-    /**
-     * Connect to an instance of a server hosting the LAMP API.
-     */
-    public static connect(base: string = 'https://api.lamp.digital') {
-        LAMP.configuration = { base }
-    }
-
+    
 
 
     //
@@ -73,14 +58,19 @@ export default class LAMP {
 
 
     public static Auth = class {
-        public static _auth: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null }
+        public static _auth: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; serverAddress: string | undefined; } = { type: null, id: null, password: null, serverAddress: undefined }
         private static _me: any | null
 
         /**
          * Authenticate/authorize as a user of a given `type`.
          * If all values are null (especially `type`), the authorization is cleared.
          */
-        public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; } = { type: null, id: null, password: null}) {
+        public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; serverAddress: string | undefined; } = { type: null, id: null, password: null, serverAddress: undefined }) {
+            LAMP.configuration = { base: (
+                !!identity.serverAddress ? 
+                    `${identity.serverAddress.startsWith('localhost') ? 
+                        'http://' : 'https://'}${identity.serverAddress}` : 
+                    'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
             let l = LAMP.Auth._auth || {type: null, id: null, password: null}
@@ -88,7 +78,7 @@ export default class LAMP {
                 return
 
             // Propogate the authorization.
-            LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password}
+            LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password, serverAddress: identity.serverAddress}
             if (!!LAMP.configuration)
                 LAMP.configuration.authorization = !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined
 
@@ -103,7 +93,7 @@ export default class LAMP {
             } catch(err) {
 
                 // We failed: clear and propogate the authorization.
-                LAMP.Auth._auth = { type: null, id: null, password: null }
+                LAMP.Auth._auth = { type: null, id: null, password: null, serverAddress: undefined }
                 if (!!LAMP.configuration)
                     LAMP.configuration.authorization = undefined
 
@@ -126,7 +116,7 @@ export default class LAMP {
 
         private static async refresh_identity() {
             let _saved = JSON.parse(sessionStorage.getItem('LAMP._auth') || 'null') || LAMP.Auth._auth
-            await LAMP.Auth.set_identity({ type: _saved.type, id: _saved.id, password: _saved.password })
+            await LAMP.Auth.set_identity({ type: _saved.type, id: _saved.id, password: _saved.password, serverAddress: _saved.serverAddress })
         }
     }
 }

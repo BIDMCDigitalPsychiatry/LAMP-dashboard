@@ -1,6 +1,6 @@
 
 // Core Imports 
-import React from 'react'
+import React, { useEffect } from 'react'
 import Paper from '@material-ui/core/Paper'
 import Dialog from '@material-ui/core/Dialog'
 import { useTheme } from '@material-ui/styles'
@@ -20,6 +20,12 @@ export const ResponsivePaper = React.forwardRef((props, ref) => {
 // 
 export const ResponsiveDialog = ({ ...props }) => 
     <Dialog fullScreen={useMediaQuery(useTheme().breakpoints.down('sm'))} {...props} />
+
+// 
+export function PageTitle({ children, ...props }) {
+    useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
+    return <React.Fragment />
+}
 
 // Produces an array of integers from 0 until the specified max number.
 export const rangeTo = (max) => [...Array(max).keys()]

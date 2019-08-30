@@ -30,7 +30,6 @@ import { ResponsiveMargin } from './Utils'
 
 class NavigationLayout extends React.Component {
     state = {
-        title: "LAMP",
         openProfile: false,
         openPopover: false,
         anchorElement: null,
@@ -100,7 +99,7 @@ class NavigationLayout extends React.Component {
                     	*/}
 					</IconButton>
 					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
-						{this.state.title}
+						{this.props.title || ''}
 					</Typography>
 					<div>
 						<IconButton color="default" buttonRef={(node) => {
@@ -135,7 +134,7 @@ class NavigationLayout extends React.Component {
             <ResponsiveMargin style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
                 {React.Children.map(this.props.children, child =>
                     React.cloneElement(child, { layout: {
-                        setTitle: (title) => { document.title = title; this.setState({ title: title }) },
+                        setTitle: (title) => {  },
                         pageLoading: (loaded) => {},
                         showMessage: (message, timeout = 3000) => {
                             this.setState({ snackMessage: message })

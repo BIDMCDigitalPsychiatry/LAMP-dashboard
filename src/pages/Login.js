@@ -7,7 +7,6 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import Avatar from '@material-ui/core/Avatar'
 import Slide from '@material-ui/core/Slide'
-import { createStyles, withStyles } from '@material-ui/core/styles'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import Radio from '@material-ui/core/Radio'
@@ -21,27 +20,7 @@ import mindLAMPLogo from '../logo.png'
 import SurveyScheduler from '../components/SurveyScheduler'
 import { ResponsivePaper, ResponsiveMargin } from '../components/Utils'
 
-const styles = theme => ({
-    textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
-    },
-    bigAvatar: {
-        margin: 20,
-        width: 80,
-        height: 80,
-    },
-    formControl: {
-        margin: theme.spacing.unit,
-        minWidth: 400,
-    },
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
-});
-
-export default function Login({ ...props }) {
+export default function Login({ setIdentity, onComplete, ...props }) {
     const [ state, setState ] = useState({
         id: "",
         password: "",
@@ -55,10 +34,6 @@ export default function Login({ ...props }) {
         open: false,
         role: 'researcher',
     })
-
-    useEffect(() => {
-        props.layout.setTitle('Login')
-    }, [])
 
     let handleChange = (event) => {
         const target = event.target
@@ -124,15 +99,16 @@ export default function Login({ ...props }) {
 
     let handleLogin = (event) => {
         event.preventDefault()
-        props.setIdentity({ 
+        setIdentity({ 
                 type: (state.id === 'root' ?
                         'root' : (state.id.includes('@') ?
                             'researcher' : 'participant')), 
                 id: state.id, 
-                password: state.password
-            }, state.serverAddress
+                password: state.password,
+                serverAddress: state.serverAddress
+            }
         ).then(res => {
-            props.history.replace('/home')
+            onComplete()
         }).catch(err => {
             console.warn("error with auth request", err)
             props.layout.showMessage('' + err.message)
@@ -205,7 +181,7 @@ export default function Login({ ...props }) {
 
         <ResponsiveMargin style={{ position: 'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
         <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin: 'auto'}}/>
+                <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{margin: 'auto'}}/>
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
             <Grid container justify="space-evenly" style={{textAlign: "center", height: 250}}>
 
@@ -241,7 +217,7 @@ export default function Login({ ...props }) {
         <Slide direction="left" in={state.slide && state.slideRegister} mountOnEnter unmountOnExit>
                     <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
                     <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                        <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin: 'auto'}}/>
+                        <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{margin: 'auto'}}/>
 
                     <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Sign Up</Typography>
                     <Typography variant="caption" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Start customizing your study.</Typography>
@@ -254,7 +230,6 @@ export default function Login({ ...props }) {
                             variant="outlined"
                             name="name"
                             value={state.name}
-                            className={styles.textField}
                             errorText={state.nameErrText}
                             onChange={handleChange}
                             />
@@ -266,7 +241,6 @@ export default function Login({ ...props }) {
                             variant="outlined"
                             name="email"
                             value={state.email}
-                            className={styles.textField}
                             errorText={state.emailErrText}
                             onChange={handleChange}
                             />
@@ -290,7 +264,6 @@ export default function Login({ ...props }) {
                             variant="outlined"
                             name="studyName"
                             value={state.studyName}
-                            className={styles.textField}
                             onChange={handleChange}
                             />
                         <br />
@@ -328,7 +301,7 @@ export default function Login({ ...props }) {
             <Slide direction="left" in={state.slide && !state.slideRegister} mountOnEnter unmountOnExit>
             <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
             <ResponsivePaper elevation={12} style={{padding: '16px'}}>
-                <Avatar alt="mindLAMP" src={mindLAMPLogo} className={props.bigAvatar} style={{margin:'auto'}} />
+                <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{margin:'auto'}} />
 
             <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
 
@@ -340,7 +313,6 @@ export default function Login({ ...props }) {
                     label="ID"
                     margin="normal"
                     variant="outlined"
-                    className={styles.textField}
                     style={{width: '100%'}}
                     value={state.id}
                     onChange={handleChange}
@@ -352,7 +324,6 @@ export default function Login({ ...props }) {
                     type="password"
                     margin="normal"
                     variant="outlined"
-                    className={styles.textField}
                     style={{width: '100%'}}
                     value={state.password}
                     onChange={handleChange}

@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import Switch from '@material-ui/core/Switch'
@@ -10,9 +10,11 @@ import IconButton from '@material-ui/core/IconButton'
 import Fab from '@material-ui/core/Fab'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
+import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
 import Popover from '@material-ui/core/Popover'
+import Slide from '@material-ui/core/Slide'
 import blue from '@material-ui/core/colors/blue'
 
 // External Imports 
@@ -24,8 +26,12 @@ import MultipleSelect from '../components/MultipleSelect'
 import Sparkline from '../components/Sparkline'
 import MultiPieChart from '../components/MultiPieChart'
 import Messages from '../components/Messages'
+import MenuButton from '../components/MenuButton'
 import { ArrayView } from '../components/DataTable'
 import { ResponsiveDialog, groupBy } from '../components/Utils'
+import Survey from '../components/Survey'
+
+function SlideUp(props) { return <Slide direction="up" {...props} /> }
 
 // TODO: all SensorEvents?
 
@@ -38,32 +44,25 @@ const strategies = {
         .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
-export default function Participant({ ...props }) {
+export default function Participant({ participant, ...props }) {
     const [ state, setState ] = useState({})
+    const [ activities, setActivities ] = useState([])
+    const [ survey, setSurvey ] = useState()
+    const [ submission, setSubmission ] = useState(0)
+
+    useEffect(() => {
+        LAMP.Type.getDynamicAttachment(participant.id, 'lamp.beta_values').then(res => {
+            setState({ ...state, attachments: [JSON.parse(res.data)] })
+        }).catch(() => {})
+    }, [])
 
     useEffect(() => {
         (async () => {
-            let { id } = props.match.params
-            if (id === 'me' && (props.auth.auth || {type: null}).type === 'participant')
-                id = props.auth.identity.id
-            if (!id || id === 'me') {
-                props.history.replace(`/`)
-                return
-            }
-
-            //
-
-            props.layout.setTitle(`Participant ${id}`)
-            LAMP.Type.getDynamicAttachment(id, 'lamp.beta_values').then(res => {
-                setState({ ...state, attachments: [JSON.parse(res.data)] })
-            }).catch(() => {})
-
-            // Update state now with the new fetched & computed objects.
-            let activities = await LAMP.Activity.allByParticipant(id)
+            let _activities = await LAMP.Activity.allByParticipant(participant.id)
             let _state = { ...state,  
-                activities: activities, 
-                activity_events: groupBy((await LAMP.ResultEvent.allByParticipant(id)).map(x => ({ ...x,
-                    activity: activities.find(y => x.activity === y.id || 
+                activities: _activities, 
+                activity_events: groupBy((await LAMP.ResultEvent.allByParticipant(participant.id)).map(x => ({ ...x,
+                    activity: _activities.find(y => x.activity === y.id || 
                                   (!!x.static_data.survey_name && 
                                       x.static_data.survey_name.toLowerCase() === y.name.toLowerCase()))
                 }))
@@ -71,7 +70,7 @@ export default function Participant({ ...props }) {
                     activity: (x.activity || {name: ''}).name,
                     activity_spec: (x.activity || {spec: ''}).spec || ''
                 })), 'activity'),
-                sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(id), 'sensor'),
+                sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(participant.id), 'sensor'),
             }
             setState({ ..._state, 
                 activity_counts: Object.assign({}, ...Object.entries((_state.activity_events || {})).map(([k, v]) => ({ [k]: v.length }))),
@@ -81,7 +80,46 @@ export default function Participant({ ...props }) {
                 }
             })
         })()
-    }, [])
+    }, [submission])
+
+    // 
+    useEffect(() => {
+        if (activities.length === 0)
+            return setSurvey()
+        setSurvey({
+            name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
+            description: 'Please complete all sections below. Thank you.',
+            sections: activities.map(x => ({
+                banner: activities.length === 1 ? undefined : x.name,
+                questions: x.settings.map(y => ({ ...y, 
+                    options: y.options === null ? null : y.options.map(z => ({ label: z, value: z }))
+                }))
+            }))
+        })
+    }, [activities])
+
+    // 
+    const submitSurvey = (response) => {
+        setSurvey()
+        let events = response.map((x, idx) => ({
+            timestamp: (new Date().getTime()),
+            duration: 0,
+            activity: activities[idx].id,
+            static_data: { survey_name: activities[idx].name },
+            temporal_events: (x || []).map(y => ({
+                item: y !== undefined ? y.item : null,
+                value: y !== undefined ? y.value : null,
+                type: null,
+                level: null,
+                duration: 0,
+            })),
+        }))
+        LAMP.ResultEvent.create(participant.id, events[0])
+            .then(x => {
+                setSubmission(submission + 1)
+            })
+            .catch(e => console.dir(e))
+    }
 
     return (
         <React.Fragment>   
@@ -287,8 +325,15 @@ export default function Participant({ ...props }) {
                     </Document>*/}
                 </Card>
             )}
+            <Box display="flex" p={4} justifyContent="center">
+                <MenuButton 
+                    style={{ margin: 'auto 0' }}
+                    title="Add Survey Response" 
+                    items={(state.activities || []).filter(x => x.spec === 'lamp.survey').map(x => x.name)} 
+                    onClick={y => setActivities((state.activities || []).filter(x => x.name === y))}
+                />
+            </Box>
             <Popover
-                id="mouse-over-popover"
                 open={!!state.helpAnchor}
                 anchorEl={state.helpAnchor}
                 anchorOrigin={{
@@ -311,8 +356,6 @@ export default function Participant({ ...props }) {
             <ResponsiveDialog
                 open={!!state.visibleSlice}
                 onClose={() => setState({ ...state, visibleSlice: undefined })}
-                aria-labelledby="alert-dialog-title2"
-                aria-describedby="alert-dialog-description2"
             >
                 <DialogContent>
                     {(state.visibleSlice || []).length === 0 ?
@@ -336,11 +379,9 @@ export default function Participant({ ...props }) {
             <ResponsiveDialog
                 open={!!state.openMessaging}
                 onClose={() => setState({ ...state, openMessaging: undefined })}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
             >
                 <DialogContent>
-                    <Messages participantOnly participant={props.match.params.id} />
+                    <Messages participantOnly participant={participant.id} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setState({ ...state, openMessaging: undefined })} color="primary" autoFocus>
@@ -348,9 +389,38 @@ export default function Participant({ ...props }) {
                     </Button>
                 </DialogActions>
             </ResponsiveDialog>
+            <Dialog
+                fullScreen
+                open={!!survey}
+                onClose={() => setSurvey()}
+                TransitionComponent={SlideUp}
+            >
+                <IconButton 
+                    style={{ 
+                        position: 'fixed', 
+                        left: 16, 
+                        top: 16, 
+                        background: '#ffffff66', 
+                        WebkitBackdropFilter: 'blur(5px)' 
+                    }} 
+                    color="inherit" 
+                    onClick={() => setSurvey()} 
+                    aria-label="Close"
+                >
+                    <Icon>close</Icon>
+                </IconButton>
+                <Box py={8} px={4}>
+                    <Survey
+                        validate
+                        content={survey} 
+                        onValidationFailure={() => props.layout.showAlert('Some responses are missing. Please complete all questions before submitting.')}
+                        onResponse={submitSurvey} 
+                    />
+                </Box>
+            </Dialog>
             <Fab 
                 color="primary" 
-                aria-label="Back" 
+                aria-label="Messages" 
                 variant="extended" 
                 style={{ position: 'fixed', bottom: 24, right: 24 }} 
                 onClick={() => setState({ ...state, openMessaging: true })}

@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
@@ -24,31 +24,62 @@ import Root from './Root'
 import Researcher from './Researcher'
 import Participant from './Participant'
 import NavigationLayout from '../components/NavigationLayout'
+import { PageTitle } from '../components/Utils'
+
+// TODO: If weird button CSS issues (via MuiButtonBase-root) appear, 
+//       material-table imports @material-ui/core again so delete it.
 
 export default function App({ ...props }) {
     const [ state, setState ] = useState({})
-    const [ documentTitle, setDocumentTitle ] = useState('LAMP')
-
-    useEffect(() => {
-        document.title = 'LAMP'
-    }, [documentTitle])
+    const [ store, setStore ] = useState({ researchers: [], participants: [] })
+    const storeRef = useRef([])
 
     useEffect(() => {
         (async () => {
-            LAMP.connect()
-
             await LAMP.Auth.refresh_identity()
             setState({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth })
         })()
     }, [])
 
-    let reset = async (identity, address) => {
+    let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
         if (!!identity)
              setState({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth })
         else setState({ ...state, identity: undefined, auth: undefined })
-        if (!!address)
-            LAMP.connect(address)
+    }
+
+    let getResearcher = (id) => {
+        if (id === 'me' && (state.auth || {type: null}).type === 'researcher')
+            id = state.identity.id
+        if (!id || id === 'me')
+            return null //props.history.replace(`/`)
+        if (!!store.researchers[id]) {
+            return store.researchers[id]
+        } else if (!storeRef.current.includes(id)) {
+            LAMP.Researcher.view(id).then(x => setStore({ 
+                researchers: { ...store.researchers, [id]: x }, 
+                participants: store.participants 
+            }))
+            storeRef.current = [ ...storeRef.current, id ]
+        }
+        return null
+    }
+
+    let getParticipant = (id) => {
+        if (id === 'me' && (state.auth || {type: null}).type === 'participant')
+            id = state.identity.id
+        if (!id || id === 'me')
+            return null //props.history.replace(`/`)
+        if (!!store.participants[id]) {
+            return store.participants[id]
+        } else if (!storeRef.current.includes(id)) {
+            LAMP.Participant.view(id).then(x => setStore({ 
+                researchers: store.researchers,
+                participants: { ...store.participants, [id]: x }
+            }))
+            storeRef.current = [ ...storeRef.current, id ]
+        }
+        return null
     }
 
     return (
@@ -92,15 +123,18 @@ export default function App({ ...props }) {
 
                         {/* Route login, register, and logout. */}
                         <Route exact path="/login" render={props =>
-                            !state.identity ?
-                            <NavigationLayout noToolbar>
-                                <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                    <Icon>memory</Icon>
-                                    API
-                                </Fab>
-                                <Login setIdentity={async (identity, address) => await reset(identity, address) } />
-                            </NavigationLayout> :
-                            <Redirect to="/home" />
+                            !!state.identity ?
+                            <Redirect to="/home" /> :
+                            <React.Fragment>
+                                <PageTitle>mindLAMP | Login</PageTitle>
+                                <NavigationLayout noToolbar>
+                                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                        <Icon>memory</Icon>
+                                        API
+                                    </Fab>
+                                    <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/home')} />
+                                </NavigationLayout>
+                            </React.Fragment>
                         } />
                         <Route exact path="/logout" render={() => {
                             reset()
@@ -111,51 +145,64 @@ export default function App({ ...props }) {
                         <Route exact path="/researcher" render={props =>
                             !state.identity || ((state.auth || {type: null}).type !== 'root') ?
                             <Redirect to="/login" /> :
-                            <NavigationLayout profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
-                                <Root {...props} root={state.identity} />
-                                <Snackbar
-                                    open
-                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                                    message="Proceed with caution: you are logged in as the administrator."
-                                />
-                            </NavigationLayout>
+                            <React.Fragment>
+                                <PageTitle>Administrator</PageTitle>
+                                <NavigationLayout title="Administrator" profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                    <Root {...props} root={state.identity} />
+                                    <Snackbar
+                                        open
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                                        message="Proceed with caution: you are logged in as the administrator."
+                                    />
+                                </NavigationLayout>
+                            </React.Fragment>
                         } />
                         <Route exact path="/researcher/:id" render={props =>
-                            !state.identity ?
-                            <Redirect to="/login" /> :
-                            <NavigationLayout profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
-                                <Researcher {...props} auth={{ ...state }} />
-                            </NavigationLayout>
+                            !state.identity ? <Redirect to="/login" /> :
+                            !getResearcher(props.match.params.id) ? <React.Fragment /> :
+                            <React.Fragment>
+                                <PageTitle>{`Researcher ${getResearcher(props.match.params.id).name}`}</PageTitle>
+                                <NavigationLayout title={`Researcher ${getResearcher(props.match.params.id).name}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                    <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
+                                </NavigationLayout>
+                            </React.Fragment>
                         } />
 
                         <Route exact path="/participant/:id" render={props =>
-                            !state.identity ? 
-                            <Redirect to="/login" /> :
-                            <NavigationLayout profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
-                                <Participant {...props} auth={{ ...state }} />
-                            </NavigationLayout>
+                            !state.identity ? <Redirect to="/login" /> : 
+                            !getParticipant(props.match.params.id) ? <React.Fragment /> :
+                            <React.Fragment>
+                                <PageTitle>{`Participant ${props.match.params.id}`}</PageTitle>
+                                <NavigationLayout title={`Participant ${props.match.params.id}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                    <Participant participant={getParticipant(props.match.params.id)} />
+                                </NavigationLayout>
+                            </React.Fragment>
                         } />
                         
                         {/* Route to the app home screen.*/}
                         <Route exact path="/app" render={props =>
                             !state.identity ? 
                             <Redirect to="/login" /> :
-                            <AppHome {...props} 
-                                auth={{ ...state }} 
-                                setIdentity={async (identity, address) => await reset(identity, address) } 
-                            />
+                            <React.Fragment>
+                                <PageTitle>mindLAMP</PageTitle>
+                                <AppHome {...props} 
+                                    auth={{ ...state }} 
+                                    setIdentity={async (identity) => await reset(identity) } 
+                                />
+                            </React.Fragment>
                         } />
 
                         {/* Route API documentation ONLY. */}
                         <Route exact path="/api" render={props =>
-                            <div>
+                            <React.Fragment>
+                                <PageTitle>LAMP API</PageTitle>
                                 <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => props.history.replace('/')}>
                                     <Icon>arrow_back</Icon>
                                     Back
                                 </Fab>
-                                <div style={{height: 56}}></div>
+                                <div style={{ height: 56 }}></div>
                                 <SwaggerUI url="https://api.lamp.digital/" docExpansion="list" />
-                            </div>
+                            </React.Fragment>
                         } />
                     </Switch>
                 </HashRouter>
