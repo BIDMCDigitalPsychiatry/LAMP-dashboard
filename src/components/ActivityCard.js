@@ -18,7 +18,7 @@ import Sparkline from '../components/Sparkline'
 import { ArrayView, ResponsiveDialog, groupBy, mediumDateFormat } from '../components/Utils'
 
 const strategies = {
-    'lamp.survey.new': (slices, activity, scopedItem) => slices
+    'lamp.survey': (slices, activity, scopedItem) => slices
         .filter((x, idx) => scopedItem !== undefined ? idx === scopedItem : true)
         .map((x, idx) => {
             let question = activity.settings.filter(y => y.text == x.item)[0]
@@ -26,23 +26,20 @@ const strategies = {
                 return ['Yes', 'True'].includes(x.value) ? 1 : 0
             else if (question.type === 'list')
                 return Math.max(question.options.indexOf(x.value), 0)
-            return 0
+            else return parseInt(x.value) || 0
         })
-        .reduce((prev, curr) => prev + curr, 0),
-    'lamp.survey': (slices, activity, scopedItem) => slices
-        .map(x => (parseInt(x.value) || (['Yes', 'True'].includes(x.value) ? 1 : 0)))
         .reduce((prev, curr) => prev + curr, 0),
     'lamp.jewels_a': (slices, activity, scopedItem) => slices
         .map(x => (parseInt(x.item) || 0))
         .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
-export default function ActivityCard({ activity, events, ...props }) {
+export default function ActivityCard({ activity, events, forceDefaultGrid, ...props }) {
     let freeText = activity.settings.map(x => x.type).filter(x => [null, 'text', 'paragraph'].includes(x))
 
     const [ visibleSlice, setVisibleSlice ] = useState()
     const [ helpAnchor, setHelpAnchor ] = useState()
-    const [ showGrid, setShowGrid ] = useState(Boolean(freeText.length))
+    const [ showGrid, setShowGrid ] = useState(forceDefaultGrid || Boolean(freeText.length))
     
     return (
         <React.Fragment>
@@ -95,8 +92,10 @@ export default function ActivityCard({ activity, events, ...props }) {
                                 data={events
                                       .map(d => ({ 
                                           x: new Date(d.timestamp), 
-                                          y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey.new' : 'lamp.jewels_a'](d.temporal_events, activity, idx)
+                                          y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events, activity, idx),
+                                          slice: d.temporal_events
                                       }))}
+                                onClick={(datum) => setVisibleSlice(datum)}
                                 lineProps={{
                                   dashArray: '3 1',
                                   dashType: 'dotted',
@@ -126,7 +125,7 @@ export default function ActivityCard({ activity, events, ...props }) {
                         data={events
                               .map(d => ({ 
                                   x: new Date(d.timestamp), 
-                                  y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey.new' : 'lamp.jewels_a'](d.temporal_events, activity),
+                                  y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events, activity),
                                   slice: d.temporal_events
                               }))}
                         onClick={(datum) => setVisibleSlice(datum)}
