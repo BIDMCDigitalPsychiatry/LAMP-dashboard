@@ -64,15 +64,24 @@ export class ArrayView extends React.Component {
         </TableHead>
         <TableBody>
         {this.props.value.map((row, index) => (
-            <TableRow hover key={index}>
-            {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
-                <ArrayView value={row[key]} />
-            ) : (!!row[key]) && (typeof row[key] === 'object') ? (
-                <ArrayView value={[row[key]]} />
-            ) : (
-                <TableCell key={row[key]} style={{borderBottom: 0}}>{row[key]}</TableCell>
-            ))}
-            </TableRow>
+            <React.Fragment>
+                <TableRow hover key={index}>
+                {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
+                    <ArrayView value={row[key]} />
+                ) : (!!row[key]) && (typeof row[key] === 'object') ? (
+                    <ArrayView value={[row[key]]} />
+                ) : (
+                    <TableCell key={row[key]} style={{borderBottom: 0}}>{row[key]}</TableCell>
+                ))}
+                </TableRow>
+                {((!!this.props.hasSpanningRowForIndex && !!this.props.spanningRowForIndex) && this.props.hasSpanningRowForIndex(index)) &&
+                    <TableRow key={`${index}-optional`}>
+                        <TableCell colSpan={this.displayKeys().length}>
+                            {this.props.spanningRowForIndex(index)}
+                        </TableCell>
+                    </TableRow>
+                }
+            </React.Fragment>
         ))}
         </TableBody>
     </Table>

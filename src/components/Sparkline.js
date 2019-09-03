@@ -68,8 +68,11 @@ class Sparkline extends React.PureComponent {
         height={Math.max(this.props.minHeight, this.props.parentHeight)}
         eventTrigger={'container'}
         eventTriggerRefs={this.eventTriggerRefs}
-        margin={{ top: 4, left: !!this.props.YAxisLabel ? 8 : 0 }}
-        onClick={({ datum }) => this.props.onClick(datum)}
+        margin={{ top: 4, left: 4, 
+          right: !!this.props.YAxisLabel ? 64 : 4, 
+          bottom: !!this.props.XAxisLabel ? 64 : 4 
+        }}
+        onClick={({ datum }) => !!this.props.onClick && this.props.onClick(datum)}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
         renderTooltip={null}
@@ -78,9 +81,9 @@ class Sparkline extends React.PureComponent {
         xScale={{ type: 'time' }}
         yScale={{ type: 'linear' }}
       >
-        {!this.props.XAxisLabel ? <div /> : 
+        {!this.props.XAxisLabel ? <React.Fragment /> : 
           <XAxis label={this.props.XAxisLabel} numTicks={5} />}
-        {!this.props.YAxisLabel ? <div /> : 
+        {!this.props.YAxisLabel ? <React.Fragment /> : 
           <YAxis label={this.props.YAxisLabel} numTicks={4} />}
         {[{
             seriesKey: this.props.YAxisLabel || 'Data',
