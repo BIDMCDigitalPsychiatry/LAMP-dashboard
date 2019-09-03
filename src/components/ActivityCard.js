@@ -21,7 +21,7 @@ const strategies = {
     'lamp.survey': (slices, activity, scopedItem) => slices
         .filter((x, idx) => scopedItem !== undefined ? idx === scopedItem : true)
         .map((x, idx) => {
-            let question = activity.settings.filter(y => y.text == x.item)[0]
+            let question = (Array.isArray(activity.settings) ? activity.settings : []).filter(y => y.text == x.item)[0]
             if (question.type === 'boolean')
                 return ['Yes', 'True'].includes(x.value) ? 1 : 0
             else if (question.type === 'list')
@@ -35,7 +35,7 @@ const strategies = {
 }
 
 export default function ActivityCard({ activity, events, forceDefaultGrid, ...props }) {
-    let freeText = activity.settings.map(x => x.type).filter(x => [null, 'text', 'paragraph'].includes(x))
+    let freeText = (Array.isArray(activity.settings) ? activity.settings : []).map(x => x.type).filter(x => [null, 'text', 'paragraph'].includes(x))
 
     const [ visibleSlice, setVisibleSlice ] = useState()
     const [ helpAnchor, setHelpAnchor ] = useState()
@@ -83,7 +83,7 @@ export default function ActivityCard({ activity, events, forceDefaultGrid, ...pr
                 ) : (showGrid ?
                     <ArrayView 
                         hiddenKeys={['x']}
-                        hasSpanningRowForIndex={idx => ['boolean', 'list'].includes(activity.settings[idx].type)} 
+                        hasSpanningRowForIndex={idx => ['boolean', 'list'].includes(((Array.isArray(activity.settings) ? activity.settings : [])[idx] || {}).type)} 
                         spanningRowForIndex={idx => (
                             <Sparkline 
                                 minWidth={48}
