@@ -54,28 +54,39 @@ export class ArrayView extends React.Component {
     displayKeys = () => Object.keys(this.props.value[0] || {}).filter(x => !((this.props.hiddenKeys || []).includes(x)))
 
     render = () => 
-    <Table>
-        <TableHead>
-            <TableRow>
-            {this.displayKeys().map((key) => (
-                <TableCell key={key} style={{borderBottom: 0}} tooltip={humanize(key)}>{humanize(key)}</TableCell>
+    <div style={{ overflowX: 'auto' }}>
+        <Table>
+            <TableHead>
+                <TableRow>
+                {this.displayKeys().map((key) => (
+                    <TableCell key={key} style={{borderBottom: 0}} tooltip={humanize(key)}>{humanize(key)}</TableCell>
+                ))}
+                </TableRow>
+            </TableHead>
+            <TableBody>
+            {this.props.value.map((row, index) => (
+                <React.Fragment>
+                    <TableRow hover key={index}>
+                    {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
+                        <ArrayView value={row[key]} />
+                    ) : (!!row[key]) && (typeof row[key] === 'object') ? (
+                        <ArrayView value={[row[key]]} />
+                    ) : (
+                        <TableCell key={row[key]} style={{borderBottom: 0}}>{row[key]}</TableCell>
+                    ))}
+                    </TableRow>
+                    {((!!this.props.hasSpanningRowForIndex && !!this.props.spanningRowForIndex) && this.props.hasSpanningRowForIndex(index)) &&
+                        <TableRow key={`${index}-optional`}>
+                            <TableCell colSpan={this.displayKeys().length}>
+                                {this.props.spanningRowForIndex(index)}
+                            </TableCell>
+                        </TableRow>
+                    }
+                </React.Fragment>
             ))}
-            </TableRow>
-        </TableHead>
-        <TableBody>
-        {this.props.value.map((row, index) => (
-            <TableRow hover key={index}>
-            {this.displayKeys().map((key) => Array.isArray(row[key]) ? (
-                <ArrayView value={row[key]} />
-            ) : (!!row[key]) && (typeof row[key] === 'object') ? (
-                <ArrayView value={[row[key]]} />
-            ) : (
-                <TableCell key={row[key]} style={{borderBottom: 0}}>{row[key]}</TableCell>
-            ))}
-            </TableRow>
-        ))}
-        </TableBody>
-    </Table>
+            </TableBody>
+        </Table>
+    </div>
 }
 
 // 

@@ -158,7 +158,11 @@ export default function Participant({ participant, ...props }) {
             }
             {(state.activities || []).filter(x => (state.selectedCharts || []).includes(x.name)).map(activity =>
                 <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
-                    <ActivityCard activity={activity} events={((state.activity_events || {})[activity.name] || [])} />
+                    <ActivityCard 
+                        activity={activity} 
+                        events={((state.activity_events || {})[activity.name] || [])} 
+                        forceDefaultGrid={LAMP.Auth.get_identity().name === 'MAP NET'}
+                    />
                 </Card>
             )}
             {!(state.selectedPassive || []).includes('Environmental Context') ? <React.Fragment /> : 
