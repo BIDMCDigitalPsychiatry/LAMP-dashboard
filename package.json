@@ -36,6 +36,7 @@
     "notistack": "^0.8.9",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-dropzone": "^10.1.8",
     "react-event-timeline": "^1.6.3",
     "react-jss": "^8.6.1",
     "react-router-dom": "^5.0.1",

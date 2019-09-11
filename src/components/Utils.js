@@ -122,6 +122,16 @@ export const shortDateFormat = {
 }
 
 // 
+export const timeOnlyDateFormat = {
+    hour: 'numeric', minute: 'numeric', hour12: true
+}
+
+// 
+export const dateOnlyDateFormat = {
+    year: 'numeric', month: 'long', day: 'numeric'
+}
+
+// 
 export const hourOnlyDateFormat = {
 	weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
 	hour: 'numeric'

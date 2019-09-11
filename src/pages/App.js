@@ -161,8 +161,8 @@ export default function App({ ...props }) {
                             !state.identity ? <Redirect to="/login" /> :
                             !getResearcher(props.match.params.id) ? <React.Fragment /> :
                             <React.Fragment>
-                                <PageTitle>{`Researcher ${getResearcher(props.match.params.id).name}`}</PageTitle>
-                                <NavigationLayout title={`Researcher ${getResearcher(props.match.params.id).name}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
+                                <NavigationLayout title={`${getResearcher(props.match.params.id).name}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
                                     <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
                                 </NavigationLayout>
                             </React.Fragment>
@@ -172,8 +172,8 @@ export default function App({ ...props }) {
                             !state.identity ? <Redirect to="/login" /> : 
                             !getParticipant(props.match.params.id) ? <React.Fragment /> :
                             <React.Fragment>
-                                <PageTitle>{`Participant ${props.match.params.id}`}</PageTitle>
-                                <NavigationLayout title={`Participant ${props.match.params.id}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                <PageTitle>{`Patient ${props.match.params.id}`}</PageTitle>
+                                <NavigationLayout title={`Patient ${props.match.params.id}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
                                     <Participant participant={getParticipant(props.match.params.id)} />
                                 </NavigationLayout>
                             </React.Fragment>

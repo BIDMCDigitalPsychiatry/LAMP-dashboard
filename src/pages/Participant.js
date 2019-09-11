@@ -120,7 +120,7 @@ export default function Participant({ participant, ...props }) {
                         Activity
                     </Typography>
                     <Box>
-                        <Typography variant="subtitle" color="inherit">
+                        <Typography variant="inherit" color="inherit">
                             Show All
                         </Typography>
                         <Switch 
@@ -137,17 +137,21 @@ export default function Participant({ participant, ...props }) {
                     badges={state.activity_counts}
                     onChange={x => setState({ ...state, selectedCharts: x })}
                 />
-                <Divider style={{ margin: '8px -16px 8px -16px' }} />
-                <Typography variant="subtitle2">
-                    Sensor
-                </Typography>
-                <MultipleSelect 
-                    selected={state.selectedPassive || []}
-                    items={[`Environmental Context`, `Step Count`]}
-                    showZeroBadges={false}
-                    badges={state.sensor_counts}
-                    onChange={x => setState({ ...state, selectedPassive: x })}
-                />
+                {LAMP.Auth.get_identity().name !== 'MAP NET' &&
+                    <React.Fragment>
+                        <Divider style={{ margin: '8px -16px 8px -16px' }} />
+                        <Typography variant="subtitle2">
+                            Sensor
+                        </Typography>
+                        <MultipleSelect 
+                            selected={state.selectedPassive || []}
+                            items={[`Environmental Context`, `Step Count`]}
+                            showZeroBadges={false}
+                            badges={state.sensor_counts}
+                            onChange={x => setState({ ...state, selectedPassive: x })}
+                        />
+                    </React.Fragment>
+                }
             </Box>
             {((state.selectedCharts || []).length + (state.selectedPassive || []).length) === 0 && 
                 <Card style={{ marginTop: 16, marginBotton: 16, height: 96, backgroundColor: blue[700] }}>
@@ -268,8 +272,8 @@ export default function Participant({ participant, ...props }) {
                         color={blue[500]}
                         data={((state.sensor_events || {})['lamp.steps'] || [])
                               .map(d => ({ 
-                                  x: new Date(d.timestamp), 
-                                  y: d.data.value
+                                  x: new Date(parseInt(d.timestamp)), 
+                                  y: d.data.value || 0
                               }))}
                         lineProps={{
                           dashArray: '3 1',
