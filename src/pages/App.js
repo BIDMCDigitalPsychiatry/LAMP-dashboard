@@ -162,7 +162,10 @@ export default function App({ ...props }) {
                             !getResearcher(props.match.params.id) ? <React.Fragment /> :
                             <React.Fragment>
                                 <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
-                                <NavigationLayout title={`${getResearcher(props.match.params.id).name}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                <NavigationLayout 
+                                    title={`${getResearcher(props.match.params.id).name}`} 
+                                    profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                >
                                     <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
                                 </NavigationLayout>
                             </React.Fragment>
@@ -172,8 +175,11 @@ export default function App({ ...props }) {
                             !state.identity ? <Redirect to="/login" /> : 
                             !getParticipant(props.match.params.id) ? <React.Fragment /> :
                             <React.Fragment>
-                                <PageTitle>{`Patient ${props.match.params.id}`}</PageTitle>
-                                <NavigationLayout title={`Patient ${props.match.params.id}`} profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
+                                <NavigationLayout 
+                                    title={`Patient ${getParticipant(props.match.params.id).id}`} 
+                                    profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                >
                                     <Participant participant={getParticipant(props.match.params.id)} />
                                 </NavigationLayout>
                             </React.Fragment>

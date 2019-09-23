@@ -35,6 +35,7 @@ import LAMP from '../lamp'
 import Activity from '../components/Activity'
 import Messages from '../components/Messages'
 import Sparkchips from '../components/Sparkchips'
+import EditField from '../components/EditField'
 import { ResponsiveDialog, ResponsivePaper } from '../components/Utils'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
@@ -58,6 +59,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     const [importFile, setImportFile] = useState()
     const [exportActivities, setExportActivities] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
+    const [names, setNames] = useState({})
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()
         reader.onabort = () => props.layout.showAlert('Couldn\'t import the Activities.')
@@ -83,6 +85,15 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
             })
         })()
     }, [])
+
+    useEffect(() => {
+        (async function() {
+            let data = (await Promise.all(state.data
+                            .map(async x => ({ id: x.id, res: await LAMP.Type.getAttachment(x.id, 'lamp.name') }))))
+                            .filter(y => y.res.message === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
+            setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
+        })()
+    }, [state])
 
     let addParticipant = async () => {
         let newCount = state.newCount
@@ -149,7 +160,23 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                     title="Patients"
                     data={state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
                     columns={[
-                        { title: 'ID', field: 'id' },
+                        { title: 'Name', field: 'id', render: (x) => 
+                            <EditField 
+                                text={names[x.id] || x.id} 
+                                onChange={newValue => {
+                                    let oldValue = names[x.id] || x.id
+                                    if (oldValue == newValue)
+                                        return
+
+                                    let isStr = (typeof newValue === 'string') && newValue.length > 0
+                                    setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
+                                    LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
+                                        console.error(err)
+                                        setNames(names => ({ ...names, [x.id]: oldValue }))
+                                    })
+                                }} 
+                            />
+                        },
                         { title: 'Last Login', field: 'last_login' },
                         { title: 'Device Type', field: 'device_type' },
                         { title: 'Indicators', field: 'data_health', render: (rowData) => 
@@ -197,32 +224,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                             </IconButton>
                         }
                     ]}
-                    detailPanel={rowData => 
-                        <div style={{ margin: 8 }}>
-                            <Typography style={{ width: '100%', textAlign: 'center' }}>
-                                <b>Patient Health</b>
-                            </Typography>
-                            <Divider style={{ margin: 8 }} />
-                            <Sparkchips items={
-                                [ ...(state.activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
-                                    .filter(x => (x.spec !== 'lamp.survey' && !!state.showUnscheduled) || (x.spec === 'lamp.survey'))
-                                    .map(x => ({ 
-                                        name: x.name, 
-                                        color: (x.spec !== 'lamp.survey' ? 
-                                            grey[700] : (x.name.length % 3 === 0 ? 
-                                                red[500] : (x.name.length % 3 === 1 ? 
-                                                    yellow[500] : 
-                                                        green[500]))), 
-                                        textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
-                                        tooltip: (x.spec !== 'lamp.survey' ? 
-                                            'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
-                                                'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
-                                                    'Monitor health status for changes.' : 
-                                                        'Health status is okay.')))
-                                    }))
-                            } />
-                        </div>
-                    }
+                    detailPanel={rowData => <div />}
                     onRowClick={(event, rowData, togglePanel) => onParticipantSelect(state.data[rowData.tableData.id].id)}
                     actions={[
                         {
@@ -269,6 +271,32 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                     }}
                     components={{ Container: props => <div {...props} /> }}
                 />
+                    {/*detailPanel={rowData => 
+                        <div style={{ margin: 8 }}>
+                            <Typography style={{ width: '100%', textAlign: 'center' }}>
+                                <b>Patient Health</b>
+                            </Typography>
+                            <Divider style={{ margin: 8 }} />
+                            <Sparkchips items={
+                                [ ...(state.activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
+                                    .filter(x => (x.spec !== 'lamp.survey' && !!state.showUnscheduled) || (x.spec === 'lamp.survey'))
+                                    .map(x => ({ 
+                                        name: x.name, 
+                                        color: (x.spec !== 'lamp.survey' ? 
+                                            grey[700] : (x.name.length % 3 === 0 ? 
+                                                red[500] : (x.name.length % 3 === 1 ? 
+                                                    yellow[500] : 
+                                                        green[500]))), 
+                                        textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
+                                        tooltip: (x.spec !== 'lamp.survey' ? 
+                                            'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
+                                                'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
+                                                    'Monitor health status for changes.' : 
+                                                        'Health status is okay.')))
+                                    }))
+                            } />
+                        </div>
+                    }*/}
             </ResponsivePaper>
             <div style={{ height: 16 }} />
             <ResponsivePaper elevation={4}>
