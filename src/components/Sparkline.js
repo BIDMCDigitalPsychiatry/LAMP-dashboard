@@ -8,10 +8,12 @@ import {
   withTheme, 
   CrossHair, 
   LineSeries, 
+  AreaSeries, 
   WithTooltip, 
   XAxis, 
   YAxis, 
-  Brush 
+  Brush,
+  LinearGradient
 } from '@data-ui/xy-chart'
 
 // Local Imports
@@ -20,6 +22,8 @@ import { fullDateFormat } from './Utils'
 const XYChartWithTheme = withTheme(theme)(XYChart)
 
 class Sparkline extends React.PureComponent {
+  rand = Math.random()
+
   renderTooltip = ({ datum, series }) =>
   <div>
     <div>
@@ -81,6 +85,7 @@ class Sparkline extends React.PureComponent {
         xScale={{ type: 'time' }}
         yScale={{ type: 'linear' }}
       >
+        <LinearGradient id={`gradient-${this.rand}`} from={this.props.color} to="#ffffff00" />
         {!this.props.XAxisLabel ? <React.Fragment /> : 
           <XAxis label={this.props.XAxisLabel} numTicks={5} />}
         {!this.props.YAxisLabel ? <React.Fragment /> : 
@@ -94,12 +99,19 @@ class Sparkline extends React.PureComponent {
             dashType: this.props.lineProps.dashType || 'dotted',
             strokeLinecap: this.props.lineProps.cap || 'butt'
           }].map(({ key, ...props }) => (
-          <LineSeries
-            key={key}
-            {...props}
-            showPoints
-            strokeWidth={2}
-          />
+            <LineSeries 
+              {...props}
+              key={key}
+              showPoints
+              strokeWidth={2}
+            />
+        ))}
+        {[{
+            seriesKey: this.props.YAxisLabel || 'Data',
+            key: this.props.YAxisLabel || 'Data',
+            data: this.props.data.map(x => ({...x, color: this.props.color})),
+          }].map(({ key, ...props }) => (
+            <AreaSeries key={key} data={props.data} fill={`url('#gradient-${this.rand}')`} />
         ))}
         <CrossHair
           fullHeight
