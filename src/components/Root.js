@@ -6,8 +6,8 @@ import MaterialTable from 'material-table'
 
 // Local Imports
 import LAMP from '../lamp'
-import EditField from '../components/EditField'
-import { ResponsivePaper } from '../components/Utils'
+import EditField from './EditField'
+import { ResponsivePaper } from './Utils'
 
 export default function Root({ ...props }) {
     const [researchers, setResearchers] = useState([])

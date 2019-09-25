@@ -1,6 +1,6 @@
 
 // Core Imports 
-import React from 'react'
+import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -27,196 +27,129 @@ import red from '@material-ui/core/colors/red'
 // Local Imports 
 import { ObjectView, ResponsiveMargin } from './Utils'
 
-class NavigationLayout extends React.Component {
-    state = {
-        openProfile: false,
-        openPopover: false,
-        anchorElement: null,
-        logoutConfirm: false,
-        me: null,
-		snackMessage: null,
-    };
-
-    anchorEl = null;
-    observer = null;
-    timer = null;
-
-    avatarSelect = (event) => {
-        this.setState({
-            openPopover: true,
-            anchorElement: event.currentTarget,
-        });
-    }
-
-    avatarClose = () => {
-        this.setState({
-            openPopover: false,
-        });
-    };
-
-    openProfile = () => {
-        this.setState({
-            openProfile: true,
-        });
-    };
-
-    closeProfile = () => {
-        this.setState({
-            openProfile: false,
-        });
-    };
-
-    goLogout = () => {
-        this.setState({
-            openPopover: false,
-            logoutConfirm: true
-        })
-    }
-    confirmLogout = () => {
-        this.props.history.replace('/logout')
-    }
-    cancelLogout = () => {
-        this.setState({
-            openPopover: true,
-            logoutConfirm: false
-        })
-    }
-
-    render = () =>
-    <div>
-		{!!this.props.noToolbar ? <React.Fragment/> :
-			<AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
-				<Toolbar>
-					<IconButton
-						onClick={this.props.history.goBack}
-						color="default"
-						aria-label="Menu">
-						<ArrowBack/>
-						{/*this.props.history.length > 2 ?
-                        <ArrowBack /> :
-                        <MenuIcon />
-                    	*/}
-					</IconButton>
-					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
-						{this.props.title || ''}
-					</Typography>
-					<div>
-						<IconButton color="default" buttonRef={(node) => {
-							this.anchorEl = node
-						}}>
-							<Badge badgeContent={0} color="secondary">
-								<NotificationsIcon/>
-							</Badge>
-						</IconButton>
-						<IconButton
-							aria-owns={this.openPopover ? 'menu-appbar' : null}
-							aria-haspopup="true"
-							onClick={this.avatarSelect}
-							color="default">
-							<AccountCircle/>
-						</IconButton>
-						<Menu
-							id="menu-appbar"
-							anchorEl={this.state.anchorElement}
-							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
-							transformOrigin={{horizontal: 'right', vertical: 'top'}}
-							open={this.state.openPopover}
-							onClose={this.avatarClose}>
-							<MenuItem onClick={this.openProfile}>Profile</MenuItem>
-							<MenuItem onClick={this.goLogout}>Logout</MenuItem>
-						</Menu>
-					</div>
-				</Toolbar>
-			</AppBar>
-		}
-        <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
-            <ResponsiveMargin style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
-                {React.Children.map(this.props.children, child =>
-                    React.cloneElement(child, { layout: {
-                        setTitle: (title) => {  },
-                        pageLoading: (loaded) => {},
-                        showMessage: (message, timeout = 3000) => {
-                            this.setState({ snackMessage: message })
-                            setTimeout(() => this.setState({ snackMessage: null }), timeout)
-                        },
-                        showAlert: (message) => this.setState({ alertMessage: message })
-                    }})
-                )}
-            </ResponsiveMargin>
+export default function NavigationLayout({ title, noToolbar, goBack, onLogout, ...props }) {
+    const [state, setState] = useState({})
+    return (
+        <div>
+    		{!!noToolbar ? <React.Fragment/> :
+    			<AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
+    				<Toolbar>
+    					<IconButton
+    						onClick={goBack} 
+    						color="default"
+    						aria-label="Menu">
+    						<ArrowBack/>
+    					</IconButton>
+    					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
+    						{title || ''}
+    					</Typography>
+    					<div>
+    						<IconButton color="default">
+    							<Badge badgeContent={0} color="secondary">
+    								<NotificationsIcon/>
+    							</Badge>
+    						</IconButton>
+    						<IconButton
+    							aria-owns={!!state.openPopover ? 'menu-appbar' : null}
+    							aria-haspopup="true"
+    							onClick={(event) => setState(state => ({ ...state, openPopover: true, anchorElement: event.currentTarget }))}
+    							color="default">
+    							<AccountCircle/>
+    						</IconButton>
+    						<Menu
+    							id="menu-appbar"
+    							anchorEl={state.anchorElement}
+    							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+    							transformOrigin={{horizontal: 'right', vertical: 'top'}}
+    							open={!!state.openPopover}
+    							onClose={() => setState(state => ({ ...state, openPopover: false }))}>
+    							<MenuItem onClick={() => setState(state => ({ ...state, openProfile: true }))}>Profile</MenuItem>
+    							<MenuItem onClick={() => setState(state => ({ ...state, openPopover: false, logoutConfirm: true }))}>Logout</MenuItem>
+    						</Menu>
+    					</div>
+    				</Toolbar>
+    			</AppBar>
+    		}
+            <div style={{ marginTop: 0, paddingBottom: 56, width: '100%', overflowY: 'auto' }}>
+                <ResponsiveMargin style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
+                    {React.Children.map(props.children, child =>
+                        React.cloneElement(child, { layout: {
+                            setTitle: (title) => {  },
+                            pageLoading: (loaded) => {},
+                            showMessage: (message, timeout = 3000) => {
+                                setState(state => ({ ...state, snackMessage: message }))
+                                setTimeout(() => setState(state => ({ ...state, snackMessage: null })), timeout)
+                            },
+                            showAlert: (message) => setState(state => ({ ...state, alertMessage: message }))
+                        }})
+                    )}
+                </ResponsiveMargin>
+            </div>
+            <Dialog
+                open={!!state.openProfile}
+                onClose={() => setState(state => ({ ...state, openProfile: false }))}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description">
+                <DialogTitle id="alert-dialog-title">Profile</DialogTitle>
+                <DialogContent>
+                    <ObjectView value={props.profile} />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setState(state => ({ ...state, openProfile: false }))} color="primary">
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={!!state.logoutConfirm}
+                onClose={() => setState(state => ({ ...state, openPopover: true, logoutConfirm: false }))}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    Are you sure you want to log out of LAMP right now?
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        If you've made some changes, make sure they're saved before you continue to log out.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setState(state => ({ ...state, openPopover: true, logoutConfirm: false }))} color="secondary">
+                        Go Back
+                    </Button>
+                    <Button onClick={onLogout} color="primary" autoFocus>
+                        Logout
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={!!state.alertMessage}
+                onClose={() => setState(state => ({ ...state, alertMessage: undefined }))}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+                PaperProps={{style: { backgroundColor: red[900] }}}
+            >
+                <DialogTitle id="alert-dialog-slide-title">
+                    <span style={{color: 'white'}}>That action could not be completed. Please try again later. (Error code: -16003.)</span>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                        <span style={{color: 'white'}}>{state.alertMessage}</span>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setState(state => ({ ...state, alertMessage: undefined }))} color="primary">
+                      <span style={{color: 'white'}}>OK</span>
+                  </Button>
+                </DialogActions>
+            </Dialog>
+    		<Snackbar
+    			open={!!state.snackMessage}
+    			message={state.snackMessage || ''}
+    			anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+    			autoHideDuration={3000}
+    			onClose={() => setState(state => ({ ...state, userMsg: null }))} />
         </div>
-        <Dialog
-            open={this.state.openProfile}
-            onClose={this.closeProfile}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description">
-            <DialogTitle id="alert-dialog-title">Profile</DialogTitle>
-            <DialogContent>
-                <ObjectView value={this.props.profile} />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={this.closeProfile} color="primary">
-                    Close
-                </Button>
-            </DialogActions>
-        </Dialog>
-        <Dialog
-            open={this.state.logoutConfirm}
-            onClose={this.cancelLogout}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-        >
-            <DialogTitle id="alert-dialog-title">
-                Are you sure you want to log out of LAMP right now?
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    If you've made some changes, make sure they're saved before you continue to log out.
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={this.cancelLogout} color="secondary">
-                    Go Back
-                </Button>
-                <Button onClick={this.confirmLogout} color="primary" autoFocus>
-                    Logout
-                </Button>
-            </DialogActions>
-        </Dialog>
-        <Dialog
-            open={!!this.state.alertMessage}
-            onClose={() => this.setState({ alertMessage: undefined })}
-            aria-labelledby="alert-dialog-slide-title"
-            aria-describedby="alert-dialog-slide-description"
-            PaperProps={{style: { backgroundColor: red[900] }}}
-        >
-            <DialogTitle id="alert-dialog-slide-title">
-                <span style={{color: 'white'}}>That action could not be completed. Please try again later. (Error code: -16003.)</span>
-            </DialogTitle>
-            <DialogContent>
-                <DialogContentText id="alert-dialog-slide-description">
-                    <span style={{color: 'white'}}>{this.state.alertMessage}</span>
-                </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => this.setState({ alertMessage: undefined })} color="primary">
-                  <span style={{color: 'white'}}>OK</span>
-              </Button>
-            </DialogActions>
-        </Dialog>
-		<Popover
-			open={false}
-			anchorEl={this.anchorEl}
-			anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-			transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
-			<Typography>The content of the Popover.</Typography>
-		</Popover>
-		<Snackbar
-			open={this.state.snackMessage !== null}
-			message={this.state.snackMessage || ''}
-			anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-			autoHideDuration={3000}
-			onClose={() => this.setState({ userMsg: null })} />
-    </div>
+    )
 }
-
-export default withRouter(NavigationLayout)

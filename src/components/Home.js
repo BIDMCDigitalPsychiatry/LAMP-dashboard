@@ -27,7 +27,7 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 
 // Local Imports
-import Jewels from '../components/Jewels'
+import Jewels from './Jewels'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
 function SlideDown(props) { return <Slide direction="down" {...props} /> }

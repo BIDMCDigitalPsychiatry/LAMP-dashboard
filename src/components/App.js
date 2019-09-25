@@ -23,8 +23,8 @@ import Login from './Login'
 import Root from './Root'
 import Researcher from './Researcher'
 import Participant from './Participant'
-import NavigationLayout from '../components/NavigationLayout'
-import { PageTitle } from '../components/Utils'
+import NavigationLayout from './NavigationLayout'
+import { PageTitle } from './Utils'
 
 // TODO: If weird button CSS issues (via MuiButtonBase-root) appear, 
 //       material-table imports @material-ui/core again so delete it.
@@ -127,7 +127,11 @@ export default function App({ ...props }) {
                             <Redirect to="/home" /> :
                             <React.Fragment>
                                 <PageTitle>mindLAMP | Login</PageTitle>
-                                <NavigationLayout noToolbar>
+                                <NavigationLayout 
+                                    noToolbar 
+                                    goBack={props.history.goBack} 
+                                    onLogout={() => props.history.replace('/logout')}
+                                >
                                     <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
                                         <Icon>memory</Icon>
                                         API
@@ -147,7 +151,12 @@ export default function App({ ...props }) {
                             <Redirect to="/login" /> :
                             <React.Fragment>
                                 <PageTitle>Administrator</PageTitle>
-                                <NavigationLayout title="Administrator" profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}>
+                                <NavigationLayout 
+                                    title="Administrator" 
+                                    profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity} 
+                                    goBack={props.history.goBack} 
+                                    onLogout={() => props.history.replace('/logout')}
+                                >
                                     <Root {...props} root={state.identity} />
                                     <Snackbar
                                         open
@@ -165,6 +174,8 @@ export default function App({ ...props }) {
                                 <NavigationLayout 
                                     title={`${getResearcher(props.match.params.id).name}`} 
                                     profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                    goBack={props.history.goBack} 
+                                    onLogout={() => props.history.replace('/logout')}
                                 >
                                     <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
                                 </NavigationLayout>
@@ -179,6 +190,8 @@ export default function App({ ...props }) {
                                 <NavigationLayout 
                                     title={`Patient ${getParticipant(props.match.params.id).id}`} 
                                     profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                    goBack={props.history.goBack} 
+                                    onLogout={() => props.history.replace('/logout')}
                                 >
                                     <Participant participant={getParticipant(props.match.params.id)} />
                                 </NavigationLayout>

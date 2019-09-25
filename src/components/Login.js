@@ -17,8 +17,8 @@ import FormLabel from '@material-ui/core/FormLabel'
 
 // Local Imports
 import mindLAMPLogo from '../logo.png'
-import SurveyScheduler from '../components/SurveyScheduler'
-import { ResponsivePaper, ResponsiveMargin } from '../components/Utils'
+import SurveyScheduler from './SurveyScheduler'
+import { ResponsivePaper, ResponsiveMargin } from './Utils'
 
 export default function Login({ setIdentity, onComplete, ...props }) {
     const [state, setState] = useState({})

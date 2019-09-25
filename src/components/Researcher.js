@@ -32,11 +32,11 @@ import { useDropzone } from 'react-dropzone'
 
 // Local Imports
 import LAMP from '../lamp'
-import Activity from '../components/Activity'
-import Messages from '../components/Messages'
-import Sparkchips from '../components/Sparkchips'
-import EditField from '../components/EditField'
-import { ResponsiveDialog, ResponsivePaper } from '../components/Utils'
+import Activity from './Activity'
+import Messages from './Messages'
+import Sparkchips from './Sparkchips'
+import EditField from './EditField'
+import { ResponsiveDialog, ResponsivePaper } from './Utils'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
 

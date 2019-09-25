@@ -22,14 +22,14 @@ import blue from '@material-ui/core/colors/blue'
 
 // Local Imports
 import LAMP from '../lamp'
-import ActivityCard from '../components/ActivityCard'
-import MultipleSelect from '../components/MultipleSelect'
-import Sparkline from '../components/Sparkline'
-import MultiPieChart from '../components/MultiPieChart'
-import Messages from '../components/Messages'
-import MenuButton from '../components/MenuButton'
-import { ResponsiveDialog, groupBy } from '../components/Utils'
-import Survey from '../components/Survey'
+import ActivityCard from './ActivityCard'
+import MultipleSelect from './MultipleSelect'
+import Sparkline from './Sparkline'
+import MultiPieChart from './MultiPieChart'
+import Messages from './Messages'
+import MenuButton from './MenuButton'
+import { ResponsiveDialog, groupBy } from './Utils'
+import Survey from './Survey'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
 
