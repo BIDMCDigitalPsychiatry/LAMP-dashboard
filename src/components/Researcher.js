@@ -96,12 +96,24 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     }, [state])
 
     const importActivities = async () => {
-        for (let activity of importFile) {
-            console.dir(await LAMP.Activity.create(researcher.studies[0], activity))
+        let allIDs = importFile.map(x => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
+        let brokenGroupsCount = importFile
+            .filter(activity => activity.spec === 'lamp.group')
+            .filter(activity => activity.settings
+                .filter(x => !Object.keys(allIDs).includes(x)).length > 0)
+            .length
+        if (brokenGroupsCount > 0) {
+            setImportFile()
+            props.layout.showAlert('Couldn\'t import the Activities because some Activities are misconfigured or missing.')
+            return
         }
-        setState({ ...state, 
-            activities: await LAMP.Activity.allByResearcher(researcher.id) 
-        })
+
+        for (let x of importFile.filter(x => x.spec !== 'lamp.group'))
+            allIDs[x.id] = (await LAMP.Activity.create(researcher.studies[0], { ...x, id: undefined, tableData: undefined })).data
+        for (let x of importFile.filter(x => x.spec === 'lamp.group'))
+            await LAMP.Activity.create(researcher.studies[0], { ...x, id: undefined, tableData: undefined, settings: x.settings.map(y => allIDs[y]) })
+
+        setState({ ...state, activities: await LAMP.Activity.allByResearcher(researcher.id) })
         setImportFile()
     }
 
@@ -343,9 +355,10 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                             icon: 'cloud_download',
                             tooltip: 'Export',
                             onClick: (event, rows) => {
-                                saveAs(new Blob([JSON.stringify(rows.map(x => ({ ...x, 
-                                    id: undefined, tableData: undefined 
-                                })), undefined, 4)], { type: 'text/plain;charset=utf-8' }), 'export.json')
+                                saveAs(new Blob(
+                                    [JSON.stringify(rows.map(x => ({ ...x, tableData: undefined })), undefined, 4)], 
+                                    { type: 'text/plain;charset=utf-8' }), 
+                                'export.json')
                             }
                         }, {
                             icon: 'add_box',
