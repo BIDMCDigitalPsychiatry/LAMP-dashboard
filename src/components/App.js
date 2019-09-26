@@ -172,6 +172,7 @@ export default function App({ ...props }) {
                             <React.Fragment>
                                 <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
                                 <NavigationLayout 
+                                    id={props.match.params.id}
                                     title={`${getResearcher(props.match.params.id).name}`} 
                                     profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
                                     goBack={props.history.goBack} 
@@ -188,6 +189,7 @@ export default function App({ ...props }) {
                             <React.Fragment>
                                 <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
                                 <NavigationLayout 
+                                    id={props.match.params.id}
                                     title={`Patient ${getParticipant(props.match.params.id).id}`} 
                                     profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
                                     goBack={props.history.goBack} 

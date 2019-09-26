@@ -6,7 +6,12 @@ import Box from '@material-ui/core/Box'
 import MaterialTable from 'material-table'
 
 // Local Imports
-import { ResponsivePaper, timeOnlyDateFormat, dateOnlyDateFormat, fullDateFormat } from '../components/Utils'
+import { 
+    ResponsivePaper, 
+    timeOnlyDateFormat, 
+    dateOnlyDateFormat, 
+    fullDateFormat 
+} from '../components/Utils'
 
 export default function Activity({ activity,  ...props }) {
 	return (

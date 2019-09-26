@@ -6,7 +6,6 @@ import Box from '@material-ui/core/Box'
 import Icon from '@material-ui/core/Icon'
 import Switch from '@material-ui/core/Switch'
 import Button from '@material-ui/core/Button'
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
@@ -36,6 +35,7 @@ import Activity from './Activity'
 import Messages from './Messages'
 import Sparkchips from './Sparkchips'
 import EditField from './EditField'
+import CredentialManager from './CredentialManager'
 import { ResponsiveDialog, ResponsivePaper } from './Utils'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
@@ -94,6 +94,16 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
             setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
         })()
     }, [state])
+
+    const importActivities = async () => {
+        for (let activity of importFile) {
+            console.dir(await LAMP.Activity.create(researcher.studies[0], activity))
+        }
+        setState({ ...state, 
+            activities: await LAMP.Activity.allByResearcher(researcher.id) 
+        })
+        setImportFile()
+    }
 
     let addParticipant = async () => {
         let newCount = state.newCount
@@ -212,16 +222,31 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                                     }} />
                                 </Tooltip>
                             </div>
-                        }, { title: 'Messages', field: '__messages', render: (rowData) => 
-                            <IconButton
-                                onClick={(event) => {
-                                    event.preventDefault()
-                                    event.stopPropagation()
-                                    setState({ ...state, openMessaging: rowData.id })
-                                }}
-                            >
-                                <Icon>chat</Icon>
-                            </IconButton>
+                        }, { title: 'Actions', field: '__messages', render: (rowData) => 
+                            <React.Fragment>
+                                <Tooltip title="Open Messages">
+                                    <IconButton
+                                        onClick={(event) => {
+                                            event.preventDefault()
+                                            event.stopPropagation()
+                                            setState({ ...state, openMessaging: rowData.id })
+                                        }}
+                                    >
+                                        <Icon>chat</Icon>
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Reset Password">
+                                    <IconButton
+                                        onClick={(event) => {
+                                            event.preventDefault()
+                                            event.stopPropagation()
+                                            setState({ ...state, openPasswordReset: rowData.id })
+                                        }}
+                                    >
+                                        <Icon>vpn_key</Icon>
+                                    </IconButton>
+                                </Tooltip>
+                            </React.Fragment>
                         }
                     ]}
                     detailPanel={rowData => <div />}
@@ -252,7 +277,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                                 selectedIcon: "delete",
                                 selectedRows: rows
                             })
-                        },
+                        }
                     ]}
                     localization={{
                         body: {
@@ -391,7 +416,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                         color = "primary"
                         onClick = {addParticipant}
                     >
-                        <CheckCircleIcon />
+                        <Icon>check_circle</Icon>
                     </IconButton>
                 </div> : 
             (state.selectedIcon === "delete" ?
@@ -437,14 +462,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                     <Button onClick={() => setImportFile()} color="secondary" autoFocus>
                         Cancel
                     </Button>
-                    <Button onClick={async () => {
-                        for (let activity of importFile)
-                            console.dir(await LAMP.Activity.create(researcher.studies[0], activity))
-                        setState({ ...state, 
-                            activities: await LAMP.Activity.allByResearcher(researcher.id) 
-                        })
-                        setImportFile()
-                    }} color="primary" autoFocus>
+                    <Button onClick={importActivities} color="primary" autoFocus>
                         Import
                     </Button>
                 </DialogActions>
@@ -486,6 +504,18 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                     </Button>
                 </DialogActions>
             </ResponsiveDialog>
+            <Dialog
+                open={!!state.openPasswordReset}
+                onClose={() => setState({ ...state,  openPasswordReset: undefined, passwordText: undefined })}
+            >
+                <DialogContent style={{ marginBottom: 12 }}>
+                    <CredentialManager 
+                        id={state.openPasswordReset} 
+                        onComplete={() => setState(state => ({ ...state,  openPasswordReset: undefined, passwordText: undefined }))} 
+                        onError={err => props.layout.showAlert(err.message)}
+                    />
+                </DialogContent>
+            </Dialog>
         </React.Fragment>
     )
 }

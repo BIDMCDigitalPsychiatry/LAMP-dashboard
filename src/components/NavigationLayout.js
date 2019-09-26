@@ -25,10 +25,12 @@ import Button from '@material-ui/core/Button'
 import red from '@material-ui/core/colors/red'
 
 // Local Imports 
+import CredentialManager from './CredentialManager'
 import { ObjectView, ResponsiveMargin } from './Utils'
 
-export default function NavigationLayout({ title, noToolbar, goBack, onLogout, ...props }) {
+export default function NavigationLayout({ title, id, noToolbar, goBack, onLogout, ...props }) {
     const [state, setState] = useState({})
+    const [passwordChange, setPasswordChange] = useState()
     return (
         <div>
     		{!!noToolbar ? <React.Fragment/> :
@@ -63,7 +65,7 @@ export default function NavigationLayout({ title, noToolbar, goBack, onLogout, .
     							transformOrigin={{horizontal: 'right', vertical: 'top'}}
     							open={!!state.openPopover}
     							onClose={() => setState(state => ({ ...state, openPopover: false }))}>
-    							<MenuItem onClick={() => setState(state => ({ ...state, openProfile: true }))}>Profile</MenuItem>
+    							{!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
     							<MenuItem onClick={() => setState(state => ({ ...state, openPopover: false, logoutConfirm: true }))}>Logout</MenuItem>
     						</Menu>
     					</div>
@@ -85,21 +87,6 @@ export default function NavigationLayout({ title, noToolbar, goBack, onLogout, .
                     )}
                 </ResponsiveMargin>
             </div>
-            <Dialog
-                open={!!state.openProfile}
-                onClose={() => setState(state => ({ ...state, openProfile: false }))}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">Profile</DialogTitle>
-                <DialogContent>
-                    <ObjectView value={props.profile} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setState(state => ({ ...state, openProfile: false }))} color="primary">
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
             <Dialog
                 open={!!state.logoutConfirm}
                 onClose={() => setState(state => ({ ...state, openPopover: true, logoutConfirm: false }))}
@@ -143,6 +130,18 @@ export default function NavigationLayout({ title, noToolbar, goBack, onLogout, .
                       <span style={{color: 'white'}}>OK</span>
                   </Button>
                 </DialogActions>
+            </Dialog>
+            <Dialog
+                open={!!passwordChange && !!id}
+                onClose={() => setPasswordChange()}
+            >
+                <DialogContent style={{ marginBottom: 12 }}>
+                    <CredentialManager 
+                        id={id} 
+                        onComplete={() => setPasswordChange()} 
+                        onError={err => setState(state => ({ ...state, alertMessage: err.message }))}
+                    />
+                </DialogContent>
             </Dialog>
     		<Snackbar
     			open={!!state.snackMessage}

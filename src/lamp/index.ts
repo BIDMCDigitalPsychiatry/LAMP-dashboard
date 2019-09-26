@@ -99,7 +99,7 @@ export default class LAMP {
 
                 // Delete the "self" identity and throw the error we received.
                 LAMP.Auth._me = null
-                throw err
+                throw new Error('invalid id or password')
             } finally {
 
                 // Save the authorization in sessionStorage for later.
