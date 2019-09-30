@@ -126,7 +126,7 @@ export default function Login({ setIdentity, onComplete, ...props }) {
                                     variant="outlined"
                                     style={{ width: '100%', height: 76 }}
                                     label="Server Location"
-                                    placeholder="https://api.lamp.digital"
+                                    placeholder="api.lamp.digital"
                                     helperText="Don't enter a server location if you're not sure what this option does."
                                     value={state.serverAddress || ''}
                                     onChange={handleChange}

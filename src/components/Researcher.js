@@ -13,6 +13,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
 import Divider from '@material-ui/core/Divider'
 import Chip from '@material-ui/core/Chip'
 import Slide from '@material-ui/core/Slide'
@@ -60,6 +62,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     const [exportActivities, setExportActivities] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
     const [names, setNames] = useState({})
+    const [currentTab, setCurrentTab] = useState(0)
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()
         reader.onabort = () => props.layout.showAlert('Couldn\'t import the Activities.')
@@ -119,13 +122,16 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
 
     let addParticipant = async () => {
         let newCount = state.newCount
-        setState({ ...state, popoverAttachElement: null, newCount: 1, selectedIcon: "", selectedRows: [] })
         let ids = []
-        for (let i = 0; i < newCount; i ++) {
-            let newID = await LAMP.Participant.create(researcher.studies[0], { study_code: '001' })
-            ids = [...ids, newID]
-        }
-        setState({ ...state, data: [...state.data, ...ids] })
+        for (let i = 0; i < newCount; i ++)
+            ids = [...ids, (await LAMP.Participant.create(researcher.studies[0], { study_code: '001' })).data]
+        setState(state => ({ ...state, 
+            data: [...state.data, ...ids], 
+            popoverAttachElement: null, 
+            newCount: 1, 
+            selectedIcon: "", 
+            selectedRows: [] 
+        }))
     }
 
     let downloadFiles = async (filetype) => {
@@ -154,10 +160,14 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
 
     let deleteParticipants = async () => {
         let selectedRows = state.selectedRows, tempRows = selectedRows.map(y => y.id)
-        setState({ ...state, popoverAttachElement: null, selectedIcon: "", selectedRows: [] })
         for (let row of selectedRows)
             await LAMP.Participant.delete(row.id)
-        setState({ ...state, data: state.data.filter((x) => !tempRows.includes(x.id)) })
+        setState(state => ({ ...state, 
+            data: state.data.filter((x) => !tempRows.includes(x.id)),
+            popoverAttachElement: null, 
+            selectedIcon: "", 
+            selectedRows: []
+        }))
     }
 
     return (
@@ -178,226 +188,237 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                 </Box>
             </Box>
             <ResponsivePaper elevation={4}>
-                <MaterialTable 
-                    title="Patients"
-                    data={state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
-                    columns={[
-                        { title: 'Name', field: 'id', render: (x) => 
-                            <EditField 
-                                text={names[x.id] || x.id} 
-                                onChange={newValue => {
-                                    let oldValue = names[x.id] || x.id
-                                    if (oldValue == newValue)
-                                        return
+                <Tabs
+                    value={currentTab}
+                    onChange={(event, newTab) => setCurrentTab(newTab)}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    centered
+                >
+                    <Tab label="Patients" />
+                    <Tab label="Activities" />
+                </Tabs>
+                {currentTab === 0 &&
+                    <MaterialTable 
+                        title="Default Clinic"
+                        data={state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
+                        columns={[
+                            { title: 'Name', field: 'id', render: (x) => 
+                                <EditField 
+                                    text={names[x.id] || x.id} 
+                                    onChange={newValue => {
+                                        let oldValue = names[x.id] || x.id
+                                        if (oldValue == newValue)
+                                            return
 
-                                    let isStr = (typeof newValue === 'string') && newValue.length > 0
-                                    setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
-                                    LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
-                                        console.error(err)
-                                        setNames(names => ({ ...names, [x.id]: oldValue }))
+                                        let isStr = (typeof newValue === 'string') && newValue.length > 0
+                                        setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
+                                        LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
+                                            console.error(err)
+                                            setNames(names => ({ ...names, [x.id]: oldValue }))
+                                        })
+                                    }} 
+                                />
+                            },
+                            { title: 'Last Login', field: 'last_login' },
+                            { title: 'Device Type', field: 'device_type' },
+                            { title: 'Indicators', field: 'data_health', render: (rowData) => 
+                                <div>
+                                    <Tooltip title={(rowData.id.length % 3 === 0 ? 
+                                                        'Data health is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
+                                                            'Data health is inconsistent and requires attention.' : 
+                                                                'Data health is optimal.'))}>
+                                      <Chip 
+                                          label="Data Health"
+                                          style={{ 
+                                              margin: 4, 
+                                              backgroundColor: (rowData.id.length % 3 === 0 ? 
+                                                                    red[500] : (rowData.id.length % 3 === 1 ? 
+                                                                        yellow[500] : 
+                                                                            green[500])), 
+                                              color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
+                                        }} />
+                                    </Tooltip>
+                                    <Tooltip title={(rowData.id.length % 3 === 0 ? 
+                                                        'Patient health is optimal.' : (rowData.id.length % 3 === 1 ? 
+                                                            'Patient health may require clinical monitoring.' : 
+                                                                'Patient health may require clinical attention.'))}>
+                                      <Chip 
+                                          label="Patient Health"
+                                          style={{ 
+                                              margin: 4, 
+                                              backgroundColor: (rowData.id.length % 3 === 0 ? 
+                                                                    green[500] : (rowData.id.length % 3 === 1 ? 
+                                                                        yellow[500] : 
+                                                                            red[500])), 
+                                              color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
+                                        }} />
+                                    </Tooltip>
+                                </div>
+                            }, { title: 'Actions', field: '__messages', render: (rowData) => 
+                                <React.Fragment>
+                                    <Tooltip title="Open Messages">
+                                        <IconButton
+                                            onClick={(event) => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+                                                setState({ ...state, openMessaging: rowData.id })
+                                            }}
+                                        >
+                                            <Icon>chat</Icon>
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Reset Password">
+                                        <IconButton
+                                            onClick={(event) => {
+                                                event.preventDefault()
+                                                event.stopPropagation()
+                                                setState({ ...state, openPasswordReset: rowData.id })
+                                            }}
+                                        >
+                                            <Icon>vpn_key</Icon>
+                                        </IconButton>
+                                    </Tooltip>
+                                </React.Fragment>
+                            }
+                        ]}
+                        detailPanel={rowData => <div />}
+                        onRowClick={(event, rowData, togglePanel) => onParticipantSelect(state.data[rowData.tableData.id].id)}
+                        actions={[
+                            {
+                                icon: 'add_box',
+                                tooltip: 'Create',
+                                isFreeAction: true,
+                                onClick: (event, rows) => setState(state => ({ ...state, 
+                                    popoverAttachElement: event.currentTarget,
+                                    selectedIcon: "add",
+                                    selectedRows: []
+                                }))
+                            }, {
+                                icon: 'arrow_downward',
+                                tooltip: 'Export',
+                                onClick: (event, rows) => setState(state => ({ ...state, 
+                                    popoverAttachElement: event.currentTarget,
+                                    selectedIcon: "download",
+                                    selectedRows: rows
+                                }))
+                            }, {
+                                icon: 'delete_forever',
+                                tooltip: 'Delete',
+                                onClick: (event, rows) => setState(state => ({ ...state, 
+                                    popoverAttachElement: event.currentTarget,
+                                    selectedIcon: "delete",
+                                    selectedRows: rows
+                                }))
+                            }
+                        ]}
+                        localization={{
+                            body: {
+                                emptyDataSourceMessage: 'No Participants. Add Participants by clicking the [+] button above.',
+                                editRow: {
+                                    deleteText: 'Are you sure you want to delete this Participant?'
+                                }
+                            }
+                        }}
+                        options={{
+                            selection: true,
+                            actionsColumnIndex: -1,
+                            pageSize: 10,
+                            pageSizeOptions: [10, 25, 50, 100]
+
+                        }}
+                        components={{ Container: props => <div {...props} /> }}
+                    />
+                }
+                {/*detailPanel={rowData => 
+                    <div style={{ margin: 8 }}>
+                        <Typography style={{ width: '100%', textAlign: 'center' }}>
+                            <b>Patient Health</b>
+                        </Typography>
+                        <Divider style={{ margin: 8 }} />
+                        <Sparkchips items={
+                            [ ...(state.activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
+                                .filter(x => (x.spec !== 'lamp.survey' && !!state.showUnscheduled) || (x.spec === 'lamp.survey'))
+                                .map(x => ({ 
+                                    name: x.name, 
+                                    color: (x.spec !== 'lamp.survey' ? 
+                                        grey[700] : (x.name.length % 3 === 0 ? 
+                                            red[500] : (x.name.length % 3 === 1 ? 
+                                                yellow[500] : 
+                                                    green[500]))), 
+                                    textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
+                                    tooltip: (x.spec !== 'lamp.survey' ? 
+                                        'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
+                                            'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
+                                                'Monitor health status for changes.' : 
+                                                    'Health status is okay.')))
+                                }))
+                        } />
+                    </div>
+                }*/}
+                {currentTab === 1 &&
+                    <MaterialTable 
+                        title="Default Clinic"
+                        data={state.activities} 
+                        columns={[
+                            { title: 'Name', field: 'name' }, 
+                            { title: 'Type', field: 'spec', lookup: { 'lamp.survey': 'Survey', 'lamp.group': 'Group' }, emptyValue: 'Cognitive Test' }
+                        ]}
+                        onRowClick={(event, rowData, togglePanel) => setSelectedActivity(rowData)}
+                        actions={[
+                            {
+                                icon: 'cloud_upload',
+                                tooltip: 'Import',
+                                isFreeAction: true,
+                                onClick: (event, rows) => setShowActivityImport(true)
+                            }, {
+                                icon: 'cloud_download',
+                                tooltip: 'Export',
+                                onClick: (event, rows) => {
+                                    saveAs(new Blob(
+                                        [JSON.stringify(rows.map(x => ({ ...x, tableData: undefined })), undefined, 4)], 
+                                        { type: 'text/plain;charset=utf-8' }), 
+                                    'export.json')
+                                }
+                            }, {
+                                icon: 'add_box',
+                                tooltip: 'Create',
+                                isFreeAction: true,
+                                onClick: (event, rows) => props.layout.showAlert('Creating a new Activity is not yet supported. Please import Activities instead.')
+                            }, {
+                                icon: 'delete_forever',
+                                tooltip: 'Delete',
+                                onClick: async (event, rows) => {
+                                    for (let activity of rows)
+                                        console.dir(await LAMP.Activity.delete(activity.id))
+                                    setState({ ...state, 
+                                        activities: await LAMP.Activity.allByResearcher(researcher.id) 
                                     })
-                                }} 
-                            />
-                        },
-                        { title: 'Last Login', field: 'last_login' },
-                        { title: 'Device Type', field: 'device_type' },
-                        { title: 'Indicators', field: 'data_health', render: (rowData) => 
-                            <div>
-                                <Tooltip title={(rowData.id.length % 3 === 0 ? 
-                                                    'Data health is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
-                                                        'Data health is inconsistent and requires attention.' : 
-                                                            'Data health is optimal.'))}>
-                                  <Chip 
-                                      label="Data Health"
-                                      style={{ 
-                                          margin: 4, 
-                                          backgroundColor: (rowData.id.length % 3 === 0 ? 
-                                                                red[500] : (rowData.id.length % 3 === 1 ? 
-                                                                    yellow[500] : 
-                                                                        green[500])), 
-                                          color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
-                                    }} />
-                                </Tooltip>
-                                <Tooltip title={(rowData.id.length % 3 === 0 ? 
-                                                    'Patient health is optimal.' : (rowData.id.length % 3 === 1 ? 
-                                                        'Patient health may require clinical monitoring.' : 
-                                                            'Patient health may require clinical attention.'))}>
-                                  <Chip 
-                                      label="Patient Health"
-                                      style={{ 
-                                          margin: 4, 
-                                          backgroundColor: (rowData.id.length % 3 === 0 ? 
-                                                                green[500] : (rowData.id.length % 3 === 1 ? 
-                                                                    yellow[500] : 
-                                                                        red[500])), 
-                                          color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
-                                    }} />
-                                </Tooltip>
-                            </div>
-                        }, { title: 'Actions', field: '__messages', render: (rowData) => 
-                            <React.Fragment>
-                                <Tooltip title="Open Messages">
-                                    <IconButton
-                                        onClick={(event) => {
-                                            event.preventDefault()
-                                            event.stopPropagation()
-                                            setState({ ...state, openMessaging: rowData.id })
-                                        }}
-                                    >
-                                        <Icon>chat</Icon>
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title="Reset Password">
-                                    <IconButton
-                                        onClick={(event) => {
-                                            event.preventDefault()
-                                            event.stopPropagation()
-                                            setState({ ...state, openPasswordReset: rowData.id })
-                                        }}
-                                    >
-                                        <Icon>vpn_key</Icon>
-                                    </IconButton>
-                                </Tooltip>
-                            </React.Fragment>
-                        }
-                    ]}
-                    detailPanel={rowData => <div />}
-                    onRowClick={(event, rowData, togglePanel) => onParticipantSelect(state.data[rowData.tableData.id].id)}
-                    actions={[
-                        {
-                            icon: 'add_box',
-                            tooltip: 'Create',
-                            isFreeAction: true,
-                            onClick: (event, rows) => setState({ ...state, 
-                                popoverAttachElement: event.currentTarget,
-                                selectedIcon: "add",
-                                selectedRows: []
-                            })
-                        }, {
-                            icon: 'arrow_downward',
-                            tooltip: 'Export',
-                            onClick: (event, rows) => setState({ ...state, 
-                                popoverAttachElement: event.currentTarget,
-                                selectedIcon: "download",
-                                selectedRows: rows
-                            })
-                        }, {
-                            icon: 'delete_forever',
-                            tooltip: 'Delete',
-                            onClick: (event, rows) => setState({ ...state, 
-                                popoverAttachElement: event.currentTarget,
-                                selectedIcon: "delete",
-                                selectedRows: rows
-                            })
-                        }
-                    ]}
-                    localization={{
-                        body: {
-                            emptyDataSourceMessage: 'No Participants. Add Participants by clicking the [+] button above.',
-                            editRow: {
-                                deleteText: 'Are you sure you want to delete this Participant?'
+                                }                  
+                            },
+                        ]}
+                        localization={{
+                            body: {
+                                emptyDataSourceMessage: 'No Activities. Add Activities by clicking the [+] button above.',
+                                editRow: {
+                                    deleteText: 'Are you sure you want to delete this Activity?'
+                                }
                             }
-                        }
-                    }}
-                    options={{
-                        selection: true,
-                        actionsColumnIndex: -1,
-                        pageSize: 10,
-                        pageSizeOptions: [10, 25, 50, 100]
-
-                    }}
-                    components={{ Container: props => <div {...props} /> }}
-                />
-                    {/*detailPanel={rowData => 
-                        <div style={{ margin: 8 }}>
-                            <Typography style={{ width: '100%', textAlign: 'center' }}>
-                                <b>Patient Health</b>
-                            </Typography>
-                            <Divider style={{ margin: 8 }} />
-                            <Sparkchips items={
-                                [ ...(state.activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
-                                    .filter(x => (x.spec !== 'lamp.survey' && !!state.showUnscheduled) || (x.spec === 'lamp.survey'))
-                                    .map(x => ({ 
-                                        name: x.name, 
-                                        color: (x.spec !== 'lamp.survey' ? 
-                                            grey[700] : (x.name.length % 3 === 0 ? 
-                                                red[500] : (x.name.length % 3 === 1 ? 
-                                                    yellow[500] : 
-                                                        green[500]))), 
-                                        textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
-                                        tooltip: (x.spec !== 'lamp.survey' ? 
-                                            'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
-                                                'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
-                                                    'Monitor health status for changes.' : 
-                                                        'Health status is okay.')))
-                                    }))
-                            } />
-                        </div>
-                    }*/}
-            </ResponsivePaper>
-            <div style={{ height: 16 }} />
-            <ResponsivePaper elevation={4}>
-                <MaterialTable 
-                    title="Activities"
-                    data={state.activities} 
-                    columns={[
-                        { title: 'Name', field: 'name' }, 
-                        { title: 'Type', field: 'spec', lookup: { 'lamp.survey': 'Survey', 'lamp.group': 'Group' }, emptyValue: 'Cognitive Test' }
-                    ]}
-                    onRowClick={(event, rowData, togglePanel) => setSelectedActivity(rowData)}
-                    actions={[
-                        {
-                            icon: 'cloud_upload',
-                            tooltip: 'Import',
-                            isFreeAction: true,
-                            onClick: (event, rows) => setShowActivityImport(true)
-                        }, {
-                            icon: 'cloud_download',
-                            tooltip: 'Export',
-                            onClick: (event, rows) => {
-                                saveAs(new Blob(
-                                    [JSON.stringify(rows.map(x => ({ ...x, tableData: undefined })), undefined, 4)], 
-                                    { type: 'text/plain;charset=utf-8' }), 
-                                'export.json')
-                            }
-                        }, {
-                            icon: 'add_box',
-                            tooltip: 'Create',
-                            isFreeAction: true,
-                            onClick: (event, rows) => props.layout.showAlert('Creating a new Activity is not yet supported. Please import Activities instead.')
-                        }, {
-                            icon: 'delete_forever',
-                            tooltip: 'Delete',
-                            onClick: async (event, rows) => {
-                                for (let activity of rows)
-                                    console.dir(await LAMP.Activity.delete(activity.id))
-                                setState({ ...state, 
-                                    activities: await LAMP.Activity.allByResearcher(researcher.id) 
-                                })
-                            }                  
-                        },
-                    ]}
-                    localization={{
-                        body: {
-                            emptyDataSourceMessage: 'No Activities. Add Activities by clicking the [+] button above.',
-                            editRow: {
-                                deleteText: 'Are you sure you want to delete this Activity?'
-                            }
-                        }
-                    }}
-                    options={{
-                        selection: true,
-                        actionsColumnIndex: -1,
-                        pageSize: 10,
-                        pageSizeOptions: [10, 25, 50, 100]
-                    }}
-                    components={{ Container: props => <div {...props} /> }}
-                />
+                        }}
+                        options={{
+                            selection: true,
+                            actionsColumnIndex: -1,
+                            pageSize: 10,
+                            pageSizeOptions: [10, 25, 50, 100]
+                        }}
+                        components={{ Container: props => <div {...props} /> }}
+                    />
+                }
             </ResponsivePaper>
             <Popover
               open={Boolean(state.popoverAttachElement)}
               anchorEl={state.popoverAttachElement}
-              onClose={() => setState({ ...state, popoverAttachElement: null })}
+              onClose={() => setState(state => ({ ...state, popoverAttachElement: null }))}
               anchorOrigin={{
                   vertical: 'bottom',
                   horizontal: 'center',
@@ -524,7 +545,6 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={state.openPasswordReset} 
-                        onComplete={() => setState(state => ({ ...state,  openPasswordReset: undefined, passwordText: undefined }))} 
                         onError={err => props.layout.showAlert(err.message)}
                     />
                 </DialogContent>

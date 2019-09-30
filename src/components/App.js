@@ -29,23 +29,36 @@ import { PageTitle } from './Utils'
 // TODO: If weird button CSS issues (via MuiButtonBase-root) appear, 
 //       material-table imports @material-ui/core again so delete it.
 
+// localhost:3000/#/?a=cm9vdDpsYW1wYWRtaW4=
+
 export default function App({ ...props }) {
     const [ state, setState ] = useState({})
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
     const storeRef = useRef([])
-
     useEffect(() => {
-        (async () => {
-            await LAMP.Auth.refresh_identity()
-            setState({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth })
-        })()
+        let query = window.location.hash.split('?')
+        if (!!query && query.length > 1) {
+            let x = atob(Object.fromEntries(new URLSearchParams(query[1]))['a']).split(':')
+            reset({ 
+                type: x[0] === 'root' ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
+                id: x[0],
+                password: x[1],
+                serverAddress: x[2]
+            }).then(x => {
+                //props.history.replace('/home')
+            })
+        } else {
+            LAMP.Auth.refresh_identity().then(x => {
+                setState(state => ({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth }))
+            })
+        }
     }, [])
 
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
         if (!!identity)
-             setState({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth })
-        else setState({ ...state, identity: undefined, auth: undefined })
+             setState(state => ({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth }))
+        else setState(state => ({ ...state, identity: undefined, auth: undefined }))
     }
 
     let getResearcher = (id) => {
@@ -108,12 +121,14 @@ export default function App({ ...props }) {
                     <Switch>
 
                         {/* Route index => login or home (which redirects based on user type). */}
-                        <Route exact path="/" render={() =>
-                            !state.identity ?
-                            <Redirect to="/login" /> :
-                            <Redirect to="/home" />
+                        <Route exact path="/" render={props =>
+                            (!(window.location.hash.split('?').length > 1 && !state.identity)) ?
+                            (!state.identity ?
+                                <Redirect to="/login" /> :
+                                <Redirect to="/home" />
+                            ) : <React.Fragment />
                         } />
-                        <Route exact path="/home" render={() =>
+                        <Route exact path="/home" render={props =>
                             (state.auth || {type: null}).type === 'root' ?
                             <Redirect to="/researcher" /> :
                             (state.auth || {type: null}).type === 'researcher' ?
@@ -189,6 +204,7 @@ export default function App({ ...props }) {
                             <React.Fragment>
                                 <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
                                 <NavigationLayout 
+                                    enableMessaging
                                     id={props.match.params.id}
                                     title={`Patient ${getParticipant(props.match.params.id).id}`} 
                                     profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}

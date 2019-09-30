@@ -73,14 +73,16 @@ export default class LAMP {
                     'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
-            let l = LAMP.Auth._auth || {type: null, id: null, password: null}
-            if (l.type === identity.type && l.id === identity.id && l.password === identity.password)
-                return
+            let l = LAMP.Auth._auth || {}
+            if (l.type === identity.type && 
+                l.id === identity.id && 
+                l.password === identity.password && 
+                l.serverAddress === identity.serverAddress
+            ) return
 
             // Propogate the authorization.
             LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password, serverAddress: identity.serverAddress}
-            if (!!LAMP.configuration)
-                LAMP.configuration.authorization = !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined
+            LAMP.configuration = { ...(LAMP.configuration || {}), authorization: !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined}
 
             try {
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import MenuItem from '@material-ui/core/MenuItem'
 import Badge from '@material-ui/core/Badge'
@@ -11,9 +12,7 @@ import Popover from '@material-ui/core/Popover'
 import IconButton from '@material-ui/core/IconButton'
 import Snackbar from '@material-ui/core/Snackbar'
 import Menu from '@material-ui/core/Menu'
-import ArrowBack from '@material-ui/icons/ArrowBack'
-import AccountCircle from '@material-ui/icons/AccountCircle'
-import NotificationsIcon from '@material-ui/icons/Notifications'
+import Icon from '@material-ui/core/Icon'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -26,11 +25,15 @@ import red from '@material-ui/core/colors/red'
 
 // Local Imports 
 import CredentialManager from './CredentialManager'
-import { ObjectView, ResponsiveMargin } from './Utils'
+import Messages from './Messages'
+import { ResponsiveDialog, ResponsiveMargin } from './Utils'
 
-export default function NavigationLayout({ title, id, noToolbar, goBack, onLogout, ...props }) {
+export default function NavigationLayout({ title, id, enableMessaging, noToolbar, goBack, onLogout, ...props }) {
     const [state, setState] = useState({})
+    const [showCustomizeMenu, setShowCustomizeMenu] = useState()
+    const [confirmLogout, setConfirmLogout] = useState()
     const [passwordChange, setPasswordChange] = useState()
+    const [showMessaging, setShowMessaging] = useState()
     return (
         <div>
     		{!!noToolbar ? <React.Fragment/> :
@@ -39,34 +42,41 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
     					<IconButton
     						onClick={goBack} 
     						color="default"
-    						aria-label="Menu">
-    						<ArrowBack/>
+    						aria-label="Menu"
+                        >
+    						<Icon>arrow_back</Icon>
     					</IconButton>
     					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
     						{title || ''}
     					</Typography>
     					<div>
-    						<IconButton color="default">
-    							<Badge badgeContent={0} color="secondary">
-    								<NotificationsIcon/>
-    							</Badge>
-    						</IconButton>
-    						<IconButton
-    							aria-owns={!!state.openPopover ? 'menu-appbar' : null}
-    							aria-haspopup="true"
-    							onClick={(event) => setState(state => ({ ...state, openPopover: true, anchorElement: event.currentTarget }))}
-    							color="default">
-    							<AccountCircle/>
-    						</IconButton>
+                            <Tooltip title="Notifications">
+        						<IconButton color="default">
+        							<Badge badgeContent={0} color="secondary">
+        								<Icon>notifications</Icon>
+        							</Badge>
+        						</IconButton>
+                            </Tooltip>
+                            <Tooltip title="Settings & More">
+        						<IconButton
+        							aria-owns={!!showCustomizeMenu ? 'menu-appbar' : null}
+        							aria-haspopup="true"
+        							onClick={event => setShowCustomizeMenu(event.currentTarget)}
+        							color="default"
+                                >
+        							<Icon>account_circle</Icon>
+        						</IconButton>
+                            </Tooltip>
     						<Menu
     							id="menu-appbar"
-    							anchorEl={state.anchorElement}
+    							anchorEl={showCustomizeMenu}
     							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
     							transformOrigin={{horizontal: 'right', vertical: 'top'}}
-    							open={!!state.openPopover}
-    							onClose={() => setState(state => ({ ...state, openPopover: false }))}>
+    							open={!!showCustomizeMenu && !confirmLogout && !showMessaging && !passwordChange}
+    							onClose={() => setShowCustomizeMenu()}>
     							{!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
-    							<MenuItem onClick={() => setState(state => ({ ...state, openPopover: false, logoutConfirm: true }))}>Logout</MenuItem>
+                                {!!enableMessaging && <MenuItem onClick={() => setShowMessaging(true)}>Messaging & Journal</MenuItem>}
+    							<MenuItem onClick={() => setConfirmLogout(true)}>Logout</MenuItem>
     						</Menu>
     					</div>
     				</Toolbar>
@@ -88,8 +98,8 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 </ResponsiveMargin>
             </div>
             <Dialog
-                open={!!state.logoutConfirm}
-                onClose={() => setState(state => ({ ...state, openPopover: true, logoutConfirm: false }))}
+                open={!!confirmLogout}
+                onClose={() => setConfirmLogout()}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
@@ -102,7 +112,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setState(state => ({ ...state, openPopover: true, logoutConfirm: false }))} color="secondary">
+                    <Button onClick={() => setConfirmLogout()} color="secondary">
                         Go Back
                     </Button>
                     <Button onClick={onLogout} color="primary" autoFocus>
@@ -131,6 +141,21 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                   </Button>
                 </DialogActions>
             </Dialog>
+            {!!enableMessaging &&
+                <ResponsiveDialog
+                    open={!!showMessaging}
+                    onClose={() => setShowMessaging()}
+                >
+                    <DialogContent>
+                        <Messages participantOnly participant={id} />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setShowMessaging()} color="primary" autoFocus>
+                            Close
+                        </Button>
+                    </DialogActions>
+                </ResponsiveDialog>
+            }
             <Dialog
                 open={!!passwordChange && !!id}
                 onClose={() => setPasswordChange()}
@@ -138,7 +163,6 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={id} 
-                        onComplete={() => setPasswordChange()} 
                         onError={err => setState(state => ({ ...state, alertMessage: err.message }))}
                     />
                 </DialogContent>

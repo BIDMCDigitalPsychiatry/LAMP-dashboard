@@ -19,13 +19,14 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
         let existing = (await LAMP.Credential.list(id))[0]
         if (!!(await LAMP.Credential.update(id, existing.access_key, { ...existing, secret_key: password })).message)
           return onError('could not change password')
-        else return onComplete() 
-      } else return onComplete() 
+        else return 
+      } else return 
     } catch(err) { onError('could not change password') }
   }
 
   return (
-    <TextField 
+    <React.Fragment>
+      <TextField 
         fullWidth
         label={`New password for ${id}`}
         type="password"
@@ -47,6 +48,16 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
             </InputAdornment>
           ),
         }}
-    />
+      />
+      {password.length > 0 &&
+        <TextField 
+          fullWidth
+          variant="outlined"
+          helperText="This is a one-time access link to log in without entering credentials."
+          value={'https://dashboard.lamp.digital/#/?a=' + btoa([id, password].join(':'))}
+          onChange={event => {}}
+        />
+      }
+    </React.Fragment>
   )
 }

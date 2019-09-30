@@ -106,7 +106,6 @@ export default function Root({ ...props }) {
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={passwordChange} 
-                        onComplete={() => setPasswordChange()} 
                         onError={err => props.layout.showAlert(err.message)}
                     />
                 </DialogContent>

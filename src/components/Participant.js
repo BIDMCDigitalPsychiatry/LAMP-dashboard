@@ -156,7 +156,7 @@ export default function Participant({ participant, ...props }) {
             {((state.selectedCharts || []).length + (state.selectedPassive || []).length) === 0 && 
                 <Card style={{ marginTop: 16, marginBotton: 16, height: 96, backgroundColor: blue[700] }}>
                     <Typography variant="h6" style={{ width: '100%', textAlign: 'center', marginTop: 32, color: '#fff' }}>
-                        No charts are selected. Please select a chart above to begin.
+                        No Activities are selected. Please select an Activity above to begin.
                     </Typography>
                 </Card>
             }
@@ -306,19 +306,6 @@ export default function Participant({ participant, ...props }) {
                     onClick={y => setActivities((state.activities || []).filter(x => x.name === y))}
                 />
             </Box>
-            <ResponsiveDialog
-                open={!!state.openMessaging}
-                onClose={() => setState({ ...state, openMessaging: undefined })}
-            >
-                <DialogContent>
-                    <Messages participantOnly participant={participant.id} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setState({ ...state, openMessaging: undefined })} color="primary" autoFocus>
-                        Close
-                    </Button>
-                </DialogActions>
-            </ResponsiveDialog>
             <Dialog
                 fullScreen
                 open={!!survey}
@@ -348,16 +335,6 @@ export default function Participant({ participant, ...props }) {
                     />
                 </Box>
             </Dialog>
-            <Fab 
-                color="primary" 
-                aria-label="Messages" 
-                variant="extended" 
-                style={{ position: 'fixed', bottom: 24, right: 24 }} 
-                onClick={() => setState({ ...state, openMessaging: true })}
-            >
-                <Icon>chat</Icon>
-                Messages
-            </Fab>
         </React.Fragment>
     )
 }
