@@ -22,9 +22,9 @@ const strategies = {
         .filter((x, idx) => scopedItem !== undefined ? idx === scopedItem : true)
         .map((x, idx) => {
             let question = (Array.isArray(activity.settings) ? activity.settings : []).filter(y => y.text == x.item)[0]
-            if (question.type === 'boolean')
+            if (!!question && question.type === 'boolean')
                 return ['Yes', 'True'].includes(x.value) ? 1 : 0
-            else if (question.type === 'list')
+            else if (!!question && question.type === 'list')
                 return Math.max(question.options.indexOf(x.value), 0)
             else return parseInt(x.value) || 0
         })
@@ -34,7 +34,7 @@ const strategies = {
         .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
-export default function ActivityCard({ activity, events, forceDefaultGrid, ...props }) {
+export default function ActivityCard({ activity, events, startDate, forceDefaultGrid, ...props }) {
     let freeText = (Array.isArray(activity.settings) ? activity.settings : []).map(x => x.type).filter(x => [null, 'text', 'paragraph'].includes(x))
 
     const [ visibleSlice, setVisibleSlice ] = useState()
@@ -83,7 +83,7 @@ export default function ActivityCard({ activity, events, forceDefaultGrid, ...pr
                 ) : (showGrid ?
                     <ArrayView 
                         hiddenKeys={['x']}
-                        hasSpanningRowForIndex={idx => ['boolean', 'list'].includes(((Array.isArray(activity.settings) ? activity.settings : [])[idx] || {}).type)} 
+                        hasSpanningRowForIndex={idx => true /* ['boolean', 'list'].includes(((Array.isArray(activity.settings) ? activity.settings : [])[idx] || {}).type) */}
                         spanningRowForIndex={idx => (
                             <Sparkline 
                                 minWidth={48}
@@ -122,6 +122,7 @@ export default function ActivityCard({ activity, events, forceDefaultGrid, ...pr
                         XAxisLabel="Time"
                         YAxisLabel="Score"
                         color={blue[500]}
+                        startDate={startDate}
                         data={events
                               .map(d => ({ 
                                   x: new Date(d.timestamp), 

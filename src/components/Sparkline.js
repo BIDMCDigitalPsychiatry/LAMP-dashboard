@@ -82,7 +82,10 @@ class Sparkline extends React.PureComponent {
         renderTooltip={null}
         snapTooltipToDataX
         tooltipData={tooltipData}
-        xScale={{ type: 'time' }}
+        xScale={{ type: 'time', domain: [
+            this.props.startDate || this.props.data.slice(0, 1)[0].x, 
+            this.props.data.slice(-1)[0].x
+        ]}}
         yScale={{ type: 'linear' }}
       >
         <LinearGradient id={`gradient-${this.rand}`} from={this.props.color} to="#ffffff00" />

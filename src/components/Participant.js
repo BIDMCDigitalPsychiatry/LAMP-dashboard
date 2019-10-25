@@ -49,6 +49,8 @@ export default function Participant({ participant, ...props }) {
 
     useEffect(() => {
         (async () => {
+
+            // Perform event coalescing/grouping by sensor or activity type.
             let _activities = await LAMP.Activity.allByParticipant(participant.id)
             let _state = { ...state,  
                 activities: _activities, 
@@ -63,6 +65,19 @@ export default function Participant({ participant, ...props }) {
                 })), 'activity'),
                 sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(participant.id), 'sensor'),
             }
+
+            // Perform datetime coalescing to either days or weeks.
+            _state.sensor_events['lamp.steps'] = 
+                Object.values(groupBy(
+                    ((_state.sensor_events || {})['lamp.steps'] || [])
+                        .map(x => ({ ...x, timestamp: Math.round(x.timestamp / (24*60*60*1000)) /* days */ })), 
+                'timestamp'))
+                .map(x => x.reduce((a, b) => !!a.timestamp ? ({ ...a, 
+                    data: { value: a.data.value + b.data.value, units: 'steps' } 
+                }) : b, {}))
+                .map(x => ({ ...x, timestamp: x.timestamp * (24*60*60*1000) /* days */}))
+
+            // Perform count coalescing on processed events grouped by type.
             setState({ ..._state, 
                 activity_counts: Object.assign({}, ...Object.entries((_state.activity_events || {})).map(([k, v]) => ({ [k]: v.length }))),
                 sensor_counts: {
@@ -110,6 +125,15 @@ export default function Participant({ participant, ...props }) {
                 setSubmission(submission + 1)
             })
             .catch(e => console.dir(e))
+    }
+
+    const earliestDate = () => {
+        return (state.activities || [])
+                    .filter(x => (state.selectedCharts || []).includes(x.name))
+                    .map(x => ((state.activity_events || {})[x.name] || []))
+                    .map(x => x.slice(0, 1)[0].timestamp)
+                    .sort((a, b) => a - b /* min */).slice(0, 1)
+                    .map(x => new Date(x))[0]
     }
 
     return (
@@ -165,6 +189,7 @@ export default function Participant({ participant, ...props }) {
                     <ActivityCard 
                         activity={activity} 
                         events={((state.activity_events || {})[activity.name] || [])} 
+                        startDate={earliestDate()}
                         forceDefaultGrid={LAMP.Auth.get_identity().name === 'MAP NET'}
                     />
                 </Card>
@@ -270,6 +295,7 @@ export default function Participant({ participant, ...props }) {
                         XAxisLabel="Time"
                         YAxisLabel="Steps Taken"
                         color={blue[500]}
+                        startDate={earliestDate()}
                         data={((state.sensor_events || {})['lamp.steps'] || [])
                               .map(d => ({ 
                                   x: new Date(parseInt(d.timestamp)), 
