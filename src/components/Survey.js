@@ -29,8 +29,7 @@ import Tab from '@material-ui/core/Tab'
 import Hidden from '@material-ui/core/Hidden'
 
 // Local Imports
-import { ResponsivePaper } from './Utils'
-
+import { ResponsivePaper, useKeyPress } from './Utils'
 
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes
@@ -192,6 +191,12 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
 function Section({ noHeader, onResponse, index, value, ...props }) {
   const responses = useRef({})
   const [activeStep, setActiveStep] = useState(0)
+  const leftArrowPress = useKeyPress('ArrowLeft', () => {}, () => {
+    setActiveStep(step => Math.max(step - 1, 0))
+  })
+  const rightArrowPress = useKeyPress('ArrowRight', () => {}, () => {
+    setActiveStep(step => Math.min(step + 1, value.questions.length))
+  })
 
   const isComplete = (idx) => responses.current[idx] && responses.current[idx].value
   const isError = (idx) => !isComplete(idx) && (idx < activeStep)
@@ -267,6 +272,12 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
   if (!content) return <React.Fragment />
   const responses = useRef({})
   const [activeTab, setActiveTab] = useState(0)
+  const upArrowPress = useKeyPress('ArrowUp', () => {}, () => {
+    setActiveTab(tab => Math.max(tab - 1, 0))
+  })
+  const downArrowPress = useKeyPress('ArrowDown', () => {}, () => {
+    setActiveTab(tab => Math.min(tab + 1, ((content || {}).sections || []).length))
+  })
 
   const validator = response => {
     for (let section of response) {
