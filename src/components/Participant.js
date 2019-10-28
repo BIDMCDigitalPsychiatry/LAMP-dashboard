@@ -327,9 +327,11 @@ export default function Participant({ participant, ...props }) {
             <Box display="flex" p={4} justifyContent="center">
                 <MenuButton 
                     style={{ margin: 'auto 0' }}
-                    title="Add Survey Response" 
+                    title="Administer Survey Instruments" 
+                    icon={<Icon>assignment</Icon>}
                     items={(state.activities || []).filter(x => x.spec === 'lamp.survey').map(x => x.name)} 
-                    onClick={y => setActivities((state.activities || []).filter(x => x.name === y))}
+                    onAction={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey'))}
+                    onClick={y => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && x.name === y))}
                 />
             </Box>
             <Dialog
