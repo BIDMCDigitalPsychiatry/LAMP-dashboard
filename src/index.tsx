@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom'
 
 // Local Imports 
 import App from './components/App'
+import * as serviceWorker from './serviceWorker'
 
 // External Imports
 import '@babel/polyfill'
@@ -36,3 +37,4 @@ input, textarea, .contenteditable, .lamp-editable * {
 }`
 
 ReactDOM.render(<App />, root)
+serviceWorker.register()

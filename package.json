@@ -26,6 +26,7 @@
     "date-fns": "^2.0.0-beta.3",
     "eventing-bus": "^1.3.3",
     "file-saver": "^1.3.8",
+    "http-server": "^0.11.1",
     "json2csv": "^4.5.2",
     "jsonexport": "^2.4.1",
     "jszip": "^3.2.2",
@@ -45,7 +46,8 @@
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {
-    "start": "BROWSER=none react-scripts start",
+    "start": "BROWSER=none NODE_ENV=production PUBLIC_URL=dashboard.lamp.digital react-scripts start",
+    "start-sw": "http-server ./build",
     "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
     "deploy": "aws s3 sync build/ `echo $DASHBOARD_DEPLOY_S3_BUCKET`"
   },
