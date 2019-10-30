@@ -7,6 +7,7 @@ import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import {blue, red} from '@material-ui/core/colors'
 import Fab from '@material-ui/core/Fab'
+import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
 import Icon from '@material-ui/core/Icon'
 import 'typeface-roboto'
@@ -32,9 +33,11 @@ import { PageTitle } from './Utils'
 // localhost:3000/#/?a=cm9vdDpsYW1wYWRtaW4=
 
 export default function App({ ...props }) {
+    const [ deferredPrompt, setDeferredPrompt ] = useState(null)
     const [ state, setState ] = useState({})
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
     const storeRef = useRef([])
+
     useEffect(() => {
         let query = window.location.hash.split('?')
         if (!!query && query.length > 1) {
@@ -53,6 +56,10 @@ export default function App({ ...props }) {
             })
         }
     }, [])
+
+    if (window.matchMedia('(display-mode: standalone)').matches)
+        console.log('Launched from home screen!')
+    window.addEventListener('beforeinstallprompt', (e) => setDeferredPrompt(e))
 
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
@@ -93,6 +100,20 @@ export default function App({ ...props }) {
             storeRef.current = [ ...storeRef.current, id ]
         }
         return null
+    }
+
+    const promptInstall = () => {
+        if (deferredPrompt === null)
+            return
+        deferredPrompt.prompt()
+        deferredPrompt.userChoice.then((c) => {
+            if (c.outcome === 'accepted') {
+                console.log('App will be installed.')
+            } else {
+                console.log('App not installed.')
+            }
+            setDeferredPrompt(null)
+        })
     }
 
     return (
@@ -243,6 +264,13 @@ export default function App({ ...props }) {
                         } />
                     </Switch>
                 </HashRouter>
+                {!!deferredPrompt && 
+                <Snackbar
+                    open
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                    message="Add mindLAMP to your home screen?"
+                    action={<Button color="inherit" size="small" onClick={promptInstall}>Install</Button>}
+                />}
             </SnackbarProvider>
         </MuiThemeProvider>
     )
