@@ -30,8 +30,6 @@ import { PageTitle } from './Utils'
 // TODO: If weird button CSS issues (via MuiButtonBase-root) appear, 
 //       material-table imports @material-ui/core again so delete it.
 
-// localhost:3000/#/?a=cm9vdDpsYW1wYWRtaW4=
-
 export default function App({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)
     const [ state, setState ] = useState({})

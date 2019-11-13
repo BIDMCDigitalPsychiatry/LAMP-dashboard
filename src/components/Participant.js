@@ -131,9 +131,9 @@ export default function Participant({ participant, ...props }) {
         return (state.activities || [])
                     .filter(x => (state.selectedCharts || []).includes(x.name))
                     .map(x => ((state.activity_events || {})[x.name] || []))
-                    .map(x => x.slice(0, 1)[0].timestamp)
+                    .map(x => x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp)
                     .sort((a, b) => a - b /* min */).slice(0, 1)
-                    .map(x => new Date(x))[0]
+                    .map(x => x === 0 ? undefined : new Date(x))[0]
     }
 
     return (

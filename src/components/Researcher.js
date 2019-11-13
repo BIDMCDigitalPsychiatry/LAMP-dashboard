@@ -30,6 +30,8 @@ import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import jsonexport from 'jsonexport'
 import { useDropzone } from 'react-dropzone'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -38,9 +40,11 @@ import Messages from './Messages'
 import Sparkchips from './Sparkchips'
 import EditField from './EditField'
 import CredentialManager from './CredentialManager'
-import { ResponsiveDialog, ResponsivePaper } from './Utils'
+import { ResponsiveDialog, ResponsivePaper, mediumDateFormat } from './Utils'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
+TimeAgo.addLocale(en)
+const timeAgo = new TimeAgo('en-US')
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 // TODO: Blogs/Tips/AppHelp
@@ -61,6 +65,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     const [importFile, setImportFile] = useState()
     const [exportActivities, setExportActivities] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
+    const [logins, setLogins] = useState({})
     const [names, setNames] = useState({})
     const [currentTab, setCurrentTab] = useState(0)
     const onDrop = useCallback(acceptedFiles => {
@@ -88,6 +93,16 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
             })
         })()
     }, [])
+
+    useEffect(() => {
+        (async function() {
+            let data = (await Promise.all(state.data
+                            .map(async x => ({ id: x.id, res: (await LAMP.SensorEvent.allByParticipant(x.id, 'lamp.analytics'))
+                                    .filter(z => z.sensor === 'lamp.analytics') }))))
+                            .filter(y => y.res.length > 0)
+            setLogins(logins => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
+        })()
+    }, [state])
 
     useEffect(() => {
         (async function() {
@@ -170,6 +185,12 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
         }))
     }
 
+    const dateInfo = (id) => ({
+        relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
+        absolute: (new Date(parseInt((logins[id] || {}).timestamp))).toLocaleString('en-US', mediumDateFormat),
+        device: (logins[id] || {data:{}}).data.device_type || 'an unknown device'
+    })
+
     return (
         <React.Fragment>
             <Box mb="16px" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -201,56 +222,46 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                 {currentTab === 0 &&
                     <MaterialTable 
                         title="Default Clinic"
-                        data={state.data.map(x => ({...x, last_login: 'Unknown', device_type: 'Unknown' }))} 
+                        data={state.data} 
                         columns={[
                             { title: 'Name', field: 'id', render: (x) => 
-                                <EditField 
-                                    text={names[x.id] || x.id} 
-                                    onChange={newValue => {
-                                        let oldValue = names[x.id] || x.id
-                                        if (oldValue == newValue)
-                                            return
+                                <Tooltip title={x.id}>
+                                    <EditField 
+                                        text={names[x.id] || x.id} 
+                                        onChange={newValue => {
+                                            let oldValue = names[x.id] || x.id
+                                            if (oldValue == newValue)
+                                                return
 
-                                        let isStr = (typeof newValue === 'string') && newValue.length > 0
-                                        setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
-                                        LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
-                                            console.error(err)
-                                            setNames(names => ({ ...names, [x.id]: oldValue }))
-                                        })
-                                    }} 
-                                />
+                                            let isStr = (typeof newValue === 'string') && newValue.length > 0
+                                            setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
+                                            LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
+                                                console.error(err)
+                                                setNames(names => ({ ...names, [x.id]: oldValue }))
+                                            })
+                                        }} 
+                                    />
+                                </Tooltip>
                             },
-                            { title: 'Last Login', field: 'last_login' },
-                            { title: 'Device Type', field: 'device_type' },
+                            { title: 'Last Active', field: 'last_active', render: (rowData) => 
+                                <Tooltip title={dateInfo(rowData.id).absolute}>
+                                    <span>{`${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}</span>
+                                </Tooltip>
+                            },
                             { title: 'Indicators', field: 'data_health', render: (rowData) => 
                                 <div>
                                     <Tooltip title={(rowData.id.length % 3 === 0 ? 
-                                                        'Data health is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
-                                                            'Data health is inconsistent and requires attention.' : 
-                                                                'Data health is optimal.'))}>
+                                                        'Data is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
+                                                            'Data is inconsistent and requires attention.' : 
+                                                                'Data is optimal.'))}>
                                       <Chip 
-                                          label="Data Health"
+                                          label="Data Quality"
                                           style={{ 
                                               margin: 4, 
                                               backgroundColor: (rowData.id.length % 3 === 0 ? 
                                                                     red[500] : (rowData.id.length % 3 === 1 ? 
                                                                         yellow[500] : 
                                                                             green[500])), 
-                                              color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
-                                        }} />
-                                    </Tooltip>
-                                    <Tooltip title={(rowData.id.length % 3 === 0 ? 
-                                                        'Patient health is optimal.' : (rowData.id.length % 3 === 1 ? 
-                                                            'Patient health may require clinical monitoring.' : 
-                                                                'Patient health may require clinical attention.'))}>
-                                      <Chip 
-                                          label="Patient Health"
-                                          style={{ 
-                                              margin: 4, 
-                                              backgroundColor: (rowData.id.length % 3 === 0 ? 
-                                                                    green[500] : (rowData.id.length % 3 === 1 ? 
-                                                                        yellow[500] : 
-                                                                            red[500])), 
                                               color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
                                         }} />
                                     </Tooltip>
