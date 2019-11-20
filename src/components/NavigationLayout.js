@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton'
 import Snackbar from '@material-ui/core/Snackbar'
 import Menu from '@material-ui/core/Menu'
 import Icon from '@material-ui/core/Icon'
+import Slide from '@material-ui/core/Slide'
 import Dialog from '@material-ui/core/Dialog'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -51,7 +52,7 @@ export default function NavigationLayout({ title, id, enableMessaging, noToolbar
     					</Typography>
     					<div>
                             <Tooltip title="Notifications">
-        						<IconButton color="default">
+        						<IconButton color="default" onClick={() => {}}>
         							<Badge badgeContent={0} color="secondary">
         								<Icon>notifications</Icon>
         							</Badge>
