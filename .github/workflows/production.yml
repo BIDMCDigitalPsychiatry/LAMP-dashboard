@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Docker Image Build
-      uses: elgohr/Publish-Docker-Github-Action@master
+    - uses: jerray/publish-docker-action@v1.0.3
       with:
-        name: bidmcdigitalpsychiatry/lamp-dashboard/lamp-dashboard
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         registry: docker.pkg.github.com
+        repository: bidmcdigitalpsychiatry/lamp-dashboard/lamp-dashboard
+        auto_tag: true
