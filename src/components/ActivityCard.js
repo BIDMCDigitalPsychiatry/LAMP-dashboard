@@ -34,7 +34,7 @@ const strategies = {
         .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
-export default function ActivityCard({ activity, events, startDate, forceDefaultGrid, ...props }) {
+export default function ActivityCard({ activity, events, startDate, forceDefaultGrid, onEditAction, onCopyAction, onDeleteAction, ...props }) {
     let freeText = (Array.isArray(activity.settings) ? activity.settings : []).map(x => x.type).filter(x => [null, 'text', 'paragraph'].includes(x))
 
     const [ visibleSlice, setVisibleSlice ] = useState()
@@ -61,11 +61,36 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                         {!Boolean(visibleSlice) ? activity.name : visibleSlice.x.toLocaleString('en-US', mediumDateFormat)}
                     </Typography>
                 </Tooltip>
-                <Tooltip title="Show App Screenshot">
-                    <IconButton onClick={event => setHelpAnchor(event.currentTarget)}>
-                        <Icon fontSize="small">help</Icon>
-                    </IconButton>
-                </Tooltip>
+                <div>
+                    {!Boolean(visibleSlice) &&
+                        <Tooltip title="Show App Screenshot">
+                            <IconButton onClick={event => setHelpAnchor(event.currentTarget)}>
+                                <Icon fontSize="small">help</Icon>
+                            </IconButton>
+                        </Tooltip>
+                    }
+                    {(Boolean(visibleSlice) && !!onDeleteAction) &&
+                        <Tooltip title="Delete Entry">
+                            <IconButton onClick={event => onDeleteAction(visibleSlice)}>
+                                <Icon fontSize="small">delete</Icon>
+                            </IconButton>
+                        </Tooltip>
+                    }
+                    {(Boolean(visibleSlice) && !!onCopyAction) &&
+                        <Tooltip title="Copy Entry">
+                            <IconButton onClick={event => onCopyAction(visibleSlice)}>
+                                <Icon fontSize="small">file_copy</Icon>
+                            </IconButton>
+                        </Tooltip>
+                    }
+                    {(Boolean(visibleSlice) && !!onEditAction) && 
+                        <Tooltip title="Edit Entry">
+                            <IconButton onClick={event => onEditAction(visibleSlice)}>
+                                <Icon fontSize="small">edit</Icon>
+                            </IconButton>
+                        </Tooltip>
+                    }
+                </div>
             </Box>
             <Divider style={{ marginBottom: 16 }} />
             {Boolean(visibleSlice) ? 

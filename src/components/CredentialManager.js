@@ -52,7 +52,7 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
         if (!!(await LAMP.Credential.update(id, resetCred.access_key, { ...resetCred, secret_key: password })).message)
           return onError('could not change password')
       } else if (!!name && !!emailAddress && !!password) {
-        if (!!(await LAMP.Credential.create(id, password)).message)
+        if (!!(await LAMP.Credential.create(id, emailAddress, password, name)).message)
           return onError('could not create credential')
       } else { onError('could not perform operation') }
     } catch(err) { onError('credential management failed') }

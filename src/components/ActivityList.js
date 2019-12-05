@@ -84,6 +84,14 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         setImportFile()
     }
 
+    const saveActivity = async (x) => {
+        let newItem = await LAMP.Activity.create(studyID, x)
+        await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', {
+            description: x.description, settings: x.settings.map(y => y.description)
+        })
+        setShowCreate()
+    }
+
 	return (
         <React.Fragment>
             <MaterialTable 
@@ -196,7 +204,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                     <Icon>close</Icon>
                 </IconButton>
                 <Box py={8} px={4}>
-                    <SurveyCreator onCancel={() => setShowCreate()} onSave={x => LAMP.Activity.create(studyID, x).then(() => setShowCreate())} />
+                    <SurveyCreator onCancel={() => setShowCreate()} onSave={saveActivity} />
                 </Box>
             </Dialog>
             <Dialog

@@ -40,6 +40,7 @@ export default function Participant({ participant, ...props }) {
     const [ activities, setActivities ] = useState([])
     const [ survey, setSurvey ] = useState()
     const [ submission, setSubmission ] = useState(0)
+    const [ hiddenEvents, setHiddenEvents ] = useState([])
 
     useEffect(() => {
         LAMP.Type.getDynamicAttachment(participant.id, 'lamp.beta_values').then(res => {
@@ -50,19 +51,27 @@ export default function Participant({ participant, ...props }) {
     useEffect(() => {
         (async () => {
 
+            // Refresh hidden events list.
+            let _hidden = await LAMP.Type.getAttachment(participant.id, 'lamp.dashboard.hidden_events')
+            _hidden = !!_hidden.message ? [] : _hidden.data
+            setHiddenEvents(_hidden)
+
             // Perform event coalescing/grouping by sensor or activity type.
             let _activities = await LAMP.Activity.allByParticipant(participant.id)
             let _state = { ...state,  
                 activities: _activities, 
-                activity_events: groupBy((await LAMP.ResultEvent.allByParticipant(participant.id)).map(x => ({ ...x,
-                    activity: _activities.find(y => x.activity === y.id || 
-                                  (!!x.static_data.survey_name && 
-                                      x.static_data.survey_name.toLowerCase() === y.name.toLowerCase()))
-                }))
-                .map(x => ({ ...x,
-                    activity: (x.activity || {name: ''}).name,
-                    activity_spec: (x.activity || {spec: ''}).spec || ''
-                })), 'activity'),
+                activity_events: groupBy((await LAMP.ResultEvent.allByParticipant(participant.id))
+                    .map(x => ({ ...x,
+                        activity: _activities.find(y => x.activity === y.id || 
+                                      (!!x.static_data.survey_name && 
+                                          x.static_data.survey_name.toLowerCase() === y.name.toLowerCase()))
+                    }))
+                    .filter(x => !!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true)
+                    .sort((x, y) => x.timestamp - y.timestamp)
+                    .map(x => ({ ...x,
+                        activity: (x.activity || {name: ''}).name,
+                        activity_spec: (x.activity || {spec: ''}).spec || ''
+                    })), 'activity'),
                 sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(participant.id), 'sensor'),
             }
 
@@ -92,23 +101,43 @@ export default function Participant({ participant, ...props }) {
     useEffect(() => {
         if (activities.length === 0)
             return setSurvey()
-        setSurvey({
-            name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
-            description: 'Please complete all sections below. Thank you.',
-            sections: activities.map(x => ({
-                banner: activities.length === 1 ? undefined : x.name,
-                questions: x.settings.map(y => ({ ...y, 
-                    options: y.options === null ? null : y.options.map(z => ({ label: z, value: z }))
-                }))
-            }))
+        Promise.all(activities.map(x => LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description'))).then(res => {
+            res = res.map(y => !!y.message ? undefined : y.data)
+            setSurvey({
+                name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
+                description: activities.length === 1 ? res[0].description: 'Please complete all sections below. Thank you.',
+                sections: activities.map((x, idx) => ({
+                    banner: activities.length === 1 ? undefined : x.name,
+                    questions: x.settings.map((y, idx2) => ({ ...y, 
+                        description: !!res[idx] ? res[idx].settings[idx2] : undefined,
+                        options: y.options === null ? null : y.options.map(z => ({ label: z, value: z }))
+                    }))
+                })),
+                prefillData: activities[0].prefillData,
+                prefillTimestamp: activities[0].prefillTimestamp
+            })
         })
     }, [activities])
 
+    //
+    const hideEvent = async (timestamp, activity) => {
+        let _hidden = await LAMP.Type.getAttachment(participant.id, 'lamp.dashboard.hidden_events')
+        let _events = !!_hidden.message ? [] : _hidden.data
+        if (hiddenEvents.includes(`${timestamp}/${activity}`))
+            return
+        let _setEvents = await LAMP.Type.setAttachment(participant.id, 'me', 'lamp.dashboard.hidden_events', 
+                            [..._events, `${timestamp}/${activity}`])
+        if (!!_setEvents.message)
+            return
+        //setHiddenEvents([..._events, `${timestamp}/${activity}`])
+        setSubmission(x => x + 1)
+    }
+
     // 
-    const submitSurvey = (response) => {
+    const submitSurvey = (response, overwritingTimestamp) => {
         setSurvey()
         let events = response.map((x, idx) => ({
-            timestamp: (new Date().getTime()),
+            timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : (new Date().getTime()),
             duration: 0,
             activity: activities[idx].id,
             static_data: { survey_name: activities[idx].name },
@@ -122,9 +151,13 @@ export default function Participant({ participant, ...props }) {
         }))
         LAMP.ResultEvent.create(participant.id, events[0])
             .then(x => {
-                setSubmission(submission + 1)
+                setSubmission(x => x + 1)
             })
             .catch(e => console.dir(e))
+
+        // If a timestamp was provided to overwrite data, hide the original event too.
+        if (!!overwritingTimestamp)
+            hideEvent(overwritingTimestamp, activities[0 /* assumption made here */].id)
     }
 
     const earliestDate = () => {
@@ -191,6 +224,18 @@ export default function Participant({ participant, ...props }) {
                         events={((state.activity_events || {})[activity.name] || [])} 
                         startDate={earliestDate()}
                         forceDefaultGrid={LAMP.Auth.get_identity().name === 'MAP NET'}
+                        onEditAction={activity.spec !== 'lamp.survey' ? undefined : (data) => {
+                            setActivities([{ ...activity, 
+                                prefillData: [data.slice.map(({ item, value }) => ({ item, value }))], 
+                                prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */
+                            }])
+                        }}
+                        onCopyAction={activity.spec !== 'lamp.survey' ? undefined : (data) => {
+                            setActivities([{ ...activity, 
+                                prefillData: [data.slice.map(({ item, value }) => ({ item, value }))]
+                            }])
+                        }}
+                        onDeleteAction={(x) => hideEvent(x.x.getTime(), activity.id)}
                     />
                 </Card>
             )}
@@ -358,6 +403,8 @@ export default function Participant({ participant, ...props }) {
                     <Survey
                         validate
                         content={survey} 
+                        prefillData={!!survey ? survey.prefillData : undefined}
+                        prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
                         onValidationFailure={() => props.layout.showAlert('Some responses are missing. Please complete all questions before submitting.')}
                         onResponse={submitSurvey} 
                     />

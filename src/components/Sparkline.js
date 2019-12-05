@@ -82,7 +82,7 @@ class Sparkline extends React.PureComponent {
         renderTooltip={null}
         snapTooltipToDataX
         tooltipData={tooltipData}
-        xScale={{ type: 'time', domain: this.props.data.length <= 1 ? undefined : [
+        xScale={{ type: 'time', domain: [
             this.props.startDate || this.props.data.slice(0, 1)[0].x, 
             this.props.data.slice(-1)[0].x
         ]}}
