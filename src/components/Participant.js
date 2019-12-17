@@ -26,7 +26,7 @@ import { groupBy } from './Utils'
 import Survey from './Survey'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
-function _shouldRestrict() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
+function _shouldRestrict() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') && (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
 // TODO: all SensorEvents?
 

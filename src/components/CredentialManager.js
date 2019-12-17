@@ -14,6 +14,9 @@ import Typography from '@material-ui/core/Typography'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import { deepOrange } from '@material-ui/core/colors';
 
+// External Imports
+import QRCode from 'qrcode.react'
+
 // Local Imports
 import LAMP from '../lamp'
 
@@ -26,6 +29,8 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
   const [name, setName] = useState('')
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
+
+  const _qrLink = () => window.location.href.split('#')[0] + '#/?a=' + btoa([id, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
 
   useEffect(() => { 
     LAMP.Credential.list(id).then(setAllCreds) 
@@ -167,13 +172,20 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
         }}
       />}
       {(showLink && password.length > 0) && 
+        <React.Fragment>
         <TextField 
           fullWidth
           style={{ marginTop: 16 }}
           variant="outlined"
-          value={'https://dashboard.lamp.digital/#/?a=' + btoa([id, password].join(':'))}
+          value={_qrLink()}
           onChange={event => {}}
         />
+        <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+          <Grid container justify="center" style={{ padding: 16 }}>
+            <QRCode size={256} level="H" value={_qrLink()} />
+          </Grid>
+        </Tooltip>
+        </React.Fragment>
       }
     </React.Fragment>
   )

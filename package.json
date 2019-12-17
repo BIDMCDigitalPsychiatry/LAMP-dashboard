@@ -36,6 +36,7 @@
     "material-table": "^1.42.0",
     "moment": "^2.24.0",
     "notistack": "^0.8.9",
+    "qrcode.react": "^1.0.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.8",

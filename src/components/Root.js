@@ -16,6 +16,8 @@ export default function Root({ ...props }) {
     //const [names, setNames] = useState({})
     const [passwordChange, setPasswordChange] = useState()
     useEffect(() => {
+        if (LAMP.Auth._auth.type !== 'root')
+            return
         (async function() {
             setResearchers(await LAMP.Researcher.all())
         })()

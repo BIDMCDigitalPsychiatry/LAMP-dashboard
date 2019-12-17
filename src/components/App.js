@@ -44,8 +44,8 @@ export default function App({ ...props }) {
         if (!!query && query.length > 1) {
             let x = atob(Object.fromEntries(new URLSearchParams(query[1]))['a']).split(':')
             reset({ 
-                type: x[0] === 'root' ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
-                id: x[0],
+                type: ['root', 'admin'].includes(x[0]) ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
+                id: x[0] === 'admin' ? 'root' : x[0],
                 password: x[1],
                 serverAddress: x[2]
             }).then(x => {
