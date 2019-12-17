@@ -8,7 +8,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import BottomNavigation from '@material-ui/core/BottomNavigation'
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import ButtonBase from '@material-ui/core/ButtonBase'
 import Icon from '@material-ui/core/Icon'
@@ -29,10 +29,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 // Local Imports
 import Jewels from './Jewels'
 
-function SlideUp(props) { return <Slide direction="up" {...props} /> }
-function SlideDown(props) { return <Slide direction="down" {...props} /> }
-function SlideLeft(props) { return <Slide direction="left" {...props} /> }
-function SlideRight(props) { return <Slide direction="right" {...props} /> }
+function SlideUp(props) { return <Slide direction="up" {...props} /> }  // eslint-disable-next-line
+function SlideDown(props) { return <Slide direction="down" {...props} /> }  // eslint-disable-next-line
+function SlideLeft(props) { return <Slide direction="left" {...props} /> }  // eslint-disable-next-line
+function SlideRight(props) { return <Slide direction="right" {...props} /> }  // eslint-disable-next-line
 
 export default function Home({ ...props }) {
     const [ state, setState ] = useState({
@@ -123,7 +123,7 @@ export default function Home({ ...props }) {
           	<IconButton style={{ position: 'fixed', right: 8, top: 8, background: '#ffffff66', webkitBackdropFilter: 'blur(5px)' }} color="inherit" onClick={() => setState({ ...state, profileOpen: true })} aria-label="Close">
             	<Icon>settings</Icon>
           	</IconButton>
-        	<MuiThemeProvider theme={theme}>
+        	<ThemeProvider theme={theme}>
 			<CssBaseline />
 			{state.value !== 'assess' ? 
 				state.data[state.value].map((row, index) => (
@@ -138,12 +138,14 @@ export default function Home({ ...props }) {
 		        <Grid container direction="row" item xs={12}>
 			        <Grid item xs={6}>
 						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, value: 'surveys' })}>
+							{ /* eslint-disable-next-line */ }
 			          		<span style={{ fontSize: '96px' }}>📝</span><br />
 			          		Check-In
 		          		</Button>
 			        </Grid>
 			        <Grid item xs={6}>
 						<Button variant="outlined" style={{ display: 'block', margin: '5%', width: '90%', height: '90%', lineHeight: 1, textTransform: 'none'  }} onClick={() => setState({ ...state, value: 'games' })}>
+							{ /* eslint-disable-next-line */ }
 			          		<span style={{ fontSize: '96px' }}>🎮</span><br />
 			          		Brain Games
 		          		</Button>
@@ -182,7 +184,7 @@ export default function Home({ ...props }) {
 		      </Grid>
 			}
 			<div style={{ height: 100 }} />
-			</MuiThemeProvider>
+			</ThemeProvider>
 			<SlideDown in={state.notification}>
           	<ButtonBase 
           		style={{ 
@@ -200,6 +202,7 @@ export default function Home({ ...props }) {
           		onClick={() => setState({ ...state, homeOpen: true })} 
           		aria-label="Close"
           	>
+				{ /* eslint-disable-next-line */ }
 	            <Typography variant="h6">
 	            	📚 There's a new article available for you to read. Check it out!
 	            </Typography>
@@ -282,6 +285,7 @@ export default function Home({ ...props }) {
 	          TransitionComponent={SlideRight}
 	        >
 	          <div style={{ width: '100%', height: '50%', top: '0%' }}>
+	      		  { /* eslint-disable-next-line */ }
 		          <img style={{ width: 120, height: 120 }} src="https://www.lamp.digital/images/68747470733a2f2f6c68332e676f6f676c6575736572636f6e74656e742e636f6d2f4f48394c75315f7762346a6e61386234797a5a4e437a5f775648594c46576c435736467342323142457971556e526631687836656b746474375047522d4178666f2d4d3d73333630.png"></img>
 	              <Typography variant="h6" color="inherit">
 	                Welcome to mindLAMP.

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Avatar from '@material-ui/core/Avatar'
 import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import Divider from '@material-ui/core/Divider'
@@ -13,7 +12,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { deepOrange, deepPurple, green, pink } from '@material-ui/core/colors';
+import { deepOrange } from '@material-ui/core/colors';
 
 // Local Imports
 import LAMP from '../lamp'

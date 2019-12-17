@@ -8,16 +8,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableHead from '@material-ui/core/TableHead'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
-import TablePagination from '@material-ui/core/TablePagination'
-import TableSortLabel from '@material-ui/core/TableSortLabel'
-import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-import Checkbox from '@material-ui/core/Checkbox'
-import Tooltip from '@material-ui/core/Tooltip'
-import IconButton from '@material-ui/core/IconButton'
-import DeleteIcon from '@material-ui/icons/Delete'
-import FilterListIcon from '@material-ui/icons/FilterList'
-import Divider from '@material-ui/core/Divider'
 import { useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 
@@ -172,6 +163,7 @@ export const fullDateFormat = {
 }
 
 // Stubbed code for .flat() which is an ES7 function...
+// eslint-disable-next-line
 Object.defineProperty(Array.prototype, 'flat', {
 	value: function(depth = 1) {
 		return this.reduce(function (flat, toFlatten) {
@@ -181,6 +173,7 @@ Object.defineProperty(Array.prototype, 'flat', {
 })
 
 // Easier Date-string formatting using Date.formatUTC
+// eslint-disable-next-line
 Object.defineProperty(Date, 'formatUTC', {
 	value: function(timestampUTC, formatObj) {
 		formatObj.timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -188,6 +181,7 @@ Object.defineProperty(Date, 'formatUTC', {
 	}
 })
 
+/*
 // Note the surveys we want to use in the average plot with their initial slot number as well as expected length.
 const usableSurveys = {
     'ANXIETY, PSYCHOSIS, AND SOCIAL': [0, 16],
@@ -280,3 +274,4 @@ const surveyMap = {
     "When I see others who are doing worse than I am, I feel fear that my future will be similar to them" : "Similar future",
     "When I see others who are doing worse than I am, I feel relieved about my own situation" : "Relieved"
 }
+*/

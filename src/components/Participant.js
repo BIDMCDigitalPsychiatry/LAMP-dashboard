@@ -1,19 +1,14 @@
 
 // Core Imports
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import Switch from '@material-ui/core/Switch'
 import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
-import Fab from '@material-ui/core/Fab'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
-import Popover from '@material-ui/core/Popover'
 import Slide from '@material-ui/core/Slide'
 import blue from '@material-ui/core/colors/blue'
 
@@ -26,12 +21,12 @@ import ActivityCard from './ActivityCard'
 import MultipleSelect from './MultipleSelect'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
-import Messages from './Messages'
 import MenuButton from './MenuButton'
-import { ResponsiveDialog, groupBy } from './Utils'
+import { groupBy } from './Utils'
 import Survey from './Survey'
 
 function SlideUp(props) { return <Slide direction="up" {...props} /> }
+function _shouldRestrict() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
 // TODO: all SensorEvents?
 
@@ -105,7 +100,7 @@ export default function Participant({ participant, ...props }) {
             res = res.map(y => !!y.message ? undefined : y.data)
             setSurvey({
                 name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
-                description: activities.length === 1 ? res[0].description: 'Please complete all sections below. Thank you.',
+                description: activities.length === 1 ? (!!res[0] ? res[0].description : undefined) : 'Please complete all sections below. Thank you.',
                 sections: activities.map((x, idx) => ({
                     banner: activities.length === 1 ? undefined : x.name,
                     questions: x.settings.map((y, idx2) => ({ ...y, 
@@ -136,6 +131,8 @@ export default function Participant({ participant, ...props }) {
     // 
     const submitSurvey = (response, overwritingTimestamp) => {
         setSurvey()
+
+        // 
         let events = response.map((x, idx) => ({
             timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : (new Date().getTime()),
             duration: 0,
@@ -149,11 +146,11 @@ export default function Participant({ participant, ...props }) {
                 duration: 0,
             })),
         }))
-        LAMP.ResultEvent.create(participant.id, events[0])
-            .then(x => {
-                setSubmission(x => x + 1)
-            })
-            .catch(e => console.dir(e))
+
+        // 
+        Promise.all(events.filter(x => x.temporal_events.length > 0).map(x => 
+            LAMP.ResultEvent.create(participant.id, x).catch(e => console.dir(e))
+        )).then(x => { setSubmission(x => x + 1) })
 
         // If a timestamp was provided to overwrite data, hide the original event too.
         if (!!overwritingTimestamp)
@@ -355,6 +352,7 @@ export default function Participant({ participant, ...props }) {
             }
             {(state.attachments || []).map(attachment =>
                 <Card key={attachment} style={{ padding: '.3rem' }}>
+                    { /* eslint-disable-next-line */ }
                     <img src={'data:image/png;base64,' + attachment} />
                     {/*
                     <Document
@@ -374,9 +372,9 @@ export default function Participant({ participant, ...props }) {
                     style={{ margin: 'auto 0' }}
                     title="Administer Survey Instruments" 
                     icon={<Icon>assignment</Icon>}
-                    items={(state.activities || []).filter(x => x.spec === 'lamp.survey').map(x => x.name)} 
-                    onAction={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey'))}
-                    onClick={y => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && x.name === y))}
+                    items={(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(x => x.name)} 
+                    onAction={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)))}
+                    onClick={y => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true) && x.name === y))}
                 />
             </Box>
             <Dialog
@@ -402,6 +400,7 @@ export default function Participant({ participant, ...props }) {
                 <Box py={8} px={4}>
                     <Survey
                         validate
+                        partialValidationOnly
                         content={survey} 
                         prefillData={!!survey ? survey.prefillData : undefined}
                         prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}

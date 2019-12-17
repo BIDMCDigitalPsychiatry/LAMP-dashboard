@@ -8,13 +8,12 @@ import MaterialTable from 'material-table'
 
 // Local Imports
 import LAMP from '../lamp'
-import EditField from './EditField'
 import CredentialManager from './CredentialManager'
 import { ResponsivePaper } from './Utils'
 
 export default function Root({ ...props }) {
     const [researchers, setResearchers] = useState([])
-    const [names, setNames] = useState({})
+    //const [names, setNames] = useState({})
     const [passwordChange, setPasswordChange] = useState()
     useEffect(() => {
         (async function() {

@@ -2,26 +2,23 @@
 // Core Imports
 import React, { useState } from 'react'
 import Box from '@material-ui/core/Box'
-import Button from '@material-ui/core/Button'
 import Icon from '@material-ui/core/Icon'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
 import Popover from '@material-ui/core/Popover'
 import blue from '@material-ui/core/colors/blue'
 
 // Local Imports
 import Sparkline from '../components/Sparkline'
-import { ArrayView, ResponsiveDialog, groupBy, mediumDateFormat } from '../components/Utils'
+import { ArrayView, groupBy, mediumDateFormat } from '../components/Utils'
 
 const strategies = {
     'lamp.survey': (slices, activity, scopedItem) => slices
         .filter((x, idx) => scopedItem !== undefined ? idx === scopedItem : true)
         .map((x, idx) => {
-            let question = (Array.isArray(activity.settings) ? activity.settings : []).filter(y => y.text == x.item)[0]
+            let question = (Array.isArray(activity.settings) ? activity.settings : []).filter(y => y.text === x.item)[0]
             if (!!question && question.type === 'boolean')
                 return ['Yes', 'True'].includes(x.value) ? 1 : 0
             else if (!!question && question.type === 'list')
@@ -177,8 +174,8 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                 onClose={event => setHelpAnchor()}
                 disableRestoreFocus
             >
-                {activity.spec === 'lamp.survey' ? 
-                    <img style={{ width: 300, height: 600}} src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/survey.png`} /> :
+                {activity.spec === 'lamp.survey' ? // eslint-disable-next-line
+                    <img style={{ width: 300, height: 600}} src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/survey.png`} /> :  // eslint-disable-next-line
                     <img style={{ width: 300, height: 600}} src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${activity.name.toLowerCase().replace(/[^0-9a-z]/gi, '')}.png`} />
                 }
             </Popover>
