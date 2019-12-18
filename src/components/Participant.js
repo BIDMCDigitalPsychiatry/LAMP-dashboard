@@ -346,7 +346,7 @@ export default function Participant({ participant, ...props }) {
                             <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center', margin: 16 }}>
                                 Personal Map
                             </Typography>
-                            <img src={require('/Users/ryanhays/Documents/Digital Psychiatry/LAMP-dashboard/src/experimental_images/pat_nets/'.concat(participant.id, '.svg'))} height="400" width="400" />                               
+                            <img src={require('../experimental_images/pat_nets/'.concat(participant.id, '.svg'))} height="400" width="400" />                               
                         </Grid>
                     </Grid> 
                 </Card>
@@ -370,7 +370,7 @@ export default function Participant({ participant, ...props }) {
                             <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center', margin: 16 }}>
                                 Personal Map
                             </Typography>
-                            <img src={require('/Users/ryanhays/Documents/Digital Psychiatry/LAMP-dashboard/src/experimental_images/heat_nets/'.concat(participant.id, '.svg'))} height="400" width="400" />                               
+                            <img src={require('../experimental_images/heat_nets/'.concat(participant.id, '.svg'))} height="400" width="400" />                               
                         </Grid>
                     </Grid> 
                 </Card>
