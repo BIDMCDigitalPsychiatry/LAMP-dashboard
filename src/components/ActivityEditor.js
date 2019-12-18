@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import MaterialTable from 'material-table'
 
 export default function ActivityEditor({ activity,  ...props }) {

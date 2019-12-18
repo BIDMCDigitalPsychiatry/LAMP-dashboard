@@ -6,9 +6,7 @@ import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Icon from '@material-ui/core/Icon'
 import Button from '@material-ui/core/Button'
-import Tooltip from '@material-ui/core/Tooltip'
 import Divider from '@material-ui/core/Divider'
-import Paper from '@material-ui/core/Paper'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormGroup from '@material-ui/core/FormGroup'
 import Radio from '@material-ui/core/Radio'
@@ -25,7 +23,7 @@ import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
-import Hidden from '@material-ui/core/Hidden'
+import { KeyboardDateTimePicker } from '@material-ui/pickers'
 
 // Local Imports
 import { ResponsivePaper, useKeyPress } from './Utils'
@@ -33,19 +31,36 @@ import { ResponsivePaper, useKeyPress } from './Utils'
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes
 
-
-function Banner({ heading, text, description, large, ...props }) {
+function Banner({ heading, text, description, large, prefillTimestamp, onChangeTimestamp, ...props }) {
   return (
     <Box {...props} p={2}>
-      <Typography variant={large ? 'subtitle2' : 'subtitle2'} color="textSecondary">
-        {heading}
-      </Typography>
-      <Typography variant={large ? 'h3' : 'h6'} color="primary" style={{ fontWeight: large ? 700 : undefined }}>
-        {text}
-      </Typography>
-      <Typography variant={large ? 'body2' : 'body2'} color="textSecondary">
-        {description}
-      </Typography>
+      <Grid container direction="row" justify="space-between" alignItems="center">
+        <Grid item>
+          <Typography variant={large ? 'subtitle2' : 'subtitle2'} color="textSecondary">
+            {heading}
+          </Typography>
+          <Typography variant={large ? 'h3' : 'h6'} color="primary" style={{ fontWeight: large ? 700 : undefined }}>
+            {text}
+          </Typography>
+          <Typography variant={large ? 'body2' : 'body2'} color="textSecondary">
+            {description}
+          </Typography>
+        </Grid>
+        <Grid item style={{ display: 'none' }}>
+          <KeyboardDateTimePicker 
+            autoOk 
+            animateYearScrolling
+            variant="inline" 
+            inputVariant="outlined" 
+            format="MM/dd/yyyy" 
+            label="Start Date" 
+            helperText="Select the start date." 
+            InputAdornmentProps={{ position: "start" }} 
+            value={prefillTimestamp || new Date()} 
+            onChange={date => onChangeTimestamp(date)} 
+          /> 
+        </Grid>
+      </Grid>
     </Box>
   )
 }
@@ -61,10 +76,12 @@ function TextResponse({ onChange, multiline, value, ...props }) {
   />
 }
 
+// eslint-disable-next-line
 function CheckboxResponse({ onChange, value, ...props }) {
   return <Checkbox {...props} value={value || false} onChange={event => onChange(event.target.value)} />
 }
 
+// eslint-disable-next-line
 function SwitchResponse({ onChange, value, ...props }) {
   return <Switch {...props} value={value || false} onChange={event => onChange(event.target.value)} />
 }
@@ -187,12 +204,14 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
   )
 }
 
-function Section({ noHeader, onResponse, index, value, ...props }) {
-  const responses = useRef({})
+function Section({ noHeader, onResponse, index, value, prefillData, ...props }) {
+  const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
   const [activeStep, setActiveStep] = useState(0)
+  // eslint-disable-next-line
   const leftArrowPress = useKeyPress('ArrowLeft', () => {}, () => {
     setActiveStep(step => Math.max(step - 1, 0))
   })
+  // eslint-disable-next-line
   const rightArrowPress = useKeyPress('ArrowRight', () => {}, () => {
     setActiveStep(step => Math.min(step + 1, value.questions.length))
   })
@@ -257,6 +276,7 @@ function Section({ noHeader, onResponse, index, value, ...props }) {
   )
 }
 
+// eslint-disable-next-line
 function TabPanel({ index, value, children }) {
   return (
     <div
@@ -267,13 +287,15 @@ function TabPanel({ index, value, children }) {
   )
 }
 
-export default function Survey({ onResponse, onValidationFailure, validate, content, ...props }) {
+export default function Survey({ onResponse, onValidationFailure, validate, partialValidationOnly, content, prefillData, prefillTimestamp, ...props }) {
   if (!content) return <React.Fragment />
-  const responses = useRef({})
+  const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
   const [activeTab, setActiveTab] = useState(0)
+  // eslint-disable-next-line
   const upArrowPress = useKeyPress('ArrowUp', () => {}, () => {
     setActiveTab(tab => Math.max(tab - 1, 0))
   })
+  // eslint-disable-next-line
   const downArrowPress = useKeyPress('ArrowDown', () => {}, () => {
     setActiveTab(tab => Math.min(tab + 1, ((content || {}).sections || []).length))
   })
@@ -281,7 +303,9 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
   const validator = response => {
     for (let section of response) {
       if (section === undefined)
-        return false
+        if (!!partialValidationOnly)
+          continue
+        else return false
       for (let question of section)
         if (question === undefined)
           return false
@@ -290,9 +314,9 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
   }
   const postSubmit = response => {
     if (!validate)
-      onResponse(response)
+      onResponse(response, prefillTimestamp)
     else if (validate && validator(response))
-      onResponse(response)
+      onResponse(response, prefillTimestamp)
     else if (validate && !validator(response))
       onValidationFailure()
   }
@@ -317,7 +341,7 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
                   onChange={(e, newValue) => setActiveTab(newValue)}
                 >
                 {((content || {}).sections || []).map((x, idx) => (
-                  <Tab label={x.banner} />
+                  <Tab key={idx} label={x.banner} />
                 ))}
                 </Tabs>
                 <Button 
@@ -326,17 +350,18 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
                   style={{ margin: '0px 0px 0px 16px', width: '85%' }} 
                   onClick={() => postSubmit(Array.from({ ...responses.current, length: content.sections.length }))}
                 >
-                  Submit
+                  {!!prefillData ? (!!prefillTimestamp ? 'Overwrite' : 'Duplicate') : 'Submit'}
                 </Button>
               </Grid>
             }
             <Grid item xs={11 + (((content || {}).sections || []).length > 1 ? 0 : 1)}>
               {((content || {}).sections || []).map((x, idx) => (
-                <div hidden={activeTab !== idx}>
+                <div hidden={activeTab !== idx} key={idx}>
                   <Section 
                     noHeader
                     index={idx + 1} 
                     value={x} 
+                    prefillData={responses.current[idx]}
                     onResponse={response => responses.current[idx] = response} 
                   />
                 </div>
@@ -349,7 +374,7 @@ export default function Survey({ onResponse, onValidationFailure, validate, cont
                 style={{ float: 'left', margin: '0px 0px 16px 16px' }} 
                 onClick={() => postSubmit(Array.from({ ...responses.current, length: content.sections.length }))}
               >
-                Submit
+                {!!prefillData ? (!!prefillTimestamp ? 'Overwrite' : 'Duplicate') : 'Submit'}
               </Button>
             }
           </Grid>

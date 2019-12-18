@@ -2,44 +2,34 @@
 // Core Imports
 import React, { useState, useEffect } from 'react'
 import IconButton from '@material-ui/core/IconButton'
-import Box from '@material-ui/core/Box'
 import Icon from '@material-ui/core/Icon'
-import Switch from '@material-ui/core/Switch'
 import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
 import MenuItem from '@material-ui/core/MenuItem'
 import Dialog from '@material-ui/core/Dialog'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
-import Divider from '@material-ui/core/Divider'
 import Chip from '@material-ui/core/Chip'
-import Slide from '@material-ui/core/Slide'
 import Tooltip from '@material-ui/core/Tooltip'
 import MaterialTable from 'material-table'
 import red from '@material-ui/core/colors/red'
 import yellow from '@material-ui/core/colors/yellow'
 import green from '@material-ui/core/colors/green'
-import grey from '@material-ui/core/colors/grey'
 
 // External Imports 
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import jsonexport from 'jsonexport'
-import { useDropzone } from 'react-dropzone'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 
 // Local Imports
 import LAMP from '../lamp'
 import Messages from './Messages'
-import Sparkchips from './Sparkchips'
 import EditField from './EditField'
 import CredentialManager from './CredentialManager'
-import { ResponsiveDialog, ResponsivePaper, mediumDateFormat } from './Utils'
+import { ResponsiveDialog, mediumDateFormat } from './Utils'
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo('en-US')
@@ -83,8 +73,8 @@ export default function ParticipantList({ participants, onChange, onParticipantS
         let ids = []
         for (let i = 0; i < newCount; i ++)
             ids = [...ids, (await LAMP.Participant.create(studyID, { study_code: '001' })).data]
+        onChange()
         setState(state => ({ ...state, 
-            data: [...state.data, ...ids], 
             popoverAttachElement: null, 
             newCount: 1, 
             selectedIcon: "", 
@@ -117,11 +107,11 @@ export default function ParticipantList({ participants, onChange, onParticipantS
     }
 
     let deleteParticipants = async () => {
-        let selectedRows = state.selectedRows, tempRows = selectedRows.map(y => y.id)
+        let selectedRows = state.selectedRows // tempRows = selectedRows.map(y => y.id)
         for (let row of selectedRows)
             await LAMP.Participant.delete(row.id)
+        onChange()
         setState(state => ({ ...state, 
-            data: state.data.filter((x) => !tempRows.includes(x.id)),
             popoverAttachElement: null, 
             selectedIcon: "", 
             selectedRows: []
@@ -141,23 +131,25 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                 data={participants} 
                 columns={[
                     { title: 'Name', field: 'id', render: (x) => 
-                        <Tooltip title={x.id}>
-                            <EditField 
-                                text={names[x.id] || x.id} 
-                                onChange={newValue => {
-                                    let oldValue = names[x.id] || x.id
-                                    if (oldValue == newValue)
-                                        return
+                        <EditField 
+                            text={names[x.id]} 
+                            defaultValue={x.id}
+                            onChange={newValue => {
+                                let id = x.id /* shadow copy */
+                                let oldValue = names[id] || id
+                                if (oldValue === newValue)
+                                    return
+                                let isStr = (typeof newValue === 'string') && newValue.length > 0
 
-                                    let isStr = (typeof newValue === 'string') && newValue.length > 0
-                                    setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
-                                    LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
+                                LAMP.Type.setAttachment(id, 'me', 'lamp.name', isStr ? newValue : null)
+                                    .then(x => setNames(names => ({ ...names, [id]: isStr ? newValue : undefined })))
+                                    .then(x => onChange())
+                                    .catch(err => {
                                         console.error(err)
-                                        setNames(names => ({ ...names, [x.id]: oldValue }))
+                                        setNames(names => ({ ...names, [id]: oldValue }))
                                     })
-                                }} 
-                            />
-                        </Tooltip>
+                            }} 
+                        />
                     },
                     { title: 'Last Active', field: 'last_active', render: (rowData) => 
                         <Tooltip title={dateInfo(rowData.id).absolute}>

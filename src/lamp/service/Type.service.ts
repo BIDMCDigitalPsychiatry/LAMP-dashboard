@@ -86,7 +86,7 @@ export class TypeService {
             throw new Error('Required parameter target was null or undefined when calling typeSetAttachment.')
         if (attachmentKey === null || attachmentKey === undefined)
             throw new Error('Required parameter attachmentKey was null or undefined when calling typeSetAttachment.')
-        if (attachmentValue === null || attachmentValue === undefined)
+        if (attachmentValue === undefined)
             throw new Error('Required parameter attachmentValue was null or undefined when calling typeSetAttachment.')
 
         return (await Fetch.put(`/type/${typeId}/attachment/${attachmentKey}/${target}`, attachmentValue, this.configuration))

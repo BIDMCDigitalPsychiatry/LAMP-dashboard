@@ -2,7 +2,6 @@
 // Core Imports
 import React, { useState, useEffect } from 'react'
 import Box from '@material-ui/core/Box'
-import Paper from '@material-ui/core/Paper'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 import Grid from '@material-ui/core/Grid'
@@ -22,7 +21,6 @@ import StepContent from '@material-ui/core/StepContent'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
-import blue from '@material-ui/core/colors/blue'
 
 function SelectList({ value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])

@@ -10,13 +10,15 @@ export class CredentialService {
      * @param typeId 
      * @param secretKey 
      */
-    public async create(typeId: Identifier, secretKey: string): Promise<Credential> {
+    public async create(typeId: Identifier, accessKey: string, secretKey: string, description?: string): Promise<Credential> {
         if (typeId === null || typeId === undefined)
             throw new Error('Required parameter typeId was null or undefined when calling credentialCreate.')
+        if (accessKey === null || accessKey === undefined)
+            throw new Error('Required parameter accessKey was null or undefined when calling credentialCreate.')
         if (secretKey === null || secretKey === undefined)
             throw new Error('Required parameter secretKey was null or undefined when calling credentialCreate.')
 
-        return (await Fetch.post(`/type/${typeId}/credential`, secretKey, this.configuration))
+        return (await Fetch.post(`/type/${typeId}/credential`, { origin: typeId, access_key: accessKey, secret_key: secretKey, description: description }, this.configuration))
     }
 
     /**
