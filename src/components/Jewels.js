@@ -50,6 +50,7 @@ export default class Jewels extends React.Component {
           opacity: this.state.actions.find(y => y === x.i) === undefined ? 1.0 : 0.2,
         }}
         onClick={() => this.onTap(x.i) }>
+         { /* eslint-disable-next-line */ }
         <span style={{ position: 'absolute', fontSize: 32 }}>💎</span>
         <Typography style={{ position: 'absolute', fontSize: 18 }}><b>{x.i + 1}</b></Typography>
       </ButtonBase>

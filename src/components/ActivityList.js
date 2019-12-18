@@ -4,23 +4,12 @@ import React, { useState, useEffect, useCallback } from 'react'
 import IconButton from '@material-ui/core/IconButton'
 import Box from '@material-ui/core/Box'
 import Icon from '@material-ui/core/Icon'
-import Switch from '@material-ui/core/Switch'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
-import TextField from '@material-ui/core/TextField'
-import Popover from '@material-ui/core/Popover'
-import MenuItem from '@material-ui/core/MenuItem'
 import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
 import DialogActions from '@material-ui/core/DialogActions'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
-import Divider from '@material-ui/core/Divider'
-import Chip from '@material-ui/core/Chip'
 import Slide from '@material-ui/core/Slide'
-import Tooltip from '@material-ui/core/Tooltip'
 import MaterialTable from 'material-table'
-import red from '@material-ui/core/colors/red'
 
 // External Imports 
 import { saveAs } from 'file-saver'
@@ -41,7 +30,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     const [showCreate, setShowCreate] = useState()
     const [showActivityImport, setShowActivityImport] = useState()
     const [importFile, setImportFile] = useState()
-    const [exportActivities, setExportActivities] = useState()
+    //const [exportActivities, setExportActivities] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
     useEffect(() => { onChange() }, [showCreate])
 
@@ -58,6 +47,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         }
         acceptedFiles.forEach(file => reader.readAsText(file))
     }, [])
+    // eslint-disable-next-line
     const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
         onDrop, accept: 'application/json,.json', maxSize: 1 * 1024 * 1024 /* 5MB */
     })
@@ -82,6 +72,14 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
 
         onChange()
         setImportFile()
+    }
+
+    const saveActivity = async (x) => {
+        let newItem = await LAMP.Activity.create(studyID, x)
+        await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', {
+            description: x.description, settings: x.settings.map(y => y.description)
+        })
+        setShowCreate()
     }
 
 	return (
@@ -196,7 +194,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                     <Icon>close</Icon>
                 </IconButton>
                 <Box py={8} px={4}>
-                    <SurveyCreator onCancel={() => setShowCreate()} onSave={x => LAMP.Activity.create(studyID, x).then(() => setShowCreate())} />
+                    <SurveyCreator onCancel={() => setShowCreate()} onSave={saveActivity} />
                 </Box>
             </Dialog>
             <Dialog

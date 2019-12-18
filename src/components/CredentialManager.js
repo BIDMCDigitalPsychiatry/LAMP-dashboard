@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid'
 import Avatar from '@material-ui/core/Avatar'
 import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from '@material-ui/core/Tooltip'
 import Divider from '@material-ui/core/Divider'
@@ -13,7 +12,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { deepOrange, deepPurple, green, pink } from '@material-ui/core/colors';
+import { deepOrange } from '@material-ui/core/colors';
+
+// External Imports
+import QRCode from 'qrcode.react'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -27,6 +29,8 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
   const [name, setName] = useState('')
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
+
+  const _qrLink = () => window.location.href.split('#')[0] + '#/?a=' + btoa([id, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
 
   useEffect(() => { 
     LAMP.Credential.list(id).then(setAllCreds) 
@@ -52,7 +56,7 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
         if (!!(await LAMP.Credential.update(id, resetCred.access_key, { ...resetCred, secret_key: password })).message)
           return onError('could not change password')
       } else if (!!name && !!emailAddress && !!password) {
-        if (!!(await LAMP.Credential.create(id, password)).message)
+        if (!!(await LAMP.Credential.create(id, emailAddress, password, name)).message)
           return onError('could not create credential')
       } else { onError('could not perform operation') }
     } catch(err) { onError('credential management failed') }
@@ -168,13 +172,20 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
         }}
       />}
       {(showLink && password.length > 0) && 
+        <React.Fragment>
         <TextField 
           fullWidth
           style={{ marginTop: 16 }}
           variant="outlined"
-          value={'https://dashboard.lamp.digital/#/?a=' + btoa([id, password].join(':'))}
+          value={_qrLink()}
           onChange={event => {}}
         />
+        <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+          <Grid container justify="center" style={{ padding: 16 }}>
+            <QRCode size={256} level="H" value={_qrLink()} />
+          </Grid>
+        </Tooltip>
+        </React.Fragment>
       }
     </React.Fragment>
   )

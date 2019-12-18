@@ -178,7 +178,7 @@ export default class SurveyScheduler extends React.Component {
                 columns={[
                 	{ title: 'Name', field: 'surveyName', cellStyle: (data, idx) => ({
                 		color: this.state.surveys.filter(x => x.surveyName === data).map(x => x.schedule.length).filter(x => x > 0).length > 0 ? 'green' : undefined,
-                		fontWeight: this.state.surveys.filter(x => x.surveyName == data).map(x => x.type === 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
+                		fontWeight: this.state.surveys.filter(x => x.surveyName === data).map(x => x.type === 'Game' ? 1 : x.questions.length).filter(x => x > 0).length > 0 ? 'bold' : undefined,
                 	}) },
                 	{ title: 'Type', field: 'type', readonly: true},
                 	{ title: 'Notes', field: 'notes'},

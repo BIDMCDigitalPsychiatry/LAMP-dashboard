@@ -12,9 +12,6 @@ import {
 } from '@data-ui/xy-chart'
 import { LegendOrdinal } from '@vx/legend'
 
-// Local Imports
-import { groupBy } from './Utils'
-
 const categoryColorScale = multiHueScaleFactory()
 
 class MultiPieChart extends React.PureComponent {

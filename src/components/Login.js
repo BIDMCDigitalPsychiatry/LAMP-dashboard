@@ -1,14 +1,11 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
 import Avatar from '@material-ui/core/Avatar'
 import Slide from '@material-ui/core/Slide'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
 import Radio from '@material-ui/core/Radio'
 import RadioGroup from '@material-ui/core/RadioGroup'
 import FormControlLabel from '@material-ui/core/FormControlLabel'
@@ -17,7 +14,6 @@ import FormLabel from '@material-ui/core/FormLabel'
 
 // Local Imports
 import mindLAMPLogo from '../logo.png'
-import SurveyScheduler from './SurveyScheduler'
 import { ResponsivePaper, ResponsiveMargin } from './Utils'
 
 export default function Login({ setIdentity, onComplete, ...props }) {
@@ -27,53 +23,15 @@ export default function Login({ setIdentity, onComplete, ...props }) {
         [event.target.name]: (event.target.type === 'checkbox' ? event.target.checked : event.target.value) 
     })
 
-    let validateForm = () => {
-        let validator = {
-            name: [{
-                test: (val) => val !== "",
-                msg: "Name field is required"
-            }],
-            email: [{
-                test: (val) => val !== "",
-                msg: "Email field is required"
-            }, {
-                test: (val) => val.match(/^.+@.+$/) !== null,
-                msg: "Must be a valid email"
-            }],
-            studyName: [{
-                test: (val) => true,
-                msg: ""
-            }],
-        }
-        let errored = false
-        let errorMsg = ""
-        Object.keys(validator).forEach((field) => {
-            let erroredField = false
-            validator[field].forEach(({ test, msg }) => {
-                if (!erroredField && !test(state[field])) {
-                    setState({ ...state,
-                        [field + "ErrText"]: msg
-                    })
-                    errorMsg = msg
-                    erroredField = true
-                    errored = true;
-                }
-            })
-        })
-        if (errored)
-            props.layout.showMessage(errorMsg)
-        return !errored
-    }
-
     let handleLogin = (event) => {
         event.preventDefault()
         if (!state.id || !state.password)
             return
         setIdentity({ 
-                type: (state.id === 'root' ?
+                type: (['root', 'admin'].includes(state.id) ?
                         'root' : (state.id.includes('@') ?
                             'researcher' : 'participant')), 
-                id: state.id, 
+                id: state.id === 'admin' ? 'root' : state.id, 
                 password: state.password,
                 serverAddress: state.serverAddress
             }

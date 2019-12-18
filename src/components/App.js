@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider'
+import { ThemeProvider } from '@material-ui/core/styles'
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
 import {blue, red} from '@material-ui/core/colors'
 import Fab from '@material-ui/core/Fab'
@@ -44,8 +44,8 @@ export default function App({ ...props }) {
         if (!!query && query.length > 1) {
             let x = atob(Object.fromEntries(new URLSearchParams(query[1]))['a']).split(':')
             reset({ 
-                type: x[0] === 'root' ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
-                id: x[0],
+                type: ['root', 'admin'].includes(x[0]) ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
+                id: x[0] === 'admin' ? 'root' : x[0],
                 password: x[1],
                 serverAddress: x[2]
             }).then(x => {
@@ -118,7 +118,7 @@ export default function App({ ...props }) {
     }
 
     return (
-        <MuiThemeProvider theme={createMuiTheme({
+        <ThemeProvider theme={createMuiTheme({
                 typography: {
                 useNextVariants: true,
             },
@@ -275,6 +275,6 @@ export default function App({ ...props }) {
                     />}
                 </SnackbarProvider>
             </MuiPickersUtilsProvider>
-        </MuiThemeProvider>
+        </ThemeProvider>
     )
 }
