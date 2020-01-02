@@ -20,6 +20,16 @@ import {
 import { Configuration } from './service/Fetch'
 
 /**
+ * 
+ */
+interface IAuth { 
+    type: 'root' | 'researcher' | 'participant' | null; 
+    id: string | null; 
+    password: string | null; 
+    serverAddress: string | undefined; 
+}
+
+/**
  * The root type in LAMP. You must use `LAMP.connect(...)` to begin using any LAMP classes.
  */
 export default class LAMP {
@@ -58,7 +68,7 @@ export default class LAMP {
 
 
     public static Auth = class {
-        public static _auth: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; serverAddress: string | undefined; } = { type: null, id: null, password: null, serverAddress: undefined }
+        public static _auth: IAuth = { type: null, id: null, password: null, serverAddress: undefined }
         private static _me: any | null
 
         /**
@@ -73,7 +83,7 @@ export default class LAMP {
                     'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
-            let l = LAMP.Auth._auth || {}
+            let l: IAuth = LAMP.Auth._auth || { type: null, id: null, password: null, serverAddress: undefined }
             if (l.type === identity.type && 
                 l.id === identity.id && 
                 l.password === identity.password && 
@@ -82,7 +92,7 @@ export default class LAMP {
 
             // Propogate the authorization.
             LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password, serverAddress: identity.serverAddress}
-            LAMP.configuration = { ...(LAMP.configuration || {}), authorization: !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined}
+            LAMP.configuration = { ...(LAMP.configuration || { base: undefined, headers: undefined }), authorization: !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined}
 
             try {
 

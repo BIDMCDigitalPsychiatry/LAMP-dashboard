@@ -22,6 +22,7 @@ import MultipleSelect from './MultipleSelect'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
 import MenuButton from './MenuButton'
+import AvatarCircleGroup from './AvatarCircleGroup'
 import { groupBy } from './Utils'
 import Survey from './Survey'
 
@@ -29,6 +30,26 @@ function SlideUp(props) { return <Slide direction="up" {...props} /> }
 function _shouldRestrict() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') && (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
 // TODO: all SensorEvents?
+
+const addAccount = ({ id, addAccount, handleAdd }) => handleAdd();
+const addAccountIndex = ({ id, accounts, addAccount, handleAdd }) =>
+  handleAdd(accounts.length - 1);
+var accounts = (onClick = addAccount) => [
+  { id: 0, name: "0", email: "test0@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab4fa082a5194a78925e_Aditya-p-800.jpeg" },
+  { id: 2, name: "2", email: "test2@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958ecfedbb68c91822af2_00100dportrait_00100_W9YBE~2-p-800.jpeg" },
+  { id: 3, name: "3", email: "test3@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958d426acc67ee9e80527_00100dportrait_00100_eqH1k~2-p-800.jpeg" },
+  { id: 4, name: "4", email: "test4@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d8296b8eb8133e6074ec808_a_r%20copy-p-800.jpeg" },
+  { id: 5, name: "5", email: "test5@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55aa09aaff48c0af1f7b1a_John-p-800.jpeg" },
+  { id: 6, name: "6", email: "test6@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ae18dd4be9bedc79ea69_Elena.jpg" },
+  { id: 7, name: "7", email: "test7@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab00dd4be939b579b48f_Hannah-p-800.jpeg" },
+  { id: 8, name: "8", email: "test8@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab6edd4be90af479b773_Phil-p-800.jpeg" },
+  {
+    id: 9,
+    name: "+",
+    onClick,
+    style: { background: "#63D13E" }
+  }
+];
 
 export default function Participant({ participant, ...props }) {
     const [ state, setState ] = useState({})
@@ -168,7 +189,10 @@ export default function Participant({ participant, ...props }) {
     }
 
     return (
-        <React.Fragment>   
+        <React.Fragment>
+            {false && <Box m="10%">
+                <AvatarCircleGroup accounts={accounts()} />
+            </Box>}
             <Box border={1} borderColor="grey.300" borderRadius={4} p={2} mx="10%">
                 <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="subtitle2">
