@@ -82,6 +82,18 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         setShowCreate()
     }
 
+    const modifyActivity = (x) => {
+        LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description').then(res => {
+            res = [res].map(y => !!y.message ? undefined : y.data)[0]
+            setSelectedActivity({ ...x, 
+                description: res.description, 
+                settings: x.settings.map((y, idx) => ({ ...y, 
+                    description: res.settings[idx] }
+                ))
+            })
+        })
+    }
+
 	return (
         <React.Fragment>
             <MaterialTable 
@@ -91,7 +103,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                     { title: 'Name', field: 'name' }, 
                     { title: 'Type', field: 'spec', lookup: { 'lamp.survey': 'Survey', 'lamp.group': 'Group' }, emptyValue: 'Cognitive Test' },
                 ]}
-                onRowClick={(event, rowData, togglePanel) => setSelectedActivity(rowData)}
+                onRowClick={(event, rowData, togglePanel) => modifyActivity(rowData)}
                 actions={[
                     {
                         icon: 'cloud_upload',

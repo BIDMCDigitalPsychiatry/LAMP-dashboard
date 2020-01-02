@@ -172,6 +172,7 @@ export default function App({ ...props }) {
                                     >
                                         <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
                                             <Icon>memory</Icon>
+                                            <span style={{ width: 8 }} />
                                             API
                                         </Fab>
                                         <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/home')} />
@@ -258,6 +259,7 @@ export default function App({ ...props }) {
                                     <PageTitle>LAMP API</PageTitle>
                                     <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => props.history.replace('/')}>
                                         <Icon>arrow_back</Icon>
+                                        <span style={{ width: 8 }} />
                                         Back
                                     </Fab>
                                     <div style={{ height: 56 }}></div>

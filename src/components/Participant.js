@@ -102,7 +102,8 @@ export default function Participant({ participant, ...props }) {
                 name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
                 description: activities.length === 1 ? (!!res[0] ? res[0].description : undefined) : 'Please complete all sections below. Thank you.',
                 sections: activities.map((x, idx) => ({
-                    banner: activities.length === 1 ? undefined : x.name,
+                    name: activities.length === 1 ? undefined : x.name,
+                    description: activities.length === 1 ? undefined : (!!res[idx] ? res[idx].description : undefined),
                     questions: x.settings.map((y, idx2) => ({ ...y, 
                         description: !!res[idx] ? res[idx].settings[idx2] : undefined,
                         options: y.options === null ? null : y.options.map(z => ({ label: z, value: z }))
@@ -397,7 +398,7 @@ export default function Participant({ participant, ...props }) {
                 >
                     <Icon>close</Icon>
                 </IconButton>
-                <Box py={8} px={4}>
+                <Box py={8} px={2}>
                     <Survey
                         validate
                         partialValidationOnly

@@ -166,7 +166,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
 export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
     const [activeStep, setActiveStep] = useState(0)
     const [text, setText] = useState(!!value ? value.name : undefined)
-    const [description, setDescription] = useState()
+    const [description, setDescription] = useState(!!value ? value.description : undefined)
     const [questions, setQuestions] = useState(!!value ? value.settings : [])
 
 	return (

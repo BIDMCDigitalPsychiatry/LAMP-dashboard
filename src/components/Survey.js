@@ -5,7 +5,8 @@ import '@material-ui/core'
 import Box from '@material-ui/core/Box'
 import Typography from '@material-ui/core/Typography'
 import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
+import Fab from '@material-ui/core/Fab'
+import Paper from '@material-ui/core/Paper'
 import Divider from '@material-ui/core/Divider'
 import Checkbox from '@material-ui/core/Checkbox'
 import FormGroup from '@material-ui/core/FormGroup'
@@ -21,8 +22,6 @@ import StepButton from '@material-ui/core/StepButton'
 import StepContent from '@material-ui/core/StepContent'
 import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
 import { KeyboardDateTimePicker } from '@material-ui/pickers'
 
 // Local Imports
@@ -223,7 +222,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
     <ResponsivePaper {...props} elevation={noHeader ? 0 : 4}>
       {noHeader !== true && <Banner 
         heading={`Section ${index}`} 
-        text={value.banner} 
+        text={value.name} 
       />}
       <div>
         <Stepper nonLinear activeStep={activeStep} orientation="vertical">
@@ -239,6 +238,11 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                 </StepLabel>
               </StepButton>
               <StepContent>
+                {!!x.description && 
+                  <Typography variant="caption">
+                    {x.description}
+                  </Typography>
+                }
                 <Question 
                   hideHeader
                   number={idx + 1} 
@@ -248,25 +252,10 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                   value={responses.current[idx]}
                   onResponse={response => {
                     responses.current[idx] = response
+                    setActiveStep(prev => prev + 1)
                     onResponse(Array.from({ ...responses.current, length: value.questions.length }))
                   }}
                 />
-                <div>
-                  <Button
-                    disabled={activeStep === 0}
-                    onClick={() => setActiveStep(prev => prev - 1)}
-                    style={{ marginRight: 16 }}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => setActiveStep(prev => prev + 1)}
-                  >
-                    {activeStep === value.questions.length - 1 ? 'Finish' : 'Next'}
-                  </Button>
-                </div>
               </StepContent>
             </Step>
           ))}
@@ -290,6 +279,8 @@ function TabPanel({ index, value, children }) {
 export default function Survey({ onResponse, onValidationFailure, validate, partialValidationOnly, content, prefillData, prefillTimestamp, ...props }) {
   if (!content) return <React.Fragment />
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
+
+  // eslint-disable-next-line
   const [activeTab, setActiveTab] = useState(0)
   // eslint-disable-next-line
   const upArrowPress = useKeyPress('ArrowUp', () => {}, () => {
@@ -322,64 +313,49 @@ export default function Survey({ onResponse, onValidationFailure, validate, part
   }
 
   return (
-    <Grid container spacing={8}>
+    <Grid container alignItems="stretch" spacing={2}>
       <Grid item xs={12}>
-        <ResponsivePaper elevation={4}>
+        <Paper elevation={4}>
           <Banner 
             large 
             text={(content || {}).name} 
             description={(content || {}).description} 
           />
-          <Divider />
-          <Grid container spacing={1}>
-            {((content || {}).sections || []).length > 1 &&
-              <Grid item xs={1}>
-                <Tabs
-                  orientation="vertical"
-                  variant="scrollable"
-                  value={activeTab}
-                  onChange={(e, newValue) => setActiveTab(newValue)}
-                >
-                {((content || {}).sections || []).map((x, idx) => (
-                  <Tab key={idx} label={x.banner} />
-                ))}
-                </Tabs>
-                <Button 
-                  variant="contained" 
-                  color="secondary" 
-                  style={{ margin: '0px 0px 0px 16px', width: '85%' }} 
-                  onClick={() => postSubmit(Array.from({ ...responses.current, length: content.sections.length }))}
-                >
-                  {!!prefillData ? (!!prefillTimestamp ? 'Overwrite' : 'Duplicate') : 'Submit'}
-                </Button>
-              </Grid>
-            }
-            <Grid item xs={11 + (((content || {}).sections || []).length > 1 ? 0 : 1)}>
-              {((content || {}).sections || []).map((x, idx) => (
-                <div hidden={activeTab !== idx} key={idx}>
-                  <Section 
-                    noHeader
-                    index={idx + 1} 
-                    value={x} 
-                    prefillData={responses.current[idx]}
-                    onResponse={response => responses.current[idx] = response} 
-                  />
-                </div>
-              ))}
-            </Grid>
-            {((content || {}).sections || []).length <= 1 &&
-              <Button 
-                variant="contained" 
-                color="secondary" 
-                style={{ float: 'left', margin: '0px 0px 16px 16px' }} 
-                onClick={() => postSubmit(Array.from({ ...responses.current, length: content.sections.length }))}
-              >
-                {!!prefillData ? (!!prefillTimestamp ? 'Overwrite' : 'Duplicate') : 'Submit'}
-              </Button>
-            }
-          </Grid>
-        </ResponsivePaper>
+        </Paper>
       </Grid>
+      {((content || {}).sections || []).map((x, idx) => (
+        <Grid item xs={12} key={idx}>
+          <Paper elevation={4}>
+            {!!x.name &&
+              <React.Fragment>
+                <Banner 
+                  text={x.name} 
+                  description={x.description} 
+                />
+                <Divider />
+              </React.Fragment>
+            }
+            <Section 
+              noHeader
+              index={idx + 1} 
+              value={x} 
+              prefillData={responses.current[idx]}
+              onResponse={response => responses.current[idx] = response} 
+            />
+          </Paper>
+        </Grid>
+      ))}
+      <Fab 
+        color="secondary" 
+        aria-label="Submit" 
+        variant="extended"
+        style={{ position: 'fixed', bottom: 24, right: 24 }} 
+        onClick={() => postSubmit(Array.from({ ...responses.current, length: content.sections.length }))}
+      >
+        {!!prefillData ? (!!prefillTimestamp ? 'Overwrite' : 'Duplicate') : 'Submit'}
+        <span style={{ width: 8 }} />
+        <Icon>save</Icon>
+      </Fab>
     </Grid>
   )
 }
