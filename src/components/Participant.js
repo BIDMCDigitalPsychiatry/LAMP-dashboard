@@ -69,7 +69,7 @@ export default function Participant({ participant, ...props }) {
 
             // Refresh hidden events list.
             let _hidden = await LAMP.Type.getAttachment(participant.id, 'lamp.dashboard.hidden_events')
-            _hidden = !!_hidden.message ? [] : _hidden.data
+            _hidden = !!_hidden.error ? [] : _hidden.data
             setHiddenEvents(_hidden)
 
             // Perform event coalescing/grouping by sensor or activity type.
@@ -118,7 +118,7 @@ export default function Participant({ participant, ...props }) {
         if (activities.length === 0)
             return setSurvey()
         Promise.all(activities.map(x => LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description'))).then(res => {
-            res = res.map(y => !!y.message ? undefined : y.data)
+            res = res.map(y => !!y.error ? undefined : y.data)
             setSurvey({
                 name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
                 description: activities.length === 1 ? (!!res[0] ? res[0].description : undefined) : 'Please complete all sections below. Thank you.',
@@ -139,12 +139,12 @@ export default function Participant({ participant, ...props }) {
     //
     const hideEvent = async (timestamp, activity) => {
         let _hidden = await LAMP.Type.getAttachment(participant.id, 'lamp.dashboard.hidden_events')
-        let _events = !!_hidden.message ? [] : _hidden.data
+        let _events = !!_hidden.error ? [] : _hidden.data
         if (hiddenEvents.includes(`${timestamp}/${activity}`))
             return
         let _setEvents = await LAMP.Type.setAttachment(participant.id, 'me', 'lamp.dashboard.hidden_events', 
                             [..._events, `${timestamp}/${activity}`])
-        if (!!_setEvents.message)
+        if (!!_setEvents.error)
             return
         //setHiddenEvents([..._events, `${timestamp}/${activity}`])
         setSubmission(x => x + 1)

@@ -39,7 +39,7 @@ export default function Login({ setIdentity, onComplete, ...props }) {
             onComplete()
         }).catch(err => {
             console.warn("error with auth request", err)
-            props.layout.showMessage('' + err.message)
+            props.layout.showMessage('' + err.error)
         })
     }
 

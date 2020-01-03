@@ -159,7 +159,7 @@ export default function NavigationLayout({ title, id, enableMessaging, noToolbar
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={id} 
-                        onError={err => setState(state => ({ ...state, alertMessage: err.message }))}
+                        onError={err => setState(state => ({ ...state, alertMessage: err }))}
                     />
                 </DialogContent>
             </Dialog>

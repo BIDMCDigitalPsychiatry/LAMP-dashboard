@@ -63,7 +63,7 @@ class Messages extends React.Component {
         this.setState({ 
             messages: Object.fromEntries((await Promise.all([this.props.participant || '']
                         .map(async (x) => [x, await LAMP.Type.getAttachment(x, 'lamp.messaging').catch(e => [])])))
-                        .filter(x => x[1].message !== 'object not found')
+                        .filter(x => x[1].message !== '404.object-not-found')
                         .map(x => [x[0], x[1].data]))
         })
     }

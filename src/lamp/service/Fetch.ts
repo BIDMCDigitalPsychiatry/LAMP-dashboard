@@ -35,8 +35,8 @@ async function _fetch<ResultType>(method: string, route: string, configuration?:
         body: body !== undefined ? JSON.stringify(body) : undefined
     })).json()
     
-    if (result['error'] !== undefined)
-        throw new Error(result['error'])
+    //if (result['error'] !== undefined)
+    //    throw new Error(result['error'])
     return result as any
 }
 

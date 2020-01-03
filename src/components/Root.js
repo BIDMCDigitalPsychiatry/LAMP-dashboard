@@ -28,7 +28,7 @@ export default function Root({ ...props }) {
         (async function() {
             let data = (await Promise.all(researchers
                             .map(async x => ({ id: x.id, res: await LAMP.Type.getAttachment(x.id, 'lamp.name') }))))
-                            .filter(y => y.res.message === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
+                            .filter(y => y.res.error === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
             setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
         })()
     }, [researchers])
@@ -107,7 +107,7 @@ export default function Root({ ...props }) {
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={passwordChange} 
-                        onError={err => props.layout.showAlert(err.message)}
+                        onError={err => props.layout.showAlert(err)}
                     />
                 </DialogContent>
             </Dialog>

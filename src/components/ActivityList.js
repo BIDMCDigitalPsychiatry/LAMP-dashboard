@@ -84,7 +84,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
 
     const modifyActivity = (x) => {
         LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description').then(res => {
-            res = [res].map(y => !!y.message ? undefined : y.data)[0]
+            res = [res].map(y => !!y.error ? undefined : y.data)[0]
             setSelectedActivity({ ...x, 
                 description: res.description, 
                 settings: x.settings.map((y, idx) => ({ ...y, 

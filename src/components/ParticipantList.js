@@ -63,7 +63,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
         (async function() {
             let data = (await Promise.all(participants
                             .map(async x => ({ id: x.id, res: await LAMP.Type.getAttachment(x.id, 'lamp.name') }))))
-                            .filter(y => y.res.message === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
+                            .filter(y => y.res.error === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
             setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
         })()
     }, [participants])
@@ -345,7 +345,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={state.openPasswordReset} 
-                        onError={err => props.layout.showAlert(err.message)}
+                        onError={err => props.layout.showAlert(err)}
                     />
                 </DialogContent>
             </Dialog>

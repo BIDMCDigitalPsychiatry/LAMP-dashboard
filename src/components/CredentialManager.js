@@ -53,10 +53,10 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
   const _submitCredential = async () => {
     try {
       if (!!resetCred && !!password) {
-        if (!!(await LAMP.Credential.update(id, resetCred.access_key, { ...resetCred, secret_key: password })).message)
+        if (!!(await LAMP.Credential.update(id, resetCred.access_key, { ...resetCred, secret_key: password })).error)
           return onError('could not change password')
       } else if (!!name && !!emailAddress && !!password) {
-        if (!!(await LAMP.Credential.create(id, emailAddress, password, name)).message)
+        if (!!(await LAMP.Credential.create(id, emailAddress, password, name)).error)
           return onError('could not create credential')
       } else { onError('could not perform operation') }
     } catch(err) { onError('credential management failed') }
@@ -67,7 +67,7 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
   const _deleteCredential = async () => {
     try {
       if (!!selected) {
-        if (!!(await LAMP.Credential.delete(id, selected.item.access_key)).message)
+        if (!!(await LAMP.Credential.delete(id, selected.item.access_key)).error)
           return onError('could not delete')
       } else { onError('could not perform operation') }
     } catch(err) { onError('credential management failed') }
