@@ -11,7 +11,6 @@ import Button from '@material-ui/core/Button'
 import Snackbar from '@material-ui/core/Snackbar'
 import Icon from '@material-ui/core/Icon'
 import 'typeface-roboto'
-
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { SnackbarProvider } from 'notistack'
 
@@ -30,12 +29,13 @@ import Participant from './Participant'
 import NavigationLayout from './NavigationLayout'
 import { PageTitle } from './Utils'
 
-// TODO: If weird button CSS issues (via MuiButtonBase-root) appear, 
-//       material-table imports @material-ui/core again so delete it.
+/* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
+/* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
+/* TODO: /participant/:participant_id/messaging -> messaging */
 
 export default function App({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)
-    const [ state, setState ] = useState({})
+    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth })
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
     const storeRef = useRef([])
 
@@ -49,11 +49,11 @@ export default function App({ ...props }) {
                 password: x[1],
                 serverAddress: x[2]
             }).then(x => {
-                //props.history.replace('/home')
+                //props.history.replace('/')
             })
-        } else {
+        } else if (!state.identity) {
             LAMP.Auth.refresh_identity().then(x => {
-                setState(state => ({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth }))
+                setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth }))
             })
         }
     }, [])
@@ -65,12 +65,12 @@ export default function App({ ...props }) {
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
         if (!!identity)
-             setState(state => ({ ...state, identity: LAMP.Auth.get_identity(), auth: LAMP.Auth._auth }))
-        else setState(state => ({ ...state, identity: undefined, auth: undefined }))
+             setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth }))
+        else setState(state => ({ ...state, identity: null, auth: null }))
     }
 
     let getResearcher = (id) => {
-        if (id === 'me' && (state.auth || {type: null}).type === 'researcher')
+        if (id === 'me' && state.auth.type === 'researcher')
             id = state.identity.id
         if (!id || id === 'me')
             return null //props.history.replace(`/`)
@@ -87,7 +87,7 @@ export default function App({ ...props }) {
     }
 
     let getParticipant = (id) => {
-        if (id === 'me' && (state.auth || {type: null}).type === 'participant')
+        if (id === 'me' && state.auth.type === 'participant')
             id = state.identity.id
         if (!id || id === 'me')
             return null //props.history.replace(`/`)
@@ -147,54 +147,55 @@ export default function App({ ...props }) {
                             <Route exact path="/" render={props =>
                                 (!(window.location.hash.split('?').length > 1 && !state.identity)) ?
                                 (!state.identity ?
-                                    <Redirect to="/login" /> :
-                                    <Redirect to="/home" />
+                                    <React.Fragment>
+                                        <PageTitle>mindLAMP | Login</PageTitle>
+                                        <NavigationLayout 
+                                            noToolbar 
+                                            goBack={props.history.goBack} 
+                                            onLogout={() => reset()}
+                                        >
+                                            <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                                <Icon>memory</Icon>
+                                                <span style={{ width: 8 }} />
+                                                API
+                                            </Fab>
+                                            <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                                        </NavigationLayout>
+                                    </React.Fragment> :
+                                    (state.auth.type === 'root' ?
+                                        <Redirect to="/researcher" /> :
+                                    state.auth.type === 'researcher' ?
+                                        <Redirect to="/researcher/me" /> :
+                                        <Redirect to="/participant/me" />
+                                    )
                                 ) : <React.Fragment />
                             } />
-                            <Route exact path="/home" render={props =>
-                                (state.auth || {type: null}).type === 'root' ?
-                                <Redirect to="/researcher" /> :
-                                (state.auth || {type: null}).type === 'researcher' ?
-                                <Redirect to="/researcher/me" /> :
-                                <Redirect to="/participant/me" />
-                            } />
 
-                            {/* Route login, register, and logout. */}
-                            <Route exact path="/login" render={props =>
-                                !!state.identity ?
-                                <Redirect to="/home" /> :
+                            {/* Route authenticated routes. */}
+                            <Route exact path="/researcher" render={props =>
+                                !state.identity || (state.auth.type !== 'root') ?
                                 <React.Fragment>
                                     <PageTitle>mindLAMP | Login</PageTitle>
                                     <NavigationLayout 
                                         noToolbar 
                                         goBack={props.history.goBack} 
-                                        onLogout={() => props.history.replace('/logout')}
+                                        onLogout={() => reset()}
                                     >
                                         <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
                                             <Icon>memory</Icon>
                                             <span style={{ width: 8 }} />
                                             API
                                         </Fab>
-                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/home')} />
+                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
                                     </NavigationLayout>
-                                </React.Fragment>
-                            } />
-                            <Route exact path="/logout" render={() => {
-                                reset()
-                                return (<Redirect to="/" />)
-                            }} />
-
-                            {/* Route authenticated routes. */}
-                            <Route exact path="/researcher" render={props =>
-                                !state.identity || ((state.auth || {type: null}).type !== 'root') ?
-                                <Redirect to="/login" /> :
+                                </React.Fragment> :
                                 <React.Fragment>
                                     <PageTitle>Administrator</PageTitle>
                                     <NavigationLayout 
                                         title="Administrator" 
-                                        profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity} 
+                                        profile={state.auth.type === 'root' ? {} : state.identity} 
                                         goBack={props.history.goBack} 
-                                        onLogout={() => props.history.replace('/logout')}
+                                        onLogout={() => reset()}
                                     >
                                         <Root {...props} root={state.identity} />
                                         <Snackbar
@@ -206,16 +207,32 @@ export default function App({ ...props }) {
                                 </React.Fragment>
                             } />
                             <Route exact path="/researcher/:id" render={props =>
-                                !state.identity ? <Redirect to="/login" /> :
-                                !getResearcher(props.match.params.id) ? <React.Fragment /> :
+                                !state.identity ? 
+                                <React.Fragment>
+                                    <PageTitle>mindLAMP | Login</PageTitle>
+                                    <NavigationLayout 
+                                        noToolbar 
+                                        goBack={props.history.goBack} 
+                                        onLogout={() => reset()}
+                                    >
+                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                            <Icon>memory</Icon>
+                                            <span style={{ width: 8 }} />
+                                            API
+                                        </Fab>
+                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                                    </NavigationLayout>
+                                </React.Fragment>:
+                                !getResearcher(props.match.params.id) ? 
+                                <React.Fragment /> :
                                 <React.Fragment>
                                     <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
                                     <NavigationLayout 
                                         id={props.match.params.id}
                                         title={`${getResearcher(props.match.params.id).name}`} 
-                                        profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                        profile={state.auth.type === 'root' ? {} : state.identity}
                                         goBack={props.history.goBack} 
-                                        onLogout={() => props.history.replace('/logout')}
+                                        onLogout={() => reset()}
                                     >
                                         <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
                                     </NavigationLayout>
@@ -223,17 +240,33 @@ export default function App({ ...props }) {
                             } />
 
                             <Route exact path="/participant/:id" render={props =>
-                                !state.identity ? <Redirect to="/login" /> : 
-                                !getParticipant(props.match.params.id) ? <React.Fragment /> :
+                                !state.identity ? 
+                                <React.Fragment>
+                                    <PageTitle>mindLAMP | Login</PageTitle>
+                                    <NavigationLayout 
+                                        noToolbar 
+                                        goBack={props.history.goBack} 
+                                        onLogout={() => reset()}
+                                    >
+                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                            <Icon>memory</Icon>
+                                            <span style={{ width: 8 }} />
+                                            API
+                                        </Fab>
+                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                                    </NavigationLayout>
+                                </React.Fragment> : 
+                                !getParticipant(props.match.params.id) ? 
+                                <React.Fragment /> :
                                 <React.Fragment>
                                     <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
                                     <NavigationLayout 
                                         enableMessaging
                                         id={props.match.params.id}
                                         title={`Patient ${getParticipant(props.match.params.id).id}`} 
-                                        profile={(state.auth || {type: null}).type === 'root' ? {} : state.identity}
+                                        profile={state.auth.type === 'root' ? {} : state.identity}
                                         goBack={props.history.goBack} 
-                                        onLogout={() => props.history.replace('/logout')}
+                                        onLogout={() => reset()}
                                     >
                                         <Participant participant={getParticipant(props.match.params.id)} />
                                     </NavigationLayout>
@@ -243,7 +276,23 @@ export default function App({ ...props }) {
                             {/* Route to the app home screen.*/}
                             <Route exact path="/app" render={props =>
                                 !state.identity ? 
-                                <Redirect to="/login" /> :
+                                <React.Fragment>
+                                    <PageTitle>mindLAMP | Login</PageTitle>
+                                    <NavigationLayout 
+                                        noToolbar 
+                                        goBack={props.history.goBack} 
+                                        onLogout={() => reset()}
+                                    >
+                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                            <Icon>memory</Icon>
+                                            <span style={{ width: 8 }} />
+                                            API
+                                        </Fab>
+                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                                    </NavigationLayout>
+                                </React.Fragment> :
+                                state.auth.type !== 'participant' ? 
+                                <Redirect to="/" /> :
                                 <React.Fragment>
                                     <PageTitle>mindLAMP</PageTitle>
                                     <AppHome {...props} 
@@ -257,7 +306,7 @@ export default function App({ ...props }) {
                             <Route exact path="/api" render={props =>
                                 <React.Fragment>
                                     <PageTitle>LAMP API</PageTitle>
-                                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => props.history.replace('/')}>
+                                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => reset()}>
                                         <Icon>arrow_back</Icon>
                                         <span style={{ width: 8 }} />
                                         Back

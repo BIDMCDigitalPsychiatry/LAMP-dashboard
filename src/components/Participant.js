@@ -216,7 +216,7 @@ export default function Participant({ participant, ...props }) {
                     badges={state.activity_counts}
                     onChange={x => setState({ ...state, selectedCharts: x })}
                 />
-                {LAMP.Auth.get_identity().name !== 'MAP NET' &&
+                {(!!LAMP.Auth._auth.serverAddress && !LAMP.Auth._auth.serverAddress.includes('psych.digital')) &&
                     <React.Fragment>
                         <Divider style={{ margin: '8px -16px 8px -16px' }} />
                         <Typography variant="subtitle2">
@@ -245,7 +245,7 @@ export default function Participant({ participant, ...props }) {
                         activity={activity} 
                         events={((state.activity_events || {})[activity.name] || [])} 
                         startDate={earliestDate()}
-                        forceDefaultGrid={LAMP.Auth.get_identity().name === 'MAP NET'}
+                        forceDefaultGrid={!!LAMP.Auth._auth.serverAddress && LAMP.Auth._auth.serverAddress.includes('psych.digital')}
                         onEditAction={activity.spec !== 'lamp.survey' ? undefined : (data) => {
                             setActivities([{ ...activity, 
                                 prefillData: [data.slice.map(({ item, value }) => ({ item, value }))], 

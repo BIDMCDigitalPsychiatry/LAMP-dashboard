@@ -68,8 +68,8 @@ export default class LAMP {
 
 
     public static Auth = class {
-        public static _auth: IAuth = { type: null, id: null, password: null, serverAddress: undefined }
-        private static _me: any | null
+        public static _auth: IAuth = { type: null, id: null, password: null, serverAddress: null }
+        public static _me: Researcher[] | Researcher | Participant | null | undefined
 
         /**
          * Authenticate/authorize as a user of a given `type`.
@@ -83,7 +83,7 @@ export default class LAMP {
                     'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
-            let l: IAuth = LAMP.Auth._auth || { type: null, id: null, password: null, serverAddress: undefined }
+            let l: IAuth = LAMP.Auth._auth || { type: null, id: null, password: null, serverAddress: null }
             if (l.type === identity.type && 
                 l.id === identity.id && 
                 l.password === identity.password && 
@@ -105,7 +105,7 @@ export default class LAMP {
             } catch(err) {
 
                 // We failed: clear and propogate the authorization.
-                LAMP.Auth._auth = { type: null, id: null, password: null, serverAddress: undefined }
+                LAMP.Auth._auth = { type: null, id: null, password: null, serverAddress: null }
                 if (!!LAMP.configuration)
                     LAMP.configuration.authorization = undefined
 
@@ -117,13 +117,6 @@ export default class LAMP {
                 // Save the authorization in sessionStorage for later.
                 sessionStorage.setItem('LAMP._auth', JSON.stringify(LAMP.Auth._auth))
             }
-        }
-
-        /**
-         * 
-         */
-        public static get_identity(): Researcher | Participant | null | undefined {
-            return LAMP.Auth._me
         }
 
         private static async refresh_identity() {
