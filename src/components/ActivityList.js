@@ -86,9 +86,9 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description').then(res => {
             res = [res].map(y => !!y.error ? undefined : y.data)[0]
             setSelectedActivity({ ...x, 
-                description: res.description, 
+                description: !!res ? res.description : undefined,
                 settings: x.settings.map((y, idx) => ({ ...y, 
-                    description: res.settings[idx] }
+                    description: !!res ? res.settings[idx] : undefined }
                 ))
             })
         })
