@@ -50,10 +50,9 @@
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {
-    "start": "HTTPS=true BROWSER=none NODE_ENV=production PUBLIC_URL=dashboard.lamp.digital react-scripts start",
+    "start": "HTTPS=true BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
     "start-sw": "http-server ./build",
-    "build": "GENERATE_SOURCEMAP=false CI=false react-scripts build",
-    "deploy": "aws s3 sync build/ `echo $DASHBOARD_DEPLOY_S3_BUCKET`"
+    "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build"
   },
   "eslintConfig": {
     "extends": "react-app"

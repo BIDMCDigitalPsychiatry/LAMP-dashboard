@@ -326,6 +326,7 @@ export default function App({ ...props }) {
                     />}
                 </SnackbarProvider>
             </MuiPickersUtilsProvider>
+            <span style={{ position: 'fixed', bottom: 16, left: 16, fontSize: '8', zIndex: -1 }}>{process.env.REACT_APP_GIT_SHA}</span>
         </ThemeProvider>
     )
 }
