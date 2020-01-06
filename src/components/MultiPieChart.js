@@ -7,16 +7,16 @@ import {
   ArcLabel, 
   multiHueScaleFactory 
 } from '@data-ui/radial-chart'
-import { 
-  withParentSize
-} from '@data-ui/xy-chart'
 import { LegendOrdinal } from '@vx/legend'
+import { useTheme } from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 
 const categoryColorScale = multiHueScaleFactory()
 
-class MultiPieChart extends React.PureComponent {
-  render = () =>
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: -50 }}>
+export default function MultiPieChart(props) {
+  let sm = useMediaQuery(useTheme().breakpoints.down('sm'))
+  return (
+  <div style={{ display: 'flex', flexDirection: sm ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', margin: -50 }}>
       <RadialChart
         ariaLabel="radial-left"
         width={400}
@@ -31,8 +31,8 @@ class MultiPieChart extends React.PureComponent {
           </div>
         }>
           <ArcSeries
-            data={this.props.data[0]}
-            pieValue={d => d.value / this.props.data[0].map(x => x.value).reduce((a, b) => a + b, 0)}
+            data={props.data[0]}
+            pieValue={d => d.value / props.data[0].map(x => x.value).reduce((a, b) => a + b, 0)}
             label={arc => arc.data.label}
             labelComponent={<ArcLabel fill="#fff" fontSize={10} />}
             margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
@@ -68,8 +68,8 @@ class MultiPieChart extends React.PureComponent {
           </div>
         }>
           <ArcSeries
-            data={this.props.data[1]}
-            pieValue={d => d.value / this.props.data[1].map(x => x.value).reduce((a, b) => a + b, 0)}
+            data={props.data[1]}
+            pieValue={d => d.value / props.data[1].map(x => x.value).reduce((a, b) => a + b, 0)}
             label={arc => arc.data.label}
             labelComponent={<ArcLabel fill="#fff" fontSize={10} />}
             innerRadius={radius => 0.35 * radius}
@@ -84,6 +84,5 @@ class MultiPieChart extends React.PureComponent {
           />
       </RadialChart>
   </div>
+  )
 }
-
-export default withParentSize(MultiPieChart)
