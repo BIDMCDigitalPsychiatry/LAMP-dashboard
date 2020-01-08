@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar, Menu, MenuItem } from "@material-ui/core";
+import { Avatar, Menu, MenuItem, Tooltip } from "@material-ui/core";
 import { isFragment } from "react-is";
 import clsx from "clsx";
 import { makeStyles, createStyles } from "@material-ui/core";
@@ -74,6 +74,7 @@ const useStyles = makeStyles(() =>
       display: "block",
       position: "absolute",
       top: "50%; left: 50%",
+      zIndex: 1,
       transform:
         index !== 0 &&
         `rotate(${index * (360 / count)}deg) translate(${diameter /
@@ -364,7 +365,8 @@ export default function AvatarCircleGroup({
 
   const handleClick = React.useCallback(
     ({ id, onClick }) => event => {
-      handleOpen(id, event);
+      id > 0 &&
+        handleOpen(id, event);
       onClick &&
         onClick({ id, accounts, addAccount, deleteAccount, handleAdd });
     },
@@ -379,14 +381,10 @@ export default function AvatarCircleGroup({
         lines={lines}
         classes={classes}
       >
-        {accounts.map(({ id, name, image, onClick, ...other }, i) => (
-          <Avatar
-            key={id}
-            onClick={handleClick({ id, onClick })}
-            alt={name}
-            src={image}
-            {...other}
-          />
+        {accounts.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
+          <Tooltip key={id} title={tooltip || ''}>
+            <Avatar alt={name} src={image} onClick={handleClick({ id, onClick })} {...other} />
+          </Tooltip>
         ))}
       </AvatarMesh>
       <Menu
@@ -395,13 +393,11 @@ export default function AvatarCircleGroup({
         open={Boolean(anchor.anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem
-          onClick={() => handleAdd(accounts.findIndex(a => a.id === anchor.id))}
-        >
+        {/*<MenuItem onClick={() => handleAdd(accounts.findIndex(a => a.id === anchor.id))}>
           Add New ({id} at Index: {accounts.findIndex(a => a.id === anchor.id)})
-        </MenuItem>
+        </MenuItem>*/}
         <MenuItem onClick={handleDelete}>Delete</MenuItem>
-        <MenuItem onClick={handleChangePassword}>Change Password</MenuItem>
+        {/*<MenuItem onClick={handleChangePassword}>Change Password</MenuItem>*/}
       </Menu>
     </>
   );

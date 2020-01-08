@@ -2,12 +2,17 @@
 // Core Imports
 import React from 'react'
 import { withRouter } from 'react-router-dom'
-import Card from '@material-ui/core/Card'
-import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
+import Avatar from '@material-ui/core/Avatar'
+import Box from '@material-ui/core/Box'
 import TextField from '@material-ui/core/TextField'
 import Tabs from '@material-ui/core/Tabs'
 import Tab from '@material-ui/core/Tab'
+import Grid from '@material-ui/core/Grid'
+import Divider from '@material-ui/core/Divider'
+import Icon from '@material-ui/core/Icon'
+import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip'
+import InputAdornment from '@material-ui/core/InputAdornment'
 import blue from '@material-ui/core/colors/blue'
 import grey from '@material-ui/core/colors/grey'
 
@@ -17,32 +22,30 @@ import { mediumDateFormat } from '../components/Utils'
 
 const capitalize = (x) => x.charAt(0).toUpperCase() + x.slice(1)
 
-const MessageItem = ({ ...props }) => 
-<div style={{ 
-    padding: 8 
-}}>
-    <Typography style={{ 
-        textAlign: props.flipped ? 'left' : 'right'
-    }}>
-        <b>{capitalize((props.from === 'researcher' ? 'clinician' : 'patient'))}</b>
-        <div />
-        <b>{(new Date(props.date || 0)).toLocaleString('en-US', mediumDateFormat)}</b>
-    </Typography>
-    <Card style={{ 
-        padding: 8, 
-        backgroundColor: props.flipped ? blue[600] : grey[100] 
-    }}>
-        <Typography 
-            style={{ 
-                wordWrap: 'break-word',
-                textAlign: props.flipped ? 'left' : 'right', 
-                color: props.flipped ? '#fff' : '#000' 
-            }}
-        >
-            {props.text}
-        </Typography>
-    </Card>
-</div>
+function MessageItem({ from, date, text, flipped, ...props }) {
+    return (
+        <Grid container direction={flipped ? 'row' : 'row-reverse'} alignItems="flex-end" spacing={1} style={{ padding: 8 }}>
+            <Grid item style={{ display: flipped ? undefined : 'none' }}>
+                <Tooltip title={capitalize((from === 'researcher' ? 'clinician' : 'patient'))}>
+                    <Avatar style={{ background: '#aaa' }} src="https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958ecfedbb68c91822af2_00100dportrait_00100_W9YBE~2-p-800.jpeg">?</Avatar>
+                </Tooltip>
+            </Grid>
+            <Grid item>
+                <Tooltip title={(new Date(date || 0)).toLocaleString('en-US', mediumDateFormat)}>
+                    <Box 
+                        p={1}
+                        borderRadius={flipped ? '16px 16px 16px 4px' : '16px 16px 4px 16px'}
+                        color={flipped ? '#fff' : '#000'}
+                        bgcolor={flipped ? blue[600] : grey[200]}
+                        style={{ wordWrap: 'break-word' }}
+                    >
+                        {text}
+                    </Box>
+                </Tooltip>
+            </Grid>
+        </Grid>
+    )
+}
 
 class Messages extends React.Component {
     state = {}
@@ -97,7 +100,7 @@ class Messages extends React.Component {
     }
 
     render = () =>
-    <React.Fragment>
+    <Box {...this.props}>
         <Tabs
             value={this.state.messageTab || 0}
             onChange={(e, value) => this.setState({ messageTab: value })}
@@ -108,22 +111,26 @@ class Messages extends React.Component {
             <Tab label="Messages" index={0} />
             <Tab label={!!this.props.participantOnly ? 'My Journal' : 'Patient Notes'} index={1} />
         </Tabs>
-        {this.getMessages()
-            .filter(x => (this.state.messageTab || 0) === 0 
-                ? (x.type === 'message') 
-                : (x.type === 'note' && x.from === (!!this.props.participantOnly ? 'participant' : 'researcher')))
-            .map(x => 
-                <MessageItem {...x} 
-                    flipped={
-                        (!!this.props.participantOnly && x.from === 'researcher') || 
-                        (!this.props.participantOnly && x.from === 'participant')
-                    } 
-                    key={JSON.stringify(x)} 
-                />
-        )}
+        <Divider />
+        <Box mx={2}>
+            {this.getMessages()
+                .filter(x => (this.state.messageTab || 0) === 0 
+                    ? (x.type === 'message') 
+                    : (x.type === 'note' && x.from === (!!this.props.participantOnly ? 'participant' : 'researcher')))
+                .map(x => 
+                    <MessageItem {...x} 
+                        flipped={
+                            (!!this.props.participantOnly && x.from === 'researcher') || 
+                            (!this.props.participantOnly && x.from === 'participant')
+                        } 
+                        key={JSON.stringify(x)} 
+                    />
+            )}
+        </Box>
+        <Divider />
         <TextField
             label="Send a message"
-            style={{ margin: 8 }}
+            style={{ margin: 16, paddingRight: 32 }}
             placeholder="Message..."
             value={this.state.currentMessage || ''}
             onChange={(event) => this.setState({ currentMessage: event.target.value })}
@@ -131,11 +138,25 @@ class Messages extends React.Component {
             margin="normal"
             variant="outlined"
             multiline
+            fullWidth
             rowsMax="4"
+            InputProps={{ endAdornment: [
+                <InputAdornment position="end">
+                  <Tooltip title="Send Message">
+                    <IconButton
+                      edge="end"
+                      aria-label="send"
+                      onClick={this.sendMessage}
+                      onMouseDown={event => event.preventDefault()}
+                    >
+                      <Icon>send</Icon>
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+            ]}}
             InputLabelProps={{ shrink: true }}
         />
-        <Button variant="contained" onClick={this.sendMessage}>Send</Button>
-    </React.Fragment>
+    </Box>
 }
 
 export default withRouter(Messages)

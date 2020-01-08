@@ -76,11 +76,7 @@ export default class LAMP {
          * If all values are null (especially `type`), the authorization is cleared.
          */
         public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; serverAddress: string | undefined; } = { type: null, id: null, password: null, serverAddress: undefined }) {
-            LAMP.configuration = { base: (
-                !!identity.serverAddress ? 
-                    `${identity.serverAddress.startsWith('localhost') ? 
-                        'http://' : 'https://'}${identity.serverAddress}` : 
-                    'https://api.lamp.digital') }
+            LAMP.configuration = { base: (!!identity.serverAddress ? `https://${identity.serverAddress}` : 'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
             let l: IAuth = LAMP.Auth._auth || { type: null, id: null, password: null, serverAddress: null }

@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Breathe({ ...props }) {
+export default function Breathe({ onComplete, ...props }) {
   const classes = useStyles(props)
   return (
     <div className={classes.Background}>

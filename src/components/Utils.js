@@ -9,6 +9,9 @@ import TableHead from '@material-ui/core/TableHead'
 import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import Typography from '@material-ui/core/Typography'
+import Icon from '@material-ui/core/Icon'
+import IconButton from '@material-ui/core/IconButton'
+import Slide from '@material-ui/core/Slide'
 import { useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 
@@ -114,14 +117,60 @@ export const ResponsivePaper = React.forwardRef((props, ref) => {
     return <Paper {...props} elevation={sm ? 0 : props.elevation} ref={ref} />
 })
 
+function SlideUp(props) { return <Slide direction="up" {...props} /> }
+
 // 
-export const ResponsiveDialog = ({ ...props }) => 
-    <Dialog fullScreen={useMediaQuery(useTheme().breakpoints.down('sm'))} {...props} />
+export const ResponsiveDialog = ({ transient, animate, fullScreen, children, ...props }) => 
+    <Dialog {...props}
+        fullScreen={!!fullScreen ? true : useMediaQuery(useTheme().breakpoints.down('sm'))} 
+        TransitionComponent={!!animate ? SlideUp : undefined}
+    >
+        {!!transient &&
+            <IconButton 
+                style={{ 
+                    position: 'fixed', 
+                    left: 16, 
+                    top: 16, 
+                    background: '#ffffff66', 
+                    WebkitBackdropFilter: 'blur(5px)' 
+                }} 
+                color="inherit" 
+                onClick={props.onClose} 
+                aria-label="Close"
+            >
+                <Icon>close</Icon>
+            </IconButton>
+        }
+        {children}
+    </Dialog>
 
 // 
 export function PageTitle({ children, ...props }) {
     useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
     return <React.Fragment />
+}
+
+export function compress(e /* event from file upload */, width, height) {
+    const reader = new FileReader()
+    reader.readAsDataURL(e.target.files[0])
+    reader.onerror = error => console.log(error)
+    reader.onload = event => {
+        const img = new Image()
+        img.src = event.target.result
+        img.onload = () => {
+            const elem = document.createElement('canvas')
+            elem.width = width
+            elem.height = height
+            const ctx = elem.getContext('2d')
+            ctx.drawImage(img, 0, 0, width, height);
+            ctx.canvas.toBlob((blob) => {
+                // eslint-disable-next-line
+                const file = new File([blob], e.target.files[0].name, 
+                    { type: 'image/jpeg', lastModified: Date.now() });
+                /* do something with file here */
+            }, 'image/jpeg', 1);
+        }
+    }
 }
 
 // Produces an array of integers from 0 until the specified max number.

@@ -1,59 +1,56 @@
 
 // Core Imports
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Typography from '@material-ui/core/Typography'
 import ButtonBase from '@material-ui/core/ButtonBase'
 
 // Local Imports
 import Activity from '../lamp/Activity'
+import { rangeTo } from './Utils'
 
 // TODO: Settings!
 
-export default class Jewels extends React.Component {
-  state = {
-    jewels: [],
-    actions: [],
-    activity: new Activity({})
-  }
+const makeJewels = () => rangeTo(Math.floor(Math.random() * 100)).map(i => ({ i, x: Math.random(), y: Math.random() }))
 
-  componentDidMount() {
-    for (let i = 0; i <= Math.floor(Math.random() * 100); i++)
-      this.state.jewels.push({ i, x: Math.random(), y: Math.random() })
-    this.state.activity.start()
-  }
+export default function Jewels({ onComplete, ...props }) {
+  const [jewels, setJewels] = useState(makeJewels())
+  const [actions, setActions] = useState([])
+  const [activity, setActivity] = useState(new Activity({}))
 
-  componentWillUnmount() {
-    this.state.activity.stop()
-  }
+  useEffect(() => {
+    activity.start()
+    return () => activity.stop()
+  }, [])
 
-  onTap(idx) {
-    this.setState({ actions: [...this.state.actions, idx] })
-    this.state.activity.emit(0, 0, 0, 0)
-    if (this.state.jewels.filter(x => this.state.actions.find(y => y === x.i) === undefined).length === 0) {
-      this.state.activity.stop()
-      this.props.onComplete(this.state.activity)
+  const onTap = (idx) => {
+    setActions(actions => [...actions, idx])
+    activity.emit(0, 0, 0, 0)
+    if (jewels.filter(x => actions.find(y => y === x.i) === undefined).length === 0) {
+      activity.stop()
+      !!onComplete && onComplete(activity)
     }
   }
 
-  render = () => 
-  <div>
-    {this.state.jewels.map(x => (
-      <ButtonBase
-        key={x.i}
-        style={{
-          position: "absolute",
-          left: x.x * (window.innerWidth - 25),
-          top: x.y * (window.innerHeight - 25),
-          width: 32,
-          height: 32,
-          borderRadius: "50%",
-          opacity: this.state.actions.find(y => y === x.i) === undefined ? 1.0 : 0.2,
-        }}
-        onClick={() => this.onTap(x.i) }>
-         { /* eslint-disable-next-line */ }
-        <span style={{ position: 'absolute', fontSize: 32 }}>💎</span>
-        <Typography style={{ position: 'absolute', fontSize: 18 }}><b>{x.i + 1}</b></Typography>
-      </ButtonBase>
-    ))}
-  </div>
+  return (
+    <div>
+      {jewels.map(x => (
+        <ButtonBase
+          key={x.i}
+          style={{
+            position: "absolute",
+            left: x.x * (window.innerWidth - 25),
+            top: x.y * (window.innerHeight - 25),
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            opacity: actions.find(y => y === x.i) === undefined ? 1.0 : 0.2,
+          }}
+          onClick={() => onTap(x.i) }>
+           { /* eslint-disable-next-line */ }
+          <span style={{ position: 'absolute', fontSize: 32 }}>💎</span>
+          <Typography style={{ position: 'absolute', fontSize: 18 }}><b>{x.i + 1}</b></Typography>
+        </ButtonBase>
+      ))}
+    </div>
+  )
 }

@@ -21,15 +21,13 @@ import red from '@material-ui/core/colors/red'
 
 // Local Imports 
 import CredentialManager from './CredentialManager'
-import Messages from './Messages'
-import { ResponsiveDialog, ResponsiveMargin } from './Utils'
+import { ResponsiveMargin } from './Utils'
 
-export default function NavigationLayout({ title, id, enableMessaging, noToolbar, goBack, onLogout, ...props }) {
+export default function NavigationLayout({ title, id, noToolbar, goBack, onLogout, ...props }) {
     const [state, setState] = useState({})
     const [showCustomizeMenu, setShowCustomizeMenu] = useState()
     const [confirmLogout, setConfirmLogout] = useState()
     const [passwordChange, setPasswordChange] = useState()
-    const [showMessaging, setShowMessaging] = useState()
     return (
         <div>
     		{!!noToolbar ? <React.Fragment/> :
@@ -68,10 +66,9 @@ export default function NavigationLayout({ title, id, enableMessaging, noToolbar
     							anchorEl={showCustomizeMenu}
     							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
     							transformOrigin={{horizontal: 'right', vertical: 'top'}}
-    							open={!!showCustomizeMenu && !confirmLogout && !showMessaging && !passwordChange}
+    							open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
     							onClose={() => setShowCustomizeMenu()}>
     							{!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
-                                {!!enableMessaging && <MenuItem onClick={() => setShowMessaging(true)}>Messaging & Journal</MenuItem>}
     							<MenuItem onClick={() => setConfirmLogout(true)}>Logout</MenuItem>
     						</Menu>
     					</div>
@@ -137,21 +134,6 @@ export default function NavigationLayout({ title, id, enableMessaging, noToolbar
                   </Button>
                 </DialogActions>
             </Dialog>
-            {!!enableMessaging &&
-                <ResponsiveDialog
-                    open={!!showMessaging}
-                    onClose={() => setShowMessaging()}
-                >
-                    <DialogContent>
-                        <Messages participantOnly participant={id} />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setShowMessaging()} color="primary" autoFocus>
-                            Close
-                        </Button>
-                    </DialogActions>
-                </ResponsiveDialog>
-            }
             <Dialog
                 open={!!passwordChange && !!id}
                 onClose={() => setPasswordChange()}

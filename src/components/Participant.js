@@ -5,11 +5,8 @@ import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import Switch from '@material-ui/core/Switch'
 import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
-import Dialog from '@material-ui/core/Dialog'
-import Slide from '@material-ui/core/Slide'
 import blue from '@material-ui/core/colors/blue'
 import Grid from '@material-ui/core/Grid'
 
@@ -20,31 +17,18 @@ import Grid from '@material-ui/core/Grid'
 import LAMP from '../lamp'
 import ActivityCard from './ActivityCard'
 import MultipleSelect from './MultipleSelect'
+import CareTeam from './CareTeam'
+import ActivityLauncher from './ActivityLauncher'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
 import MenuButton from './MenuButton'
-import AvatarCircleGroup from './AvatarCircleGroup'
 import { groupBy } from './Utils'
 import Survey from './Survey'
+import { ResponsiveDialog } from './Utils'
 
-function SlideUp(props) { return <Slide direction="up" {...props} /> }
 function _shouldRestrict() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') && (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
 // TODO: all SensorEvents?
-
-const addAccount = ({ id, addAccount, handleAdd }) => handleAdd()
-const addAccountIndex = ({ id, accounts, addAccount, handleAdd }) => handleAdd(accounts.length - 1)
-var accounts = (onClick = addAccount) => [
-  { id: 0, name: "0", email: "test0@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab4fa082a5194a78925e_Aditya-p-800.jpeg" },
-  { id: 2, name: "2", email: "test2@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958ecfedbb68c91822af2_00100dportrait_00100_W9YBE~2-p-800.jpeg" },
-  { id: 3, name: "3", email: "test3@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958d426acc67ee9e80527_00100dportrait_00100_eqH1k~2-p-800.jpeg" },
-  { id: 4, name: "4", email: "test4@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d8296b8eb8133e6074ec808_a_r%20copy-p-800.jpeg" },
-  { id: 5, name: "5", email: "test5@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55aa09aaff48c0af1f7b1a_John-p-800.jpeg" },
-  { id: 6, name: "6", email: "test6@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ae18dd4be9bedc79ea69_Elena.jpg" },
-  { id: 7, name: "7", email: "test7@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab00dd4be939b579b48f_Hannah-p-800.jpeg" },
-  { id: 8, name: "8", email: "test8@test.com", image: "https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d55ab6edd4be90af479b773_Phil-p-800.jpeg" },
-  { id: 9, name: "+", onClick, style: { background: "#63D13E" } }
-]
 
 export default function Participant({ participant, ...props }) {
     const [ state, setState ] = useState({})
@@ -181,20 +165,24 @@ export default function Participant({ participant, ...props }) {
             hideEvent(overwritingTimestamp, activities[0 /* assumption made here */].id)
     }
 
-    const earliestDate = () => {
-        return (state.activities || [])
-                    .filter(x => (state.selectedCharts || []).includes(x.name))
-                    .map(x => ((state.activity_events || {})[x.name] || []))
-                    .map(x => x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp)
-                    .sort((a, b) => a - b /* min */).slice(0, 1)
-                    .map(x => x === 0 ? undefined : new Date(x))[0]
-    }
+    const earliestDate = () => (state.activities || [])
+        .filter(x => (state.selectedCharts || []).includes(x.name))
+        .map(x => ((state.activity_events || {})[x.name] || []))
+        .map(x => x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp)
+        .sort((a, b) => a - b /* min */).slice(0, 1)
+        .map(x => x === 0 ? undefined : new Date(x))[0]
 
     return (
         <React.Fragment>
-            {false && <Box m="10%">
-                <AvatarCircleGroup accounts={accounts()} />
-            </Box>}
+            {/*
+            <Box border={1} borderColor="grey.300" borderRadius={4} p={2} my={4}>
+                <CareTeam participant={participant} />
+            </Box>
+            <Box border={1} borderColor="grey.300" borderRadius={4} my={4}>
+                <ActivityLauncher participant={participant} />
+            </Box>
+            */}
+            
             <Box border={1} borderColor="grey.300" borderRadius={4} p={2} mx="10%">
                 <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography variant="subtitle2">
@@ -240,6 +228,8 @@ export default function Participant({ participant, ...props }) {
                             Automations
                         </Typography>
                         <MultipleSelect 
+                            tooltips={{}}
+                            defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
                             selected={state.selectedExperimental || []}
                             items={Object.keys(visualizations).map(x => x.replace('lamp.dashboard.experimental.', ''))}
                             showZeroBadges={false}
@@ -250,11 +240,20 @@ export default function Participant({ participant, ...props }) {
                 }
             </Box>
             {((state.selectedCharts || []).length + (state.selectedPassive || []).length) === 0 && 
-                <Card style={{ marginTop: 16, marginBotton: 16, height: 96, backgroundColor: blue[700] }}>
-                    <Typography variant="h6" style={{ width: '100%', textAlign: 'center', marginTop: 32, color: '#fff' }}>
-                        No Activities are selected. Please select an Activity above to begin.
+                <Box 
+                    display="flex" 
+                    justifyContent="center" 
+                    border={1} 
+                    borderColor={blue[700]}
+                    borderRadius={4} 
+                    bgcolor="grey.100"
+                    color={blue[700]}
+                    p={2} my={4} mx="10%"
+                >
+                    <Typography variant="overline" style={{ textAlign: 'center' }}>
+                        <b>No Activities are selected. Please select an Activity above to begin.</b>
                     </Typography>
-                </Card>
+                </Box>
             }
             {(state.activities || []).filter(x => (state.selectedCharts || []).includes(x.name)).map(activity =>
                 <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
@@ -424,26 +423,7 @@ export default function Participant({ participant, ...props }) {
                     onClick={y => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true) && x.name === y))}
                 />
             </Box>
-            <Dialog
-                fullScreen
-                open={!!survey}
-                onClose={() => setSurvey()}
-                TransitionComponent={SlideUp}
-            >
-                <IconButton 
-                    style={{ 
-                        position: 'fixed', 
-                        left: 16, 
-                        top: 16, 
-                        background: '#ffffff66', 
-                        WebkitBackdropFilter: 'blur(5px)' 
-                    }} 
-                    color="inherit" 
-                    onClick={() => setSurvey()} 
-                    aria-label="Close"
-                >
-                    <Icon>close</Icon>
-                </IconButton>
+            <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
                 <Box py={8} px={2}>
                     <Survey
                         validate
@@ -455,7 +435,7 @@ export default function Participant({ participant, ...props }) {
                         onResponse={submitSurvey} 
                     />
                 </Box>
-            </Dialog>
+            </ResponsiveDialog>
         </React.Fragment>
     )
 }
