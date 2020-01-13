@@ -17,7 +17,9 @@ import ResponsiveDialog from './ResponsiveDialog'
 import Breathe from './Breathe'
 import Jewels from './Jewels'
 
-function _shouldRestrict() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') && (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
+function _hideCareTeam() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
+function _patientMode() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') }
+function _shouldRestrict() { return _patientMode() && _hideCareTeam() }
 
 // TODO: all SensorEvents?
 
@@ -167,9 +169,11 @@ export default function Participant({ participant, ...props }) {
 
     return (
         <React.Fragment>
-            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} my={4}>
-                <CareTeam participant={participant} />
-            </Box>
+            {!_hideCareTeam() &&
+                <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} my={4}>
+                    <CareTeam participant={participant} />
+                </Box>
+            }
             <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" my={4}>
                 <Launcher.Group>
                     <Launcher.Section title="Learn">
@@ -189,7 +193,9 @@ export default function Participant({ participant, ...props }) {
                         ]}
                     </Launcher.Section>
                     <Launcher.Section title="Manage">
-                        <Launcher.Button favorite title="Breathe" onClick={() => setLaunchedActivity('breathe')} />
+                        {!_hideCareTeam() &&
+                            <Launcher.Button favorite title="Breathe" onClick={() => setLaunchedActivity('breathe')} />
+                        }
                     </Launcher.Section>
                     <Launcher.Section title="Prevent">
                     </Launcher.Section>
