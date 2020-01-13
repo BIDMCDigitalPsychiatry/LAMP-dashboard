@@ -1,7 +1,10 @@
 
 // Core Imports
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Typography, makeStyles } from '@material-ui/core'
+
+// Local Imports
+import useInterval from './useInterval'
 
 const useStyles = makeStyles(theme => ({
   '@keyframes Pulse': {
@@ -91,14 +94,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Breathe({ onComplete, ...props }) {
   const classes = useStyles(props)
-  useEffect(() => {
-    if (!navigator.vibrate)
-      return 
-
-    navigator.vibrate([25, 400, 75, 400, 25])
-    let timer = setInterval(() => navigator.vibrate([25, 400, 75, 400, 25]), 4000)
-    return () => clearInterval(timer)
-  }, [])
+  useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
   return (
     <div className={classes.Background}>
       <div className={classes.Face}>
