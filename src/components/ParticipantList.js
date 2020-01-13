@@ -24,7 +24,7 @@ import LAMP from '../lamp'
 import Messages from './Messages'
 import EditField from './EditField'
 import CredentialManager from './CredentialManager'
-import { ResponsiveDialog, mediumDateFormat } from './Utils'
+import ResponsiveDialog from './ResponsiveDialog'
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo('en-US')
@@ -116,7 +116,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
 
     const dateInfo = (id) => ({
         relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
-        absolute: (new Date(parseInt((logins[id] || {}).timestamp))).toLocaleString('en-US', mediumDateFormat),
+        absolute: (new Date(parseInt((logins[id] || {}).timestamp))).toLocaleString('en-US', Date.formatStyle('medium')),
         device: (logins[id] || {data:{}}).data.device_type || 'an unknown device'
     })
 

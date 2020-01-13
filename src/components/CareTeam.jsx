@@ -14,7 +14,7 @@ import LAMP from '../lamp'
 import AvatarCircleGroup from './AvatarCircleGroup'
 import CredentialManager from './CredentialManager'
 import Messages from './Messages'
-import { ResponsiveDialog } from './Utils'
+import ResponsiveDialog from './ResponsiveDialog'
 
 export default function CareTeam({ participant,  ...props }) {
     const [showMessaging, setShowMessaging] = useState(false)

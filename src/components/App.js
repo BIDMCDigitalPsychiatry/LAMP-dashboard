@@ -26,11 +26,15 @@ import Root from './Root'
 import Researcher from './Researcher'
 import Participant from './Participant'
 import NavigationLayout from './NavigationLayout'
-import { PageTitle } from './Utils'
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
+
+function PageTitle({ children, ...props }) {
+    useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
+    return <React.Fragment />
+}
 
 export default function App({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)

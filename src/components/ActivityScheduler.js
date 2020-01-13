@@ -4,13 +4,6 @@ import React from 'react'
 import { KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import MaterialTable from 'material-table'
 
-// Local Imports
-import { 
-    timeOnlyDateFormat, 
-    dateOnlyDateFormat, 
-    fullDateFormat 
-} from '../components/Utils'
-
 export default function ActivityScheduler({ activity, ...props }) {
 	return (
         <MaterialTable 
@@ -18,7 +11,7 @@ export default function ActivityScheduler({ activity, ...props }) {
             data={((activity || {}).schedule || [])} 
             columns={[
                 { title: 'Start Date', field: 'start_date', 
-                    render: rowData => <span>{(new Date(rowData.start_date)).toLocaleString('en-US', dateOnlyDateFormat)}</span>, 
+                    render: rowData => <span>{(new Date(rowData.start_date)).toLocaleString('en-US', Date.formatStyle('dateOnly'))}</span>, 
                     editComponent: props => 
                         <KeyboardDatePicker 
                             autoOk 
@@ -34,7 +27,7 @@ export default function ActivityScheduler({ activity, ...props }) {
                         /> 
                 }, 
                 { title: 'Time', field: 'time', 
-                    render: rowData => <span>{(new Date(rowData.time)).toLocaleString('en-US', timeOnlyDateFormat)}</span>,
+                    render: rowData => <span>{(new Date(rowData.time)).toLocaleString('en-US', Date.formatStyle('timeOnly'))}</span>,
                     editComponent: props => 
                         <KeyboardTimePicker 
                             autoOk 
@@ -70,7 +63,7 @@ export default function ActivityScheduler({ activity, ...props }) {
                     data={(rowData.custom_time || []).map(x => ({ custom_time: x }))} 
                     columns={[
                         { title: 'Custom Time', field: 'custom_time', 
-                            render: rowData => <span>{(new Date(rowData.custom_time)).toLocaleString('en-US', fullDateFormat)}</span> }
+                            render: rowData => <span>{(new Date(rowData.custom_time)).toLocaleString('en-US', Date.formatStyle('full'))}</span> }
                     ]}
                     localization={{
                         body: {

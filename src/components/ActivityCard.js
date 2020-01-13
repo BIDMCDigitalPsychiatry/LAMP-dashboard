@@ -11,8 +11,8 @@ import Popover from '@material-ui/core/Popover'
 import blue from '@material-ui/core/colors/blue'
 
 // Local Imports
-import Sparkline from '../components/Sparkline'
-import { ArrayView, groupBy, mediumDateFormat } from '../components/Utils'
+import Sparkline from './Sparkline'
+import ArrayView from './ArrayView'
 
 const strategies = {
     'lamp.survey': (slices, activity, scopedItem) => slices
@@ -55,7 +55,7 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                 }
                 <Tooltip title={Boolean(visibleSlice) ? activity.name : `Activity Type`}>
                     <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
-                        {!Boolean(visibleSlice) ? activity.name : visibleSlice.x.toLocaleString('en-US', mediumDateFormat)}
+                        {!Boolean(visibleSlice) ? activity.name : visibleSlice.x.toLocaleString('en-US', Date.formatStyle('medium'))}
                     </Typography>
                 </Tooltip>
                 <div>
@@ -121,14 +121,14 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                             />
                         )}
                         value={
-                            Object.values(groupBy(
+                            Object.values(
                                 events
                                     .map(d => d.temporal_events.map(t => ({ 
-                                        item: t.item, [(new Date(d.timestamp)).toLocaleString('en-US', mediumDateFormat)]: t.value 
+                                        item: t.item, [(new Date(d.timestamp)).toLocaleString('en-US', Date.formatStyle('medium'))]: t.value 
                                     })))
-                                    .reduce((x, y) => x.concat(y), []),
-                                'item'
-                            ))
+                                    .reduce((x, y) => x.concat(y), [])
+                                    .groupBy('item')
+                            )
                             .map(v => Object.assign({}, ...v))
                             .reduce((x, y) => x.concat(y), [])
                         }

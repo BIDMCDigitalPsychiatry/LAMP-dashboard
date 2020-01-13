@@ -31,7 +31,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
                 </Tooltip>
             </Grid>
             <Grid item>
-                <Tooltip title={(new Date(date || 0)).toLocaleString('en-US', mediumDateFormat)}>
+                <Tooltip title={(new Date(date || 0)).toLocaleString('en-US', Date.formatStyle('medium'))}>
                     <Box 
                         p={1}
                         borderRadius={flipped ? '16px 16px 16px 4px' : '16px 16px 4px 16px'}

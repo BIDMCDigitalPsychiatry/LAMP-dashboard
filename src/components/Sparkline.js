@@ -17,9 +17,6 @@ import {
   PatternLines
 } from '@data-ui/xy-chart'
 
-// Local Imports
-import { fullDateFormat } from './Utils'
-
 // TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot
 
 class Sparkline extends React.PureComponent {
@@ -28,7 +25,7 @@ class Sparkline extends React.PureComponent {
   renderTooltip = ({ datum, series }) =>
   <div>
     <div>
-      <strong style={{ fontFamily: 'Roboto' }}>{datum.x.toLocaleString('en-US', fullDateFormat)}</strong>
+      <strong style={{ fontFamily: 'Roboto' }}>{datum.x.toLocaleString('en-US', Date.formatStyle('full'))}</strong>
       {(!series || Object.keys(series).length === 0) && <div style={{ fontFamily: 'Roboto' }}>{datum.y}</div>}
     </div>
     <br />

@@ -25,7 +25,8 @@ import Grid from '@material-ui/core/Grid'
 import { KeyboardDateTimePicker } from '@material-ui/pickers'
 
 // Local Imports
-import { ResponsivePaper, useKeyPress } from './Utils'
+import useKeyPress from './useKeyPress'
+import { ResponsivePaper } from './Utils'
 
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes

@@ -6,11 +6,10 @@ import ButtonBase from '@material-ui/core/ButtonBase'
 
 // Local Imports
 import Activity from '../lamp/Activity'
-import { rangeTo } from './Utils'
 
 // TODO: Settings!
 
-const makeJewels = () => rangeTo(Math.floor(Math.random() * 100)).map(i => ({ i, x: Math.random(), y: Math.random() }))
+const makeJewels = () => Array.rangeTo(Math.floor(Math.random() * 100)).map(i => ({ i, x: Math.random(), y: Math.random() }))
 
 export default function Jewels({ onComplete, ...props }) {
     // eslint-disable-next-line

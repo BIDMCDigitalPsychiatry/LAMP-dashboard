@@ -20,9 +20,8 @@ import CareTeam from './CareTeam'
 import Launcher from './Launcher'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
-import { groupBy } from './Utils'
 import Survey from './Survey'
-import { ResponsiveDialog } from './Utils'
+import ResponsiveDialog from './ResponsiveDialog'
 import Breathe from './Breathe'
 import Jewels from './Jewels'
 
@@ -63,7 +62,7 @@ export default function Participant({ participant, ...props }) {
             let _activities = await LAMP.Activity.allByParticipant(participant.id)
             let _state = { ...state,  
                 activities: _activities, 
-                activity_events: groupBy((await LAMP.ResultEvent.allByParticipant(participant.id))
+                activity_events: (await LAMP.ResultEvent.allByParticipant(participant.id))
                     .map(x => ({ ...x,
                         activity: _activities.find(y => x.activity === y.id || 
                                       (!!x.static_data.survey_name && 
@@ -74,16 +73,17 @@ export default function Participant({ participant, ...props }) {
                     .map(x => ({ ...x,
                         activity: (x.activity || {name: ''}).name,
                         activity_spec: (x.activity || {spec: ''}).spec || ''
-                    })), 'activity'),
-                sensor_events: groupBy(await LAMP.SensorEvent.allByParticipant(participant.id), 'sensor'),
+                    }))
+                    .groupBy('activity'),
+                sensor_events: (await LAMP.SensorEvent.allByParticipant(participant.id)).groupBy('sensor'),
             }
 
             // Perform datetime coalescing to either days or weeks.
             _state.sensor_events['lamp.steps'] = 
-                Object.values(groupBy(
+                Object.values(
                     ((_state.sensor_events || {})['lamp.steps'] || [])
-                        .map(x => ({ ...x, timestamp: Math.round(x.timestamp / (24*60*60*1000)) /* days */ })), 
-                'timestamp'))
+                        .map(x => ({ ...x, timestamp: Math.round(x.timestamp / (24*60*60*1000)) /* days */ }))
+                    .groupBy('timestamp'))
                 .map(x => x.reduce((a, b) => !!a.timestamp ? ({ ...a, 
                     data: { value: a.data.value + b.data.value, units: 'steps' } 
                 }) : b, {}))

@@ -22,7 +22,26 @@ import { useDropzone } from 'react-dropzone'
 
 // Local Imports
 import LAMP from '../lamp'
-import { compress } from './Utils'
+
+function compress(file, width, height) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onerror = error => reject(error)
+        reader.onload = event => {
+            const img = new Image()
+            img.src = event.target.result
+            img.onload = () => {
+                const elem = document.createElement('canvas')
+                elem.width = width
+                elem.height = height
+                const ctx = elem.getContext('2d')
+                ctx.drawImage(img, 0, 0, width, height)
+                resolve(ctx.canvas.toDataURL())
+            }
+        }
+    })
+}
 
 function CredentialEditor({ credential, auxData, mode, onChange }) {
   const [photo, setPhoto] = useState()
