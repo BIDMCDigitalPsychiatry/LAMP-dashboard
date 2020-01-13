@@ -1,17 +1,10 @@
 
 // Core Imports
 import React, { useState } from 'react'
-import Box from '@material-ui/core/Box'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Tooltip from '@material-ui/core/Tooltip'
-import Collapse from '@material-ui/core/Collapse'
-import { useTheme } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
-import ButtonBase from '@material-ui/core/ButtonBase'
+import { 
+    Box, Icon, IconButton, Typography, Divider, Grid, 
+    Tooltip, Collapse, Paper, ButtonBase, useTheme 
+} from '@material-ui/core'
 
 var Launcher = {}
 

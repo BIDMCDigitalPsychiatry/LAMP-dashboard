@@ -1,9 +1,7 @@
 
 // Core Imports 
-import React, { useState, useEffect } from 'react'
-import Paper from '@material-ui/core/Paper'
-import { useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import React from 'react'
+import { Paper, useTheme, useMediaQuery } from '@material-ui/core'
 
 // 
 export const ResponsiveMargin = React.forwardRef((props, ref) => {

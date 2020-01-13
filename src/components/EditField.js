@@ -1,10 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
-import TextField from '@material-ui/core/TextField'
-import Tooltip from '@material-ui/core/Tooltip'
+import { Icon, IconButton, TextField, Tooltip } from '@material-ui/core'
 
 export default function EditField({ text, defaultValue, onChange, ...props }) {
   const [currentText, setText] = useState(text || defaultValue)

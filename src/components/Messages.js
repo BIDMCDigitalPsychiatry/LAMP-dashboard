@@ -1,24 +1,14 @@
 
 // Core Imports
 import React from 'react'
-import { withRouter } from 'react-router-dom'
-import Avatar from '@material-ui/core/Avatar'
-import Box from '@material-ui/core/Box'
-import TextField from '@material-ui/core/TextField'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
-import Grid from '@material-ui/core/Grid'
-import Divider from '@material-ui/core/Divider'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from '@material-ui/core/Tooltip'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import blue from '@material-ui/core/colors/blue'
-import grey from '@material-ui/core/colors/grey'
+import { 
+    Avatar, Box, TextField, Tabs, Tab, Grid, Divider, 
+    Icon, IconButton, Tooltip, InputAdornment 
+} from '@material-ui/core'
+import { blue, grey } from '@material-ui/core/colors'
 
 // Local Imports
 import LAMP from '../lamp'
-import { mediumDateFormat } from '../components/Utils'
 
 const capitalize = (x) => x.charAt(0).toUpperCase() + x.slice(1)
 
@@ -47,7 +37,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
     )
 }
 
-class Messages extends React.Component {
+export default class Messages extends React.Component {
     state = {}
 
     componentDidMount() {
@@ -168,5 +158,3 @@ class Messages extends React.Component {
         />
     </Box>
 }
-
-export default withRouter(Messages)

@@ -2,19 +2,9 @@
 // Core Imports
 import React from 'react'
 import { 
-  XYChart, 
-  theme, 
-  withParentSize,
-  CrossHair, 
-  LineSeries, 
-  AreaSeries, 
-  PointSeries,
-  WithTooltip, 
-  XAxis, 
-  YAxis, 
-  Brush,
-  LinearGradient,
-  PatternLines
+  XYChart, theme, withParentSize, CrossHair, LineSeries, 
+  AreaSeries, PointSeries, WithTooltip, XAxis, YAxis, 
+  Brush, LinearGradient, PatternLines
 } from '@data-ui/xy-chart'
 
 // TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot

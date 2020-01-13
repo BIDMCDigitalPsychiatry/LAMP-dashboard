@@ -1,16 +1,10 @@
 
 // Core Imports
 import React, { useState } from 'react'
-import Typography from '@material-ui/core/Typography'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import Avatar from '@material-ui/core/Avatar'
-import Slide from '@material-ui/core/Slide'
-import Radio from '@material-ui/core/Radio'
-import RadioGroup from '@material-ui/core/RadioGroup'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import FormControl from '@material-ui/core/FormControl'
-import FormLabel from '@material-ui/core/FormLabel'
+import { 
+    Typography, TextField, Button, Avatar, Slide, Radio, 
+    RadioGroup, FormControlLabel, FormControl, FormLabel 
+} from '@material-ui/core'
 
 // Local Imports
 import mindLAMPLogo from '../logo.png'

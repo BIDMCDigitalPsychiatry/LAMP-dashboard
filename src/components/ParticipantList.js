@@ -1,16 +1,9 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import IconButton from '@material-ui/core/IconButton'
-import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import Popover from '@material-ui/core/Popover'
-import MenuItem from '@material-ui/core/MenuItem'
-import Chip from '@material-ui/core/Chip'
-import Tooltip from '@material-ui/core/Tooltip'
+import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip } from '@material-ui/core'
+import { green } from '@material-ui/core/colors'
 import MaterialTable from 'material-table'
-import green from '@material-ui/core/colors/green'
 
 // External Imports 
 import { saveAs } from 'file-saver'

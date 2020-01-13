@@ -2,17 +2,11 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from 'react'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { ThemeProvider } from '@material-ui/core/styles'
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme'
-import {blue, red} from '@material-ui/core/colors'
-import Fab from '@material-ui/core/Fab'
-import Button from '@material-ui/core/Button'
-import Snackbar from '@material-ui/core/Snackbar'
-import Icon from '@material-ui/core/Icon'
-import 'typeface-roboto'
+import { CssBaseline, Fab, Button, Snackbar, Icon, ThemeProvider, createMuiTheme } from '@material-ui/core'
+import { blue, red } from '@material-ui/core/colors'
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
 import { SnackbarProvider } from 'notistack'
+import 'typeface-roboto'
 
 // External Imports
 import DateFnsUtils from '@date-io/date-fns'

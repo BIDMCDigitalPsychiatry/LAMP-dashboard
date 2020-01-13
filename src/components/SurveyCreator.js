@@ -1,26 +1,12 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import Box from '@material-ui/core/Box'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
-import Grid from '@material-ui/core/Grid'
-import Fab from '@material-ui/core/Fab'
-import Divider from '@material-ui/core/Divider'
-import IconButton from '@material-ui/core/IconButton'
-import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
-import ButtonGroup from '@material-ui/core/ButtonGroup'
-import TextField from '@material-ui/core/TextField'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import Stepper from '@material-ui/core/Stepper'
-import Step from '@material-ui/core/Step'
-import StepLabel from '@material-ui/core/StepLabel'
-import StepButton from '@material-ui/core/StepButton'
-import StepContent from '@material-ui/core/StepContent'
-import Radio from '@material-ui/core/Radio'
-import RadioGroup from '@material-ui/core/RadioGroup'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
+import { 
+  Box, Tooltip, Typography, Grid, Fab, Divider, 
+  IconButton, Icon, Button, ButtonGroup, TextField, 
+  InputAdornment, Stepper, Step, StepLabel, StepButton, 
+  StepContent, Radio, RadioGroup, FormControlLabel 
+} from '@material-ui/core'
 
 function SelectList({ value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])

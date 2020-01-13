@@ -1,20 +1,11 @@
 
 // Core Imports
 import React, { useState, useEffect, useCallback } from 'react'
-import Box from '@material-ui/core/Box'
-import Grid from '@material-ui/core/Grid'
-import Avatar from '@material-ui/core/Avatar'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from '@material-ui/core/Tooltip'
-import Divider from '@material-ui/core/Divider'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-import TextField from '@material-ui/core/TextField'
-import ButtonBase from '@material-ui/core/ButtonBase'
-import Typography from '@material-ui/core/Typography'
-import InputAdornment from '@material-ui/core/InputAdornment'
-import { useTheme } from '@material-ui/core/styles'
+import { 
+  Box, Grid, Avatar, Icon, IconButton, Tooltip, Divider, 
+  Menu, MenuItem, TextField, ButtonBase, Typography, 
+  InputAdornment, useTheme 
+} from '@material-ui/core'
 
 // External Imports
 import QRCode from 'qrcode.react'

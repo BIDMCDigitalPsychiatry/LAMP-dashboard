@@ -1,23 +1,12 @@
 
 // Core Imports 
 import React, { useState } from 'react'
-import Box from '@material-ui/core/Box'
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Tooltip from '@material-ui/core/Tooltip'
-import MenuItem from '@material-ui/core/MenuItem'
-import Badge from '@material-ui/core/Badge'
-import IconButton from '@material-ui/core/IconButton'
-import Snackbar from '@material-ui/core/Snackbar'
-import Menu from '@material-ui/core/Menu'
-import Icon from '@material-ui/core/Icon'
-import Dialog from '@material-ui/core/Dialog'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogActions from '@material-ui/core/DialogActions'
-import Button from '@material-ui/core/Button'
-import red from '@material-ui/core/colors/red'
+import { 
+    Box, Button, AppBar, Toolbar, Tooltip, MenuItem, Badge, 
+    IconButton, Snackbar, Menu, Icon, Dialog, DialogTitle, 
+    DialogContent, DialogContentText, DialogActions 
+} from '@material-ui/core'
+import { red } from '@material-ui/core/colors'
 
 // Local Imports 
 import CredentialManager from './CredentialManager'

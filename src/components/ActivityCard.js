@@ -1,14 +1,8 @@
 
 // Core Imports
 import React, { useState } from 'react'
-import Box from '@material-ui/core/Box'
-import Icon from '@material-ui/core/Icon'
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
-import Divider from '@material-ui/core/Divider'
-import Popover from '@material-ui/core/Popover'
-import blue from '@material-ui/core/colors/blue'
+import { Box, Icon, IconButton, Tooltip, Typography, Divider, Popover } from '@material-ui/core'
+import { blue } from '@material-ui/core/colors'
 
 // Local Imports
 import Sparkline from './Sparkline'

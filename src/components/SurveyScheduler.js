@@ -1,21 +1,10 @@
 
 // Core Imports
 import React from 'react'
-import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
-import Grid from '@material-ui/core/Grid'
-import ReorderIcon from '@material-ui/icons/Reorder'
-import HelpIcon from '@material-ui/icons/Help'
-import EditIcon from '@material-ui/icons/Edit'
-import CalendarIcon from '@material-ui/icons/CalendarToday'
-import SettingsIcon from '@material-ui/icons/Settings'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import IconButton from '@material-ui/core/IconButton'
-import AddIcon from '@material-ui/icons/Add'
+import { 
+	Button, Typography, Grid, Dialog, DialogActions, DialogContent, 
+	DialogContentText, DialogTitle, IconButton 
+} from '@material-ui/core'
 import MaterialTable from 'material-table'
 
 // Local Imports
@@ -91,7 +80,7 @@ export default class SurveyScheduler extends React.Component {
 			    		}
 			    		}>
 			    		Load Preset Surveys and Games  
-			    		<ReorderIcon/>
+			    		<Icon>reorder</Icon>
 					</Button>
 					    <Dialog
 				          open={this.state.dialogOpen}
@@ -123,13 +112,13 @@ export default class SurveyScheduler extends React.Component {
 			    			this.setState({ surveys: tempSurveys })}
 			    		}>
 			    		Add Custom Survey  
-			    		<AddIcon/>
+			    		<Icon>add</Icon>
 					</Button>
 					</Grid>
 					<Grid item>
 					<IconButton
 						onClick = {this.handleDialogOpen('help')} >
-					<HelpIcon/>
+					<Icon>help</Icon>
 					</IconButton>
 						<Dialog
 				          open={this.state.helpDialogOpen}
@@ -142,14 +131,14 @@ export default class SurveyScheduler extends React.Component {
 				            <DialogContentText id="alert-dialog-description">
 				            	<ol>
 				            	<li>
-				                 To begin customizing your study, you can click <Button variant="contained" size="large"> Load Preset Surveys and Games <ReorderIcon/> </Button><br/> and/or <br/>
-				                  <Button variant="contained" size="large" color="primary"> Add Custom Survey <AddIcon/> </Button><br/>
+				                 To begin customizing your study, you can click <Button variant="contained" size="large"> Load Preset Surveys and Games <Icon>reorder</Icon> </Button><br/> and/or <br/>
+				                  <Button variant="contained" size="large" color="primary"> Add Custom Survey <Icon>add</Icon> </Button><br/>
 				                  </li>
 				                  <li>
-				                 Click <EditIcon/> to change the survey name and <SettingsIcon/> to edit or add new questions. <br/>
+				                 Click <Icon>edit</Icon> to change the survey name and <Icon>settings</Icon> to edit or add new questions. <br/>
 				                 </li>
 				                 <li>
-				                 Click <CalendarIcon/> to set a scheduled day and time for survey notifications to be broadcasted. <br/>
+				                 Click <Icon>calendar</Icon> to set a scheduled day and time for survey notifications to be broadcasted. <br/>
 				                 </li>
 				                 <li>
 				                 Surveys that have been successfully scheduled will be <Typography variant="h6" style={{fontWeight: 'bold', color: 'green'}}>bold and green</Typography>.

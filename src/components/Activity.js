@@ -1,9 +1,7 @@
 
 // Core Imports
 import React, { useState } from 'react'
-import Box from '@material-ui/core/Box'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
+import { Box, Tabs, Tab } from '@material-ui/core'
 
 // Local Imports
 import ActivityScheduler from './ActivityScheduler'

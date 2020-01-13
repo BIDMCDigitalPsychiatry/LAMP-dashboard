@@ -1,13 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import Grid from '@material-ui/core/Grid'
-import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
-import Collapse from '@material-ui/core/Collapse'
-import Typography from '@material-ui/core/Typography'
-import { useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { Grid, Icon, Button, Collapse, Typography, useTheme, useMediaQuery } from '@material-ui/core'
 
 // Local Imports
 import LAMP from '../lamp'

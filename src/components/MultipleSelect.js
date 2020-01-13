@@ -1,9 +1,7 @@
 
 // Core Imports
 import React from 'react'
-import Chip from '@material-ui/core/Chip'
-import Tooltip from '@material-ui/core/Tooltip'
-import Badge from '@material-ui/core/Badge'
+import { Chip, Tooltip, Badge } from '@material-ui/core'
 
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 

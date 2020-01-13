@@ -1,8 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import Typography from '@material-ui/core/Typography'
-import ButtonBase from '@material-ui/core/ButtonBase'
+import { Typography, ButtonBase } from '@material-ui/core'
 
 // Local Imports
 import Activity from '../lamp/Activity'

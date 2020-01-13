@@ -1,9 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import Box from '@material-ui/core/Box'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
+import { Box, Dialog, DialogContent } from '@material-ui/core'
 import MaterialTable from 'material-table'
 
 // Local Imports

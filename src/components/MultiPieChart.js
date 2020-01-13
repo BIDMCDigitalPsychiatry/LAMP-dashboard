@@ -8,8 +8,7 @@ import {
   multiHueScaleFactory 
 } from '@data-ui/radial-chart'
 import { LegendOrdinal } from '@vx/legend'
-import { useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { useTheme, useMediaQuery } from '@material-ui/core'
 
 const categoryColorScale = multiHueScaleFactory()
 

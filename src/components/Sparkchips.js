@@ -1,8 +1,7 @@
 
 // Core Imports
 import React from 'react'
-import Chip from '@material-ui/core/Chip'
-import Tooltip from '@material-ui/core/Tooltip'
+import { Chip, Tooltip } from '@material-ui/core'
 
 export default class Sparkchips extends React.Component {
   render = () =>

@@ -1,11 +1,7 @@
 
 // Core Imports 
-import React, { useState, useEffect } from 'react'
-import Table from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableHead from '@material-ui/core/TableHead'
-import TableCell from '@material-ui/core/TableCell'
-import TableRow from '@material-ui/core/TableRow'
+import React from 'react'
+import { Table, TableBody, TableHead, TableCell, TableRow } from '@material-ui/core'
 
 // Convert underscore case into human-readable strings.
 const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && ' ') + $2.toUpperCase())

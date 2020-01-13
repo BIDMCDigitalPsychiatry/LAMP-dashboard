@@ -1,11 +1,7 @@
 
 // Core Imports
 import React, { useState } from 'react'
-import Button from '@material-ui/core/Button'
-import ButtonGroup from '@material-ui/core/ButtonGroup'
-import Icon from '@material-ui/core/Icon'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
+import { Button, ButtonGroup, Icon, Menu, MenuItem } from '@material-ui/core'
 
 export default function MenuButton({ title, icon, color, hideMainButton, items, onClick, onAction, ...props }) {
   const [anchorEl, setAnchorEl] = useState(null)

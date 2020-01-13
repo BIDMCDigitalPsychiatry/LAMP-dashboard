@@ -1,27 +1,12 @@
 
 // Core Imports
 import React, { useState, useRef } from 'react'
-import '@material-ui/core'
-import Box from '@material-ui/core/Box'
-import Typography from '@material-ui/core/Typography'
-import Icon from '@material-ui/core/Icon'
-import Fab from '@material-ui/core/Fab'
-import Paper from '@material-ui/core/Paper'
-import Divider from '@material-ui/core/Divider'
-import Checkbox from '@material-ui/core/Checkbox'
-import FormGroup from '@material-ui/core/FormGroup'
-import Radio from '@material-ui/core/Radio'
-import RadioGroup from '@material-ui/core/RadioGroup'
-import Switch from '@material-ui/core/Switch'
-import FormControl from '@material-ui/core/FormControl'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Stepper from '@material-ui/core/Stepper'
-import Step from '@material-ui/core/Step'
-import StepLabel from '@material-ui/core/StepLabel'
-import StepButton from '@material-ui/core/StepButton'
-import StepContent from '@material-ui/core/StepContent'
-import TextField from '@material-ui/core/TextField'
-import Grid from '@material-ui/core/Grid'
+import { 
+  Box, Typography, Icon, Fab, Paper, Divider, Checkbox, 
+  FormGroup, Radio, RadioGroup, Switch, FormControl, 
+  FormControlLabel, Stepper, Step, StepLabel, StepButton, 
+  StepContent, TextField, Grid 
+} from '@material-ui/core'
 import { KeyboardDateTimePicker } from '@material-ui/pickers'
 
 // Local Imports

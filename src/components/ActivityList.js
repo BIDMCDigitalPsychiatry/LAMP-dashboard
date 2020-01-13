@@ -1,14 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect, useCallback } from 'react'
-import IconButton from '@material-ui/core/IconButton'
-import Box from '@material-ui/core/Box'
-import Icon from '@material-ui/core/Icon'
-import Button from '@material-ui/core/Button'
-import Typography from '@material-ui/core/Typography'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import Slide from '@material-ui/core/Slide'
+import { IconButton, Box, Icon, Button, Typography, Dialog, DialogActions, Slide } from '@material-ui/core'
 import MaterialTable from 'material-table'
 
 // External Imports 
