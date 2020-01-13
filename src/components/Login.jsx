@@ -5,6 +5,7 @@ import {
     Typography, TextField, Button, Avatar, Slide, Radio, 
     RadioGroup, FormControlLabel, FormControl, FormLabel 
 } from '@material-ui/core'
+import { useSnackbar } from 'notistack'
 
 // Local Imports
 import mindLAMPLogo from '../logo.png'
@@ -12,6 +13,7 @@ import { ResponsivePaper, ResponsiveMargin } from './Utils'
 
 export default function Login({ setIdentity, onComplete, ...props }) {
     const [state, setState] = useState({})
+    const { enqueueSnackbar } = useSnackbar()
 
     let handleChange = event => setState({ ...state, 
         [event.target.name]: (event.target.type === 'checkbox' ? event.target.checked : event.target.value) 
@@ -33,7 +35,7 @@ export default function Login({ setIdentity, onComplete, ...props }) {
             onComplete()
         }).catch(err => {
             console.warn("error with auth request", err)
-            props.layout.showMessage('' + err.error)
+            enqueueSnackbar('' + err.error, { variant: 'error' })
         })
     }
 
@@ -54,12 +56,12 @@ export default function Login({ setIdentity, onComplete, ...props }) {
             .then(data => {
                 console.log(JSON.stringify(data))
                 setState(state => ({ ...state, slideRegister: false, name: undefined, email: undefined }))
-                props.layout.showMessage("Success! The system will process your request and notify you within 24 hours.")
+                enqueueSnackbar("Success! The system will process your request and notify you within 24 hours.", { variant: 'success' })
             })
             .catch(error => {
                 console.error(error)
                 setState(state => ({ ...state, slideRegister: false, name: undefined, email: undefined }))
-                props.layout.showMessage("The system could not process your request. Please try again later or contact us for help.")
+                enqueueSnackbar("The system could not process your request. Please try again later or contact us for help.", { variant: 'error' })
             })
     }
 

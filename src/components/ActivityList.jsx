@@ -7,6 +7,7 @@ import MaterialTable from 'material-table'
 // External Imports 
 import { saveAs } from 'file-saver'
 import { useDropzone } from 'react-dropzone'
+import { useSnackbar } from 'notistack'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -25,18 +26,19 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     const [importFile, setImportFile] = useState()
     //const [exportActivities, setExportActivities] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
+    const { enqueueSnackbar } = useSnackbar()
     useEffect(() => { onChange() }, [showCreate])
 
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()
-        reader.onabort = () => props.layout.showAlert('Couldn\'t import the Activities.')
-        reader.onerror = () => props.layout.showAlert('Couldn\'t import the Activities.')
+        reader.onabort = () => enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
+        reader.onerror = () => enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
         reader.onload = () => {
             setShowActivityImport()
             let obj = JSON.parse(reader.result)
             if (Array.isArray(obj) && obj.filter(x => (typeof x === 'object' && !!x.name && !!x.settings && !!x.schedule)).length > 0)
                 setImportFile(obj)
-            else props.layout.showAlert('Couldn\'t import the Activities.')
+            else enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
         }
         acceptedFiles.forEach(file => reader.readAsText(file))
     }, [])
@@ -54,7 +56,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
             .length
         if (brokenGroupsCount > 0) {
             setImportFile()
-            props.layout.showAlert('Couldn\'t import the Activities because some Activities are misconfigured or missing.')
+            enqueueSnackbar('Couldn\'t import the Activities because some Activities are misconfigured or missing.', { variant: 'error' })
             return
         }
 

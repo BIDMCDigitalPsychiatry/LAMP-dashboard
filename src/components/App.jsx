@@ -2,10 +2,10 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from 'react'
 import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
-import { CssBaseline, Fab, Button, Snackbar, Icon, ThemeProvider, createMuiTheme } from '@material-ui/core'
+import { CssBaseline, Fab, Button, Icon, ThemeProvider, createMuiTheme } from '@material-ui/core'
 import { blue, red } from '@material-ui/core/colors'
 import { MuiPickersUtilsProvider } from '@material-ui/pickers'
-import { SnackbarProvider } from 'notistack'
+import { SnackbarProvider, useSnackbar } from 'notistack'
 import 'typeface-roboto'
 
 // External Imports
@@ -30,10 +30,11 @@ function PageTitle({ children, ...props }) {
     return <React.Fragment />
 }
 
-export default function App({ ...props }) {
+function AppRouter({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)
     const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth })
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const storeRef = useRef([])
 
     useEffect(() => {
@@ -54,6 +55,33 @@ export default function App({ ...props }) {
             })
         }
     }, [])
+
+    useEffect(() => {
+        if (!deferredPrompt) 
+            return
+        enqueueSnackbar('Add mindLAMP to your home screen?', { 
+            variant: 'info', 
+            persist: true, 
+            action: key =>
+                <React.Fragment>
+                    <Button onClick={promptInstall}>Install</Button>
+                    <Button onClick={() => closeSnackbar(key)}>Dismiss</Button>
+                </React.Fragment>
+        })
+    }, [deferredPrompt])
+
+    useEffect(() => {
+        closeSnackbar('admin')
+        if (!state.identity || (state.auth.type !== 'root'))
+            return
+        enqueueSnackbar('Proceed with caution: you are logged in as the administrator.', { 
+            key: 'admin',
+            variant: 'info',
+            persist: true, 
+            preventDuplicate: true,
+            action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
+        })
+    }, [state])
 
     if (window.matchMedia('(display-mode: standalone)').matches)
         console.log('Launched from home screen!')
@@ -115,6 +143,152 @@ export default function App({ ...props }) {
     }
 
     return (
+        <Switch>
+
+            {/* Route index => login or home (which redirects based on user type). */}
+            <Route exact path="/" render={props =>
+                (!(window.location.hash.split('?').length > 1 && !state.identity)) ?
+                (!state.identity ?
+                    <React.Fragment>
+                        <PageTitle>mindLAMP | Login</PageTitle>
+                        <NavigationLayout 
+                            noToolbar 
+                            goBack={props.history.goBack} 
+                            onLogout={() => reset()}
+                        >
+                            <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                                <Icon>memory</Icon>
+                                <span style={{ width: 8 }} />
+                                API
+                            </Fab>
+                            <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                        </NavigationLayout>
+                    </React.Fragment> :
+                    (state.auth.type === 'root' ?
+                        <Redirect to="/researcher" /> :
+                    state.auth.type === 'researcher' ?
+                        <Redirect to="/researcher/me" /> :
+                        <Redirect to="/participant/me" />
+                    )
+                ) : <React.Fragment />
+            } />
+
+            {/* Route authenticated routes. */}
+            <Route exact path="/researcher" render={props =>
+                !state.identity || (state.auth.type !== 'root') ?
+                <React.Fragment>
+                    <PageTitle>mindLAMP | Login</PageTitle>
+                    <NavigationLayout 
+                        noToolbar 
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                            <Icon>memory</Icon>
+                            <span style={{ width: 8 }} />
+                            API
+                        </Fab>
+                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                    </NavigationLayout>
+                </React.Fragment> :
+                <React.Fragment>
+                    <PageTitle>Administrator</PageTitle>
+                    <NavigationLayout 
+                        title="Administrator" 
+                        profile={state.auth.type === 'root' ? {} : state.identity} 
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Root {...props} root={state.identity} />
+                    </NavigationLayout>
+                </React.Fragment>
+            } />
+            <Route exact path="/researcher/:id" render={props =>
+                !state.identity ? 
+                <React.Fragment>
+                    <PageTitle>mindLAMP | Login</PageTitle>
+                    <NavigationLayout 
+                        noToolbar 
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                            <Icon>memory</Icon>
+                            <span style={{ width: 8 }} />
+                            API
+                        </Fab>
+                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                    </NavigationLayout>
+                </React.Fragment>:
+                !getResearcher(props.match.params.id) ? 
+                <React.Fragment /> :
+                <React.Fragment>
+                    <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
+                    <NavigationLayout 
+                        id={props.match.params.id}
+                        title={`${getResearcher(props.match.params.id).name}`} 
+                        profile={state.auth.type === 'root' ? {} : state.identity}
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
+                    </NavigationLayout>
+                </React.Fragment>
+            } />
+
+            <Route exact path="/participant/:id" render={props =>
+                !state.identity ? 
+                <React.Fragment>
+                    <PageTitle>mindLAMP | Login</PageTitle>
+                    <NavigationLayout 
+                        noToolbar 
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
+                            <Icon>memory</Icon>
+                            <span style={{ width: 8 }} />
+                            API
+                        </Fab>
+                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                    </NavigationLayout>
+                </React.Fragment> : 
+                !getParticipant(props.match.params.id) ? 
+                <React.Fragment /> :
+                <React.Fragment>
+                    <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
+                    <NavigationLayout 
+                        enableMessaging
+                        id={props.match.params.id}
+                        title={`Patient ${getParticipant(props.match.params.id).id}`} 
+                        profile={state.auth.type === 'root' ? {} : state.identity}
+                        goBack={props.history.goBack} 
+                        onLogout={() => reset()}
+                    >
+                        <Participant participant={getParticipant(props.match.params.id)} />
+                    </NavigationLayout>
+                </React.Fragment>
+            } />
+
+            {/* Route API documentation ONLY. */}
+            <Route exact path="/api" render={props =>
+                <React.Fragment>
+                    <PageTitle>LAMP API</PageTitle>
+                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => reset()}>
+                        <Icon>arrow_back</Icon>
+                        <span style={{ width: 8 }} />
+                        Back
+                    </Fab>
+                    <div style={{ height: 56 }}></div>
+                    <SwaggerUI url="https://api.lamp.digital/" docExpansion="list" />
+                </React.Fragment>
+            } />
+        </Switch>
+    )
+}
+
+export default function App({ ...props }) {
+    return (
         <ThemeProvider theme={createMuiTheme({
                 typography: {
                 useNextVariants: true,
@@ -138,160 +312,8 @@ export default function App({ ...props }) {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                 <SnackbarProvider maxSnack={3}>
                     <HashRouter>
-                        <Switch>
-
-                            {/* Route index => login or home (which redirects based on user type). */}
-                            <Route exact path="/" render={props =>
-                                (!(window.location.hash.split('?').length > 1 && !state.identity)) ?
-                                (!state.identity ?
-                                    <React.Fragment>
-                                        <PageTitle>mindLAMP | Login</PageTitle>
-                                        <NavigationLayout 
-                                            noToolbar 
-                                            goBack={props.history.goBack} 
-                                            onLogout={() => reset()}
-                                        >
-                                            <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                                <Icon>memory</Icon>
-                                                <span style={{ width: 8 }} />
-                                                API
-                                            </Fab>
-                                            <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
-                                        </NavigationLayout>
-                                    </React.Fragment> :
-                                    (state.auth.type === 'root' ?
-                                        <Redirect to="/researcher" /> :
-                                    state.auth.type === 'researcher' ?
-                                        <Redirect to="/researcher/me" /> :
-                                        <Redirect to="/participant/me" />
-                                    )
-                                ) : <React.Fragment />
-                            } />
-
-                            {/* Route authenticated routes. */}
-                            <Route exact path="/researcher" render={props =>
-                                !state.identity || (state.auth.type !== 'root') ?
-                                <React.Fragment>
-                                    <PageTitle>mindLAMP | Login</PageTitle>
-                                    <NavigationLayout 
-                                        noToolbar 
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                            <Icon>memory</Icon>
-                                            <span style={{ width: 8 }} />
-                                            API
-                                        </Fab>
-                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
-                                    </NavigationLayout>
-                                </React.Fragment> :
-                                <React.Fragment>
-                                    <PageTitle>Administrator</PageTitle>
-                                    <NavigationLayout 
-                                        title="Administrator" 
-                                        profile={state.auth.type === 'root' ? {} : state.identity} 
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Root {...props} root={state.identity} />
-                                        <Snackbar
-                                            open
-                                            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                                            message="Proceed with caution: you are logged in as the administrator."
-                                        />
-                                    </NavigationLayout>
-                                </React.Fragment>
-                            } />
-                            <Route exact path="/researcher/:id" render={props =>
-                                !state.identity ? 
-                                <React.Fragment>
-                                    <PageTitle>mindLAMP | Login</PageTitle>
-                                    <NavigationLayout 
-                                        noToolbar 
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                            <Icon>memory</Icon>
-                                            <span style={{ width: 8 }} />
-                                            API
-                                        </Fab>
-                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
-                                    </NavigationLayout>
-                                </React.Fragment>:
-                                !getResearcher(props.match.params.id) ? 
-                                <React.Fragment /> :
-                                <React.Fragment>
-                                    <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
-                                    <NavigationLayout 
-                                        id={props.match.params.id}
-                                        title={`${getResearcher(props.match.params.id).name}`} 
-                                        profile={state.auth.type === 'root' ? {} : state.identity}
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
-                                    </NavigationLayout>
-                                </React.Fragment>
-                            } />
-
-                            <Route exact path="/participant/:id" render={props =>
-                                !state.identity ? 
-                                <React.Fragment>
-                                    <PageTitle>mindLAMP | Login</PageTitle>
-                                    <NavigationLayout 
-                                        noToolbar 
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                            <Icon>memory</Icon>
-                                            <span style={{ width: 8 }} />
-                                            API
-                                        </Fab>
-                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
-                                    </NavigationLayout>
-                                </React.Fragment> : 
-                                !getParticipant(props.match.params.id) ? 
-                                <React.Fragment /> :
-                                <React.Fragment>
-                                    <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
-                                    <NavigationLayout 
-                                        enableMessaging
-                                        id={props.match.params.id}
-                                        title={`Patient ${getParticipant(props.match.params.id).id}`} 
-                                        profile={state.auth.type === 'root' ? {} : state.identity}
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Participant participant={getParticipant(props.match.params.id)} />
-                                    </NavigationLayout>
-                                </React.Fragment>
-                            } />
-
-                            {/* Route API documentation ONLY. */}
-                            <Route exact path="/api" render={props =>
-                                <React.Fragment>
-                                    <PageTitle>LAMP API</PageTitle>
-                                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => reset()}>
-                                        <Icon>arrow_back</Icon>
-                                        <span style={{ width: 8 }} />
-                                        Back
-                                    </Fab>
-                                    <div style={{ height: 56 }}></div>
-                                    <SwaggerUI url="https://api.lamp.digital/" docExpansion="list" />
-                                </React.Fragment>
-                            } />
-                        </Switch>
+                        <AppRouter {...props} />
                     </HashRouter>
-                    {!!deferredPrompt && 
-                    <Snackbar
-                        open
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                        message="Add mindLAMP to your home screen?"
-                        action={<Button color="inherit" size="small" onClick={promptInstall}>Install</Button>}
-                    />}
                 </SnackbarProvider>
             </MuiPickersUtilsProvider>
             <span style={{ position: 'fixed', bottom: 16, left: 16, fontSize: '8', zIndex: -1, opacity: 0.1 }}>{process.env.REACT_APP_GIT_SHA}</span>

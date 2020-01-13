@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Card, Switch, Typography, Divider, Grid } from '@material-ui/core'
 import { blue } from '@material-ui/core/colors'
+import { useSnackbar } from 'notistack'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -31,6 +32,7 @@ export default function Participant({ participant, ...props }) {
     const [ submission, setSubmission ] = useState(0)
     const [ hiddenEvents, setHiddenEvents ] = useState([])
     const [launchedActivity, setLaunchedActivity] = useState()
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         (async () => {
@@ -214,7 +216,7 @@ export default function Participant({ participant, ...props }) {
                             content={survey} 
                             prefillData={!!survey ? survey.prefillData : undefined}
                             prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-                            onValidationFailure={() => props.layout.showAlert('Some responses are missing. Please complete all questions before submitting.')}
+                            onValidationFailure={() => enqueueSnackbar('Some responses are missing. Please complete all questions before submitting.', { variant: 'error' })}
                             onResponse={submitSurvey} 
                         />
                     </Box>

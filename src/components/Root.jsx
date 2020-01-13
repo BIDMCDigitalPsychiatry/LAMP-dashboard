@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Box, Dialog, DialogContent } from '@material-ui/core'
 import MaterialTable from 'material-table'
+import { useSnackbar } from 'notistack'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -16,6 +17,7 @@ export default function Root({ onChange, ...props }) {
     const [researchers, setResearchers] = useState([])
     //const [names, setNames] = useState({})
     const [passwordChange, setPasswordChange] = useState()
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         if (LAMP.Auth._auth.type !== 'root')
@@ -107,7 +109,7 @@ export default function Root({ onChange, ...props }) {
                 <DialogContent style={{ marginBottom: 12 }}>
                     <CredentialManager 
                         id={passwordChange} 
-                        onError={err => props.layout.showAlert(err)}
+                        onError={err => enqueueSnackbar(err, { variant: 'error' })}
                     />
                 </DialogContent>
             </Dialog>

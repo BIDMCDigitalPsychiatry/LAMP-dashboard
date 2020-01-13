@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip } from '@material-ui/core'
 import { green } from '@material-ui/core/colors'
 import MaterialTable from 'material-table'
+import { useSnackbar } from 'notistack'
 
 // External Imports 
 import { saveAs } from 'file-saver'
@@ -37,6 +38,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
     const [openPasswordReset, setOpenPasswordReset] = useState()
     const [logins, setLogins] = useState({})
     const [names, setNames] = useState({})
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         (async function() {
@@ -300,7 +302,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                 <Messages participant={openMessaging} />
             </ResponsiveDialog>
             <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset()}>
-                <CredentialManager style={{ margin: 16 }} id={openPasswordReset} onError={err => props.layout.showAlert(err)} />
+                <CredentialManager style={{ margin: 16 }} id={openPasswordReset} onError={err => enqueueSnackbar(err, { variant: 'error' })} />
             </ResponsiveDialog>
         </React.Fragment>
     )
