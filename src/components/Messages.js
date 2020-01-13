@@ -17,7 +17,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
         <Grid container direction={flipped ? 'row' : 'row-reverse'} alignItems="flex-end" spacing={1} style={{ padding: 8 }}>
             <Grid item style={{ display: flipped ? undefined : 'none' }}>
                 <Tooltip title={capitalize((from === 'researcher' ? 'clinician' : 'patient'))}>
-                    <Avatar style={{ background: '#aaa' }} src="https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958ecfedbb68c91822af2_00100dportrait_00100_W9YBE~2-p-800.jpeg">?</Avatar>
+                    <Avatar style={{ background: '#aaa' }} /* src="https://uploads-ssl.webflow.com/5d321d55bdb594133bc03c07/5d7958ecfedbb68c91822af2_00100dportrait_00100_W9YBE~2-p-800.jpeg" */>C</Avatar>
                 </Tooltip>
             </Grid>
             <Grid item>
