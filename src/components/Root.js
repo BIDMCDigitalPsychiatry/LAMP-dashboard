@@ -11,10 +11,14 @@ import LAMP from '../lamp'
 import CredentialManager from './CredentialManager'
 import { ResponsivePaper } from './Utils'
 
-export default function Root({ ...props }) {
+// initial load = not working
+
+
+export default function Root({ onChange, ...props }) {
     const [researchers, setResearchers] = useState([])
     //const [names, setNames] = useState({})
     const [passwordChange, setPasswordChange] = useState()
+
     useEffect(() => {
         if (LAMP.Auth._auth.type !== 'root')
             return
@@ -32,25 +36,26 @@ export default function Root({ ...props }) {
             setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
         })()
     }, [researchers])
-    */
-
-    /*
     render: (x) => 
-        <EditField 
-            text={names[x.id] || x.id} 
-            onChange={newValue => {
-                let oldValue = names[x.id] || x.id
-                if (oldValue == newValue)
-                    return
+    <EditField 
+        text={names[x.id]} 
+        defaultValue={x.id}
+        onChange={newValue => {
+            let id = x.id /* shadow copy /
+            let oldValue = names[id] || id
+            if (oldValue === newValue)
+                return
+            let isStr = (typeof newValue === 'string') && newValue.length > 0
 
-                let isStr = (typeof newValue === 'string') && newValue.length > 0
-                setNames(names => ({ ...names, [x.id]: isStr ? newValue : undefined }))
-                LAMP.Type.setAttachment(x.id, 'me', 'lamp.name', newValue).catch(err => {
+            LAMP.Type.setAttachment(id, 'me', 'lamp.name', isStr ? newValue : null)
+                .then(x => setNames(names => ({ ...names, [id]: isStr ? newValue : undefined })))
+                .then(x => onChange())
+                .catch(err => {
                     console.error(err)
-                    setNames(names => ({ ...names, [x.id]: oldValue }))
+                    setNames(names => ({ ...names, [id]: oldValue }))
                 })
-            }} 
-        /> 
+        }} 
+    /> 
     */
 
 	return (
@@ -59,10 +64,7 @@ export default function Root({ ...props }) {
                 <MaterialTable 
                     title="Researchers"
                     data={researchers} 
-                    columns={[
-                        { title: 'Name', field: 'name' },
-                        { title: 'Email', field: 'email' }
-                    ]}
+                    columns={[{ title: 'Name', field: 'name' }]}
                     onRowClick={(event, rowData, togglePanel) => 
                         props.history.push(`/researcher/${researchers[rowData.tableData.id].id}`)}
                     editable={{
@@ -82,7 +84,7 @@ export default function Root({ ...props }) {
                     actions={[
                         {
                             icon: 'vpn_key',
-                            tooltip: 'Reset Password',
+                            tooltip: 'Manage Credentials',
                             onClick: (event, rowData) => setPasswordChange(rowData.id)
                         }
                     ]}

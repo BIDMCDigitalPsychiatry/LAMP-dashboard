@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Box from '@material-ui/core/Box'
 import Card from '@material-ui/core/Card'
 import Switch from '@material-ui/core/Switch'
-import Icon from '@material-ui/core/Icon'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 import blue from '@material-ui/core/colors/blue'
@@ -18,13 +17,14 @@ import LAMP from '../lamp'
 import ActivityCard from './ActivityCard'
 import MultipleSelect from './MultipleSelect'
 import CareTeam from './CareTeam'
-import ActivityLauncher from './ActivityLauncher'
+import Launcher from './Launcher'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
-import MenuButton from './MenuButton'
 import { groupBy } from './Utils'
 import Survey from './Survey'
 import { ResponsiveDialog } from './Utils'
+import Breathe from './Breathe'
+import Jewels from './Jewels'
 
 function _shouldRestrict() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') && (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
@@ -37,6 +37,7 @@ export default function Participant({ participant, ...props }) {
     const [ survey, setSurvey ] = useState()
     const [ submission, setSubmission ] = useState(0)
     const [ hiddenEvents, setHiddenEvents ] = useState([])
+    const [launchedActivity, setLaunchedActivity] = useState()
 
     useEffect(() => {
         (async () => {
@@ -174,22 +175,60 @@ export default function Participant({ participant, ...props }) {
 
     return (
         <React.Fragment>
-            {/*
-            <Box border={1} borderColor="grey.300" borderRadius={4} p={2} my={4}>
+            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} my={4}>
                 <CareTeam participant={participant} />
             </Box>
-            <Box border={1} borderColor="grey.300" borderRadius={4} my={4}>
-                <ActivityLauncher participant={participant} />
+            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" my={4}>
+                <Launcher.Group>
+                    <Launcher.Section title="Learn">
+                    </Launcher.Section>
+                    <Launcher.Section title="Assess">
+                        {[
+                            <Launcher.Button key="_-1" 
+                                notification title="Administer All Survey Instruments" 
+                                onClick={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)))} 
+                            />,
+                            ...(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
+                                <Launcher.Button key={y.name} 
+                                    title={y.name} 
+                                    onClick={() => setActivities([y])}
+                                />
+                            ))
+                        ]}
+                    </Launcher.Section>
+                    <Launcher.Section title="Manage">
+                        <Launcher.Button favorite title="Breathe" onClick={() => setLaunchedActivity('breathe')} />
+                    </Launcher.Section>
+                    <Launcher.Section title="Prevent">
+                    </Launcher.Section>
+                </Launcher.Group>
+                <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
+                    {launchedActivity === 'breathe' ?
+                        <Breathe onComplete={() => setLaunchedActivity()} /> : 
+                        <Jewels onComplete={() => setLaunchedActivity()} />
+                    }
+                </ResponsiveDialog>
+                <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
+                    <Box py={8} px={2}>
+                        <Survey
+                            validate
+                            partialValidationOnly
+                            content={survey} 
+                            prefillData={!!survey ? survey.prefillData : undefined}
+                            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+                            onValidationFailure={() => props.layout.showAlert('Some responses are missing. Please complete all questions before submitting.')}
+                            onResponse={submitSurvey} 
+                        />
+                    </Box>
+                </ResponsiveDialog>
             </Box>
-            */}
-            
-            <Box border={1} borderColor="grey.300" borderRadius={4} p={2} mx="10%">
-                <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant="subtitle2">
+            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} mx="10%">
+                <Box display="flex" justifyContent="space-between">
+                    <Typography variant="overline">
                         Activity
                     </Typography>
                     <Box>
-                        <Typography variant="inherit" color="inherit">
+                        <Typography variant="overline" color="inherit">
                             Show All
                         </Typography>
                         <Switch 
@@ -209,7 +248,7 @@ export default function Participant({ participant, ...props }) {
                 {(!(!!LAMP.Auth._auth.serverAddress && !LAMP.Auth._auth.serverAddress.includes('psych.digital'))) &&
                     <React.Fragment>
                         <Divider style={{ margin: '8px -16px 8px -16px' }} />
-                        <Typography variant="subtitle2">
+                        <Typography variant="overline">
                             Sensor
                         </Typography>
                         <MultipleSelect 
@@ -224,7 +263,7 @@ export default function Participant({ participant, ...props }) {
                 {Object.keys(visualizations).length > 0 &&
                     <React.Fragment>
                         <Divider style={{ margin: '8px -16px 8px -16px' }} />
-                        <Typography variant="subtitle2">
+                        <Typography variant="overline">
                             Automations
                         </Typography>
                         <MultipleSelect 
@@ -250,7 +289,7 @@ export default function Participant({ participant, ...props }) {
                     color={blue[700]}
                     p={2} my={4} mx="10%"
                 >
-                    <Typography variant="overline" style={{ textAlign: 'center' }}>
+                    <Typography variant="overline" align="center">
                         <b>No Activities are selected. Please select an Activity above to begin.</b>
                     </Typography>
                 </Box>
@@ -279,7 +318,7 @@ export default function Participant({ participant, ...props }) {
             )}
             {!(state.selectedPassive || []).includes('Environmental Context') ? <React.Fragment /> : 
                 <Card style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center', margin: 16 }}>
+                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
                         Environmental Context
                     </Typography>
                     <Divider style={{ marginBottom: 16 }} />
@@ -368,7 +407,7 @@ export default function Participant({ participant, ...props }) {
             }
             {!(state.selectedPassive || []).includes('Step Count') ? <React.Fragment /> : 
                 <Card style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center', margin: 16 }}>
+                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
                         Step Count
                     </Typography>
                     <Divider style={{ marginBottom: 16 }} />
@@ -383,17 +422,12 @@ export default function Participant({ participant, ...props }) {
                               .map(d => ({ 
                                   x: new Date(parseInt(d.timestamp)), 
                                   y: d.data.value || 0
-                              }))}
-                        lineProps={{
-                          dashArray: '3 1',
-                          dashType: 'dotted',
-                          cap: 'butt'
-                        }} />
+                              }))} />
                 </Card>
             }
             {(state.selectedExperimental || []).map(x => (
                 <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" style={{ width: '100%', textAlign: 'center', margin: 16 }}>
+                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
                         {x}
                     </Typography>
                     <Divider style={{ marginBottom: 16 }} />
@@ -413,29 +447,6 @@ export default function Participant({ participant, ...props }) {
                     </Grid>
                 </Card>
             ))}
-            <Box display="flex" p={4} justifyContent="center">
-                <MenuButton 
-                    style={{ margin: 'auto 0' }}
-                    title="Administer Survey Instruments" 
-                    icon={<Icon>assignment</Icon>}
-                    items={(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(x => x.name)} 
-                    onAction={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)))}
-                    onClick={y => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true) && x.name === y))}
-                />
-            </Box>
-            <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
-                <Box py={8} px={2}>
-                    <Survey
-                        validate
-                        partialValidationOnly
-                        content={survey} 
-                        prefillData={!!survey ? survey.prefillData : undefined}
-                        prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-                        onValidationFailure={() => props.layout.showAlert('Some responses are missing. Please complete all questions before submitting.')}
-                        onResponse={submitSurvey} 
-                    />
-                </Box>
-            </ResponsiveDialog>
         </React.Fragment>
     )
 }

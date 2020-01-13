@@ -277,7 +277,6 @@ function TabPanel({ index, value, children }) {
 }
 
 export default function Survey({ onResponse, onValidationFailure, validate, partialValidationOnly, content, prefillData, prefillTimestamp, ...props }) {
-  if (!content) return <React.Fragment />
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
 
   // eslint-disable-next-line
@@ -290,6 +289,8 @@ export default function Survey({ onResponse, onValidationFailure, validate, part
   const downArrowPress = useKeyPress('ArrowDown', () => {}, () => {
     setActiveTab(tab => Math.min(tab + 1, ((content || {}).sections || []).length))
   })
+
+  if (!content) return <React.Fragment />
 
   const validator = response => {
     for (let section of response) {

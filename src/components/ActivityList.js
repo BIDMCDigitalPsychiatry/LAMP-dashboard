@@ -49,7 +49,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     }, [])
     // eslint-disable-next-line
     const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-        onDrop, accept: 'application/json,.json', maxSize: 1 * 1024 * 1024 /* 5MB */
+        onDrop, accept: 'application/json,.json', maxSize: 1 * 1024 * 1024 /* 1MB */
     })
 
     const importActivities = async () => {

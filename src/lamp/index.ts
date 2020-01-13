@@ -1,6 +1,3 @@
-export * from './service/index'
-export * from './model/index'
-
 import { 
     Researcher, 
     Participant 
@@ -18,6 +15,9 @@ import {
     TypeService 
 } from './service/index'
 import { Configuration } from './service/Fetch'
+
+export * from './service/index'
+export * from './model/index'
 
 /**
  * 

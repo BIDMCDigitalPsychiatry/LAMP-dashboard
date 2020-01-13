@@ -1,10 +1,10 @@
 
 // Core Imports 
 import React, { useState } from 'react'
+import Box from '@material-ui/core/Box'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
 import MenuItem from '@material-ui/core/MenuItem'
 import Badge from '@material-ui/core/Badge'
 import IconButton from '@material-ui/core/IconButton'
@@ -40,9 +40,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                         >
     						<Icon>arrow_back</Icon>
     					</IconButton>
-    					<Typography variant="h6" color="textPrimary" style={{flexGrow: 1}}>
-    						{title || ''}
-    					</Typography>
+                        <Box flexGrow={1} />
     					<div>
                             <Tooltip title="Notifications">
         						<IconButton color="default" onClick={() => {}}>
@@ -51,7 +49,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
         							</Badge>
         						</IconButton>
                             </Tooltip>
-                            <Tooltip title="Settings & More">
+                            <Tooltip title="Profile & Settings">
         						<IconButton
         							aria-owns={!!showCustomizeMenu ? 'menu-appbar' : null}
         							aria-haspopup="true"
@@ -67,7 +65,9 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
     							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
     							transformOrigin={{horizontal: 'right', vertical: 'top'}}
     							open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
-    							onClose={() => setShowCustomizeMenu()}>
+    							onClose={() => setShowCustomizeMenu()}
+                            >
+                                <MenuItem disabled divider><b>{title}</b></MenuItem>
     							{!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
     							<MenuItem onClick={() => setConfirmLogout(true)}>Logout</MenuItem>
     						</Menu>
@@ -79,8 +79,6 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 <ResponsiveMargin style={{ width: '80%', marginTop: 20, marginLeft: 'auto', marginRight: 'auto' }}>
                     {React.Children.map(props.children, child =>
                         React.cloneElement(child, { layout: {
-                            setTitle: (title) => {  },
-                            pageLoading: (loaded) => {},
                             showMessage: (message, timeout = 3000) => {
                                 setState(state => ({ ...state, snackMessage: message }))
                                 setTimeout(() => setState(state => ({ ...state, snackMessage: null })), timeout)

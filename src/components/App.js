@@ -21,7 +21,6 @@ import 'swagger-ui-react/swagger-ui.css'
 
 // Local Imports
 import LAMP from '../lamp'
-import AppHome from './Home'
 import Login from './Login'
 import Root from './Root'
 import Researcher from './Researcher'
@@ -272,35 +271,6 @@ export default function App({ ...props }) {
                                     </NavigationLayout>
                                 </React.Fragment>
                             } />
-                            
-                            {/* Route to the app home screen.*/}
-                            <Route exact path="/app" render={props =>
-                                !state.identity ? 
-                                <React.Fragment>
-                                    <PageTitle>mindLAMP | Login</PageTitle>
-                                    <NavigationLayout 
-                                        noToolbar 
-                                        goBack={props.history.goBack} 
-                                        onLogout={() => reset()}
-                                    >
-                                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                            <Icon>memory</Icon>
-                                            <span style={{ width: 8 }} />
-                                            API
-                                        </Fab>
-                                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
-                                    </NavigationLayout>
-                                </React.Fragment> :
-                                state.auth.type !== 'participant' ? 
-                                <Redirect to="/" /> :
-                                <React.Fragment>
-                                    <PageTitle>mindLAMP</PageTitle>
-                                    <AppHome {...props} 
-                                        auth={{ ...state }} 
-                                        setIdentity={async (identity) => await reset(identity) } 
-                                    />
-                                </React.Fragment>
-                            } />
 
                             {/* Route API documentation ONLY. */}
                             <Route exact path="/api" render={props =>
@@ -326,7 +296,7 @@ export default function App({ ...props }) {
                     />}
                 </SnackbarProvider>
             </MuiPickersUtilsProvider>
-            <span style={{ position: 'fixed', bottom: 16, left: 16, fontSize: '8', zIndex: -1 }}>{process.env.REACT_APP_GIT_SHA}</span>
+            <span style={{ position: 'fixed', bottom: 16, left: 16, fontSize: '8', zIndex: -1, opacity: 0.1 }}>{process.env.REACT_APP_GIT_SHA}</span>
         </ThemeProvider>
     )
 }

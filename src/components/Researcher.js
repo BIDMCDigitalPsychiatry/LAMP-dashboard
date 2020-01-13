@@ -2,6 +2,7 @@
 // Core Imports
 import React, { useState, useEffect } from 'react'
 import Box from '@material-ui/core/Box'
+import Divider from '@material-ui/core/Divider'
 import Switch from '@material-ui/core/Switch'
 import Typography from '@material-ui/core/Typography'
 import Tabs from '@material-ui/core/Tabs'
@@ -53,6 +54,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                     <Tab label="Patients" />
                     <Tab label="Activities" />
                 </Tabs>
+                <Divider />
                 {currentTab === 0 &&
                     <ParticipantList 
                         title="Default Clinic"

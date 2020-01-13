@@ -1,6 +1,7 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import Box from '@material-ui/core/Box'
 import Grid from '@material-ui/core/Grid'
 import Avatar from '@material-ui/core/Avatar'
 import Icon from '@material-ui/core/Icon'
@@ -10,183 +11,284 @@ import Divider from '@material-ui/core/Divider'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import TextField from '@material-ui/core/TextField'
+import ButtonBase from '@material-ui/core/ButtonBase'
 import Typography from '@material-ui/core/Typography'
 import InputAdornment from '@material-ui/core/InputAdornment'
-import { deepOrange } from '@material-ui/core/colors';
+import { useTheme } from '@material-ui/core/styles'
 
 // External Imports
 import QRCode from 'qrcode.react'
+import { useDropzone } from 'react-dropzone'
 
 // Local Imports
 import LAMP from '../lamp'
+import { compress } from './Utils'
 
-export default function CredentialManager({ id, onComplete, onError, ...props }) {
-  const [allCreds, setAllCreds] = useState([])
-  const [selected, setSelected] = useState()
-  const [resetCred, setResetCred] = useState()
-  const [createNew, setCreateNew] = useState(false)
-  const [showLink, setShowLink] = useState(false)
+function CredentialEditor({ credential, auxData, mode, onChange }) {
+  const [photo, setPhoto] = useState()
   const [name, setName] = useState('')
+  const [role, setRole] = useState('')
   const [emailAddress, setEmailAddress] = useState('')
   const [password, setPassword] = useState('')
+  const [showLink, setShowLink] = useState(false)
 
-  const _qrLink = () => window.location.href.split('#')[0] + '#/?a=' + btoa([id, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
+  useEffect(() => {
+    setPhoto(auxData.photo)
+    setRole(auxData.role)
+  }, [auxData])
+
+  const onDrop = useCallback(acceptedFiles => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
+  // eslint-disable-next-line
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+      onDrop, accept: 'image/*', maxSize: 2 * 1024 * 1024 /* 5MB */
+  })
+
+  const credID = !!credential ? (credential.description === 'Default Credential' ? credential.origin : credential.access_key) : ''
+  const _qrLink = () => window.location.href.split('#')[0] + '#/?a=' + btoa([credID, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
+
+  return (
+    <Grid container justify="center" alignItems="center">
+      {['create-new', 'change-role'].includes(mode) &&
+        <Tooltip title={!photo ? 'Drag a photo or tap to select a photo.' : 'Drag a photo to replace the existing photo or tap to delete the photo.'}>
+          <Box {...getRootProps()} 
+            my={2}
+            width={128}
+            height={128}
+            border={1}
+            borderRadius={4}
+            borderColor={!(isDragActive || isDragAccept || !!photo) ? 'text.secondary' : '#fff'}
+            bgcolor={(isDragActive || isDragAccept) ? 'text.secondary' : undefined} 
+            color={!(isDragActive || isDragAccept || !!photo) ? 'text.secondary' : '#fff'}
+            style={{ background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined }}
+          >
+            <ButtonBase style={{ width: '100%', height: '100%' }} onClick={() => !!photo && setPhoto()}>
+              {!photo && <input {...getInputProps()} />}
+              <Icon fontSize="large">{!photo ? 'add_a_photo' : 'delete_forever'}</Icon>
+            </ButtonBase>
+          </Box>
+        </Tooltip>
+      }
+      {['create-new'].includes(mode) && 
+        <TextField 
+          fullWidth
+          label={`Name`}
+          type="text"
+          variant="outlined"
+          helperText="Enter the family member or clinician's name here."
+          value={name}
+          onChange={event => setName(event.target.value)}
+          style={{ marginBottom: 16 }}
+        />
+      }
+      {['create-new', 'change-role'].includes(mode) && 
+        <TextField 
+          fullWidth
+          label={`Role`}
+          type="text"
+          variant="outlined"
+          helperText="Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+          value={role}
+          onChange={event => setRole(event.target.value)}
+          style={{ marginBottom: 16 }}
+          InputProps={{
+            endAdornment: [
+              !['change-role'].includes(mode) ? undefined : 
+              <InputAdornment position="end" key="a">
+                <Tooltip title="Save Role & Photo">
+                  <IconButton
+                    edge="end"
+                    aria-label="save role"
+                    onClick={() => onChange({ credential, photo, name, role, emailAddress, password })}
+                    onMouseDown={event => event.preventDefault()}
+                  >
+                    <Icon>check_circle</Icon>
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ],
+          }}
+        />
+      }
+      {['create-new'].includes(mode) && 
+        <TextField 
+          fullWidth
+          label={`Email Address`}
+          type="email"
+          variant="outlined"
+          helperText="Enter the email address here."
+          value={emailAddress}
+          onChange={event => setEmailAddress(event.target.value)}
+          style={{ marginBottom: 16 }}
+        />
+      }
+      {['create-new', 'reset-password'].includes(mode) && 
+        <TextField 
+          fullWidth
+          label={`Password`}
+          type="password"
+          variant="outlined"
+          helperText="Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+          value={password}
+          onChange={event => setPassword(event.target.value)}
+          InputProps={{
+            endAdornment: [
+              ['create-new'].includes(mode) ? undefined : 
+              <InputAdornment position="end" key="a">
+                <Tooltip title="Copy one-time access link that can be used to log in without entering credentials.">
+                  <IconButton
+                    edge="end"
+                    aria-label="copy link"
+                    onClick={() => setShowLink(showLink => !showLink)}
+                    onMouseDown={event => event.preventDefault()}
+                  >
+                    <Icon>save</Icon>
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>,
+              !['reset-password', 'create-new'].includes(mode) ? undefined : 
+              <InputAdornment position="end" key="b">
+                <Tooltip title="Save Credential">
+                  <IconButton
+                    edge="end"
+                    aria-label="submit credential"
+                    onClick={() => onChange({ credential, photo, name, role, emailAddress, password })}
+                    onMouseDown={event => event.preventDefault()}
+                  >
+                    <Icon>check_circle</Icon>
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ],
+          }}
+        />
+      }
+      {(showLink && password.length > 0) && 
+        <Grid item>
+          <TextField 
+            fullWidth
+            style={{ marginTop: 16 }}
+            variant="outlined"
+            value={_qrLink()}
+            onChange={event => {}}
+          />
+          <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+            <Grid container justify="center" style={{ padding: 16 }}>
+              <QRCode size={256} level="H" value={_qrLink()} />
+            </Grid>
+          </Tooltip>
+        </Grid>
+      }
+    </Grid>
+  )
+}
+
+export default function CredentialManager({ id, onComplete, onError, ...props }) {
+  const theme = useTheme()
+  const [selected, setSelected] = useState({ anchorEl: undefined, credential: undefined, mode: undefined })
+  const [allCreds, setAllCreds] = useState([])
+  const [allRoles, setAllRoles] = useState({})
+  const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState()
 
   useEffect(() => { 
+    LAMP.Type.parent(id).then(x => Object.keys(x.data).length === 0).then(setShouldSyncWithChildren)
     LAMP.Credential.list(id).then(setAllCreds) 
+    LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
+      .then(res => setAllRoles(!!res.data ? res.data : {}))
   }, [])
-  useEffect(() => { 
-    setShowLink(false)
-    setCreateNew(false)
-    setName('')
-    setEmailAddress('')
-    setPassword('') 
-  }, [selected])
-  useEffect(() => { 
-    setCreateNew(false)
-    setSelected() 
-  }, [resetCred])
-  useEffect(() => { 
-    setSelected() 
-  }, [createNew])
 
-  const _submitCredential = async () => {
+  useEffect(() => {
+    if (shouldSyncWithChildren !== true)
+      return
+    LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
+      .then(res => !!res.data ? LAMP.Type.setAttachment(id, 'Participant', 'lamp.dashboard.credential_roles.external', res.data) : console.log('no roles to sync'))
+  }, [shouldSyncWithChildren, allRoles])
+
+  const _submitCredential = async (data) => {
     try {
-      if (!!resetCred && !!password) {
-        if (!!(await LAMP.Credential.update(id, resetCred.access_key, { ...resetCred, secret_key: password })).error)
+      if (selected.mode === 'reset-password' && (!!data.password)) {
+        if (!!(await LAMP.Credential.update(id, data.credential.access_key, { ...data.credential, secret_key: data.password })).error)
           return onError('could not change password')
-      } else if (!!name && !!emailAddress && !!password) {
-        if (!!(await LAMP.Credential.create(id, emailAddress, password, name)).error)
+      } else if (selected.mode === 'create-new' && (!!data.name && !!data.emailAddress && !!data.password)) {
+        if (!!(await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)).error)
           return onError('could not create credential')
+        await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
+          { ...allRoles, [data.emailAddress]: (!data.role && !data.photo) ? undefined : { role: data.role, photo: data.photo }})
+      } else if (selected.mode === 'change-role') {
+        await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
+          { ...allRoles, [data.credential.access_key]: (!data.role && !data.photo) ? undefined : { role: data.role, photo: data.photo }})
       } else { onError('could not perform operation') }
     } catch(err) { onError('credential management failed') }
     LAMP.Credential.list(id).then(setAllCreds) 
-    return setResetCred()
+    LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
+      .then(res => setAllRoles(!!res.data ? res.data : []))
+    return setSelected({ anchorEl: undefined, credential: undefined, mode: undefined })
   }
 
-  const _deleteCredential = async () => {
+  const _deleteCredential = async (credential) => {
     try {
-      if (!!selected) {
-        if (!!(await LAMP.Credential.delete(id, selected.item.access_key)).error)
-          return onError('could not delete')
-      } else { onError('could not perform operation') }
-    } catch(err) { onError('credential management failed') }
+      if (!!(await LAMP.Credential.delete(id, credential.access_key)).error)
+        return onError('could not delete')
+      await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
+        { ...allRoles, [credential.access_key]: undefined })
+    } catch(err) { 
+      onError('credential management failed') 
+    }
     LAMP.Credential.list(id).then(setAllCreds) 
+    LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
+      .then(res => setAllRoles(!!res.data ? res.data : []))
   }
 
   return (
-    <React.Fragment>
-      <Grid container justify="center" alignItems="center" spacing={2} style={{ marginBottom: 16 }}>
+    <Box {...props}>
+      <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
-          <Typography variant="h4" align="center">
-            Your <b>Care Team</b>.
+          <Typography variant="h6" align="center">
+            Manage Credentials
           </Typography>
         </Grid>
-        {allCreds.map(x => (
-          <Grid item>
-            <Tooltip title={[x.description, <br />, x.access_key]}>
-              <IconButton onClick={event => setSelected({ item: x, target: event.currentTarget })}>
-                <Avatar style={{ backgroundColor: deepOrange[500] }}>{x.description.substring(0, 1)}</Avatar>
+        {allCreds.map((x, idx) => (
+          <Grid item key={idx}>
+            <Tooltip title={<React.Fragment>{x.description}<br />{x.access_key}</React.Fragment>}>
+              <IconButton onClick={event => setSelected(selected => ({ anchorEl: event.currentTarget, credential: x, mode: undefined }))}>
+                <Avatar src={(allRoles[(x || {}).access_key] || {}).photo} style={{ backgroundColor: theme.palette.primary.main }}>{x.description.substring(0, 1)}</Avatar>
               </IconButton>
             </Tooltip>
           </Grid>
         ))}
         <Grid item>
           <Tooltip title="Add a new member of your care team.">
-            <IconButton onClick={() => setCreateNew(createNew => !createNew)}>
-              <Avatar>+</Avatar>
+            <IconButton onClick={() => setSelected(selected => ({ anchorEl: undefined, credential: undefined, mode: selected.mode === 'create-new' ? undefined : 'create-new' }))}>
+              <Avatar style={{ backgroundColor: theme.palette.secondary.main }}>+</Avatar>
             </IconButton>
           </Tooltip>
         </Grid>
       </Grid>
       <Menu
-        anchorEl={selected ? selected.target : undefined}
         keepMounted
-        open={selected && !!selected.target}
-        onClose={() => setSelected()}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        anchorEl={selected.anchorEl}
+        open={!!selected.anchorEl}
+        onClose={() => setSelected({})}
       >
-        <MenuItem onClick={() => setResetCred(selected.item) || setSelected()}>
+        <MenuItem onClick={() => setSelected(selected => ({ anchorEl: undefined, credential: selected.credential, mode: 'change-role' }))}>
+          Update Photo & Role
+        </MenuItem>
+        <MenuItem onClick={() => setSelected(selected => ({ anchorEl: undefined, credential: selected.credential, mode: 'reset-password' }))}>
           Reset Password
         </MenuItem>
-        <MenuItem onClick={() => _deleteCredential() || setSelected()}>
+        <MenuItem onClick={() => _deleteCredential(selected.credential).then(() => setSelected(selected => ({ anchorEl: undefined, credential: undefined, mode: undefined })))}>
           <b>Delete</b>
         </MenuItem>
       </Menu>
-      {(resetCred || createNew) && <Divider style={{ margin: '0px -24px 32px -24px' }} />}
-      {createNew && <TextField 
-        fullWidth
-        label={`Name`}
-        type="text"
-        variant="outlined"
-        helperText="Enter the name here."
-        value={name}
-        onChange={event => setName(event.target.value)}
-        style={{ marginBottom: 16 }}
-      />}
-      {createNew && <TextField 
-        fullWidth
-        label={`Email Address`}
-        type="email"
-        variant="outlined"
-        helperText="Enter the email address here."
-        value={emailAddress}
-        onChange={event => setEmailAddress(event.target.value)}
-        style={{ marginBottom: 16 }}
-      />}
-      {(resetCred || createNew) && <TextField 
-        fullWidth
-        label={`Password`}
-        type="password"
-        variant="outlined"
-        helperText="Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
-        value={password}
-        onChange={event => setPassword(event.target.value)}
-        InputProps={{
-          endAdornment: [
-            createNew ? undefined : <InputAdornment position="end">
-              <Tooltip title="Copy one-time access link that can be used to log in without entering credentials.">
-                <IconButton
-                  edge="end"
-                  aria-label="copy link"
-                  onClick={() => setShowLink(showLink => !showLink)}
-                  onMouseDown={event => event.preventDefault()}
-                >
-                  <Icon>save</Icon>
-                </IconButton>
-              </Tooltip>
-            </InputAdornment>,
-            <InputAdornment position="end">
-              <Tooltip title="Save Credential">
-                <IconButton
-                  edge="end"
-                  aria-label="submit credential"
-                  onClick={_submitCredential}
-                  onMouseDown={event => event.preventDefault()}
-                >
-                  <Icon>check_circle</Icon>
-                </IconButton>
-              </Tooltip>
-            </InputAdornment>
-          ],
-        }}
-      />}
-      {(showLink && password.length > 0) && 
-        <React.Fragment>
-        <TextField 
-          fullWidth
-          style={{ marginTop: 16 }}
-          variant="outlined"
-          value={_qrLink()}
-          onChange={event => {}}
+      {!!selected.mode && 
+        <Divider style={{ margin: '0px -24px 32px -24px' }} />}
+      {!!selected.mode && 
+        <CredentialEditor 
+          credential={selected.credential} 
+          auxData={allRoles[(selected.credential || {}).access_key] || {}} 
+          mode={selected.mode} 
+          onChange={_submitCredential} 
         />
-        <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
-          <Grid container justify="center" style={{ padding: 16 }}>
-            <QRCode size={256} level="H" value={_qrLink()} />
-          </Grid>
-        </Tooltip>
-        </React.Fragment>
       }
-    </React.Fragment>
+    </Box>
   )
 }

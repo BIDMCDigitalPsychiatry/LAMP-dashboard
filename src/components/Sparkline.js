@@ -5,21 +5,22 @@ import {
   XYChart, 
   theme, 
   withParentSize,
-  withTheme, 
   CrossHair, 
   LineSeries, 
   AreaSeries, 
+  PointSeries,
   WithTooltip, 
   XAxis, 
   YAxis, 
   Brush,
-  LinearGradient
+  LinearGradient,
+  PatternLines
 } from '@data-ui/xy-chart'
 
 // Local Imports
 import { fullDateFormat } from './Utils'
 
-const XYChartWithTheme = withTheme(theme)(XYChart)
+// TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot
 
 class Sparkline extends React.PureComponent {
   rand = Math.random()
@@ -31,42 +32,31 @@ class Sparkline extends React.PureComponent {
       {(!series || Object.keys(series).length === 0) && <div style={{ fontFamily: 'Roboto' }}>{datum.y}</div>}
     </div>
     <br />
-    {[{
-      seriesKey: this.props.YAxisLabel || 'Data',
-      key: this.props.YAxisLabel || 'Data',
-      data: this.props.data.map(x => ({...x, color: this.props.color})),
-      stroke: this.props.color,
-      strokeDasharray: this.props.lineProps.dashArray || '3 1',
-      dashType: this.props.lineProps.dashType || 'dotted',
-      strokeLinecap: this.props.lineProps.cap || 'butt'
-    }].map(
-      ({ seriesKey, stroke: color, dashType }) =>
-        series &&
-        series[seriesKey] && (
-          <div key={seriesKey}>
-            <span
-              style={{
-                color,
-                textDecoration:
-                  series[seriesKey] === datum
-                    ? `underline ${dashType} ${color}`
-                    : null,
-                fontWeight: series[seriesKey] === datum ? 900 : 500,
-                fontFamily: 'Roboto'
-              }}
-            >
-              {`${seriesKey} `}
-            </span>
-            <span style={{ fontFamily: 'Roboto' }}>{series[seriesKey].y}</span>
-          </div>
-        ),
+    {(series && series[this.props.YAxisLabel || 'Data']) && (
+      <div key={this.props.YAxisLabel || 'Data'}>
+        <span
+          style={{
+            color: this.props.color,
+            textDecoration:
+              series[this.props.YAxisLabel || 'Data'] === datum
+                ? `underline dotted ${this.props.color}`
+                : null,
+            fontWeight: series[this.props.YAxisLabel || 'Data'] === datum ? 900 : 500,
+            fontFamily: 'Roboto'
+          }}
+        >
+          {`${this.props.YAxisLabel || 'Data'} `}
+        </span>
+        <span style={{ fontFamily: 'Roboto' }}>{series[this.props.YAxisLabel || 'Data'].y}</span>
+      </div>
     )}
   </div>
 
   render = () =>
   <WithTooltip renderTooltip={this.renderTooltip}>
     {({ onMouseLeave, onMouseMove, tooltipData }) => (
-      <XYChartWithTheme
+      <XYChart
+        theme={theme}
         ariaLabel="Chart"
         width={Math.max(this.props.minWidth, this.props.parentWidth)}
         height={Math.max(this.props.minHeight, this.props.parentHeight)}
@@ -87,47 +77,50 @@ class Sparkline extends React.PureComponent {
             this.props.data.slice(-1)[0].x
         ]}}
         yScale={{ type: 'linear' }}
-      >
+      > 
+        <PatternLines id={`brush-${this.rand}`} height={12} width={12} stroke={this.props.color} strokeWidth={1} orientation={['diagonal']} />
         <LinearGradient id={`gradient-${this.rand}`} from={this.props.color} to="#ffffff00" />
-        {!this.props.XAxisLabel ? <React.Fragment /> : 
-          <XAxis label={this.props.XAxisLabel} numTicks={5} />}
-        {!this.props.YAxisLabel ? <React.Fragment /> : 
-          <YAxis label={this.props.YAxisLabel} numTicks={4} />}
-        {[{
-            seriesKey: this.props.YAxisLabel || 'Data',
-            key: this.props.YAxisLabel || 'Data',
-            data: this.props.data.map(x => ({...x, color: this.props.color})),
-            stroke: this.props.color,
-            strokeDasharray: this.props.lineProps.dashArray || '3 1',
-            dashType: this.props.lineProps.dashType || 'dotted',
-            strokeLinecap: this.props.lineProps.cap || 'butt'
-          }].map(({ key, ...props }) => (
-            <LineSeries 
-              {...props}
-              key={key}
-              showPoints
-              strokeWidth={2}
-            />
-        ))}
-        {[{
-            seriesKey: this.props.YAxisLabel || 'Data',
-            key: this.props.YAxisLabel || 'Data',
-            data: this.props.data.map(x => ({...x, color: this.props.color})),
-          }].map(({ key, ...props }) => (
-            <AreaSeries key={key} data={props.data} fill={`url('#gradient-${this.rand}')`} />
-        ))}
+        {this.props.XAxisLabel && 
+          <XAxis label={this.props.XAxisLabel} numTicks={5} />
+        }
+        {this.props.YAxisLabel &&
+          <YAxis label={this.props.YAxisLabel} numTicks={4} />
+        }
+        <LineSeries 
+          data={this.props.data} 
+          seriesKey={this.props.YAxisLabel || 'Data'} 
+          stroke={this.props.color} 
+          strokeWidth={2} 
+          strokeDasharray="3 1" 
+          strokeLinecap="butt" 
+          dashType="dotted" 
+        />
+        <AreaSeries 
+          data={this.props.data} 
+          seriesKey={this.props.YAxisLabel || 'Data'} 
+          fill={`url('#gradient-${this.rand}')`} 
+          strokeWidth={0} 
+        />
+        <PointSeries 
+          data={this.props.data} 
+          seriesKey={this.props.YAxisLabel || 'Data'} 
+          fill={this.props.color} 
+          fillOpacity={1} 
+          strokeWidth={0} 
+        />
         <CrossHair
           fullHeight
           showHorizontalLine={false}
-          strokeDasharray=""
+          stroke={this.props.color}
+          strokeDasharray="3 1"
           circleSize={d => (d.y === tooltipData.datum.y ? 6 : 4)}
-          circleStroke={d => (d.y === tooltipData.datum.y ? '#fff' : d.color)}
+          circleStroke={d => (d.y === tooltipData.datum.y ? '#fff' : this.props.color)}
           circleStyles={{ strokeWidth: 1.5 }}
-          circleFill={d => (d.y === tooltipData.datum.y ? d.color : '#fff')}
+          circleFill={d => (d.y === tooltipData.datum.y ? this.props.color : '#fff')}
           showCircle
         />
-        <Brush disableDraggingSelection />
-      </XYChartWithTheme>
+        <Brush selectedBoxStyle={{ fill: `url(#brush-${this.rand})`, stroke: this.props.color }} />
+      </XYChart>
     )}
   </WithTooltip>
 }

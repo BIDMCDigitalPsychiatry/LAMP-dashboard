@@ -118,11 +118,6 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                                           slice: d.temporal_events
                                       }))}
                                 onClick={(datum) => setVisibleSlice(datum)}
-                                lineProps={{
-                                  dashArray: '3 1',
-                                  dashType: 'dotted',
-                                  cap: 'butt'
-                                }} 
                             />
                         )}
                         value={
@@ -152,11 +147,6 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                                   slice: d.temporal_events
                               }))}
                         onClick={(datum) => setVisibleSlice(datum)}
-                        lineProps={{
-                          dashArray: '3 1',
-                          dashType: 'dotted',
-                          cap: 'butt'
-                        }} 
                     />
                 )
             }

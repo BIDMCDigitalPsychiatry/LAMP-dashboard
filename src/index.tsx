@@ -8,7 +8,8 @@ import App from './components/App'
 import * as serviceWorker from './serviceWorker'
 
 // External Imports
-import '@babel/polyfill'
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
 import 'url-search-params-polyfill'
 import 'material-icons'
 

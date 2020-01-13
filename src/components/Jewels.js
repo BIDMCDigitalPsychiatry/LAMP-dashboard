@@ -13,8 +13,10 @@ import { rangeTo } from './Utils'
 const makeJewels = () => rangeTo(Math.floor(Math.random() * 100)).map(i => ({ i, x: Math.random(), y: Math.random() }))
 
 export default function Jewels({ onComplete, ...props }) {
+    // eslint-disable-next-line
   const [jewels, setJewels] = useState(makeJewels())
   const [actions, setActions] = useState([])
+    // eslint-disable-next-line
   const [activity, setActivity] = useState(new Activity({}))
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Avatar, Menu, MenuItem, Tooltip } from "@material-ui/core";
+import { Avatar, Menu, MenuItem, Tooltip, ButtonBase } from "@material-ui/core";
 import { isFragment } from "react-is";
 import clsx from "clsx";
 import { makeStyles, createStyles } from "@material-ui/core";
@@ -325,7 +325,7 @@ export default function AvatarCircleGroup({
   classes = undefined
 }: AvatarCircleGroupProps) {
   const [anchor, handleOpen, handleClose] = useMenu();
-  const onAdd = React.useCallback(
+  /*const onAdd = React.useCallback(
     account => {
       OnAdd && OnAdd(account);
       handleClose();
@@ -371,7 +371,8 @@ export default function AvatarCircleGroup({
         onClick({ id, accounts, addAccount, deleteAccount, handleAdd });
     },
     [handleOpen, addAccount, deleteAccount, handleAdd, accounts]
-  );
+  );*/
+  let accounts = Accounts
 
   return (
     <>
@@ -383,7 +384,9 @@ export default function AvatarCircleGroup({
       >
         {accounts.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
           <Tooltip key={id} title={tooltip || ''}>
-            <Avatar alt={name} src={image} onClick={handleClick({ id, onClick })} {...other} />
+            <ButtonBase style={{ borderRadius: avatarWidth / 2 }} onClick={onClick}>
+            <Avatar alt={name} src={image} {...other} style={{ ...(other.style || {}), width: avatarWidth, height: avatarWidth, margin: -(avatarWidth + 4) / 2 }} />
+            </ButtonBase>
           </Tooltip>
         ))}
       </AvatarMesh>
@@ -396,7 +399,7 @@ export default function AvatarCircleGroup({
         {/*<MenuItem onClick={() => handleAdd(accounts.findIndex(a => a.id === anchor.id))}>
           Add New ({id} at Index: {accounts.findIndex(a => a.id === anchor.id)})
         </MenuItem>*/}
-        <MenuItem onClick={handleDelete}>Delete</MenuItem>
+        {/*<MenuItem onClick={handleDelete}>Delete</MenuItem>*/}
         {/*<MenuItem onClick={handleChangePassword}>Change Password</MenuItem>*/}
       </Menu>
     </>

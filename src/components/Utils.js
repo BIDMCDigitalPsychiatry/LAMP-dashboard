@@ -109,7 +109,7 @@ export class ArrayView extends React.Component {
 // 
 export const ResponsiveMargin = React.forwardRef((props, ref) => {
     let sm = useMediaQuery(useTheme().breakpoints.down('sm'))
-    return <div {...props} style={{ ...props.style, width: sm ? '100%' : props.style.width }} ref={ref} />
+    return <div {...props} style={{ ...props.style, width: sm ? '98%' : props.style.width }} ref={ref} />
 })
 
 export const ResponsivePaper = React.forwardRef((props, ref) => {
@@ -117,12 +117,16 @@ export const ResponsivePaper = React.forwardRef((props, ref) => {
     return <Paper {...props} elevation={sm ? 0 : props.elevation} ref={ref} />
 })
 
-function SlideUp(props) { return <Slide direction="up" {...props} /> }
+const SlideUp = React.forwardRef((props, ref) => (
+  <Slide direction="up" {...props} ref={ref} />
+))
 
 // 
-export const ResponsiveDialog = ({ transient, animate, fullScreen, children, ...props }) => 
+export const ResponsiveDialog = ({ transient, animate, fullScreen, children, ...props }) => {
+    const sm = useMediaQuery(useTheme().breakpoints.down('sm'))
+    return (
     <Dialog {...props}
-        fullScreen={!!fullScreen ? true : useMediaQuery(useTheme().breakpoints.down('sm'))} 
+        fullScreen={!!fullScreen ? true : sm} 
         TransitionComponent={!!animate ? SlideUp : undefined}
     >
         {!!transient &&
@@ -134,7 +138,6 @@ export const ResponsiveDialog = ({ transient, animate, fullScreen, children, ...
                     background: '#ffffff66', 
                     WebkitBackdropFilter: 'blur(5px)' 
                 }} 
-                color="inherit" 
                 onClick={props.onClose} 
                 aria-label="Close"
             >
@@ -143,6 +146,8 @@ export const ResponsiveDialog = ({ transient, animate, fullScreen, children, ...
         }
         {children}
     </Dialog>
+    )
+}
 
 // 
 export function PageTitle({ children, ...props }) {
@@ -150,27 +155,24 @@ export function PageTitle({ children, ...props }) {
     return <React.Fragment />
 }
 
-export function compress(e /* event from file upload */, width, height) {
-    const reader = new FileReader()
-    reader.readAsDataURL(e.target.files[0])
-    reader.onerror = error => console.log(error)
-    reader.onload = event => {
-        const img = new Image()
-        img.src = event.target.result
-        img.onload = () => {
-            const elem = document.createElement('canvas')
-            elem.width = width
-            elem.height = height
-            const ctx = elem.getContext('2d')
-            ctx.drawImage(img, 0, 0, width, height);
-            ctx.canvas.toBlob((blob) => {
-                // eslint-disable-next-line
-                const file = new File([blob], e.target.files[0].name, 
-                    { type: 'image/jpeg', lastModified: Date.now() });
-                /* do something with file here */
-            }, 'image/jpeg', 1);
+export function compress(file, width, height) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.readAsDataURL(file)
+        reader.onerror = error => reject(error)
+        reader.onload = event => {
+            const img = new Image()
+            img.src = event.target.result
+            img.onload = () => {
+                const elem = document.createElement('canvas')
+                elem.width = width
+                elem.height = height
+                const ctx = elem.getContext('2d')
+                ctx.drawImage(img, 0, 0, width, height)
+                resolve(ctx.canvas.toDataURL())
+            }
         }
-    }
+    })
 }
 
 // Produces an array of integers from 0 until the specified max number.

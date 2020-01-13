@@ -7,14 +7,9 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Popover from '@material-ui/core/Popover'
 import MenuItem from '@material-ui/core/MenuItem'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogActions from '@material-ui/core/DialogActions'
 import Chip from '@material-ui/core/Chip'
 import Tooltip from '@material-ui/core/Tooltip'
 import MaterialTable from 'material-table'
-import red from '@material-ui/core/colors/red'
-import yellow from '@material-ui/core/colors/yellow'
 import green from '@material-ui/core/colors/green'
 
 // External Imports 
@@ -45,7 +40,8 @@ export default function ParticipantList({ participants, onChange, onParticipantS
         newCount: 1,
         selectedRows: []
     })
-
+    const [openMessaging, setOpenMessaging] = useState()
+    const [openPasswordReset, setOpenPasswordReset] = useState()
     const [logins, setLogins] = useState({})
     const [names, setNames] = useState({})
 
@@ -128,8 +124,9 @@ export default function ParticipantList({ participants, onChange, onParticipantS
         <React.Fragment>
             <MaterialTable 
                 title="Default Clinic"
-                data={participants} 
+                data={participants.map(x => ({ ...x, '__name': names[x.id] }))} 
                 columns={[
+                    { title: '__name', field: '__name', hidden: true, searchable: true },
                     { title: 'Name', field: 'id', render: (x) => 
                         <EditField 
                             text={names[x.id]} 
@@ -151,57 +148,37 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                             }} 
                         />
                     },
-                    { title: 'Last Active', field: 'last_active', render: (rowData) => 
+                    { title: 'Last Active', field: 'last_active', searchable: false, render: (rowData) => 
                         <Tooltip title={dateInfo(rowData.id).absolute}>
                             <span>{`${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}</span>
                         </Tooltip>
                     },
-                    { title: 'Indicators', field: 'data_health', render: (rowData) => 
+                    { title: 'Indicators', field: 'data_health', searchable: false, render: (rowData) => 
                         <div>
-                            <Tooltip title={(rowData.id.length % 3 === 0 ? 
-                                                'Data is either missing or inconsistent and requires attention.' : (rowData.id.length % 3 === 1 ? 
-                                                    'Data is inconsistent and requires attention.' : 
-                                                        'Data is optimal.'))}>
+                            <Tooltip title={'Data is optimal.'}>
                               <Chip 
                                   label="Data Quality"
                                   style={{ 
                                       margin: 4, 
-                                      backgroundColor: (rowData.id.length % 3 === 0 ? 
-                                                            red[500] : (rowData.id.length % 3 === 1 ? 
-                                                                yellow[500] : 
-                                                                    green[500])), 
-                                      color: (rowData.id.length % 3 === 1) ? '#000' : '#fff'
+                                      backgroundColor: green[500], 
+                                      color: '#fff'
                                 }} />
-                            </Tooltip>
-                        </div>
-                    }, { title: 'Actions', field: '__messages', render: (rowData) => 
-                        <React.Fragment>
-                            <Tooltip title="Open Messages">
-                                <IconButton
-                                    onClick={(event) => {
-                                        event.preventDefault()
-                                        event.stopPropagation()
-                                        setState({ ...state, openMessaging: rowData.id })
-                                    }}
-                                >
-                                    <Icon>chat</Icon>
-                                </IconButton>
                             </Tooltip>
                             <Tooltip title="Reset Password">
                                 <IconButton
                                     onClick={(event) => {
                                         event.preventDefault()
                                         event.stopPropagation()
-                                        setState({ ...state, openPasswordReset: rowData.id })
+                                        setOpenPasswordReset(rowData.id)
                                     }}
                                 >
                                     <Icon>vpn_key</Icon>
                                 </IconButton>
                             </Tooltip>
-                        </React.Fragment>
+                        </div>
                     }
                 ]}
-                detailPanel={rowData => <div />}
+                detailPanel={rowData => <Messages refresh participant={participants[rowData.tableData.id].id} />}
                 onRowClick={(event, rowData, togglePanel) => onParticipantSelect(participants[rowData.tableData.id].id)}
                 actions={[
                     {
@@ -209,7 +186,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                         tooltip: 'Create',
                         isFreeAction: true,
                         onClick: (event, rows) => setState(state => ({ ...state, 
-                            popoverAttachElement: event.currentTarget,
+                            popoverAttachElement: event.currentTarget.parentNode,
                             selectedIcon: "add",
                             selectedRows: []
                         }))
@@ -217,7 +194,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                         icon: 'arrow_downward',
                         tooltip: 'Export',
                         onClick: (event, rows) => setState(state => ({ ...state, 
-                            popoverAttachElement: event.currentTarget,
+                            popoverAttachElement: event.currentTarget.parentNode,
                             selectedIcon: "download",
                             selectedRows: rows
                         }))
@@ -225,7 +202,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                         icon: 'delete_forever',
                         tooltip: 'Delete',
                         onClick: (event, rows) => setState(state => ({ ...state, 
-                            popoverAttachElement: event.currentTarget,
+                            popoverAttachElement: event.currentTarget.parentNode,
                             selectedIcon: "delete",
                             selectedRows: rows
                         }))
@@ -276,7 +253,8 @@ export default function ParticipantList({ participants, onChange, onParticipantS
             }*/}
             <Popover
               open={Boolean(state.popoverAttachElement)}
-              anchorEl={state.popoverAttachElement}
+              anchorPosition={!!state.popoverAttachElement && state.popoverAttachElement.getBoundingClientRect()}
+              anchorReference="anchorPosition"
               onClose={() => setState(state => ({ ...state, popoverAttachElement: null }))}
               anchorOrigin={{
                   vertical: 'bottom',
@@ -325,30 +303,12 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                 <div />
             ))}
             </Popover>
-            <ResponsiveDialog
-                open={!!state.openMessaging}
-                onClose={() => setState({ ...state,  openMessaging: undefined })}
-            >
-                <DialogContent>
-                    <Messages participant={state.openMessaging} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setState({ ...state,  openMessaging: undefined })} color="primary" autoFocus>
-                        Close
-                    </Button>
-                </DialogActions>
+            <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging()}>
+                <Messages participant={openMessaging} />
             </ResponsiveDialog>
-            <Dialog
-                open={!!state.openPasswordReset}
-                onClose={() => setState({ ...state,  openPasswordReset: undefined, passwordText: undefined })}
-            >
-                <DialogContent style={{ marginBottom: 12 }}>
-                    <CredentialManager 
-                        id={state.openPasswordReset} 
-                        onError={err => props.layout.showAlert(err)}
-                    />
-                </DialogContent>
-            </Dialog>
+            <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset()}>
+                <CredentialManager style={{ margin: 16 }} id={openPasswordReset} onError={err => props.layout.showAlert(err)} />
+            </ResponsiveDialog>
         </React.Fragment>
     )
 }

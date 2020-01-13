@@ -49,16 +49,24 @@ function MessageItem({ from, date, text, flipped, ...props }) {
 
 class Messages extends React.Component {
     state = {}
-    async componentWillMount() {
-        await this.loadMessages()
-        this.timeout = setInterval(async () => {
-            await this.loadMessages()
-        }, 10 * 1000)
-    }
 
+    componentDidMount() {
+        this.loadMessages()
+    }
     componentWillUnmount() {
         if (!!this.timeout)
             clearInterval(this.timeout)
+    }
+    componentDidUpdate() {
+        if (!!this.props.refresh && !this.timeout) {
+            console.log('Starting message refresh...')
+            this.timeout = setInterval(async () => {
+                await this.loadMessages()
+            }, 10 * 1000)
+        } else if (!!this.timeout) {
+            console.log('Cancelling message refresh...')
+            clearInterval(this.timeout)
+        }
     }
 
     loadMessages = async () => {
@@ -99,6 +107,8 @@ class Messages extends React.Component {
         return x
     }
 
+    // FIXME: don't pass in this.props ie. functions!
+
     render = () =>
     <Box {...this.props}>
         <Tabs
@@ -112,7 +122,7 @@ class Messages extends React.Component {
             <Tab label={!!this.props.participantOnly ? 'My Journal' : 'Patient Notes'} index={1} />
         </Tabs>
         <Divider />
-        <Box mx={2}>
+        <Box mx={2} style={{ minHeight: 100, maxHeight: 500, overflow: 'scroll' }}>
             {this.getMessages()
                 .filter(x => (this.state.messageTab || 0) === 0 
                     ? (x.type === 'message') 
@@ -141,7 +151,7 @@ class Messages extends React.Component {
             fullWidth
             rowsMax="4"
             InputProps={{ endAdornment: [
-                <InputAdornment position="end">
+                <InputAdornment key={'end'} position="end">
                   <Tooltip title="Send Message">
                     <IconButton
                       edge="end"

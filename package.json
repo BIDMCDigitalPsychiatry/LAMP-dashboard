@@ -5,11 +5,12 @@
   "description": "LAMP Dashboard",
   "private": true,
   "devDependencies": {
-    "react-scripts": "^2.0.0",
-    "typescript": "^3.5.3"
+    "react-scripts": "^3.3.0",
+    "typescript": "^3.7.0"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.4.4",
+    "core-js": "^3.6.0",
+    "regenerator-runtime": "^0.13.3",
     "@data-ui/radial-chart": "0.0.80",
     "@data-ui/sparkline": "0.0.79",
     "@data-ui/xy-chart": "0.0.79",
