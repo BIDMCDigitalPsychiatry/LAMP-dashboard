@@ -229,7 +229,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
         await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
           { ...allRoles, [data.credential.access_key]: (!data.role && !data.photo) ? undefined : { role: data.role, photo: data.photo }})
       } else { enqueueSnackbar('Could not perform operation for an unknown reason.', { variant: 'error' }) }
-    } catch(err) { enqueueSnackbar('Credential management failed.', { variant: 'error' }) }
+    } catch(err) { enqueueSnackbar('Credential management failed. The email address could be in use already.', { variant: 'error' }) }
     LAMP.Credential.list(id).then(setAllCreds) 
     LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
       .then(res => setAllRoles(!!res.data ? res.data : []))
