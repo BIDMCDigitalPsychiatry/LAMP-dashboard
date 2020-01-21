@@ -94,11 +94,7 @@ export default function CareTeam({ participant,  ...props }) {
             	open={showCredentials} 
             	onClose={() => setShowCredentials()}
         	>
-                <CredentialManager 
-                	style={{ margin: 16 }} 
-                	id={participant.id} 
-                	onError={err => console.dir(err)} 
-            	/>
+                <CredentialManager id={participant.id} style={{ margin: 16 }} />
             </ResponsiveDialog>
         </React.Fragment>
 	)

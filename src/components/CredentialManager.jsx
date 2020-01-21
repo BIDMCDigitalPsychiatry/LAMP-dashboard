@@ -6,6 +6,7 @@ import {
   Menu, MenuItem, TextField, ButtonBase, Typography, 
   InputAdornment, useTheme 
 } from '@material-ui/core'
+import { useSnackbar } from 'notistack'
 
 // External Imports
 import QRCode from 'qrcode.react'
@@ -192,12 +193,13 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
-export default function CredentialManager({ id, onComplete, onError, ...props }) {
+export default function CredentialManager({ id, onComplete, ...props }) {
   const theme = useTheme()
   const [selected, setSelected] = useState({ anchorEl: undefined, credential: undefined, mode: undefined })
   const [allCreds, setAllCreds] = useState([])
   const [allRoles, setAllRoles] = useState({})
   const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState()
+  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => { 
     LAMP.Type.parent(id).then(x => Object.keys(x.data).length === 0).then(setShouldSyncWithChildren)
@@ -217,17 +219,17 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
     try {
       if (selected.mode === 'reset-password' && (!!data.password)) {
         if (!!(await LAMP.Credential.update(id, data.credential.access_key, { ...data.credential, secret_key: data.password })).error)
-          return onError('could not change password')
+          return enqueueSnackbar('Could not change password.', { variant: 'error' })
       } else if (selected.mode === 'create-new' && (!!data.name && !!data.emailAddress && !!data.password)) {
         if (!!(await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)).error)
-          return onError('could not create credential')
+          return enqueueSnackbar('Could not create credential.', { variant: 'error' })
         await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
           { ...allRoles, [data.emailAddress]: (!data.role && !data.photo) ? undefined : { role: data.role, photo: data.photo }})
       } else if (selected.mode === 'change-role') {
         await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
           { ...allRoles, [data.credential.access_key]: (!data.role && !data.photo) ? undefined : { role: data.role, photo: data.photo }})
-      } else { onError('could not perform operation') }
-    } catch(err) { onError('credential management failed') }
+      } else { enqueueSnackbar('Could not perform operation for an unknown reason.', { variant: 'error' }) }
+    } catch(err) { enqueueSnackbar('Credential management failed.', { variant: 'error' }) }
     LAMP.Credential.list(id).then(setAllCreds) 
     LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')
       .then(res => setAllRoles(!!res.data ? res.data : []))
@@ -237,11 +239,11 @@ export default function CredentialManager({ id, onComplete, onError, ...props })
   const _deleteCredential = async (credential) => {
     try {
       if (!!(await LAMP.Credential.delete(id, credential.access_key)).error)
-        return onError('could not delete')
+        return enqueueSnackbar('Could not delete.', { variant: 'error' })
       await LAMP.Type.setAttachment(id, 'me', 'lamp.dashboard.credential_roles', 
         { ...allRoles, [credential.access_key]: undefined })
     } catch(err) { 
-      onError('credential management failed') 
+      enqueueSnackbar('Credential management failed.', { variant: 'error' }) 
     }
     LAMP.Credential.list(id).then(setAllCreds) 
     LAMP.Type.getAttachment(id, 'lamp.dashboard.credential_roles')

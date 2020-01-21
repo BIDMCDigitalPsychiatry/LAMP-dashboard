@@ -22,9 +22,7 @@ export default function Root({ onChange, ...props }) {
     useEffect(() => {
         if (LAMP.Auth._auth.type !== 'root')
             return
-        (async function() {
-            setResearchers(await LAMP.Researcher.all())
-        })()
+        LAMP.Researcher.all().then(setResearchers)
     }, [])
 
 	return (
@@ -38,31 +36,33 @@ export default function Root({ onChange, ...props }) {
                         props.history.push(`/researcher/${researchers[rowData.tableData.id].id}`)}
                     editable={{
                         onRowAdd: async (newData) => {
-                            console.dir(await LAMP.Researcher.create(newData))
+                            if ((await LAMP.Researcher.create(newData)).error === undefined)
+                                 enqueueSnackbar(`Successfully created a new Researcher.`, { variant: 'success' })
+                            else enqueueSnackbar(`Failed to create a new Researcher.`, { variant: 'error' })
                             setResearchers(await LAMP.Researcher.all())
                         },
                         onRowUpdate: async (newData, oldData) => {
-                            console.dir(await LAMP.Researcher.update(oldData.id, newData))
+                            if ((await LAMP.Researcher.update(oldData.id, newData)).error === undefined)
+                                 enqueueSnackbar(`Successfully updated the Researcher.`, { variant: 'success' })
+                            else enqueueSnackbar(`Failed to update the Researcher.`, { variant: 'error' })
                             setResearchers(await LAMP.Researcher.all())
                         },
                         onRowDelete: async (oldData) => {
-                            console.dir(await LAMP.Researcher.delete(oldData.id))
+                            if ((await LAMP.Researcher.delete(oldData.id)).error === undefined)
+                                 enqueueSnackbar(`Successfully deleted the Researcher.`, { variant: 'success' })
+                            else enqueueSnackbar(`Failed to delete the Researcher.`, { variant: 'error' })
                             setResearchers(await LAMP.Researcher.all())
                         }
                     }}
-                    actions={[
-                        {
+                    actions={[{
                             icon: 'vpn_key',
                             tooltip: 'Manage Credentials',
                             onClick: (event, rowData) => setPasswordChange(rowData.id)
-                        }
-                    ]}
-                    localization={{
-                        body: {
+                    }]}
+                    localization={{ body: {
                             emptyDataSourceMessage: 'No Researchers. Add Researchers by clicking the [+] button above.',
                             editRow: { deleteText: 'Are you sure you want to delete this Researcher?' }
-                        }
-                    }}
+                    }}}
                     options={{
                         actionsColumnIndex: -1,
                         pageSize: 10,
@@ -76,10 +76,7 @@ export default function Root({ onChange, ...props }) {
                 onClose={() => setPasswordChange()}
             >
                 <DialogContent style={{ marginBottom: 12 }}>
-                    <CredentialManager 
-                        id={passwordChange} 
-                        onError={err => enqueueSnackbar(err, { variant: 'error' })}
-                    />
+                    <CredentialManager id={passwordChange} />
                 </DialogContent>
             </Dialog>
         </React.Fragment>

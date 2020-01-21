@@ -13,8 +13,7 @@ import { useSnackbar } from 'notistack'
 import LAMP from '../lamp'
 import Activity from './Activity'
 import SurveyCreator from './SurveyCreator'
-
-function SlideUp(props) { return <Slide direction="up" {...props} /> }
+import ResponsiveDialog from './ResponsiveDialog'
 
 
 // TODO: Blogs/Tips/AppHelp
@@ -140,6 +139,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
             tag: res[idx]
         }))
         _saveFile(data)
+        enqueueSnackbar("The selected Activities were successfully exported.", { variant: 'info' })
     }
 
     // Create a new Activity object & survey descriptions if set.
@@ -147,6 +147,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         const { raw, tag } = unspliceActivity(x)
         let newItem = await LAMP.Activity.create(studyID, raw)
         await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
+        enqueueSnackbar("Successfully created a new Activity.", { variant: 'success' })
         setShowCreate()
     }
 
@@ -157,6 +158,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
             let raw = await LAMP.Activity.delete(activity.id)
             console.dir({ tag, raw })
         }
+        enqueueSnackbar("Successfully deleted the selected Activities.", { variant: 'success' })
         onChange()
     }
 
@@ -170,8 +172,12 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
     const updateActivity = async (x) => {
         enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
-        // FIXME: when Activity object editing is enabled, copy over: selectedActivity.schedule
         const { raw, tag } = unspliceActivity(x)
+        /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
+        raw.id = selectedActivity.id
+        raw.schedule = selectedActivity.schedule
+        await LAMP.Activity.updateActivity(raw)
+        */
         await LAMP.Type.setAttachment(selectedActivity.id, 'me', 'lamp.dashboard.survey_description', tag)
         setSelectedActivity()
     }
@@ -223,10 +229,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                 }}
                 components={{ Container: props => <div {...props} /> }}
             />
-            <Dialog
-                open={!!showActivityImport}
-                onClose={() => setShowActivityImport()}
-            >
+            <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()} >
                 <Box {...getRootProps()} 
                     p={4} 
                     bgcolor={(isDragActive || isDragAccept) ? 'primary.main' : undefined} 
@@ -238,10 +241,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                     </Typography>
                 </Box>
             </Dialog>
-            <Dialog
-                open={!!importFile}
-                onClose={() => setImportFile()}
-            >
+            <Dialog open={!!importFile} onClose={() => setImportFile()} >
                 <MaterialTable 
                     title="Continue importing?"
                     data={importFile || []} 
@@ -258,54 +258,14 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog
-                fullScreen
-                open={!!showCreate}
-                onClose={() => setShowCreate()}
-                TransitionComponent={SlideUp}
-            >
-                <IconButton 
-                    style={{ 
-                        position: 'fixed', 
-                        left: 16, 
-                        top: 16, 
-                        background: '#ffffff66', 
-                        WebkitBackdropFilter: 'blur(5px)' 
-                    }} 
-                    color="inherit" 
-                    onClick={() => setShowCreate()} 
-                    aria-label="Close"
-                >
-                    <Icon>close</Icon>
-                </IconButton>
+            <ResponsiveDialog fullScreen transient animate open={!!showCreate} onClose={() => setShowCreate()}>
                 <Box py={8} px={4}>
                     <SurveyCreator onSave={saveActivity} />
                 </Box>
-            </Dialog>
-            <Dialog
-                fullScreen
-                open={!!selectedActivity}
-                onClose={() => setSelectedActivity()}
-                TransitionComponent={SlideUp}
-            >
-                <IconButton 
-                    style={{ 
-                        position: 'fixed', 
-                        left: 16, 
-                        top: 16, 
-                        background: '#ffffff66', 
-                        WebkitBackdropFilter: 'blur(5px)' 
-                    }} 
-                    color="inherit" 
-                    onClick={() => setSelectedActivity()} 
-                    aria-label="Close"
-                >
-                    <Icon>close</Icon>
-                </IconButton>
-                <Box py={8} px={4}>
-                    <Activity activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
-                </Box>
-            </Dialog>
+            </ResponsiveDialog>
+            <ResponsiveDialog fullScreen transient animate open={!!selectedActivity} onClose={() => setSelectedActivity()}>
+                <Activity activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
+            </ResponsiveDialog>
         </React.Fragment>
     )
 }

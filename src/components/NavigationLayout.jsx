@@ -97,10 +97,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 onClose={() => setPasswordChange()}
             >
                 <DialogContent style={{ marginBottom: 12 }}>
-                    <CredentialManager 
-                        id={id} 
-                        onError={err => enqueueSnackbar(err.message)}
-                    />
+                    <CredentialManager id={id} />
                 </DialogContent>
             </Dialog>
         </div>

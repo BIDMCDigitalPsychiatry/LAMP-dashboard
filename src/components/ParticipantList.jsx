@@ -273,7 +273,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                 <Messages participant={openMessaging} />
             </ResponsiveDialog>
             <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset()}>
-                <CredentialManager style={{ margin: 16 }} id={openPasswordReset} onError={err => enqueueSnackbar(err, { variant: 'error' })} />
+                <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
             </ResponsiveDialog>
         </React.Fragment>
     )
