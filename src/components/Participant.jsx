@@ -250,7 +250,7 @@ export default function Participant({ participant, ...props }) {
                     badges={state.activity_counts}
                     onChange={x => setState({ ...state, selectedCharts: x })}
                 />
-                {(!(!!LAMP.Auth._auth.serverAddress && !LAMP.Auth._auth.serverAddress.includes('psych.digital'))) &&
+                {(!(!!LAMP.Auth._auth.serverAddress && LAMP.Auth._auth.serverAddress.includes('psych.digital'))) &&
                     <React.Fragment>
                         <Divider style={{ margin: '8px -16px 8px -16px' }} />
                         <Typography variant="overline">

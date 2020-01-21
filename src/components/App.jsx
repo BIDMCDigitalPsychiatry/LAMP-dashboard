@@ -25,6 +25,15 @@ import NavigationLayout from './NavigationLayout'
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
 
+
+// 
+const srcLock = () => {
+    let query = (window.location.hash.split('?') || [])
+    let src = Object.fromEntries(new URLSearchParams(query[1]))['src']
+    return (typeof src === 'string' && src.length > 0)
+}
+
+
 function PageTitle({ children, ...props }) {
     useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
     return <React.Fragment />

@@ -20,7 +20,8 @@ export default function ResponsiveDialog({ transient, animate, fullScreen, child
                         left: 16, 
                         top: 16, 
                         background: '#ffffff66', 
-                        WebkitBackdropFilter: 'blur(5px)' 
+                        WebkitBackdropFilter: 'blur(5px)',
+                        zIndex: 99999
                     }} 
                     onClick={props.onClose} 
                     aria-label="Close"

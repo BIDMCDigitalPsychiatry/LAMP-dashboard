@@ -3,8 +3,10 @@
 import React from 'react'
 import { KeyboardDatePicker, KeyboardTimePicker } from '@material-ui/pickers'
 import MaterialTable from 'material-table'
+import { useSnackbar } from 'notistack'
 
 export default function ActivityScheduler({ activity, ...props }) {
+    const { enqueueSnackbar } = useSnackbar()
 	return (
         <MaterialTable 
             title={activity && activity.name}
@@ -85,13 +87,13 @@ export default function ActivityScheduler({ activity, ...props }) {
             )}
             editable={{
                 onRowAdd: async (newData) => {
-
+                    enqueueSnackbar(`Creating new schedule items is currently disabled.`, { variant: 'error' })
                 },
                 onRowUpdate: async (newData, oldData) => {
-
+                    enqueueSnackbar(`Modifying schedule items is currently disabled.`, { variant: 'error' })
                 },
                 onRowDelete: async (oldData) => {
-
+                    enqueueSnackbar(`Deleting schedule items is currently disabled.`, { variant: 'error' })
                 }
             }}
             localization={{

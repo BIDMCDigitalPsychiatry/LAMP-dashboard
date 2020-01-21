@@ -150,8 +150,18 @@ function SelectResponse({ onChange, options, value, ...props }) {
 
 function Question({ onResponse, hideHeader, number, text, type, options, value, ...props }) {
   let onChange = value => onResponse({ item: text, value: value })
-  const _boolOpts = [{ label: 'Yes', value: 'Yes' /* true */ }, { label: 'No', value: 'No' /* false */ }]
-  // CheckboxResponse, SwitchResponse
+  const _boolOpts = [
+    { label: 'Yes', value: 'Yes' /* true */ }, 
+    { label: 'No', value: 'No' /* false */ }
+  ]
+  const _likertOpts = [
+    { label: 'Nearly All the Time', value: 3 }, 
+    { label: 'More than Half the Time', value: 2 }, 
+    { label: 'Several Times', value: 1 }, 
+    { label: 'Not at all', value: 0 }
+  ]
+
+  // FIXME: CheckboxResponse, SwitchResponse
 
   let component = <Box />
   if (type === 'select' || type === 'list')
@@ -160,6 +170,8 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
     component = <MultiSelectResponse options={options} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'boolean')
     component = <SelectResponse options={_boolOpts} onChange={onChange} value={!!value ? value.value : undefined} />
+  else if (type === 'likert')
+    component = <SelectResponse options={_likertOpts} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'text' || type === null)
     component = <TextResponse onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'paragraph')
