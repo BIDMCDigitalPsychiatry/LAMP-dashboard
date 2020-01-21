@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
     Typography, TextField, Button, Avatar, Slide, Radio, 
     RadioGroup, FormControlLabel, FormControl, FormLabel 
@@ -13,7 +13,19 @@ import { ResponsivePaper, ResponsiveMargin } from './Utils'
 
 export default function Login({ setIdentity, onComplete, ...props }) {
     const [state, setState] = useState({})
+    const [srcLocked, setSrcLocked] = useState(false)
     const { enqueueSnackbar } = useSnackbar()
+
+    useEffect(() => {
+        let query = window.location.hash.split('?')
+        if (!!query && query.length > 1) {
+            let src = Object.fromEntries(new URLSearchParams(query[1]))['src']
+            if (typeof src === 'string' && src.length > 0) {
+                setState(state => ({ ...state, serverAddress: src }))
+                setSrcLocked(true)
+            }
+        }
+    }, [])
 
     let handleChange = event => setState({ ...state, 
         [event.target.name]: (event.target.type === 'checkbox' ? event.target.checked : event.target.value) 
@@ -35,7 +47,9 @@ export default function Login({ setIdentity, onComplete, ...props }) {
             onComplete()
         }).catch(err => {
             console.warn("error with auth request", err)
-            enqueueSnackbar('' + err.error, { variant: 'error' })
+            enqueueSnackbar('Incorrect username, password, or server address.', { variant: 'error' })
+            if (!srcLocked)
+                enqueueSnackbar('Are you sure you\'re logging into the right mindLAMP server?', { variant: 'info' })
         })
     }
 
@@ -84,6 +98,7 @@ export default function Login({ setIdentity, onComplete, ...props }) {
                                     helperText="Don't enter a server location if you're not sure what this option does."
                                     value={state.serverAddress || ''}
                                     onChange={handleChange}
+                                    disabled={srcLocked}
                                 />
                                 <TextField
                                     required 

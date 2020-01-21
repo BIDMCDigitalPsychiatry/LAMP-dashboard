@@ -40,7 +40,19 @@ function AppRouter({ ...props }) {
     useEffect(() => {
         let query = window.location.hash.split('?')
         if (!!query && query.length > 1) {
-            let x = atob(Object.fromEntries(new URLSearchParams(query[1]))['a']).split(':')
+
+            // 
+            let src = Object.fromEntries(new URLSearchParams(query[1]))['src']
+            if (typeof src === 'string' && src.length > 0) {
+                enqueueSnackbar(`You're using the "${src}" server to log into mindLAMP.`, { variant: 'info' })
+            }
+
+            // 
+            let a = Object.fromEntries(new URLSearchParams(query[1]))['a']
+            if (a === undefined) return
+            let x = atob(a).split(':')
+
+            // 
             reset({ 
                 type: ['root', 'admin'].includes(x[0]) ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
                 id: x[0] === 'admin' ? 'root' : x[0],

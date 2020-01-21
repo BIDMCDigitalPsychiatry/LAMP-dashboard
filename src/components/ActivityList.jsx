@@ -27,11 +27,11 @@ export function spliceActivity({ raw, tag }) {
         name: raw.name,
         description: tag?.description,
         schedule: raw.schedule,
-        settings: raw.settings.map((question, idx) => ({ 
+        settings: !Array.isArray(raw.settings) ? raw.settings : raw.settings.map((question, idx) => ({ 
             text: question.text, 
             type: question.type,
             description: tag?.questions?.[idx]?.description,
-            options: question.options === null ? null : question.options.map((z, idx2) => ({
+            options: question.options === null ? null : question.options?.map((z, idx2) => ({
                 value: z,
                 description: tag?.questions?.[idx]?.options?.[idx2]
             }))
@@ -50,14 +50,14 @@ export function unspliceActivity(x) {
             settings: x.settings.map(y => ({
                 text: y.text,
                 type: y.type,
-                options: y.options === null ? null : y.options.map(z => z.value)
+                options: y.options === null ? null : y.options?.map(z => z.value)
             }))
         }, 
         tag: {
             description: x.description,
             questions: x.settings.map(y => ({
                 description: y.description,
-                options: y.options === null ? null : y.options.map(z => z.description)
+                options: y.options === null ? null : y.options?.map(z => z.description)
             }))
         } 
     }
@@ -76,7 +76,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         reader.onerror = () => enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
         reader.onload = () => {
             setShowActivityImport()
-            let obj = atob(JSON.parse(reader.result))
+            let obj = JSON.parse(atob(reader.result))
             if (Array.isArray(obj) && obj.filter(x => (typeof x === 'object' && !!x.name && !!x.settings && !!x.schedule)).length > 0)
                 setImportFile(obj)
             else enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
@@ -111,39 +111,57 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
 
         // Groups only.
         for (let x of importFile.filter(x => ['lamp.group'].includes(x.spec))) {
-            await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined, settings: x.settings.map(y => allIDs[y]) })
+            try {
+                await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined, settings: x.settings.map(y => allIDs[y]) })
+            } catch(e) {
+                enqueueSnackbar("Couldn't import one of the selected Activity groups.", { variant: 'error' })
+            }
         }
 
         // Surveys only.
         for (let x of importFile.filter(x => ['lamp.survey'].includes(x.spec))) {
             const { raw, tag } = unspliceActivity(x)
-            allIDs[raw.id] = (await LAMP.Activity.create(studyID, { ...raw, id: undefined, tableData: undefined })).data
-            await LAMP.Type.setAttachment(raw.id, 'me', 'lamp.dashboard.survey_description', tag)
+            try {
+                allIDs[raw.id] = (await LAMP.Activity.create(studyID, { ...raw, id: undefined, tableData: undefined })).data
+                await LAMP.Type.setAttachment(raw.id, 'me', 'lamp.dashboard.survey_description', tag)
+            } catch(e) {
+                enqueueSnackbar("Couldn't import one of the selected survey Activities.", { variant: 'error' })
+            }
         }
 
         // CTests only.
         for (let x of importFile.filter(x => !['lamp.group', 'lamp.survey'].includes(x.spec))) {
-            allIDs[x.id] = (await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined })).data
+            try {
+                allIDs[x.id] = (await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined })).data
+            } catch(e) {
+                enqueueSnackbar("Couldn't import one of the selected cognitive test Activities.", { variant: 'error' })
+            }
         }
 
         onChange()
         setImportFile()
+        enqueueSnackbar("The selected Activities were successfully imported.", { variant: 'info' })
     }
 
     // Export a file containing this Study's pre-linked Activity objects.
     const downloadActivities = async (rows) => {
-        let res = await Promise.all(rows.map(x => LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description')))
-        res = res.map(y => !!y.error ? undefined : y.data)
-        let data = rows.map((x, idx) => spliceActivity({ 
-            raw: { ...x, tableData: undefined }, 
-            tag: res[idx]
-        }))
+        let data = []
+        for (let x of rows) {
+            if (x.spec === 'lamp.survey') {
+                try {
+                    let res = await LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description')
+                    let activity = spliceActivity({ raw: { ...x, tableData: undefined }, tag: !!res.error ? undefined : res.data })
+                    data.push(activity)
+                } catch(e) {}
+            } else data.push({ ...x, tableData: undefined })
+        }
         _saveFile(data)
         enqueueSnackbar("The selected Activities were successfully exported.", { variant: 'info' })
     }
 
     // Create a new Activity object & survey descriptions if set.
     const saveActivity = async (x) => {
+        // FIXME: ensure this is a lamp.survey only!
         const { raw, tag } = unspliceActivity(x)
         let newItem = await LAMP.Activity.create(studyID, raw)
         await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
@@ -154,9 +172,12 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     // Delete the selected Activity objects & survey descriptions if set.
     const deleteActivities = async (rows) => {
         for (let activity of rows) {
-            let tag = await LAMP.Type.setAttachment(activity.id, 'me', 'lamp.dashboard.survey_description', null)
+            if (activity.spec === 'lamp.survey') {
+                let tag = await LAMP.Type.setAttachment(activity.id, 'me', 'lamp.dashboard.survey_description', null)
+                console.dir('deleted tag ' + JSON.stringify(tag))
+            }
             let raw = await LAMP.Activity.delete(activity.id)
-            console.dir({ tag, raw })
+            console.dir(raw)
         }
         enqueueSnackbar("Successfully deleted the selected Activities.", { variant: 'success' })
         onChange()
@@ -164,13 +185,16 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
 
     // Begin an Activity object modification (ONLY DESCRIPTIONS).
     const modifyActivity = async (raw) => {
-        let tag = [await LAMP.Type.getAttachment(raw.id, 'lamp.dashboard.survey_description')].map(y => !!y.error ? undefined : y.data)[0]
-        const activity = spliceActivity({ raw, tag })
-        setSelectedActivity(activity)
+        if (raw.spec === 'lamp.survey') {
+            let tag = [await LAMP.Type.getAttachment(raw.id, 'lamp.dashboard.survey_description')].map(y => !!y.error ? undefined : y.data)[0]
+            const activity = spliceActivity({ raw, tag })
+            setSelectedActivity(activity)
+        } else setSelectedActivity(raw)
     }
 
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
     const updateActivity = async (x) => {
+        // FIXME: ensure this is a lamp.survey only!
         enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
         const { raw, tag } = unspliceActivity(x)
         /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
