@@ -17,9 +17,9 @@ function SelectList({ value, onChange, ...props }) {
         <RadioGroup name="option">
           {options.map((x, idx) => (
               <FormControlLabel
-                  key={`${x}-${idx}`}
-                  value={x} 
-                  style={{ width: '100%' }}
+                  key={`${x.value}-${idx}`}
+                  value={x.value} 
+                  style={{ width: '100%', alignItems: 'flex-start' }}
                   control={<Radio
                     disabled
                     color="secondary"
@@ -27,30 +27,54 @@ function SelectList({ value, onChange, ...props }) {
                     checkedIcon={<Icon fontSize="small">radio_button_checked</Icon>}
                   />}
               label={
-                <TextField
-                    fullWidth
-                    style={{ marginBottom: 16 }}
-                    variant="outlined"
-                    defaultValue={x}
-                    label="Question Option"
-                    onBlur={event => setOptions(options => Object.assign([...options], { [idx]: event.target.value }))} 
-                    InputProps={{
-                      endAdornment: [
-                        <InputAdornment position="end" key="adornment">
-                          <Tooltip title="Delete this option from the question's list of options.">
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() => setOptions(options => [...options.slice(0, idx), ...options.slice(idx + 1)])}
-                              onMouseDown={event => event.preventDefault()}
-                            >
-                              <Icon>delete_forever</Icon>
-                            </IconButton>
-                          </Tooltip>
-                        </InputAdornment>
-                      ]
-                    }}
-                  /> 
+                <React.Fragment>
+                  <TextField
+                      fullWidth
+                      variant="outlined"
+                      defaultValue={x.value || ''}
+                      label="Question Option"
+                      onBlur={event => setOptions(options => Object.assign(
+                        [...options], { 
+                          [idx]: { 
+                            value: event.target.value, 
+                            description: options[idx].description 
+                          } 
+                        })
+                      )}
+                      InputProps={{
+                        endAdornment: [
+                          <InputAdornment position="end" key="adornment">
+                            <Tooltip title="Delete this option from the question's list of options.">
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => setOptions(options => [...options.slice(0, idx), ...options.slice(idx + 1)])}
+                                onMouseDown={event => event.preventDefault()}
+                              >
+                                <Icon>delete_forever</Icon>
+                              </IconButton>
+                            </Tooltip>
+                          </InputAdornment>
+                        ]
+                      }}
+                    /> 
+                  <TextField
+                      fullWidth
+                      margin="dense"
+                      variant="filled"
+                      style={{ marginBottom: 16 }}
+                      defaultValue={x.description || ''}
+                      label="Option Description"
+                      onBlur={event => setOptions(options => Object.assign(
+                        [...options], { 
+                          [idx]: { 
+                            value: options[idx].value, 
+                            description: event.target.value
+                          } 
+                        })
+                      )}
+                    /> 
+                  </React.Fragment>
               }
               labelPlacement="end"
             />)
@@ -72,14 +96,13 @@ function SelectList({ value, onChange, ...props }) {
   )
 }
 
-
 function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected, ...props }) {
     const [text, setText] = useState(question.text)
     const [description, setDescription] = useState(question.description)
     const [type, setType] = useState(question.type || 'text')
     const [options, setOptions] = useState(question.options)
     useEffect(() => { 
-        onChange({ text, type, options: type === 'list' ? options : null, description }) 
+        onChange({ text, type, description, options: type === 'list' ? options : null }) 
     }, [text, description, type, options])
 
     return (
@@ -91,7 +114,6 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
                     fullWidth
                     variant="outlined"
                     label="Question Title"
-                    helperText="Modify the question's prompt."
                     defaultValue={text}
                     onBlur={event => setText(event.target.value)} 
                     InputProps={{
@@ -119,10 +141,8 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
                 <Grid item>
                     <TextField
                         fullWidth multiline
-                        style={{ marginTop: 16 }}
                         label="Question Description"
-                        variant="outlined"
-                        helperText="Modify the question description."
+                        variant="filled"
                         defaultValue={description}
                         onBlur={event => setDescription(event.target.value)} 
                     /> 
@@ -148,12 +168,11 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
     )
 }
 
-
 export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
-    const [activeStep, setActiveStep] = useState(0)
-    const [text, setText] = useState(!!value ? value.name : undefined)
-    const [description, setDescription] = useState(!!value ? value.description : undefined)
-    const [questions, setQuestions] = useState(!!value ? value.settings : [])
+  const [activeStep, setActiveStep] = useState(0)
+  const [text, setText] = useState(!!value ? value.name : undefined)
+  const [description, setDescription] = useState(!!value ? value.description : undefined)
+  const [questions, setQuestions] = useState(!!value ? value.settings : [])
 
 	return (
         <Grid container direction="column" spacing={2}>
@@ -165,8 +184,7 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
                 <TextField
                     fullWidth
                     variant="outlined"
-                    label="Survey Instrument Title"
-                    helperText="Modify the survey instrument title."
+                    label="Survey Title"
                     defaultValue={text}
                     onChange={event => setText(event.target.value)} 
                 /> 
@@ -175,9 +193,8 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
                 <TextField
                     fullWidth
                     multiline
-                    label="Survey Instrument Description"
-                    variant="outlined"
-                    helperText="Modify the survey instrument description."
+                    label="Survey Description"
+                    variant="filled"
                     defaultValue={description}
                     onChange={event => setDescription(event.target.value)} 
                 /> 
@@ -211,28 +228,25 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
                   </Grid>
                 </Stepper>
             </Grid>
-            <Grid item>
-                <Divider />
-            </Grid>
-            <Grid item container alignItems="center" justify="flex-end" spacing={2}>
-                <Grid item>
-                    <Button variant="contained" color="secondary" onClick={onCancel} disabled={!onCancel}>
-                        Cancel
-                    </Button>
-                </Grid>
-                <Grid>
-                    <Button variant="contained" color="primary" onClick={() => onSave({ 
-                        id: undefined,
-                        name: text, 
-                        spec: 'lamp.survey',
-                        schedule: [],
-                        settings: questions,
-                        description
-                    })} disabled={!onSave || questions.length === 0 || !text}>
-                        Save
-                    </Button>
-                </Grid>
-            </Grid>
+            <Fab 
+              color="secondary" 
+              aria-label="Save" 
+              variant="extended"
+              style={{ position: 'fixed', bottom: 24, right: 24 }} 
+              onClick={() => onSave({ 
+                  id: undefined,
+                  name: text, 
+                  spec: 'lamp.survey',
+                  schedule: [],
+                  settings: questions,
+                  description
+              })} 
+              disabled={!onSave || questions.length === 0 || !text}
+            >
+              Save
+              <span style={{ width: 8 }} />
+              <Icon>save</Icon>
+            </Fab>
         </Grid>
     )
 }

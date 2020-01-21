@@ -116,9 +116,10 @@ function SelectResponse({ onChange, options, value, ...props }) {
       }} 
     >
       {options.map(x => (
-          <FormControlLabel
+        <FormControlLabel
           key={x.label}
           value={`${x.value}`}
+          style={{ alignItems: !!x.description ? 'flex-start' : undefined }}
           control={<Radio
             color={selectedValue === `${x.value}` ? 'secondary' : 'default'}
             onClick={() => {
@@ -133,6 +134,11 @@ function SelectResponse({ onChange, options, value, ...props }) {
           label={
             <Typography component="span" variant="body2">
               {x.label}
+              {!!x.description && 
+                <Box my={0.5} p={0.5} borderRadius={4} borderColor="text.secondary" border={1} color="text.secondary">
+                  {x.description}
+                </Box>
+              }
             </Typography>
           }
           labelPlacement="end"
@@ -198,7 +204,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
   })
   // eslint-disable-next-line
   const rightArrowPress = useKeyPress('ArrowRight', () => {}, () => {
-    setActiveStep(step => Math.min(step + 1, value.questions.length))
+    setActiveStep(step => Math.min(step + 1, value.settings.length))
   })
 
   const isComplete = (idx) => responses.current[idx] && responses.current[idx].value
@@ -212,7 +218,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
       />}
       <div>
         <Stepper nonLinear activeStep={activeStep} orientation="vertical">
-          {value.questions.map((x, idx) => (
+          {value.settings.map((x, idx) => (
             <Step key={idx}>
               <StepButton 
                 onClick={() => setActiveStep(idx)} 
@@ -234,12 +240,12 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                   number={idx + 1} 
                   text={x.text} 
                   type={x.type} 
-                  options={x.options} 
+                  options={x.options?.map(y => ({ ...y, label: y.value }))} 
                   value={responses.current[idx]}
                   onResponse={response => {
                     responses.current[idx] = response
                     setActiveStep(prev => prev + 1)
-                    onResponse(Array.from({ ...responses.current, length: value.questions.length }))
+                    onResponse(Array.from({ ...responses.current, length: value.settings.length }))
                   }}
                 />
               </StepContent>

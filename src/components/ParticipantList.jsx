@@ -37,7 +37,6 @@ export default function ParticipantList({ participants, onChange, onParticipantS
     const [openMessaging, setOpenMessaging] = useState()
     const [openPasswordReset, setOpenPasswordReset] = useState()
     const [logins, setLogins] = useState({})
-    const [names, setNames] = useState({})
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
@@ -47,15 +46,6 @@ export default function ParticipantList({ participants, onChange, onParticipantS
                                     .filter(z => z.sensor === 'lamp.analytics') }))))
                             .filter(y => y.res.length > 0)
             setLogins(logins => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
-        })()
-    }, [participants])
-
-    useEffect(() => {
-        (async function() {
-            let data = (await Promise.all(participants
-                            .map(async x => ({ id: x.id, res: await LAMP.Type.getAttachment(x.id, 'lamp.name') }))))
-                            .filter(y => y.res.error === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
-            setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
         })()
     }, [participants])
 
@@ -119,29 +109,10 @@ export default function ParticipantList({ participants, onChange, onParticipantS
         <React.Fragment>
             <MaterialTable 
                 title="Default Clinic"
-                data={participants.map(x => ({ ...x, '__name': names[x.id] }))} 
+                data={participants} 
                 columns={[
-                    { title: '__name', field: '__name', hidden: true, searchable: true },
                     { title: 'Name', field: 'id', render: (x) => 
-                        <EditField 
-                            text={names[x.id]} 
-                            defaultValue={x.id}
-                            onChange={newValue => {
-                                let id = x.id /* shadow copy */
-                                let oldValue = names[id] || id
-                                if (oldValue === newValue)
-                                    return
-                                let isStr = (typeof newValue === 'string') && newValue.length > 0
-
-                                LAMP.Type.setAttachment(id, 'me', 'lamp.name', isStr ? newValue : null)
-                                    .then(x => setNames(names => ({ ...names, [id]: isStr ? newValue : undefined })))
-                                    .then(x => onChange())
-                                    .catch(err => {
-                                        console.error(err)
-                                        setNames(names => ({ ...names, [id]: oldValue }))
-                                    })
-                            }} 
-                        />
+                        <EditField participant={x} />
                     },
                     { title: 'Last Active', field: 'last_active', searchable: false, render: (rowData) => 
                         <Tooltip title={dateInfo(rowData.id).absolute}>

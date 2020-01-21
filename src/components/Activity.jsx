@@ -8,7 +8,7 @@ import ActivityScheduler from './ActivityScheduler'
 import SurveyCreator from './SurveyCreator'
 import { ResponsivePaper } from '../components/Utils'
 
-export default function Activity({ activity, studyID,  ...props }) {
+export default function Activity({ activity, studyID, onSave, ...props }) {
     //const isGroup = ((activity || {}).spec) === 'lamp.group'
     const isSurvey = ((activity || {}).spec) === 'lamp.survey'
     const [currentTab, setCurrentTab] = useState(isSurvey ? 0 : 1)
@@ -24,7 +24,7 @@ export default function Activity({ activity, studyID,  ...props }) {
                 <Tab label="Settings" />
                 <Tab label="Schedules" />
             </Tabs>
-            {currentTab === 0 && isSurvey && <Box m={4}><SurveyCreator value={activity} /></Box>}
+            {currentTab === 0 && isSurvey && <Box m={4}><SurveyCreator value={activity} onSave={onSave} /></Box>}
             {currentTab === 1 && <ActivityScheduler activity={activity} />}
         </ResponsivePaper>
     )

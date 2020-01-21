@@ -17,6 +17,7 @@ import Survey from './Survey'
 import ResponsiveDialog from './ResponsiveDialog'
 import Breathe from './Breathe'
 import Jewels from './Jewels'
+import { spliceActivity } from './ActivityList'
 
 function _hideCareTeam() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 function _patientMode() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') }
@@ -100,21 +101,25 @@ export default function Participant({ participant, ...props }) {
     useEffect(() => {
         if (activities.length === 0)
             return setSurvey()
+
+        // Splice together all selected activities & their tags.
         Promise.all(activities.map(x => LAMP.Type.getAttachment(x.id, 'lamp.dashboard.survey_description'))).then(res => {
-            res = res.map(y => !!y.error ? undefined : y.data)
+            let spliced = res.map((y, idx) => spliceActivity({ raw: activities[idx], tag: !!y.error ? undefined : y.data }))
+            
+            // Short-circuit the main title & description if there's only one survey.
+            const main = {
+                name: spliced.length === 1 ? spliced[0].name : 'Multi-questionnaire',
+                description: spliced.length === 1 ? spliced[0].description : 'Please complete all sections below. Thank you.'
+            }
+            if (spliced.length === 1)
+                spliced[0].name = spliced[0].description = undefined 
+
             setSurvey({
-                name: activities.length === 1 ? activities[0].name : 'Multi-questionnaire',
-                description: activities.length === 1 ? (!!res[0] ? res[0].description : undefined) : 'Please complete all sections below. Thank you.',
-                sections: activities.map((x, idx) => ({
-                    name: activities.length === 1 ? undefined : x.name,
-                    description: activities.length === 1 ? undefined : (!!res[idx] ? res[idx].description : undefined),
-                    questions: x.settings.map((y, idx2) => ({ ...y, 
-                        description: !!res[idx] ? res[idx].settings[idx2] : undefined,
-                        options: y.options === null ? null : y.options.map(z => ({ label: z, value: z }))
-                    }))
-                })),
-                prefillData: activities[0].prefillData,
-                prefillTimestamp: activities[0].prefillTimestamp
+                name: main.name,
+                description: main.description,
+                sections: spliced,
+                prefillData: spliced[0].prefillData,
+                prefillTimestamp: spliced[0].prefillTimestamp
             })
         })
     }, [activities])

@@ -39,44 +39,44 @@ function MessageItem({ from, date, text, flipped, ...props }) {
 }
 
 export default function Messages({ ...props }) {
-    const [state, setState] = useState({})
+    const [messages, setMessages] = useState({})
+    const [currentMessage, setCurrentMessage] = useState()
+    const [messageTab, setMessageTab] = useState(0)
 
     useInterval(() => {
-        (async () => {
-            console.log('Fetching messages...')
-            setState({ 
-                messages: Object.fromEntries((await Promise.all([props.participant || '']
-                            .map(async (x) => [x, await LAMP.Type.getAttachment(x, 'lamp.messaging').catch(e => [])])))
-                            .filter(x => x[1].message !== '404.object-not-found')
-                            .map(x => [x[0], x[1].data]))
-            })
-        })()
+        refreshMessages()
     }, !!props.refresh ? 10 * 1000 /* 10s */ : null, true)
 
     const sendMessage = async () => {
-        let msg = (state.currentMessage || '').trim()
+        let msg = (currentMessage || '').trim()
         if (msg.length === 0 || !props.participant)
             return
 
+        await refreshMessages()
         let all = getMessages()
         all.push({
             from: !!props.participantOnly ? 'participant' : 'researcher',
-            type: (state.messageTab || 0) === 1 ? 'note' : 'message',
+            type: (messageTab || 0) === 1 ? 'note' : 'message',
             date: new Date(),
             text: msg
         })
         LAMP.Type.setAttachment(props.participant, 'me', 'lamp.messaging', all)
-        setState({ 
-            currentMessage: undefined, 
-            messages: {
-                ...(state.messages || {}), 
-                [props.participant]: all
-            }
-        })
+        setCurrentMessage()
+        setMessages({ ...(messages || {}), [props.participant]: all })
+    }
+
+    const refreshMessages = async () => {
+        console.log('Fetching messages...')
+        setMessages(
+            Object.fromEntries((await Promise.all([props.participant || '']
+                .map(async (x) => [x, await LAMP.Type.getAttachment(x, 'lamp.messaging').catch(e => [])])))
+                .filter(x => x[1].message !== '404.object-not-found')
+                .map(x => [x[0], x[1].data]))
+        )
     }
 
     const getMessages = () => {
-        let x = ((state.messages || {})[props.participant || ''] || [])
+        let x = ((messages || {})[props.participant || ''] || [])
         return !Array.isArray(x) ? [] : x
     }
 
@@ -84,8 +84,8 @@ export default function Messages({ ...props }) {
     return (
         <Box {...props}>
             <Tabs
-                value={state.messageTab || 0}
-                onChange={(e, value) => setState({ messageTab: value })}
+                value={messageTab}
+                onChange={(e, value) => setMessageTab(value)}
                 indicatorColor="primary"
                 textColor="primary"
                 centered
@@ -96,7 +96,7 @@ export default function Messages({ ...props }) {
             <Divider />
             <Box mx={2} style={{ minHeight: 100, maxHeight: 500, overflow: 'scroll' }}>
                 {getMessages()
-                    .filter(x => (state.messageTab || 0) === 0 
+                    .filter(x => (messageTab || 0) === 0 
                         ? (x.type === 'message') 
                         : (x.type === 'note' && x.from === (!!props.participantOnly ? 'participant' : 'researcher')))
                     .map(x => 
@@ -114,9 +114,9 @@ export default function Messages({ ...props }) {
                 label="Send a message"
                 style={{ margin: 16, paddingRight: 32 }}
                 placeholder="Message..."
-                value={state.currentMessage || ''}
-                onChange={(event) => setState({ currentMessage: event.target.value })}
-                helperText={`Your ${!!props.participantOnly ? 'clinician' : 'patient'} will ${(state.messageTab || 0) === 0 ? 'be able to see your messages when they log in.' : 'not be able to see this message.'}`}
+                value={currentMessage || ''}
+                onChange={(event) => setCurrentMessage(event.target.value)}
+                helperText={`Your ${!!props.participantOnly ? 'clinician' : 'patient'} will ${(messageTab || 0) === 0 ? 'be able to see your messages when they log in.' : 'not be able to see this message.'}`}
                 margin="normal"
                 variant="outlined"
                 multiline

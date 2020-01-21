@@ -11,7 +11,7 @@ import CredentialManager from './CredentialManager'
 import { ResponsivePaper } from './Utils'
 
 // initial load = not working
-
+// TODO: <EditField researcher={x} /> 
 
 export default function Root({ onChange, ...props }) {
     const [researchers, setResearchers] = useState([])
@@ -26,37 +26,6 @@ export default function Root({ onChange, ...props }) {
             setResearchers(await LAMP.Researcher.all())
         })()
     }, [])
-
-    /*
-    useEffect(() => {
-        (async function() {
-            let data = (await Promise.all(researchers
-                            .map(async x => ({ id: x.id, res: await LAMP.Type.getAttachment(x.id, 'lamp.name') }))))
-                            .filter(y => y.res.error === undefined && (typeof y.res.data === 'string') && y.res.data.length > 0)
-            setNames(names => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.data }), names))
-        })()
-    }, [researchers])
-    render: (x) => 
-    <EditField 
-        text={names[x.id]} 
-        defaultValue={x.id}
-        onChange={newValue => {
-            let id = x.id /* shadow copy /
-            let oldValue = names[id] || id
-            if (oldValue === newValue)
-                return
-            let isStr = (typeof newValue === 'string') && newValue.length > 0
-
-            LAMP.Type.setAttachment(id, 'me', 'lamp.name', isStr ? newValue : null)
-                .then(x => setNames(names => ({ ...names, [id]: isStr ? newValue : undefined })))
-                .then(x => onChange())
-                .catch(err => {
-                    console.error(err)
-                    setNames(names => ({ ...names, [id]: oldValue }))
-                })
-        }} 
-    /> 
-    */
 
 	return (
         <React.Fragment>
