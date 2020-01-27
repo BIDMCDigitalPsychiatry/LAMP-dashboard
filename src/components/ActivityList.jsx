@@ -193,16 +193,24 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     }
 
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
-    const updateActivity = async (x) => {
-        // FIXME: ensure this is a lamp.survey only!
-        enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
+    const updateActivity = async (x, isDuplicated) => {
         const { raw, tag } = unspliceActivity(x)
-        /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
-        raw.id = selectedActivity.id
-        raw.schedule = selectedActivity.schedule
-        await LAMP.Activity.updateActivity(raw)
-        */
-        await LAMP.Type.setAttachment(selectedActivity.id, 'me', 'lamp.dashboard.survey_description', tag)
+        if (isDuplicated) /* duplicate */ {
+
+            let newItem = await LAMP.Activity.create(studyID, raw)
+            await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
+            enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: 'success' })
+            onChange()
+        } else /* overwrite */ {
+
+            /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
+            raw.id = selectedActivity.id
+            raw.schedule = selectedActivity.schedule
+            await LAMP.Activity.updateActivity(raw)
+            */
+            await LAMP.Type.setAttachment(selectedActivity.id, 'me', 'lamp.dashboard.survey_description', tag)
+            enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
+        }
         setSelectedActivity()
     }
 

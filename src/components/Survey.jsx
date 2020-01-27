@@ -27,7 +27,7 @@ function Banner({ heading, text, description, large, prefillTimestamp, onChangeT
           <Typography variant={large ? 'h3' : 'h6'} color="primary" style={{ fontWeight: large ? 700 : undefined }}>
             {text}
           </Typography>
-          <Typography variant={large ? 'body2' : 'body2'} color="textSecondary">
+          <Typography variant={large ? 'body2' : 'body2'} color="textSecondary" style={{ whiteSpace: 'pre-wrap' }}>
             {description}
           </Typography>
         </Grid>
@@ -135,7 +135,7 @@ function SelectResponse({ onChange, options, value, ...props }) {
             <Typography component="span" variant="body2">
               {x.label}
               {!!x.description && 
-                <Box my={0.5} p={0.5} borderRadius={4} borderColor="text.secondary" border={1} color="text.secondary">
+                <Box my={0.5} p={0.5} borderRadius={4} borderColor="text.secondary" border={1} color="text.secondary" style={{ whiteSpace: 'pre-wrap' }}>
                   {x.description}
                 </Box>
               }
@@ -243,7 +243,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
               </StepButton>
               <StepContent>
                 {!!x.description && 
-                  <Typography variant="caption">
+                  <Typography variant="caption" style={{ whiteSpace: 'pre-wrap' }}>
                     {x.description}
                   </Typography>
                 }

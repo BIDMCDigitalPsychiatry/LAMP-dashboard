@@ -228,25 +228,59 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
                   </Grid>
                 </Stepper>
             </Grid>
-            <Fab 
-              color="secondary" 
-              aria-label="Save" 
-              variant="extended"
-              style={{ position: 'fixed', bottom: 24, right: 24 }} 
-              onClick={() => onSave({ 
-                  id: undefined,
-                  name: text, 
-                  spec: 'lamp.survey',
-                  schedule: [],
-                  settings: questions,
-                  description
-              })} 
-              disabled={!onSave || questions.length === 0 || !text}
+            <Grid container 
+              direction="column" 
+              alignItems="flex-end" 
+              spacing={1} 
+              style={{ position: 'fixed', bottom: 24, right: 24, width: 'auto' }}
             >
-              Save
-              <span style={{ width: 8 }} />
-              <Icon>save</Icon>
-            </Fab>
+              {!!value &&
+                <Grid item>
+                  <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+                    <Fab 
+                      color="primary" 
+                      aria-label="Duplicate" 
+                      variant="extended"
+                      onClick={() => onSave({ 
+                          id: undefined,
+                          name: text, 
+                          spec: 'lamp.survey',
+                          schedule: [],
+                          settings: questions,
+                          description
+                      }, true /* duplicate */)} 
+                      disabled={!onSave || questions.length === 0 || !text || (value.name.trim() === text.trim())}
+                    >
+                      Duplicate
+                      <span style={{ width: 8 }} />
+                      <Icon>file_copy</Icon>
+                    </Fab>
+                  </Tooltip>
+                </Grid>
+              }
+              <Grid item>
+                <Tooltip title="Save this survey instrument.">
+                  <Fab 
+                    color="secondary" 
+                    aria-label="Save" 
+                    variant="extended"
+                    onClick={() => onSave({ 
+                        id: undefined,
+                        name: text, 
+                        spec: 'lamp.survey',
+                        schedule: [],
+                        settings: questions,
+                        description
+                    }, false /* overwrite */)} 
+                    disabled={!onSave || questions.length === 0 || !text}
+                  >
+                    Save
+                    <span style={{ width: 8 }} />
+                    <Icon>save</Icon>
+                  </Fab>
+                </Tooltip>
+              </Grid>
+            </Grid>
         </Grid>
     )
 }
