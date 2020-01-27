@@ -114,12 +114,14 @@ export default function Participant({ participant, ...props }) {
             if (spliced.length === 1)
                 spliced[0].name = spliced[0].description = undefined 
 
+            console.dir(spliced)
+
             setSurvey({
                 name: main.name,
                 description: main.description,
                 sections: spliced,
-                prefillData: spliced[0].prefillData,
-                prefillTimestamp: spliced[0].prefillTimestamp
+                prefillData: !_patientMode() ? activities[0].prefillData : undefined,
+                prefillTimestamp: !_patientMode() ? activities[0].prefillTimestamp : undefined
             })
         })
     }, [activities])
@@ -305,14 +307,14 @@ export default function Participant({ participant, ...props }) {
                         activity={activity} 
                         events={((state.activity_events || {})[activity.name] || [])} 
                         startDate={earliestDate()}
-                        forceDefaultGrid={!!LAMP.Auth._auth.serverAddress && LAMP.Auth._auth.serverAddress.includes('psych.digital')}
-                        onEditAction={activity.spec !== 'lamp.survey' ? undefined : (data) => {
+                        forceDefaultGrid={_hideCareTeam()}
+                        onEditAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
                             setActivities([{ ...activity, 
                                 prefillData: [data.slice.map(({ item, value }) => ({ item, value }))], 
                                 prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */
                             }])
                         }}
-                        onCopyAction={activity.spec !== 'lamp.survey' ? undefined : (data) => {
+                        onCopyAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
                             setActivities([{ ...activity, 
                                 prefillData: [data.slice.map(({ item, value }) => ({ item, value }))]
                             }])
