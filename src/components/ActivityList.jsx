@@ -29,7 +29,7 @@ export function spliceActivity({ raw, tag }) {
         schedule: raw.schedule,
         settings: !Array.isArray(raw.settings) ? raw.settings : raw.settings.map((question, idx) => ({ 
             text: question.text, 
-            type: question.type,
+            type: tag?.questions?.[idx]?.multiselect === true ? 'multiselect' : question.type,
             description: tag?.questions?.[idx]?.description,
             options: question.options === null ? null : question.options?.map((z, idx2) => ({
                 value: z,
@@ -49,13 +49,14 @@ export function unspliceActivity(x) {
             schedule: x.schedule,
             settings: x.settings.map(y => ({
                 text: y.text,
-                type: y.type,
+                type: y.type === 'multiselect' ? 'list' : y.type,
                 options: y.options === null ? null : y.options?.map(z => z.value)
             }))
         }, 
         tag: {
             description: x.description,
             questions: x.settings.map(y => ({
+                multiselect: y.type === 'multiselect' ? true : undefined,
                 description: y.description,
                 options: y.options === null ? null : y.options?.map(z => z.description)
             }))

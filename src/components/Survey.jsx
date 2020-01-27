@@ -13,6 +13,9 @@ import { KeyboardDateTimePicker } from '@material-ui/pickers'
 import useKeyPress from './useKeyPress'
 import { ResponsivePaper } from './Utils'
 
+const CSV_parse = x => Array.isArray(JSON.parse(`[${x}]`)) ? JSON.parse(`[${x}]`) : []
+const CSV_stringify = x => Array.isArray(x) ? JSON.stringify(x).slice(1, -1) : ''
+
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes
 
@@ -72,21 +75,26 @@ function SwitchResponse({ onChange, value, ...props }) {
 }
 
 function MultiSelectResponse({ onChange, options, value, ...props }) {
-  const [selectedValue, setSelectedValue] = useState(value || [])
+  const [selectedValue, setSelectedValue] = useState(value || '')
+  const _selection = CSV_parse(selectedValue)
   return (
     <FormGroup {...props}>
       {options.map(x => (
           <FormControlLabel
-          key={`${x.value || x.label}`}
-          value={`${x.value || x.label}`}
+          key={x.label}
+          value={`${x.value}`}
+          style={{ alignItems: !!x.description ? 'flex-start' : undefined }}
           control={<Checkbox
+            checked={_selection.includes(`${x.value}`)}
+            color={_selection.includes(`${x.value}`) ? 'secondary' : 'default'}
             onClick={() => {
-              let targetValue = !selectedValue.includes(`${x.value || x.label}`) ? 
-                [...selectedValue, `${x.value || x.label}`] : 
-                selectedValue.filter(y => y !== `${x.value || x.label}`)
+              let targetValue = !_selection.includes(`${x.value}`) ? 
+                [..._selection, `${x.value}`] : 
+                _selection.filter(y => y !== `${x.value}`)
+              let _target = CSV_stringify(targetValue)
 
-              setSelectedValue(targetValue)
-              onChange(targetValue)
+              setSelectedValue(_target)
+              onChange(_target)
             }}
             icon={<Icon fontSize="small">check_box_outline_blank</Icon>}
             checkedIcon={<Icon fontSize="small">check_box</Icon>}
@@ -94,6 +102,11 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
           label={
             <Typography component="span" variant="body2">
               {x.label}
+              {!!x.description && 
+                <Box my={0.5} p={0.5} borderRadius={4} borderColor="text.secondary" border={1} color="text.secondary" style={{ whiteSpace: 'pre-wrap' }}>
+                  {x.description}
+                </Box>
+              }
             </Typography>
           }
           labelPlacement="end"
@@ -256,7 +269,11 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                   value={responses.current[idx]}
                   onResponse={response => {
                     responses.current[idx] = response
-                    setActiveStep(prev => prev + 1)
+
+                    // Can be problematic when trying to select 2+ items...
+                    if (x.type !== 'multiselect')
+                      setActiveStep(prev => prev + 1)
+                    
                     onResponse(Array.from({ ...responses.current, length: value.settings.length }))
                   }}
                 />

@@ -114,8 +114,6 @@ export default function Participant({ participant, ...props }) {
             if (spliced.length === 1)
                 spliced[0].name = spliced[0].description = undefined 
 
-            console.dir(spliced)
-
             setSurvey({
                 name: main.name,
                 description: main.description,

@@ -5,26 +5,34 @@ import {
   Box, Tooltip, Typography, Grid, Fab, Divider, 
   IconButton, Icon, Button, ButtonGroup, TextField, 
   InputAdornment, Stepper, Step, StepLabel, StepButton, 
-  StepContent, Radio, RadioGroup, FormControlLabel 
+  StepContent, Radio, RadioGroup, FormControlLabel,
+  FormGroup, Checkbox
 } from '@material-ui/core'
 
-function SelectList({ value, onChange, ...props }) {
+function SelectList({ checkbox, value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])
   useEffect(() => { onChange(options) }, [options])
 
+  // Toggle certain components/icons between Checkbox/Radio variants.
+  const TypeGroup = checkbox ? FormGroup : RadioGroup
+  const TypeComponent = checkbox ? Checkbox : Radio
+  const AddIcon = checkbox ? 'add_box' : 'add_circle'
+  const CheckedIcon = checkbox ? 'check_box' : 'radio_button_checked'
+  const UncheckedIcon = checkbox ? 'check_box_outline_blank' : 'radio_button_unchecked'
+
   return (
       <React.Fragment>
-        <RadioGroup name="option">
+        <TypeGroup name="option">
           {options.map((x, idx) => (
               <FormControlLabel
                   key={`${x.value}-${idx}`}
                   value={x.value} 
                   style={{ width: '100%', alignItems: 'flex-start' }}
-                  control={<Radio
+                  control={<TypeComponent
                     disabled
                     color="secondary"
-                    icon={<Icon fontSize="small">radio_button_unchecked</Icon>}
-                    checkedIcon={<Icon fontSize="small">radio_button_checked</Icon>}
+                    icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                    checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
                   />}
               label={
                 <React.Fragment>
@@ -80,18 +88,18 @@ function SelectList({ value, onChange, ...props }) {
             />)
           )}
           <FormControlLabel
-              control={<Radio
+              control={<TypeComponent
                 checked
                 color="primary"
                 onClick={() => setOptions(options => [...options, ''])}
-                checkedIcon={<Icon fontSize="small">add_circle</Icon>}
+                checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
               />}
               label={
                   <Typography>Add Option</Typography>
               }
               labelPlacement="end"
             />
-        </RadioGroup>
+        </TypeGroup>
       </React.Fragment>
   )
 }
@@ -102,7 +110,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
     const [type, setType] = useState(question.type || 'text')
     const [options, setOptions] = useState(question.options)
     useEffect(() => { 
-        onChange({ text, type, description, options: type === 'list' ? options : null }) 
+        onChange({ text, type, description, options: ['list', 'select', 'multiselect'].includes(type) ? options : null }) 
     }, [text, description, type, options])
 
     return (
@@ -153,15 +161,17 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
                       <Button color={type === 'text' ? 'primary' : 'default'} onClick={() => setType('text')}>text</Button>
                       <Button color={type === 'boolean' ? 'primary' : 'default'} onClick={() => setType('boolean')}>boolean</Button>
                       <Button color={type === 'likert' ? 'primary' : 'default'} onClick={() => setType('likert')}>likert</Button>
-                      <Button color={type === 'list' ? 'primary' : 'default'} onClick={() => setType('list')}>list</Button>
+                      <Button color={['list', 'select'].includes(type) ? 'primary' : 'default'} onClick={() => setType('list')}>list</Button>
+                      <Button color={type === 'multiselect' ? 'primary' : 'default'} onClick={() => setType('multiselect')}>multi-select</Button>
                     </ButtonGroup>
                 </Grid>
-                {type === 'list' && 
-                <Grid item>
-                    <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
-                        <SelectList value={options} onChange={setOptions} />
-                    </Box>
-                </Grid>}
+                {['list', 'select', 'multiselect'].includes(type) && 
+                  <Grid item>
+                      <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
+                          <SelectList checkbox={type === 'multiselect'} value={options} onChange={setOptions} />
+                      </Box>
+                  </Grid>
+                }
             </Grid>
           </StepContent>
         </Step>
