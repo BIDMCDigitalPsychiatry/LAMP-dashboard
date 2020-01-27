@@ -77,7 +77,7 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
         reader.onerror = () => enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
         reader.onload = () => {
             setShowActivityImport()
-            let obj = JSON.parse(atob(reader.result))
+            let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result))))
             if (Array.isArray(obj) && obj.filter(x => (typeof x === 'object' && !!x.name && !!x.settings && !!x.schedule)).length > 0)
                 setImportFile(obj)
             else enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
@@ -86,9 +86,9 @@ export default function ActivityList({ title, activities, studyID, onChange, ...
     }, [])
     // eslint-disable-next-line
     const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-        onDrop, accept: 'application/json,.json', maxSize: 1 * 1024 * 1024 /* 1MB */
+        onDrop, accept: 'application/json,.json', maxSize: 5 * 1024 * 1024 /* 5MB */
     })
-    const _saveFile = (data) => saveAs(new Blob([btoa(JSON.stringify(data))], { type: 'text/plain;charset=utf-8' }), 'export.json')
+    const _saveFile = (data) => saveAs(new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(data))))], { type: 'text/plain;charset=utf-8' }), 'export.json')
 
 
 
