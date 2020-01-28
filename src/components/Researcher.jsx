@@ -9,18 +9,9 @@ import ParticipantList from './ParticipantList'
 import ActivityList from './ActivityList'
 import { ResponsivePaper } from './Utils'
 
-export default function Researcher({ researcher, onParticipantSelect, ...props }) {
+function Study({ study, onParticipantSelect, ...props }) {
     const [showUnscheduled, setShowUnscheduled] = useState(false)
     const [currentTab, setCurrentTab] = useState(0)
-    const [participants, setParticipants] = useState([])
-    const [activities, setActivities] = useState([])
-    useEffect(() => {
-        LAMP.Participant.allByResearcher(researcher.id).then(setParticipants)
-    }, [])
-    useEffect(() => {
-        LAMP.Activity.allByResearcher(researcher.id).then(setActivities)
-    }, [])
-
     return (
         <React.Fragment>
             <Box mb="16px" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -28,7 +19,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                      
                 </Typography>
                 <Box>
-                    <Typography variant="inherit" color="inherit">
+                    <Typography variant="overline">
                         Show Unscheduled Activities
                     </Typography>
                     <Switch 
@@ -52,21 +43,25 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
                 <Divider />
                 {currentTab === 0 &&
                     <ParticipantList 
-                        title="Default Clinic"
-                        participants={participants}
-                        studyID={researcher.studies[0]}
+                        title={study.name}
+                        studyID={study.id}
                         showUnscheduled={showUnscheduled}
-                        onParticipantSelect={onParticipantSelect}
-                        onChange={() => LAMP.Participant.allByResearcher(researcher.id).then(setParticipants)}  />
+                        onParticipantSelect={onParticipantSelect} />
                 }
                 {currentTab === 1 &&
                     <ActivityList 
-                        title="Default Clinic" 
-                        activities={activities}
-                        studyID={researcher.studies[0]}
-                        onChange={() => LAMP.Activity.allByResearcher(researcher.id).then(setActivities)} />
+                        title={study.name} 
+                        studyID={study.id} />
                 }
             </ResponsivePaper>
         </React.Fragment>
     )
+}
+
+export default function Researcher({ researcher, onParticipantSelect, ...props }) {
+    const [studies, setStudies] = useState([])
+    useEffect(() => {
+        LAMP.Study.allByResearcher(researcher.id).then(setStudies)
+    }, [])
+    return studies.map(study => <Study study={study} onParticipantSelect={onParticipantSelect} />)
 }

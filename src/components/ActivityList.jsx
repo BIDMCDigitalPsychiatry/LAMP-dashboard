@@ -64,12 +64,17 @@ export function unspliceActivity(x) {
     }
 }
 
-export default function ActivityList({ title, activities, studyID, onChange, ...props }) {
+export default function ActivityList({ studyID, title, ...props }) {
+    const [activities, setActivities] = useState([])
     const [showCreate, setShowCreate] = useState()
     const [showActivityImport, setShowActivityImport] = useState()
     const [importFile, setImportFile] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
     const { enqueueSnackbar } = useSnackbar()
+    useEffect(() => {
+        LAMP.Activity.allByStudy(studyID).then(setActivities)
+    }, [])
+    const onChange = () => LAMP.Activity.allByStudy(studyID).then(setActivities)
     useEffect(() => { onChange() }, [showCreate])
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()

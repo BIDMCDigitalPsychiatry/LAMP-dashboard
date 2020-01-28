@@ -27,17 +27,22 @@ const timeAgo = new TimeAgo('en-US')
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 
 
-export default function ParticipantList({ participants, onChange, onParticipantSelect, studyID, showUnscheduled, ...props }) {
+export default function ParticipantList({ studyID, title, onParticipantSelect, showUnscheduled, ...props }) {
     const [state, setState] = useState({
         popoverAttachElement: null,
         selectedIcon: null,
         newCount: 1,
         selectedRows: []
     })
+    const [participants, setParticipants] = useState([])
     const [openMessaging, setOpenMessaging] = useState()
     const [openPasswordReset, setOpenPasswordReset] = useState()
     const [logins, setLogins] = useState({})
     const { enqueueSnackbar } = useSnackbar()
+    useEffect(() => {
+        LAMP.Participant.allByStudy(studyID).then(setParticipants)
+    }, [])
+    const onChange = () => LAMP.Participant.allByStudy(studyID).then(setParticipants)
 
     useEffect(() => {
         (async function() {
@@ -108,7 +113,7 @@ export default function ParticipantList({ participants, onChange, onParticipantS
 	return (
         <React.Fragment>
             <MaterialTable 
-                title="Default Clinic"
+                title={title}
                 data={participants} 
                 columns={[
                     { title: 'Name', field: 'id', render: (x) => 
