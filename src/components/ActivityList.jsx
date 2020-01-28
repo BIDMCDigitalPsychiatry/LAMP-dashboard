@@ -1,7 +1,10 @@
 
 // Core Imports
 import React, { useState, useEffect, useCallback } from 'react'
-import { IconButton, Box, Icon, Button, Typography, Dialog, DialogActions, Slide } from '@material-ui/core'
+import { 
+    IconButton, Box, Icon, Button, Typography, Dialog, 
+    DialogActions, Slide, Menu, MenuItem, Divider
+} from '@material-ui/core'
 import MaterialTable from 'material-table'
 import { useSnackbar } from 'notistack'
 
@@ -13,6 +16,7 @@ import { useDropzone } from 'react-dropzone'
 import LAMP from '../lamp'
 import Activity from './Activity'
 import SurveyCreator from './SurveyCreator'
+import GroupCreator from './GroupCreator'
 import ResponsiveDialog from './ResponsiveDialog'
 
 
@@ -65,17 +69,22 @@ export function unspliceActivity(x) {
 }
 
 export default function ActivityList({ studyID, title, ...props }) {
+    const [activitySpecs, setActivitySpecs] = useState([])
     const [activities, setActivities] = useState([])
+    const [createMenu, setCreateMenu] = useState()
     const [showCreate, setShowCreate] = useState()
+    const [groupCreate, setGroupCreate] = useState()
     const [showActivityImport, setShowActivityImport] = useState()
     const [importFile, setImportFile] = useState()
     const [selectedActivity, setSelectedActivity] = useState()
     const { enqueueSnackbar } = useSnackbar()
     useEffect(() => {
         LAMP.Activity.allByStudy(studyID).then(setActivities)
+        LAMP.ActivitySpec.all().then(res => setActivitySpecs(res.filter(x => !['lamp.activity_group', 'lamp.group', 'lamp.survey'].includes(x.name))))
     }, [])
     const onChange = () => LAMP.Activity.allByStudy(studyID).then(setActivities)
     useEffect(() => { onChange() }, [showCreate])
+    useEffect(() => { onChange() }, [groupCreate])
     const onDrop = useCallback(acceptedFiles => {
         const reader = new FileReader()
         reader.onabort = () => enqueueSnackbar('Couldn\'t import the Activities.', { variant: 'error' })
@@ -171,8 +180,24 @@ export default function ActivityList({ studyID, title, ...props }) {
         const { raw, tag } = unspliceActivity(x)
         let newItem = await LAMP.Activity.create(studyID, raw)
         await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
-        enqueueSnackbar("Successfully created a new Activity.", { variant: 'success' })
+        enqueueSnackbar("Successfully created a new survey Activity.", { variant: 'success' })
         setShowCreate()
+    }
+
+    // Create a new Activity object that represents a group of other Activities.
+    const saveGroup = async (x) => {
+        enqueueSnackbar("Failed to create a new group Activity.", { variant: 'error' })
+        setGroupCreate()
+    }
+
+    // Create a new Activity object that represents a cognitive test.
+    const saveCTest = async (x) => {
+        let newItem = await LAMP.Activity.create(studyID, { spec: x.name })
+        console.dir(newItem)
+        if (!!newItem.data) {
+            onChange()
+            enqueueSnackbar("Successfully created a new cognitive test Activity.", { variant: 'success' })
+        } else enqueueSnackbar("Failed to create a new cognitive test Activity.", { variant: 'error' })
     }
 
     // Delete the selected Activity objects & survey descriptions if set.
@@ -200,6 +225,16 @@ export default function ActivityList({ studyID, title, ...props }) {
 
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
     const updateActivity = async (x, isDuplicated) => {
+
+        // Short-circuit for groups and CTests
+        if (!['lamp.group', 'lamp.survey'].includes(x.spec)) {
+            let result = await LAMP.Activity.update(x.id, { settings: x.settings })
+            if (!!result.error)
+                 enqueueSnackbar('Encountered an error: ' + result?.error, { variant: 'error' })
+            else enqueueSnackbar('Successfully updated the Activity.', { variant: 'success' })
+            return 
+        }
+
         const { raw, tag } = unspliceActivity(x)
         if (isDuplicated) /* duplicate */ {
 
@@ -244,7 +279,7 @@ export default function ActivityList({ studyID, title, ...props }) {
                         icon: 'add_box',
                         tooltip: 'Create',
                         isFreeAction: true,
-                        onClick: (event, rows) => setShowCreate(true)
+                        onClick: (event, rows) => setCreateMenu(event.currentTarget.parentNode)
                     }, {
                         icon: 'delete_forever',
                         tooltip: 'Delete',
@@ -267,6 +302,23 @@ export default function ActivityList({ studyID, title, ...props }) {
                 }}
                 components={{ Container: props => <div {...props} /> }}
             />
+            <Menu
+                keepMounted
+                open={Boolean(createMenu)}
+                anchorPosition={createMenu?.getBoundingClientRect()}
+                anchorReference="anchorPosition"
+                onClose={() => setCreateMenu()}
+            >
+                <MenuItem disabled><b>Create a new...</b></MenuItem>
+                <Divider />
+                <MenuItem onClick={() => { setCreateMenu(); setGroupCreate(true) }}>Activity Group</MenuItem>
+                <MenuItem onClick={() => { setCreateMenu(); setShowCreate(true) }}>Survey Instrument</MenuItem>
+                <Divider />
+                <MenuItem disabled><b>Smartphone Cognitive Tests</b></MenuItem>
+                {activitySpecs.map(x => (
+                    <MenuItem onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
+                ))}
+            </Menu>
             <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()} >
                 <Box {...getRootProps()} 
                     p={4} 
@@ -299,6 +351,11 @@ export default function ActivityList({ studyID, title, ...props }) {
             <ResponsiveDialog fullScreen transient animate open={!!showCreate} onClose={() => setShowCreate()}>
                 <Box py={8} px={4}>
                     <SurveyCreator onSave={saveActivity} />
+                </Box>
+            </ResponsiveDialog>
+            <ResponsiveDialog fullScreen transient animate open={!!groupCreate} onClose={() => setGroupCreate()}>
+                <Box py={8} px={4}>
+                    <GroupCreator activities={activities} onSave={saveGroup} />
                 </Box>
             </ResponsiveDialog>
             <ResponsiveDialog fullScreen transient animate open={!!selectedActivity} onClose={() => setSelectedActivity()}>
