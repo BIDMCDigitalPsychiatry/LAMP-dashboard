@@ -20,7 +20,7 @@ export default function Root({ onChange, ...props }) {
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
-        if (LAMP.Auth._auth.type !== 'root')
+        if (LAMP.Auth._type !== 'admin')
             return
         LAMP.Researcher.all().then(setResearchers)
     }, [])

@@ -41,7 +41,7 @@ function PageTitle({ children, ...props }) {
 
 function AppRouter({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)
-    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth })
+    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type })
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const storeRef = useRef([])
@@ -63,8 +63,7 @@ function AppRouter({ ...props }) {
 
             // 
             reset({ 
-                type: ['root', 'admin'].includes(x[0]) ? 'root' : (x[0].includes('@') ? 'researcher' : 'participant'), 
-                id: x[0] === 'admin' ? 'root' : x[0],
+                id: x[0],
                 password: x[1],
                 serverAddress: x[2]
             }).then(x => {
@@ -72,7 +71,7 @@ function AppRouter({ ...props }) {
             })
         } else if (!state.identity) {
             LAMP.Auth.refresh_identity().then(x => {
-                setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth }))
+                setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type }))
             })
         }
         
@@ -95,7 +94,7 @@ function AppRouter({ ...props }) {
 
     useEffect(() => {
         closeSnackbar('admin')
-        if (!state.identity || (state.auth.type !== 'root'))
+        if (!state.identity || (state.authType !== 'admin'))
             return
         enqueueSnackbar('Proceed with caution: you are logged in as the administrator.', { 
             key: 'admin',
@@ -109,12 +108,12 @@ function AppRouter({ ...props }) {
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
         if (!!identity)
-             setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth }))
-        else setState(state => ({ ...state, identity: null, auth: null }))
+             setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth , authType: LAMP.Auth._type }))
+        else setState(state => ({ ...state, identity: null, auth: null, authType: null }))
     }
 
     let getResearcher = (id) => {
-        if (id === 'me' && state.auth.type === 'researcher')
+        if (id === 'me' && state.authType === 'researcher')
             id = state.identity.id
         if (!id || id === 'me')
             return null //props.history.replace(`/`)
@@ -131,7 +130,7 @@ function AppRouter({ ...props }) {
     }
 
     let getParticipant = (id) => {
-        if (id === 'me' && state.auth.type === 'participant')
+        if (id === 'me' && state.authType === 'participant')
             id = state.identity.id
         if (!id || id === 'me')
             return null //props.history.replace(`/`)
@@ -183,9 +182,9 @@ function AppRouter({ ...props }) {
                             <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
                         </NavigationLayout>
                     </React.Fragment> :
-                    (state.auth.type === 'root' ?
+                    (state.authType === 'admin' ?
                         <Redirect to="/researcher" /> :
-                    state.auth.type === 'researcher' ?
+                    state.authType === 'researcher' ?
                         <Redirect to="/researcher/me" /> :
                         <Redirect to="/participant/me" />
                     )
@@ -194,7 +193,7 @@ function AppRouter({ ...props }) {
 
             {/* Route authenticated routes. */}
             <Route exact path="/researcher" render={props =>
-                !state.identity || (state.auth.type !== 'root') ?
+                !state.identity || (state.authType !== 'admin') ?
                 <React.Fragment>
                     <PageTitle>mindLAMP | Login</PageTitle>
                     <NavigationLayout 
@@ -214,11 +213,11 @@ function AppRouter({ ...props }) {
                     <PageTitle>Administrator</PageTitle>
                     <NavigationLayout 
                         title="Administrator" 
-                        profile={state.auth.type === 'root' ? {} : state.identity} 
+                        profile={state.authType === 'admin' ? {} : state.identity} 
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >
-                        <Root {...props} root={state.identity} />
+                        <Root {...props} />
                     </NavigationLayout>
                 </React.Fragment>
             } />
@@ -246,7 +245,7 @@ function AppRouter({ ...props }) {
                     <NavigationLayout 
                         id={props.match.params.id}
                         title={`${getResearcher(props.match.params.id).name}`} 
-                        profile={state.auth.type === 'root' ? {} : state.identity}
+                        profile={state.authType === 'admin' ? {} : state.identity}
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >
@@ -280,7 +279,7 @@ function AppRouter({ ...props }) {
                         enableMessaging
                         id={props.match.params.id}
                         title={`Patient ${getParticipant(props.match.params.id).id}`} 
-                        profile={state.auth.type === 'root' ? {} : state.identity}
+                        profile={state.authType === 'admin' ? {} : state.identity}
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >

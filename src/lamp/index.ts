@@ -23,7 +23,6 @@ export * from './model/index'
  * 
  */
 interface IAuth { 
-    type: 'root' | 'researcher' | 'participant' | null; 
     id: string | null; 
     password: string | null; 
     serverAddress: string | undefined; 
@@ -68,39 +67,46 @@ export default class LAMP {
 
 
     public static Auth = class {
-        public static _auth: IAuth = { type: null, id: null, password: null, serverAddress: null }
+        public static _auth: IAuth = { id: null, password: null, serverAddress: null }
         public static _me: Researcher[] | Researcher | Participant | null | undefined
+        public static _type: 'admin' | 'researcher' | 'participant' | null = null
 
         /**
          * Authenticate/authorize as a user of a given `type`.
          * If all values are null (especially `type`), the authorization is cleared.
          */
-        public static async set_identity(identity: { type: 'root' | 'researcher' | 'participant' | null; id: string | null; password: string | null; serverAddress: string | undefined; } = { type: null, id: null, password: null, serverAddress: undefined }) {
+        public static async set_identity(identity: { id: string | null; password: string | null; serverAddress: string | undefined; } = { id: null, password: null, serverAddress: undefined }) {
             LAMP.configuration = { base: (!!identity.serverAddress ? `https://${identity.serverAddress}` : 'https://api.lamp.digital') }
 
             // Ensure there's actually a change to process.
-            let l: IAuth = LAMP.Auth._auth || { type: null, id: null, password: null, serverAddress: null }
-            if (l.type === identity.type && 
-                l.id === identity.id && 
+            let l: IAuth = LAMP.Auth._auth || { id: null, password: null, serverAddress: null }
+            if (l.id === identity.id && 
                 l.password === identity.password && 
                 l.serverAddress === identity.serverAddress
             ) return
 
             // Propogate the authorization.
-            LAMP.Auth._auth = {type: identity.type, id: identity.id, password: identity.password, serverAddress: identity.serverAddress}
+            LAMP.Auth._auth = { id: identity.id, password: identity.password, serverAddress: identity.serverAddress }
             LAMP.configuration = { ...(LAMP.configuration || { base: undefined, headers: undefined }), authorization: !!LAMP.Auth._auth.id ? `${LAMP.Auth._auth.id}:${LAMP.Auth._auth.password}` : undefined}
 
             try {
 
                 // If we aren't clearing the credential, get the "self" identity.
-                if (!!identity.type && !!identity.id && !!identity.password) {
-                    LAMP.Auth._me = await (identity.type === 'root' ? 
-                        LAMP.Researcher.all() : (identity.type === 'researcher' ? 
+                if (!!identity.id && !!identity.password) {
+
+                    // Get our 'me' context so we know what object type we are.
+                    let typeData
+                    try { typeData = await LAMP.Type.parent('me') } catch(e) {}
+                    LAMP.Auth._type = (typeData.error === '400.context-substitution-failed' ? 'admin' : (Object.entries(typeData.data).length === 0 ? 'researcher' : (!!typeData.data ? 'participant' : null)))
+
+                    // Get our 'me' object now that we figured out our type.
+                    LAMP.Auth._me = await (LAMP.Auth._type === 'admin' ? 
+                        { id: identity.id } : (LAMP.Auth._type === 'researcher' ? 
                             LAMP.Researcher.view('me') : 
                             LAMP.Participant.view('me')))
 
                     // Tie-in for the mobile apps. Login only if we are a participant.
-                    if (identity.type === 'participant') {
+                    if (LAMP.Auth._type === 'participant') {
                         (<any>window)?.webkit?.messageHandlers?.login?.postMessage?.({ 
                             authorizationToken: LAMP.configuration.authorization, 
                             identityObject: LAMP.Auth._me,
@@ -109,22 +115,22 @@ export default class LAMP {
                     }
                 } else {
 
-                    // Tie-in for the mobile apps. Logout only if we were a participant.
-                    if (l.type === 'participant') {
-                        (<any>window)?.webkit?.messageHandlers?.logout?.postMessage?.({ 
-                            deleteCache: true // FIXME!
-                        })
-                    }
+                    // Tie-in for the mobile apps. 
+                    // FIXME: Logout only if we were a participant... right now the app should ignore erroneous logouts.
+                    (<any>window)?.webkit?.messageHandlers?.logout?.postMessage?.({ 
+                        deleteCache: true // FIXME!
+                    })
                 }
             } catch(err) {
 
                 // We failed: clear and propogate the authorization.
-                LAMP.Auth._auth = { type: null, id: null, password: null, serverAddress: null }
+                LAMP.Auth._auth = { id: null, password: null, serverAddress: null }
                 if (!!LAMP.configuration)
                     LAMP.configuration.authorization = undefined
 
                 // Delete the "self" identity and throw the error we received.
                 LAMP.Auth._me = null
+                LAMP.Auth._type = null
                 throw new Error('invalid id or password')
             } finally {
 
@@ -135,7 +141,7 @@ export default class LAMP {
 
         private static async refresh_identity() {
             let _saved = JSON.parse(sessionStorage.getItem('LAMP._auth') || 'null') || LAMP.Auth._auth
-            await LAMP.Auth.set_identity({ type: _saved.type, id: _saved.id, password: _saved.password, serverAddress: _saved.serverAddress })
+            await LAMP.Auth.set_identity({ id: _saved.id, password: _saved.password, serverAddress: _saved.serverAddress })
         }
     }
 }

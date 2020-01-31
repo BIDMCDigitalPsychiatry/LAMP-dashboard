@@ -36,10 +36,7 @@ export default function Login({ setIdentity, onComplete, ...props }) {
         if (!state.id || !state.password)
             return
         setIdentity({ 
-                type: (['root', 'admin'].includes(state.id) ?
-                        'root' : (state.id.includes('@') ?
-                            'researcher' : 'participant')), 
-                id: state.id === 'admin' ? 'root' : state.id, 
+                id: state.id, 
                 password: state.password,
                 serverAddress: state.serverAddress
             }

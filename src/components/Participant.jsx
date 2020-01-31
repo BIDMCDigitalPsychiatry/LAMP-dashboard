@@ -20,7 +20,7 @@ import Jewels from './Jewels'
 import { spliceActivity } from './ActivityList'
 
 function _hideCareTeam() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
-function _patientMode() { return LAMP.Auth._auth.type === 'participant' }
+function _patientMode() { return LAMP.Auth._type === 'participant' }
 function _shouldRestrict() { return _patientMode() && _hideCareTeam() }
 
 // TODO: all SensorEvents?
