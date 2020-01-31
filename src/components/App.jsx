@@ -75,6 +75,8 @@ function AppRouter({ ...props }) {
                 setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth }))
             })
         }
+        
+        window.addEventListener('beforeinstallprompt', (e) => setDeferredPrompt(e))
     }, [])
 
     useEffect(() => {
@@ -85,8 +87,8 @@ function AppRouter({ ...props }) {
             persist: true, 
             action: key =>
                 <React.Fragment>
-                    <Button onClick={promptInstall}>Install</Button>
-                    <Button onClick={() => closeSnackbar(key)}>Dismiss</Button>
+                    <Button style={{ color: '#fff' }} onClick={promptInstall}>Install</Button>
+                    <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
                 </React.Fragment>
         })
     }, [deferredPrompt])
@@ -103,10 +105,6 @@ function AppRouter({ ...props }) {
             action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
         })
     }, [state])
-
-    if (window.matchMedia('(display-mode: standalone)').matches)
-        console.log('Launched from home screen!')
-    window.addEventListener('beforeinstallprompt', (e) => setDeferredPrompt(e))
 
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
@@ -155,9 +153,9 @@ function AppRouter({ ...props }) {
         deferredPrompt.prompt()
         deferredPrompt.userChoice.then((c) => {
             if (c.outcome === 'accepted') {
-                console.log('App will be installed.')
+                enqueueSnackbar('mindLAMP will be installed on your device.', { variant: 'info' })
             } else {
-                console.log('App not installed.')
+                enqueueSnackbar('mindLAMP will not be installed on your device.', { variant: 'warning' })
             }
             setDeferredPrompt(null)
         })

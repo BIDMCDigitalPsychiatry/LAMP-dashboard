@@ -51,8 +51,6 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
     						<Menu
     							id="menu-appbar"
     							anchorEl={showCustomizeMenu}
-    							anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
-    							transformOrigin={{horizontal: 'right', vertical: 'top'}}
     							open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
     							onClose={() => setShowCustomizeMenu()}
                             >

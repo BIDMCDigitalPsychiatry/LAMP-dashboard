@@ -20,7 +20,7 @@ import Jewels from './Jewels'
 import { spliceActivity } from './ActivityList'
 
 function _hideCareTeam() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
-function _patientMode() { return !['admin', 'root'].includes(LAMP.Auth._auth.id) && !LAMP.Auth._auth.id.includes('@') }
+function _patientMode() { return LAMP.Auth._auth.type === 'participant' }
 function _shouldRestrict() { return _patientMode() && _hideCareTeam() }
 
 // TODO: all SensorEvents?
@@ -250,7 +250,7 @@ export default function Participant({ participant, ...props }) {
                     badges={state.activity_counts}
                     onChange={x => setState({ ...state, selectedCharts: x })}
                 />
-                {(!(!!LAMP.Auth._auth.serverAddress && LAMP.Auth._auth.serverAddress.includes('psych.digital'))) &&
+                {!_hideCareTeam() &&
                     <React.Fragment>
                         <Divider style={{ margin: '8px -16px 8px -16px' }} />
                         <Typography variant="overline">
@@ -317,7 +317,7 @@ export default function Participant({ participant, ...props }) {
                                 prefillData: [data.slice.map(({ item, value }) => ({ item, value }))]
                             }])
                         }}
-                        onDeleteAction={(x) => hideEvent(x.x.getTime(), activity.id)}
+                        onDeleteAction={_patientMode() ? undefined : (x) => hideEvent(x.x.getTime(), activity.id)}
                     />
                 </Card>
             )}

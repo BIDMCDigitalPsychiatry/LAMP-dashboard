@@ -93,11 +93,29 @@ export default class LAMP {
             try {
 
                 // If we aren't clearing the credential, get the "self" identity.
-                if (!!identity.type && !!identity.id && !!identity.password)
+                if (!!identity.type && !!identity.id && !!identity.password) {
                     LAMP.Auth._me = await (identity.type === 'root' ? 
                         LAMP.Researcher.all() : (identity.type === 'researcher' ? 
                             LAMP.Researcher.view('me') : 
                             LAMP.Participant.view('me')))
+
+                    // Tie-in for the mobile apps. Login only if we are a participant.
+                    if (identity.type === 'participant') {
+                        (<any>window)?.webkit?.messageHandlers?.login?.postMessage?.({ 
+                            authorizationToken: LAMP.configuration.authorization, 
+                            identityObject: LAMP.Auth._me,
+                            serverAddress:  LAMP.configuration.base
+                        })
+                    }
+                } else {
+
+                    // Tie-in for the mobile apps. Logout only if we were a participant.
+                    if (l.type === 'participant') {
+                        (<any>window)?.webkit?.messageHandlers?.logout?.postMessage?.({ 
+                            deleteCache: true // FIXME!
+                        })
+                    }
+                }
             } catch(err) {
 
                 // We failed: clear and propogate the authorization.
