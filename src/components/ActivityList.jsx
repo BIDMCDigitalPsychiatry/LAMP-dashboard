@@ -19,6 +19,7 @@ import SurveyCreator from './SurveyCreator'
 import GroupCreator from './GroupCreator'
 import ResponsiveDialog from './ResponsiveDialog'
 
+function _hideCognitiveTesting() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 
 // TODO: Blogs/Tips/AppHelp
 
@@ -112,29 +113,22 @@ export default function ActivityList({ studyID, title, ...props }) {
 
     // Import a file containing pre-linked Activity objects from another Study.
     const importActivities = async () => {
-        let allIDs = importFile.map(x => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
-        let brokenGroupsCount = importFile
+        const _importFile = [...importFile] // clone it so we can close the dialog first
+        setImportFile()
+
+        let allIDs = _importFile.map(x => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
+        let brokenGroupsCount = _importFile
             .filter(activity => activity.spec === 'lamp.group')
             .filter(activity => activity.settings
                 .filter(x => !Object.keys(allIDs).includes(x)).length > 0)
             .length
         if (brokenGroupsCount > 0) {
-            setImportFile()
             enqueueSnackbar('Couldn\'t import the Activities because some Activities are misconfigured or missing.', { variant: 'error' })
             return
         }
 
-        // Groups only.
-        for (let x of importFile.filter(x => ['lamp.group'].includes(x.spec))) {
-            try {
-                await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined, settings: x.settings.map(y => allIDs[y]) })
-            } catch(e) {
-                enqueueSnackbar("Couldn't import one of the selected Activity groups.", { variant: 'error' })
-            }
-        }
-
         // Surveys only.
-        for (let x of importFile.filter(x => ['lamp.survey'].includes(x.spec))) {
+        for (let x of _importFile.filter(x => ['lamp.survey'].includes(x.spec))) {
             const { raw, tag } = unspliceActivity(x)
             try {
                 allIDs[raw.id] = (await LAMP.Activity.create(studyID, { ...raw, id: undefined, tableData: undefined })).data
@@ -145,7 +139,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         }
 
         // CTests only.
-        for (let x of importFile.filter(x => !['lamp.group', 'lamp.survey'].includes(x.spec))) {
+        for (let x of _importFile.filter(x => !['lamp.group', 'lamp.survey'].includes(x.spec))) {
             try {
                 allIDs[x.id] = (await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined })).data
             } catch(e) {
@@ -153,8 +147,16 @@ export default function ActivityList({ studyID, title, ...props }) {
             }
         }
 
+        // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
+        for (let x of _importFile.filter(x => ['lamp.group'].includes(x.spec))) {
+            try {
+                await LAMP.Activity.create(studyID, { ...x, id: undefined, tableData: undefined, settings: x.settings.map(y => allIDs[y]) })
+            } catch(e) {
+                enqueueSnackbar("Couldn't import one of the selected Activity groups.", { variant: 'error' })
+            }
+        }
+
         onChange()
-        setImportFile()
         enqueueSnackbar("The selected Activities were successfully imported.", { variant: 'info' })
     }
 
@@ -313,11 +315,15 @@ export default function ActivityList({ studyID, title, ...props }) {
                 <Divider />
                 <MenuItem onClick={() => { setCreateMenu(); setGroupCreate(true) }}>Activity Group</MenuItem>
                 <MenuItem onClick={() => { setCreateMenu(); setShowCreate(true) }}>Survey Instrument</MenuItem>
-                <Divider />
-                <MenuItem disabled><b>Smartphone Cognitive Tests</b></MenuItem>
-                {activitySpecs.map(x => (
-                    <MenuItem onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
-                ))}
+                {!_hideCognitiveTesting() && 
+                    <React.Fragment>
+                        <Divider />
+                        <MenuItem disabled><b>Smartphone Cognitive Tests</b></MenuItem>
+                        {activitySpecs.map(x => (
+                            <MenuItem onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
+                        ))}
+                    </React.Fragment>
+                }
             </Menu>
             <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()} >
                 <Box {...getRootProps()} 
