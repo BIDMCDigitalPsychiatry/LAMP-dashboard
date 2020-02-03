@@ -132,7 +132,7 @@ export default function ActivityList({ studyID, title, ...props }) {
             const { raw, tag } = unspliceActivity(x)
             try {
                 allIDs[raw.id] = (await LAMP.Activity.create(studyID, { ...raw, id: undefined, tableData: undefined })).data
-                await LAMP.Type.setAttachment(raw.id, 'me', 'lamp.dashboard.survey_description', tag)
+                await LAMP.Type.setAttachment(allIDs[raw.id], 'me', 'lamp.dashboard.survey_description', tag)
             } catch(e) {
                 enqueueSnackbar("Couldn't import one of the selected survey Activities.", { variant: 'error' })
             }
@@ -157,7 +157,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         }
 
         onChange()
-        enqueueSnackbar("The selected Activities were successfully imported.", { variant: 'info' })
+        enqueueSnackbar("The selected Activities were successfully imported.", { variant: 'success' })
     }
 
     // Export a file containing this Study's pre-linked Activity objects.
