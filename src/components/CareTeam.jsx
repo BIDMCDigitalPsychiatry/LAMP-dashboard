@@ -1,7 +1,10 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import { Grid, Icon, Button, Collapse, Typography, useTheme, useMediaQuery } from '@material-ui/core'
+import { 
+	Grid, Icon, Button, Collapse, Typography, Divider, 
+	useTheme, useMediaQuery 
+} from '@material-ui/core'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -42,13 +45,14 @@ export default function CareTeam({ participant,  ...props }) {
 	            	direction="column" 
 	            	spacing={1} 
 	            	alignItems={sm ? 'center' : 'flex-start'} 
-	            	xs={12} sm={12} md={6} lg={4}
+	            	xs={12} sm={12} md={6} lg={6}
             	>
 	                <Grid item>
 	                    <Typography 
 	                    	variant="h2" 
 	                    	gutterBottom
 	                    	align={sm ? 'center' : 'left'}
+	                    	style={{ fontFamily: 'Garamond', fontWeight: 700, color: '#074377' }}
                     	>
 	                        Meet your care team.
 	                    </Typography>
@@ -57,7 +61,7 @@ export default function CareTeam({ participant,  ...props }) {
 	                    	align={sm ? 'center' : 'left'}
                     	>
 	                        Your care team consists of your clinicians and family members you'd like to grant access to your data. 
-	                        To add a family member, press the (+) icon to the right. 
+	                        To add a family member, press the <Icon style={{ verticalAlign: '-0.2em' }}>add_circle</Icon> icon {sm ? 'above' : 'to the right'}. 
 	                    </Typography>
 	                </Grid>
 	                <Grid item>
@@ -82,8 +86,9 @@ export default function CareTeam({ participant,  ...props }) {
 	        	in={showMessaging} 
 	        	collapsedHeight={0}
         	>
+        		<Divider style={{ margin: '0px -16px 0px -16px' }} />
 	            <Messages 
-	            	style={{ margin: -16 }} 
+	            	style={{ margin: '0px -16px -16px -16px' }} 
 	            	refresh={showMessaging} 
 	            	participantOnly 
 	            	participant={participant.id} 

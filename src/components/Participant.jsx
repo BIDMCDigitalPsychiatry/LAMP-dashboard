@@ -1,7 +1,10 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import { Box, Card, Switch, Typography, Divider, Grid } from '@material-ui/core'
+import { 
+    Box, Card, Switch, Typography, Divider, Grid, Fab,
+    Drawer, Icon, IconButton, useTheme, useMediaQuery, Tooltip
+} from '@material-ui/core'
 import { blue } from '@material-ui/core/colors'
 import { useSnackbar } from 'notistack'
 
@@ -10,6 +13,7 @@ import LAMP from '../lamp'
 import ActivityCard from './ActivityCard'
 import MultipleSelect from './MultipleSelect'
 import CareTeam from './CareTeam'
+import Messages from './Messages'
 import Launcher from './Launcher'
 import Sparkline from './Sparkline'
 import MultiPieChart from './MultiPieChart'
@@ -32,8 +36,12 @@ export default function Participant({ participant, ...props }) {
     const [ survey, setSurvey ] = useState()
     const [ submission, setSubmission ] = useState(0)
     const [ hiddenEvents, setHiddenEvents ] = useState([])
-    const [launchedActivity, setLaunchedActivity] = useState()
+    const [ launchedActivity, setLaunchedActivity ] = useState()
+    const [ sidebarOpen, setSidebarOpen ] = useState()
     const { enqueueSnackbar } = useSnackbar()
+
+    const supportsSidebar = useMediaQuery(useTheme().breakpoints.up('md'))
+    useEffect(() => { setSidebarOpen(false) }, [survey])
 
     useEffect(() => {
         (async () => {
@@ -215,15 +223,48 @@ export default function Participant({ participant, ...props }) {
                 </ResponsiveDialog>
                 <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
                     <Box py={8} px={2}>
-                        <Survey
-                            validate
-                            partialValidationOnly
-                            content={survey} 
-                            prefillData={!!survey ? survey.prefillData : undefined}
-                            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-                            onValidationFailure={() => enqueueSnackbar('Some responses are missing. Please complete all questions before submitting.', { variant: 'error' })}
-                            onResponse={submitSurvey} 
-                        />
+                        <Grid container direction="row">
+                            <Grid item>
+                                <Survey
+                                    validate
+                                    partialValidationOnly
+                                    content={survey} 
+                                    prefillData={!!survey ? survey.prefillData : undefined}
+                                    prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+                                    onValidationFailure={() => enqueueSnackbar('Some responses are missing. Please complete all questions before submitting.', { variant: 'error' })}
+                                    onResponse={submitSurvey} 
+                                />
+                            </Grid>
+                            {(supportsSidebar && !_patientMode()) && 
+                                <Grid item>
+                                    <Drawer
+                                        anchor="right"
+                                        variant="temporary"
+                                        open={!!sidebarOpen}
+                                        onClose={() => setSidebarOpen()}
+                                    >
+                                        <Box flexGrow={1} />
+                                        <Divider />
+                                        <Messages 
+                                            refresh={!!survey} 
+                                            expandHeight
+                                            privateOnly
+                                            participant={participant.id} 
+                                        />
+                                    </Drawer>
+                                    <Tooltip title="Patient Notes" placement="left">
+                                      <Fab 
+                                        color="primary" 
+                                        aria-label="Patient Notes" 
+                                        style={{ position: 'fixed', bottom: 85, right: 24 }} 
+                                        onClick={() => setSidebarOpen(true)}
+                                      >
+                                        <Icon>note_add</Icon>
+                                      </Fab>
+                                  </Tooltip>
+                                </Grid>
+                            }
+                        </Grid>
                     </Box>
                 </ResponsiveDialog>
             </Box>

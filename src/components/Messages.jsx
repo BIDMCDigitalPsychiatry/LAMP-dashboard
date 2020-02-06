@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import { 
     Avatar, Box, TextField, Tabs, Tab, Grid, Divider, 
-    Icon, IconButton, Tooltip, InputAdornment 
+    Icon, IconButton, Tooltip, InputAdornment,
+    useTheme, useMediaQuery
 } from '@material-ui/core'
 import { blue, grey } from '@material-ui/core/colors'
 
@@ -28,7 +29,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
                         borderRadius={flipped ? '16px 16px 16px 4px' : '16px 16px 4px 16px'}
                         color={flipped ? '#fff' : '#000'}
                         bgcolor={flipped ? blue[600] : grey[200]}
-                        style={{ wordWrap: 'break-word' }}
+                        style={{ wordWrap: 'break-word', whiteSpace: 'pre-line' }}
                     >
                         {text}
                     </Box>
@@ -38,10 +39,12 @@ function MessageItem({ from, date, text, flipped, ...props }) {
     )
 }
 
-export default function Messages({ ...props }) {
+export default function Messages({ privateOnly, expandHeight, ...props }) {
     const [messages, setMessages] = useState({})
     const [currentMessage, setCurrentMessage] = useState()
-    const [messageTab, setMessageTab] = useState(0)
+    const [messageTab, setMessageTab] = useState(!!privateOnly ? 1 : 0)
+    const theme = useTheme()
+    const sm = useMediaQuery(theme.breakpoints.down('sm'))
 
     useInterval(() => {
         refreshMessages()
@@ -83,61 +86,76 @@ export default function Messages({ ...props }) {
     // FIXME: don't pass in props ie. functions!
     return (
         <Box {...props}>
-            <Tabs
-                value={messageTab}
-                onChange={(e, value) => setMessageTab(value)}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-            >
-                <Tab label="Messages" index={0} />
-                <Tab label={!!props.participantOnly ? 'My Journal' : 'Patient Notes'} index={1} />
-            </Tabs>
-            <Divider />
-            <Box mx={2} style={{ minHeight: 100, maxHeight: 500, overflow: 'scroll' }}>
-                {getMessages()
-                    .filter(x => (messageTab || 0) === 0 
-                        ? (x.type === 'message') 
-                        : (x.type === 'note' && x.from === (!!props.participantOnly ? 'participant' : 'researcher')))
-                    .map(x => 
-                        <MessageItem {...x} 
-                            flipped={
-                                (!!props.participantOnly && x.from === 'researcher') || 
-                                (!props.participantOnly && x.from === 'participant')
-                            } 
-                            key={JSON.stringify(x)} 
-                        />
-                )}
-            </Box>
-            <Divider />
-            <TextField
-                label="Send a message"
-                style={{ margin: 16, paddingRight: 32 }}
-                placeholder="Message..."
-                value={currentMessage || ''}
-                onChange={(event) => setCurrentMessage(event.target.value)}
-                helperText={`Your ${!!props.participantOnly ? 'clinician' : 'patient'} will ${(messageTab || 0) === 0 ? 'be able to see your messages when they log in.' : 'not be able to see this message.'}`}
-                margin="normal"
-                variant="outlined"
-                multiline
-                fullWidth
-                rowsMax="4"
-                InputProps={{ endAdornment: [
-                    <InputAdornment key={'end'} position="end">
-                      <Tooltip title="Send Message">
-                        <IconButton
-                          edge="end"
-                          aria-label="send"
-                          onClick={sendMessage}
-                          onMouseDown={event => event.preventDefault()}
-                        >
-                          <Icon>send</Icon>
-                        </IconButton>
-                      </Tooltip>
-                    </InputAdornment>
-                ]}}
-                InputLabelProps={{ shrink: true }}
-            />
+            <Grid container direction={sm ? 'column' : 'row'} alignItems="stretch">
+                <Grid item hidden={!!privateOnly}>
+                    <Tabs
+                        value={messageTab}
+                        onChange={(e, value) => setMessageTab(value)}
+                        orientation={sm ? 'horizontal' : 'vertical'}
+                        variant="scrollable"
+                        indicatorColor="primary"
+                        textColor="primary"
+                    >
+                        <Tab label="Messages" index={0} />
+                        <Tab label={!!props.participantOnly ? 'My Journal' : 'Patient Notes'} index={1} />
+                    </Tabs>
+                </Grid>
+                <Grid item hidden={!!privateOnly}>
+                    <Divider orientation={sm ? 'horizontal' : 'vertical'} />
+                </Grid>
+                <Grid item style={{ flexGrow: 1 }}>
+                    <Grid container direction="column">
+                        <Grid item>
+                            <Box mx={2} style={{ minHeight: 100, maxHeight: expandHeight ? undefined : '50vh', overflow: expandHeight ? undefined : 'scroll' }}>
+                                {getMessages()
+                                    .filter(x => (messageTab || 0) === 0 
+                                        ? (x.type === 'message') 
+                                        : (x.type === 'note' && x.from === (!!props.participantOnly ? 'participant' : 'researcher')))
+                                    .map(x => 
+                                        <MessageItem {...x} 
+                                            flipped={
+                                                (!!props.participantOnly && x.from === 'researcher') || 
+                                                (!props.participantOnly && x.from === 'participant')
+                                            } 
+                                            key={JSON.stringify(x)} 
+                                        />
+                                )}
+                            </Box>
+                            <Divider />
+                        </Grid>
+                        <Grid item>
+                            <TextField
+                                label="Send a message"
+                                style={{ margin: 16, paddingRight: 32 }}
+                                placeholder="Message..."
+                                value={currentMessage || ''}
+                                onChange={(event) => setCurrentMessage(event.target.value)}
+                                helperText={`Your ${!!props.participantOnly ? 'clinician' : 'patient'} will ${(messageTab || 0) === 0 ? 'be able to see your messages when they log in.' : 'not be able to see this message.'}`}
+                                margin="normal"
+                                variant="outlined"
+                                multiline
+                                fullWidth
+                                rowsMax="15"
+                                InputProps={{ endAdornment: [
+                                    <InputAdornment key={'end'} position="end">
+                                      <Tooltip title="Send Message">
+                                        <IconButton
+                                          edge="end"
+                                          aria-label="send"
+                                          onClick={sendMessage}
+                                          onMouseDown={event => event.preventDefault()}
+                                        >
+                                          <Icon>send</Icon>
+                                        </IconButton>
+                                      </Tooltip>
+                                    </InputAdornment>
+                                ]}}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
         </Box>
     )
 }
