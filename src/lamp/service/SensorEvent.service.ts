@@ -24,7 +24,7 @@ export class SensorEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
-        return (await Fetch.get<{data: any[]}>(`/participant/${participantId}/sensor_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new SensorEvent(), x))
+        return (await Fetch.get<{data: any[]}>(`/participant/${participantId}/sensor_event?${queryParameters.toString()}`, this.configuration))?.data?.map(x => Object.assign(new SensorEvent(), x))
     }
 
     /**
@@ -46,7 +46,7 @@ export class SensorEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
-        return (await Fetch.get<{data: any[]}>(`/researcher/${researcherId}/sensor_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new SensorEvent(), x))
+        return (await Fetch.get<{data: any[]}>(`/researcher/${researcherId}/sensor_event?${queryParameters.toString()}`, this.configuration))?.data?.map(x => Object.assign(new SensorEvent(), x))
     }
 
     /**
@@ -68,7 +68,7 @@ export class SensorEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
-        return (await Fetch.get<{data: any[]}>(`/study/${studyId}/sensor_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new SensorEvent(), x))
+        return (await Fetch.get<{data: any[]}>(`/study/${studyId}/sensor_event?${queryParameters.toString()}`, this.configuration))?.data?.map(x => Object.assign(new SensorEvent(), x))
     }
 
     /**

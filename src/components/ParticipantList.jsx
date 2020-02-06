@@ -48,7 +48,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         (async function() {
             let data = (await Promise.all(participants
                             .map(async x => ({ id: x.id, res: (await LAMP.SensorEvent.allByParticipant(x.id, 'lamp.analytics'))
-                                    .filter(z => z.sensor === 'lamp.analytics') }))))
+                                    ?.filter(z => z.sensor === 'lamp.analytics') ?? [] }))))
                             .filter(y => y.res.length > 0)
             setLogins(logins => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
         })()

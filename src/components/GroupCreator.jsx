@@ -10,11 +10,11 @@ import {
 } from '@material-ui/core'
 
 function ActivitySelector({ activities, selected, onSave, onDelete, ...props }) {
-  const [_selected, setSelected] = useState(selected)
+  const [_selected, setSelected] = useState(!!selected ? activities.filter(x => x.id === selected)[0] : null)
   const [anchorEl, setAnchorEl] = useState()
   useEffect(() => {
     if (_selected !== selected)
-      onSave && onSave()
+      onSave && onSave(_selected.id)
   }, [_selected])
   return (
     <React.Fragment>
@@ -50,7 +50,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, ...props }) 
 export default function GroupCreator({ activities, value, onSave, ...props }) {
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
-  const [questions, setQuestions] = useState(!!value ? value.settings : [])
+  const [items, setItems] = useState(!!value ? value.settings : [])
 
 	return (
         <Grid container direction="column" spacing={2}>
@@ -69,18 +69,24 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
             </Grid>
             <Grid item>
                 <Divider />
-                <Typography variant="h6">Configure questions, parameters, and options.</Typography>
+                <Typography variant="h6">Configure activities and options.</Typography>
             </Grid>
             <Grid item>
                 <Stepper nonLinear activeStep={activeStep} orientation="vertical">
-                  {questions.map((x, idx) => (
-                      <ActivitySelector activities={activities}>{JSON.stringify(x)}</ActivitySelector>
+                  {items.map((x, idx) => (
+                      <ActivitySelector 
+                        key={`${idx}.${x}`}
+                        activities={activities.filter(x => x.spec !== 'lamp.group')} 
+                        selected={x}
+                        onSave={(x) => setItems(it => { let y = [...it]; y[idx] = x; return y })}
+                        onDelete={() => setItems(it => { let x = [...it]; x.splice(idx, 1); return x })}
+                      />
                   ))}
                   <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2} style={{ margin: '8px 0px 0px -8px' }}>
                       <Fab
                         size="small"
                         color="primary"
-                        onClick={() => {setQuestions(questions => [...questions, {}]); setActiveStep(questions.length)}}
+                        onClick={() => {setItems(items => [...items, null]); setActiveStep(items.length)}}
                       >
                         <Icon fontSize="small">add_circle</Icon>
                       </Fab>
@@ -98,7 +104,7 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
             >
               {!!value &&
                 <Grid item>
-                  <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+                  <Tooltip title="Duplicate this activity group and save it with a new title.">
                     <Fab 
                       color="primary" 
                       aria-label="Duplicate" 
@@ -106,11 +112,11 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
                       onClick={() => onSave({ 
                           id: undefined,
                           name: text, 
-                          spec: 'lamp.survey',
+                          spec: 'lamp.group',
                           schedule: [],
-                          settings: questions,
+                          settings: items.filter(i => i !== null),
                       }, true /* duplicate */)} 
-                      disabled={!onSave || questions.length === 0 || !text || (value.name.trim() === text.trim())}
+                      disabled={!onSave || items.length === 0 || items.filter(i => i === null).length > 0 || !text || (value.name.trim() === text.trim())}
                     >
                       Duplicate
                       <span style={{ width: 8 }} />
@@ -120,7 +126,7 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
                 </Grid>
               }
               <Grid item>
-                <Tooltip title="Save this survey instrument.">
+                <Tooltip title="Save this activity group.">
                   <Fab 
                     color="secondary" 
                     aria-label="Save" 
@@ -128,11 +134,11 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
                     onClick={() => onSave({ 
                         id: undefined,
                         name: text, 
-                        spec: 'lamp.survey',
+                        spec: 'lamp.group',
                         schedule: [],
-                        settings: questions,
+                        settings: items.filter(i => i !== null),
                     }, false /* overwrite */)} 
-                    disabled={!onSave || questions.length === 0 || !text}
+                    disabled={!onSave || items.length === 0 || items.filter(i => i === null).length > 0 || !text}
                   >
                     Save
                     <span style={{ width: 8 }} />

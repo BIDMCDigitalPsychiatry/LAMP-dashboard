@@ -52,18 +52,18 @@ export function unspliceActivity(x) {
             spec: 'lamp.survey',
             name: x.name,
             schedule: x.schedule,
-            settings: x.settings.map(y => ({
-                text: y.text,
-                type: y.type === 'multiselect' ? 'list' : y.type,
-                options: y.options === null ? null : y.options?.map(z => z.value)
+            settings: x.settings?.map(y => ({
+                text: y?.text,
+                type: y?.type === 'multiselect' ? 'list' : y?.type,
+                options: y?.options === null ? null : y?.options?.map(z => z?.value)
             }))
         }, 
         tag: {
             description: x.description,
-            questions: x.settings.map(y => ({
-                multiselect: y.type === 'multiselect' ? true : undefined,
-                description: y.description,
-                options: y.options === null ? null : y.options?.map(z => z.description)
+            questions: x.settings?.map(y => ({
+                multiselect: y?.type === 'multiselect' ? true : undefined,
+                description: y?.description,
+                options: y?.options === null ? null : y?.options?.map(z => z?.description)
             }))
         } 
     }
@@ -188,7 +188,11 @@ export default function ActivityList({ studyID, title, ...props }) {
 
     // Create a new Activity object that represents a group of other Activities.
     const saveGroup = async (x) => {
-        enqueueSnackbar("Failed to create a new group Activity.", { variant: 'error' })
+        let newItem = await LAMP.Activity.create(studyID, { ...x, schedule: [{ start_date: '1970-01-01', time: '0', repeat_interval: 'none', custom_time: [] }] })
+        console.dir(newItem)
+        if (!!newItem.error)
+             enqueueSnackbar("Failed to create a new group Activity.", { variant: 'error' })
+        else enqueueSnackbar("Successfully created a new group Activity.", { variant: 'success' })
         setGroupCreate()
     }
 
@@ -227,32 +231,42 @@ export default function ActivityList({ studyID, title, ...props }) {
 
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
     const updateActivity = async (x, isDuplicated) => {
-
-        // Short-circuit for groups and CTests
         if (!['lamp.group', 'lamp.survey'].includes(x.spec)) {
+
+            // Short-circuit for groups and CTests
             let result = await LAMP.Activity.update(x.id, { settings: x.settings })
             if (!!result.error)
                  enqueueSnackbar('Encountered an error: ' + result?.error, { variant: 'error' })
             else enqueueSnackbar('Successfully updated the Activity.', { variant: 'success' })
-            return 
-        }
+        } else if (x.spec === 'lamp.group') {
 
-        const { raw, tag } = unspliceActivity(x)
-        if (isDuplicated) /* duplicate */ {
-
-            let newItem = await LAMP.Activity.create(studyID, raw)
-            await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
-            enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: 'success' })
+            //
+            let result = await LAMP.Activity.update(selectedActivity.id, { settings: x.settings })
+            if (!!result.error)
+                 enqueueSnackbar('Encountered an error: ' + result?.error, { variant: 'error' })
+            else enqueueSnackbar('Successfully updated the Activity.', { variant: 'success' })
             onChange()
-        } else /* overwrite */ {
 
-            /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
-            raw.id = selectedActivity.id
-            raw.schedule = selectedActivity.schedule
-            await LAMP.Activity.updateActivity(raw)
-            */
-            await LAMP.Type.setAttachment(selectedActivity.id, 'me', 'lamp.dashboard.survey_description', tag)
-            enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
+        } else if (x.spec === 'lamp.survey') {
+
+            // 
+            const { raw, tag } = unspliceActivity(x)
+            if (isDuplicated) /* duplicate */ {
+
+                let newItem = await LAMP.Activity.create(studyID, raw)
+                await LAMP.Type.setAttachment(newItem.data, 'me', 'lamp.dashboard.survey_description', tag)
+                enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: 'success' })
+                onChange()
+            } else /* overwrite */ {
+
+                /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
+                raw.id = selectedActivity.id
+                raw.schedule = selectedActivity.schedule
+                await LAMP.Activity.updateActivity(raw)
+                */
+                await LAMP.Type.setAttachment(selectedActivity.id, 'me', 'lamp.dashboard.survey_description', tag)
+                enqueueSnackbar('Only survey description content was modified to prevent irrecoverable data loss.', { variant: 'error' })
+            }
         }
         setSelectedActivity()
     }
@@ -365,7 +379,7 @@ export default function ActivityList({ studyID, title, ...props }) {
                 </Box>
             </ResponsiveDialog>
             <ResponsiveDialog fullScreen transient animate open={!!selectedActivity} onClose={() => setSelectedActivity()}>
-                <Activity activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
+                <Activity allActivities={activities} activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
             </ResponsiveDialog>
         </React.Fragment>
     )
