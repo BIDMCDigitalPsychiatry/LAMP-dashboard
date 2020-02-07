@@ -65,7 +65,7 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
                         style={{ height: '100%' }}
                     >
                         <Grid item>
-                            {icon || <Icon fontSize="large">assignment</Icon>}
+                            {icon || <Icon fontSize="large">more_horiz</Icon>}
                         </Grid>
                         <Grid item>
                             <Typography variant="overline" style={{ lineHeight: 'normal' }}>

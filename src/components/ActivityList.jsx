@@ -188,7 +188,12 @@ export default function ActivityList({ studyID, title, ...props }) {
 
     // Create a new Activity object that represents a group of other Activities.
     const saveGroup = async (x) => {
-        let newItem = await LAMP.Activity.create(studyID, { ...x, schedule: [{ start_date: '1970-01-01', time: '0', repeat_interval: 'none', custom_time: [] }] })
+        let newItem = await LAMP.Activity.create(studyID, { ...x, id: undefined, schedule: [{ 
+            start_date: '1970-01-01T00:00:00.000Z',  // FIXME should not need this!
+            time: '1970-01-01T00:00:00.000Z',  // FIXME should not need this!
+            repeat_interval: 'none',  // FIXME should not need this!
+            custom_time: null  // FIXME should not need this!
+        }] })
         console.dir(newItem)
         if (!!newItem.error)
              enqueueSnackbar("Failed to create a new group Activity.", { variant: 'error' })
@@ -329,15 +334,13 @@ export default function ActivityList({ studyID, title, ...props }) {
                 <Divider />
                 <MenuItem onClick={() => { setCreateMenu(); setGroupCreate(true) }}>Activity Group</MenuItem>
                 <MenuItem onClick={() => { setCreateMenu(); setShowCreate(true) }}>Survey Instrument</MenuItem>
-                {!_hideCognitiveTesting() && 
-                    <React.Fragment>
-                        <Divider />
-                        <MenuItem disabled><b>Smartphone Cognitive Tests</b></MenuItem>
-                        {activitySpecs.map(x => (
-                            <MenuItem onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
-                        ))}
-                    </React.Fragment>
-                }
+                {!_hideCognitiveTesting() && [
+                    <Divider key="div" />,
+                    <MenuItem key="head" disabled><b>Smartphone Cognitive Tests</b></MenuItem>,
+                    ...activitySpecs.map(x => (
+                        <MenuItem key={x?.name} onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
+                    ))
+                ]}
             </Menu>
             <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()} >
                 <Box {...getRootProps()} 

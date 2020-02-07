@@ -195,13 +195,20 @@ export default function Participant({ participant, ...props }) {
                     </Launcher.Section>
                     <Launcher.Section title="Assess">
                         {[
-                            <Launcher.Button key="_-1" 
-                                notification title="Administer All Survey Instruments" 
-                                onClick={() => setActivities((state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)))} 
-                            />,
-                            ...(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
-                                <Launcher.Button key={y.name} 
+                            ...(state.activities || []).filter(x => x.spec === 'lamp.group' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
+                                <Launcher.Button 
+                                    key={y.name} 
+                                    notification 
                                     title={y.name} 
+                                    icon={<Icon fontSize="large">menu_open</Icon>}
+                                    onClick={() => setActivities((state.activities ?? []).filter(x => x.spec === 'lamp.survey' && y.settings.includes(x.id)))}
+                                />
+                            )),
+                            ...(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
+                                <Launcher.Button 
+                                    key={y.name} 
+                                    title={y.name} 
+                                    icon={<Icon fontSize="large">assignment</Icon>}
                                     onClick={() => setActivities([y])}
                                 />
                             ))
@@ -209,7 +216,12 @@ export default function Participant({ participant, ...props }) {
                     </Launcher.Section>
                     <Launcher.Section title="Manage">
                         {!_hideCareTeam() &&
-                            <Launcher.Button favorite title="Breathe" onClick={() => setLaunchedActivity('breathe')} />
+                            <Launcher.Button 
+                                favorite 
+                                title="Breathe" 
+                                icon={<Icon fontSize="large">spa</Icon>}
+                                onClick={() => setLaunchedActivity('breathe')} 
+                            />
                         }
                     </Launcher.Section>
                     <Launcher.Section title="Prevent">
