@@ -10,9 +10,11 @@ import {
 import { KeyboardDateTimePicker } from '@material-ui/pickers'
 
 // Local Imports
+import LAMP from '../lamp'
 import useKeyPress from './useKeyPress'
 import { ResponsivePaper } from './Utils'
 
+function _useTernaryBool() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 const CSV_parse = x => Array.isArray(JSON.parse(`[${x}]`)) ? JSON.parse(`[${x}]`) : []
 const CSV_stringify = x => Array.isArray(x) ? JSON.stringify(x).slice(1, -1) : ''
 
@@ -163,9 +165,14 @@ function SelectResponse({ onChange, options, value, ...props }) {
 
 function Question({ onResponse, hideHeader, number, text, type, options, value, ...props }) {
   let onChange = value => onResponse({ item: text, value: value })
-  const _boolOpts = [
+  const _binaryOpts = [
     { label: 'Yes', value: 'Yes' /* true */ }, 
     { label: 'No', value: 'No' /* false */ }
+  ]
+  const _ternaryOpts = [
+    { label: 'Yes', value: 'Yes' /* true */ }, 
+    { label: 'No', value: 'No' /* false */ }, 
+    { label: 'N/A', value: null /* null */ }
   ]
   const _likertOpts = [
     { label: 'Nearly All the Time', value: 3 }, 
@@ -173,6 +180,7 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
     { label: 'Several Times', value: 1 }, 
     { label: 'Not at all', value: 0 }
   ]
+  const _boolOpts = _useTernaryBool() ? _ternaryOpts : _binaryOpts // FIXME
 
   // FIXME: CheckboxResponse, SwitchResponse
 

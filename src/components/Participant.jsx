@@ -215,7 +215,7 @@ export default function Participant({ participant, ...props }) {
                         ]}
                     </Launcher.Section>
                     <Launcher.Section title="Manage">
-                        {!_hideCareTeam() &&
+                        {!_hideCareTeam() ? undefined :
                             <Launcher.Button 
                                 favorite 
                                 title="Breathe" 
@@ -223,14 +223,23 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('breathe')} 
                             />
                         }
+                        {!_hideCareTeam() ? undefined :
+                            <Launcher.Button 
+                                favorite 
+                                title="Jewels" 
+                                icon={<Icon fontSize="large">videogame_asset</Icon>}
+                                onClick={() => setLaunchedActivity('jewels')} 
+                            />
+                        }
                     </Launcher.Section>
                     <Launcher.Section title="Prevent">
                     </Launcher.Section>
                 </Launcher.Group>
                 <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
-                    {launchedActivity === 'breathe' ?
-                        <Breathe onComplete={() => setLaunchedActivity()} /> : 
-                        <Jewels onComplete={() => setLaunchedActivity()} />
+                    {{
+                        breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
+                        jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
+                     }[launchedActivity ?? '']}
                     }
                 </ResponsiveDialog>
                 <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>

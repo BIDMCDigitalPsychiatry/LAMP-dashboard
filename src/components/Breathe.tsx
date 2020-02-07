@@ -1,10 +1,11 @@
 
 // Core Imports
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Typography, makeStyles } from '@material-ui/core'
 
 // Local Imports
 import useInterval from './useInterval'
+import useAudio from './useAudio'
 
 const useStyles = makeStyles(theme => ({
   '@keyframes Pulse': {
@@ -94,7 +95,10 @@ const useStyles = makeStyles(theme => ({
 
 export default function Breathe({ onComplete, ...props }) {
   const classes = useStyles(props)
+  const [playing, setPlaying] = useAudio('/calm.mp3', true, true)
+  useEffect(() => () => setPlaying(false), [])
   useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
+  
   return (
     <div className={classes.Background}>
       <div className={classes.Face}>

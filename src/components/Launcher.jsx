@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
     Box, Icon, IconButton, Typography, Divider, Grid, 
     Tooltip, Collapse, Paper, ButtonBase, useTheme 
@@ -80,9 +80,10 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
 }
 
 Launcher.Section = function Section({ title, children, ...props }) {
-    const [expanded, setExpanded] = useState(!!children)
+    const [expanded, setExpanded] = useState(false)
     // eslint-disable-next-line
     const [scroll, setScroll] = useState(true)
+    useEffect(() => setExpanded(Array.isArray(children) ? children.filter(x => !!x).length > 0 : !!children), [children])
     return (
         <React.Fragment>
             <Grid item style={{ margin: '0px 16px' }}>
@@ -111,17 +112,17 @@ Launcher.Section = function Section({ title, children, ...props }) {
                                 padding: scroll ? '0px 0px 16px 16px' : undefined
                             }}
                         >
-                            {!!children ? (!Array.isArray(children) ? 
-                                <Grid item>
-                                    {children}
-                                </Grid> : 
-                                children.map((x, idx) => (
+                            {(Array.isArray(children) && children.filter(x => !!x).length > 0) ?
+                                children.filter(x => !!x).map((x, idx) => (
                                     <Grid item key={idx}>
                                         {x}
                                     </Grid>
-                                ))) :
+                                )) : 
                                 <Grid item>
-                                    <Launcher.Placeholder />
+                                    {(Array.isArray(children) && children.filter(x => !!x).length == 0) ? 
+                                        <Launcher.Placeholder /> : 
+                                        children ?? <Launcher.Placeholder />
+                                    }
                                 </Grid>
                             }
                             <Grid item />
