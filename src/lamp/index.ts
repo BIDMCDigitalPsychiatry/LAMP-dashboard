@@ -111,12 +111,12 @@ export default class LAMP {
                             authorizationToken: LAMP.configuration.authorization, 
                             identityObject: LAMP.Auth._me,
                             serverAddress:  LAMP.configuration.base
-                        })
+                        });
                         (<any>window)?.login?.postMessage?.({ 
                             authorizationToken: LAMP.configuration.authorization, 
                             identityObject: LAMP.Auth._me,
                             serverAddress:  LAMP.configuration.base
-                        })
+                        });
                     }
                 } else {
 
@@ -124,10 +124,10 @@ export default class LAMP {
                     // FIXME: Logout only if we were a participant... right now the app should ignore erroneous logouts.
                     (<any>window)?.webkit?.messageHandlers?.logout?.postMessage?.({ 
                         deleteCache: true // FIXME!
-                    })
+                    });
                     (<any>window)?.logout?.postMessage?.({ 
                         deleteCache: true // FIXME!
-                    })
+                    });
                 }
             } catch(err) {
 

@@ -215,7 +215,7 @@ export default function Participant({ participant, ...props }) {
                         ]}
                     </Launcher.Section>
                     <Launcher.Section title="Manage">
-                        {!_hideCareTeam() ? undefined :
+                        {_hideCareTeam() ? undefined :
                             <Launcher.Button 
                                 favorite 
                                 title="Breathe" 
@@ -223,7 +223,7 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('breathe')} 
                             />
                         }
-                        {!_hideCareTeam() ? undefined :
+                        {_hideCareTeam() ? undefined :
                             <Launcher.Button 
                                 favorite 
                                 title="Jewels" 
