@@ -277,7 +277,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
       ref={handleSetRef}
       {...other}
     >
-      {children.map((c, i) => (
+      {children.map((c: any, i) => (
         <OnCircle
           key={i}
           diameter={diameter}
@@ -291,7 +291,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
         >
           {React.cloneElement(c, {
             ref: el => (i === 0 ? setRoot(el) : undefined),
-            className: clsx(classes.avatar, c.props.className),
+            className: clsx(classes.avatar, c?.props.className),
             style: {
               zIndex: children.length - i,
               ...c.props.style

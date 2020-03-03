@@ -5,13 +5,13 @@
   "description": "LAMP Dashboard",
   "private": true,
   "devDependencies": {
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "@types/react-is": "^16.7.1",
+    "@types/react-router-dom": "^4.3.4",
     "http-server": "^0.11.1",
     "react-scripts": "^3.3.0",
-    "typescript": "^3.7.0",
-    "@types/react": "^16.8.24",
-    "@types/react-dom": "^16.8.5",
-    "@types/react-is": "^16.7.1",
-    "@types/react-router-dom": "^4.3.4"
+    "typescript": "3.7.2"
   },
   "dependencies": {
     "core-js": "^3.6.0",
@@ -45,7 +45,7 @@
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {
-    "start": "HTTPS=true BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
+    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
     "start-sw": "http-server ./build",
     "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build"
   },

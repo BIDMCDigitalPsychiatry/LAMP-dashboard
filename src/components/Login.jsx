@@ -3,17 +3,19 @@
 import React, { useState, useEffect } from 'react'
 import { 
     Typography, TextField, Button, Avatar, Slide, Radio, 
-    RadioGroup, FormControlLabel, FormControl, FormLabel 
+    RadioGroup, FormControlLabel, FormControl, FormLabel,
+    Menu, MenuItem, Icon, IconButton, colors
 } from '@material-ui/core'
 import { useSnackbar } from 'notistack'
 
 // Local Imports
-import mindLAMPLogo from '../logo.png'
-import { ResponsivePaper, ResponsiveMargin } from './Utils'
+import { ResponsivePaper, ResponsiveMargin, mindLAMPLogo } from './Utils'
 
-export default function Login({ setIdentity, onComplete, ...props }) {
-    const [state, setState] = useState({})
+export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
+    const [state, setState] = useState({ serverAddress: lastDomain })
     const [srcLocked, setSrcLocked] = useState(false)
+    const [tryitMenu, setTryitMenu] = useState()
+    const [helpMenu, setHelpMenu] = useState()
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
@@ -31,16 +33,15 @@ export default function Login({ setIdentity, onComplete, ...props }) {
         [event.target.name]: (event.target.type === 'checkbox' ? event.target.checked : event.target.value) 
     })
 
-    let handleLogin = (event) => {
+    let handleLogin = (event, mode) => {
         event.preventDefault()
-        if (!state.id || !state.password)
+        if (mode === undefined && (!state.id || !state.password))
             return
         setIdentity({ 
-                id: state.id, 
-                password: state.password,
-                serverAddress: state.serverAddress
-            }
-        ).then(res => {
+            id: !!mode ? `${mode}@demo.lamp.digital` : state.id, 
+            password: !!mode ? 'demo' : state.password,
+            serverAddress: !!mode ? 'demo.lamp.digital' : state.serverAddress
+        }).then(res => {
             onComplete()
         }).catch(err => {
             console.warn("error with auth request", err)
@@ -50,165 +51,97 @@ export default function Login({ setIdentity, onComplete, ...props }) {
         })
     }
 
-    // Sending email to team@digitalpsych.org -> 
-    let handleRegister = (event) => {
-        event.preventDefault()
-        fetch("https://api.lamp.digital/internal/sysmsg", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    subject: "New LAMP Registration",
-                    contents: `${state.name} (${state.email}) would like to register as a ${state.role}.`
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(JSON.stringify(data))
-                setState(state => ({ ...state, slideRegister: false, name: undefined, email: undefined }))
-                enqueueSnackbar("Success! The system will process your request and notify you within 24 hours.", { variant: 'success' })
-            })
-            .catch(error => {
-                console.error(error)
-                setState(state => ({ ...state, slideRegister: false, name: undefined, email: undefined }))
-                enqueueSnackbar("The system could not process your request. Please try again later or contact us for help.", { variant: 'error' })
-            })
-    }
-
     return (
-        <React.Fragment>
-            <Slide direction="right" in={!state.slideRegister} mountOnEnter unmountOnExit>
-                <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
-                    <ResponsivePaper elevation={12} style={{ padding: '16px' }}>
-                        <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{ margin:'auto' }} />
-                        <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
-                        <form onSubmit={handleLogin}>
-                            <div>
-                                <TextField
-                                    margin="normal"
-                                    name="serverAddress"
-                                    variant="outlined"
-                                    style={{ width: '100%', height: 76 }}
-                                    label="Server Location"
-                                    placeholder="api.lamp.digital"
-                                    helperText="Don't enter a server location if you're not sure what this option does."
-                                    value={state.serverAddress || ''}
-                                    onChange={handleChange}
-                                    disabled={srcLocked}
-                                />
-                                <TextField
-                                    required 
-                                    name="id"
-                                    label="ID"
-                                    margin="normal"
-                                    variant="outlined"
-                                    style={{ width: '100%', height: 76 }}
-                                    placeholder="my.email@address.com"
-                                    helperText="Use your email address to login."
-                                    value={state.id || ''}
-                                    onChange={handleChange}
-                                />
-                                <TextField
-                                    required
-                                    name="password"
-                                    label="Password"
-                                    type="password"
-                                    margin="normal"
-                                    variant="outlined"
-                                    style={{ width: '100%', height: 76, marginBottom: 24 }}
-                                    placeholder="********"
-                                    helperText="Use your password to login."
-                                    value={state.password || ''}
-                                    onChange={handleChange}
-                                />
-                                <br />
-                                <Button
-                                    variant="outlined"
-                                    color="default"
-                                    style={{ width: '45%' }}
-                                    onClick={() => setState(state => ({ ...state, slideRegister: true }))}>
-                                    Request Access
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    type="submit"
-                                    style={{ float: 'right', width: '45%' }}
-                                    onClick={handleLogin}>
-                                    Login
-                                    <input type="submit" style={{
-                                        cursor: 'pointer',
-                                        position: 'absolute',
-                                        top: 0,
-                                        bottom: 0,
-                                        right: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        opacity: 0,
-                                    }}/>
-                                </Button>
-                            </div>
-                        </form>
-                    </ResponsivePaper>
-                </ResponsiveMargin>
-            </Slide>
-            <Slide direction="left" in={state.slideRegister} mountOnEnter unmountOnExit>
-                <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
-                    <ResponsivePaper elevation={12} style={{ padding: '16px' }}>
-                        <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{ margin: 'auto' }}/>
-                        <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 10}}>Request Access</Typography>
-                        <Typography variant="caption" align="center" style={{ fontWeight: 400, paddingBottom: 10 }}>
-                            Request access to mindLAMP by filling out the following form. We'll get back to you within 24 hours.
-                        </Typography>
-                        <form onSubmit={handleRegister}>
+        <Slide direction="right" in={true} mountOnEnter unmountOnExit>
+            <ResponsiveMargin style={{ position:'absolute', width:'33%', left: 0, right: 0, margin:'0 auto' }}>
+                <ResponsivePaper elevation={12} style={{ padding: '16px' }}>
+                    <IconButton style={{ position: 'absolute', top: 8, right: 8 }} onClick={(event) => setHelpMenu(event.currentTarget)}>
+                        <Icon>help</Icon>
+                        <Menu
+                            keepMounted
+                            open={Boolean(helpMenu)}
+                            anchorPosition={helpMenu?.getBoundingClientRect()}
+                            anchorReference="anchorPosition"
+                            onClose={() => setHelpMenu()}
+                        >
+                            <MenuItem dense onClick={() => { setHelpMenu(); window.open('https://docs.lamp.digital', '_blank') }}><b style={{ color: colors.grey['600'] }}>Help & Support</b></MenuItem>
+                            <MenuItem dense onClick={() => { setHelpMenu(); window.open('https://community.lamp.digital', '_blank') }}><b style={{ color: colors.grey['600'] }}>LAMP Community</b></MenuItem>
+                            <MenuItem dense onClick={() => { setHelpMenu(); window.open('mailto:team@digitalpsych.org', '_blank') }}><b style={{ color: colors.grey['600'] }}>Contact Us</b></MenuItem>
+                        </Menu>
+                    </IconButton>
+                    <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{ margin:'auto' }} />
+                    <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
+                    <form onSubmit={handleLogin}>
+                        <div>
                             <TextField
-                                required
-                                label="Name"
-                                style={{ width: '100%' }}
+                                margin="dense"
+                                size="small"
+                                name="serverAddress"
+                                variant="outlined"
+                                style={{ width: '100%', height: 76 }}
+                                label="Domain"
+                                placeholder="api.lamp.digital"
+                                helperText="Don't enter a domain if you're not sure what this option does."
+                                value={state.serverAddress || ''}
+                                onChange={handleChange}
+                                disabled={srcLocked}
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <TextField
+                                required 
+                                name="id"
+                                label="ID"
                                 margin="normal"
                                 variant="outlined"
-                                name="name"
-                                value={state.name || ''}
+                                style={{ width: '100%', height: 76 }}
+                                placeholder="my.email@address.com"
+                                helperText="Use your email address to login."
+                                value={state.id || ''}
                                 onChange={handleChange}
+                                InputLabelProps={{ shrink: true }}
                             />
                             <TextField
                                 required
-                                label="Email"
-                                style={{ width: '100%' }}
+                                name="password"
+                                label="Password"
+                                type="password"
                                 margin="normal"
                                 variant="outlined"
-                                name="email"
-                                value={state.email || ''}
+                                style={{ width: '100%', height: 76, marginBottom: 24 }}
+                                placeholder="•••••••••"
+                                helperText="Use your password to login."
+                                value={state.password || ''}
                                 onChange={handleChange}
+                                InputLabelProps={{ shrink: true }}
                             />
-                            <FormControl component="fieldset" style={{ marginTop: 10 }}>
-                              <FormLabel component="legend">I am a...</FormLabel>
-                              <RadioGroup
-                                aria-label="Role"
-                                name="role1"
-                                value={state.role || 'researcher'}
-                                onChange={event => setState(state => ({ ...state, role: event.target.value }))}
-                              >
-                                <FormControlLabel value="researcher" control={<Radio />} label="Researcher" />
-                                <FormControlLabel value="participant" control={<Radio />} label="Participant" />
-                              </RadioGroup>
-                            </FormControl>
                             <br />
                             <Button
                                 variant="outlined"
                                 color="default"
-                                style={{width: '45%'}}
-                                onClick={() => setState(state => ({ ...state, slideRegister: false }))}>
-                                Back
+                                style={{ width: '45%' }}
+                                onClick={event => setTryitMenu(event.currentTarget)}>
+                                Try It
                             </Button>
+                            <Menu
+                                keepMounted
+                                open={Boolean(tryitMenu)}
+                                anchorPosition={tryitMenu?.getBoundingClientRect()}
+                                anchorReference="anchorPosition"
+                                onClose={() => setTryitMenu()}
+                            >
+                                <MenuItem disabled divider><b>Try mindLAMP out as a...</b></MenuItem>
+                                <MenuItem onClick={event => { setTryitMenu(); handleLogin(event, 'researcher') }}>Researcher</MenuItem>
+                                <MenuItem divider onClick={event => { setTryitMenu(); handleLogin(event, 'clinician') }}>Clinician</MenuItem>
+                                <MenuItem onClick={event => { setTryitMenu(); handleLogin(event, 'participant') }}>Participant</MenuItem>
+                                <MenuItem onClick={event => { setTryitMenu(); handleLogin(event, 'patient') }}>Patient</MenuItem>
+                            </Menu>
                             <Button
                                 variant="contained"
                                 color="primary"
-                                className="submit"
+                                type="submit"
                                 style={{ float: 'right', width: '45%' }}
-                                onClick={handleRegister}>
-                                Request Access
+                                onClick={handleLogin}>
+                                Login
                                 <input type="submit" style={{
                                     cursor: 'pointer',
                                     position: 'absolute',
@@ -218,14 +151,12 @@ export default function Login({ setIdentity, onComplete, ...props }) {
                                     left: 0,
                                     width: '100%',
                                     opacity: 0,
-                                    marginTop: 20,
                                 }}/>
                             </Button>
-                            <br />
-                        </form>
-                    </ResponsivePaper>
-                </ResponsiveMargin>
-            </Slide>
-        </React.Fragment>
+                        </div>
+                    </form>
+                </ResponsivePaper>
+            </ResponsiveMargin>
+        </Slide>
     )
 }

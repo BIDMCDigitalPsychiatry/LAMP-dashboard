@@ -1,6 +1,7 @@
 import { Fetch, Configuration } from './Fetch'
 import { ActivitySpec } from '../model/ActivitySpec'
 import { Identifier } from '../model/Type'
+import { Demo } from './Demo'
 
 export class ActivitySpecService {
     public configuration?: Configuration
@@ -9,6 +10,9 @@ export class ActivitySpecService {
      * Get all ActivitySpecs registered.
      */
     public async all(): Promise<ActivitySpec[]> {
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            return Promise.resolve(Demo.ActivitySpec.map(x => Object.assign(new ActivitySpec(), x)))
+        }
         return (await Fetch.get<{data: any[]}>(`/activity_spec`, this.configuration)).data.map(x => Object.assign(new ActivitySpec(), x))
     }
 
@@ -20,6 +24,9 @@ export class ActivitySpecService {
         if (activitySpec === null || activitySpec === undefined)
             throw new Error('Required parameter activitySpec was null or undefined when calling activitySpecCreate.')
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            return Promise.resolve({ 'error': '500.demo-restriction' } as any)
+        }
         return (await Fetch.post(`/activity_spec`, activitySpec, this.configuration))
     }
 
@@ -31,6 +38,9 @@ export class ActivitySpecService {
         if (activitySpecName === null || activitySpecName === undefined)
             throw new Error('Required parameter activitySpecName was null or undefined when calling activitySpecDelete.')
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            return Promise.resolve({ 'error': '500.demo-restriction' } as any)
+        }
         return (await Fetch.delete(`/activity_spec/${activitySpecName}`, this.configuration))
     }
 
@@ -45,6 +55,9 @@ export class ActivitySpecService {
         if (activitySpec === null || activitySpec === undefined)
             throw new Error('Required parameter activitySpec was null or undefined when calling activitySpecUpdate.')
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            return Promise.resolve({ 'error': '500.demo-restriction' } as any)
+        }
         return (await Fetch.put(`/activity_spec/${activitySpecName}`, activitySpec, this.configuration))
     }
 
@@ -56,6 +69,10 @@ export class ActivitySpecService {
         if (activitySpecName === null || activitySpecName === undefined)
             throw new Error('Required parameter activitySpecName was null or undefined when calling activitySpecView.')
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let data = Demo.ActivitySpec.filter(x => x['name'] === activitySpecName).map(x => Object.assign(new ActivitySpec(), x))
+            return Promise.resolve(data.length > 0 ? data[0] : { 'error': '404.not-found' } as any)
+        }
         return (await Fetch.get<{data: any[]}>(`/activity_spec/${activitySpecName}`, this.configuration)).data.map(x => Object.assign(new ActivitySpec(), x))[0]
     }
 }

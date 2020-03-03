@@ -1,4 +1,3 @@
-# LAMP API
+# LAMP Dashboard
 
-See the `docs` folder for more information.
-
+[To learn more about the LAMP Platform, visit our documentation.](https://docs.lamp.digital/)

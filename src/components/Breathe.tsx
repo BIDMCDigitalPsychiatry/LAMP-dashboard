@@ -95,8 +95,8 @@ const useStyles = makeStyles(theme => ({
 
 export default function Breathe({ onComplete, ...props }) {
   const classes = useStyles(props)
-  const [playing, setPlaying] = useAudio('/calm.mp3', true, true)
-  useEffect(() => () => setPlaying(false), [])
+  //const [playing, setPlaying] = useAudio('/calm.mp3', true, true)
+  //useEffect(() => () => setPlaying(false), [])
   useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
   
   return (

@@ -28,7 +28,7 @@ css.innerHTML =
     user-select: none;
     cursor: default;
 }
-input, textarea, .contenteditable, .lamp-editable * {
+input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
     -webkit-touch-callout: default;
     -webkit-user-select: text;
     -moz-user-select: text;

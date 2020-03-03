@@ -41,7 +41,7 @@ function PageTitle({ children, ...props }) {
 
 function AppRouter({ ...props }) {
     const [ deferredPrompt, setDeferredPrompt ] = useState(null)
-    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type })
+    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type, lastDomain: undefined })
     const [ store, setStore ] = useState({ researchers: [], participants: [] })
     const { enqueueSnackbar, closeSnackbar } = useSnackbar()
     const storeRef = useRef([])
@@ -94,22 +94,34 @@ function AppRouter({ ...props }) {
 
     useEffect(() => {
         closeSnackbar('admin')
-        if (!state.identity || (state.authType !== 'admin'))
-            return
-        enqueueSnackbar('Proceed with caution: you are logged in as the administrator.', { 
-            key: 'admin',
-            variant: 'info',
-            persist: true, 
-            preventDuplicate: true,
-            action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
-        })
+        closeSnackbar('demo')
+        if (!!state.identity && state.authType === 'admin') {
+            enqueueSnackbar('Proceed with caution: you are logged in as the administrator.', { 
+                key: 'admin',
+                variant: 'info',
+                persist: true, 
+                preventDuplicate: true,
+                action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
+            })
+        } else if (state.auth?.serverAddress === 'demo.lamp.digital') {
+            enqueueSnackbar('You\'re logged into a demo account. Any changes you make will be reset when you restart the app.', { 
+                key: 'demo',
+                variant: 'info',
+                persist: true, 
+                preventDuplicate: true,
+                action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
+            })
+        }
     }, [state])
 
     let reset = async (identity) => {
         await LAMP.Auth.set_identity(identity)
         if (!!identity)
              setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth , authType: LAMP.Auth._type }))
-        else setState(state => ({ ...state, identity: null, auth: null, authType: null }))
+        else setState(state => ({ ...state, 
+            identity: null, auth: null, authType: null, 
+            lastDomain: ['api.lamp.digital', 'demo.lamp.digital'].includes(state.auth.serverAddress) ? undefined : state.auth.serverAddress 
+        }))
     }
 
     let getResearcher = (id) => {
@@ -174,12 +186,7 @@ function AppRouter({ ...props }) {
                             goBack={props.history.goBack} 
                             onLogout={() => reset()}
                         >
-                            <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                                <Icon>memory</Icon>
-                                <span style={{ width: 8 }} />
-                                API
-                            </Fab>
-                            <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                            <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
                         </NavigationLayout>
                     </React.Fragment> :
                     (state.authType === 'admin' ?
@@ -201,12 +208,7 @@ function AppRouter({ ...props }) {
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >
-                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                            <Icon>memory</Icon>
-                            <span style={{ width: 8 }} />
-                            API
-                        </Fab>
-                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
                     </NavigationLayout>
                 </React.Fragment> :
                 <React.Fragment>
@@ -230,12 +232,7 @@ function AppRouter({ ...props }) {
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >
-                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                            <Icon>memory</Icon>
-                            <span style={{ width: 8 }} />
-                            API
-                        </Fab>
-                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
                     </NavigationLayout>
                 </React.Fragment>:
                 !getResearcher(props.match.params.id) ? 
@@ -263,12 +260,7 @@ function AppRouter({ ...props }) {
                         goBack={props.history.goBack} 
                         onLogout={() => reset()}
                     >
-                        <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', bottom: 24, right: 24 }} onClick={() => props.history.replace('/api')}>
-                            <Icon>memory</Icon>
-                            <span style={{ width: 8 }} />
-                            API
-                        </Fab>
-                        <Login setIdentity={async (identity) => await reset(identity) } onComplete={() => props.history.replace('/')} />
+                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
                     </NavigationLayout>
                 </React.Fragment> : 
                 !getParticipant(props.match.params.id) ? 
@@ -291,14 +283,14 @@ function AppRouter({ ...props }) {
             {/* Route API documentation ONLY. */}
             <Route exact path="/api" render={props =>
                 <React.Fragment>
-                    <PageTitle>LAMP API</PageTitle>
-                    <Fab color="primary" aria-label="Back" variant="extended" style={{ position: 'fixed', top: 24, left: 24 }} onClick={() => reset()}>
-                        <Icon>arrow_back</Icon>
-                        <span style={{ width: 8 }} />
-                        Back
-                    </Fab>
-                    <div style={{ height: 56 }}></div>
-                    <SwaggerUI url="https://api.lamp.digital/" docExpansion="list" />
+                    <PageTitle>LAMP Platform API</PageTitle>
+                    <SwaggerUI 
+                        url="https://api.lamp.digital/" 
+                        docExpansion="list" 
+                        displayOperationId={true} 
+                        deepLinking={true} 
+                        displayRequestDuration={true} 
+                    />
                 </React.Fragment>
             } />
         </Switch>

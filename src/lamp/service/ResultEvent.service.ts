@@ -1,6 +1,7 @@
 import { Fetch, Configuration } from './Fetch'
 import { Identifier } from '../model/Type'
 import { ResultEvent } from '../model/ResultEvent'
+import { Demo } from './Demo'
 
 export class ResultEventService {
     public configuration?: Configuration
@@ -24,6 +25,20 @@ export class ResultEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let auth = (this.configuration.authorization || ':').split(':')
+            let credential = Demo.Credential.filter(x => x['access_key'] === auth[0] && x['secret_key'] === auth[1])
+            if (credential.length === 0)
+                return Promise.resolve({ 'error': '403.invalid-credentials' } as any)
+            if (participantId === 'me')
+                participantId = credential.length > 0 ? credential[0]['origin'] : participantId
+
+            if (Demo.Participant.filter(x => x['id'] === participantId).length > 0) {
+                return Promise.resolve(Demo.ActivityEvent.filter(x => x['#parent'] === participantId && (!!origin ? x['spec'] === origin : true)).map(x => Object.assign(new ResultEvent(), x)))
+            } else {
+                return Promise.resolve({ 'error': '404.not-found' } as any)
+            }
+        }
         return (await Fetch.get<{data: any[]}>(`/participant/${participantId}/result_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new ResultEvent(), x))
     }
 
@@ -46,6 +61,22 @@ export class ResultEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let auth = (this.configuration.authorization || ':').split(':')
+            let credential = Demo.Credential.filter(x => x['access_key'] === auth[0] && x['secret_key'] === auth[1])
+            if (credential.length === 0)
+                return Promise.resolve({ 'error': '403.invalid-credentials' } as any)
+            if (researcherId === 'me')
+                researcherId = credential.length > 0 ? credential[0]['origin'] : researcherId
+
+            if (Demo.Researcher.filter(x => x['id'] === researcherId).length > 0) {
+                let participants = Demo.Study.filter(x => x['#parent'] === researcherId).map(x => Demo.Participant.filter(y => y['#parent'] === x['id'])).flat(1)
+                let fn = (id: string) => Demo.ActivityEvent.filter(x => x['#parent'] === id && (!!origin ? x['spec'] === origin : true)).map(x => Object.assign(new ResultEvent(), x))
+                return Promise.resolve(participants.reduce((all, participant) => ({ ...all, [participant['id']]: fn(participant['id']) }), {}) as any)
+            } else {
+                return Promise.resolve({ 'error': '404.not-found' } as any)
+            }
+        }
         return (await Fetch.get<{data: any[]}>(`/researcher/${researcherId}/result_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new ResultEvent(), x))
     }
 
@@ -68,6 +99,22 @@ export class ResultEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let auth = (this.configuration.authorization || ':').split(':')
+            let credential = Demo.Credential.filter(x => x['access_key'] === auth[0] && x['secret_key'] === auth[1])
+            if (credential.length === 0)
+                return Promise.resolve({ 'error': '403.invalid-credentials' } as any)
+            if (studyId === 'me')
+                studyId = credential.length > 0 ? credential[0]['origin'] : studyId
+
+            if (Demo.Study.filter(x => x['id'] === studyId).length > 0) {
+                let participants = Demo.Participant.filter(x => x['#parent'] === studyId)
+                let fn = (id: string) => Demo.ActivityEvent.filter(x => x['#parent'] === id && (!!origin ? x['spec'] === origin : true)).map(x => Object.assign(new ResultEvent(), x))
+                return Promise.resolve(participants.reduce((all, participant) => ({ ...all, [participant['id']]: fn(participant['id']) }), {}) as any)
+            } else {
+                return Promise.resolve({ 'error': '404.not-found' } as any)
+            }
+        }
         return (await Fetch.get<{data: any[]}>(`/study/${studyId}/result_event?${queryParameters.toString()}`, this.configuration)).data.map(x => Object.assign(new ResultEvent(), x))
     }
 
@@ -82,6 +129,25 @@ export class ResultEventService {
         if (resultEvent === null || resultEvent === undefined)
             throw new Error('Required parameter resultEvent was null or undefined when calling resultEventCreate.')
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let auth = (this.configuration.authorization || ':').split(':')
+            let credential = Demo.Credential.filter(x => x['access_key'] === auth[0] && x['secret_key'] === auth[1])
+            if (credential.length === 0)
+                return Promise.resolve({ 'error': '403.invalid-credentials' } as any)
+            if (participantId === 'me')
+                participantId = credential.length > 0 ? credential[0]['origin'] : participantId
+
+            if (Demo.Participant.filter(x => x['id'] === participantId).length > 0) {
+                Demo.ActivityEvent.push({
+                    "#type": "ActivityEvent",
+                    "#parent": participantId,
+                    ...resultEvent
+                })
+                return Promise.resolve({} as any)
+            } else {
+                return Promise.resolve({ 'error': '404.not-found' } as any)
+            }
+        }
         return (await Fetch.post(`/participant/${participantId}/result_event`, resultEvent, this.configuration))
     }
 
@@ -104,6 +170,20 @@ export class ResultEventService {
         if (to !== undefined && to !== null)
             queryParameters.set('to', <any>to)
 
+        if (this.configuration.base === 'https://demo.lamp.digital') { // DEMO
+            let auth = (this.configuration.authorization || ':').split(':')
+            let credential = Demo.Credential.filter(x => x['access_key'] === auth[0] && x['secret_key'] === auth[1])
+            if (credential.length === 0)
+                return Promise.resolve({ 'error': '403.invalid-credentials' } as any)
+            if (participantId === 'me')
+                participantId = credential.length > 0 ? credential[0]['origin'] : participantId
+
+            if (Demo.Participant.filter(x => x['id'] === participantId).length > 0) {
+                return Promise.resolve({ 'error': '500.demo-restriction' } as any)
+            } else {
+                return Promise.resolve({ 'error': '404.not-found' } as any)
+            }
+        }
         return (await Fetch.delete(`/participant/${participantId}/result_event?${queryParameters.toString()}`, this.configuration))
     }
 }

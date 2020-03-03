@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { 
     IconButton, Box, Icon, Button, Typography, Dialog, 
-    DialogActions, Slide, Menu, MenuItem, Divider
+    DialogActions, Slide, Menu, MenuItem
 } from '@material-ui/core'
 import MaterialTable from 'material-table'
 import { useSnackbar } from 'notistack'
@@ -330,12 +330,10 @@ export default function ActivityList({ studyID, title, ...props }) {
                 anchorReference="anchorPosition"
                 onClose={() => setCreateMenu()}
             >
-                <MenuItem disabled><b>Create a new...</b></MenuItem>
-                <Divider />
+                <MenuItem disabled divider><b>Create a new...</b></MenuItem>
                 <MenuItem onClick={() => { setCreateMenu(); setGroupCreate(true) }}>Activity Group</MenuItem>
-                <MenuItem onClick={() => { setCreateMenu(); setShowCreate(true) }}>Survey Instrument</MenuItem>
+                <MenuItem divider onClick={() => { setCreateMenu(); setShowCreate(true) }}>Survey Instrument</MenuItem>
                 {!_hideCognitiveTesting() && [
-                    <Divider key="div" />,
                     <MenuItem key="head" disabled><b>Smartphone Cognitive Tests</b></MenuItem>,
                     ...activitySpecs.map(x => (
                         <MenuItem key={x?.name} onClick={() => { setCreateMenu(); saveCTest(x) }}>{x?.name?.replace('lamp.', '')}</MenuItem>
