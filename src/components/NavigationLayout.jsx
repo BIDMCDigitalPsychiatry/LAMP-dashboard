@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { 
     Box, Button, AppBar, Toolbar, Tooltip, MenuItem, Badge, 
     IconButton, Menu, Icon, Dialog, DialogTitle, 
-    DialogContent, DialogContentText, DialogActions 
+    DialogContent, DialogContentText, DialogActions, colors
 } from '@material-ui/core'
 import { useSnackbar } from 'notistack'
 
@@ -16,7 +16,6 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
     const [showCustomizeMenu, setShowCustomizeMenu] = useState()
     const [confirmLogout, setConfirmLogout] = useState()
     const [passwordChange, setPasswordChange] = useState()
-    const { enqueueSnackbar } = useSnackbar()
     return (
         <div>
     		{!!noToolbar ? <React.Fragment/> :
@@ -56,7 +55,10 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                             >
                                 <MenuItem disabled divider><b>{title}</b></MenuItem>
     							{!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
-    							<MenuItem onClick={() => setConfirmLogout(true)}>Logout</MenuItem>
+    							<MenuItem divider onClick={() => setConfirmLogout(true)}>Logout</MenuItem>
+                                <MenuItem dense onClick={() => { setShowCustomizeMenu(); window.open('https://docs.lamp.digital', '_blank') }}><b style={{ color: colors.grey['600'] }}>Help & Support</b></MenuItem>
+                                <MenuItem dense onClick={() => { setShowCustomizeMenu(); window.open('https://community.lamp.digital', '_blank') }}><b style={{ color: colors.grey['600'] }}>LAMP Community</b></MenuItem>
+                                <MenuItem dense onClick={() => { setShowCustomizeMenu(); window.open('mailto:team@digitalpsych.org', '_blank') }}><b style={{ color: colors.grey['600'] }}>Contact Us</b></MenuItem>
     						</Menu>
     					</div>
     				</Toolbar>

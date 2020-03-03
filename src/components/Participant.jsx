@@ -49,7 +49,8 @@ export default function Participant({ participant, ...props }) {
             for (let attachmentID of (await LAMP.Type.listAttachments(participant.id)).data) {
                 if (!attachmentID.startsWith('lamp.dashboard.experimental'))
                     continue
-                visualizations[attachmentID] = (await LAMP.Type.getAttachment(participant.id, attachmentID)).data
+                let bstr = (await LAMP.Type.getAttachment(participant.id, attachmentID)).data
+                visualizations[attachmentID] = bstr.startsWith('data:') ? bstr : `data:image/svg+xml;base64,${bstr}` // defaults
             }
             setVisualizations(visualizations)
         })()
@@ -181,6 +182,86 @@ export default function Participant({ participant, ...props }) {
         .map(x => x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp)
         .sort((a, b) => a - b /* min */).slice(0, 1)
         .map(x => x === 0 ? undefined : new Date(x))[0]
+
+    const pieData = () => ([
+        [
+
+            {
+                label: 'Alone',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.social === 'alone')
+                    .length
+            },
+            {
+                label: 'Friends',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.social === 'friends')
+                    .length
+            },
+            {
+                label: 'Family',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.social === 'family')
+                    .length
+            },
+            {
+                label: 'Peers',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.social === 'peers')
+                    .length
+            },
+            {
+                label: 'Crowd',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.social === 'crowd')
+                    .length
+            },
+        ],
+        [
+            {
+                label: 'Home',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'home')
+                    .length
+            },
+            {
+                label: 'School',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'school')
+                    .length
+            },
+            {
+                label: 'Work',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'work')
+                    .length
+            },
+            {
+                label: 'Hospital',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'hospital')
+                    .length
+            },
+            {
+                label: 'Outside',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'outside')
+                    .length
+            },
+            {
+                label: 'Shopping',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'shopping')
+                    .length
+            },
+            {
+                label: 'Transit',
+                value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
+                    .filter(x => x.data.context.environment === 'transit')
+                    .length
+            },
+        ]
+    ])
 
     return (
         <React.Fragment>
@@ -388,88 +469,8 @@ export default function Participant({ participant, ...props }) {
                     <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
                         Environmental Context
                     </Typography>
-                    <Divider style={{ marginBottom: 16 }} />
-                    <MultiPieChart data={
-                        [
-                            [
-
-                                {
-                                    label: 'Alone',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.social === 'alone')
-                                        .length
-                                },
-                                {
-                                    label: 'Friends',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.social === 'friends')
-                                        .length
-                                },
-                                {
-                                    label: 'Family',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.social === 'family')
-                                        .length
-                                },
-                                {
-                                    label: 'Peers',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.social === 'peers')
-                                        .length
-                                },
-                                {
-                                    label: 'Crowd',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.social === 'crowd')
-                                        .length
-                                },
-                            ],
-                            [
-                                {
-                                    label: 'Home',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'home')
-                                        .length
-                                },
-                                {
-                                    label: 'School',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'school')
-                                        .length
-                                },
-                                {
-                                    label: 'Work',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'work')
-                                        .length
-                                },
-                                {
-                                    label: 'Hospital',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'hospital')
-                                        .length
-                                },
-                                {
-                                    label: 'Outside',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'outside')
-                                        .length
-                                },
-                                {
-                                    label: 'Shopping',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'shopping')
-                                        .length
-                                },
-                                {
-                                    label: 'Transit',
-                                    value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                                        .filter(x => x.data.context.environment === 'transit')
-                                        .length
-                                },
-                            ]
-                        ]
-                    } />
+                    <Divider />
+                    <MultiPieChart data={pieData()} />
                 </Card>
             }
             {!(state.selectedPassive || []).includes('Step Count') ? <React.Fragment /> : 
@@ -477,7 +478,7 @@ export default function Participant({ participant, ...props }) {
                     <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
                         Step Count
                     </Typography>
-                    <Divider style={{ marginBottom: 16 }} />
+                    <Divider />
                     <Sparkline 
                         minWidth={250}
                         minHeight={250}
@@ -489,7 +490,8 @@ export default function Participant({ participant, ...props }) {
                               .map(d => ({ 
                                   x: new Date(parseInt(d.timestamp)), 
                                   y: d.data.value || 0
-                              }))} />
+                              }))} 
+                    />
                 </Card>
             }
             {(state.selectedExperimental || []).map(x => (
@@ -499,18 +501,7 @@ export default function Participant({ participant, ...props }) {
                     </Typography>
                     <Divider style={{ marginBottom: 16 }} />
                     <Grid container justify="center">
-                        <img alt="visualization" src={'data:image/svg+xml;base64,' + visualizations['lamp.dashboard.experimental.' + x]} height="85%" width="85%" />
-                        {/*<img alt="visualization" src={'data:image/png;base64,' + visualizations['lamp.dashboard.experimental.' + x]} />*/}
-                        {/*<Document
-                            file={'data:application/pdf;base64,' + visualizations['lamp.dashboard.experimental.' + x]}
-                            error={
-                                <Typography variant="body1" color="error">
-                                    Visualization error occurred.
-                                </Typography>
-                            }
-                            loading="">
-                            <Page renderMode="svg" pageIndex={0}/>
-                        </Document>*/}
+                        <img alt="visualization" src={visualizations['lamp.dashboard.experimental.' + x]} height="85%" width="85%" />
                     </Grid>
                 </Card>
             ))}

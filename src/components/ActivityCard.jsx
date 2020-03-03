@@ -31,6 +31,8 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
     const [ visibleSlice, setVisibleSlice ] = useState()
     const [ helpAnchor, setHelpAnchor ] = useState()
     const [ showGrid, setShowGrid ] = useState(forceDefaultGrid || Boolean(freeText.length))
+
+    console.dir(events)
     
     return (
         <React.Fragment>
@@ -83,7 +85,7 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                     }
                 </div>
             </Box>
-            <Divider style={{ marginBottom: 16 }} />
+            <Divider />
             {Boolean(visibleSlice) ? 
                 ((visibleSlice.slice || []).length === 0 ?
                     <Typography variant="subtitle2" style={{ margin: 16 }}>
@@ -109,7 +111,8 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                                       .map(d => ({ 
                                           x: new Date(d.timestamp), 
                                           y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events, activity, idx),
-                                          slice: d.temporal_events
+                                          slice: d.temporal_events,
+                                          missing: [null, 'NULL'].includes(d.temporal_events[idx].value)
                                       }))}
                                 onClick={(datum) => setVisibleSlice(datum)}
                             />
@@ -138,7 +141,8 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                               .map(d => ({ 
                                   x: new Date(d.timestamp), 
                                   y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events, activity),
-                                  slice: d.temporal_events
+                                  slice: d.temporal_events,
+                                  missing: d.temporal_events.filter(z => [null, 'NULL'].includes(z.value)).length > 0
                               }))}
                         onClick={(datum) => setVisibleSlice(datum)}
                     />

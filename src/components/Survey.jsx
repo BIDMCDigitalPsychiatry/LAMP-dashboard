@@ -1,6 +1,6 @@
 
 // Core Imports
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { 
   Box, Typography, Icon, Fab, Paper, Divider, Checkbox, 
   FormGroup, Radio, RadioGroup, Switch, FormControl, 
@@ -180,7 +180,7 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
     { label: 'Several Times', value: 1 }, 
     { label: 'Not at all', value: 0 }
   ]
-  const _boolOpts = _useTernaryBool() ? _ternaryOpts : _binaryOpts // FIXME
+  const _boolOpts = _useTernaryBool() ? _ternaryOpts : _binaryOpts // FIXME DEPRECATED
 
   // FIXME: CheckboxResponse, SwitchResponse
 
@@ -190,7 +190,7 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
   else if (type === 'multiselect')
     component = <MultiSelectResponse options={options} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'boolean')
-    component = <SelectResponse options={_boolOpts} onChange={onChange} value={!!value ? value.value : undefined} />
+    component = <SelectResponse options={_binaryOpts} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'likert')
     component = <SelectResponse options={_likertOpts} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === 'text' || type === null)
@@ -229,7 +229,8 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
 }
 
 function Section({ noHeader, onResponse, index, value, prefillData, ...props }) {
-  const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
+  const base = value.settings.map(x => ({ item: x.text, value: null }))
+  const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
   // eslint-disable-next-line
   const leftArrowPress = useKeyPress('ArrowLeft', () => {}, () => {
@@ -240,7 +241,9 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
     setActiveStep(step => Math.min(step + 1, value.settings.length))
   })
 
-  const isComplete = (idx) => responses.current[idx] && responses.current[idx].value
+  // Force creation of result data whether survey was interacted with or not.
+  useEffect(() => { onResponse(Array.from({ ...responses.current, length: value.settings.length })) }, [])
+  const isComplete = (idx) => !!responses.current[idx]?.value
   const isError = (idx) => !isComplete(idx) && (idx < activeStep)
 
   return (
@@ -258,7 +261,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                 completed={isComplete(idx)}
                 optional={isError(idx) && <Typography variant="caption" color="error">Required</Typography>}
               >
-                <StepLabel error={isError(idx)} style={{ textAlign: 'left' }}>
+                <StepLabel error={isError(idx)} style={{ textAlign: 'left', whiteSpace: 'pre-wrap' }}>
                   {x.text}
                 </StepLabel>
               </StepButton>
