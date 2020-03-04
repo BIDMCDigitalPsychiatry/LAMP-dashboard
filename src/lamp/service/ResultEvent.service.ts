@@ -141,7 +141,7 @@ export class ResultEventService {
                 Demo.ActivityEvent.push({
                     "#type": "ActivityEvent",
                     "#parent": participantId,
-                    ...resultEvent
+                    ...resultEvent as any
                 })
                 return Promise.resolve({} as any)
             } else {

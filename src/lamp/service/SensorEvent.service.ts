@@ -141,7 +141,7 @@ export class SensorEventService {
                 Demo.SensorEvent.push({
                     "#type": "ActivityEvent",
                     "#parent": participantId,
-                    ...sensorEvent
+                    ...sensorEvent as any
                 })
                 return Promise.resolve({} as any)
             } else {
