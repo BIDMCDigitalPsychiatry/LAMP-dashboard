@@ -43,6 +43,12 @@ Object.defineProperty(Array, 'rangeTo', {
     }
 })
 
+// An invalid date object returns NaN for getTime() and NaN is the only object not strictly equal to itself.
+// eslint-disable-next-line
+Date.prototype.isValid = function () {
+    return this.getTime() === this.getTime()
+}
+
 // Easier Date-string formatting using Date.formatUTC
 // eslint-disable-next-line
 Object.defineProperty(Date, 'formatUTC', {

@@ -6,7 +6,6 @@ import MaterialTable from 'material-table'
 import { useSnackbar } from 'notistack'
 
 // Local Imports
-import ActivityScheduler from './ActivityScheduler'
 import SurveyCreator from './SurveyCreator'
 import GroupCreator from './GroupCreator'
 import { ResponsivePaper } from '../components/Utils'
@@ -50,24 +49,11 @@ export default function Activity({ allActivities, activity, studyID, onSave, ...
     const isGroup = ((activity || {}).spec) === 'lamp.group'
     const isSurvey = ((activity || {}).spec) === 'lamp.survey'
     const isJewels = ['lamp.jewels_a', 'lamp.jewels_b'].includes((activity || {}).spec)
-    const [currentTab, setCurrentTab] = useState((isGroup || isSurvey || isJewels) ? 0 : 1)
-
 	return (
         <ResponsivePaper elevation={4}>
-            <Tabs
-                value={currentTab}
-                onChange={(event, newTab) => setCurrentTab((isGroup || isSurvey || isJewels) ? newTab : 1)}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-            >
-                <Tab label="Settings" />
-                <Tab label="Schedules" />
-            </Tabs>
-            {currentTab === 0 && isGroup && <Box m={4}><GroupCreator activities={allActivities} value={activity} onSave={onSave} /></Box>}
-            {currentTab === 0 && isSurvey && <Box m={4}><SurveyCreator value={activity} onSave={onSave} /></Box>}
-            {currentTab === 0 && isJewels && <JewelsSettings value={activity} onSave={onSave} />}
-            {currentTab === 1 && <ActivityScheduler activity={activity} />}
+            {isGroup && <Box m={4}><GroupCreator activities={allActivities} value={activity} onSave={onSave} /></Box>}
+            {isSurvey && <Box m={4}><SurveyCreator value={activity} onSave={onSave} /></Box>}
+            {isJewels && <JewelsSettings value={activity} onSave={onSave} />}
         </ResponsivePaper>
     )
 }

@@ -17,6 +17,7 @@ import LAMP from '../lamp'
 import Activity from './Activity'
 import SurveyCreator from './SurveyCreator'
 import GroupCreator from './GroupCreator'
+import ActivityScheduler from './ActivityScheduler'
 import ResponsiveDialog from './ResponsiveDialog'
 
 function _hideCognitiveTesting() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
@@ -194,7 +195,7 @@ export default function ActivityList({ studyID, title, ...props }) {
             repeat_interval: 'none',  // FIXME should not need this!
             custom_time: null  // FIXME should not need this!
         }] })
-        console.dir(newItem)
+        //console.dir(newItem)
         if (!!newItem.error)
              enqueueSnackbar("Failed to create a new group Activity.", { variant: 'error' })
         else enqueueSnackbar("Successfully created a new group Activity.", { variant: 'success' })
@@ -204,7 +205,7 @@ export default function ActivityList({ studyID, title, ...props }) {
     // Create a new Activity object that represents a cognitive test.
     const saveCTest = async (x) => {
         let newItem = await LAMP.Activity.create(studyID, { spec: x.name })
-        console.dir(newItem)
+        //console.dir(newItem)
         if (!!newItem.data) {
             onChange()
             enqueueSnackbar("Successfully created a new cognitive test Activity.", { variant: 'success' })
@@ -219,7 +220,7 @@ export default function ActivityList({ studyID, title, ...props }) {
                 console.dir('deleted tag ' + JSON.stringify(tag))
             }
             let raw = await LAMP.Activity.delete(activity.id)
-            console.dir(raw)
+            //console.dir(raw)
         }
         enqueueSnackbar("Successfully deleted the selected Activities.", { variant: 'success' })
         onChange()
@@ -231,7 +232,11 @@ export default function ActivityList({ studyID, title, ...props }) {
             let tag = [await LAMP.Type.getAttachment(raw.id, 'lamp.dashboard.survey_description')].map(y => !!y.error ? undefined : y.data)[0]
             const activity = spliceActivity({ raw, tag })
             setSelectedActivity(activity)
-        } else setSelectedActivity(raw)
+        } else if (raw.spec === 'lamp.group') {
+            setSelectedActivity(raw)
+        } else if (['lamp.jewels_a', 'lamp.jewels_b'].includes(raw.spec)) {
+            setSelectedActivity(raw)
+        }  //else setSelectedActivity(raw) // FIXME
     }
 
     // Commit an update to an Activity object (ONLY DESCRIPTIONS).
@@ -276,6 +281,15 @@ export default function ActivityList({ studyID, title, ...props }) {
         setSelectedActivity()
     }
 
+    //
+    const updateSchedule = async (x) => {
+        let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
+        let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
+        let all = await LAMP.Activity.allByStudy(studyID)
+        setActivities(all) // need to resave below to trigger detail panel correctly! 
+        setActivities(all.map(x => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
+    }
+
 	return (
         <React.Fragment>
             <MaterialTable 
@@ -286,6 +300,14 @@ export default function ActivityList({ studyID, title, ...props }) {
                     { title: 'Type', field: 'spec', lookup: { 'lamp.survey': 'Survey', 'lamp.group': 'Group' }, emptyValue: 'Cognitive Test' },
                 ]}
                 onRowClick={(event, rowData, togglePanel) => modifyActivity(rowData)}
+                detailPanel={rowData => 
+                    <Box ml={6} borderLeft={1} borderColor="grey.300">
+                        <ActivityScheduler 
+                            activity={rowData} 
+                            onChange={x => updateSchedule({ ...rowData, schedule: x })}
+                        />
+                    </Box>
+                }
                 actions={[
                     {
                         icon: 'cloud_upload',

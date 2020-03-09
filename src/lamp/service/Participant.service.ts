@@ -94,7 +94,7 @@ export class ParticipantService {
                 let data = {
                     "#type": "Participant",
                     "#parent": studyId,
-                    "id": "U" + Math.random().toString().substring(2, 9),
+                    "id": "U" + Math.random().toString().substring(2, 11),
                     "language": "en",
                     "theme": "#359FFE",
                     "emergency_contact": null,

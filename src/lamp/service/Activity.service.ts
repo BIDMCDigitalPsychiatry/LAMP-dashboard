@@ -122,7 +122,7 @@ export class ActivityService {
                     "#type": "Activity",
                     "#parent": studyId,
                     ...(activity as any),
-                    "id": "activity" + Math.random().toString().substring(2, 3),
+                    "id": "activity" + Math.random().toString().substring(2, 6),
                 }
                 Demo.Activity.push(data)
                 return Promise.resolve({ data: data['id'] } as any)
