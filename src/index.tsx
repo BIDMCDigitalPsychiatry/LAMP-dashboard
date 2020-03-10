@@ -38,4 +38,11 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
 }`
 
 ReactDOM.render(<App />, root)
-serviceWorker.register()
+serviceWorker.register({
+    onUpdate: registration => {
+        //alert('Updating to the latest available version of mindLAMP.')
+        if (registration && registration.waiting)
+        registration.waiting.postMessage({ type: 'SKIP_WAITING' })
+        window.location.reload()
+    }
+})

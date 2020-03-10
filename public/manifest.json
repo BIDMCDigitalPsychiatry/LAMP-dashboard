@@ -14,7 +14,7 @@
 	"prefer_related_applications" : false,
 	"icons" : [
 		{
-			"src": "https://uploads-ssl.webflow.com/5d321d54bdb5944debc03c00/5d4dd3a4c1a7e40da95b7f8d_lamp.png",
+			"src": "logo.png",
 			"sizes": "360x360",
 			"type": "image/png"
 		}

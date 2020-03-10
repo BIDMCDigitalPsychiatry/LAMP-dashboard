@@ -9,7 +9,7 @@ import {
 import { useSnackbar } from 'notistack'
 
 // Local Imports
-import { ResponsivePaper, ResponsiveMargin, mindLAMPLogo } from './Utils'
+import { ResponsivePaper, ResponsiveMargin } from './Utils'
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
     const [state, setState] = useState({ serverAddress: lastDomain })
@@ -69,7 +69,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                             <MenuItem dense onClick={() => { setHelpMenu(); window.open('mailto:team@digitalpsych.org', '_blank') }}><b style={{ color: colors.grey['600'] }}>Contact Us</b></MenuItem>
                         </Menu>
                     </IconButton>
-                    <Avatar alt="mindLAMP" src={mindLAMPLogo} style={{ margin:'auto' }} />
+                    <Avatar alt="mindLAMP" src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin:'auto' }} />
                     <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>mindLAMP</Typography>
                     <form onSubmit={handleLogin}>
                         <div>
