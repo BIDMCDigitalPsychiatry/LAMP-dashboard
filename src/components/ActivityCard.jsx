@@ -112,7 +112,7 @@ export default function ActivityCard({ activity, events, startDate, forceDefault
                                           x: new Date(d.timestamp), 
                                           y: strategies[d.static_data.survey_name !== undefined ? 'lamp.survey' : 'lamp.jewels_a'](d.temporal_events, activity, idx),
                                           slice: d.temporal_events,
-                                          missing: [null, 'NULL'].includes(d.temporal_events[idx].value)
+                                          missing: [null, 'NULL'].includes(d.temporal_events[idx]?.value ?? null) // sometimes the slice itself is missing, not set to null
                                       }))}
                                 onClick={(datum) => setVisibleSlice(datum)}
                             />

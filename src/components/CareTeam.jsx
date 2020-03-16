@@ -52,7 +52,7 @@ export default function CareTeam({ participant,  ...props }) {
 	                    	variant="h2" 
 	                    	gutterBottom
 	                    	align={sm ? 'center' : 'left'}
-	                    	style={{ fontFamily: 'Garamond', fontWeight: 700, color: '#074377' }}
+	                    	style={{ fontWeight: 700, color: '#074377' }}
                     	>
 	                        Meet your care team.
 	                    </Typography>
