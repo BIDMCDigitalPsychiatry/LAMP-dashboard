@@ -407,18 +407,18 @@ export default function Participant({ participant, ...props }) {
                             />
                         }
                     </Launcher.Section>
-                    <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
-                        {{
-                            breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
-                            jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
-                            journal: <Journal onComplete={() => setLaunchedActivity()}/>,
-                            hopebox: <Hopebox onComplete={() => setLaunchedActivity()}/>,
-                            resources: <Resources onComplete={() => setLaunchedActivity()} />,
-                            tips: <Tips onComplete={() => setLaunchedActivity()} />,
-                        }[launchedActivity ?? '']}
-                    </ResponsiveDialog>
                 </Box>
             }
+            <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
+                {{
+                    breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
+                    jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
+                    journal: <Journal onComplete={() => setLaunchedActivity()}/>,
+                    hopebox: <Hopebox onComplete={() => setLaunchedActivity()}/>,
+                    resources: <Resources onComplete={() => setLaunchedActivity()} />,
+                    tips: <Tips onComplete={() => setLaunchedActivity()} />,
+                }[launchedActivity ?? '']}
+            </ResponsiveDialog>
             {tab === 'prevent' && 
                 <React.Fragment>
                     <Box border={1} borderColor="grey.300" borderRadius={8} bgcolor="#fff" p={2} mx="10%">
