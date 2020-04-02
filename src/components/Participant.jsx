@@ -280,7 +280,7 @@ export default function Participant({ participant, ...props }) {
             {(tab === 'learn') &&
                 <Box>
                     <Launcher.Section>
-                        {_hideCareTeam() &&
+                        {!_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Tips" 
@@ -288,7 +288,7 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('tips')}
                             />
                         }
-                        {_hideCareTeam() &&
+                        {!_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Resources" 
@@ -374,7 +374,7 @@ export default function Participant({ participant, ...props }) {
             {(tab === 'manage') &&
                 <Box border={0} borderColor="grey.300" borderRadius={8} bgcolor="#fff" my={4}>
                      <Launcher.Section>
-                        {_hideCareTeam() &&
+                        {!_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Breathe" 
@@ -382,7 +382,7 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('breathe')} 
                             />
                          }
-                        {_hideCareTeam() &&
+                        {!_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Jewels" 
@@ -390,7 +390,7 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('jewels')} 
                             />
                         }
-                        {_hideCareTeam() ? undefined :
+                        {!_hideCareTeam() &&
                             <Launcher.Button
                             favorite
                             title="Journal"
@@ -398,7 +398,7 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('journal')} 
                             />
                         }
-                        {_hideCareTeam() && 
+                        {!_hideCareTeam() && 
                             <Launcher.Button
                             favorite
                             title="Hope Box"
