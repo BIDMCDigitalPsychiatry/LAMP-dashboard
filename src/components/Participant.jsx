@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import { 
     Box, Card, Switch, Typography, Divider, Grid, Fab,
-    Drawer, Icon, IconButton, useTheme, useMediaQuery, Tooltip
+    Drawer, Icon, useTheme, useMediaQuery, Tooltip, 
+    Paper, BottomNavigation, BottomNavigationAction
 } from '@material-ui/core'
 import { blue } from '@material-ui/core/colors'
 import { useSnackbar } from 'notistack'
@@ -22,6 +23,10 @@ import ResponsiveDialog from './ResponsiveDialog'
 import Breathe from './Breathe'
 import Jewels from './Jewels'
 import { spliceActivity } from './ActivityList'
+import Journal from './Journal'
+import Resources from './Resources'
+import Tips from './Tips'
+import Hopebox from './Hopebox'
 
 function _hideCareTeam() { return (LAMP.Auth._auth.serverAddress || '').includes('.psych.digital') }
 function _patientMode() { return LAMP.Auth._type === 'participant' }
@@ -39,6 +44,8 @@ export default function Participant({ participant, ...props }) {
     const [ launchedActivity, setLaunchedActivity ] = useState()
     const [ sidebarOpen, setSidebarOpen ] = useState()
     const { enqueueSnackbar } = useSnackbar()
+    const [tab, setTab] = useState('assess')
+
 
     const supportsSidebar = useMediaQuery(useTheme().breakpoints.up('md'))
     useEffect(() => { setSidebarOpen(false) }, [survey])
@@ -221,7 +228,7 @@ export default function Participant({ participant, ...props }) {
             {
                 label: 'Home',
                 value: ((state.sensor_events || {})['lamp.gps.contextual'] || [])
-                    .filter(x => x.data.context.environment === 'home')
+                    .filter(x => x.data.context.environment === 'home' || x.data.context.environment === null)
                     .length
             },
             {
@@ -265,16 +272,36 @@ export default function Participant({ participant, ...props }) {
 
     return (
         <React.Fragment>
-            {!_hideCareTeam() &&
+            {(!_hideCareTeam() && tab === 'prevent') &&
                 <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} my={4}>
                     <CareTeam participant={participant} />
                 </Box>
             }
-            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" my={4}>
-                <Launcher.Group>
-                    <Launcher.Section title="Learn">
+            {(tab === 'learn') &&
+                <Box>
+                    <Launcher.Section>
+                        {_hideCareTeam() &&
+                            <Launcher.Button 
+                                favorite 
+                                title="Tips" 
+                                icon={<Icon fontSize="large">flare</Icon>}
+                                onClick={() => setLaunchedActivity('tips')}
+                            />
+                        }
+                        {_hideCareTeam() &&
+                            <Launcher.Button 
+                                favorite 
+                                title="Resources" 
+                                icon={<Icon fontSize="large">menu_book</Icon>}
+                                onClick={() => setLaunchedActivity('resources')}
+                            />
+                        }
                     </Launcher.Section>
-                    <Launcher.Section title="Assess">
+                </Box>
+            }
+            {(tab === 'assess') &&
+                <Box border={0} borderColor="grey.300" borderRadius={8} bgcolor="#fff" my={4}>
+                    <Launcher.Section>
                         {[
                             ...(state.activities || []).filter(x => x.spec === 'lamp.group' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
                                 <Launcher.Button 
@@ -288,6 +315,7 @@ export default function Participant({ participant, ...props }) {
                             ...(state.activities || []).filter(x => x.spec === 'lamp.survey' && (_shouldRestrict() ? x.name.includes('SELF REPORT') : true)).map(y => (
                                 <Launcher.Button 
                                     key={y.name} 
+                                    favorite
                                     title={y.name} 
                                     icon={<Icon fontSize="large">assignment</Icon>}
                                     onClick={() => setActivities([y])}
@@ -295,16 +323,66 @@ export default function Participant({ participant, ...props }) {
                             ))
                         ]}
                     </Launcher.Section>
-                    <Launcher.Section title="Manage">
-                        {_hideCareTeam() ? undefined :
+                    <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
+                        <Box py={8} px={2}>
+                            <Grid container direction="row">
+                                <Grid item style={{ width: '100%' }}>
+                                    <Survey
+                                        validate
+                                        partialValidationOnly
+                                        content={survey} 
+                                        prefillData={!!survey ? survey.prefillData : undefined}
+                                        prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+                                        onValidationFailure={() => enqueueSnackbar('Some responses are missing. Please complete all questions before submitting.', { variant: 'error' })}
+                                        onResponse={submitSurvey} 
+                                    />
+                                </Grid>
+                                {(supportsSidebar && !_patientMode()) && 
+                                    <Grid item>
+                                        <Drawer
+                                            anchor="right"
+                                            variant="temporary"
+                                            open={!!sidebarOpen}
+                                            onClose={() => setSidebarOpen()}
+                                        >
+                                            <Box flexGrow={1} />
+                                            <Divider />
+                                            <Messages 
+                                                refresh={!!survey} 
+                                                expandHeight
+                                                privateOnly
+                                                participant={participant.id} 
+                                            />
+                                        </Drawer>
+                                        <Tooltip title="Patient Notes" placement="left">
+                                        <Fab 
+                                            color="primary" 
+                                            aria-label="Patient Notes" 
+                                            style={{ position: 'fixed', bottom: 85, right: 24 }} 
+                                            onClick={() => setSidebarOpen(true)}
+                                        >
+                                            <Icon>note_add</Icon>
+                                        </Fab>
+                                    </Tooltip>
+                                    </Grid>
+                                }
+                            </Grid>
+                        </Box>
+                    </ResponsiveDialog>
+                </Box>        
+            }
+            {(tab === 'manage') &&
+                <Box border={0} borderColor="grey.300" borderRadius={8} bgcolor="#fff" my={4}>
+                     <Launcher.Section>
+                        {_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Breathe" 
                                 icon={<Icon fontSize="large">spa</Icon>}
                                 onClick={() => setLaunchedActivity('breathe')} 
                             />
-                        }
-                        {_hideCareTeam() ? undefined :
+                         }
+                        {_hideCareTeam() &&
                             <Launcher.Button 
                                 favorite 
                                 title="Jewels" 
@@ -312,199 +390,186 @@ export default function Participant({ participant, ...props }) {
                                 onClick={() => setLaunchedActivity('jewels')} 
                             />
                         }
+                        {_hideCareTeam() ? undefined :
+                            <Launcher.Button
+                            favorite
+                            title="Journal"
+                            icon={<Icon fontSize="large">import_contacts</Icon>}
+                                onClick={() => setLaunchedActivity('journal')} 
+                            />
+                        }
+                        {_hideCareTeam() && 
+                            <Launcher.Button
+                            favorite
+                            title="Hope Box"
+                            icon={<Icon fontSize="large">launch</Icon>}
+                                onClick={() => setLaunchedActivity('hopebox')} 
+                            />
+                        }
                     </Launcher.Section>
-                    <Launcher.Section title="Prevent">
-                    </Launcher.Section>
-                </Launcher.Group>
-                <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
-                    {{
-                        breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
-                        jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
-                     }[launchedActivity ?? '']}
-                    }
-                </ResponsiveDialog>
-                <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
-                    <Box py={8} px={2}>
-                        <Grid container direction="row">
-                            <Grid item>
-                                <Survey
-                                    validate
-                                    partialValidationOnly
-                                    content={survey} 
-                                    prefillData={!!survey ? survey.prefillData : undefined}
-                                    prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-                                    onValidationFailure={() => enqueueSnackbar('Some responses are missing. Please complete all questions before submitting.', { variant: 'error' })}
-                                    onResponse={submitSurvey} 
+                    <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
+                        {{
+                            breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
+                            jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
+                            journal: <Journal onComplete={() => setLaunchedActivity()}/>,
+                            hopebox: <Hopebox onComplete={() => setLaunchedActivity()}/>,
+                            resources: <Resources onComplete={() => setLaunchedActivity()} />,
+                            tips: <Tips onComplete={() => setLaunchedActivity()} />,
+                        }[launchedActivity ?? '']}
+                    </ResponsiveDialog>
+                </Box>
+            }
+            {tab === 'prevent' && 
+                <React.Fragment>
+                    <Box border={1} borderColor="grey.300" borderRadius={8} bgcolor="#fff" p={2} mx="10%">
+                        <Box display="flex" justifyContent="space-between">
+                            <Typography variant="overline">
+                                Activity
+                            </Typography>
+                            <Box>
+                                <Typography variant="overline" color="inherit">
+                                    Show All
+                                </Typography>
+                                <Switch 
+                                    size="small"
+                                    checked={state.showAll} 
+                                    onChange={() => setState({ ...state, showAll: !state.showAll, selectedCharts: undefined })} 
                                 />
+                            </Box>
+                        </Box>
+                        <MultipleSelect 
+                            selected={state.selectedCharts || []}
+                            items={(state.activities || []).filter(x => x.spec === 'lamp.survey' || !!state.showAll).map(x => `${x.name}`)}
+                            showZeroBadges={false}
+                            badges={state.activity_counts}
+                            onChange={x => setState({ ...state, selectedCharts: x })}
+                        />
+                        {!_hideCareTeam() &&
+                            <React.Fragment>
+                                <Divider style={{ margin: '8px -16px 8px -16px' }} />
+                                <Typography variant="overline">
+                                    Sensor
+                                </Typography>
+                                <MultipleSelect 
+                                    selected={state.selectedPassive || []}
+                                    items={[`Environmental Context`, `Step Count`]}
+                                    showZeroBadges={false}
+                                    badges={state.sensor_counts}
+                                    onChange={x => setState({ ...state, selectedPassive: x })}
+                                />
+                            </React.Fragment>
+                        }
+                        {Object.keys(visualizations).length > 0 &&
+                            <React.Fragment>
+                                <Divider style={{ margin: '8px -16px 8px -16px' }} />
+                                <Typography variant="overline">
+                                    Automations
+                                </Typography>
+                                <MultipleSelect 
+                                    tooltips={{}}
+                                    defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
+                                    selected={state.selectedExperimental || []}
+                                    items={Object.keys(visualizations).map(x => x.replace('lamp.dashboard.experimental.', ''))}
+                                    showZeroBadges={false}
+                                    badges={Object.keys(visualizations).map(x => x.replace('lamp.dashboard.experimental.', '')).reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
+                                    onChange={x => setState({ ...state, selectedExperimental: x })}
+                                />
+                            </React.Fragment>
+                        }
+                    </Box>
+                    {((state.selectedCharts || []).length + (state.selectedPassive || []).length) === 0 && 
+                        <Box 
+                            display="flex" 
+                            justifyContent="center" 
+                            border={1} 
+                            borderColor={blue[700]}
+                            borderRadius={8} 
+                            bgcolor="grey.100"
+                            color={blue[700]}
+                            p={2} my={4} mx="10%"
+                        >
+                            <Typography variant="overline" align="center">
+                                <b>No Activities are selected. Please select an Activity above to begin.</b>
+                            </Typography>
+                        </Box>
+                    }
+                    {(state.activities || []).filter(x => (state.selectedCharts || []).includes(x.name)).map(activity =>
+                        <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
+                            <ActivityCard 
+                                activity={activity} 
+                                events={((state.activity_events || {})[activity.name] || [])} 
+                                startDate={earliestDate()}
+                                forceDefaultGrid={_hideCareTeam()}
+                                onEditAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
+                                    setActivities([{ ...activity, 
+                                        prefillData: [data.slice.map(({ item, value }) => ({ item, value }))], 
+                                        prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */
+                                    }])
+                                }}
+                                onCopyAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
+                                    setActivities([{ ...activity, 
+                                        prefillData: [data.slice.map(({ item, value }) => ({ item, value }))]
+                                    }])
+                                }}
+                                onDeleteAction={_patientMode() ? undefined : (x) => hideEvent(x.x.getTime(), activity.id)}
+                            />
+                        </Card>
+                    )}
+                    {!(state.selectedPassive || []).includes('Environmental Context') ? <React.Fragment /> : 
+                        <Card style={{ marginTop: 16, marginBotton: 16 }}>
+                            <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
+                                Environmental Context
+                            </Typography>
+                            <Divider />
+                            <MultiPieChart data={pieData()} />
+                        </Card>
+                    }
+                    {!(state.selectedPassive || []).includes('Step Count') ? <React.Fragment /> : 
+                        <Card style={{ marginTop: 16, marginBotton: 16 }}>
+                            <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
+                                Step Count
+                            </Typography>
+                            <Divider />
+                            <Sparkline 
+                                minWidth={250}
+                                minHeight={250}
+                                XAxisLabel="Time"
+                                YAxisLabel="Steps Taken"
+                                color={blue[500]}
+                                startDate={earliestDate()}
+                                data={((state.sensor_events || {})['lamp.steps'] || [])
+                                    .map(d => ({ 
+                                        x: new Date(parseInt(d.timestamp)), 
+                                        y: d.data.value || 0
+                                    }))} 
+                            />
+                        </Card>
+                    }
+                    {(state.selectedExperimental || []).map(x => (
+                        <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
+                            <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
+                                {x}
+                            </Typography>
+                            <Divider style={{ marginBottom: 16 }} />
+                            <Grid container justify="center">
+                                <img alt="visualization" src={visualizations['lamp.dashboard.experimental.' + x]} height="85%" width="85%" />
                             </Grid>
-                            {(supportsSidebar && !_patientMode()) && 
-                                <Grid item>
-                                    <Drawer
-                                        anchor="right"
-                                        variant="temporary"
-                                        open={!!sidebarOpen}
-                                        onClose={() => setSidebarOpen()}
-                                    >
-                                        <Box flexGrow={1} />
-                                        <Divider />
-                                        <Messages 
-                                            refresh={!!survey} 
-                                            expandHeight
-                                            privateOnly
-                                            participant={participant.id} 
-                                        />
-                                    </Drawer>
-                                    <Tooltip title="Patient Notes" placement="left">
-                                      <Fab 
-                                        color="primary" 
-                                        aria-label="Patient Notes" 
-                                        style={{ position: 'fixed', bottom: 85, right: 24 }} 
-                                        onClick={() => setSidebarOpen(true)}
-                                      >
-                                        <Icon>note_add</Icon>
-                                      </Fab>
-                                  </Tooltip>
-                                </Grid>
-                            }
-                        </Grid>
-                    </Box>
-                </ResponsiveDialog>
-            </Box>
-            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} mx="10%">
-                <Box display="flex" justifyContent="space-between">
-                    <Typography variant="overline">
-                        Activity
-                    </Typography>
-                    <Box>
-                        <Typography variant="overline" color="inherit">
-                            Show All
-                        </Typography>
-                        <Switch 
-                            size="small"
-                            checked={state.showAll} 
-                            onChange={() => setState({ ...state, showAll: !state.showAll, selectedCharts: undefined })} 
-                        />
-                    </Box>
-                </Box>
-                <MultipleSelect 
-                    selected={state.selectedCharts || []}
-                    items={(state.activities || []).filter(x => x.spec === 'lamp.survey' || !!state.showAll).map(x => `${x.name}`)}
-                    showZeroBadges={false}
-                    badges={state.activity_counts}
-                    onChange={x => setState({ ...state, selectedCharts: x })}
-                />
-                {!_hideCareTeam() &&
-                    <React.Fragment>
-                        <Divider style={{ margin: '8px -16px 8px -16px' }} />
-                        <Typography variant="overline">
-                            Sensor
-                        </Typography>
-                        <MultipleSelect 
-                            selected={state.selectedPassive || []}
-                            items={[`Environmental Context`, `Step Count`]}
-                            showZeroBadges={false}
-                            badges={state.sensor_counts}
-                            onChange={x => setState({ ...state, selectedPassive: x })}
-                        />
-                    </React.Fragment>
-                }
-                {Object.keys(visualizations).length > 0 &&
-                    <React.Fragment>
-                        <Divider style={{ margin: '8px -16px 8px -16px' }} />
-                        <Typography variant="overline">
-                            Automations
-                        </Typography>
-                        <MultipleSelect 
-                            tooltips={{}}
-                            defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
-                            selected={state.selectedExperimental || []}
-                            items={Object.keys(visualizations).map(x => x.replace('lamp.dashboard.experimental.', ''))}
-                            showZeroBadges={false}
-                            badges={Object.keys(visualizations).map(x => x.replace('lamp.dashboard.experimental.', '')).reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
-                            onChange={x => setState({ ...state, selectedExperimental: x })}
-                        />
-                    </React.Fragment>
-                }
-            </Box>
-            {((state.selectedCharts || []).length + (state.selectedPassive || []).length) === 0 && 
-                <Box 
-                    display="flex" 
-                    justifyContent="center" 
-                    border={1} 
-                    borderColor={blue[700]}
-                    borderRadius={4} 
-                    bgcolor="grey.100"
-                    color={blue[700]}
-                    p={2} my={4} mx="10%"
-                >
-                    <Typography variant="overline" align="center">
-                        <b>No Activities are selected. Please select an Activity above to begin.</b>
-                    </Typography>
-                </Box>
+                        </Card>
+                    ))}
+                </React.Fragment>
             }
-            {(state.activities || []).filter(x => (state.selectedCharts || []).includes(x.name)).map(activity =>
-                <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
-                    <ActivityCard 
-                        activity={activity} 
-                        events={((state.activity_events || {})[activity.name] || [])} 
-                        startDate={earliestDate()}
-                        forceDefaultGrid={_hideCareTeam()}
-                        onEditAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
-                            setActivities([{ ...activity, 
-                                prefillData: [data.slice.map(({ item, value }) => ({ item, value }))], 
-                                prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */
-                            }])
-                        }}
-                        onCopyAction={activity.spec !== 'lamp.survey' || _patientMode() ? undefined : (data) => {
-                            setActivities([{ ...activity, 
-                                prefillData: [data.slice.map(({ item, value }) => ({ item, value }))]
-                            }])
-                        }}
-                        onDeleteAction={_patientMode() ? undefined : (x) => hideEvent(x.x.getTime(), activity.id)}
-                    />
-                </Card>
-            )}
-            {!(state.selectedPassive || []).includes('Environmental Context') ? <React.Fragment /> : 
-                <Card style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
-                        Environmental Context
-                    </Typography>
-                    <Divider />
-                    <MultiPieChart data={pieData()} />
-                </Card>
-            }
-            {!(state.selectedPassive || []).includes('Step Count') ? <React.Fragment /> : 
-                <Card style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
-                        Step Count
-                    </Typography>
-                    <Divider />
-                    <Sparkline 
-                        minWidth={250}
-                        minHeight={250}
-                        XAxisLabel="Time"
-                        YAxisLabel="Steps Taken"
-                        color={blue[500]}
-                        startDate={earliestDate()}
-                        data={((state.sensor_events || {})['lamp.steps'] || [])
-                              .map(d => ({ 
-                                  x: new Date(parseInt(d.timestamp)), 
-                                  y: d.data.value || 0
-                              }))} 
-                    />
-                </Card>
-            }
-            {(state.selectedExperimental || []).map(x => (
-                <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
-                    <Typography component="h6" variant="h6" align="center" style={{ width: '100%', margin: 16 }}>
-                        {x}
-                    </Typography>
-                    <Divider style={{ marginBottom: 16 }} />
-                    <Grid container justify="center">
-                        <img alt="visualization" src={visualizations['lamp.dashboard.experimental.' + x]} height="85%" width="85%" />
-                    </Grid>
-                </Card>
-            ))}
-        </React.Fragment>
+        <Paper elevation={9} style={{ position: 'fixed', width: '100%', left: 0, bottom: 0, zIndex: 500 }}>
+            <BottomNavigation
+                value={tab}
+                onChange={(_, newTab) => setTab(newTab)}
+                showLabels
+            >
+                <BottomNavigationAction label="Learn" value="learn" icon={<Icon>bookmark_border</Icon>} />
+                <BottomNavigationAction label="Assess" value="assess" icon={<Icon>assessment</Icon>} />
+                <BottomNavigationAction label="Manage" value="manage" icon={<Icon>create_outlined</Icon>} />
+                <BottomNavigationAction label="Prevent" value="prevent" icon={<Icon>speaker_notes_outlined</Icon>} />
+            </BottomNavigation>
+        </Paper>
+      </React.Fragment>
     )
 }

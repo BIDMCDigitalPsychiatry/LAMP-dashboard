@@ -1,7 +1,7 @@
 
 // Core Imports
-import React, { useState, useEffect } from 'react'
-import { Box, Tabs, Tab } from '@material-ui/core'
+import React, { useState } from 'react'
+import { Box } from '@material-ui/core'
 import MaterialTable from 'material-table'
 import { useSnackbar } from 'notistack'
 
