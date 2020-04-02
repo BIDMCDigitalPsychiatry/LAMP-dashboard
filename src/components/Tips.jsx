@@ -2,7 +2,7 @@
 // Core Imports
 import React from 'react'
 import { 
-    Typography, makeStyles, Box, Grid, Card, CardMedia, CardActionArea, 
+    Typography, makeStyles, Box, Grid, Card, CardMedia, CardActionArea, Icon,
     CardContent, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary 
 } from '@material-ui/core'
 

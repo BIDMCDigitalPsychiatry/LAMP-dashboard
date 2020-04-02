@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useState } from 'react'
 import { 
-  Typography, makeStyles, Box, Grid, Link, ExpansionPanel, 
+  Typography, makeStyles, Box, Icon, Link, ExpansionPanel, 
   ExpansionPanelDetails, ExpansionPanelSummary 
 } from '@material-ui/core'
 
