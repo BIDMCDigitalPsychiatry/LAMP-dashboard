@@ -120,8 +120,8 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                         <EditField participant={x} />
                     },
                     { title: 'Last Active', field: 'last_active', searchable: false, render: (rowData) => 
-                        <Tooltip title={dateInfo(rowData.id).absolute}>
-                            <span>{`${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}</span>
+                       <Tooltip title={dateInfo(rowData.id).absolute}>
+                            <span>{ (dateInfo(rowData.id).relative !== 'in NaN years') && `${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}</span>
                         </Tooltip>
                     },
                     { title: 'Indicators', field: 'data_health', searchable: false, render: (rowData) => 

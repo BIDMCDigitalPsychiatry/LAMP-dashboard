@@ -44,7 +44,7 @@ export default function Participant({ participant, ...props }) {
     const [ launchedActivity, setLaunchedActivity ] = useState()
     const [ sidebarOpen, setSidebarOpen ] = useState()
     const { enqueueSnackbar } = useSnackbar()
-    const [tab, setTab] = useState('assess')
+    const [tab, setTab] = useState('prevent')
 
 
     const supportsSidebar = useMediaQuery(useTheme().breakpoints.up('md'))
