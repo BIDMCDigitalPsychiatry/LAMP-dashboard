@@ -29,16 +29,14 @@ const timeAgo = new TimeAgo('en-US')
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 
 
-export default function ParticipantList({ studyID, title, onParticipantSelect, showUnscheduled, credential, ...props }) {
+export default function ParticipantList({ studyID, title, onParticipantSelect, showUnscheduled, ...props }) {
     const [state, setState] = useState({
         popoverAttachElement: null,
         selectedIcon: null,
         newCount: 1,
         selectedRows: []
     })
-    const [password, setPassword] = useState('')
-    const credID = !!credential ? (credential.description === 'Default Credential' ? credential.origin : credential.access_key) : ''
-    const _qrLink = () => window.location.href.split('#')[0] + '#/?a=' + btoa([credID, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
+    const _qrLink = (credID, password) => window.location.href.split('#')[0] + '#/?a=' + btoa([credID, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
     const [participants, setParticipants] = useState([])
     const [openMessaging, setOpenMessaging] = useState()
     const [openPasswordReset, setOpenPasswordReset] = useState()
@@ -59,21 +57,15 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         })()
     }, [participants])
 
-
     let addParticipant = async () => {
         let newCount = state.newCount
         let ids = []
-        let id = []
-        let tempPassword = []
 
         for (let i = 0; i < newCount; i ++) {
-            id = (await LAMP.Participant.create(studyID, { study_code: '001' })).data
-            tempPassword = id
-            if (!!(await LAMP.Credential.create(id, tempPassword, 'Temporary Login')).error) {
-                enqueueSnackbar(`Could not create credential for ${id}.`, { variant: 'error' , anchorOrigin: {
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }})
+            let id = (await LAMP.Participant.create(studyID, { study_code: '001' })).data 
+            let tempPassword = id
+            if (!!(await LAMP.Credential.create(id, `${id}@lamp.com`, tempPassword, 'Temporary Login')).error) {
+                enqueueSnackbar(`Could not create credential for ${id}.`, { variant: 'error'})
             } else {
                 enqueueSnackbar(`Successfully created Participant ${id}. Tap the expand icon on the right to see credentials and details.`, {
                     variant: 'success', 
@@ -94,7 +86,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                                 />
                                 <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
                                     <Grid container justify="center" style={{ padding: 16 }}>
-                                    <QRCode size={256} level="H" value={_qrLink()} />
+                                    <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, tempPassword)} />
                                     </Grid>
                                 </Tooltip>
                             </Grid>
