@@ -38,21 +38,11 @@ const timeAgo = new TimeAgo("en-US")
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
   "#/?a=" +
-  btoa(
-    [credID, password, LAMP.Auth._auth.serverAddress]
-      .filter((x) => !!x)
-      .join(":")
-  )
+  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
 
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 
-export default function ParticipantList({
-  studyID,
-  title,
-  onParticipantSelect,
-  showUnscheduled,
-  ...props
-}) {
+export default function ParticipantList({ studyID, title, onParticipantSelect, showUnscheduled, ...props }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
     selectedIcon: null,
@@ -67,8 +57,7 @@ export default function ParticipantList({
   useEffect(() => {
     LAMP.Participant.allByStudy(studyID).then(setParticipants)
   }, [])
-  const onChange = () =>
-    LAMP.Participant.allByStudy(studyID).then(setParticipants)
+  const onChange = () => LAMP.Participant.allByStudy(studyID).then(setParticipants)
 
   useEffect(() => {
     ;(async function () {
@@ -77,18 +66,13 @@ export default function ParticipantList({
           participants.map(async (x) => ({
             id: x.id,
             res:
-              (
-                await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics")
-              )?.filter((z) => z.sensor === "lamp.analytics") ?? [],
+              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics"))?.filter(
+                (z) => z.sensor === "lamp.analytics"
+              ) ?? [],
           }))
         )
       ).filter((y) => y.res.length > 0)
-      setLogins((logins) =>
-        data.reduce(
-          (prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }),
-          logins
-        )
-      )
+      setLogins((logins) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
     })()
   }, [participants])
 
@@ -97,22 +81,9 @@ export default function ParticipantList({
     let ids = []
 
     for (let i = 0; i < newCount; i++) {
-      let id = (await LAMP.Participant.create(studyID, { study_code: "001" }))
-        .data
-      let tempPassword = id
-      if (
-        !!(
-          await LAMP.Credential.create(
-            id,
-            `${id}@lamp.com`,
-            tempPassword,
-            "Temporary Login"
-          )
-        ).error
-      ) {
-        enqueueSnackbar(`Could not create credential for ${id}.`, {
-          variant: "error",
-        })
+      let id = (await LAMP.Participant.create(studyID, { study_code: "001" })).data?.id
+      if (!!(await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")).error) {
+        enqueueSnackbar(`Could not create credential for ${id}.`, { variant: "error" })
       } else {
         enqueueSnackbar(
           `Successfully created Participant ${id}. Tap the expand icon on the right to see credentials and details.`,
@@ -121,35 +92,21 @@ export default function ParticipantList({
             persist: true,
             content: (key, message) => (
               <SnackMessage id={key} message={message}>
-                <TextField
-                  variant='outlined'
-                  size='small'
-                  label='Temporary email address'
-                  value={`${id}@lamp.com`}
-                />
+                <TextField variant='outlined' size='small' label='Temporary email address' value={`${id}@lamp.com`} />
                 <div style={{ height: 16 }} />
-                <TextField
-                  variant='outlined'
-                  size='small'
-                  label='Temporary password'
-                  value={`${tempPassword}`}
-                />
+                <TextField variant='outlined' size='small' label='Temporary password' value={`${id}`} />
                 <Grid item>
                   <TextField
                     fullWidth
                     label='One-time login link'
                     style={{ marginTop: 16 }}
                     variant='outlined'
-                    value={_qrLink(`${id}@lamp.com`, tempPassword)}
+                    value={_qrLink(`${id}@lamp.com`, id)}
                     onChange={(event) => {}}
                   />
                   <Tooltip title='Scan this QR code on a mobile device to automatically open a patient dashboard.'>
                     <Grid container justify='center' style={{ padding: 16 }}>
-                      <QRCode
-                        size={256}
-                        level='H'
-                        value={_qrLink(`${id}@lamp.com`, tempPassword)}
-                      />
+                      <QRCode size={256} level='H' value={_qrLink(`${id}@lamp.com`, id)} />
                     </Grid>
                   </Tooltip>
                 </Grid>
@@ -187,17 +144,11 @@ export default function ParticipantList({
         zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
         zip.file(`${row.id}/result_event.json`, JSON.stringify(resultEvents))
       } else if (filetype === "csv") {
-        jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function (
-          err,
-          csv
-        ) {
+        jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function (err, csv) {
           if (err) return console.log(err)
           zip.file(`${row.id}/sensor_event.csv`, csv)
         })
-        jsonexport(JSON.parse(JSON.stringify(resultEvents)), function (
-          err,
-          csv
-        ) {
+        jsonexport(JSON.parse(JSON.stringify(resultEvents)), function (err, csv) {
           if (err) return console.log(err)
           zip.file(`${row.id}/result_event.csv`, csv)
         })
@@ -220,12 +171,8 @@ export default function ParticipantList({
 
   const dateInfo = (id) => ({
     relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
-    absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString(
-      "en-US",
-      Date.formatStyle("medium")
-    ),
-    device:
-      (logins[id] || { data: {} }).data.device_type || "an unknown device",
+    absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
+    device: (logins[id] || { data: {} }).data.device_type || "an unknown device",
   })
 
   return (
@@ -247,9 +194,7 @@ export default function ParticipantList({
               <Tooltip title={dateInfo(rowData.id).absolute}>
                 <span>
                   {dateInfo(rowData.id).relative !== "in NaN years" &&
-                    `${dateInfo(rowData.id).relative} on ${
-                      dateInfo(rowData.id).device
-                    }`}
+                    `${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}
                 </span>
               </Tooltip>
             ),
@@ -285,15 +230,8 @@ export default function ParticipantList({
             ),
           },
         ]}
-        detailPanel={(rowData) => (
-          <Messages
-            refresh
-            participant={participants[rowData.tableData.id].id}
-          />
-        )}
-        onRowClick={(event, rowData, togglePanel) =>
-          onParticipantSelect(participants[rowData.tableData.id].id)
-        }
+        detailPanel={(rowData) => <Messages refresh participant={participants[rowData.tableData.id].id} />}
+        onRowClick={(event, rowData, togglePanel) => onParticipantSelect(participants[rowData.tableData.id].id)}
         actions={[
           {
             icon: "add_box",
@@ -332,8 +270,7 @@ export default function ParticipantList({
         ]}
         localization={{
           body: {
-            emptyDataSourceMessage:
-              "No Participants. Add Participants by clicking the [+] button above.",
+            emptyDataSourceMessage: "No Participants. Add Participants by clicking the [+] button above.",
             editRow: {
               deleteText: "Are you sure you want to delete this Participant?",
             },
@@ -375,14 +312,9 @@ export default function ParticipantList({
         }*/}
       <Popover
         open={Boolean(state.popoverAttachElement)}
-        anchorPosition={
-          !!state.popoverAttachElement &&
-          state.popoverAttachElement.getBoundingClientRect()
-        }
+        anchorPosition={!!state.popoverAttachElement && state.popoverAttachElement.getBoundingClientRect()}
         anchorReference='anchorPosition'
-        onClose={() =>
-          setState((state) => ({ ...state, popoverAttachElement: null }))
-        }
+        onClose={() => setState((state) => ({ ...state, popoverAttachElement: null }))}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "center",
@@ -402,30 +334,20 @@ export default function ParticipantList({
             <TextField
               label='Number of participants to add:'
               value={state.newCount}
-              onChange={(event) =>
-                setState({ ...state, newCount: event.target.value })
-              }
+              onChange={(event) => setState({ ...state, newCount: event.target.value })}
               type='number'
               InputLabelProps={{
                 shrink: true,
               }}
               margin='normal'
             />
-            <IconButton
-              aria-label='Create'
-              color='primary'
-              onClick={addParticipant}
-            >
+            <IconButton aria-label='Create' color='primary' onClick={addParticipant}>
               <Icon>check_circle</Icon>
             </IconButton>
           </div>
         ) : state.selectedIcon === "delete" ? (
           <div style={{ padding: "20px" }}>
-            <Button
-              variant='contained'
-              color='secondary'
-              onClick={deleteParticipants}
-            >
+            <Button variant='contained' color='secondary' onClick={deleteParticipants}>
               Are you sure you want to delete these participants?
             </Button>
           </div>
@@ -433,19 +355,10 @@ export default function ParticipantList({
           <div />
         )}
       </Popover>
-      <ResponsiveDialog
-        transient
-        animate
-        open={!!openMessaging}
-        onClose={() => setOpenMessaging()}
-      >
+      <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging()}>
         <Messages participant={openMessaging} />
       </ResponsiveDialog>
-      <ResponsiveDialog
-        transient
-        open={!!openPasswordReset}
-        onClose={() => setOpenPasswordReset()}
-      >
+      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset()}>
         <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
       </ResponsiveDialog>
     </React.Fragment>

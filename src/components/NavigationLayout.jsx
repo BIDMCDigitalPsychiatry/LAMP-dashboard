@@ -25,14 +25,7 @@ import {
 import CredentialManager from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 
-export default function NavigationLayout({
-  title,
-  id,
-  noToolbar,
-  goBack,
-  onLogout,
-  ...props
-}) {
+export default function NavigationLayout({ title, id, noToolbar, goBack, onLogout, ...props }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState()
   const [confirmLogout, setConfirmLogout] = useState()
   const [passwordChange, setPasswordChange] = useState()
@@ -43,20 +36,14 @@ export default function NavigationLayout({
       {!!noToolbar ? (
         <React.Fragment />
       ) : (
-        <AppBar
-          position='static'
-          style={{ background: "transparent", boxShadow: "none" }}
-        >
+        <AppBar position='static' style={{ background: "transparent", boxShadow: "none" }}>
           <Toolbar>
             <IconButton
               onClick={goBack}
               color='default'
               aria-label='Menu'
               style={{
-                marginLeft:
-                  supportsSidebar && title.startsWith("Patient")
-                    ? 64
-                    : undefined,
+                marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,
               }}
             >
               <Icon>arrow_back</Icon>
@@ -89,11 +76,7 @@ export default function NavigationLayout({
                 <MenuItem disabled divider>
                   <b>{title}</b>
                 </MenuItem>
-                {!!id && (
-                  <MenuItem onClick={() => setPasswordChange(true)}>
-                    Manage Credentials
-                  </MenuItem>
-                )}
+                {!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
                 <MenuItem divider onClick={() => setConfirmLogout(true)}>
                   Logout
                 </MenuItem>
@@ -154,32 +137,22 @@ export default function NavigationLayout({
         aria-labelledby='alert-dialog-title'
         aria-describedby='alert-dialog-description'
       >
-        <DialogTitle id='alert-dialog-title'>
-          Are you sure you want to log out of LAMP right now?
-        </DialogTitle>
+        <DialogTitle id='alert-dialog-title'>Are you sure you want to log out of LAMP right now?</DialogTitle>
         <DialogContent>
           <DialogContentText id='alert-dialog-description'>
-            If you've made some changes, make sure they're saved before you
-            continue to log out.
+            If you've made some changes, make sure they're saved before you continue to log out.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmLogout()} color='secondary'>
             Go Back
           </Button>
-          <Button
-            onClick={() => onLogout() && setConfirmLogout()}
-            color='primary'
-            autoFocus
-          >
+          <Button onClick={() => onLogout() && setConfirmLogout()} color='primary' autoFocus>
             Logout
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog
-        open={!!passwordChange && !!id}
-        onClose={() => setPasswordChange()}
-      >
+      <Dialog open={!!passwordChange && !!id} onClose={() => setPasswordChange()}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={id} />
         </DialogContent>

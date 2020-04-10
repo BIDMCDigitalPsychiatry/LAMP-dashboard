@@ -71,14 +71,10 @@ export default function Participant({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       let visualizations = {}
-      for (let attachmentID of (await LAMP.Type.listAttachments(participant.id))
-        .data) {
+      for (let attachmentID of (await LAMP.Type.listAttachments(participant.id)).data) {
         if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
-        let bstr = (await LAMP.Type.getAttachment(participant.id, attachmentID))
-          .data
-        visualizations[attachmentID] = bstr.startsWith("data:")
-          ? bstr
-          : `data:image/svg+xml;base64,${bstr}` // defaults
+        let bstr = (await LAMP.Type.getAttachment(participant.id, attachmentID)).data
+        visualizations[attachmentID] = bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}` // defaults
       }
       setVisualizations(visualizations)
     })()
@@ -87,10 +83,7 @@ export default function Participant({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       // Refresh hidden events list.
-      let _hidden = await LAMP.Type.getAttachment(
-        participant.id,
-        "lamp.dashboard.hidden_events"
-      )
+      let _hidden = await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")
       _hidden = !!_hidden.error ? [] : _hidden.data
       setHiddenEvents(_hidden)
 
@@ -99,24 +92,16 @@ export default function Participant({ participant, ...props }) {
       let _state = {
         ...state,
         activities: _activities,
-        activity_events: (
-          await LAMP.ResultEvent.allByParticipant(participant.id)
-        )
+        activity_events: (await LAMP.ResultEvent.allByParticipant(participant.id))
           .map((x) => ({
             ...x,
             activity: _activities.find(
               (y) =>
                 x.activity === y.id ||
-                (!!x.static_data.survey_name &&
-                  x.static_data.survey_name.toLowerCase() ===
-                    y.name.toLowerCase())
+                (!!x.static_data.survey_name && x.static_data.survey_name.toLowerCase() === y.name.toLowerCase())
             ),
           }))
-          .filter((x) =>
-            !!x.activity
-              ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`)
-              : true
-          )
+          .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
           .sort((x, y) => x.timestamp - y.timestamp)
           .map((x) => ({
             ...x,
@@ -124,9 +109,7 @@ export default function Participant({ participant, ...props }) {
             activity_spec: (x.activity || { spec: "" }).spec || "",
           }))
           .groupBy("activity"),
-        sensor_events: (
-          await LAMP.SensorEvent.allByParticipant(participant.id)
-        ).groupBy("sensor"),
+        sensor_events: (await LAMP.SensorEvent.allByParticipant(participant.id)).groupBy("sensor"),
       }
 
       // Perform datetime coalescing to either days or weeks.
@@ -134,9 +117,7 @@ export default function Participant({ participant, ...props }) {
         ((_state.sensor_events || {})["lamp.steps"] || [])
           .map((x) => ({
             ...x,
-            timestamp: Math.round(
-              x.timestamp / (24 * 60 * 60 * 1000)
-            ) /* days */,
+            timestamp: Math.round(x.timestamp / (24 * 60 * 60 * 1000)) /* days */,
           }))
           .groupBy("timestamp")
       )
@@ -170,11 +151,8 @@ export default function Participant({ participant, ...props }) {
           }))
         ),
         sensor_counts: {
-          "Environmental Context": (
-            (_state.sensor_events || {})["lamp.gps.contextual"] || []
-          ).length,
-          "Step Count": ((_state.sensor_events || {})["lamp.steps"] || [])
-            .length,
+          "Environmental Context": ((_state.sensor_events || {})["lamp.gps.contextual"] || []).length,
+          "Step Count": ((_state.sensor_events || {})["lamp.steps"] || []).length,
         },
       })
     })()
@@ -185,55 +163,42 @@ export default function Participant({ participant, ...props }) {
     if (activities.length === 0) return setSurvey()
 
     // Splice together all selected activities & their tags.
-    Promise.all(
-      activities.map((x) =>
-        LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")
-      )
-    ).then((res) => {
-      let spliced = res.map((y, idx) =>
-        spliceActivity({
-          raw: activities[idx],
-          tag: !!y.error ? undefined : y.data,
+    Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description"))).then(
+      (res) => {
+        let spliced = res.map((y, idx) =>
+          spliceActivity({
+            raw: activities[idx],
+            tag: !!y.error ? undefined : y.data,
+          })
+        )
+
+        // Short-circuit the main title & description if there's only one survey.
+        const main = {
+          name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
+          description: spliced.length === 1 ? spliced[0].description : "Please complete all sections below. Thank you.",
+        }
+        if (spliced.length === 1) spliced[0].name = spliced[0].description = undefined
+
+        setSurvey({
+          name: main.name,
+          description: main.description,
+          sections: spliced,
+          prefillData: !_patientMode() ? activities[0].prefillData : undefined,
+          prefillTimestamp: !_patientMode() ? activities[0].prefillTimestamp : undefined,
         })
-      )
-
-      // Short-circuit the main title & description if there's only one survey.
-      const main = {
-        name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
-        description:
-          spliced.length === 1
-            ? spliced[0].description
-            : "Please complete all sections below. Thank you.",
       }
-      if (spliced.length === 1)
-        spliced[0].name = spliced[0].description = undefined
-
-      setSurvey({
-        name: main.name,
-        description: main.description,
-        sections: spliced,
-        prefillData: !_patientMode() ? activities[0].prefillData : undefined,
-        prefillTimestamp: !_patientMode()
-          ? activities[0].prefillTimestamp
-          : undefined,
-      })
-    })
+    )
   }, [activities])
 
   //
   const hideEvent = async (timestamp, activity) => {
-    let _hidden = await LAMP.Type.getAttachment(
-      participant.id,
-      "lamp.dashboard.hidden_events"
-    )
+    let _hidden = await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")
     let _events = !!_hidden.error ? [] : _hidden.data
     if (hiddenEvents.includes(`${timestamp}/${activity}`)) return
-    let _setEvents = await LAMP.Type.setAttachment(
-      participant.id,
-      "me",
-      "lamp.dashboard.hidden_events",
-      [..._events, `${timestamp}/${activity}`]
-    )
+    let _setEvents = await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.hidden_events", [
+      ..._events,
+      `${timestamp}/${activity}`,
+    ])
     if (!!_setEvents.error) return
     //setHiddenEvents([..._events, `${timestamp}/${activity}`])
     setSubmission((x) => x + 1)
@@ -245,9 +210,7 @@ export default function Participant({ participant, ...props }) {
 
     //
     let events = response.map((x, idx) => ({
-      timestamp: !!overwritingTimestamp
-        ? overwritingTimestamp + 1000 /* 1sec */
-        : new Date().getTime(),
+      timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : new Date().getTime(),
       duration: 0,
       activity: activities[idx].id,
       static_data: { survey_name: activities[idx].name },
@@ -264,21 +227,13 @@ export default function Participant({ participant, ...props }) {
     Promise.all(
       events
         .filter((x) => x.temporal_events.length > 0)
-        .map((x) =>
-          LAMP.ResultEvent.create(participant.id, x).catch((e) =>
-            console.dir(e)
-          )
-        )
+        .map((x) => LAMP.ResultEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
       setSubmission((x) => x + 1)
     })
 
     // If a timestamp was provided to overwrite data, hide the original event too.
-    if (!!overwritingTimestamp)
-      hideEvent(
-        overwritingTimestamp,
-        activities[0 /* assumption made here */].id
-      )
+    if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activities[0 /* assumption made here */].id)
   }
 
   const earliestDate = () =>
@@ -294,81 +249,77 @@ export default function Participant({ participant, ...props }) {
     [
       {
         label: "Alone",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.social === "alone").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.social === "alone"
+        ).length,
       },
       {
         label: "Friends",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.social === "friends").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.social === "friends"
+        ).length,
       },
       {
         label: "Family",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.social === "family").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.social === "family"
+        ).length,
       },
       {
         label: "Peers",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.social === "peers").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.social === "peers"
+        ).length,
       },
       {
         label: "Crowd",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.social === "crowd").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.social === "crowd"
+        ).length,
       },
     ],
     [
       {
         label: "Home",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter(
-          (x) =>
-            x.data.context.environment === "home" ||
-            x.data.context.environment === null
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "home" || x.data.context.environment === null
         ).length,
       },
       {
         label: "School",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "school").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "school"
+        ).length,
       },
       {
         label: "Work",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "work").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "work"
+        ).length,
       },
       {
         label: "Hospital",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "hospital").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "hospital"
+        ).length,
       },
       {
         label: "Outside",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "outside").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "outside"
+        ).length,
       },
       {
         label: "Shopping",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "shopping").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "shopping"
+        ).length,
       },
       {
         label: "Transit",
-        value: (
-          (state.sensor_events || {})["lamp.gps.contextual"] || []
-        ).filter((x) => x.data.context.environment === "transit").length,
+        value: ((state.sensor_events || {})["lamp.gps.contextual"] || []).filter(
+          (x) => x.data.context.environment === "transit"
+        ).length,
       },
     ],
   ]
@@ -376,14 +327,7 @@ export default function Participant({ participant, ...props }) {
   return (
     <React.Fragment>
       {!_hideCareTeam() && tab === "prevent" && (
-        <Box
-          border={1}
-          borderColor='grey.300'
-          borderRadius={4}
-          bgcolor='#fff'
-          p={2}
-          my={4}
-        >
+        <Box border={1} borderColor='grey.300' borderRadius={4} bgcolor='#fff' p={2} my={4}>
           <CareTeam participant={participant} />
         </Box>
       )}
@@ -410,21 +354,11 @@ export default function Participant({ participant, ...props }) {
         </Box>
       )}
       {tab === "assess" && (
-        <Box
-          border={0}
-          borderColor='grey.300'
-          borderRadius={8}
-          bgcolor='#fff'
-          my={4}
-        >
+        <Box border={0} borderColor='grey.300' borderRadius={8} bgcolor='#fff' my={4}>
           <Launcher.Section>
             {[
               ...(state.activities || [])
-                .filter(
-                  (x) =>
-                    x.spec === "lamp.group" &&
-                    (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
-                )
+                .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
                 .map((y) => (
                   <Launcher.Button
                     key={y.name}
@@ -433,21 +367,13 @@ export default function Participant({ participant, ...props }) {
                     icon={<Icon fontSize='large'>menu_open</Icon>}
                     onClick={() =>
                       setActivities(
-                        (state.activities ?? []).filter(
-                          (x) =>
-                            x.spec === "lamp.survey" &&
-                            y.settings.includes(x.id)
-                        )
+                        (state.activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
                       )
                     }
                   />
                 )),
               ...(state.activities || [])
-                .filter(
-                  (x) =>
-                    x.spec === "lamp.survey" &&
-                    (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
-                )
+                .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
                 .map((y) => (
                   <Launcher.Button
                     key={y.name}
@@ -459,13 +385,7 @@ export default function Participant({ participant, ...props }) {
                 )),
             ]}
           </Launcher.Section>
-          <ResponsiveDialog
-            transient
-            animate
-            fullScreen
-            open={!!survey}
-            onClose={() => setSurvey()}
-          >
+          <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
             <Box py={8} px={2}>
               <Grid container direction='row'>
                 <Grid item style={{ width: "100%" }}>
@@ -474,36 +394,21 @@ export default function Participant({ participant, ...props }) {
                     partialValidationOnly
                     content={survey}
                     prefillData={!!survey ? survey.prefillData : undefined}
-                    prefillTimestamp={
-                      !!survey ? survey.prefillTimestamp : undefined
-                    }
+                    prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
                     onValidationFailure={() =>
-                      enqueueSnackbar(
-                        "Some responses are missing. Please complete all questions before submitting.",
-                        {
-                          variant: "error",
-                        }
-                      )
+                      enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
+                        variant: "error",
+                      })
                     }
                     onResponse={submitSurvey}
                   />
                 </Grid>
                 {supportsSidebar && !_patientMode() && (
                   <Grid item>
-                    <Drawer
-                      anchor='right'
-                      variant='temporary'
-                      open={!!sidebarOpen}
-                      onClose={() => setSidebarOpen()}
-                    >
+                    <Drawer anchor='right' variant='temporary' open={!!sidebarOpen} onClose={() => setSidebarOpen()}>
                       <Box flexGrow={1} />
                       <Divider />
-                      <Messages
-                        refresh={!!survey}
-                        expandHeight
-                        privateOnly
-                        participant={participant.id}
-                      />
+                      <Messages refresh={!!survey} expandHeight privateOnly participant={participant.id} />
                     </Drawer>
                     <Tooltip title='Patient Notes' placement='left'>
                       <Fab
@@ -523,13 +428,7 @@ export default function Participant({ participant, ...props }) {
         </Box>
       )}
       {tab === "manage" && (
-        <Box
-          border={0}
-          borderColor='grey.300'
-          borderRadius={8}
-          bgcolor='#fff'
-          my={4}
-        >
+        <Box border={0} borderColor='grey.300' borderRadius={8} bgcolor='#fff' my={4}>
           <Launcher.Section>
             {!_hideCareTeam() && (
               <Launcher.Button
@@ -566,13 +465,7 @@ export default function Participant({ participant, ...props }) {
           </Launcher.Section>
         </Box>
       )}
-      <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!launchedActivity}
-        onClose={() => setLaunchedActivity()}
-      >
+      <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
         {
           {
             breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
@@ -586,14 +479,7 @@ export default function Participant({ participant, ...props }) {
       </ResponsiveDialog>
       {tab === "prevent" && (
         <React.Fragment>
-          <Box
-            border={1}
-            borderColor='grey.300'
-            borderRadius={8}
-            bgcolor='#fff'
-            p={2}
-            mx='10%'
-          >
+          <Box border={1} borderColor='grey.300' borderRadius={8} bgcolor='#fff' p={2} mx='10%'>
             <Box display='flex' justifyContent='space-between'>
               <Typography variant='overline'>Activity</Typography>
               <Box>
@@ -643,23 +529,17 @@ export default function Participant({ participant, ...props }) {
                   tooltips={{}}
                   defaultTooltip='An experimental visualization generated by an automation you or your clinician have installed.'
                   selected={state.selectedExperimental || []}
-                  items={Object.keys(visualizations).map((x) =>
-                    x.replace("lamp.dashboard.experimental.", "")
-                  )}
+                  items={Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", ""))}
                   showZeroBadges={false}
                   badges={Object.keys(visualizations)
                     .map((x) => x.replace("lamp.dashboard.experimental.", ""))
                     .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
-                  onChange={(x) =>
-                    setState({ ...state, selectedExperimental: x })
-                  }
+                  onChange={(x) => setState({ ...state, selectedExperimental: x })}
                 />
               </React.Fragment>
             )}
           </Box>
-          {(state.selectedCharts || []).length +
-            (state.selectedPassive || []).length ===
-            0 && (
+          {(state.selectedCharts || []).length + (state.selectedPassive || []).length === 0 && (
             <Box
               display='flex'
               justifyContent='center'
@@ -673,20 +553,14 @@ export default function Participant({ participant, ...props }) {
               mx='10%'
             >
               <Typography variant='overline' align='center'>
-                <b>
-                  No Activities are selected. Please select an Activity above to
-                  begin.
-                </b>
+                <b>No Activities are selected. Please select an Activity above to begin.</b>
               </Typography>
             </Box>
           )}
           {(state.activities || [])
             .filter((x) => (state.selectedCharts || []).includes(x.name))
             .map((activity) => (
-              <Card
-                key={activity.id}
-                style={{ marginTop: 16, marginBotton: 16 }}
-              >
+              <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
                 <ActivityCard
                   activity={activity}
                   events={(state.activity_events || {})[activity.name] || []}
@@ -727,11 +601,7 @@ export default function Participant({ participant, ...props }) {
                           ])
                         }
                   }
-                  onDeleteAction={
-                    _patientMode()
-                      ? undefined
-                      : (x) => hideEvent(x.x.getTime(), activity.id)
-                  }
+                  onDeleteAction={_patientMode() ? undefined : (x) => hideEvent(x.x.getTime(), activity.id)}
                 />
               </Card>
             ))}
@@ -739,12 +609,7 @@ export default function Participant({ participant, ...props }) {
             <React.Fragment />
           ) : (
             <Card style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography
-                component='h6'
-                variant='h6'
-                align='center'
-                style={{ width: "100%", margin: 16 }}
-              >
+              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
                 Environmental Context
               </Typography>
               <Divider />
@@ -755,12 +620,7 @@ export default function Participant({ participant, ...props }) {
             <React.Fragment />
           ) : (
             <Card style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography
-                component='h6'
-                variant='h6'
-                align='center'
-                style={{ width: "100%", margin: 16 }}
-              >
+              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
                 Step Count
               </Typography>
               <Divider />
@@ -771,23 +631,16 @@ export default function Participant({ participant, ...props }) {
                 YAxisLabel='Steps Taken'
                 color={blue[500]}
                 startDate={earliestDate()}
-                data={((state.sensor_events || {})["lamp.steps"] || []).map(
-                  (d) => ({
-                    x: new Date(parseInt(d.timestamp)),
-                    y: d.data.value || 0,
-                  })
-                )}
+                data={((state.sensor_events || {})["lamp.steps"] || []).map((d) => ({
+                  x: new Date(parseInt(d.timestamp)),
+                  y: d.data.value || 0,
+                }))}
               />
             </Card>
           )}
           {(state.selectedExperimental || []).map((x) => (
             <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography
-                component='h6'
-                variant='h6'
-                align='center'
-                style={{ width: "100%", margin: 16 }}
-              >
+              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
                 {x}
               </Typography>
               <Divider style={{ marginBottom: 16 }} />
