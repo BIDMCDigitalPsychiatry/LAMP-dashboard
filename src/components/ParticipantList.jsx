@@ -81,7 +81,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                                     label = 'One-time login link'
                                     style={{ marginTop: 16 }}
                                     variant="outlined"
-                                    value={_qrLink()}
+                                    value={_qrLink(`${id}@lamp.com`, tempPassword)}
                                     onChange={event => {}}
                                 />
                                 <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
