@@ -3,10 +3,9 @@
 import React, { useState } from 'react'
 import { 
     Box, Button, AppBar, Toolbar, Tooltip, MenuItem, Badge, 
-    IconButton, Menu, Icon, Dialog, DialogTitle, 
+    IconButton, Menu, Icon, Dialog, DialogTitle, useTheme, useMediaQuery,
     DialogContent, DialogContentText, DialogActions, colors
 } from '@material-ui/core'
-import { useSnackbar } from 'notistack'
 
 // Local Imports 
 import CredentialManager from './CredentialManager'
@@ -16,12 +15,14 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
     const [showCustomizeMenu, setShowCustomizeMenu] = useState()
     const [confirmLogout, setConfirmLogout] = useState()
     const [passwordChange, setPasswordChange] = useState()
+    const supportsSidebar = useMediaQuery(useTheme().breakpoints.up('md'))
     return (
         <div>
     		{!!noToolbar ? <React.Fragment/> :
     			<AppBar position="static" style={{background: 'transparent', boxShadow: 'none'}}>
     				<Toolbar>
     					<IconButton
+                            style={{ marginLeft: supportsSidebar ? 64 : undefined }}
     						onClick={goBack} 
     						color="default"
     						aria-label="Menu"

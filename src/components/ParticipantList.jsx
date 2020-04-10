@@ -1,7 +1,7 @@
 
 // Core Imports
 import React, { useState, useEffect } from 'react'
-import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip } from '@material-ui/core'
+import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip, Typography, Grid } from '@material-ui/core'
 import { green } from '@material-ui/core/colors'
 import MaterialTable from 'material-table'
 import { useSnackbar } from 'notistack'
@@ -12,6 +12,7 @@ import JSZip from 'jszip'
 import jsonexport from 'jsonexport'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
+import QRCode from 'qrcode.react'
 
 // Local Imports
 import LAMP from '../lamp'
@@ -19,6 +20,7 @@ import Messages from './Messages'
 import EditField from './EditField'
 import CredentialManager from './CredentialManager'
 import ResponsiveDialog from './ResponsiveDialog'
+import SnackMessage from './SnackMessage'
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo('en-US')
@@ -34,6 +36,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         newCount: 1,
         selectedRows: []
     })
+    const _qrLink = (credID, password) => window.location.href.split('#')[0] + '#/?a=' + btoa([credID, password, LAMP.Auth._auth.serverAddress].filter(x => !!x).join(':'))
     const [participants, setParticipants] = useState([])
     const [openMessaging, setOpenMessaging] = useState()
     const [openPasswordReset, setOpenPasswordReset] = useState()
@@ -57,8 +60,42 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
     let addParticipant = async () => {
         let newCount = state.newCount
         let ids = []
-        for (let i = 0; i < newCount; i ++)
-            ids = [...ids, (await LAMP.Participant.create(studyID, { study_code: '001' })).data]
+
+        for (let i = 0; i < newCount; i ++) {
+            let id = (await LAMP.Participant.create(studyID, { study_code: '001' })).data 
+            let tempPassword = id
+            if (!!(await LAMP.Credential.create(id, `${id}@lamp.com`, tempPassword, 'Temporary Login')).error) {
+                enqueueSnackbar(`Could not create credential for ${id}.`, { variant: 'error'})
+            } else {
+                enqueueSnackbar(`Successfully created Participant ${id}. Tap the expand icon on the right to see credentials and details.`, {
+                    variant: 'success', 
+                    persist: true, 
+                    content: (key, message) => 
+                        <SnackMessage id={key} message={message}>
+                            <TextField variant="outlined" size="small" label="Temporary email address" value={`${id}@lamp.com`} />
+                            <div style={{ height: 16 }} />
+                            <TextField variant="outlined" size="small" label="Temporary password" value={`${tempPassword}`} />
+                            <Grid item>
+                                <TextField 
+                                    fullWidth
+                                    label = 'One-time login link'
+                                    style={{ marginTop: 16 }}
+                                    variant="outlined"
+                                    value={_qrLink(`${id}@lamp.com`, tempPassword)}
+                                    onChange={event => {}}
+                                />
+                                <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+                                    <Grid container justify="center" style={{ padding: 16 }}>
+                                    <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, tempPassword)} />
+                                    </Grid>
+                                </Tooltip>
+                            </Grid>
+                        </SnackMessage>
+                })
+            }
+            ids = [...ids, id]   
+        }
+          
         onChange()
         setState(state => ({ ...state, 
             popoverAttachElement: null, 
