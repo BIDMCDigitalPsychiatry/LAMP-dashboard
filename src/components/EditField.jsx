@@ -61,8 +61,8 @@ export default function EditField({ participant, onUpdate, ...props }) {
   return (
     <TextField
       inputRef={inputRef}
-      variant='outlined'
-      margin='dense'
+      variant="outlined"
+      margin="dense"
       disabled={!editing}
       label={participant.id}
       value={alias || ""}
@@ -74,15 +74,15 @@ export default function EditField({ participant, onUpdate, ...props }) {
       InputProps={{
         style: { color: "#000" },
         endAdornment: (
-          <InputAdornment position='end'>
-            <Tooltip title='Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.'>
+          <InputAdornment position="end">
+            <Tooltip title="Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.">
               <IconButton
-                edge='end'
-                aria-label='save edit'
+                edge="end"
+                aria-label="save edit"
                 onClick={() => setEditing((editing) => !editing)}
                 onMouseDown={(event) => event.preventDefault()}
               >
-                <Icon fontSize='small'>{editing ? "check" : "edit"}</Icon>
+                <Icon fontSize="small">{editing ? "check" : "edit"}</Icon>
               </IconButton>
             </Tooltip>
           </InputAdornment>

@@ -327,7 +327,7 @@ export default function Participant({ participant, ...props }) {
   return (
     <React.Fragment>
       {!_hideCareTeam() && tab === "prevent" && (
-        <Box border={1} borderColor='grey.300' borderRadius={4} bgcolor='#fff' p={2} my={4}>
+        <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="#fff" p={2} my={4}>
           <CareTeam participant={participant} />
         </Box>
       )}
@@ -337,16 +337,16 @@ export default function Participant({ participant, ...props }) {
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Tips'
-                icon={<Icon fontSize='large'>flare</Icon>}
+                title="Tips"
+                icon={<Icon fontSize="large">flare</Icon>}
                 onClick={() => setLaunchedActivity("tips")}
               />
             )}
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Resources'
-                icon={<Icon fontSize='large'>menu_book</Icon>}
+                title="Resources"
+                icon={<Icon fontSize="large">menu_book</Icon>}
                 onClick={() => setLaunchedActivity("resources")}
               />
             )}
@@ -354,7 +354,7 @@ export default function Participant({ participant, ...props }) {
         </Box>
       )}
       {tab === "assess" && (
-        <Box border={0} borderColor='grey.300' borderRadius={8} bgcolor='#fff' my={4}>
+        <Box border={0} borderColor="grey.300" borderRadius={8} bgcolor="#fff" my={4}>
           <Launcher.Section>
             {[
               ...(state.activities || [])
@@ -364,7 +364,7 @@ export default function Participant({ participant, ...props }) {
                     key={y.name}
                     notification
                     title={y.name}
-                    icon={<Icon fontSize='large'>menu_open</Icon>}
+                    icon={<Icon fontSize="large">menu_open</Icon>}
                     onClick={() =>
                       setActivities(
                         (state.activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
@@ -379,7 +379,7 @@ export default function Participant({ participant, ...props }) {
                     key={y.name}
                     favorite
                     title={y.name}
-                    icon={<Icon fontSize='large'>assignment</Icon>}
+                    icon={<Icon fontSize="large">assignment</Icon>}
                     onClick={() => setActivities([y])}
                   />
                 )),
@@ -387,7 +387,7 @@ export default function Participant({ participant, ...props }) {
           </Launcher.Section>
           <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
             <Box py={8} px={2}>
-              <Grid container direction='row'>
+              <Grid container direction="row">
                 <Grid item style={{ width: "100%" }}>
                   <Survey
                     validate
@@ -405,15 +405,15 @@ export default function Participant({ participant, ...props }) {
                 </Grid>
                 {supportsSidebar && !_patientMode() && (
                   <Grid item>
-                    <Drawer anchor='right' variant='temporary' open={!!sidebarOpen} onClose={() => setSidebarOpen()}>
+                    <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen()}>
                       <Box flexGrow={1} />
                       <Divider />
                       <Messages refresh={!!survey} expandHeight privateOnly participant={participant.id} />
                     </Drawer>
-                    <Tooltip title='Patient Notes' placement='left'>
+                    <Tooltip title="Patient Notes" placement="left">
                       <Fab
-                        color='primary'
-                        aria-label='Patient Notes'
+                        color="primary"
+                        aria-label="Patient Notes"
                         style={{ position: "fixed", bottom: 85, right: 24 }}
                         onClick={() => setSidebarOpen(true)}
                       >
@@ -428,37 +428,37 @@ export default function Participant({ participant, ...props }) {
         </Box>
       )}
       {tab === "manage" && (
-        <Box border={0} borderColor='grey.300' borderRadius={8} bgcolor='#fff' my={4}>
+        <Box border={0} borderColor="grey.300" borderRadius={8} bgcolor="#fff" my={4}>
           <Launcher.Section>
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Breathe'
-                icon={<Icon fontSize='large'>spa</Icon>}
+                title="Breathe"
+                icon={<Icon fontSize="large">spa</Icon>}
                 onClick={() => setLaunchedActivity("breathe")}
               />
             )}
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Jewels'
-                icon={<Icon fontSize='large'>videogame_asset</Icon>}
+                title="Jewels"
+                icon={<Icon fontSize="large">videogame_asset</Icon>}
                 onClick={() => setLaunchedActivity("jewels")}
               />
             )}
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Journal'
-                icon={<Icon fontSize='large'>import_contacts</Icon>}
+                title="Journal"
+                icon={<Icon fontSize="large">import_contacts</Icon>}
                 onClick={() => setLaunchedActivity("journal")}
               />
             )}
             {!_hideCareTeam() && (
               <Launcher.Button
                 favorite
-                title='Hope Box'
-                icon={<Icon fontSize='large'>launch</Icon>}
+                title="Hope Box"
+                icon={<Icon fontSize="large">launch</Icon>}
                 onClick={() => setLaunchedActivity("hopebox")}
               />
             )}
@@ -479,15 +479,15 @@ export default function Participant({ participant, ...props }) {
       </ResponsiveDialog>
       {tab === "prevent" && (
         <React.Fragment>
-          <Box border={1} borderColor='grey.300' borderRadius={8} bgcolor='#fff' p={2} mx='10%'>
-            <Box display='flex' justifyContent='space-between'>
-              <Typography variant='overline'>Activity</Typography>
+          <Box border={1} borderColor="grey.300" borderRadius={8} bgcolor="#fff" p={2} mx="10%">
+            <Box display="flex" justifyContent="space-between">
+              <Typography variant="overline">Activity</Typography>
               <Box>
-                <Typography variant='overline' color='inherit'>
+                <Typography variant="overline" color="inherit">
                   Show All
                 </Typography>
                 <Switch
-                  size='small'
+                  size="small"
                   checked={state.showAll}
                   onChange={() =>
                     setState({
@@ -511,7 +511,7 @@ export default function Participant({ participant, ...props }) {
             {!_hideCareTeam() && (
               <React.Fragment>
                 <Divider style={{ margin: "8px -16px 8px -16px" }} />
-                <Typography variant='overline'>Sensor</Typography>
+                <Typography variant="overline">Sensor</Typography>
                 <MultipleSelect
                   selected={state.selectedPassive || []}
                   items={[`Environmental Context`, `Step Count`]}
@@ -524,10 +524,10 @@ export default function Participant({ participant, ...props }) {
             {Object.keys(visualizations).length > 0 && (
               <React.Fragment>
                 <Divider style={{ margin: "8px -16px 8px -16px" }} />
-                <Typography variant='overline'>Automations</Typography>
+                <Typography variant="overline">Automations</Typography>
                 <MultipleSelect
                   tooltips={{}}
-                  defaultTooltip='An experimental visualization generated by an automation you or your clinician have installed.'
+                  defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
                   selected={state.selectedExperimental || []}
                   items={Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", ""))}
                   showZeroBadges={false}
@@ -541,18 +541,18 @@ export default function Participant({ participant, ...props }) {
           </Box>
           {(state.selectedCharts || []).length + (state.selectedPassive || []).length === 0 && (
             <Box
-              display='flex'
-              justifyContent='center'
+              display="flex"
+              justifyContent="center"
               border={1}
               borderColor={blue[700]}
               borderRadius={8}
-              bgcolor='grey.100'
+              bgcolor="grey.100"
               color={blue[700]}
               p={2}
               my={4}
-              mx='10%'
+              mx="10%"
             >
-              <Typography variant='overline' align='center'>
+              <Typography variant="overline" align="center">
                 <b>No Activities are selected. Please select an Activity above to begin.</b>
               </Typography>
             </Box>
@@ -609,7 +609,7 @@ export default function Participant({ participant, ...props }) {
             <React.Fragment />
           ) : (
             <Card style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
+              <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 Environmental Context
               </Typography>
               <Divider />
@@ -620,15 +620,15 @@ export default function Participant({ participant, ...props }) {
             <React.Fragment />
           ) : (
             <Card style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
+              <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 Step Count
               </Typography>
               <Divider />
               <Sparkline
                 minWidth={250}
                 minHeight={250}
-                XAxisLabel='Time'
-                YAxisLabel='Steps Taken'
+                XAxisLabel="Time"
+                YAxisLabel="Steps Taken"
                 color={blue[500]}
                 startDate={earliestDate()}
                 data={((state.sensor_events || {})["lamp.steps"] || []).map((d) => ({
@@ -640,16 +640,16 @@ export default function Participant({ participant, ...props }) {
           )}
           {(state.selectedExperimental || []).map((x) => (
             <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
-              <Typography component='h6' variant='h6' align='center' style={{ width: "100%", margin: 16 }}>
+              <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 {x}
               </Typography>
               <Divider style={{ marginBottom: 16 }} />
-              <Grid container justify='center'>
+              <Grid container justify="center">
                 <img
-                  alt='visualization'
+                  alt="visualization"
                   src={visualizations["lamp.dashboard.experimental." + x]}
-                  height='85%'
-                  width='85%'
+                  height="85%"
+                  width="85%"
                 />
               </Grid>
             </Card>
@@ -658,8 +658,8 @@ export default function Participant({ participant, ...props }) {
       )}
       <Drawer
         anchor={supportsSidebar ? "left" : "bottom"}
-        open='true'
-        variant='permanent'
+        open="true"
+        variant="permanent"
         PaperProps={{
           style: {
             flexDirection: supportsSidebar ? "column" : "row",
@@ -671,32 +671,32 @@ export default function Participant({ participant, ...props }) {
         <BottomNavigationAction
           showLabel
           selected={tab === "learn"}
-          label='Learn'
-          value='learn'
+          label="Learn"
+          value="learn"
           icon={<Icon>bookmark_border</Icon>}
           onChange={(_, newTab) => setTab(newTab)}
         />
         <BottomNavigationAction
           showLabel
           selected={tab === "assess"}
-          label='Assess'
-          value='assess'
+          label="Assess"
+          value="assess"
           icon={<Icon>assessment</Icon>}
           onChange={(_, newTab) => setTab(newTab)}
         />
         <BottomNavigationAction
           showLabel
           selected={tab === "manage"}
-          label='Manage'
-          value='manage'
+          label="Manage"
+          value="manage"
           icon={<Icon>create_outlined</Icon>}
           onChange={(_, newTab) => setTab(newTab)}
         />
         <BottomNavigationAction
           showLabel
           selected={tab === "prevent"}
-          label='Prevent'
-          value='prevent'
+          label="Prevent"
+          value="prevent"
           icon={<Icon>speaker_notes_outlined</Icon>}
           onChange={(_, newTab) => setTab(newTab)}
         />

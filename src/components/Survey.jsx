@@ -41,15 +41,15 @@ const CSV_stringify = (x) => (Array.isArray(x) ? JSON.stringify(x).slice(1, -1) 
 function Banner({ heading, text, description, large, prefillTimestamp, onChangeTimestamp, ...props }) {
   return (
     <Box {...props} p={2}>
-      <Grid container direction='row' justify='space-between' alignItems='center'>
+      <Grid container direction="row" justify="space-between" alignItems="center">
         <Grid item>
-          <Typography variant={large ? "subtitle2" : "subtitle2"} color='textSecondary'>
+          <Typography variant={large ? "subtitle2" : "subtitle2"} color="textSecondary">
             {heading}
           </Typography>
-          <Typography variant={large ? "h3" : "h6"} color='primary' style={{ fontWeight: large ? 700 : undefined }}>
+          <Typography variant={large ? "h3" : "h6"} color="primary" style={{ fontWeight: large ? 700 : undefined }}>
             {text}
           </Typography>
-          <Typography variant={large ? "body2" : "body2"} color='textSecondary' style={{ whiteSpace: "pre-wrap" }}>
+          <Typography variant={large ? "body2" : "body2"} color="textSecondary" style={{ whiteSpace: "pre-wrap" }}>
             {description}
           </Typography>
         </Grid>
@@ -57,11 +57,11 @@ function Banner({ heading, text, description, large, prefillTimestamp, onChangeT
           <KeyboardDateTimePicker
             autoOk
             animateYearScrolling
-            variant='inline'
-            inputVariant='outlined'
-            format='MM/dd/yyyy'
-            label='Start Date'
-            helperText='Select the start date.'
+            variant="inline"
+            inputVariant="outlined"
+            format="MM/dd/yyyy"
+            label="Start Date"
+            helperText="Select the start date."
             InputAdornmentProps={{ position: "start" }}
             value={prefillTimestamp || new Date()}
             onChange={(date) => onChangeTimestamp(date)}
@@ -79,7 +79,7 @@ function TextResponse({ onChange, multiline, value, ...props }) {
       fullWidth={multiline}
       multiline={multiline}
       rowsMax={multiline ? "10" : undefined}
-      variant='outlined'
+      variant="outlined"
       defaultValue={value}
       onBlur={(event) => onChange(event.target.value)}
     />
@@ -119,21 +119,21 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
                 setSelectedValue(_target)
                 onChange(_target)
               }}
-              icon={<Icon fontSize='small'>check_box_outline_blank</Icon>}
-              checkedIcon={<Icon fontSize='small'>check_box</Icon>}
+              icon={<Icon fontSize="small">check_box_outline_blank</Icon>}
+              checkedIcon={<Icon fontSize="small">check_box</Icon>}
             />
           }
           label={
-            <Typography component='span' variant='body2'>
+            <Typography component="span" variant="body2">
               {x.label}
               {!!x.description && (
                 <Box
                   my={0.5}
                   p={0.5}
                   borderRadius={4}
-                  borderColor='text.secondary'
+                  borderColor="text.secondary"
                   border={1}
-                  color='text.secondary'
+                  color="text.secondary"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
                   {x.description}
@@ -141,7 +141,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
               )}
             </Typography>
           }
-          labelPlacement='end'
+          labelPlacement="end"
         />
       ))}
     </FormGroup>
@@ -153,7 +153,7 @@ function SelectResponse({ onChange, options, value, ...props }) {
   return (
     <RadioGroup
       {...props}
-      name='option'
+      name="option"
       value={selectedValue}
       onChange={(event) => {
         setSelectedValue(event.target.value)
@@ -174,21 +174,21 @@ function SelectResponse({ onChange, options, value, ...props }) {
                   onChange(undefined)
                 }
               }}
-              icon={<Icon fontSize='small'>radio_button_unchecked</Icon>}
-              checkedIcon={<Icon fontSize='small'>radio_button_checked</Icon>}
+              icon={<Icon fontSize="small">radio_button_unchecked</Icon>}
+              checkedIcon={<Icon fontSize="small">radio_button_checked</Icon>}
             />
           }
           label={
-            <Typography component='span' variant='body2'>
+            <Typography component="span" variant="body2">
               {x.label}
               {!!x.description && (
                 <Box
                   my={0.5}
                   p={0.5}
                   borderRadius={4}
-                  borderColor='text.secondary'
+                  borderColor="text.secondary"
                   border={1}
-                  color='text.secondary'
+                  color="text.secondary"
                   style={{ whiteSpace: "pre-wrap" }}
                 >
                   {x.description}
@@ -196,7 +196,7 @@ function SelectResponse({ onChange, options, value, ...props }) {
               )}
             </Typography>
           }
-          labelPlacement='end'
+          labelPlacement="end"
         />
       ))}
     </RadioGroup>
@@ -240,7 +240,7 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
   else component = <TextResponse onChange={onChange} value={!!value ? value.value : undefined} />
 
   return (
-    <FormControl {...props} component='fieldset' style={{ ...props.style, width: "100%", margin: 16 }}>
+    <FormControl {...props} component="fieldset" style={{ ...props.style, width: "100%", margin: 16 }}>
       <Grid
         container
         spacing={2}
@@ -249,10 +249,10 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
       >
         {hideHeader !== true && (
           <Grid item xs={12} lg={6}>
-            <Typography variant='subtitle2' color='textSecondary'>
+            <Typography variant="subtitle2" color="textSecondary">
               Question {number}
             </Typography>
-            <Typography variant='h6'>{text}</Typography>
+            <Typography variant="h6">{text}</Typography>
           </Grid>
         )}
         <Grid item xs={12} lg={6}>
@@ -295,7 +295,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
     <ResponsivePaper {...props} elevation={noHeader ? 0 : 4}>
       {noHeader !== true && <Banner heading={`Section ${index}`} text={value.name} />}
       <div>
-        <Stepper nonLinear activeStep={activeStep} orientation='vertical'>
+        <Stepper nonLinear activeStep={activeStep} orientation="vertical">
           {value.settings.map((x, idx) => (
             <Step key={idx}>
               <StepButton
@@ -303,7 +303,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
                 completed={isComplete(idx)}
                 optional={
                   isError(idx) && (
-                    <Typography variant='caption' color='error'>
+                    <Typography variant="caption" color="error">
                       Required
                     </Typography>
                   )
@@ -315,7 +315,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
               </StepButton>
               <StepContent>
                 {!!x.description && (
-                  <Typography variant='caption' style={{ whiteSpace: "pre-wrap" }}>
+                  <Typography variant="caption" style={{ whiteSpace: "pre-wrap" }}>
                     {x.description}
                   </Typography>
                 )}
@@ -403,7 +403,7 @@ export default function Survey({
   }
 
   return (
-    <Grid container alignItems='stretch' spacing={2}>
+    <Grid container alignItems="stretch" spacing={2}>
       <Grid item xs={12}>
         <Paper elevation={4}>
           <Banner large text={(content || {}).name} description={(content || {}).description} />
@@ -429,9 +429,9 @@ export default function Survey({
         </Grid>
       ))}
       <Fab
-        color='secondary'
-        aria-label='Submit'
-        variant='extended'
+        color="secondary"
+        aria-label="Submit"
+        variant="extended"
         style={{ position: "fixed", bottom: 24, right: 24 }}
         onClick={() =>
           postSubmit(

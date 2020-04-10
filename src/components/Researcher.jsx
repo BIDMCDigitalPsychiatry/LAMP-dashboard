@@ -13,12 +13,12 @@ function Study({ study, onParticipantSelect, ...props }) {
   const [currentTab, setCurrentTab] = useState(0)
   return (
     <React.Fragment>
-      <Box mb='16px' style={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant='h5' color='inherit'></Typography>
+      <Box mb="16px" style={{ display: "flex", justifyContent: "space-between" }}>
+        <Typography variant="h5" color="inherit"></Typography>
         <Box>
-          <Typography variant='overline'>Show Unscheduled Activities</Typography>
+          <Typography variant="overline">Show Unscheduled Activities</Typography>
           <Switch
-            size='small'
+            size="small"
             checked={showUnscheduled}
             onChange={() => setShowUnscheduled((showUnscheduled) => !showUnscheduled)}
           />
@@ -28,12 +28,12 @@ function Study({ study, onParticipantSelect, ...props }) {
         <Tabs
           value={currentTab}
           onChange={(event, newTab) => setCurrentTab(newTab)}
-          indicatorColor='primary'
-          textColor='primary'
+          indicatorColor="primary"
+          textColor="primary"
           centered
         >
-          <Tab label='Patients' />
-          <Tab label='Activities' />
+          <Tab label="Patients" />
+          <Tab label="Activities" />
         </Tabs>
         <Divider />
         {currentTab === 0 && (

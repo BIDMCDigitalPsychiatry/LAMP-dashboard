@@ -14,28 +14,28 @@ export default function Journal() {
   }, [])
 
   return (
-    <Container maxWidth='sm'>
-      <Box display='flex' border={2} borderColor='grey.300' borderRadius={8} bgcolor='#fff' p={5} my={10}>
-        <Grid container justify='space-around'>
+    <Container maxWidth="sm">
+      <Box display="flex" border={2} borderColor="grey.300" borderRadius={8} bgcolor="#fff" p={5} my={10}>
+        <Grid container justify="space-around">
           <KeyboardDatePicker
             disableToolbar
-            variant='inline'
-            format='MM/dd/yyyy'
-            margin='normal'
+            variant="inline"
+            format="MM/dd/yyyy"
+            margin="normal"
             label="Today's Date"
             value={selectedDate}
             onChange={(date) => setSelectedDate(date)}
           />
         </Grid>
       </Box>
-      <Box border={1} borderColor='grey.300' borderRadius={8} bgcolor='#fff'>
-        <TextField label='Type Here' variant='outlined' multiline rows='15' fullWidth />
+      <Box border={1} borderColor="grey.300" borderRadius={8} bgcolor="#fff">
+        <TextField label="Type Here" variant="outlined" multiline rows="15" fullWidth />
       </Box>
       <div>
-        <Button startIcon={<Icon fontSize='large'>save</Icon>} variant='contained'>
+        <Button startIcon={<Icon fontSize="large">save</Icon>} variant="contained">
           Save
         </Button>
-        <Button startIcon={<Icon fontSize='large'>delete</Icon>} variant='contained'>
+        <Button startIcon={<Icon fontSize="large">delete</Icon>} variant="contained">
           Delete
         </Button>
       </div>

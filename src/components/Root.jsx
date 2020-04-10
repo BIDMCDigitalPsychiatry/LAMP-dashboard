@@ -27,7 +27,7 @@ export default function Root({ onChange, ...props }) {
     <React.Fragment>
       <ResponsivePaper elevation={4}>
         <MaterialTable
-          title='Researchers'
+          title="Researchers"
           data={researchers}
           columns={[{ title: "Name", field: "name" }]}
           onRowClick={(event, rowData, togglePanel) =>

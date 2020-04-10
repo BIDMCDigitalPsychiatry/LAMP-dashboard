@@ -166,7 +166,7 @@ export default withParentSize(function Sparkline({ ...props }) {
       {({ onMouseLeave, onMouseMove, tooltipData }) => (
         <XYChart
           theme={theme}
-          ariaLabel='Chart'
+          ariaLabel="Chart"
           width={Math.max(props.minWidth, props.parentWidth)}
           height={Math.max(props.minHeight, props.parentHeight)}
           eventTrigger={"container"}
@@ -200,7 +200,7 @@ export default withParentSize(function Sparkline({ ...props }) {
             strokeWidth={1}
             orientation={["diagonal"]}
           />
-          <LinearGradient id={`gradient-${rand}`} from={props.color} to='#ffffff00' />
+          <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
           {props.XAxisLabel && (
             <XAxis
               label={props.XAxisLabel}
@@ -224,9 +224,9 @@ export default withParentSize(function Sparkline({ ...props }) {
             seriesKey={props.YAxisLabel ?? "Data"}
             stroke={props.color}
             strokeWidth={2}
-            strokeDasharray='3 1'
-            strokeLinecap='butt'
-            dashType='dotted'
+            strokeDasharray="3 1"
+            strokeLinecap="butt"
+            dashType="dotted"
           />
           <AreaSeries
             data={props.data}
@@ -241,12 +241,12 @@ export default withParentSize(function Sparkline({ ...props }) {
             fillOpacity={1}
             strokeWidth={0}
           />
-          <PointSeries data={props.data.filter((x) => x.missing)} fill='#ff0000' fillOpacity={1} strokeWidth={0} />
+          <PointSeries data={props.data.filter((x) => x.missing)} fill="#ff0000" fillOpacity={1} strokeWidth={0} />
           <CrossHair
             fullHeight
             showHorizontalLine={false}
             stroke={props.color}
-            strokeDasharray='3 1'
+            strokeDasharray="3 1"
             circleSize={(d) => (d.y === tooltipData.datum.y ? 8 : 4)}
             circleStyles={{ strokeWidth: 0.0 }}
             circleFill={(d) => (d.y === tooltipData.datum.y ? (d.missing ? "#f00" : props.color) : "#fff")}

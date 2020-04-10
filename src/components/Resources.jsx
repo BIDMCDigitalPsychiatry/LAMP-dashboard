@@ -32,14 +32,14 @@ const useStyles = makeStyles((theme) => ({
 export default function Resources({ ...props }) {
   const classes = useStyles()
   return (
-    <Box p={4} my={4} width='100%'>
+    <Box p={4} my={4} width="100%">
       <div className={classes.root}>
         <ExpansionPanel>
           <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
             <Typography className={classes.heading}>Department of Mental Health (DMH)</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Link href='https://www.mass.gov/orgs/massachusetts-department-of-mental-health'>
+            <Link href="https://www.mass.gov/orgs/massachusetts-department-of-mental-health">
               Department of Mental Health (DMH)
             </Link>
           </ExpansionPanelDetails>
@@ -49,7 +49,7 @@ export default function Resources({ ...props }) {
             <Typography className={classes.heading}>National Alliance on Mental Illness (NAMI)</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Link href='https://www.nami.org/#'>National Alliance on Mental Illness (NAMI)</Link>
+            <Link href="https://www.nami.org/#">National Alliance on Mental Illness (NAMI)</Link>
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <ExpansionPanel>
@@ -57,7 +57,7 @@ export default function Resources({ ...props }) {
             <Typography className={classes.heading}>NAMI Massachussetts</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Link href='https://namimass.org/'>NAMI Massachussetts</Link>
+            <Link href="https://namimass.org/">NAMI Massachussetts</Link>
           </ExpansionPanelDetails>
         </ExpansionPanel>
       </div>

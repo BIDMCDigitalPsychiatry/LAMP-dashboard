@@ -14,7 +14,7 @@ function JewelsSettings({ value, onSave, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   return (
     <MaterialTable
-      title='Jewels Settings'
+      title="Jewels Settings"
       data={Object.entries(settings)}
       columns={[
         { field: "0", title: "Parameter", editable: "never" },

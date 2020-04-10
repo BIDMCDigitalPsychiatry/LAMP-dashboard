@@ -109,10 +109,10 @@ export default function Breathe({ onComplete, ...props }) {
         <div className={classes.Circle} />
       </div>
       <div style={{ marginTop: 75 }}>
-        <Typography variant='overline' className={classes.InhaleContainer}>
+        <Typography variant="overline" className={classes.InhaleContainer}>
           Inhale
         </Typography>
-        <Typography variant='overline' className={classes.ExhaleContainer}>
+        <Typography variant="overline" className={classes.ExhaleContainer}>
           Exhale
         </Typography>
       </div>

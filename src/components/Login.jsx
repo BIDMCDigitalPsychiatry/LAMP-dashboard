@@ -68,7 +68,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
 
   return (
-    <Slide direction='right' in={true} mountOnEnter unmountOnExit>
+    <Slide direction="right" in={true} mountOnEnter unmountOnExit>
       <ResponsiveMargin
         style={{
           position: "absolute",
@@ -88,7 +88,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               keepMounted
               open={Boolean(helpMenu)}
               anchorPosition={helpMenu?.getBoundingClientRect()}
-              anchorReference='anchorPosition'
+              anchorReference="anchorPosition"
               onClose={() => setHelpMenu()}
             >
               <MenuItem
@@ -120,20 +120,20 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               </MenuItem>
             </Menu>
           </IconButton>
-          <Avatar alt='mindLAMP' src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin: "auto" }} />
-          <Typography variant='h4' align='center' style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
+          <Avatar alt="mindLAMP" src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin: "auto" }} />
+          <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
             mindLAMP
           </Typography>
           <form onSubmit={handleLogin}>
             <div>
               <TextField
-                margin='dense'
-                size='small'
-                name='serverAddress'
-                variant='outlined'
+                margin="dense"
+                size="small"
+                name="serverAddress"
+                variant="outlined"
                 style={{ width: "100%", height: 76 }}
-                label='Domain'
-                placeholder='api.lamp.digital'
+                label="Domain"
+                placeholder="api.lamp.digital"
                 helperText="Don't enter a domain if you're not sure what this option does."
                 value={state.serverAddress || ""}
                 onChange={handleChange}
@@ -142,35 +142,35 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               />
               <TextField
                 required
-                name='id'
-                label='ID'
-                margin='normal'
-                variant='outlined'
+                name="id"
+                label="ID"
+                margin="normal"
+                variant="outlined"
                 style={{ width: "100%", height: 76 }}
-                placeholder='my.email@address.com'
-                helperText='Use your email address to login.'
+                placeholder="my.email@address.com"
+                helperText="Use your email address to login."
                 value={state.id || ""}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
               />
               <TextField
                 required
-                name='password'
-                label='Password'
-                type='password'
-                margin='normal'
-                variant='outlined'
+                name="password"
+                label="Password"
+                type="password"
+                margin="normal"
+                variant="outlined"
                 style={{ width: "100%", height: 76, marginBottom: 24 }}
-                placeholder='•••••••••'
-                helperText='Use your password to login.'
+                placeholder="•••••••••"
+                helperText="Use your password to login."
                 value={state.password || ""}
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
               />
               <br />
               <Button
-                variant='outlined'
-                color='default'
+                variant="outlined"
+                color="default"
                 style={{ width: "45%" }}
                 onClick={(event) => setTryitMenu(event.currentTarget)}
               >
@@ -180,7 +180,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 keepMounted
                 open={Boolean(tryitMenu)}
                 anchorPosition={tryitMenu?.getBoundingClientRect()}
-                anchorReference='anchorPosition'
+                anchorReference="anchorPosition"
                 onClose={() => setTryitMenu()}
               >
                 <MenuItem disabled divider>
@@ -221,15 +221,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 </MenuItem>
               </Menu>
               <Button
-                variant='contained'
-                color='primary'
-                type='submit'
+                variant="contained"
+                color="primary"
+                type="submit"
                 style={{ float: "right", width: "45%" }}
                 onClick={handleLogin}
               >
                 Login
                 <input
-                  type='submit'
+                  type="submit"
                   style={{
                     cursor: "pointer",
                     position: "absolute",

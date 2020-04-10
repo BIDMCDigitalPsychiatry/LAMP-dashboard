@@ -77,7 +77,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
 
   return (
-    <Grid container justify='center' alignItems='center'>
+    <Grid container justify="center" alignItems="center">
       {["create-new", "change-role"].includes(mode) && (
         <Tooltip
           title={
@@ -102,7 +102,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
           >
             <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto()}>
               {!photo && <input {...getInputProps()} />}
-              <Icon fontSize='large'>{!photo ? "add_a_photo" : "delete_forever"}</Icon>
+              <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
             </ButtonBase>
           </Box>
         </Tooltip>
@@ -111,8 +111,8 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
         <TextField
           fullWidth
           label={`Name`}
-          type='text'
-          variant='outlined'
+          type="text"
+          variant="outlined"
           helperText="Enter the family member or clinician's name here."
           value={name}
           onChange={(event) => setName(event.target.value)}
@@ -123,8 +123,8 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
         <TextField
           fullWidth
           label={`Role`}
-          type='text'
-          variant='outlined'
+          type="text"
+          variant="outlined"
           helperText="Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
           value={role}
           onChange={(event) => setRole(event.target.value)}
@@ -132,11 +132,11 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
           InputProps={{
             endAdornment: [
               !["change-role"].includes(mode) ? undefined : (
-                <InputAdornment position='end' key='a'>
-                  <Tooltip title='Save Role & Photo'>
+                <InputAdornment position="end" key="a">
+                  <Tooltip title="Save Role & Photo">
                     <IconButton
-                      edge='end'
-                      aria-label='save role'
+                      edge="end"
+                      aria-label="save role"
                       onClick={() =>
                         onChange({
                           credential,
@@ -162,9 +162,9 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
         <TextField
           fullWidth
           label={`Email Address`}
-          type='email'
-          variant='outlined'
-          helperText='Enter the email address here.'
+          type="email"
+          variant="outlined"
+          helperText="Enter the email address here."
           value={emailAddress}
           onChange={(event) => setEmailAddress(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -174,19 +174,19 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
         <TextField
           fullWidth
           label={`Password`}
-          type='password'
-          variant='outlined'
+          type="password"
+          variant="outlined"
           helperText="Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           InputProps={{
             endAdornment: [
               ["create-new"].includes(mode) ? undefined : (
-                <InputAdornment position='end' key='a'>
-                  <Tooltip title='Copy one-time access link that can be used to log in without entering credentials.'>
+                <InputAdornment position="end" key="a">
+                  <Tooltip title="Copy one-time access link that can be used to log in without entering credentials.">
                     <IconButton
-                      edge='end'
-                      aria-label='copy link'
+                      edge="end"
+                      aria-label="copy link"
                       onClick={() => setShowLink((showLink) => !showLink)}
                       onMouseDown={(event) => event.preventDefault()}
                     >
@@ -196,11 +196,11 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
                 </InputAdornment>
               ),
               !["reset-password", "create-new"].includes(mode) ? undefined : (
-                <InputAdornment position='end' key='b'>
-                  <Tooltip title='Save Credential'>
+                <InputAdornment position="end" key="b">
+                  <Tooltip title="Save Credential">
                     <IconButton
-                      edge='end'
-                      aria-label='submit credential'
+                      edge="end"
+                      aria-label="submit credential"
                       onClick={() =>
                         onChange({
                           credential,
@@ -227,13 +227,13 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
           <TextField
             fullWidth
             style={{ marginTop: 16 }}
-            variant='outlined'
+            variant="outlined"
             value={_qrLink()}
             onChange={(event) => {}}
           />
-          <Tooltip title='Scan this QR code on a mobile device to automatically open a patient dashboard.'>
-            <Grid container justify='center' style={{ padding: 16 }}>
-              <QRCode size={256} level='H' value={_qrLink()} />
+          <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+            <Grid container justify="center" style={{ padding: 16 }}>
+              <QRCode size={256} level="H" value={_qrLink()} />
             </Grid>
           </Tooltip>
         </Grid>
@@ -339,9 +339,9 @@ export default function CredentialManager({ id, onComplete, ...props }) {
 
   return (
     <Box {...props}>
-      <Grid container justify='center' alignItems='center' spacing={1} style={{ marginBottom: 16 }}>
+      <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
-          <Typography variant='h6' align='center'>
+          <Typography variant="h6" align="center">
             Manage Credentials
           </Typography>
         </Grid>
@@ -376,7 +376,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title='Add a new member of your care team.'>
+          <Tooltip title="Add a new member of your care team.">
             <IconButton
               onClick={() =>
                 setSelected((selected) => ({

@@ -40,7 +40,7 @@ function SelectList({ checkbox, value, onChange, ...props }) {
 
   return (
     <React.Fragment>
-      <TypeGroup name='option'>
+      <TypeGroup name="option">
         {options.map((x, idx) => (
           <FormControlLabel
             key={`${x.value}-${idx}`}
@@ -49,18 +49,18 @@ function SelectList({ checkbox, value, onChange, ...props }) {
             control={
               <TypeComponent
                 disabled
-                color='secondary'
-                icon={<Icon fontSize='small'>{UncheckedIcon}</Icon>}
-                checkedIcon={<Icon fontSize='small'>{CheckedIcon}</Icon>}
+                color="secondary"
+                icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
               />
             }
             label={
               <React.Fragment>
                 <TextField
                   fullWidth
-                  variant='outlined'
+                  variant="outlined"
                   defaultValue={x.value || ""}
-                  label='Question Option'
+                  label="Question Option"
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
@@ -73,11 +73,11 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                   }
                   InputProps={{
                     endAdornment: [
-                      <InputAdornment position='end' key='adornment'>
+                      <InputAdornment position="end" key="adornment">
                         <Tooltip title="Delete this option from the question's list of options.">
                           <IconButton
-                            edge='end'
-                            aria-label='delete'
+                            edge="end"
+                            aria-label="delete"
                             onClick={() =>
                               setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
                             }
@@ -92,11 +92,11 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                 />
                 <TextField
                   fullWidth
-                  margin='dense'
-                  variant='filled'
+                  margin="dense"
+                  variant="filled"
                   style={{ marginBottom: 16 }}
                   defaultValue={x.description || ""}
-                  label='Option Description'
+                  label="Option Description"
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
@@ -110,20 +110,20 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                 />
               </React.Fragment>
             }
-            labelPlacement='end'
+            labelPlacement="end"
           />
         ))}
         <FormControlLabel
           control={
             <TypeComponent
               checked
-              color='primary'
+              color="primary"
               onClick={() => setOptions((options) => [...options, ""])}
-              checkedIcon={<Icon fontSize='small'>{AddIcon}</Icon>}
+              checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
             />
           }
           label={<Typography>Add Option</Typography>}
-          labelPlacement='end'
+          labelPlacement="end"
         />
       </TypeGroup>
     </React.Fragment>
@@ -153,17 +153,17 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
           ) : (
             <TextField
               fullWidth
-              variant='outlined'
-              label='Question Title'
+              variant="outlined"
+              label="Question Title"
               defaultValue={text}
               onBlur={(event) => setText(event.target.value)}
               InputProps={{
                 endAdornment: [
-                  <InputAdornment position='end' variant='filled' key='adornment'>
-                    <Tooltip title='Delete question from survey instrument.'>
+                  <InputAdornment position="end" variant="filled" key="adornment">
+                    <Tooltip title="Delete question from survey instrument.">
                       <IconButton
-                        edge='end'
-                        aria-label='delete'
+                        edge="end"
+                        aria-label="delete"
                         onClick={() => onDelete()}
                         onMouseDown={(event) => event.preventDefault()}
                       >
@@ -178,19 +178,19 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
         </StepLabel>
       </StepButton>
       <StepContent>
-        <Grid container direction='column' spacing={2}>
+        <Grid container direction="column" spacing={2}>
           <Grid item>
             <TextField
               fullWidth
               multiline
-              label='Question Description'
-              variant='filled'
+              label="Question Description"
+              variant="filled"
               defaultValue={description}
               onBlur={(event) => setDescription(event.target.value)}
             />
           </Grid>
           <Grid item xs={12}>
-            <ButtonGroup size='small'>
+            <ButtonGroup size="small">
               <Button disabled>Question Type</Button>
               <Button color={type === "text" ? "primary" : "default"} onClick={() => setType("text")}>
                 text
@@ -211,7 +211,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
           </Grid>
           {["list", "select", "multiselect"].includes(type) && (
             <Grid item>
-              <Box borderColor='grey.400' border={1} borderRadius={4} p={2}>
+              <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <SelectList checkbox={type === "multiselect"} value={options} onChange={setOptions} />
               </Box>
             </Grid>
@@ -229,9 +229,9 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
 
   return (
-    <Grid container direction='column' spacing={2}>
+    <Grid container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant='h4'>
+        <Typography variant="h4">
           {!!value ? "Modify an existing survey instrument." : "Create a new survey instrument."}
         </Typography>
         <Divider />
@@ -239,8 +239,8 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
       <Grid item>
         <TextField
           fullWidth
-          variant='outlined'
-          label='Survey Title'
+          variant="outlined"
+          label="Survey Title"
           defaultValue={text}
           onChange={(event) => setText(event.target.value)}
         />
@@ -249,18 +249,18 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
         <TextField
           fullWidth
           multiline
-          label='Survey Description'
-          variant='filled'
+          label="Survey Description"
+          variant="filled"
           defaultValue={description}
           onChange={(event) => setDescription(event.target.value)}
         />
       </Grid>
       <Grid item>
         <Divider />
-        <Typography variant='h6'>Configure questions, parameters, and options.</Typography>
+        <Typography variant="h6">Configure questions, parameters, and options.</Typography>
       </Grid>
       <Grid item>
-        <Stepper nonLinear activeStep={activeStep} orientation='vertical'>
+        <Stepper nonLinear activeStep={activeStep} orientation="vertical">
           {questions.map((x, idx) => (
             <QuestionCreator
               key={`${x.text}-${idx}`}
@@ -276,42 +276,42 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
           ))}
           <Grid
             container
-            direction='row'
-            justify='flex-start'
-            alignItems='center'
+            direction="row"
+            justify="flex-start"
+            alignItems="center"
             spacing={2}
             style={{ margin: "8px 0px 0px -8px" }}
           >
             <Fab
-              size='small'
-              color='primary'
+              size="small"
+              color="primary"
               onClick={() => {
                 setQuestions((questions) => [...questions, {}])
                 setActiveStep(questions.length)
               }}
             >
-              <Icon fontSize='small'>add_circle</Icon>
+              <Icon fontSize="small">add_circle</Icon>
             </Fab>
             <Grid item>
-              <Typography variant='subtitle2'>Add Question</Typography>
+              <Typography variant="subtitle2">Add Question</Typography>
             </Grid>
           </Grid>
         </Stepper>
       </Grid>
       <Grid
         container
-        direction='column'
-        alignItems='flex-end'
+        direction="column"
+        alignItems="flex-end"
         spacing={1}
         style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
       >
         {!!value && (
           <Grid item>
-            <Tooltip title='Duplicate this survey instrument and save it with a new title.'>
+            <Tooltip title="Duplicate this survey instrument and save it with a new title.">
               <Fab
-                color='primary'
-                aria-label='Duplicate'
-                variant='extended'
+                color="primary"
+                aria-label="Duplicate"
+                variant="extended"
                 onClick={() =>
                   onSave(
                     {
@@ -335,11 +335,11 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
           </Grid>
         )}
         <Grid item>
-          <Tooltip title='Save this survey instrument.'>
+          <Tooltip title="Save this survey instrument.">
             <Fab
-              color='secondary'
-              aria-label='Save'
-              variant='extended'
+              color="secondary"
+              aria-label="Save"
+              variant="extended"
               onClick={() =>
                 onSave(
                   {

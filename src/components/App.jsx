@@ -214,7 +214,7 @@ function AppRouter({ ...props }) {
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
-        path='/'
+        path="/"
         render={(props) =>
           !(window.location.hash.split("?").length > 1 && !state.identity) ? (
             !state.identity ? (
@@ -229,11 +229,11 @@ function AppRouter({ ...props }) {
                 </NavigationLayout>
               </React.Fragment>
             ) : state.authType === "admin" ? (
-              <Redirect to='/researcher' />
+              <Redirect to="/researcher" />
             ) : state.authType === "researcher" ? (
-              <Redirect to='/researcher/me' />
+              <Redirect to="/researcher/me" />
             ) : (
-              <Redirect to='/participant/me' />
+              <Redirect to="/participant/me" />
             )
           ) : (
             <React.Fragment />
@@ -244,7 +244,7 @@ function AppRouter({ ...props }) {
       {/* Route authenticated routes. */}
       <Route
         exact
-        path='/researcher'
+        path="/researcher"
         render={(props) =>
           !state.identity || state.authType !== "admin" ? (
             <React.Fragment>
@@ -261,7 +261,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>Administrator</PageTitle>
               <NavigationLayout
-                title='Administrator'
+                title="Administrator"
                 profile={state.authType === "admin" ? {} : state.identity}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
@@ -274,7 +274,7 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
-        path='/researcher/:id'
+        path="/researcher/:id"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -311,7 +311,7 @@ function AppRouter({ ...props }) {
 
       <Route
         exact
-        path='/participant/:id'
+        path="/participant/:id"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -347,13 +347,13 @@ function AppRouter({ ...props }) {
       {/* Route API documentation ONLY. */}
       <Route
         exact
-        path='/api'
+        path="/api"
         render={(props) => (
           <React.Fragment>
             <PageTitle>LAMP Platform API</PageTitle>
             <SwaggerUI
-              url='https://api.lamp.digital/'
-              docExpansion='list'
+              url="https://api.lamp.digital/"
+              docExpansion="list"
               displayOperationId={true}
               deepLinking={true}
               displayRequestDuration={true}

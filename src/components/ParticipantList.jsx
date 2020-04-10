@@ -92,21 +92,21 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             persist: true,
             content: (key, message) => (
               <SnackMessage id={key} message={message}>
-                <TextField variant='outlined' size='small' label='Temporary email address' value={`${id}@lamp.com`} />
+                <TextField variant="outlined" size="small" label="Temporary email address" value={`${id}@lamp.com`} />
                 <div style={{ height: 16 }} />
-                <TextField variant='outlined' size='small' label='Temporary password' value={`${id}`} />
+                <TextField variant="outlined" size="small" label="Temporary password" value={`${id}`} />
                 <Grid item>
                   <TextField
                     fullWidth
-                    label='One-time login link'
+                    label="One-time login link"
                     style={{ marginTop: 16 }}
-                    variant='outlined'
+                    variant="outlined"
                     value={_qrLink(`${id}@lamp.com`, id)}
                     onChange={(event) => {}}
                   />
-                  <Tooltip title='Scan this QR code on a mobile device to automatically open a patient dashboard.'>
-                    <Grid container justify='center' style={{ padding: 16 }}>
-                      <QRCode size={256} level='H' value={_qrLink(`${id}@lamp.com`, id)} />
+                  <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+                    <Grid container justify="center" style={{ padding: 16 }}>
+                      <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
                     </Grid>
                   </Tooltip>
                 </Grid>
@@ -207,7 +207,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
               <div>
                 <Tooltip title={"Data is optimal."}>
                   <Chip
-                    label='Data Quality'
+                    label="Data Quality"
                     style={{
                       margin: 4,
                       backgroundColor: green[500],
@@ -215,7 +215,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                     }}
                   />
                 </Tooltip>
-                <Tooltip title='Reset Password'>
+                <Tooltip title="Reset Password">
                   <IconButton
                     onClick={(event) => {
                       event.preventDefault()
@@ -313,7 +313,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
       <Popover
         open={Boolean(state.popoverAttachElement)}
         anchorPosition={!!state.popoverAttachElement && state.popoverAttachElement.getBoundingClientRect()}
-        anchorReference='anchorPosition'
+        anchorReference="anchorPosition"
         onClose={() => setState((state) => ({ ...state, popoverAttachElement: null }))}
         anchorOrigin={{
           vertical: "bottom",
@@ -332,22 +332,22 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         ) : state.selectedIcon === "add" ? (
           <div style={{ padding: "20px" }}>
             <TextField
-              label='Number of participants to add:'
+              label="Number of participants to add:"
               value={state.newCount}
               onChange={(event) => setState({ ...state, newCount: event.target.value })}
-              type='number'
+              type="number"
               InputLabelProps={{
                 shrink: true,
               }}
-              margin='normal'
+              margin="normal"
             />
-            <IconButton aria-label='Create' color='primary' onClick={addParticipant}>
+            <IconButton aria-label="Create" color="primary" onClick={addParticipant}>
               <Icon>check_circle</Icon>
             </IconButton>
           </div>
         ) : state.selectedIcon === "delete" ? (
           <div style={{ padding: "20px" }}>
-            <Button variant='contained' color='secondary' onClick={deleteParticipants}>
+            <Button variant="contained" color="secondary" onClick={deleteParticipants}>
               Are you sure you want to delete these participants?
             </Button>
           </div>

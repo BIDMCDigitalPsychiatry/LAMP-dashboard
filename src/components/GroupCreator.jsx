@@ -48,21 +48,21 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
         <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <Tooltip
             enterDelay={1000}
-            title='Drag the handle on the left to change the order in which this Activity appears in the group.'
+            title="Drag the handle on the left to change the order in which this Activity appears in the group."
           >
             <ButtonGroup style={{ background: "#fff", margin: 8 }}>
-              <Button disabled variant='outlined' color={_selected?.name ? "primary" : "secondary"}>
+              <Button disabled variant="outlined" color={_selected?.name ? "primary" : "secondary"}>
                 <Icon>drag_indicator</Icon>
               </Button>
               <Button
-                variant='outlined'
+                variant="outlined"
                 color={_selected?.name ? "primary" : "secondary"}
                 onClick={(e) => setAnchorEl(e.currentTarget)}
               >
                 {_selected?.name ?? "No selection"}
               </Button>
               <Button
-                variant='outlined'
+                variant="outlined"
                 color={_selected?.name ? "primary" : "secondary"}
                 onClick={() => onDelete && onDelete()}
               >
@@ -99,27 +99,27 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
   }
 
   return (
-    <Grid container direction='column' spacing={2}>
+    <Grid container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant='h4'>{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
+        <Typography variant="h4">{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
         <Divider />
       </Grid>
       <Grid item>
         <TextField
           fullWidth
-          variant='outlined'
-          label='Group Title'
+          variant="outlined"
+          label="Group Title"
           defaultValue={text}
           onChange={(event) => setText(event.target.value)}
         />
       </Grid>
       <Grid item>
         <Divider />
-        <Typography variant='h6'>Configure activities and options.</Typography>
+        <Typography variant="h6">Configure activities and options.</Typography>
       </Grid>
       <Grid item>
         <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId='list'>
+          <Droppable droppableId="list">
             {(provided) => (
               <div ref={provided.innerRef} {...provided.droppableProps}>
                 {items.map((x, idx) => (
@@ -150,13 +150,13 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
           </Droppable>
         </DragDropContext>
         <ButtonGroup style={{ background: "#fff", margin: 8 }}>
-          <Button variant='contained' color='primary' onClick={() => setItems((items) => [...items, null])}>
+          <Button variant="contained" color="primary" onClick={() => setItems((items) => [...items, null])}>
             <Icon>add_circle</Icon>
           </Button>
           <Button
-            variant='contained'
-            size='small'
-            color='primary'
+            variant="contained"
+            size="small"
+            color="primary"
             onClick={() => setItems((items) => [...items, null])}
           >
             Add Activity
@@ -165,17 +165,17 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
       </Grid>
       <Grid
         container
-        direction='column'
-        alignItems='flex-end'
+        direction="column"
+        alignItems="flex-end"
         spacing={1}
         style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
       >
         <Grid item>
-          <Tooltip title='Save this activity group.'>
+          <Tooltip title="Save this activity group.">
             <Fab
-              color='secondary'
-              aria-label='Save'
-              variant='extended'
+              color="secondary"
+              aria-label="Save"
+              variant="extended"
               onClick={() =>
                 onSave(
                   {
