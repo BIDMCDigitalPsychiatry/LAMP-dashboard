@@ -13,12 +13,13 @@ import {
   Icon,
   Dialog,
   DialogTitle,
+  useTheme,
+  useMediaQuery,
   DialogContent,
   DialogContentText,
   DialogActions,
   colors,
 } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 
 // Local Imports
 import CredentialManager from "./CredentialManager"
@@ -35,6 +36,8 @@ export default function NavigationLayout({
   const [showCustomizeMenu, setShowCustomizeMenu] = useState()
   const [confirmLogout, setConfirmLogout] = useState()
   const [passwordChange, setPasswordChange] = useState()
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+
   return (
     <div>
       {!!noToolbar ? (
@@ -45,7 +48,17 @@ export default function NavigationLayout({
           style={{ background: "transparent", boxShadow: "none" }}
         >
           <Toolbar>
-            <IconButton onClick={goBack} color='default' aria-label='Menu'>
+            <IconButton
+              onClick={goBack}
+              color='default'
+              aria-label='Menu'
+              style={{
+                marginLeft:
+                  supportsSidebar && title.startsWith("Patient")
+                    ? 64
+                    : undefined,
+              }}
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
             <Box flexGrow={1} />

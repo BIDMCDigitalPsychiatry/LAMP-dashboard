@@ -36,7 +36,7 @@
     "jszip": "^3.2.2",
     "material-icons": "^0.3.1",
     "material-table": "^1.42.0",
-    "notistack": "^0.8.9",
+    "notistack": "^0.9.9",
     "qrcode.react": "^1.0.0",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^13.0.0",
@@ -81,7 +81,8 @@
   },
   "prettier": {
     "semi": false,
-    "jsxSingleQuote": true
+    "jsxSingleQuote": true,
+    "printWidth": 120
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
