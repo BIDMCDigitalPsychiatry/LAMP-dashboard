@@ -31,9 +31,7 @@ export default function Root({ onChange, ...props }) {
           data={researchers}
           columns={[{ title: "Name", field: "name" }]}
           onRowClick={(event, rowData, togglePanel) =>
-            props.history.push(
-              `/researcher/${researchers[rowData.tableData.id].id}`
-            )
+            props.history.push(`/researcher/${researchers[rowData.tableData.id].id}`)
           }
           editable={{
             onRowAdd: async (newData) => {
@@ -48,10 +46,7 @@ export default function Root({ onChange, ...props }) {
               setResearchers(await LAMP.Researcher.all())
             },
             onRowUpdate: async (newData, oldData) => {
-              if (
-                (await LAMP.Researcher.update(oldData.id, newData)).error ===
-                undefined
-              )
+              if ((await LAMP.Researcher.update(oldData.id, newData)).error === undefined)
                 enqueueSnackbar(`Successfully updated the Researcher.`, {
                   variant: "success",
                 })
@@ -62,9 +57,7 @@ export default function Root({ onChange, ...props }) {
               setResearchers(await LAMP.Researcher.all())
             },
             onRowDelete: async (oldData) => {
-              if (
-                (await LAMP.Researcher.delete(oldData.id)).error === undefined
-              )
+              if ((await LAMP.Researcher.delete(oldData.id)).error === undefined)
                 enqueueSnackbar(`Successfully deleted the Researcher.`, {
                   variant: "success",
                 })
@@ -84,8 +77,7 @@ export default function Root({ onChange, ...props }) {
           ]}
           localization={{
             body: {
-              emptyDataSourceMessage:
-                "No Researchers. Add Researchers by clicking the [+] button above.",
+              emptyDataSourceMessage: "No Researchers. Add Researchers by clicking the [+] button above.",
               editRow: {
                 deleteText: "Are you sure you want to delete this Researcher?",
               },

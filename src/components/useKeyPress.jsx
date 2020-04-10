@@ -1,11 +1,7 @@
 // Core Imports
 import { useState, useEffect } from "react"
 
-export default function useKeyPress(
-  targetKey,
-  onPressDown = () => {},
-  onPressUp = () => {}
-) {
+export default function useKeyPress(targetKey, onPressDown = () => {}, onPressUp = () => {}) {
   const [keyPressed, setKeyPressed] = useState(false)
   const downHandler = ({ key }) => {
     if (key !== targetKey) return

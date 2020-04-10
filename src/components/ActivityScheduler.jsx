@@ -22,9 +22,7 @@ const manyDates = (items) =>
   items?.length > 0
     ? items
         ?.slice(0, 3)
-        .map((x) =>
-          new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))
-        )
+        .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
 
@@ -51,19 +49,14 @@ function InlineMenu({ customTimes, onChange, ...props }) {
         {items?.map((x, idx) => (
           <MenuItem dense disabled key={idx}>
             <Typography variant='overline'>
-              {new Date(x).toLocaleString(
-                "en-US",
-                Date.formatStyle("timeOnly")
-              )}
+              {new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
             </Typography>
             <ListItemSecondaryAction>
               <Tooltip title='Delete this time from the list.'>
                 <IconButton
                   edge='end'
                   aria-label='remove'
-                  onClick={() =>
-                    setItems((x) => x.slice(0, idx).concat(x.slice(idx + 1)))
-                  }
+                  onClick={() => setItems((x) => x.slice(0, idx).concat(x.slice(idx + 1)))}
                 >
                   <Icon fontSize='small'>delete_forever</Icon>
                 </IconButton>
@@ -120,12 +113,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
           field: "start_date",
           initialEditValue: new Date(),
           render: (rowData) => (
-            <span>
-              {new Date(rowData.start_date).toLocaleString(
-                "en-US",
-                Date.formatStyle("dateOnly")
-              )}
-            </span>
+            <span>{new Date(rowData.start_date).toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
           ),
           editComponent: (props) => (
             <KeyboardDatePicker
@@ -147,12 +135,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
           field: "time",
           initialEditValue: new Date(),
           render: (rowData) => (
-            <span>
-              {new Date(rowData.time).toLocaleString(
-                "en-US",
-                Date.formatStyle("timeOnly")
-              )}
-            </span>
+            <span>{new Date(rowData.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
           ),
           editComponent: (props) => (
             <KeyboardTimePicker
@@ -192,21 +175,14 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
           field: "custom_time",
           initialEditValue: [],
           render: (props) =>
-            props.repeat_interval === "custom" ? (
-              <span>{manyDates(props.custom_time)}</span>
-            ) : (
-              "No custom times"
-            ),
+            props.repeat_interval === "custom" ? <span>{manyDates(props.custom_time)}</span> : "No custom times",
           editComponent: (props) =>
             props.rowData.repeat_interval !== "custom" ? (
               <Button variant='outlined' disabled>
                 No custom times
               </Button>
             ) : (
-              <InlineMenu
-                customTimes={props.value}
-                onChange={(x) => props.onChange(x)}
-              />
+              <InlineMenu customTimes={props.value} onChange={(x) => props.onChange(x)} />
             ),
         },
       ]}

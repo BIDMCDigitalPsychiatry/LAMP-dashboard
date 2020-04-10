@@ -36,9 +36,7 @@ function SelectList({ checkbox, value, onChange, ...props }) {
   const TypeComponent = checkbox ? Checkbox : Radio
   const AddIcon = checkbox ? "add_box" : "add_circle"
   const CheckedIcon = checkbox ? "check_box" : "radio_button_checked"
-  const UncheckedIcon = checkbox
-    ? "check_box_outline_blank"
-    : "radio_button_unchecked"
+  const UncheckedIcon = checkbox ? "check_box_outline_blank" : "radio_button_unchecked"
 
   return (
     <React.Fragment>
@@ -81,10 +79,7 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                             edge='end'
                             aria-label='delete'
                             onClick={() =>
-                              setOptions((options) => [
-                                ...options.slice(0, idx),
-                                ...options.slice(idx + 1),
-                              ])
+                              setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
                             }
                             onMouseDown={(event) => event.preventDefault()}
                           >
@@ -135,14 +130,7 @@ function SelectList({ checkbox, value, onChange, ...props }) {
   )
 }
 
-function QuestionCreator({
-  question,
-  onChange,
-  onDelete,
-  isSelected,
-  setSelected,
-  ...props
-}) {
+function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected, ...props }) {
   const [text, setText] = useState(question.text)
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
@@ -152,9 +140,7 @@ function QuestionCreator({
       text,
       type,
       description,
-      options: ["list", "select", "multiselect"].includes(type)
-        ? options
-        : null,
+      options: ["list", "select", "multiselect"].includes(type) ? options : null,
     })
   }, [text, description, type, options])
 
@@ -173,11 +159,7 @@ function QuestionCreator({
               onBlur={(event) => setText(event.target.value)}
               InputProps={{
                 endAdornment: [
-                  <InputAdornment
-                    position='end'
-                    variant='filled'
-                    key='adornment'
-                  >
+                  <InputAdornment position='end' variant='filled' key='adornment'>
                     <Tooltip title='Delete question from survey instrument.'>
                       <IconButton
                         edge='end'
@@ -210,36 +192,19 @@ function QuestionCreator({
           <Grid item xs={12}>
             <ButtonGroup size='small'>
               <Button disabled>Question Type</Button>
-              <Button
-                color={type === "text" ? "primary" : "default"}
-                onClick={() => setType("text")}
-              >
+              <Button color={type === "text" ? "primary" : "default"} onClick={() => setType("text")}>
                 text
               </Button>
-              <Button
-                color={type === "boolean" ? "primary" : "default"}
-                onClick={() => setType("boolean")}
-              >
+              <Button color={type === "boolean" ? "primary" : "default"} onClick={() => setType("boolean")}>
                 boolean
               </Button>
-              <Button
-                color={type === "likert" ? "primary" : "default"}
-                onClick={() => setType("likert")}
-              >
+              <Button color={type === "likert" ? "primary" : "default"} onClick={() => setType("likert")}>
                 likert
               </Button>
-              <Button
-                color={
-                  ["list", "select"].includes(type) ? "primary" : "default"
-                }
-                onClick={() => setType("list")}
-              >
+              <Button color={["list", "select"].includes(type) ? "primary" : "default"} onClick={() => setType("list")}>
                 list
               </Button>
-              <Button
-                color={type === "multiselect" ? "primary" : "default"}
-                onClick={() => setType("multiselect")}
-              >
+              <Button color={type === "multiselect" ? "primary" : "default"} onClick={() => setType("multiselect")}>
                 multi-select
               </Button>
             </ButtonGroup>
@@ -247,11 +212,7 @@ function QuestionCreator({
           {["list", "select", "multiselect"].includes(type) && (
             <Grid item>
               <Box borderColor='grey.400' border={1} borderRadius={4} p={2}>
-                <SelectList
-                  checkbox={type === "multiselect"}
-                  value={options}
-                  onChange={setOptions}
-                />
+                <SelectList checkbox={type === "multiselect"} value={options} onChange={setOptions} />
               </Box>
             </Grid>
           )}
@@ -264,18 +225,14 @@ function QuestionCreator({
 export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
-  const [description, setDescription] = useState(
-    !!value ? value.description : undefined
-  )
+  const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
 
   return (
     <Grid container direction='column' spacing={2}>
       <Grid item>
         <Typography variant='h4'>
-          {!!value
-            ? "Modify an existing survey instrument."
-            : "Create a new survey instrument."}
+          {!!value ? "Modify an existing survey instrument." : "Create a new survey instrument."}
         </Typography>
         <Divider />
       </Grid>
@@ -300,9 +257,7 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
       </Grid>
       <Grid item>
         <Divider />
-        <Typography variant='h6'>
-          Configure questions, parameters, and options.
-        </Typography>
+        <Typography variant='h6'>Configure questions, parameters, and options.</Typography>
       </Grid>
       <Grid item>
         <Stepper nonLinear activeStep={activeStep} orientation='vertical'>
@@ -310,16 +265,9 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
             <QuestionCreator
               key={`${x.text}-${idx}`}
               question={x}
-              onChange={(change) =>
-                setQuestions((questions) =>
-                  Object.assign([...questions], { [idx]: change })
-                )
-              }
+              onChange={(change) => setQuestions((questions) => Object.assign([...questions], { [idx]: change }))}
               onDelete={() => {
-                setQuestions((questions) => [
-                  ...questions.slice(0, idx),
-                  ...questions.slice(idx + 1),
-                ])
+                setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
                 setActiveStep((prev) => prev - 1)
               }}
               isSelected={activeStep !== idx}
@@ -377,12 +325,7 @@ export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
                     true /* duplicate */
                   )
                 }
-                disabled={
-                  !onSave ||
-                  questions.length === 0 ||
-                  !text ||
-                  value.name.trim() === text.trim()
-                }
+                disabled={!onSave || questions.length === 0 || !text || value.name.trim() === text.trim()}
               >
                 Duplicate
                 <span style={{ width: 8 }} />

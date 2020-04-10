@@ -1,11 +1,6 @@
 // Core Imports
 import React from "react"
-import {
-  RadialChart,
-  ArcSeries,
-  ArcLabel,
-  multiHueScaleFactory,
-} from "@data-ui/radial-chart"
+import { RadialChart, ArcSeries, ArcLabel, multiHueScaleFactory } from "@data-ui/radial-chart"
 import { LegendOrdinal } from "@vx/legend"
 import { useTheme, useMediaQuery } from "@material-ui/core"
 
@@ -31,9 +26,7 @@ export default function MultiPieChart(props) {
         renderTooltip={({ datum, fraction }) => (
           <div>
             <div>
-              <strong style={{ color: categoryColorScale(datum.label) }}>
-                {datum.label}
-              </strong>
+              <strong style={{ color: categoryColorScale(datum.label) }}>{datum.label}</strong>
             </div>
             <div>{(fraction * 100).toFixed()}%</div>
           </div>
@@ -41,10 +34,7 @@ export default function MultiPieChart(props) {
       >
         <ArcSeries
           data={props.data[0]}
-          pieValue={(d) =>
-            d.value /
-            props.data[0].map((x) => x.value).reduce((a, b) => a + b, 0)
-          }
+          pieValue={(d) => d.value / props.data[0].map((x) => x.value).reduce((a, b) => a + b, 0)}
           label={(arc) => arc.data.label}
           labelComponent={<ArcLabel fill='#fff' fontSize={10} />}
           margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
@@ -74,9 +64,7 @@ export default function MultiPieChart(props) {
         renderTooltip={({ datum, fraction }) => (
           <div>
             <div>
-              <strong style={{ color: categoryColorScale(datum.label) }}>
-                {datum.label}
-              </strong>
+              <strong style={{ color: categoryColorScale(datum.label) }}>{datum.label}</strong>
             </div>
             <div>{(fraction * 100).toFixed()}%</div>
           </div>
@@ -84,10 +72,7 @@ export default function MultiPieChart(props) {
       >
         <ArcSeries
           data={props.data[1]}
-          pieValue={(d) =>
-            d.value /
-            props.data[1].map((x) => x.value).reduce((a, b) => a + b, 0)
-          }
+          pieValue={(d) => d.value / props.data[1].map((x) => x.value).reduce((a, b) => a + b, 0)}
           label={(arc) => arc.data.label}
           labelComponent={<ArcLabel fill='#fff' fontSize={10} />}
           innerRadius={(radius) => 0.35 * radius}

@@ -1,12 +1,6 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
-import {
-  Icon,
-  IconButton,
-  TextField,
-  Tooltip,
-  InputAdornment,
-} from "@material-ui/core"
+import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
 // Local Imports
@@ -26,32 +20,16 @@ export default function EditField({ participant, onUpdate, ...props }) {
   useEffect(() => {
     if (!!alias) return
     LAMP.Type.getAttachment(participant.id, "lamp.name")
-      .then((res) =>
-        res.error === undefined &&
-        typeof res.data === "string" &&
-        res.data.length > 0
-          ? res.data
-          : null
-      )
+      .then((res) => (res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null))
       .then((res) => setAlias((oldValue.current = res)))
       .catch((err) =>
-        enqueueSnackbar(
-          `Failed to load ${participant.id}'s alias: \'${err.message}\'`,
-          { variant: "error" }
-        )
+        enqueueSnackbar(`Failed to load ${participant.id}'s alias: \'${err.message}\'`, { variant: "error" })
       )
   }, [])
 
   // Update the tag when editing ends (not continuously).
   useEffect(() => {
-    if (
-      !(
-        typeof alias === "string" &&
-        alias !== participant.id &&
-        alias !== oldValue.current
-      )
-    )
-      return
+    if (!(typeof alias === "string" && alias !== participant.id && alias !== oldValue.current)) return
 
     LAMP.Type.setAttachment(participant.id, "me", "lamp.name", alias ?? null)
       .then((res) => setAlias((oldValue.current = alias)))
@@ -66,10 +44,7 @@ export default function EditField({ participant, onUpdate, ...props }) {
           })
       })
       .catch((err) =>
-        enqueueSnackbar(
-          `Failed to change ${participant.id}'s alias: \'${err.message}\'`,
-          { variant: "error" }
-        )
+        enqueueSnackbar(`Failed to change ${participant.id}'s alias: \'${err.message}\'`, { variant: "error" })
       )
   }, [editing])
 

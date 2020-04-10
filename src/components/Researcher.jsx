@@ -13,21 +13,14 @@ function Study({ study, onParticipantSelect, ...props }) {
   const [currentTab, setCurrentTab] = useState(0)
   return (
     <React.Fragment>
-      <Box
-        mb='16px'
-        style={{ display: "flex", justifyContent: "space-between" }}
-      >
+      <Box mb='16px' style={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant='h5' color='inherit'></Typography>
         <Box>
-          <Typography variant='overline'>
-            Show Unscheduled Activities
-          </Typography>
+          <Typography variant='overline'>Show Unscheduled Activities</Typography>
           <Switch
             size='small'
             checked={showUnscheduled}
-            onChange={() =>
-              setShowUnscheduled((showUnscheduled) => !showUnscheduled)
-            }
+            onChange={() => setShowUnscheduled((showUnscheduled) => !showUnscheduled)}
           />
         </Box>
       </Box>
@@ -51,24 +44,16 @@ function Study({ study, onParticipantSelect, ...props }) {
             onParticipantSelect={onParticipantSelect}
           />
         )}
-        {currentTab === 1 && (
-          <ActivityList title={study.name} studyID={study.id} />
-        )}
+        {currentTab === 1 && <ActivityList title={study.name} studyID={study.id} />}
       </ResponsivePaper>
     </React.Fragment>
   )
 }
 
-export default function Researcher({
-  researcher,
-  onParticipantSelect,
-  ...props
-}) {
+export default function Researcher({ researcher, onParticipantSelect, ...props }) {
   const [studies, setStudies] = useState([])
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
   }, [])
-  return studies.map((study) => (
-    <Study study={study} onParticipantSelect={onParticipantSelect} />
-  ))
+  return studies.map((study) => <Study study={study} onParticipantSelect={onParticipantSelect} />)
 }

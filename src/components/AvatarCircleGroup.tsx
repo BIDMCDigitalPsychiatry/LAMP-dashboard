@@ -12,22 +12,12 @@ const createTestAccount = (id) => ({
 
 export const useMenu = (): any => {
   const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null })
-  const handleOpen = React.useCallback(
-    (id, event) => setAnchor({ id, anchorEl: event.currentTarget }),
-    [setAnchor]
-  )
-  const handleClose = React.useCallback(
-    () => setAnchor({ id: null, anchorEl: null }),
-    [setAnchor]
-  )
+  const handleOpen = React.useCallback((id, event) => setAnchor({ id, anchorEl: event.currentTarget }), [setAnchor])
+  const handleClose = React.useCallback(() => setAnchor({ id: null, anchorEl: null }), [setAnchor])
   return [anchor, handleOpen, handleClose]
 }
 
-export const useAccounts = ({
-  accounts: Accounts = [],
-  onDelete,
-  onAdd,
-}): any => {
+export const useAccounts = ({ accounts: Accounts = [], onDelete, onAdd }): any => {
   const [accounts, setAccounts] = React.useState(Accounts)
 
   const addAccount = React.useCallback(
@@ -77,9 +67,7 @@ const useStyles = makeStyles(() =>
       zIndex: 1,
       transform:
         index !== 0 &&
-        `rotate(${index * (360 / count)}deg) translate(${
-          diameter / 2
-        }px) rotate(-${index * (360 / count)}deg)`,
+        `rotate(${index * (360 / count)}deg) translate(${diameter / 2}px) rotate(-${index * (360 / count)}deg)`,
     }),
     line: {
       borderTopColor: "lightgrey",
@@ -97,15 +85,7 @@ const useStyles = makeStyles(() =>
   } as any)
 )
 
-const OnCircle = ({
-  children,
-  root,
-  line,
-  parent,
-  avatarWidth,
-  classes = {} as any,
-  ...props
-}) => {
+const OnCircle = ({ children, root, line, parent, avatarWidth, classes = {} as any, ...props }) => {
   const [ref, setRef] = React.useState(null)
   return (
     <>
@@ -119,10 +99,7 @@ const OnCircle = ({
           avatarWidth={avatarWidth}
         />
       )}
-      <div
-        ref={(el) => setRef(el)}
-        className={clsx(useStyles(props).circle, classes.circle)}
-      >
+      <div ref={(el) => setRef(el)} className={clsx(useStyles(props).circle, classes.circle)}>
         {children}
       </div>
     </>
@@ -176,16 +153,7 @@ function parseAnchor(value) {
 }
 
 const Line = (props: any) => {
-  const {
-    from,
-    to,
-    fromAnchor = undefined,
-    toAnchor = undefined,
-    parent,
-    count: Count,
-    avatarWidth,
-    className,
-  } = props
+  const { from, to, fromAnchor = undefined, toAnchor = undefined, parent, count: Count, avatarWidth, className } = props
 
   const getCoordinates = React.useCallback(() => {
     if (!from || !to) {
@@ -204,10 +172,8 @@ const Line = (props: any) => {
     if (parent) {
       const boxp = parent.getBoundingClientRect()
 
-      offsetX -=
-        boxp.left + (window.pageXOffset || document.documentElement.scrollLeft)
-      offsetY -=
-        boxp.top + (window.pageYOffset || document.documentElement.scrollTop)
+      offsetX -= boxp.left + (window.pageXOffset || document.documentElement.scrollLeft)
+      offsetY -= boxp.top + (window.pageYOffset || document.documentElement.scrollTop)
     }
 
     const x0 = box0.left + box0.width * anchor0.x + offsetX
@@ -237,15 +203,7 @@ const Line = (props: any) => {
 }
 
 const AvatarMesh = React.forwardRef(function AvatarMesh(
-  {
-    diameter,
-    avatarWidth,
-    lines,
-    className,
-    classes: Classes,
-    children: childrenProp,
-    ...other
-  }: any,
+  { diameter, avatarWidth, lines, className, classes: Classes, children: childrenProp, ...other }: any,
   ref: any
 ) {
   const classes = useStyles({ diameter, avatarWidth })
@@ -271,11 +229,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
   }
 
   return (
-    <div
-      className={clsx(classes.root, className)}
-      ref={handleSetRef}
-      {...other}
-    >
+    <div className={clsx(classes.root, className)} ref={handleSetRef} {...other}>
       {children.map((c: any, i) => (
         <OnCircle
           key={i}
@@ -375,18 +329,10 @@ export default function AvatarCircleGroup({
 
   return (
     <>
-      <AvatarMesh
-        diameter={diameter}
-        avatarWidth={avatarWidth}
-        lines={lines}
-        classes={classes}
-      >
+      <AvatarMesh diameter={diameter} avatarWidth={avatarWidth} lines={lines} classes={classes}>
         {accounts.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
           <Tooltip key={id} title={tooltip || ""}>
-            <ButtonBase
-              style={{ borderRadius: avatarWidth / 2 }}
-              onClick={onClick}
-            >
+            <ButtonBase style={{ borderRadius: avatarWidth / 2 }} onClick={onClick}>
               <Avatar
                 alt={name}
                 src={image}
@@ -402,12 +348,7 @@ export default function AvatarCircleGroup({
           </Tooltip>
         ))}
       </AvatarMesh>
-      <Menu
-        anchorEl={anchor.anchorEl}
-        keepMounted
-        open={Boolean(anchor.anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchor.anchorEl} keepMounted open={Boolean(anchor.anchorEl)} onClose={handleClose}>
         {/*<MenuItem onClick={() => handleAdd(accounts.findIndex(a => a.id === anchor.id))}>
           Add New ({id} at Index: {accounts.findIndex(a => a.id === anchor.id)})
         </MenuItem>*/}

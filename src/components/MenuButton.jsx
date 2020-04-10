@@ -2,16 +2,7 @@
 import React, { useState } from "react"
 import { Button, ButtonGroup, Icon, Menu, MenuItem } from "@material-ui/core"
 
-export default function MenuButton({
-  title,
-  icon,
-  color,
-  hideMainButton,
-  items,
-  onClick,
-  onAction,
-  ...props
-}) {
+export default function MenuButton({ title, icon, color, hideMainButton, items, onClick, onAction, ...props }) {
   const [anchorEl, setAnchorEl] = useState(null)
   return (
     <React.Fragment>
@@ -36,12 +27,7 @@ export default function MenuButton({
           {icon || <Icon>arrow_drop_down</Icon>}
         </Button>
       </ButtonGroup>
-      <Menu
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={() => setAnchorEl(null)}
-      >
+      <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
         {(items || []).map((x) => (
           <MenuItem key={x} onClick={() => setAnchorEl(null) || onClick(x)}>
             {x}

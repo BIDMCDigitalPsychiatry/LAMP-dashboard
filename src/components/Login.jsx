@@ -22,12 +22,7 @@ import { useSnackbar } from "notistack"
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 
-export default function Login({
-  setIdentity,
-  lastDomain,
-  onComplete,
-  ...props
-}) {
+export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const [state, setState] = useState({ serverAddress: lastDomain })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState()
@@ -48,10 +43,7 @@ export default function Login({
   let handleChange = (event) =>
     setState({
       ...state,
-      [event.target.name]:
-        event.target.type === "checkbox"
-          ? event.target.checked
-          : event.target.value,
+      [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
   let handleLogin = (event, mode) => {
@@ -71,10 +63,7 @@ export default function Login({
           variant: "error",
         })
         if (!srcLocked)
-          enqueueSnackbar(
-            "Are you sure you're logging into the right mindLAMP server?",
-            { variant: "info" }
-          )
+          enqueueSnackbar("Are you sure you're logging into the right mindLAMP server?", { variant: "info" })
       })
   }
 
@@ -131,16 +120,8 @@ export default function Login({
               </MenuItem>
             </Menu>
           </IconButton>
-          <Avatar
-            alt='mindLAMP'
-            src={`${process.env.PUBLIC_URL}/logo.png`}
-            style={{ margin: "auto" }}
-          />
-          <Typography
-            variant='h4'
-            align='center'
-            style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}
-          >
+          <Avatar alt='mindLAMP' src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin: "auto" }} />
+          <Typography variant='h4' align='center' style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
             mindLAMP
           </Typography>
           <form onSubmit={handleLogin}>

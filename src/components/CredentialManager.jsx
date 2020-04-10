@@ -58,18 +58,9 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
     setRole(auxData.role)
   }, [auxData])
 
-  const onDrop = useCallback(
-    (acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto),
-    []
-  )
+  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
   // eslint-disable-next-line
-  const {
-    acceptedFiles,
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-  } = useDropzone({
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
@@ -83,11 +74,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   const _qrLink = () =>
     window.location.href.split("#")[0] +
     "#/?a=" +
-    btoa(
-      [credID, password, LAMP.Auth._auth.serverAddress]
-        .filter((x) => !!x)
-        .join(":")
-    )
+    btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
 
   return (
     <Grid container justify='center' alignItems='center'>
@@ -106,33 +93,16 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
             height={128}
             border={1}
             borderRadius={4}
-            borderColor={
-              !(isDragActive || isDragAccept || !!photo)
-                ? "text.secondary"
-                : "#fff"
-            }
-            bgcolor={
-              isDragActive || isDragAccept ? "text.secondary" : undefined
-            }
-            color={
-              !(isDragActive || isDragAccept || !!photo)
-                ? "text.secondary"
-                : "#fff"
-            }
+            borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+            bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+            color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
             style={{
-              background: !!photo
-                ? `url(${photo}) center center/contain no-repeat`
-                : undefined,
+              background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
             }}
           >
-            <ButtonBase
-              style={{ width: "100%", height: "100%" }}
-              onClick={() => !!photo && setPhoto()}
-            >
+            <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto()}>
               {!photo && <input {...getInputProps()} />}
-              <Icon fontSize='large'>
-                {!photo ? "add_a_photo" : "delete_forever"}
-              </Icon>
+              <Icon fontSize='large'>{!photo ? "add_a_photo" : "delete_forever"}</Icon>
             </ButtonBase>
           </Box>
         </Tooltip>
@@ -298,12 +268,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
     if (shouldSyncWithChildren !== true) return
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
       !!res.data
-        ? LAMP.Type.setAttachment(
-            id,
-            "Participant",
-            "lamp.dashboard.credential_roles.external",
-            res.data
-          )
+        ? LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
         : console.log("no roles to sync")
     )
   }, [shouldSyncWithChildren, allRoles])
@@ -322,60 +287,27 @@ export default function CredentialManager({ id, onComplete, ...props }) {
           return enqueueSnackbar("Could not change password.", {
             variant: "error",
           })
-      } else if (
-        selected.mode === "create-new" &&
-        !!data.name &&
-        !!data.emailAddress &&
-        !!data.password
-      ) {
-        if (
-          !!(
-            await LAMP.Credential.create(
-              id,
-              data.emailAddress,
-              data.password,
-              data.name
-            )
-          ).error
-        )
+      } else if (selected.mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
+        if (!!(await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)).error)
           return enqueueSnackbar("Could not create credential.", {
             variant: "error",
           })
-        await LAMP.Type.setAttachment(
-          id,
-          "me",
-          "lamp.dashboard.credential_roles",
-          {
-            ...allRoles,
-            [data.emailAddress]:
-              !data.role && !data.photo
-                ? undefined
-                : { role: data.role, photo: data.photo },
-          }
-        )
+        await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
+          ...allRoles,
+          [data.emailAddress]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
+        })
       } else if (selected.mode === "change-role") {
-        await LAMP.Type.setAttachment(
-          id,
-          "me",
-          "lamp.dashboard.credential_roles",
-          {
-            ...allRoles,
-            [data.credential.access_key]:
-              !data.role && !data.photo
-                ? undefined
-                : { role: data.role, photo: data.photo },
-          }
-        )
+        await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
+          ...allRoles,
+          [data.credential.access_key]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
+        })
       } else {
         enqueueSnackbar("Could not perform operation for an unknown reason.", {
           variant: "error",
         })
       }
     } catch (err) {
-      enqueueSnackbar(
-        "Credential management failed. The email address could be in use already.",
-        { variant: "error" }
-      )
+      enqueueSnackbar("Credential management failed. The email address could be in use already.", { variant: "error" })
     }
     LAMP.Credential.list(id).then(setAllCreds)
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
@@ -392,12 +324,10 @@ export default function CredentialManager({ id, onComplete, ...props }) {
     try {
       if (!!(await LAMP.Credential.delete(id, credential.access_key)).error)
         return enqueueSnackbar("Could not delete.", { variant: "error" })
-      await LAMP.Type.setAttachment(
-        id,
-        "me",
-        "lamp.dashboard.credential_roles",
-        { ...allRoles, [credential.access_key]: undefined }
-      )
+      await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
+        ...allRoles,
+        [credential.access_key]: undefined,
+      })
     } catch (err) {
       enqueueSnackbar("Credential management failed.", { variant: "error" })
     }
@@ -409,13 +339,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
 
   return (
     <Box {...props}>
-      <Grid
-        container
-        justify='center'
-        alignItems='center'
-        spacing={1}
-        style={{ marginBottom: 16 }}
-      >
+      <Grid container justify='center' alignItems='center' spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant='h6' align='center'>
             Manage Credentials
@@ -458,24 +382,16 @@ export default function CredentialManager({ id, onComplete, ...props }) {
                 setSelected((selected) => ({
                   anchorEl: undefined,
                   credential: undefined,
-                  mode:
-                    selected.mode === "create-new" ? undefined : "create-new",
+                  mode: selected.mode === "create-new" ? undefined : "create-new",
                 }))
               }
             >
-              <Avatar style={{ backgroundColor: theme.palette.secondary.main }}>
-                +
-              </Avatar>
+              <Avatar style={{ backgroundColor: theme.palette.secondary.main }}>+</Avatar>
             </IconButton>
           </Tooltip>
         </Grid>
       </Grid>
-      <Menu
-        keepMounted
-        anchorEl={selected.anchorEl}
-        open={!!selected.anchorEl}
-        onClose={() => setSelected({})}
-      >
+      <Menu keepMounted anchorEl={selected.anchorEl} open={!!selected.anchorEl} onClose={() => setSelected({})}>
         <MenuItem
           onClick={() =>
             setSelected((selected) => ({
@@ -512,9 +428,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
           <b>Delete</b>
         </MenuItem>
       </Menu>
-      {!!selected.mode && (
-        <Divider style={{ margin: "0px -24px 32px -24px" }} />
-      )}
+      {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}
       {!!selected.mode && (
         <CredentialEditor
           credential={selected.credential}

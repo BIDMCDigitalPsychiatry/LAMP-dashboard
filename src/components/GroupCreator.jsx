@@ -36,17 +36,8 @@ const reorder = (list, startIndex, endIndex) => {
   return result
 }
 
-function ActivitySelector({
-  activities,
-  selected,
-  onSave,
-  onDelete,
-  index,
-  ...props
-}) {
-  const [_selected, setSelected] = useState(
-    !!selected ? activities.filter((x) => x.id === selected)[0] : null
-  )
+function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
+  const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x.id === selected)[0] : null)
   const [anchorEl, setAnchorEl] = useState()
   useEffect(() => {
     if (_selected !== selected) onSave && onSave(_selected.id)
@@ -54,21 +45,13 @@ function ActivitySelector({
   return (
     <Draggable draggableId={`${index}`} index={index} {...props}>
       {(provided) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-        >
+        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <Tooltip
             enterDelay={1000}
             title='Drag the handle on the left to change the order in which this Activity appears in the group.'
           >
             <ButtonGroup style={{ background: "#fff", margin: 8 }}>
-              <Button
-                disabled
-                variant='outlined'
-                color={_selected?.name ? "primary" : "secondary"}
-              >
+              <Button disabled variant='outlined' color={_selected?.name ? "primary" : "secondary"}>
                 <Icon>drag_indicator</Icon>
               </Button>
               <Button
@@ -87,11 +70,7 @@ function ActivitySelector({
               </Button>
             </ButtonGroup>
           </Tooltip>
-          <Menu
-            open={Boolean(anchorEl)}
-            anchorEl={anchorEl}
-            onClose={() => setAnchorEl()}
-          >
+          <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl()}>
             {activities.map((activity) => (
               <MenuItem
                 onClick={() => {
@@ -115,17 +94,14 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
   const [items, setItems] = useState(!!value ? value.settings : [])
 
   const onDragEnd = (result) => {
-    if (!result.destination || result.destination.index === result.source.index)
-      return
+    if (!result.destination || result.destination.index === result.source.index) return
     setItems(reorder(items, result.source.index, result.destination.index))
   }
 
   return (
     <Grid container direction='column' spacing={2}>
       <Grid item>
-        <Typography variant='h4'>
-          {!!value ? "Modify an existing group." : "Create a new group."}
-        </Typography>
+        <Typography variant='h4'>{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
         <Divider />
       </Grid>
       <Grid item>
@@ -150,9 +126,7 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
                   <ActivitySelector
                     index={idx}
                     key={`${idx}.${x}`}
-                    activities={activities.filter(
-                      (x) => x.spec !== "lamp.group"
-                    )}
+                    activities={activities.filter((x) => x.spec !== "lamp.group")}
                     selected={x}
                     onSave={(x) =>
                       setItems((it) => {
@@ -176,11 +150,7 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
           </Droppable>
         </DragDropContext>
         <ButtonGroup style={{ background: "#fff", margin: 8 }}>
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={() => setItems((items) => [...items, null])}
-          >
+          <Button variant='contained' color='primary' onClick={() => setItems((items) => [...items, null])}>
             <Icon>add_circle</Icon>
           </Button>
           <Button
@@ -218,12 +188,7 @@ export default function GroupCreator({ activities, value, onSave, ...props }) {
                   false /* overwrite */
                 )
               }
-              disabled={
-                !onSave ||
-                items.length === 0 ||
-                items.filter((i) => i === null).length > 0 ||
-                !text
-              }
+              disabled={!onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text}
             >
               Save
               <span style={{ width: 8 }} />

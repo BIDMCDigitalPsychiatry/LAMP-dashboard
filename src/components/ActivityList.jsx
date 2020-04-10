@@ -45,10 +45,7 @@ export function spliceActivity({ raw, tag }) {
       ? raw.settings
       : raw.settings.map((question, idx) => ({
           text: question.text,
-          type:
-            tag?.questions?.[idx]?.multiselect === true
-              ? "multiselect"
-              : question.type,
+          type: tag?.questions?.[idx]?.multiselect === true ? "multiselect" : question.type,
           description: tag?.questions?.[idx]?.description,
           options:
             question.options === null
@@ -80,8 +77,7 @@ export function unspliceActivity(x) {
       questions: x.settings?.map((y) => ({
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
-        options:
-          y?.options === null ? null : y?.options?.map((z) => z?.description),
+        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
       })),
     },
   }
@@ -100,14 +96,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   useEffect(() => {
     LAMP.Activity.allByStudy(studyID).then(setActivities)
     LAMP.ActivitySpec.all().then((res) =>
-      setActivitySpecs(
-        res.filter(
-          (x) =>
-            !["lamp.activity_group", "lamp.group", "lamp.survey"].includes(
-              x.name
-            )
-        )
-      )
+      setActivitySpecs(res.filter((x) => !["lamp.activity_group", "lamp.group", "lamp.survey"].includes(x.name)))
     )
   }, [])
   const onChange = () => LAMP.Activity.allByStudy(studyID).then(setActivities)
@@ -119,34 +108,22 @@ export default function ActivityList({ studyID, title, ...props }) {
   }, [groupCreate])
   const onDrop = useCallback((acceptedFiles) => {
     const reader = new FileReader()
-    reader.onabort = () =>
-      enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onerror = () =>
-      enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
     reader.onload = () => {
       setShowActivityImport()
       let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result))))
       if (
         Array.isArray(obj) &&
-        obj.filter(
-          (x) =>
-            typeof x === "object" && !!x.name && !!x.settings && !!x.schedule
-        ).length > 0
+        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       )
         setImportFile(obj)
-      else
-        enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
     }
     acceptedFiles.forEach((file) => reader.readAsText(file))
   }, [])
   // eslint-disable-next-line
-  const {
-    acceptedFiles,
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-  } = useDropzone({
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "application/json,.json",
     maxSize: 5 * 1024 * 1024 /* 5MB */,
@@ -166,21 +143,14 @@ export default function ActivityList({ studyID, title, ...props }) {
     const _importFile = [...importFile] // clone it so we can close the dialog first
     setImportFile()
 
-    let allIDs = _importFile
-      .map((x) => x.id)
-      .reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
+    let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
-      .filter(
-        (activity) =>
-          activity.settings.filter((x) => !Object.keys(allIDs).includes(x))
-            .length > 0
-      ).length
+      .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
     if (brokenGroupsCount > 0) {
-      enqueueSnackbar(
-        "Couldn't import the Activities because some Activities are misconfigured or missing.",
-        { variant: "error" }
-      )
+      enqueueSnackbar("Couldn't import the Activities because some Activities are misconfigured or missing.", {
+        variant: "error",
+      })
       return
     }
 
@@ -195,24 +165,14 @@ export default function ActivityList({ studyID, title, ...props }) {
             tableData: undefined,
           })
         ).data
-        await LAMP.Type.setAttachment(
-          allIDs[raw.id],
-          "me",
-          "lamp.dashboard.survey_description",
-          tag
-        )
+        await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
       } catch (e) {
-        enqueueSnackbar(
-          "Couldn't import one of the selected survey Activities.",
-          { variant: "error" }
-        )
+        enqueueSnackbar("Couldn't import one of the selected survey Activities.", { variant: "error" })
       }
     }
 
     // CTests only.
-    for (let x of _importFile.filter(
-      (x) => !["lamp.group", "lamp.survey"].includes(x.spec)
-    )) {
+    for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
       try {
         allIDs[x.id] = (
           await LAMP.Activity.create(studyID, {
@@ -222,10 +182,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           })
         ).data
       } catch (e) {
-        enqueueSnackbar(
-          "Couldn't import one of the selected cognitive test Activities.",
-          { variant: "error" }
-        )
+        enqueueSnackbar("Couldn't import one of the selected cognitive test Activities.", { variant: "error" })
       }
     }
 
@@ -239,10 +196,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           settings: x.settings.map((y) => allIDs[y]),
         })
       } catch (e) {
-        enqueueSnackbar(
-          "Couldn't import one of the selected Activity groups.",
-          { variant: "error" }
-        )
+        enqueueSnackbar("Couldn't import one of the selected Activity groups.", { variant: "error" })
       }
     }
 
@@ -258,10 +212,7 @@ export default function ActivityList({ studyID, title, ...props }) {
     for (let x of rows) {
       if (x.spec === "lamp.survey") {
         try {
-          let res = await LAMP.Type.getAttachment(
-            x.id,
-            "lamp.dashboard.survey_description"
-          )
+          let res = await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")
           let activity = spliceActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
@@ -281,12 +232,7 @@ export default function ActivityList({ studyID, title, ...props }) {
     // FIXME: ensure this is a lamp.survey only!
     const { raw, tag } = unspliceActivity(x)
     let newItem = await LAMP.Activity.create(studyID, raw)
-    await LAMP.Type.setAttachment(
-      newItem.data,
-      "me",
-      "lamp.dashboard.survey_description",
-      tag
-    )
+    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
     enqueueSnackbar("Successfully created a new survey Activity.", {
       variant: "success",
     })
@@ -338,12 +284,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   const deleteActivities = async (rows) => {
     for (let activity of rows) {
       if (activity.spec === "lamp.survey") {
-        let tag = await LAMP.Type.setAttachment(
-          activity.id,
-          "me",
-          "lamp.dashboard.survey_description",
-          null
-        )
+        let tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
         console.dir("deleted tag " + JSON.stringify(tag))
       }
       let raw = await LAMP.Activity.delete(activity.id)
@@ -358,12 +299,9 @@ export default function ActivityList({ studyID, title, ...props }) {
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async (raw) => {
     if (raw.spec === "lamp.survey") {
-      let tag = [
-        await LAMP.Type.getAttachment(
-          raw.id,
-          "lamp.dashboard.survey_description"
-        ),
-      ].map((y) => (!!y.error ? undefined : y.data))[0]
+      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.survey_description")].map((y) =>
+        !!y.error ? undefined : y.data
+      )[0]
       const activity = spliceActivity({ raw, tag })
       setSelectedActivity(activity)
     } else if (raw.spec === "lamp.group") {
@@ -405,16 +343,8 @@ export default function ActivityList({ studyID, title, ...props }) {
       const { raw, tag } = unspliceActivity(x)
       if (isDuplicated) {
         /* duplicate */ let newItem = await LAMP.Activity.create(studyID, raw)
-        await LAMP.Type.setAttachment(
-          newItem.data,
-          "me",
-          "lamp.dashboard.survey_description",
-          tag
-        )
-        enqueueSnackbar(
-          "Successfully duplicated the Activity under a new name.",
-          { variant: "success" }
-        )
+        await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
+        enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: "success" })
         onChange()
       } /* overwrite */ else {
         /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
@@ -422,16 +352,10 @@ export default function ActivityList({ studyID, title, ...props }) {
                 raw.schedule = selectedActivity.schedule
                 await LAMP.Activity.updateActivity(raw)
                 */
-        await LAMP.Type.setAttachment(
-          selectedActivity.id,
-          "me",
-          "lamp.dashboard.survey_description",
-          tag
-        )
-        enqueueSnackbar(
-          "Only survey description content was modified to prevent irrecoverable data loss.",
-          { variant: "error" }
-        )
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
+        enqueueSnackbar("Only survey description content was modified to prevent irrecoverable data loss.", {
+          variant: "error",
+        })
       }
     }
     setSelectedActivity()
@@ -440,15 +364,10 @@ export default function ActivityList({ studyID, title, ...props }) {
   //
   const updateSchedule = async (x) => {
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
-    let tbl = activities.reduce(
-      (prev, curr) => ({ ...prev, [curr.id]: curr.tableData }),
-      {}
-    )
+    let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
     let all = await LAMP.Activity.allByStudy(studyID)
     setActivities(all) // need to resave below to trigger detail panel correctly!
-    setActivities(
-      all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } }))
-    )
+    setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
   }
 
   return (
@@ -468,10 +387,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         onRowClick={(event, rowData, togglePanel) => modifyActivity(rowData)}
         detailPanel={(rowData) => (
           <Box ml={6} borderLeft={1} borderColor='grey.300'>
-            <ActivityScheduler
-              activity={rowData}
-              onChange={(x) => updateSchedule({ ...rowData, schedule: x })}
-            />
+            <ActivityScheduler activity={rowData} onChange={(x) => updateSchedule({ ...rowData, schedule: x })} />
           </Box>
         )}
         actions={[
@@ -490,8 +406,7 @@ export default function ActivityList({ studyID, title, ...props }) {
             icon: "add_box",
             tooltip: "Create",
             isFreeAction: true,
-            onClick: (event, rows) =>
-              setCreateMenu(event.currentTarget.parentNode),
+            onClick: (event, rows) => setCreateMenu(event.currentTarget.parentNode),
           },
           {
             icon: "delete_forever",
@@ -501,8 +416,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         ]}
         localization={{
           body: {
-            emptyDataSourceMessage:
-              "No Activities. Add Activities by clicking the [+] button above.",
+            emptyDataSourceMessage: "No Activities. Add Activities by clicking the [+] button above.",
             editRow: {
               deleteText: "Are you sure you want to delete this Activity?",
             },
@@ -560,10 +474,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           )),
         ]}
       </Menu>
-      <Dialog
-        open={!!showActivityImport}
-        onClose={() => setShowActivityImport()}
-      >
+      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()}>
         <Box
           {...getRootProps()}
           p={4}
@@ -571,9 +482,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
         >
           <input {...getInputProps()} />
-          <Typography variant='h6'>
-            Drag files here, or click to select files.
-          </Typography>
+          <Typography variant='h6'>Drag files here, or click to select files.</Typography>
         </Box>
       </Dialog>
       <Dialog open={!!importFile} onClose={() => setImportFile()}>
@@ -593,41 +502,18 @@ export default function ActivityList({ studyID, title, ...props }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog
-        fullScreen
-        transient
-        animate
-        open={!!showCreate}
-        onClose={() => setShowCreate()}
-      >
+      <ResponsiveDialog fullScreen transient animate open={!!showCreate} onClose={() => setShowCreate()}>
         <Box py={8} px={4}>
           <SurveyCreator onSave={saveActivity} />
         </Box>
       </ResponsiveDialog>
-      <ResponsiveDialog
-        fullScreen
-        transient
-        animate
-        open={!!groupCreate}
-        onClose={() => setGroupCreate()}
-      >
+      <ResponsiveDialog fullScreen transient animate open={!!groupCreate} onClose={() => setGroupCreate()}>
         <Box py={8} px={4}>
           <GroupCreator activities={activities} onSave={saveGroup} />
         </Box>
       </ResponsiveDialog>
-      <ResponsiveDialog
-        fullScreen
-        transient
-        animate
-        open={!!selectedActivity}
-        onClose={() => setSelectedActivity()}
-      >
-        <Activity
-          allActivities={activities}
-          activity={selectedActivity}
-          studyID={studyID}
-          onSave={updateActivity}
-        />
+      <ResponsiveDialog fullScreen transient animate open={!!selectedActivity} onClose={() => setSelectedActivity()}>
+        <Activity allActivities={activities} activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
       </ResponsiveDialog>
     </React.Fragment>
   )

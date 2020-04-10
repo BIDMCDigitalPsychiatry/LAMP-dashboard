@@ -5,13 +5,7 @@ import { Paper, useTheme, useMediaQuery } from "@material-ui/core"
 //
 export const ResponsiveMargin = React.forwardRef((props, ref) => {
   let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
-  return (
-    <div
-      {...props}
-      style={{ ...props.style, width: sm ? "98%" : props.style.width }}
-      ref={ref}
-    />
-  )
+  return <div {...props} style={{ ...props.style, width: sm ? "98%" : props.style.width }} ref={ref} />
 })
 
 export const ResponsivePaper = React.forwardRef((props, ref) => {
@@ -24,11 +18,7 @@ export const ResponsivePaper = React.forwardRef((props, ref) => {
 Object.defineProperty(Array.prototype, "flat", {
   value: function (depth = 1) {
     return this.reduce(function (flat, toFlatten) {
-      return flat.concat(
-        Array.isArray(toFlatten) && depth - 1
-          ? toFlatten.flat(depth - 1)
-          : toFlatten
-      )
+      return flat.concat(Array.isArray(toFlatten) && depth - 1 ? toFlatten.flat(depth - 1) : toFlatten)
     }, [])
   },
 })
@@ -65,10 +55,7 @@ Date.prototype.isValid = function () {
 // eslint-disable-next-line
 Object.defineProperty(Date, "formatUTC", {
   value: function (timestampUTC, formatObj) {
-    return new Date(timestampUTC).toLocaleString(
-      "en-US",
-      Date.formatStyle(formatObj)
-    )
+    return new Date(timestampUTC).toLocaleString("en-US", Date.formatStyle(formatObj))
   },
 })
 
@@ -76,12 +63,9 @@ Object.defineProperty(Date, "formatUTC", {
 // eslint-disable-next-line
 Object.defineProperty(Date, "formatStyle", {
   value: function (formatObj = {}) {
-    if (formatObj === "short")
-      formatObj = { year: "2-digit", month: "2-digit", day: "2-digit" }
-    else if (formatObj === "timeOnly")
-      formatObj = { hour: "numeric", minute: "numeric", hour12: true }
-    else if (formatObj === "dateOnly")
-      formatObj = { year: "numeric", month: "long", day: "numeric" }
+    if (formatObj === "short") formatObj = { year: "2-digit", month: "2-digit", day: "2-digit" }
+    else if (formatObj === "timeOnly") formatObj = { hour: "numeric", minute: "numeric", hour12: true }
+    else if (formatObj === "dateOnly") formatObj = { year: "numeric", month: "long", day: "numeric" }
     else if (formatObj === "hourOnly")
       formatObj = {
         weekday: "long",

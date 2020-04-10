@@ -29,10 +29,7 @@ export default function Jewels({ onComplete, ...props }) {
   const onTap = (idx) => {
     setActions((actions) => [...actions, idx])
     activity.emit(0, 0, 0, 0)
-    if (
-      jewels.filter((x) => actions.find((y) => y === x.i) === undefined)
-        .length === 0
-    ) {
+    if (jewels.filter((x) => actions.find((y) => y === x.i) === undefined).length === 0) {
       activity.stop()
       !!onComplete && onComplete(activity)
     }

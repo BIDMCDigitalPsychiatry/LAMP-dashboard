@@ -4,22 +4,19 @@ import { GridList, GridListTile } from "@material-ui/core"
 
 const tileData = [
   {
-    img:
-      "https://www.success.com/wp-content/uploads/legacy/sites/default/files/new2.jpg",
+    img: "https://www.success.com/wp-content/uploads/legacy/sites/default/files/new2.jpg",
     title: "Motivation",
     author: "BrainyQuote",
     cols: 2,
     featured: true,
   },
   {
-    img:
-      "https://i.pinimg.com/originals/38/93/be/3893be88133b4a0c306e6950aaac4e1b.jpg",
+    img: "https://i.pinimg.com/originals/38/93/be/3893be88133b4a0c306e6950aaac4e1b.jpg",
     title: "Happiness",
     author: "director90",
   },
   {
-    img:
-      "https://cdn2.vectorstock.com/i/1000x1000/98/21/mental-health-quotes-type-vector-22179821.jpg",
+    img: "https://cdn2.vectorstock.com/i/1000x1000/98/21/mental-health-quotes-type-vector-22179821.jpg",
     title: "Feelings",
     author: "Danson67",
   },
@@ -36,8 +33,7 @@ const tileData = [
     author: "Hans",
   },
   {
-    img:
-      "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/life-quotes-albert-einstein-1561406885.png",
+    img: "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/life-quotes-albert-einstein-1561406885.png",
     title: "Quote",
     author: "fancycravel",
   },
@@ -90,17 +86,9 @@ export default function AdvancedGridList() {
         height: "auto",
       }}
     >
-      <GridList
-        cellHeight={400}
-        spacing={1}
-        style={{ width: "auto", height: "100%" }}
-      >
+      <GridList cellHeight={400} spacing={1} style={{ width: "auto", height: "100%" }}>
         {tileData.map((tile) => (
-          <GridListTile
-            key={tile.img}
-            cols={tile.featured ? 2 : 1}
-            rows={tile.featured ? 2 : 1}
-          >
+          <GridListTile key={tile.img} cols={tile.featured ? 2 : 1} rows={tile.featured ? 2 : 1}>
             <img src={tile.img} alt={tile.title} />
           </GridListTile>
         ))}

@@ -36,9 +36,7 @@ export default function Resources({ ...props }) {
       <div className={classes.root}>
         <ExpansionPanel>
           <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
-            <Typography className={classes.heading}>
-              Department of Mental Health (DMH)
-            </Typography>
+            <Typography className={classes.heading}>Department of Mental Health (DMH)</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Link href='https://www.mass.gov/orgs/massachusetts-department-of-mental-health'>
@@ -48,21 +46,15 @@ export default function Resources({ ...props }) {
         </ExpansionPanel>
         <ExpansionPanel>
           <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
-            <Typography className={classes.heading}>
-              National Alliance on Mental Illness (NAMI)
-            </Typography>
+            <Typography className={classes.heading}>National Alliance on Mental Illness (NAMI)</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
-            <Link href='https://www.nami.org/#'>
-              National Alliance on Mental Illness (NAMI)
-            </Link>
+            <Link href='https://www.nami.org/#'>National Alliance on Mental Illness (NAMI)</Link>
           </ExpansionPanelDetails>
         </ExpansionPanel>
         <ExpansionPanel>
           <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
-            <Typography className={classes.heading}>
-              NAMI Massachussetts
-            </Typography>
+            <Typography className={classes.heading}>NAMI Massachussetts</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
             <Link href='https://namimass.org/'>NAMI Massachussetts</Link>

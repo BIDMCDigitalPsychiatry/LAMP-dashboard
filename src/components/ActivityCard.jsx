@@ -1,14 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import {
-  Box,
-  Icon,
-  IconButton,
-  Tooltip,
-  Typography,
-  Divider,
-  Popover,
-} from "@material-ui/core"
+import { Box, Icon, IconButton, Tooltip, Typography, Divider, Popover } from "@material-ui/core"
 import { blue } from "@material-ui/core/colors"
 
 // Local Imports
@@ -18,25 +10,16 @@ import ArrayView from "./ArrayView"
 const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     slices
-      .filter((x, idx) =>
-        scopedItem !== undefined ? idx === scopedItem : true
-      )
+      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
-        let question = (Array.isArray(activity.settings)
-          ? activity.settings
-          : []
-        ).filter((y) => y.text === x.item)[0]
-        if (!!question && question.type === "boolean")
-          return ["Yes", "True"].includes(x.value) ? 1 : 0
-        else if (!!question && question.type === "list")
-          return Math.max(question.options.indexOf(x.value), 0)
+        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
+        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) =>
-    slices
-      .map((x) => parseInt(x.item) || 0)
-      .reduce((prev, curr) => (prev > curr ? prev : curr), 0),
+    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
 export default function ActivityCard({
@@ -55,20 +38,13 @@ export default function ActivityCard({
 
   const [visibleSlice, setVisibleSlice] = useState()
   const [helpAnchor, setHelpAnchor] = useState()
-  const [showGrid, setShowGrid] = useState(
-    forceDefaultGrid || Boolean(freeText.length)
-  )
+  const [showGrid, setShowGrid] = useState(forceDefaultGrid || Boolean(freeText.length))
 
   console.dir(events)
 
   return (
     <React.Fragment>
-      <Box
-        display='flex'
-        justifyContent='space-between'
-        alignContent='center'
-        m={2}
-      >
+      <Box display='flex' justifyContent='space-between' alignContent='center' m={2}>
         {!Boolean(visibleSlice) ? (
           <Tooltip title='Switch Views'>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
@@ -82,28 +58,17 @@ export default function ActivityCard({
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip
-          title={Boolean(visibleSlice) ? activity.name : `Activity Type`}
-        >
-          <Typography
-            variant='h6'
-            align='center'
-            style={{ marginTop: 6, flexGrow: 1 }}
-          >
+        <Tooltip title={Boolean(visibleSlice) ? activity.name : `Activity Type`}>
+          <Typography variant='h6' align='center' style={{ marginTop: 6, flexGrow: 1 }}>
             {!Boolean(visibleSlice)
               ? activity.name
-              : visibleSlice.x.toLocaleString(
-                  "en-US",
-                  Date.formatStyle("medium")
-                )}
+              : visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))}
           </Typography>
         </Tooltip>
         <div>
           {!Boolean(visibleSlice) && (
             <Tooltip title='Show App Screenshot'>
-              <IconButton
-                onClick={(event) => setHelpAnchor(event.currentTarget)}
-              >
+              <IconButton onClick={(event) => setHelpAnchor(event.currentTarget)}>
                 <Icon fontSize='small'>help</Icon>
               </IconButton>
             </Tooltip>
@@ -161,15 +126,13 @@ export default function ActivityCard({
               color={blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
-                y: strategies[
-                  d.static_data.survey_name !== undefined
-                    ? "lamp.survey"
-                    : "lamp.jewels_a"
-                ](d.temporal_events, activity, idx),
+                y: strategies[d.static_data.survey_name !== undefined ? "lamp.survey" : "lamp.jewels_a"](
+                  d.temporal_events,
+                  activity,
+                  idx
+                ),
                 slice: d.temporal_events,
-                missing: [null, "NULL"].includes(
-                  d.temporal_events[idx]?.value ?? null
-                ), // sometimes the slice itself is missing, not set to null
+                missing: [null, "NULL"].includes(d.temporal_events[idx]?.value ?? null), // sometimes the slice itself is missing, not set to null
               }))}
               onClick={(datum) => setVisibleSlice(datum)}
             />
@@ -179,10 +142,7 @@ export default function ActivityCard({
               .map((d) =>
                 d.temporal_events.map((t) => ({
                   item: t.item,
-                  [new Date(d.timestamp).toLocaleString(
-                    "en-US",
-                    Date.formatStyle("medium")
-                  )]: t.value,
+                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value,
                 }))
               )
               .reduce((x, y) => x.concat(y), [])
@@ -201,15 +161,12 @@ export default function ActivityCard({
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),
-            y: strategies[
-              d.static_data.survey_name !== undefined
-                ? "lamp.survey"
-                : "lamp.jewels_a"
-            ](d.temporal_events, activity),
+            y: strategies[d.static_data.survey_name !== undefined ? "lamp.survey" : "lamp.jewels_a"](
+              d.temporal_events,
+              activity
+            ),
             slice: d.temporal_events,
-            missing:
-              d.temporal_events.filter((z) => [null, "NULL"].includes(z.value))
-                .length > 0,
+            missing: d.temporal_events.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
           }))}
           onClick={(datum) => setVisibleSlice(datum)}
         />

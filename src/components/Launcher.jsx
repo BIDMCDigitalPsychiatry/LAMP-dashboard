@@ -31,13 +31,7 @@ Launcher.Placeholder = function Placeholder({ ...props }) {
           ...(props.style || {}),
         }}
       >
-        <Grid
-          container
-          direction='column'
-          justify='center'
-          alignItems='center'
-          style={{ height: "100%" }}
-        >
+        <Grid container direction='column' justify='center' alignItems='center' style={{ height: "100%" }}>
           <Grid item>
             <Icon>more_horiz</Icon>
           </Grid>
@@ -51,14 +45,7 @@ Launcher.Placeholder = function Placeholder({ ...props }) {
   )
 }
 
-Launcher.Button = function Button({
-  notification,
-  favorite,
-  icon,
-  title,
-  onClick,
-  ...props
-}) {
+Launcher.Button = function Button({ notification, favorite, icon, title, onClick, ...props }) {
   const theme = useTheme()
   const color = !!notification
     ? theme.palette.secondary.main
@@ -80,26 +67,12 @@ Launcher.Button = function Button({
             height: 150,
             borderRadius: 8,
             background: color,
-            color:
-              !!notification || !!favorite
-                ? "#fff"
-                : theme.palette.text.primary,
+            color: !!notification || !!favorite ? "#fff" : theme.palette.text.primary,
           }}
         >
-          <ButtonBase
-            style={{ width: "100%", height: "100%" }}
-            onClick={onClick || (() => {})}
-          >
-            <Grid
-              container
-              direction='column'
-              justify='center'
-              alignItems='center'
-              style={{ height: "100%" }}
-            >
-              <Grid item>
-                {icon || <Icon fontSize='large'>more_horiz</Icon>}
-              </Grid>
+          <ButtonBase style={{ width: "100%", height: "100%" }} onClick={onClick || (() => {})}>
+            <Grid container direction='column' justify='center' alignItems='center' style={{ height: "100%" }}>
+              <Grid item>{icon || <Icon fontSize='large'>more_horiz</Icon>}</Grid>
               <Grid item />
             </Grid>
           </ButtonBase>
@@ -118,23 +91,14 @@ Launcher.Section = function Section({ title, children, ...props }) {
   const [expanded, setExpanded] = useState(false)
   // eslint-disable-next-line
   const [scroll, setScroll] = useState(false)
-  useEffect(
-    () =>
-      setExpanded(
-        Array.isArray(children)
-          ? children.filter((x) => !!x).length > 0
-          : !!children
-      ),
-    [children]
-  )
+  useEffect(() => setExpanded(Array.isArray(children) ? children.filter((x) => !!x).length > 0 : !!children), [
+    children,
+  ])
 
   return (
     <React.Fragment>
       <Grid item style={{ margin: "0px 16px" }}>
-        <Typography
-          variant='overline'
-          style={{ fontWeight: 700, fontSize: 16 }}
-        >
+        <Typography variant='overline' style={{ fontWeight: 700, fontSize: 16 }}>
           {title}
         </Typography>
       </Grid>
@@ -161,8 +125,7 @@ Launcher.Section = function Section({ title, children, ...props }) {
               ))
           ) : (
             <Grid item>
-              {Array.isArray(children) &&
-              children.filter((x) => !!x).length === 0 ? (
+              {Array.isArray(children) && children.filter((x) => !!x).length === 0 ? (
                 <Launcher.Placeholder />
               ) : (
                 children ?? <Launcher.Placeholder />

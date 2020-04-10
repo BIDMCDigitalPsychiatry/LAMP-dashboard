@@ -33,9 +33,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
       style={{ padding: 8 }}
     >
       <Grid item style={{ display: flipped ? undefined : "none" }}>
-        <Tooltip
-          title={capitalize(from === "researcher" ? "clinician" : "patient")}
-        >
+        <Tooltip title={capitalize(from === "researcher" ? "clinician" : "patient")}>
           <Avatar
             style={{
               background: "#aaa",
@@ -46,12 +44,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
         </Tooltip>
       </Grid>
       <Grid item>
-        <Tooltip
-          title={new Date(date || 0).toLocaleString(
-            "en-US",
-            Date.formatStyle("medium")
-          )}
-        >
+        <Tooltip title={new Date(date || 0).toLocaleString("en-US", Date.formatStyle("medium"))}>
           <Box
             p={1}
             borderRadius={flipped ? "16px 16px 16px 4px" : "16px 16px 4px 16px"}
@@ -107,10 +100,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
           await Promise.all(
             [props.participant || ""].map(async (x) => [
               x,
-              await LAMP.Type.getAttachment(
-                x,
-                "lamp.messaging"
-              ).catch((e) => []),
+              await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
           )
         )
@@ -139,10 +129,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
             textColor='primary'
           >
             <Tab label='Messages' index={0} />
-            <Tab
-              label={!!props.participantOnly ? "My Journal" : "Patient Notes"}
-              index={1}
-            />
+            <Tab label={!!props.participantOnly ? "My Journal" : "Patient Notes"} index={1} />
           </Tabs>
         </Grid>
         <Grid item hidden={!!privateOnly}>
@@ -163,11 +150,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
                   .filter((x) =>
                     (messageTab || 0) === 0
                       ? x.type === "message"
-                      : x.type === "note" &&
-                        x.from ===
-                          (!!props.participantOnly
-                            ? "participant"
-                            : "researcher")
+                      : x.type === "note" && x.from === (!!props.participantOnly ? "participant" : "researcher")
                   )
                   .map((x) => (
                     <MessageItem
@@ -189,9 +172,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
                 placeholder='Message...'
                 value={currentMessage || ""}
                 onChange={(event) => setCurrentMessage(event.target.value)}
-                helperText={`Your ${
-                  !!props.participantOnly ? "clinician" : "patient"
-                } will ${
+                helperText={`Your ${!!props.participantOnly ? "clinician" : "patient"} will ${
                   (messageTab || 0) === 0
                     ? "be able to see your messages when they log in."
                     : "not be able to see this message."

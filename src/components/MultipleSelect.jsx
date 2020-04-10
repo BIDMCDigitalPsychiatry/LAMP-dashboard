@@ -28,28 +28,16 @@ export default function MultipleSelect({ ...props }) {
           >
             <Chip
               label={item}
-              color={
-                (props.selected || []).indexOf(item) >= 0
-                  ? "primary"
-                  : undefined
-              }
+              color={(props.selected || []).indexOf(item) >= 0 ? "primary" : undefined}
               onClick={
                 (props.selected || []).indexOf(item) >= 0
                   ? () => {}
-                  : () =>
-                      props.onChange(
-                        !!props.singleSelect
-                          ? [item]
-                          : [...(props.selected || []), item]
-                      )
+                  : () => props.onChange(!!props.singleSelect ? [item] : [...(props.selected || []), item])
               }
               onDelete={
                 (props.selected || []).indexOf(item) < 0
                   ? undefined
-                  : () =>
-                      props.onChange(
-                        (props.selected || []).filter((x) => x !== item)
-                      )
+                  : () => props.onChange((props.selected || []).filter((x) => x !== item))
               }
             />
           </Badge>

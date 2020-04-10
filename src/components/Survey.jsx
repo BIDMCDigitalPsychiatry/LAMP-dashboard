@@ -32,50 +32,24 @@ import { ResponsivePaper } from "./Utils"
 function _useTernaryBool() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
-const CSV_parse = (x) =>
-  Array.isArray(JSON.parse(`[${x}]`)) ? JSON.parse(`[${x}]`) : []
-const CSV_stringify = (x) =>
-  Array.isArray(x) ? JSON.stringify(x).slice(1, -1) : ""
+const CSV_parse = (x) => (Array.isArray(JSON.parse(`[${x}]`)) ? JSON.parse(`[${x}]`) : [])
+const CSV_stringify = (x) => (Array.isArray(x) ? JSON.stringify(x).slice(1, -1) : "")
 
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes
 
-function Banner({
-  heading,
-  text,
-  description,
-  large,
-  prefillTimestamp,
-  onChangeTimestamp,
-  ...props
-}) {
+function Banner({ heading, text, description, large, prefillTimestamp, onChangeTimestamp, ...props }) {
   return (
     <Box {...props} p={2}>
-      <Grid
-        container
-        direction='row'
-        justify='space-between'
-        alignItems='center'
-      >
+      <Grid container direction='row' justify='space-between' alignItems='center'>
         <Grid item>
-          <Typography
-            variant={large ? "subtitle2" : "subtitle2"}
-            color='textSecondary'
-          >
+          <Typography variant={large ? "subtitle2" : "subtitle2"} color='textSecondary'>
             {heading}
           </Typography>
-          <Typography
-            variant={large ? "h3" : "h6"}
-            color='primary'
-            style={{ fontWeight: large ? 700 : undefined }}
-          >
+          <Typography variant={large ? "h3" : "h6"} color='primary' style={{ fontWeight: large ? 700 : undefined }}>
             {text}
           </Typography>
-          <Typography
-            variant={large ? "body2" : "body2"}
-            color='textSecondary'
-            style={{ whiteSpace: "pre-wrap" }}
-          >
+          <Typography variant={large ? "body2" : "body2"} color='textSecondary' style={{ whiteSpace: "pre-wrap" }}>
             {description}
           </Typography>
         </Grid>
@@ -114,24 +88,12 @@ function TextResponse({ onChange, multiline, value, ...props }) {
 
 // eslint-disable-next-line
 function CheckboxResponse({ onChange, value, ...props }) {
-  return (
-    <Checkbox
-      {...props}
-      value={value || false}
-      onChange={(event) => onChange(event.target.value)}
-    />
-  )
+  return <Checkbox {...props} value={value || false} onChange={(event) => onChange(event.target.value)} />
 }
 
 // eslint-disable-next-line
 function SwitchResponse({ onChange, value, ...props }) {
-  return (
-    <Switch
-      {...props}
-      value={value || false}
-      onChange={(event) => onChange(event.target.value)}
-    />
-  )
+  return <Switch {...props} value={value || false} onChange={(event) => onChange(event.target.value)} />
 }
 
 function MultiSelectResponse({ onChange, options, value, ...props }) {
@@ -147,9 +109,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
           control={
             <Checkbox
               checked={_selection.includes(`${x.value}`)}
-              color={
-                _selection.includes(`${x.value}`) ? "secondary" : "default"
-              }
+              color={_selection.includes(`${x.value}`) ? "secondary" : "default"}
               onClick={() => {
                 let targetValue = !_selection.includes(`${x.value}`)
                   ? [..._selection, `${x.value}`]
@@ -243,16 +203,7 @@ function SelectResponse({ onChange, options, value, ...props }) {
   )
 }
 
-function Question({
-  onResponse,
-  hideHeader,
-  number,
-  text,
-  type,
-  options,
-  value,
-  ...props
-}) {
+function Question({ onResponse, hideHeader, number, text, type, options, value, ...props }) {
   let onChange = (value) => onResponse({ item: text, value: value })
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -275,66 +226,21 @@ function Question({
 
   let component = <Box />
   if (type === "select" || type === "list")
-    component = (
-      <SelectResponse
-        options={options}
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <SelectResponse options={options} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === "multiselect")
-    component = (
-      <MultiSelectResponse
-        options={options}
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <MultiSelectResponse options={options} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === "boolean")
-    component = (
-      <SelectResponse
-        options={_binaryOpts}
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <SelectResponse options={_binaryOpts} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === "likert")
-    component = (
-      <SelectResponse
-        options={_likertOpts}
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <SelectResponse options={_likertOpts} onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === "text" || type === null)
-    component = (
-      <TextResponse
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <TextResponse onChange={onChange} value={!!value ? value.value : undefined} />
   else if (type === "paragraph")
-    component = (
-      <TextResponse
-        multiline
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
-  else
-    component = (
-      <TextResponse
-        onChange={onChange}
-        value={!!value ? value.value : undefined}
-      />
-    )
+    component = <TextResponse multiline onChange={onChange} value={!!value ? value.value : undefined} />
+  else component = <TextResponse onChange={onChange} value={!!value ? value.value : undefined} />
 
   return (
-    <FormControl
-      {...props}
-      component='fieldset'
-      style={{ ...props.style, width: "100%", margin: 16 }}
-    >
+    <FormControl {...props} component='fieldset' style={{ ...props.style, width: "100%", margin: 16 }}>
       <Grid
         container
         spacing={2}
@@ -357,18 +263,9 @@ function Question({
   )
 }
 
-function Section({
-  noHeader,
-  onResponse,
-  index,
-  value,
-  prefillData,
-  ...props
-}) {
+function Section({ noHeader, onResponse, index, value, prefillData, ...props }) {
   const base = value.settings.map((x) => ({ item: x.text, value: null }))
-  const responses = useRef(
-    !!prefillData ? Object.assign(base, prefillData) : base
-  )
+  const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
   // eslint-disable-next-line
   const leftArrowPress = useKeyPress(
@@ -389,18 +286,14 @@ function Section({
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
-    onResponse(
-      Array.from({ ...responses.current, length: value.settings.length })
-    )
+    onResponse(Array.from({ ...responses.current, length: value.settings.length }))
   }, [])
   const isComplete = (idx) => !!responses.current[idx]?.value
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   return (
     <ResponsivePaper {...props} elevation={noHeader ? 0 : 4}>
-      {noHeader !== true && (
-        <Banner heading={`Section ${index}`} text={value.name} />
-      )}
+      {noHeader !== true && <Banner heading={`Section ${index}`} text={value.name} />}
       <div>
         <Stepper nonLinear activeStep={activeStep} orientation='vertical'>
           {value.settings.map((x, idx) => (
@@ -416,19 +309,13 @@ function Section({
                   )
                 }
               >
-                <StepLabel
-                  error={isError(idx)}
-                  style={{ textAlign: "left", whiteSpace: "pre-wrap" }}
-                >
+                <StepLabel error={isError(idx)} style={{ textAlign: "left", whiteSpace: "pre-wrap" }}>
                   {x.text}
                 </StepLabel>
               </StepButton>
               <StepContent>
                 {!!x.description && (
-                  <Typography
-                    variant='caption'
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
+                  <Typography variant='caption' style={{ whiteSpace: "pre-wrap" }}>
                     {x.description}
                   </Typography>
                 )}
@@ -443,8 +330,7 @@ function Section({
                     responses.current[idx] = response
 
                     // Can be problematic when trying to select 2+ items...
-                    if (x.type !== "multiselect")
-                      setActiveStep((prev) => prev + 1)
+                    if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
                     onResponse(
                       Array.from({
@@ -495,9 +381,7 @@ export default function Survey({
     "ArrowDown",
     () => {},
     () => {
-      setActiveTab((tab) =>
-        Math.min(tab + 1, ((content || {}).sections || []).length)
-      )
+      setActiveTab((tab) => Math.min(tab + 1, ((content || {}).sections || []).length))
     }
   )
 
@@ -514,8 +398,7 @@ export default function Survey({
   }
   const postSubmit = (response) => {
     if (!validate) onResponse(response, prefillTimestamp)
-    else if (validate && validator(response))
-      onResponse(response, prefillTimestamp)
+    else if (validate && validator(response)) onResponse(response, prefillTimestamp)
     else if (validate && !validator(response)) onValidationFailure()
   }
 
@@ -523,11 +406,7 @@ export default function Survey({
     <Grid container alignItems='stretch' spacing={2}>
       <Grid item xs={12}>
         <Paper elevation={4}>
-          <Banner
-            large
-            text={(content || {}).name}
-            description={(content || {}).description}
-          />
+          <Banner large text={(content || {}).name} description={(content || {}).description} />
         </Paper>
       </Grid>
       {((content || {}).sections || []).map((x, idx) => (
@@ -563,11 +442,7 @@ export default function Survey({
           )
         }
       >
-        {!!prefillData
-          ? !!prefillTimestamp
-            ? "Overwrite"
-            : "Duplicate"
-          : "Submit"}
+        {!!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
         <span style={{ width: 8 }} />
         <Icon>save</Icon>
       </Fab>

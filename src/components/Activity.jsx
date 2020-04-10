@@ -29,15 +29,9 @@ function JewelsSettings({ value, onSave, ...props }) {
               ...value,
               settings: { ...settings, [newData[0]]: newValue },
             })
-            enqueueSnackbar(
-              `Successfully changed the value for the parameter '${newData[0]}'.`,
-              { variant: "success" }
-            )
+            enqueueSnackbar(`Successfully changed the value for the parameter '${newData[0]}'.`, { variant: "success" })
           } else {
-            enqueueSnackbar(
-              `The value for the parameter '${newData[0]}' must be numeric.`,
-              { variant: "error" }
-            )
+            enqueueSnackbar(`The value for the parameter '${newData[0]}' must be numeric.`, { variant: "error" })
           }
         },
       }}
@@ -53,27 +47,15 @@ function JewelsSettings({ value, onSave, ...props }) {
   )
 }
 
-export default function Activity({
-  allActivities,
-  activity,
-  studyID,
-  onSave,
-  ...props
-}) {
+export default function Activity({ allActivities, activity, studyID, onSave, ...props }) {
   const isGroup = (activity || {}).spec === "lamp.group"
   const isSurvey = (activity || {}).spec === "lamp.survey"
-  const isJewels = ["lamp.jewels_a", "lamp.jewels_b"].includes(
-    (activity || {}).spec
-  )
+  const isJewels = ["lamp.jewels_a", "lamp.jewels_b"].includes((activity || {}).spec)
   return (
     <ResponsivePaper elevation={4}>
       {isGroup && (
         <Box m={4}>
-          <GroupCreator
-            activities={allActivities}
-            value={activity}
-            onSave={onSave}
-          />
+          <GroupCreator activities={allActivities} value={activity} onSave={onSave} />
         </Box>
       )}
       {isSurvey && (

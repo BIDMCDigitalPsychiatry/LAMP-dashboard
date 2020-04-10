@@ -1,14 +1,7 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import {
-  CssBaseline,
-  Fab,
-  Button,
-  Icon,
-  ThemeProvider,
-  createMuiTheme,
-} from "@material-ui/core"
+import { CssBaseline, Fab, Button, Icon, ThemeProvider, createMuiTheme } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -63,10 +56,7 @@ function AppRouter({ ...props }) {
       //
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
-        enqueueSnackbar(
-          `You're using the "${src}" server to log into mindLAMP.`,
-          { variant: "info" }
-        )
+        enqueueSnackbar(`You're using the "${src}" server to log into mindLAMP.`, { variant: "info" })
       }
 
       //
@@ -118,23 +108,17 @@ function AppRouter({ ...props }) {
     closeSnackbar("admin")
     closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
-      enqueueSnackbar(
-        "Proceed with caution: you are logged in as the administrator.",
-        {
-          key: "admin",
-          variant: "info",
-          persist: true,
-          preventDuplicate: true,
-          action: (key) => (
-            <Button
-              style={{ color: "#fff" }}
-              onClick={() => closeSnackbar(key)}
-            >
-              Dismiss
-            </Button>
-          ),
-        }
-      )
+      enqueueSnackbar("Proceed with caution: you are logged in as the administrator.", {
+        key: "admin",
+        variant: "info",
+        persist: true,
+        preventDuplicate: true,
+        action: (key) => (
+          <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
+            Dismiss
+          </Button>
+        ),
+      })
     } else if (state.auth?.serverAddress === "demo.lamp.digital") {
       enqueueSnackbar(
         "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
@@ -144,10 +128,7 @@ function AppRouter({ ...props }) {
           persist: true,
           preventDuplicate: true,
           action: (key) => (
-            <Button
-              style={{ color: "#fff" }}
-              onClick={() => closeSnackbar(key)}
-            >
+            <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
               Dismiss
             </Button>
           ),
@@ -171,9 +152,7 @@ function AppRouter({ ...props }) {
         identity: null,
         auth: null,
         authType: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(
-          state.auth.serverAddress
-        )
+        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
           ? undefined
           : state.auth.serverAddress,
       }))
@@ -241,11 +220,7 @@ function AppRouter({ ...props }) {
             !state.identity ? (
               <React.Fragment>
                 <PageTitle>mindLAMP | Login</PageTitle>
-                <NavigationLayout
-                  noToolbar
-                  goBack={props.history.goBack}
-                  onLogout={() => reset()}
-                >
+                <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                   <Login
                     setIdentity={async (identity) => await reset(identity)}
                     lastDomain={state.lastDomain}
@@ -274,11 +249,7 @@ function AppRouter({ ...props }) {
           !state.identity || state.authType !== "admin" ? (
             <React.Fragment>
               <PageTitle>mindLAMP | Login</PageTitle>
-              <NavigationLayout
-                noToolbar
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-              >
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
@@ -308,11 +279,7 @@ function AppRouter({ ...props }) {
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | Login</PageTitle>
-              <NavigationLayout
-                noToolbar
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-              >
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
@@ -324,9 +291,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`${
-                getResearcher(props.match.params.id).name
-              }`}</PageTitle>
+              <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
               <NavigationLayout
                 id={props.match.params.id}
                 title={`${getResearcher(props.match.params.id).name}`}
@@ -336,9 +301,7 @@ function AppRouter({ ...props }) {
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
-                  onParticipantSelect={(id) =>
-                    props.history.push(`/participant/${id}`)
-                  }
+                  onParticipantSelect={(id) => props.history.push(`/participant/${id}`)}
                 />
               </NavigationLayout>
             </React.Fragment>
@@ -353,11 +316,7 @@ function AppRouter({ ...props }) {
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | Login</PageTitle>
-              <NavigationLayout
-                noToolbar
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-              >
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
@@ -369,9 +328,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`Patient ${
-                getParticipant(props.match.params.id).id
-              }`}</PageTitle>
+              <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
               <NavigationLayout
                 enableMessaging
                 id={props.match.params.id}
@@ -380,9 +337,7 @@ function AppRouter({ ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Participant
-                  participant={getParticipant(props.match.params.id)}
-                />
+                <Participant participant={getParticipant(props.match.params.id)} />
               </NavigationLayout>
             </React.Fragment>
           )

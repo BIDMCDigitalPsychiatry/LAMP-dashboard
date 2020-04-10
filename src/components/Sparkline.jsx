@@ -128,9 +128,7 @@ export default withParentSize(function Sparkline({ ...props }) {
       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
         <ListItemText
           primaryTypographyProps={{ variant: "overline" }}
-          secondary={
-            !series || Object.keys(series).length === 0 ? datum.y : undefined
-          }
+          secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
         >
           {datum.x.toLocaleString("en-US", Date.formatStyle("full"))}
         </ListItemText>
@@ -147,21 +145,13 @@ export default withParentSize(function Sparkline({ ...props }) {
               display: "block",
               style: { color: "#f00", fontWeight: 900, lineHeight: "1em" },
             }}
-            secondary={
-              series[props.YAxisLabel ?? "Data"]?.missing
-                ? "Missing Data"
-                : undefined
-            }
+            secondary={series[props.YAxisLabel ?? "Data"]?.missing ? "Missing Data" : undefined}
           >
             <span
               style={{
                 color: props.color,
-                textDecoration:
-                  series[props.YAxisLabel ?? "Data"] === datum
-                    ? `underline dotted ${props.color}`
-                    : null,
-                fontWeight:
-                  series[props.YAxisLabel ?? "Data"] === datum ? 900 : 500,
+                textDecoration: series[props.YAxisLabel ?? "Data"] === datum ? `underline dotted ${props.color}` : null,
+                fontWeight: series[props.YAxisLabel ?? "Data"] === datum ? 900 : 500,
               }}
             >{`${props.YAxisLabel ?? "Data"} `}</span>
             <span>{series[props.YAxisLabel ?? "Data"].y}</span>
@@ -198,10 +188,7 @@ export default withParentSize(function Sparkline({ ...props }) {
             domain:
               props.data.length <= 0
                 ? undefined
-                : [
-                    props.startDate ?? props.data.slice(0, 1)[0].x,
-                    props.data.slice(-1)[0].x,
-                  ],
+                : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
           }}
           yScale={{ type: "linear" }}
         >
@@ -213,11 +200,7 @@ export default withParentSize(function Sparkline({ ...props }) {
             strokeWidth={1}
             orientation={["diagonal"]}
           />
-          <LinearGradient
-            id={`gradient-${rand}`}
-            from={props.color}
-            to='#ffffff00'
-          />
+          <LinearGradient id={`gradient-${rand}`} from={props.color} to='#ffffff00' />
           {props.XAxisLabel && (
             <XAxis
               label={props.XAxisLabel}
@@ -258,12 +241,7 @@ export default withParentSize(function Sparkline({ ...props }) {
             fillOpacity={1}
             strokeWidth={0}
           />
-          <PointSeries
-            data={props.data.filter((x) => x.missing)}
-            fill='#ff0000'
-            fillOpacity={1}
-            strokeWidth={0}
-          />
+          <PointSeries data={props.data.filter((x) => x.missing)} fill='#ff0000' fillOpacity={1} strokeWidth={0} />
           <CrossHair
             fullHeight
             showHorizontalLine={false}
@@ -271,13 +249,7 @@ export default withParentSize(function Sparkline({ ...props }) {
             strokeDasharray='3 1'
             circleSize={(d) => (d.y === tooltipData.datum.y ? 8 : 4)}
             circleStyles={{ strokeWidth: 0.0 }}
-            circleFill={(d) =>
-              d.y === tooltipData.datum.y
-                ? d.missing
-                  ? "#f00"
-                  : props.color
-                : "#fff"
-            }
+            circleFill={(d) => (d.y === tooltipData.datum.y ? (d.missing ? "#f00" : props.color) : "#fff")}
             showCircle
           />
           <Brush

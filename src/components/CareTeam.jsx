@@ -1,15 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Grid,
-  Icon,
-  Button,
-  Collapse,
-  Typography,
-  Divider,
-  useTheme,
-  useMediaQuery,
-} from "@material-ui/core"
+import { Grid, Icon, Button, Collapse, Typography, Divider, useTheme, useMediaQuery } from "@material-ui/core"
 
 // Local Imports
 import LAMP from "../lamp"
@@ -27,18 +18,8 @@ export default function CareTeam({ participant, ...props }) {
 
   useEffect(() => {
     ;(async function () {
-      let ext = (
-        await LAMP.Type.getAttachment(
-          participant.id,
-          "lamp.dashboard.credential_roles.external"
-        )
-      ).data
-      let int = (
-        await LAMP.Type.getAttachment(
-          participant.id,
-          "lamp.dashboard.credential_roles"
-        )
-      ).data
+      let ext = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles.external")).data
+      let int = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles")).data
       setAccounts([
         {
           id: 0,
@@ -77,12 +58,7 @@ export default function CareTeam({ participant, ...props }) {
 
   return (
     <React.Fragment>
-      <Grid
-        container
-        direction={sm ? "column-reverse" : "row"}
-        justify={sm ? "center" : "space-between"}
-        spacing={2}
-      >
+      <Grid container direction={sm ? "column-reverse" : "row"} justify={sm ? "center" : "space-between"} spacing={2}>
         <Grid
           container
           item
@@ -104,23 +80,15 @@ export default function CareTeam({ participant, ...props }) {
               Meet your care team.
             </Typography>
             <Typography variant='subtitle1' align={sm ? "center" : "left"}>
-              Your care team consists of your clinicians and family members
-              you'd like to grant access to your data. To add a family member,
-              press the{" "}
-              <Icon style={{ verticalAlign: "-0.2em" }}>add_circle</Icon> icon{" "}
+              Your care team consists of your clinicians and family members you'd like to grant access to your data. To
+              add a family member, press the <Icon style={{ verticalAlign: "-0.2em" }}>add_circle</Icon> icon{" "}
               {sm ? "above" : "to the right"}.
             </Typography>
           </Grid>
           <Grid item>
-            <Button
-              variant='outlined'
-              color='secondary'
-              onClick={() => setShowMessaging((x) => !x)}
-            >
+            <Button variant='outlined' color='secondary' onClick={() => setShowMessaging((x) => !x)}>
               {showMessaging ? "Hide" : "Show"} my conversations
-              <Icon>
-                {showMessaging ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-              </Icon>
+              <Icon>{showMessaging ? "keyboard_arrow_up" : "keyboard_arrow_down"}</Icon>
             </Button>
           </Grid>
           <Grid item />
@@ -138,11 +106,7 @@ export default function CareTeam({ participant, ...props }) {
           participant={participant.id}
         />
       </Collapse>
-      <ResponsiveDialog
-        transient
-        open={showCredentials}
-        onClose={() => setShowCredentials()}
-      >
+      <ResponsiveDialog transient open={showCredentials} onClose={() => setShowCredentials()}>
         <CredentialManager id={participant.id} style={{ margin: 16 }} />
       </ResponsiveDialog>
     </React.Fragment>
