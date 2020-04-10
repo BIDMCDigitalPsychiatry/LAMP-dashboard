@@ -46,7 +46,6 @@ export default function Participant({ participant, ...props }) {
     const { enqueueSnackbar } = useSnackbar()
     const [tab, setTab] = useState('assess')
 
-
     const supportsSidebar = useMediaQuery(useTheme().breakpoints.up('md'))
     useEffect(() => { setSidebarOpen(false) }, [survey])
 
@@ -558,18 +557,49 @@ export default function Participant({ participant, ...props }) {
                     ))}
                 </React.Fragment>
             }
-        <Paper elevation={9} style={{ position: 'fixed', width: '100%', left: 0, bottom: 0, zIndex: 500 }}>
-            <BottomNavigation
-                value={tab}
-                onChange={(_, newTab) => setTab(newTab)}
-                showLabels
+            <Drawer
+                anchor={supportsSidebar ? 'left' : 'bottom'}
+                open="true"
+                variant="permanent"
+                PaperProps={{ style: { 
+                    flexDirection: supportsSidebar ? 'column' : 'row', 
+                    justifyContent: !supportsSidebar ? 'center' : undefined,
+                    height: !supportsSidebar ? 56 : undefined
+                }}}
             >
-                <BottomNavigationAction label="Learn" value="learn" icon={<Icon>bookmark_border</Icon>} />
-                <BottomNavigationAction label="Assess" value="assess" icon={<Icon>assessment</Icon>} />
-                <BottomNavigationAction label="Manage" value="manage" icon={<Icon>create_outlined</Icon>} />
-                <BottomNavigationAction label="Prevent" value="prevent" icon={<Icon>speaker_notes_outlined</Icon>} />
-            </BottomNavigation>
-        </Paper>
-      </React.Fragment>
+                <BottomNavigationAction 
+                    showLabel
+                    selected={tab === 'learn'} 
+                    label="Learn" 
+                    value="learn" 
+                    icon={<Icon>bookmark_border</Icon>} 
+                    onChange={(_, newTab) => setTab(newTab)}
+                />
+                <BottomNavigationAction 
+                    showLabel
+                    selected={tab === 'assess'} 
+                    label="Assess" 
+                    value="assess" 
+                    icon={<Icon>assessment</Icon>} 
+                    onChange={(_, newTab) => setTab(newTab)}
+                />
+                <BottomNavigationAction 
+                    showLabel
+                    selected={tab === 'manage'} 
+                    label="Manage" 
+                    value="manage" 
+                    icon={<Icon>create_outlined</Icon>} 
+                    onChange={(_, newTab) => setTab(newTab)}
+                />
+                <BottomNavigationAction 
+                    showLabel
+                    selected={tab === 'prevent'} 
+                    label="Prevent" 
+                    value="prevent" 
+                    icon={<Icon>speaker_notes_outlined</Icon>} 
+                    onChange={(_, newTab) => setTab(newTab)}
+                />
+            </Drawer>
+        </React.Fragment>
     )
 }
