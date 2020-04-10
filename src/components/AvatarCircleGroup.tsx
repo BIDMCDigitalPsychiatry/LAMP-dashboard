@@ -1,56 +1,56 @@
-import * as React from "react";
-import { Avatar, Menu, MenuItem, Tooltip, ButtonBase } from "@material-ui/core";
-import { isFragment } from "react-is";
-import clsx from "clsx";
-import { makeStyles, createStyles } from "@material-ui/core";
+import * as React from "react"
+import { Avatar, Menu, MenuItem, Tooltip, ButtonBase } from "@material-ui/core"
+import { isFragment } from "react-is"
+import clsx from "clsx"
+import { makeStyles, createStyles } from "@material-ui/core"
 
-const createTestAccount = id => ({
+const createTestAccount = (id) => ({
   id,
   name: `${id}`,
-  image: "/images/test.jpg"
-});
+  image: "/images/test.jpg",
+})
 
 export const useMenu = (): any => {
-  const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null });
+  const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null })
   const handleOpen = React.useCallback(
     (id, event) => setAnchor({ id, anchorEl: event.currentTarget }),
     [setAnchor]
-  );
+  )
   const handleClose = React.useCallback(
     () => setAnchor({ id: null, anchorEl: null }),
     [setAnchor]
-  );
-  return [anchor, handleOpen, handleClose];
-};
+  )
+  return [anchor, handleOpen, handleClose]
+}
 
 export const useAccounts = ({
   accounts: Accounts = [],
   onDelete,
-  onAdd
+  onAdd,
 }): any => {
-  const [accounts, setAccounts] = React.useState(Accounts);
+  const [accounts, setAccounts] = React.useState(Accounts)
 
   const addAccount = React.useCallback(
     (account, index = accounts.length) => {
-      setAccounts(prev => {
-        var next = [...prev];
-        next.splice(index, 0, account);
-        return next;
-      });
-      onAdd && onAdd(account);
+      setAccounts((prev) => {
+        var next = [...prev]
+        next.splice(index, 0, account)
+        return next
+      })
+      onAdd && onAdd(account)
     },
     [accounts, setAccounts, onAdd]
-  );
+  )
 
   const deleteAccount = React.useCallback(
-    id => {
-      setAccounts(prev => [...prev].filter(a => a.id !== id));
-      onDelete && onDelete(id);
+    (id) => {
+      setAccounts((prev) => [...prev].filter((a) => a.id !== id))
+      onDelete && onDelete(id)
     },
     [setAccounts, onDelete]
-  );
-  return [accounts, addAccount, deleteAccount];
-};
+  )
+  return [accounts, addAccount, deleteAccount]
+}
 
 const useStyles = makeStyles(() =>
   createStyles({
@@ -61,14 +61,14 @@ const useStyles = makeStyles(() =>
       height: diameter,
       padding: avatarWidth / 2,
       borderRadius: "50%",
-      margin: "auto"
+      margin: "auto",
     }),
     avatar: ({ avatarWidth }) => ({
       align: "center",
       height: avatarWidth,
       width: avatarWidth,
       margin: -(avatarWidth + 4) / 2,
-      border: "solid 2px white"
+      border: "solid 2px white",
     }),
     circle: ({ index, diameter, count }) => ({
       display: "block",
@@ -77,13 +77,14 @@ const useStyles = makeStyles(() =>
       zIndex: 1,
       transform:
         index !== 0 &&
-        `rotate(${index * (360 / count)}deg) translate(${diameter /
-          2}px) rotate(-${index * (360 / count)}deg)`
+        `rotate(${index * (360 / count)}deg) translate(${
+          diameter / 2
+        }px) rotate(-${index * (360 / count)}deg)`,
     }),
     line: {
       borderTopColor: "lightgrey",
       borderTopStyle: "dashed",
-      borderTopWidth: 3
+      borderTopWidth: 3,
     },
     linePosition: ({ x0, y0, length, angle }) => ({
       position: "absolute",
@@ -91,10 +92,10 @@ const useStyles = makeStyles(() =>
       left: `${x0}px`,
       width: `${length}px`,
       transform: `rotate(${angle}deg)`,
-      transformOrigin: "0 0"
-    })
+      transformOrigin: "0 0",
+    }),
   } as any)
-);
+)
 
 const OnCircle = ({
   children,
@@ -105,7 +106,7 @@ const OnCircle = ({
   classes = {} as any,
   ...props
 }) => {
-  const [ref, setRef] = React.useState(null);
+  const [ref, setRef] = React.useState(null)
   return (
     <>
       {line && (
@@ -119,59 +120,59 @@ const OnCircle = ({
         />
       )}
       <div
-        ref={el => setRef(el)}
+        ref={(el) => setRef(el)}
         className={clsx(useStyles(props).circle, classes.circle)}
       >
         {children}
       </div>
     </>
-  );
-};
+  )
+}
 
-const defaultAnchor = { x: 0.5, y: 0.5 };
+const defaultAnchor = { x: 0.5, y: 0.5 }
 
 function parseAnchorPercent(value) {
-  const percent = parseFloat(value) / 100;
+  const percent = parseFloat(value) / 100
   if (isNaN(percent) || !isFinite(percent)) {
-    throw new Error(`LinkTo could not parse percent value "${value}"`);
+    throw new Error(`LinkTo could not parse percent value "${value}"`)
   }
-  return percent;
+  return percent
 }
 
 function parseAnchorText(value) {
   // Try to infer the relevant axis.
   switch (value) {
     case "top":
-      return { y: 0 };
+      return { y: 0 }
     case "left":
-      return { x: 0 };
+      return { x: 0 }
     case "middle":
-      return { y: 0.5 };
+      return { y: 0.5 }
     case "center":
-      return { x: 0.5 };
+      return { x: 0.5 }
     case "bottom":
-      return { y: 1 };
+      return { y: 1 }
     case "right":
-      return { x: 1 };
+      return { x: 1 }
   }
-  return null;
+  return null
 }
 
 function parseAnchor(value) {
   if (!value) {
-    return defaultAnchor;
+    return defaultAnchor
   }
-  const parts = value.split(" ");
+  const parts = value.split(" ")
   if (parts.length > 2) {
-    throw new Error('LinkTo anchor format is "<x> <y>"');
+    throw new Error('LinkTo anchor format is "<x> <y>"')
   }
-  const [x, y] = parts;
+  const [x, y] = parts
   return Object.assign(
     {},
     defaultAnchor,
     x ? parseAnchorText(x) || { x: parseAnchorPercent(x) } : {},
     y ? parseAnchorText(y) || { y: parseAnchorPercent(y) } : {}
-  );
+  )
 }
 
 const Line = (props: any) => {
@@ -183,59 +184,57 @@ const Line = (props: any) => {
     parent,
     count: Count,
     avatarWidth,
-    className
-  } = props;
+    className,
+  } = props
 
   const getCoordinates = React.useCallback(() => {
     if (!from || !to) {
-      return false;
+      return false
     }
 
-    const anchor0 = parseAnchor(fromAnchor);
-    const anchor1 = parseAnchor(toAnchor);
+    const anchor0 = parseAnchor(fromAnchor)
+    const anchor1 = parseAnchor(toAnchor)
 
-    const box0 = from.getBoundingClientRect();
-    const box1 = to.getBoundingClientRect();
+    const box0 = from.getBoundingClientRect()
+    const box1 = to.getBoundingClientRect()
 
-    let offsetX = window.pageXOffset;
-    let offsetY = window.pageYOffset;
+    let offsetX = window.pageXOffset
+    let offsetY = window.pageYOffset
 
     if (parent) {
-      const boxp = parent.getBoundingClientRect();
+      const boxp = parent.getBoundingClientRect()
 
       offsetX -=
-        boxp.left + (window.pageXOffset || document.documentElement.scrollLeft);
+        boxp.left + (window.pageXOffset || document.documentElement.scrollLeft)
       offsetY -=
-        boxp.top + (window.pageYOffset || document.documentElement.scrollTop);
+        boxp.top + (window.pageYOffset || document.documentElement.scrollTop)
     }
 
-    const x0 = box0.left + box0.width * anchor0.x + offsetX;
-    const x1 = box1.left + box1.width * anchor1.x + offsetX;
-    const y0 = box0.top + box0.height * anchor0.y + offsetY;
-    const y1 = box1.top + box1.height * anchor1.y + offsetY;
+    const x0 = box0.left + box0.width * anchor0.x + offsetX
+    const x1 = box1.left + box1.width * anchor1.x + offsetX
+    const y0 = box0.top + box0.height * anchor0.y + offsetY
+    const y1 = box1.top + box1.height * anchor1.y + offsetY
 
-    return { x0, y0, x1, y1 } as any;
-  }, [from, to, fromAnchor, toAnchor, parent]);
+    return { x0, y0, x1, y1 } as any
+  }, [from, to, fromAnchor, toAnchor, parent])
 
-  const [, setCount] = React.useState(); // Needed to trigger re-render of lines on add/remove
+  const [, setCount] = React.useState() // Needed to trigger re-render of lines on add/remove
 
   React.useEffect(() => {
-    setCount(Count);
-  }, [Count]); // Needed to trigger re-render of lines on add/remove
+    setCount(Count)
+  }, [Count]) // Needed to trigger re-render of lines on add/remove
 
-  const { x0, y0, x1, y1 } = getCoordinates();
+  const { x0, y0, x1, y1 } = getCoordinates()
 
-  const dy = y1 - y0;
-  const dx = x1 - x0;
+  const dy = y1 - y0
+  const dx = x1 - x0
 
-  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-  const length = Math.sqrt(dx * dx + dy * dy) - avatarWidth / 2;
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI
+  const length = Math.sqrt(dx * dx + dy * dy) - avatarWidth / 2
 
-  const classes = useStyles({ y0, x0, length, angle });
-  return (
-    <div className={clsx(classes.linePosition, classes.line, className)} />
-  );
-};
+  const classes = useStyles({ y0, x0, length, angle })
+  return <div className={clsx(classes.linePosition, classes.line, className)} />
+}
 
 const AvatarMesh = React.forwardRef(function AvatarMesh(
   {
@@ -249,27 +248,27 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
   }: any,
   ref: any
 ) {
-  const classes = useStyles({ diameter, avatarWidth });
+  const classes = useStyles({ diameter, avatarWidth })
 
-  const children = React.Children.toArray(childrenProp).filter(child => {
+  const children = React.Children.toArray(childrenProp).filter((child) => {
     if (isFragment(child)) {
       console.error(
         [
           "Material-UI: the AvatarMesh component doesn't accept a Fragment as a child.",
-          "Consider providing an array instead."
+          "Consider providing an array instead.",
         ].join("\n")
-      );
+      )
     }
-    return React.isValidElement(child);
-  });
+    return React.isValidElement(child)
+  })
 
-  const [root, setRoot] = React.useState(null);
-  const [parent, setParent] = React.useState(null);
+  const [root, setRoot] = React.useState(null)
+  const [parent, setParent] = React.useState(null)
 
-  const handleSetRef = el => {
-    ref && ref(el);
-    setParent(el);
-  };
+  const handleSetRef = (el) => {
+    ref && ref(el)
+    setParent(el)
+  }
 
   return (
     <div
@@ -290,28 +289,28 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
           classes={Classes}
         >
           {React.cloneElement(c, {
-            ref: el => (i === 0 ? setRoot(el) : undefined),
+            ref: (el) => (i === 0 ? setRoot(el) : undefined),
             className: clsx(classes.avatar, c?.props.className),
             style: {
               zIndex: children.length - i,
-              ...c.props.style
-            }
+              ...c.props.style,
+            },
           })}
         </OnCircle>
       ))}
     </div>
-  );
-});
+  )
+})
 
 export interface AvatarCircleGroupProps {
-  diameter?: number;
-  avatarWidth?: number;
-  accounts: any[];
-  lines?: boolean;
-  onAdd?: (account) => void;
-  onRemove?: (id) => void;
-  onResetPassword?: (id) => void;
-  classes?: object;
+  diameter?: number
+  avatarWidth?: number
+  accounts: any[]
+  lines?: boolean
+  onAdd?: (account) => void
+  onRemove?: (id) => void
+  onResetPassword?: (id) => void
+  classes?: object
 }
 
 export default function AvatarCircleGroup({
@@ -322,9 +321,9 @@ export default function AvatarCircleGroup({
   onAdd: OnAdd = undefined,
   onRemove = undefined,
   onResetPassword = undefined,
-  classes = undefined
+  classes = undefined,
 }: AvatarCircleGroupProps) {
-  const [anchor, handleOpen, handleClose] = useMenu();
+  const [anchor, handleOpen, handleClose] = useMenu()
   /*const onAdd = React.useCallback(
     account => {
       OnAdd && OnAdd(account);
@@ -383,9 +382,22 @@ export default function AvatarCircleGroup({
         classes={classes}
       >
         {accounts.map(({ id, name, image, tooltip, onClick, ...other }, i) => (
-          <Tooltip key={id} title={tooltip || ''}>
-            <ButtonBase style={{ borderRadius: avatarWidth / 2 }} onClick={onClick}>
-            <Avatar alt={name} src={image} {...other} style={{ ...(other.style || {}), width: avatarWidth, height: avatarWidth, margin: -(avatarWidth + 4) / 2 }} />
+          <Tooltip key={id} title={tooltip || ""}>
+            <ButtonBase
+              style={{ borderRadius: avatarWidth / 2 }}
+              onClick={onClick}
+            >
+              <Avatar
+                alt={name}
+                src={image}
+                {...other}
+                style={{
+                  ...(other.style || {}),
+                  width: avatarWidth,
+                  height: avatarWidth,
+                  margin: -(avatarWidth + 4) / 2,
+                }}
+              />
             </ButtonBase>
           </Tooltip>
         ))}
@@ -403,5 +415,5 @@ export default function AvatarCircleGroup({
         {/*<MenuItem onClick={handleChangePassword}>Change Password</MenuItem>*/}
       </Menu>
     </>
-  );
+  )
 }

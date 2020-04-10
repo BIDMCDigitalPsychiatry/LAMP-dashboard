@@ -1,332 +1,457 @@
-
 // Core Imports
-import React, { useState, useEffect, useRef } from 'react'
-import { HashRouter, Route, Redirect, Switch } from 'react-router-dom'
-import { CssBaseline, Fab, Button, Icon, ThemeProvider, createMuiTheme } from '@material-ui/core'
-import { blue, red } from '@material-ui/core/colors'
-import { MuiPickersUtilsProvider } from '@material-ui/pickers'
-import { SnackbarProvider, useSnackbar } from 'notistack'
-import 'typeface-roboto'
+import React, { useState, useEffect, useRef } from "react"
+import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
+import {
+  CssBaseline,
+  Fab,
+  Button,
+  Icon,
+  ThemeProvider,
+  createMuiTheme,
+} from "@material-ui/core"
+import { blue, red } from "@material-ui/core/colors"
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import { SnackbarProvider, useSnackbar } from "notistack"
+import "typeface-roboto"
 
 // External Imports
-import DateFnsUtils from '@date-io/date-fns'
-import SwaggerUI from 'swagger-ui-react'
-import 'swagger-ui-react/swagger-ui.css'
+import DateFnsUtils from "@date-io/date-fns"
+import SwaggerUI from "swagger-ui-react"
+import "swagger-ui-react/swagger-ui.css"
 
 // Local Imports
-import LAMP from '../lamp'
-import Login from './Login'
-import Root from './Root'
-import Researcher from './Researcher'
-import Participant from './Participant'
-import NavigationLayout from './NavigationLayout'
+import LAMP from "../lamp"
+import Login from "./Login"
+import Root from "./Root"
+import Researcher from "./Researcher"
+import Participant from "./Participant"
+import NavigationLayout from "./NavigationLayout"
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
 
-
-// 
+//
 const srcLock = () => {
-    let query = (window.location.hash.split('?') || [])
-    let src = Object.fromEntries(new URLSearchParams(query[1]))['src']
-    return (typeof src === 'string' && src.length > 0)
+  let query = window.location.hash.split("?") || []
+  let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
+  return typeof src === "string" && src.length > 0
 }
 
-
 function PageTitle({ children, ...props }) {
-    useEffect(() => { document.title = `${typeof children === 'string' ? children : ''}` })
-    return <React.Fragment />
+  useEffect(() => {
+    document.title = `${typeof children === "string" ? children : ""}`
+  })
+  return <React.Fragment />
 }
 
 function AppRouter({ ...props }) {
-    const [ deferredPrompt, setDeferredPrompt ] = useState(null)
-    const [ state, setState ] = useState({ identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type, lastDomain: undefined })
-    const [ store, setStore ] = useState({ researchers: [], participants: [] })
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-    const storeRef = useRef([])
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const [state, setState] = useState({
+    identity: LAMP.Auth._me,
+    auth: LAMP.Auth._auth,
+    authType: LAMP.Auth._type,
+    lastDomain: undefined,
+  })
+  const [store, setStore] = useState({ researchers: [], participants: [] })
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const storeRef = useRef([])
 
-    useEffect(() => {
-        let query = window.location.hash.split('?')
-        if (!!query && query.length > 1) {
+  useEffect(() => {
+    let query = window.location.hash.split("?")
+    if (!!query && query.length > 1) {
+      //
+      let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
+      if (typeof src === "string" && src.length > 0) {
+        enqueueSnackbar(
+          `You're using the "${src}" server to log into mindLAMP.`,
+          { variant: "info" }
+        )
+      }
 
-            // 
-            let src = Object.fromEntries(new URLSearchParams(query[1]))['src']
-            if (typeof src === 'string' && src.length > 0) {
-                enqueueSnackbar(`You're using the "${src}" server to log into mindLAMP.`, { variant: 'info' })
-            }
+      //
+      let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
+      if (a === undefined) return
+      let x = atob(a).split(":")
 
-            // 
-            let a = Object.fromEntries(new URLSearchParams(query[1]))['a']
-            if (a === undefined) return
-            let x = atob(a).split(':')
-
-            // 
-            reset({ 
-                id: x[0],
-                password: x[1],
-                serverAddress: x[2]
-            }).then(x => {
-                //props.history.replace('/')
-            })
-        } else if (!state.identity) {
-            LAMP.Auth.refresh_identity().then(x => {
-                setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth, authType: LAMP.Auth._type }))
-            })
-        }
-        
-        window.addEventListener('beforeinstallprompt', (e) => setDeferredPrompt(e))
-    }, [])
-
-    useEffect(() => {
-        if (!deferredPrompt) 
-            return
-        enqueueSnackbar('Add mindLAMP to your home screen?', { 
-            variant: 'info', 
-            persist: true, 
-            action: key =>
-                <React.Fragment>
-                    <Button style={{ color: '#fff' }} onClick={promptInstall}>Install</Button>
-                    <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
-                </React.Fragment>
-        })
-    }, [deferredPrompt])
-
-    useEffect(() => {
-        closeSnackbar('admin')
-        closeSnackbar('demo')
-        if (!!state.identity && state.authType === 'admin') {
-            enqueueSnackbar('Proceed with caution: you are logged in as the administrator.', { 
-                key: 'admin',
-                variant: 'info',
-                persist: true, 
-                preventDuplicate: true,
-                action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
-            })
-        } else if (state.auth?.serverAddress === 'demo.lamp.digital') {
-            enqueueSnackbar('You\'re logged into a demo account. Any changes you make will be reset when you restart the app.', { 
-                key: 'demo',
-                variant: 'info',
-                persist: true, 
-                preventDuplicate: true,
-                action: key => <Button style={{ color: '#fff' }} onClick={() => closeSnackbar(key)}>Dismiss</Button>
-            })
-        }
-    }, [state])
-
-    let reset = async (identity) => {
-        await LAMP.Auth.set_identity(identity)
-        if (!!identity)
-             setState(state => ({ ...state, identity: LAMP.Auth._me, auth: LAMP.Auth._auth , authType: LAMP.Auth._type }))
-        else setState(state => ({ ...state, 
-            identity: null, auth: null, authType: null, 
-            lastDomain: ['api.lamp.digital', 'demo.lamp.digital'].includes(state.auth.serverAddress) ? undefined : state.auth.serverAddress 
+      //
+      reset({
+        id: x[0],
+        password: x[1],
+        serverAddress: x[2],
+      }).then((x) => {
+        //props.history.replace('/')
+      })
+    } else if (!state.identity) {
+      LAMP.Auth.refresh_identity().then((x) => {
+        setState((state) => ({
+          ...state,
+          identity: LAMP.Auth._me,
+          auth: LAMP.Auth._auth,
+          authType: LAMP.Auth._type,
         }))
+      })
     }
 
-    let getResearcher = (id) => {
-        if (id === 'me' && state.authType === 'researcher')
-            id = state.identity.id
-        if (!id || id === 'me')
-            return null //props.history.replace(`/`)
-        if (!!store.researchers[id]) {
-            return store.researchers[id]
-        } else if (!storeRef.current.includes(id)) {
-            LAMP.Researcher.view(id).then(x => setStore({ 
-                researchers: { ...store.researchers, [id]: x }, 
-                participants: store.participants 
-            }))
-            storeRef.current = [ ...storeRef.current, id ]
+    window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
+  }, [])
+
+  useEffect(() => {
+    if (!deferredPrompt) return
+    enqueueSnackbar("Add mindLAMP to your home screen?", {
+      variant: "info",
+      persist: true,
+      action: (key) => (
+        <React.Fragment>
+          <Button style={{ color: "#fff" }} onClick={promptInstall}>
+            Install
+          </Button>
+          <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
+            Dismiss
+          </Button>
+        </React.Fragment>
+      ),
+    })
+  }, [deferredPrompt])
+
+  useEffect(() => {
+    closeSnackbar("admin")
+    closeSnackbar("demo")
+    if (!!state.identity && state.authType === "admin") {
+      enqueueSnackbar(
+        "Proceed with caution: you are logged in as the administrator.",
+        {
+          key: "admin",
+          variant: "info",
+          persist: true,
+          preventDuplicate: true,
+          action: (key) => (
+            <Button
+              style={{ color: "#fff" }}
+              onClick={() => closeSnackbar(key)}
+            >
+              Dismiss
+            </Button>
+          ),
         }
-        return null
-    }
-
-    let getParticipant = (id) => {
-        if (id === 'me' && state.authType === 'participant')
-            id = state.identity.id
-        if (!id || id === 'me')
-            return null //props.history.replace(`/`)
-        if (!!store.participants[id]) {
-            return store.participants[id]
-        } else if (!storeRef.current.includes(id)) {
-            LAMP.Participant.view(id).then(x => setStore({ 
-                researchers: store.researchers,
-                participants: { ...store.participants, [id]: x }
-            }))
-            storeRef.current = [ ...storeRef.current, id ]
+      )
+    } else if (state.auth?.serverAddress === "demo.lamp.digital") {
+      enqueueSnackbar(
+        "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
+        {
+          key: "demo",
+          variant: "info",
+          persist: true,
+          preventDuplicate: true,
+          action: (key) => (
+            <Button
+              style={{ color: "#fff" }}
+              onClick={() => closeSnackbar(key)}
+            >
+              Dismiss
+            </Button>
+          ),
         }
-        return null
+      )
     }
+  }, [state])
 
-    const promptInstall = () => {
-        if (deferredPrompt === null)
-            return
-        deferredPrompt.prompt()
-        deferredPrompt.userChoice.then((c) => {
-            if (c.outcome === 'accepted') {
-                enqueueSnackbar('mindLAMP will be installed on your device.', { variant: 'info' })
-            } else {
-                enqueueSnackbar('mindLAMP will not be installed on your device.', { variant: 'warning' })
-            }
-            setDeferredPrompt(null)
+  let reset = async (identity) => {
+    await LAMP.Auth.set_identity(identity)
+    if (!!identity)
+      setState((state) => ({
+        ...state,
+        identity: LAMP.Auth._me,
+        auth: LAMP.Auth._auth,
+        authType: LAMP.Auth._type,
+      }))
+    else
+      setState((state) => ({
+        ...state,
+        identity: null,
+        auth: null,
+        authType: null,
+        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(
+          state.auth.serverAddress
+        )
+          ? undefined
+          : state.auth.serverAddress,
+      }))
+  }
+
+  let getResearcher = (id) => {
+    if (id === "me" && state.authType === "researcher") id = state.identity.id
+    if (!id || id === "me") return null //props.history.replace(`/`)
+    if (!!store.researchers[id]) {
+      return store.researchers[id]
+    } else if (!storeRef.current.includes(id)) {
+      LAMP.Researcher.view(id).then((x) =>
+        setStore({
+          researchers: { ...store.researchers, [id]: x },
+          participants: store.participants,
         })
+      )
+      storeRef.current = [...storeRef.current, id]
     }
+    return null
+  }
 
-    return (
-        <Switch>
+  let getParticipant = (id) => {
+    if (id === "me" && state.authType === "participant") id = state.identity.id
+    if (!id || id === "me") return null //props.history.replace(`/`)
+    if (!!store.participants[id]) {
+      return store.participants[id]
+    } else if (!storeRef.current.includes(id)) {
+      LAMP.Participant.view(id).then((x) =>
+        setStore({
+          researchers: store.researchers,
+          participants: { ...store.participants, [id]: x },
+        })
+      )
+      storeRef.current = [...storeRef.current, id]
+    }
+    return null
+  }
 
-            {/* Route index => login or home (which redirects based on user type). */}
-            <Route exact path="/" render={props =>
-                (!(window.location.hash.split('?').length > 1 && !state.identity)) ?
-                (!state.identity ?
-                    <React.Fragment>
-                        <PageTitle>mindLAMP | Login</PageTitle>
-                        <NavigationLayout 
-                            noToolbar 
-                            goBack={props.history.goBack} 
-                            onLogout={() => reset()}
-                        >
-                            <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
-                        </NavigationLayout>
-                    </React.Fragment> :
-                    (state.authType === 'admin' ?
-                        <Redirect to="/researcher" /> :
-                    state.authType === 'researcher' ?
-                        <Redirect to="/researcher/me" /> :
-                        <Redirect to="/participant/me" />
-                    )
-                ) : <React.Fragment />
-            } />
+  const promptInstall = () => {
+    if (deferredPrompt === null) return
+    deferredPrompt.prompt()
+    deferredPrompt.userChoice.then((c) => {
+      if (c.outcome === "accepted") {
+        enqueueSnackbar("mindLAMP will be installed on your device.", {
+          variant: "info",
+        })
+      } else {
+        enqueueSnackbar("mindLAMP will not be installed on your device.", {
+          variant: "warning",
+        })
+      }
+      setDeferredPrompt(null)
+    })
+  }
 
-            {/* Route authenticated routes. */}
-            <Route exact path="/researcher" render={props =>
-                !state.identity || (state.authType !== 'admin') ?
-                <React.Fragment>
-                    <PageTitle>mindLAMP | Login</PageTitle>
-                    <NavigationLayout 
-                        noToolbar 
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
-                    </NavigationLayout>
-                </React.Fragment> :
-                <React.Fragment>
-                    <PageTitle>Administrator</PageTitle>
-                    <NavigationLayout 
-                        title="Administrator" 
-                        profile={state.authType === 'admin' ? {} : state.identity} 
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Root {...props} />
-                    </NavigationLayout>
-                </React.Fragment>
-            } />
-            <Route exact path="/researcher/:id" render={props =>
-                !state.identity ? 
-                <React.Fragment>
-                    <PageTitle>mindLAMP | Login</PageTitle>
-                    <NavigationLayout 
-                        noToolbar 
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
-                    </NavigationLayout>
-                </React.Fragment>:
-                !getResearcher(props.match.params.id) ? 
-                <React.Fragment /> :
-                <React.Fragment>
-                    <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
-                    <NavigationLayout 
-                        id={props.match.params.id}
-                        title={`${getResearcher(props.match.params.id).name}`} 
-                        profile={state.authType === 'admin' ? {} : state.identity}
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Researcher researcher={getResearcher(props.match.params.id)} onParticipantSelect={(id) => props.history.push(`/participant/${id}`)} />
-                    </NavigationLayout>
-                </React.Fragment>
-            } />
+  return (
+    <Switch>
+      {/* Route index => login or home (which redirects based on user type). */}
+      <Route
+        exact
+        path='/'
+        render={(props) =>
+          !(window.location.hash.split("?").length > 1 && !state.identity) ? (
+            !state.identity ? (
+              <React.Fragment>
+                <PageTitle>mindLAMP | Login</PageTitle>
+                <NavigationLayout
+                  noToolbar
+                  goBack={props.history.goBack}
+                  onLogout={() => reset()}
+                >
+                  <Login
+                    setIdentity={async (identity) => await reset(identity)}
+                    lastDomain={state.lastDomain}
+                    onComplete={() => props.history.replace("/")}
+                  />
+                </NavigationLayout>
+              </React.Fragment>
+            ) : state.authType === "admin" ? (
+              <Redirect to='/researcher' />
+            ) : state.authType === "researcher" ? (
+              <Redirect to='/researcher/me' />
+            ) : (
+              <Redirect to='/participant/me' />
+            )
+          ) : (
+            <React.Fragment />
+          )
+        }
+      />
 
-            <Route exact path="/participant/:id" render={props =>
-                !state.identity ? 
-                <React.Fragment>
-                    <PageTitle>mindLAMP | Login</PageTitle>
-                    <NavigationLayout 
-                        noToolbar 
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Login setIdentity={async (identity) => await reset(identity) } lastDomain={state.lastDomain} onComplete={() => props.history.replace('/')} />
-                    </NavigationLayout>
-                </React.Fragment> : 
-                !getParticipant(props.match.params.id) ? 
-                <React.Fragment /> :
-                <React.Fragment>
-                    <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
-                    <NavigationLayout 
-                        enableMessaging
-                        id={props.match.params.id}
-                        title={`Patient ${getParticipant(props.match.params.id).id}`} 
-                        profile={state.authType === 'admin' ? {} : state.identity}
-                        goBack={props.history.goBack} 
-                        onLogout={() => reset()}
-                    >
-                        <Participant participant={getParticipant(props.match.params.id)} />
-                    </NavigationLayout>
-                </React.Fragment>
-            } />
+      {/* Route authenticated routes. */}
+      <Route
+        exact
+        path='/researcher'
+        render={(props) =>
+          !state.identity || state.authType !== "admin" ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout
+                noToolbar
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>Administrator</PageTitle>
+              <NavigationLayout
+                title='Administrator'
+                profile={state.authType === "admin" ? {} : state.identity}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Root {...props} />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
+      <Route
+        exact
+        path='/researcher/:id'
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout
+                noToolbar
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : !getResearcher(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{`${
+                getResearcher(props.match.params.id).name
+              }`}</PageTitle>
+              <NavigationLayout
+                id={props.match.params.id}
+                title={`${getResearcher(props.match.params.id).name}`}
+                profile={state.authType === "admin" ? {} : state.identity}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Researcher
+                  researcher={getResearcher(props.match.params.id)}
+                  onParticipantSelect={(id) =>
+                    props.history.push(`/participant/${id}`)
+                  }
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
 
-            {/* Route API documentation ONLY. */}
-            <Route exact path="/api" render={props =>
-                <React.Fragment>
-                    <PageTitle>LAMP Platform API</PageTitle>
-                    <SwaggerUI 
-                        url="https://api.lamp.digital/" 
-                        docExpansion="list" 
-                        displayOperationId={true} 
-                        deepLinking={true} 
-                        displayRequestDuration={true} 
-                    />
-                </React.Fragment>
-            } />
-        </Switch>
-    )
+      <Route
+        exact
+        path='/participant/:id'
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout
+                noToolbar
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : !getParticipant(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{`Patient ${
+                getParticipant(props.match.params.id).id
+              }`}</PageTitle>
+              <NavigationLayout
+                enableMessaging
+                id={props.match.params.id}
+                title={`Patient ${getParticipant(props.match.params.id).id}`}
+                profile={state.authType === "admin" ? {} : state.identity}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Participant
+                  participant={getParticipant(props.match.params.id)}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
+
+      {/* Route API documentation ONLY. */}
+      <Route
+        exact
+        path='/api'
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>LAMP Platform API</PageTitle>
+            <SwaggerUI
+              url='https://api.lamp.digital/'
+              docExpansion='list'
+              displayOperationId={true}
+              deepLinking={true}
+              displayRequestDuration={true}
+            />
+          </React.Fragment>
+        )}
+      />
+    </Switch>
+  )
 }
 
 export default function App({ ...props }) {
-    return (
-        <ThemeProvider theme={createMuiTheme({
-                typography: {
-                useNextVariants: true,
-            },
-                palette: {
-                    primary: blue,
-                    secondary: red,
-                    background: {
-                      default: "#fff"
-                    }
-                },
-                appBar: {
-                    height: 48,
-                }, 
-                ripple: {
-                    color: red,
-                }
-            })}
-        >
-            <CssBaseline />
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                <SnackbarProvider maxSnack={3}>
-                    <HashRouter>
-                        <AppRouter {...props} />
-                    </HashRouter>
-                </SnackbarProvider>
-            </MuiPickersUtilsProvider>
-            <span style={{ position: 'fixed', bottom: 16, left: 16, fontSize: '8', zIndex: -1, opacity: 0.1 }}>{process.env.REACT_APP_GIT_SHA}</span>
-        </ThemeProvider>
-    )
+  return (
+    <ThemeProvider
+      theme={createMuiTheme({
+        typography: {
+          useNextVariants: true,
+        },
+        palette: {
+          primary: blue,
+          secondary: red,
+          background: {
+            default: "#fff",
+          },
+        },
+        appBar: {
+          height: 48,
+        },
+        ripple: {
+          color: red,
+        },
+      })}
+    >
+      <CssBaseline />
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
+        <SnackbarProvider maxSnack={3}>
+          <HashRouter>
+            <AppRouter {...props} />
+          </HashRouter>
+        </SnackbarProvider>
+      </MuiPickersUtilsProvider>
+      <span
+        style={{
+          position: "fixed",
+          bottom: 16,
+          left: 16,
+          fontSize: "8",
+          zIndex: -1,
+          opacity: 0.1,
+        }}
+      >
+        {process.env.REACT_APP_GIT_SHA}
+      </span>
+    </ThemeProvider>
+  )
 }
