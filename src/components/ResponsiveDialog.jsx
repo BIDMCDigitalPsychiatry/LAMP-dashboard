@@ -2,7 +2,7 @@
 import React from "react"
 import { Dialog, Icon, IconButton, Slide, useTheme, useMediaQuery } from "@material-ui/core"
 
-const SlideUp = React.forwardRef((props, ref) => <Slide direction='up' {...props} ref={ref} />)
+const SlideUp = React.forwardRef((props, ref) => <Slide direction="up" {...props} ref={ref} />)
 
 //
 export default function ResponsiveDialog({ transient, animate, fullScreen, children, ...props }) {
@@ -20,7 +20,7 @@ export default function ResponsiveDialog({ transient, animate, fullScreen, child
             zIndex: 99999,
           }}
           onClick={props.onClose}
-          aria-label='Close'
+          aria-label="Close"
         >
           <Icon>close</Icon>
         </IconButton>

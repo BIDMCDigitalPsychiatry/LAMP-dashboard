@@ -62,7 +62,7 @@ export default function CareTeam({ participant, ...props }) {
         <Grid
           container
           item
-          direction='column'
+          direction="column"
           spacing={1}
           alignItems={sm ? "center" : "flex-start"}
           xs={12}
@@ -72,21 +72,21 @@ export default function CareTeam({ participant, ...props }) {
         >
           <Grid item>
             <Typography
-              variant='h2'
+              variant="h2"
               gutterBottom
               align={sm ? "center" : "left"}
               style={{ fontWeight: 700, color: "#074377" }}
             >
               Meet your care team.
             </Typography>
-            <Typography variant='subtitle1' align={sm ? "center" : "left"}>
+            <Typography variant="subtitle1" align={sm ? "center" : "left"}>
               Your care team consists of your clinicians and family members you'd like to grant access to your data. To
               add a family member, press the <Icon style={{ verticalAlign: "-0.2em" }}>add_circle</Icon> icon{" "}
               {sm ? "above" : "to the right"}.
             </Typography>
           </Grid>
           <Grid item>
-            <Button variant='outlined' color='secondary' onClick={() => setShowMessaging((x) => !x)}>
+            <Button variant="outlined" color="secondary" onClick={() => setShowMessaging((x) => !x)}>
               {showMessaging ? "Hide" : "Show"} my conversations
               <Icon>{showMessaging ? "keyboard_arrow_up" : "keyboard_arrow_down"}</Icon>
             </Button>

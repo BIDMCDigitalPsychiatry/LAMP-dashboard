@@ -81,7 +81,6 @@
   },
   "prettier": {
     "semi": false,
-    "jsxSingleQuote": true,
     "printWidth": 120
   },
   "eslintConfig": {

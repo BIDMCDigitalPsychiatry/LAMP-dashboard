@@ -33,7 +33,7 @@ function InlineMenu({ customTimes, onChange, ...props }) {
 
   return (
     <React.Fragment>
-      <Button variant='outlined' onClick={(e) => setOpen(e.currentTarget)}>
+      <Button variant="outlined" onClick={(e) => setOpen(e.currentTarget)}>
         {manyDates(items)}
       </Button>
       <Menu
@@ -48,17 +48,17 @@ function InlineMenu({ customTimes, onChange, ...props }) {
         </MenuItem>
         {items?.map((x, idx) => (
           <MenuItem dense disabled key={idx}>
-            <Typography variant='overline'>
+            <Typography variant="overline">
               {new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
             </Typography>
             <ListItemSecondaryAction>
-              <Tooltip title='Delete this time from the list.'>
+              <Tooltip title="Delete this time from the list.">
                 <IconButton
-                  edge='end'
-                  aria-label='remove'
+                  edge="end"
+                  aria-label="remove"
                   onClick={() => setItems((x) => x.slice(0, idx).concat(x.slice(idx + 1)))}
                 >
-                  <Icon fontSize='small'>delete_forever</Icon>
+                  <Icon fontSize="small">delete_forever</Icon>
                 </IconButton>
               </Tooltip>
             </ListItemSecondaryAction>
@@ -68,24 +68,24 @@ function InlineMenu({ customTimes, onChange, ...props }) {
         <MenuItem>
           <KeyboardTimePicker
             autoOk
-            variant='inline'
-            inputVariant='outlined'
-            format='h:mm a'
-            label='Time'
-            helperText='Add a new custom time.'
+            variant="inline"
+            inputVariant="outlined"
+            format="h:mm a"
+            label="Time"
+            helperText="Add a new custom time."
             InputAdornmentProps={{ position: "start" }}
             InputProps={{
               style: { color: "#000" },
               endAdornment: (
-                <InputAdornment position='end'>
-                  <Tooltip title='Add this time to the list.'>
+                <InputAdornment position="end">
+                  <Tooltip title="Add this time to the list.">
                     <IconButton
-                      edge='end'
-                      aria-label='add'
+                      edge="end"
+                      aria-label="add"
                       onClick={() => setItems((x) => [...x, current.toJSON()])}
                       onMouseDown={(event) => event.preventDefault()}
                     >
-                      <Icon fontSize='small'>check</Icon>
+                      <Icon fontSize="small">check</Icon>
                     </IconButton>
                   </Tooltip>
                 </InputAdornment>
@@ -105,7 +105,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
   const schedules = activity?.schedule ?? []
   return (
     <MaterialTable
-      title='Activity Schedule'
+      title="Activity Schedule"
       data={schedules}
       columns={[
         {
@@ -119,11 +119,11 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
             <KeyboardDatePicker
               autoOk
               animateYearScrolling
-              variant='inline'
-              inputVariant='outlined'
-              format='MM/dd/yyyy'
-              label='Start Date'
-              helperText='Select the start date.'
+              variant="inline"
+              inputVariant="outlined"
+              format="MM/dd/yyyy"
+              label="Start Date"
+              helperText="Select the start date."
               InputAdornmentProps={{ position: "start" }}
               value={props.value}
               onChange={(date) => date?.isValid() && props.onChange(date)}
@@ -140,11 +140,11 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
           editComponent: (props) => (
             <KeyboardTimePicker
               autoOk
-              variant='inline'
-              inputVariant='outlined'
-              format='h:mm a'
-              label='Time'
-              helperText='Select the start time.'
+              variant="inline"
+              inputVariant="outlined"
+              format="h:mm a"
+              label="Time"
+              helperText="Select the start time."
               InputAdornmentProps={{ position: "start" }}
               value={props.value}
               onChange={(date) => date?.isValid() && props.onChange(date)}
@@ -178,7 +178,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
             props.repeat_interval === "custom" ? <span>{manyDates(props.custom_time)}</span> : "No custom times",
           editComponent: (props) =>
             props.rowData.repeat_interval !== "custom" ? (
-              <Button variant='outlined' disabled>
+              <Button variant="outlined" disabled>
                 No custom times
               </Button>
             ) : (

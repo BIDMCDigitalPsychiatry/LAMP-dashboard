@@ -21,9 +21,9 @@ Launcher.Placeholder = function Placeholder({ ...props }) {
     <React.Fragment>
       <Box
         {...props}
-        bgcolor='grey.100'
+        bgcolor="grey.100"
         border={1}
-        borderColor='grey.300'
+        borderColor="grey.300"
         borderRadius={8}
         style={{
           width: 150,
@@ -31,14 +31,14 @@ Launcher.Placeholder = function Placeholder({ ...props }) {
           ...(props.style || {}),
         }}
       >
-        <Grid container direction='column' justify='center' alignItems='center' style={{ height: "100%" }}>
+        <Grid container direction="column" justify="center" alignItems="center" style={{ height: "100%" }}>
           <Grid item>
             <Icon>more_horiz</Icon>
           </Grid>
           <Grid item />
         </Grid>
       </Box>
-      <Typography variant='overline' align='center'>
+      <Typography variant="overline" align="center">
         No items available
       </Typography>
     </React.Fragment>
@@ -71,15 +71,15 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
           }}
         >
           <ButtonBase style={{ width: "100%", height: "100%" }} onClick={onClick || (() => {})}>
-            <Grid container direction='column' justify='center' alignItems='center' style={{ height: "100%" }}>
-              <Grid item>{icon || <Icon fontSize='large'>more_horiz</Icon>}</Grid>
+            <Grid container direction="column" justify="center" alignItems="center" style={{ height: "100%" }}>
+              <Grid item>{icon || <Icon fontSize="large">more_horiz</Icon>}</Grid>
               <Grid item />
             </Grid>
           </ButtonBase>
         </Paper>
       </Tooltip>
-      <Box textAlign='center' padding style={{ width: 150 }}>
-        <Typography variant='overline' style={{ lineHeight: "normal" }}>
+      <Box textAlign="center" padding style={{ width: 150 }}>
+        <Typography variant="overline" style={{ lineHeight: "normal" }}>
           {!!notification || !!favorite ? <b>{title}</b> : title}
         </Typography>
       </Box>
@@ -98,15 +98,15 @@ Launcher.Section = function Section({ title, children, ...props }) {
   return (
     <React.Fragment>
       <Grid item style={{ margin: "0px 16px" }}>
-        <Typography variant='overline' style={{ fontWeight: 700, fontSize: 16 }}>
+        <Typography variant="overline" style={{ fontWeight: 700, fontSize: 16 }}>
           {title}
         </Typography>
       </Grid>
       <Grid>
         <Grid
           container
-          justify='center'
-          direction='row'
+          justify="center"
+          direction="row"
           wrap={scroll ? "nowrap" : "wrap"}
           spacing={scroll ? 2 : 1}
           style={{
@@ -141,7 +141,7 @@ Launcher.Section = function Section({ title, children, ...props }) {
 
 Launcher.Group = function ({ children, ...props }) {
   return (
-    <Grid container direction='column' spacing={2} wrap='nowrap'>
+    <Grid container direction="column" spacing={2} wrap="nowrap">
       <Grid item />
       {children.map((x, idx) => (
         <React.Fragment key={idx}>

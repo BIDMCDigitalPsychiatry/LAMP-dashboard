@@ -44,22 +44,22 @@ export default function ActivityCard({
 
   return (
     <React.Fragment>
-      <Box display='flex' justifyContent='space-between' alignContent='center' m={2}>
+      <Box display="flex" justifyContent="space-between" alignContent="center" m={2}>
         {!Boolean(visibleSlice) ? (
-          <Tooltip title='Switch Views'>
+          <Tooltip title="Switch Views">
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
-              <Icon fontSize='small'>dashboard</Icon>
+              <Icon fontSize="small">dashboard</Icon>
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title='Go Back'>
+          <Tooltip title="Go Back">
             <IconButton onClick={(event) => setVisibleSlice()}>
-              <Icon fontSize='small'>arrow_back</Icon>
+              <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
         )}
         <Tooltip title={Boolean(visibleSlice) ? activity.name : `Activity Type`}>
-          <Typography variant='h6' align='center' style={{ marginTop: 6, flexGrow: 1 }}>
+          <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
             {!Boolean(visibleSlice)
               ? activity.name
               : visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))}
@@ -67,30 +67,30 @@ export default function ActivityCard({
         </Tooltip>
         <div>
           {!Boolean(visibleSlice) && (
-            <Tooltip title='Show App Screenshot'>
+            <Tooltip title="Show App Screenshot">
               <IconButton onClick={(event) => setHelpAnchor(event.currentTarget)}>
-                <Icon fontSize='small'>help</Icon>
+                <Icon fontSize="small">help</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onDeleteAction && (
-            <Tooltip title='Delete Entry'>
+            <Tooltip title="Delete Entry">
               <IconButton onClick={(event) => onDeleteAction(visibleSlice)}>
-                <Icon fontSize='small'>delete</Icon>
+                <Icon fontSize="small">delete</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onCopyAction && (
-            <Tooltip title='Copy Entry'>
+            <Tooltip title="Copy Entry">
               <IconButton onClick={(event) => onCopyAction(visibleSlice)}>
-                <Icon fontSize='small'>file_copy</Icon>
+                <Icon fontSize="small">file_copy</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onEditAction && (
-            <Tooltip title='Edit Entry'>
+            <Tooltip title="Edit Entry">
               <IconButton onClick={(event) => onEditAction(visibleSlice)}>
-                <Icon fontSize='small'>edit</Icon>
+                <Icon fontSize="small">edit</Icon>
               </IconButton>
             </Tooltip>
           )}
@@ -99,7 +99,7 @@ export default function ActivityCard({
       <Divider />
       {Boolean(visibleSlice) ? (
         (visibleSlice.slice || []).length === 0 ? (
-          <Typography variant='subtitle2' style={{ margin: 16 }}>
+          <Typography variant="subtitle2" style={{ margin: 16 }}>
             No detail view available.
           </Typography>
         ) : (
@@ -155,8 +155,8 @@ export default function ActivityCard({
         <Sparkline
           minWidth={250}
           minHeight={250}
-          XAxisLabel='Time'
-          YAxisLabel='Score'
+          XAxisLabel="Time"
+          YAxisLabel="Score"
           color={blue[500]}
           startDate={startDate}
           data={events.map((d) => ({

@@ -71,12 +71,12 @@ const SnackMessage = React.forwardRef((props, ref) => {
   return (
     <Card className={classes.card} ref={ref}>
       <CardActions classes={{ root: classes.actionRoot }}>
-        <Typography variant='subtitle2' className={classes.typography}>
+        <Typography variant="subtitle2" className={classes.typography}>
           {props.message}
         </Typography>
         <div className={classes.icons}>
           <IconButton
-            aria-label='Show more'
+            aria-label="Show more"
             className={classnames(classes.expand, {
               [classes.expandOpen]: expanded,
             })}
@@ -89,7 +89,7 @@ const SnackMessage = React.forwardRef((props, ref) => {
           </IconButton>
         </div>
       </CardActions>
-      <Collapse in={expanded} timeout='auto' unmountOnExit>
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Paper className={classes.collapse}>{props.children}</Paper>
       </Collapse>
     </Card>

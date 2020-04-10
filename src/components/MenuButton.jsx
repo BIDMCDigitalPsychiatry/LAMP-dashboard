@@ -6,13 +6,13 @@ export default function MenuButton({ title, icon, color, hideMainButton, items, 
   const [anchorEl, setAnchorEl] = useState(null)
   return (
     <React.Fragment>
-      <ButtonGroup variant='contained' color={color || "secondary"}>
+      <ButtonGroup variant="contained" color={color || "secondary"}>
         {hideMainButton !== true && (
           <Button
             {...props}
-            variant='contained'
+            variant="contained"
             color={color || "secondary"}
-            aria-haspopup='true'
+            aria-haspopup="true"
             onClick={(event) => !!onAction && onAction()}
           >
             {title}
@@ -20,8 +20,8 @@ export default function MenuButton({ title, icon, color, hideMainButton, items, 
         )}
         <Button
           color={color || "secondary"}
-          size='small'
-          aria-haspopup='true'
+          size="small"
+          aria-haspopup="true"
           onClick={(event) => setAnchorEl(event.currentTarget)}
         >
           {icon || <Icon>arrow_drop_down</Icon>}

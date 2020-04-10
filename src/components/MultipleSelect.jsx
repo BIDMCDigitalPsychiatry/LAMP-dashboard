@@ -24,7 +24,7 @@ export default function MultipleSelect({ ...props }) {
           <Badge
             showZero={props.showZeroBadges}
             badgeContent={(props.badges || {})[item] || props.defaultBadge || 0}
-            color='primary'
+            color="primary"
           >
             <Chip
               label={item}

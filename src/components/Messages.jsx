@@ -28,7 +28,7 @@ function MessageItem({ from, date, text, flipped, ...props }) {
     <Grid
       container
       direction={flipped ? "row" : "row-reverse"}
-      alignItems='flex-end'
+      alignItems="flex-end"
       spacing={1}
       style={{ padding: 8 }}
     >
@@ -118,17 +118,17 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
   // FIXME: don't pass in props ie. functions!
   return (
     <Box {...props}>
-      <Grid container direction={sm ? "column" : "row"} alignItems='stretch'>
+      <Grid container direction={sm ? "column" : "row"} alignItems="stretch">
         <Grid item hidden={!!privateOnly}>
           <Tabs
             value={messageTab}
             onChange={(e, value) => setMessageTab(value)}
             orientation={sm ? "horizontal" : "vertical"}
-            variant='scrollable'
-            indicatorColor='primary'
-            textColor='primary'
+            variant="scrollable"
+            indicatorColor="primary"
+            textColor="primary"
           >
-            <Tab label='Messages' index={0} />
+            <Tab label="Messages" index={0} />
             <Tab label={!!props.participantOnly ? "My Journal" : "Patient Notes"} index={1} />
           </Tabs>
         </Grid>
@@ -136,7 +136,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
           <Divider orientation={sm ? "horizontal" : "vertical"} />
         </Grid>
         <Grid item style={{ flexGrow: 1 }}>
-          <Grid container direction='column'>
+          <Grid container direction="column">
             <Grid item>
               <Box
                 mx={2}
@@ -167,9 +167,9 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
             </Grid>
             <Grid item>
               <TextField
-                label='Send a message'
+                label="Send a message"
                 style={{ margin: 16, paddingRight: 32 }}
-                placeholder='Message...'
+                placeholder="Message..."
                 value={currentMessage || ""}
                 onChange={(event) => setCurrentMessage(event.target.value)}
                 helperText={`Your ${!!props.participantOnly ? "clinician" : "patient"} will ${
@@ -177,18 +177,18 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
                     ? "be able to see your messages when they log in."
                     : "not be able to see this message."
                 }`}
-                margin='normal'
-                variant='outlined'
+                margin="normal"
+                variant="outlined"
                 multiline
                 fullWidth
-                rowsMax='15'
+                rowsMax="15"
                 InputProps={{
                   endAdornment: [
-                    <InputAdornment key={"end"} position='end'>
-                      <Tooltip title='Send Message'>
+                    <InputAdornment key={"end"} position="end">
+                      <Tooltip title="Send Message">
                         <IconButton
-                          edge='end'
-                          aria-label='send'
+                          edge="end"
+                          aria-label="send"
                           onClick={sendMessage}
                           onMouseDown={(event) => event.preventDefault()}
                         >

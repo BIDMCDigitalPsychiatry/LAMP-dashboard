@@ -386,7 +386,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         ]}
         onRowClick={(event, rowData, togglePanel) => modifyActivity(rowData)}
         detailPanel={(rowData) => (
-          <Box ml={6} borderLeft={1} borderColor='grey.300'>
+          <Box ml={6} borderLeft={1} borderColor="grey.300">
             <ActivityScheduler activity={rowData} onChange={(x) => updateSchedule({ ...rowData, schedule: x })} />
           </Box>
         )}
@@ -434,7 +434,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         keepMounted
         open={Boolean(createMenu)}
         anchorPosition={createMenu?.getBoundingClientRect()}
-        anchorReference='anchorPosition'
+        anchorReference="anchorPosition"
         onClose={() => setCreateMenu()}
       >
         <MenuItem disabled divider>
@@ -458,7 +458,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           Survey Instrument
         </MenuItem>
         {!_hideCognitiveTesting() && [
-          <MenuItem key='head' disabled>
+          <MenuItem key="head" disabled>
             <b>Smartphone Cognitive Tests</b>
           </MenuItem>,
           ...activitySpecs.map((x) => (
@@ -482,22 +482,22 @@ export default function ActivityList({ studyID, title, ...props }) {
           color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
         >
           <input {...getInputProps()} />
-          <Typography variant='h6'>Drag files here, or click to select files.</Typography>
+          <Typography variant="h6">Drag files here, or click to select files.</Typography>
         </Box>
       </Dialog>
       <Dialog open={!!importFile} onClose={() => setImportFile()}>
         <MaterialTable
-          title='Continue importing?'
+          title="Continue importing?"
           data={importFile || []}
           columns={[{ title: "Activity Name", field: "name" }]}
           options={{ search: false, selection: false }}
           components={{ Container: (props) => <div {...props} /> }}
         />
         <DialogActions>
-          <Button onClick={() => setImportFile()} color='secondary' autoFocus>
+          <Button onClick={() => setImportFile()} color="secondary" autoFocus>
             Cancel
           </Button>
-          <Button onClick={importActivities} color='primary' autoFocus>
+          <Button onClick={importActivities} color="primary" autoFocus>
             Import
           </Button>
         </DialogActions>
