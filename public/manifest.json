@@ -1,24 +1,24 @@
 {
-	"dir" : "ltr",
-	"lang" : "English",
-	"name" : "mindLAMP",
-	"scope" : "/",
-	"display" : "standalone",
-	"start_url" : ".",
-	"short_name" : "mindLAMP",
-	"theme_color" : "#ffffff",
-	"description" : "mindLAMP app.",
-	"orientation" : "natural",
-	"background_color" : "#ffffff",
-	"related_applications" : [],
-	"prefer_related_applications" : false,
-	"icons" : [
-		{
-			"src": "logo.png",
-			"sizes": "360x360",
-			"type": "image/png"
-		}
-	],
-	"screenshots" : [],
-	"generated" : "true"
+  "dir": "ltr",
+  "lang": "English",
+  "name": "mindLAMP",
+  "scope": "/",
+  "display": "standalone",
+  "start_url": ".",
+  "short_name": "mindLAMP",
+  "theme_color": "#ffffff",
+  "description": "mindLAMP app.",
+  "orientation": "natural",
+  "background_color": "#ffffff",
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "360x360",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [],
+  "generated": "true"
 }

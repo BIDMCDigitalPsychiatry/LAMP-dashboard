@@ -9,7 +9,12 @@
     "@types/react-dom": "^16.9.5",
     "@types/react-is": "^16.7.1",
     "@types/react-router-dom": "^4.3.4",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "http-server": "^0.11.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.1.3",
+    "prettier": "2.0.4",
     "react-scripts": "^3.3.0",
     "typescript": "3.7.2"
   },
@@ -48,10 +53,49 @@
   "scripts": {
     "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
     "start-sw": "http-server ./build",
-    "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build"
+    "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
+    "format": "prettier --write 'src/**/*.{js,ts,jsx,tsx}'"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.ts": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.jsx": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.tsx": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "jsxSingleQuote": true,
+    "printWidth": 120
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "react-app",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "prettier/@typescript-eslint"
+    ]
   },
   "browserslist": [
     ">0.2%",

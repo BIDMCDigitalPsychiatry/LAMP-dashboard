@@ -1,26 +1,24 @@
-
 // Core Imports
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from "react"
+import ReactDOM from "react-dom"
 
-// Local Imports 
-import App from './components/App'
-import * as serviceWorker from './serviceWorker'
+// Local Imports
+import App from "./components/App"
+import * as serviceWorker from "./serviceWorker"
 
 // External Imports
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-import 'url-search-params-polyfill'
-import 'material-icons'
+import "core-js/stable"
+import "regenerator-runtime/runtime"
+import "url-search-params-polyfill"
+import "material-icons"
 
 // in index.html: <!DOCTYPE html><html></html>
-let root = document.createElement('div')
-var css = document.createElement('style')
+let root = document.createElement("div")
+var css = document.createElement("style")
 document.head.appendChild(css)
 document.body.appendChild(root)
-css.type = 'text/css'
-css.innerHTML = 
-`* {
+css.type = "text/css"
+css.innerHTML = `* {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -39,10 +37,10 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
 
 ReactDOM.render(<App />, root)
 serviceWorker.register({
-    onUpdate: registration => {
-        //alert('Updating to the latest available version of mindLAMP.')
-        if (registration && registration.waiting)
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' })
-        window.location.reload()
-    }
+  onUpdate: (registration) => {
+    //alert('Updating to the latest available version of mindLAMP.')
+    if (registration && registration.waiting)
+      registration.waiting.postMessage({ type: "SKIP_WAITING" })
+    window.location.reload()
+  },
 })
