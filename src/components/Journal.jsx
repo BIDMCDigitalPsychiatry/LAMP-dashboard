@@ -1,12 +1,17 @@
 
 // Core Imports 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box, Container, TextField, Button, Grid, Icon } from '@material-ui/core'
 import { KeyboardDatePicker } from '@material-ui/pickers'
+import { useSnackbar } from 'notistack'
 
 export default function Journal() {
   const [selectedDate, setSelectedDate] = useState(new Date('2020-04-25T21:11:54'))
-  
+  const { enqueueSnackbar } = useSnackbar()
+  useEffect(() => {
+    enqueueSnackbar(`This is a demo only. Entries will not be saved.`, { variant: 'info'})
+  }, [])
+
   return (
     <Container maxWidth="sm">
       <Box display="flex" border={2} borderColor="grey.300" borderRadius={8} bgcolor="#fff" p={5} my={10}>
