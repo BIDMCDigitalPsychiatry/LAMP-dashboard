@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Box, Divider, Switch, Typography, Tabs, Tab } from "@material-ui/core"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import ParticipantList from "./ParticipantList"
 import ActivityList from "./ActivityList"
 import { ResponsivePaper } from "./Utils"

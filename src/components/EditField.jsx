@@ -4,7 +4,7 @@ import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-
 import { useSnackbar } from "notistack"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized

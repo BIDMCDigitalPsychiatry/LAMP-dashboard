@@ -13,7 +13,7 @@ import SwaggerUI from "swagger-ui-react"
 import "swagger-ui-react/swagger-ui.css"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import Login from "./Login"
 import Root from "./Root"
 import Researcher from "./Researcher"

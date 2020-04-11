@@ -2,9 +2,6 @@
 import React, { useState, useEffect } from "react"
 import { Typography, ButtonBase } from "@material-ui/core"
 
-// Local Imports
-import Activity from "../lamp/Activity"
-
 // TODO: Settings!
 
 const makeJewels = () =>
@@ -19,18 +16,18 @@ export default function Jewels({ onComplete, ...props }) {
   const [jewels, setJewels] = useState(makeJewels())
   const [actions, setActions] = useState([])
   // eslint-disable-next-line
-  const [activity, setActivity] = useState(new Activity({}))
+  const [activity, setActivity] = useState({})
 
   useEffect(() => {
-    activity.start()
-    return () => activity.stop()
+    //activity.start()
+    return () => {} //activity.stop()
   }, [])
 
   const onTap = (idx) => {
     setActions((actions) => [...actions, idx])
-    activity.emit(0, 0, 0, 0)
+    //activity.emit(0, 0, 0, 0)
     if (jewels.filter((x) => actions.find((y) => y === x.i) === undefined).length === 0) {
-      activity.stop()
+      //activity.stop()
       !!onComplete && onComplete(activity)
     }
   }

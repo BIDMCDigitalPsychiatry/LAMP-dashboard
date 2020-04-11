@@ -21,7 +21,7 @@ import { blue } from "@material-ui/core/colors"
 import { useSnackbar } from "notistack"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import ActivityCard from "./ActivityCard"
 import MultipleSelect from "./MultipleSelect"
 import CareTeam from "./CareTeam"
@@ -92,7 +92,7 @@ export default function Participant({ participant, ...props }) {
       let _state = {
         ...state,
         activities: _activities,
-        activity_events: (await LAMP.ResultEvent.allByParticipant(participant.id))
+        activity_events: (await LAMP.ActivityEvent.allByParticipant(participant.id))
           .map((x) => ({
             ...x,
             activity: _activities.find(
@@ -214,7 +214,7 @@ export default function Participant({ participant, ...props }) {
       duration: 0,
       activity: activities[idx].id,
       static_data: { survey_name: activities[idx].name },
-      temporal_events: (x || []).map((y) => ({
+      temporal_slices: (x || []).map((y) => ({
         item: y !== undefined ? y.item : null,
         value: y !== undefined ? y.value : null,
         type: null,
@@ -226,8 +226,8 @@ export default function Participant({ participant, ...props }) {
     //
     Promise.all(
       events
-        .filter((x) => x.temporal_events.length > 0)
-        .map((x) => LAMP.ResultEvent.create(participant.id, x).catch((e) => console.dir(e)))
+        .filter((x) => x.temporal_slices.length > 0)
+        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
       setSubmission((x) => x + 1)
     })

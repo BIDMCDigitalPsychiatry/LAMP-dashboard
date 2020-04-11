@@ -39,8 +39,7 @@ ReactDOM.render(<App />, root)
 serviceWorker.register({
   onUpdate: (registration) => {
     //alert('Updating to the latest available version of mindLAMP.')
-    if (registration && registration.waiting)
-      registration.waiting.postMessage({ type: "SKIP_WAITING" })
+    if (registration && registration.waiting) registration.waiting.postMessage({ type: "SKIP_WAITING" })
     window.location.reload()
   },
 })

@@ -25,7 +25,7 @@ import {
 import { KeyboardDateTimePicker } from "@material-ui/pickers"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import useKeyPress from "./useKeyPress"
 import { ResponsivePaper } from "./Utils"
 

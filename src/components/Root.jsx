@@ -5,7 +5,7 @@ import MaterialTable from "material-table"
 import { useSnackbar } from "notistack"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import CredentialManager from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 

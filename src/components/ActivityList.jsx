@@ -20,7 +20,7 @@ import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import Activity from "./Activity"
 import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"

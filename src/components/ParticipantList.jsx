@@ -25,7 +25,7 @@ import en from "javascript-time-ago/locale/en"
 import QRCode from "qrcode.react"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import Messages from "./Messages"
 import EditField from "./EditField"
 import CredentialManager from "./CredentialManager"
@@ -139,16 +139,16 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
     let zip = new JSZip()
     for (let row of selectedRows) {
       let sensorEvents = await LAMP.SensorEvent.allByParticipant(row.id)
-      let resultEvents = await LAMP.ResultEvent.allByParticipant(row.id)
+      let activityEvents = await LAMP.ActivityEvent.allByParticipant(row.id)
       if (filetype === "json") {
         zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
-        zip.file(`${row.id}/result_event.json`, JSON.stringify(resultEvents))
+        zip.file(`${row.id}/result_event.json`, JSON.stringify(activityEvents))
       } else if (filetype === "csv") {
         jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function (err, csv) {
           if (err) return console.log(err)
           zip.file(`${row.id}/sensor_event.csv`, csv)
         })
-        jsonexport(JSON.parse(JSON.stringify(resultEvents)), function (err, csv) {
+        jsonexport(JSON.parse(JSON.stringify(activityEvents)), function (err, csv) {
           if (err) return console.log(err)
           zip.file(`${row.id}/result_event.csv`, csv)
         })

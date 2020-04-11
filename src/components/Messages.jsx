@@ -18,7 +18,7 @@ import {
 import { blue, grey } from "@material-ui/core/colors"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 
 const capitalize = (x) => x.charAt(0).toUpperCase() + x.slice(1)

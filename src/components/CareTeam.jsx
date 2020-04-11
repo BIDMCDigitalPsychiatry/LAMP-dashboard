@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Grid, Icon, Button, Collapse, Typography, Divider, useTheme, useMediaQuery } from "@material-ui/core"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 import AvatarCircleGroup from "./AvatarCircleGroup"
 import CredentialManager from "./CredentialManager"
 import Messages from "./Messages"

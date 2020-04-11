@@ -23,7 +23,7 @@ import QRCode from "qrcode.react"
 import { useDropzone } from "react-dropzone"
 
 // Local Imports
-import LAMP from "../lamp"
+import LAMP from "lamp-core"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
