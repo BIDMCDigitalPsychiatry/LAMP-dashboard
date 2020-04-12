@@ -86,12 +86,12 @@ export function unspliceActivity(x) {
 export default function ActivityList({ studyID, title, ...props }) {
   const [activitySpecs, setActivitySpecs] = useState([])
   const [activities, setActivities] = useState([])
-  const [createMenu, setCreateMenu] = useState()
-  const [showCreate, setShowCreate] = useState()
-  const [groupCreate, setGroupCreate] = useState()
-  const [showActivityImport, setShowActivityImport] = useState()
-  const [importFile, setImportFile] = useState()
-  const [selectedActivity, setSelectedActivity] = useState()
+  const [createMenu, setCreateMenu] = useState<Element>()
+  const [showCreate, setShowCreate] = useState(false)
+  const [groupCreate, setGroupCreate] = useState(false)
+  const [showActivityImport, setShowActivityImport] = useState(false)
+  const [importFile, setImportFile] = useState<any>()
+  const [selectedActivity, setSelectedActivity] = useState<any>()
   const { enqueueSnackbar } = useSnackbar()
   useEffect(() => {
     LAMP.Activity.allByStudy(studyID).then(setActivities)
@@ -111,8 +111,8 @@ export default function ActivityList({ studyID, title, ...props }) {
     reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
     reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
     reader.onload = () => {
-      setShowActivityImport()
-      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result))))
+      setShowActivityImport(false)
+      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
       if (
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
@@ -141,7 +141,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async () => {
     const _importFile = [...importFile] // clone it so we can close the dialog first
-    setImportFile()
+    setImportFile(undefined)
 
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
@@ -158,13 +158,11 @@ export default function ActivityList({ studyID, title, ...props }) {
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
       const { raw, tag } = unspliceActivity(x)
       try {
-        allIDs[raw.id] = (
-          await LAMP.Activity.create(studyID, {
-            ...raw,
-            id: undefined,
-            tableData: undefined,
-          })
-        ).data
+        allIDs[raw.id] = ((await LAMP.Activity.create(studyID, {
+          ...raw,
+          id: undefined,
+          tableData: undefined,
+        } as any)) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
       } catch (e) {
         enqueueSnackbar("Couldn't import one of the selected survey Activities.", { variant: "error" })
@@ -174,13 +172,11 @@ export default function ActivityList({ studyID, title, ...props }) {
     // CTests only.
     for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
       try {
-        allIDs[x.id] = (
-          await LAMP.Activity.create(studyID, {
-            ...x,
-            id: undefined,
-            tableData: undefined,
-          })
-        ).data
+        allIDs[x.id] = ((await LAMP.Activity.create(studyID, {
+          ...x,
+          id: undefined,
+          tableData: undefined,
+        })) as any).data
       } catch (e) {
         enqueueSnackbar("Couldn't import one of the selected cognitive test Activities.", { variant: "error" })
       }
@@ -212,7 +208,7 @@ export default function ActivityList({ studyID, title, ...props }) {
     for (let x of rows) {
       if (x.spec === "lamp.survey") {
         try {
-          let res = await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")
+          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any
           let activity = spliceActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
@@ -231,17 +227,17 @@ export default function ActivityList({ studyID, title, ...props }) {
   const saveActivity = async (x) => {
     // FIXME: ensure this is a lamp.survey only!
     const { raw, tag } = unspliceActivity(x)
-    let newItem = await LAMP.Activity.create(studyID, raw)
+    let newItem = (await LAMP.Activity.create(studyID, raw)) as any
     await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
     enqueueSnackbar("Successfully created a new survey Activity.", {
       variant: "success",
     })
-    setShowCreate()
+    setShowCreate(false)
   }
 
   // Create a new Activity object that represents a group of other Activities.
   const saveGroup = async (x) => {
-    let newItem = await LAMP.Activity.create(studyID, {
+    let newItem = (await LAMP.Activity.create(studyID, {
       ...x,
       id: undefined,
       schedule: [
@@ -252,7 +248,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           custom_time: null, // FIXME should not need this!
         },
       ],
-    })
+    })) as any
     //console.dir(newItem)
     if (!!newItem.error)
       enqueueSnackbar("Failed to create a new group Activity.", {
@@ -262,12 +258,12 @@ export default function ActivityList({ studyID, title, ...props }) {
       enqueueSnackbar("Successfully created a new group Activity.", {
         variant: "success",
       })
-    setGroupCreate()
+    setGroupCreate(false)
   }
 
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
-    let newItem = await LAMP.Activity.create(studyID, { spec: x.name })
+    let newItem = (await LAMP.Activity.create(studyID, { spec: x.name })) as any
     //console.dir(newItem)
     if (!!newItem.data) {
       onChange()
@@ -299,7 +295,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async (raw) => {
     if (raw.spec === "lamp.survey") {
-      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.survey_description")].map((y) =>
+      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.survey_description")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
       const activity = spliceActivity({ raw, tag })
@@ -315,7 +311,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   const updateActivity = async (x, isDuplicated) => {
     if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
       // Short-circuit for groups and CTests
-      let result = await LAMP.Activity.update(x.id, { settings: x.settings })
+      let result = (await LAMP.Activity.update(x.id, { settings: x.settings })) as any
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
@@ -326,9 +322,9 @@ export default function ActivityList({ studyID, title, ...props }) {
         })
     } else if (x.spec === "lamp.group") {
       //
-      let result = await LAMP.Activity.update(selectedActivity.id, {
+      let result = (await LAMP.Activity.update(selectedActivity.id, {
         settings: x.settings,
-      })
+      })) as any
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
@@ -342,7 +338,7 @@ export default function ActivityList({ studyID, title, ...props }) {
       //
       const { raw, tag } = unspliceActivity(x)
       if (isDuplicated) {
-        /* duplicate */ let newItem = await LAMP.Activity.create(studyID, raw)
+        /* duplicate */ let newItem = (await LAMP.Activity.create(studyID, raw)) as any
         await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
         enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: "success" })
         onChange()
@@ -358,7 +354,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         })
       }
     }
-    setSelectedActivity()
+    setSelectedActivity(undefined)
   }
 
   //
@@ -435,14 +431,14 @@ export default function ActivityList({ studyID, title, ...props }) {
         open={Boolean(createMenu)}
         anchorPosition={createMenu?.getBoundingClientRect()}
         anchorReference="anchorPosition"
-        onClose={() => setCreateMenu()}
+        onClose={() => setCreateMenu(undefined)}
       >
         <MenuItem disabled divider>
           <b>Create a new...</b>
         </MenuItem>
         <MenuItem
           onClick={() => {
-            setCreateMenu()
+            setCreateMenu(undefined)
             setGroupCreate(true)
           }}
         >
@@ -451,7 +447,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         <MenuItem
           divider
           onClick={() => {
-            setCreateMenu()
+            setCreateMenu(undefined)
             setShowCreate(true)
           }}
         >
@@ -465,7 +461,7 @@ export default function ActivityList({ studyID, title, ...props }) {
             <MenuItem
               key={x?.name}
               onClick={() => {
-                setCreateMenu()
+                setCreateMenu(undefined)
                 saveCTest(x)
               }}
             >
@@ -474,7 +470,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           )),
         ]}
       </Menu>
-      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport()}>
+      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
         <Box
           {...getRootProps()}
           p={4}
@@ -485,7 +481,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           <Typography variant="h6">Drag files here, or click to select files.</Typography>
         </Box>
       </Dialog>
-      <Dialog open={!!importFile} onClose={() => setImportFile()}>
+      <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
         <MaterialTable
           title="Continue importing?"
           data={importFile || []}
@@ -494,7 +490,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           components={{ Container: (props) => <div {...props} /> }}
         />
         <DialogActions>
-          <Button onClick={() => setImportFile()} color="secondary" autoFocus>
+          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
             Cancel
           </Button>
           <Button onClick={importActivities} color="primary" autoFocus>
@@ -502,17 +498,23 @@ export default function ActivityList({ studyID, title, ...props }) {
           </Button>
         </DialogActions>
       </Dialog>
-      <ResponsiveDialog fullScreen transient animate open={!!showCreate} onClose={() => setShowCreate()}>
+      <ResponsiveDialog fullScreen transient animate open={!!showCreate} onClose={() => setShowCreate(false)}>
         <Box py={8} px={4}>
           <SurveyCreator onSave={saveActivity} />
         </Box>
       </ResponsiveDialog>
-      <ResponsiveDialog fullScreen transient animate open={!!groupCreate} onClose={() => setGroupCreate()}>
+      <ResponsiveDialog fullScreen transient animate open={!!groupCreate} onClose={() => setGroupCreate(false)}>
         <Box py={8} px={4}>
           <GroupCreator activities={activities} onSave={saveGroup} />
         </Box>
       </ResponsiveDialog>
-      <ResponsiveDialog fullScreen transient animate open={!!selectedActivity} onClose={() => setSelectedActivity()}>
+      <ResponsiveDialog
+        fullScreen
+        transient
+        animate
+        open={!!selectedActivity}
+        onClose={() => setSelectedActivity(undefined)}
+      >
         <Activity allActivities={activities} activity={selectedActivity} studyID={studyID} onSave={updateActivity} />
       </ResponsiveDialog>
     </React.Fragment>

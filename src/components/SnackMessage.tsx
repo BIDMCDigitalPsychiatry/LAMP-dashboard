@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const SnackMessage = React.forwardRef((props, ref) => {
+const SnackMessage = React.forwardRef((props: { id?: string; message?: string; children: any }, ref) => {
   const classes = useStyles()
   const { closeSnackbar } = useSnackbar()
   const [expanded, setExpanded] = useState(false)
@@ -95,9 +95,5 @@ const SnackMessage = React.forwardRef((props, ref) => {
     </Card>
   )
 })
-
-SnackMessage.propTypes = {
-  id: PropTypes.number.isRequired,
-}
 
 export default SnackMessage

@@ -22,13 +22,27 @@ import {
 } from "@material-ui/core"
 
 // Local Imports
-import CredentialManager from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 
-export default function NavigationLayout({ title, id, noToolbar, goBack, onLogout, ...props }) {
-  const [showCustomizeMenu, setShowCustomizeMenu] = useState()
-  const [confirmLogout, setConfirmLogout] = useState()
-  const [passwordChange, setPasswordChange] = useState()
+export default function NavigationLayout({
+  title,
+  id,
+  noToolbar,
+  goBack,
+  onLogout,
+  ...props
+}: {
+  title?: string
+  id?: string
+  noToolbar?: boolean
+  goBack?: any
+  onLogout?: any
+  children?: any
+}) {
+  const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
+  const [confirmLogout, setConfirmLogout] = useState(false)
+  const [passwordChange, setPasswordChange] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   return (
@@ -36,7 +50,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
       {!!noToolbar ? (
         <React.Fragment />
       ) : (
-        <AppBar position="static" style={{ background: "transparent", boxShadow: "none" }}>
+        <AppBar position="static" style={{ height: 48, background: "transparent", boxShadow: "none" }}>
           <Toolbar>
             <IconButton
               onClick={goBack}
@@ -71,7 +85,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 id="menu-appbar"
                 anchorEl={showCustomizeMenu}
                 open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
-                onClose={() => setShowCustomizeMenu()}
+                onClose={() => setShowCustomizeMenu(undefined)}
               >
                 <MenuItem disabled divider>
                   <b>{title}</b>
@@ -83,7 +97,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 <MenuItem
                   dense
                   onClick={() => {
-                    setShowCustomizeMenu()
+                    setShowCustomizeMenu(undefined)
                     window.open("https://docs.lamp.digital", "_blank")
                   }}
                 >
@@ -92,7 +106,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 <MenuItem
                   dense
                   onClick={() => {
-                    setShowCustomizeMenu()
+                    setShowCustomizeMenu(undefined)
                     window.open("https://community.lamp.digital", "_blank")
                   }}
                 >
@@ -101,7 +115,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
                 <MenuItem
                   dense
                   onClick={() => {
-                    setShowCustomizeMenu()
+                    setShowCustomizeMenu(undefined)
                     window.open("mailto:team@digitalpsych.org", "_blank")
                   }}
                 >
@@ -133,7 +147,7 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
       </div>
       <Dialog
         open={!!confirmLogout}
-        onClose={() => setConfirmLogout()}
+        onClose={() => setConfirmLogout(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -144,15 +158,22 @@ export default function NavigationLayout({ title, id, noToolbar, goBack, onLogou
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmLogout()} color="secondary">
+          <Button onClick={() => setConfirmLogout(false)} color="secondary">
             Go Back
           </Button>
-          <Button onClick={() => onLogout() && setConfirmLogout()} color="primary" autoFocus>
+          <Button
+            onClick={() => {
+              onLogout()
+              setConfirmLogout(false)
+            }}
+            color="primary"
+            autoFocus
+          >
             Logout
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={!!passwordChange && !!id} onClose={() => setPasswordChange()}>
+      <Dialog open={!!passwordChange && !!id} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={id} />
         </DialogContent>

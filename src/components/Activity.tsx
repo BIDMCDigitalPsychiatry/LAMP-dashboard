@@ -21,7 +21,7 @@ function JewelsSettings({ value, onSave, ...props }) {
         { field: "1", title: "Value", editable: "onUpdate" },
       ]}
       editable={{
-        onRowUpdate: async (newData, oldData) => {
+        onRowUpdate: async (newData: any, oldData: any) => {
           let newValue = parseInt(newData[1])
           if (!!newValue && !isNaN(newValue)) {
             setSettings((settings) => ({ ...settings, [newData[0]]: newValue }))

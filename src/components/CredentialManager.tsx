@@ -32,7 +32,7 @@ function compress(file, width, height) {
     reader.onerror = (error) => reject(error)
     reader.onload = (event) => {
       const img = new Image()
-      img.src = event.target.result
+      img.src = event.target.result as string
       img.onload = () => {
         const elem = document.createElement("canvas")
         elem.width = width
@@ -100,7 +100,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
               background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
             }}
           >
-            <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto()}>
+            <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
               {!photo && <input {...getInputProps()} />}
               <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
             </ButtonBase>
@@ -242,53 +242,55 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
-export default function CredentialManager({ id, onComplete, ...props }) {
+export const CredentialManager: React.FunctionComponent<{
+  id?: any
+  onComplete?: any
+  style?: any
+}> = ({ id, onComplete, ...props }) => {
   const theme = useTheme()
-  const [selected, setSelected] = useState({
+  const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
     credential: undefined,
     mode: undefined,
   })
   const [allCreds, setAllCreds] = useState([])
   const [allRoles, setAllRoles] = useState({})
-  const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState()
+  const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     LAMP.Type.parent(id)
       .then((x) => Object.keys(x.data).length === 0)
-      .then(setShouldSyncWithChildren)
+      .then((x) => setShouldSyncWithChildren(x))
     LAMP.Credential.list(id).then(setAllCreds)
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
+    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : {})
     )
   }, [])
 
   useEffect(() => {
     if (shouldSyncWithChildren !== true) return
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
+    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
       !!res.data
         ? LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
         : console.log("no roles to sync")
-    )
+    })
   }, [shouldSyncWithChildren, allRoles])
 
   const _submitCredential = async (data) => {
     try {
       if (selected.mode === "reset-password" && !!data.password) {
         if (
-          !!(
-            await LAMP.Credential.update(id, data.credential.access_key, {
-              ...data.credential,
-              secret_key: data.password,
-            })
-          ).error
+          !!((await LAMP.Credential.update(id, data.credential.access_key, {
+            ...data.credential,
+            secret_key: data.password,
+          })) as any).error
         )
           return enqueueSnackbar("Could not change password.", {
             variant: "error",
           })
       } else if (selected.mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
-        if (!!(await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)).error)
+        if (!!((await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any).error)
           return enqueueSnackbar("Could not create credential.", {
             variant: "error",
           })
@@ -310,7 +312,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
       enqueueSnackbar("Credential management failed. The email address could be in use already.", { variant: "error" })
     }
     LAMP.Credential.list(id).then(setAllCreds)
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
+    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : [])
     )
     return setSelected({
@@ -322,7 +324,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
 
   const _deleteCredential = async (credential) => {
     try {
-      if (!!(await LAMP.Credential.delete(id, credential.access_key)).error)
+      if (!!((await LAMP.Credential.delete(id, credential.access_key)) as any).error)
         return enqueueSnackbar("Could not delete.", { variant: "error" })
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
@@ -332,7 +334,7 @@ export default function CredentialManager({ id, onComplete, ...props }) {
       enqueueSnackbar("Credential management failed.", { variant: "error" })
     }
     LAMP.Credential.list(id).then(setAllCreds)
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res) =>
+    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : [])
     )
   }

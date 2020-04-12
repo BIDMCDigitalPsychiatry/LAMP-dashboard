@@ -9,18 +9,20 @@ import LAMP from "lamp-core"
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized
 
-export default function EditField({ participant, onUpdate, ...props }) {
-  const inputRef = useRef()
-  const oldValue = useRef()
+export default function EditField({ participant, onUpdate, ...props }: { participant?: any; onUpdate?: any }) {
+  const inputRef = useRef<any>()
+  const oldValue = useRef<string>()
   const [editing, setEditing] = useState(false)
-  const [alias, setAlias] = useState()
+  const [alias, setAlias] = useState<string>()
   const { enqueueSnackbar } = useSnackbar()
 
   // Load the current alias only upon initialization.
   useEffect(() => {
     if (!!alias) return
     LAMP.Type.getAttachment(participant.id, "lamp.name")
-      .then((res) => (res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null))
+      .then((res: any) =>
+        res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null
+      )
       .then((res) => setAlias((oldValue.current = res)))
       .catch((err) =>
         enqueueSnackbar(`Failed to load ${participant.id}'s alias: \'${err.message}\'`, { variant: "error" })

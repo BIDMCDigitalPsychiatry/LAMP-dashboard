@@ -28,7 +28,7 @@ import QRCode from "qrcode.react"
 import LAMP from "lamp-core"
 import Messages from "./Messages"
 import EditField from "./EditField"
-import CredentialManager from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SnackMessage from "./SnackMessage"
 
@@ -46,7 +46,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
   const [state, setState] = useState({
     popoverAttachElement: null,
     selectedIcon: null,
-    newCount: 1,
+    newCount: "1",
     selectedRows: [],
   })
   const [participants, setParticipants] = useState([])
@@ -77,12 +77,12 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
   }, [participants])
 
   let addParticipant = async () => {
-    let newCount = state.newCount
+    let newCount = parseInt(state.newCount) ?? 0
     let ids = []
 
     for (let i = 0; i < newCount; i++) {
-      let id = (await LAMP.Participant.create(studyID, { study_code: "001" })).data?.id
-      if (!!(await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")).error) {
+      let id = ((await LAMP.Participant.create(studyID, { study_code: "001" } as any)) as any).data?.id
+      if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
         enqueueSnackbar(`Could not create credential for ${id}.`, { variant: "error" })
       } else {
         enqueueSnackbar(
@@ -90,7 +90,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           {
             variant: "success",
             persist: true,
-            content: (key, message) => (
+            content: (key: string, message: string) => (
               <SnackMessage id={key} message={message}>
                 <TextField variant="outlined" size="small" label="Temporary email address" value={`${id}@lamp.com`} />
                 <div style={{ height: 16 }} />
@@ -122,7 +122,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
     setState((state) => ({
       ...state,
       popoverAttachElement: null,
-      newCount: 1,
+      newCount: "1",
       selectedIcon: "",
       selectedRows: [],
     }))
@@ -355,10 +355,10 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           <div />
         )}
       </Popover>
-      <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging()}>
+      <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging(undefined)}>
         <Messages participant={openMessaging} />
       </ResponsiveDialog>
-      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset()}>
+      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
         <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
       </ResponsiveDialog>
     </React.Fragment>

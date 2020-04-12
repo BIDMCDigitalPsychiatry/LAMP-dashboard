@@ -14,7 +14,7 @@ import {
   useTheme,
 } from "@material-ui/core"
 
-var Launcher = {}
+var Launcher: any = {}
 
 Launcher.Placeholder = function Placeholder({ ...props }) {
   return (
@@ -51,7 +51,7 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
     ? theme.palette.secondary.main
     : !!favorite
     ? theme.palette.primary.main
-    : theme.palette.background
+    : theme.palette.background.paper
   const tooltip = !!notification
     ? "You have a pending notification for this activity."
     : !!favorite

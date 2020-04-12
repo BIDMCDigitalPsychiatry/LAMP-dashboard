@@ -55,5 +55,11 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
   }, [])
-  return studies.map((study) => <Study study={study} onParticipantSelect={onParticipantSelect} />)
+  return (
+    <React.Fragment>
+      {studies.map((study) => (
+        <Study study={study} onParticipantSelect={onParticipantSelect} />
+      ))}
+    </React.Fragment>
+  )
 }

@@ -3,7 +3,7 @@ import React, { useState } from "react"
 import { Button, ButtonGroup, Icon, Menu, MenuItem } from "@material-ui/core"
 
 export default function MenuButton({ title, icon, color, hideMainButton, items, onClick, onAction, ...props }) {
-  const [anchorEl, setAnchorEl] = useState(null)
+  const [anchorEl, setAnchorEl] = useState<Element | null>(null)
   return (
     <React.Fragment>
       <ButtonGroup variant="contained" color={color || "secondary"}>
@@ -29,7 +29,13 @@ export default function MenuButton({ title, icon, color, hideMainButton, items, 
       </ButtonGroup>
       <Menu anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
         {(items || []).map((x) => (
-          <MenuItem key={x} onClick={() => setAnchorEl(null) || onClick(x)}>
+          <MenuItem
+            key={x}
+            onClick={() => {
+              setAnchorEl(null)
+              onClick(x)
+            }}
+          >
             {x}
           </MenuItem>
         ))}

@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef } from "react"
 
 export default function useInterval(callback, delay, now) {
-  const savedCallback = useRef()
+  const savedCallback = useRef<any>()
   useEffect(() => {
     savedCallback.current = callback
   }, [callback])
   useEffect(() => {
     function tick() {
-      savedCallback.current()
+      savedCallback.current?.()
     }
     if (delay !== null) {
       let id = setInterval(tick, delay)

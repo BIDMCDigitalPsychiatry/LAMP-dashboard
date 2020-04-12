@@ -23,10 +23,10 @@ import { useSnackbar } from "notistack"
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
-  const [state, setState] = useState({ serverAddress: lastDomain })
+  const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
-  const [tryitMenu, setTryitMenu] = useState()
-  const [helpMenu, setHelpMenu] = useState()
+  const [tryitMenu, setTryitMenu] = useState<Element>()
+  const [helpMenu, setHelpMenu] = useState<Element>()
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
     })
 
-  let handleLogin = (event, mode) => {
+  let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
     if (mode === undefined && (!state.id || !state.password)) return
     setIdentity({
@@ -89,12 +89,12 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               open={Boolean(helpMenu)}
               anchorPosition={helpMenu?.getBoundingClientRect()}
               anchorReference="anchorPosition"
-              onClose={() => setHelpMenu()}
+              onClose={() => setHelpMenu(undefined)}
             >
               <MenuItem
                 dense
                 onClick={() => {
-                  setHelpMenu()
+                  setHelpMenu(undefined)
                   window.open("https://docs.lamp.digital", "_blank")
                 }}
               >
@@ -103,7 +103,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               <MenuItem
                 dense
                 onClick={() => {
-                  setHelpMenu()
+                  setHelpMenu(undefined)
                   window.open("https://community.lamp.digital", "_blank")
                 }}
               >
@@ -112,7 +112,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               <MenuItem
                 dense
                 onClick={() => {
-                  setHelpMenu()
+                  setHelpMenu(undefined)
                   window.open("mailto:team@digitalpsych.org", "_blank")
                 }}
               >
@@ -124,7 +124,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
             mindLAMP
           </Typography>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={(e) => handleLogin(e)}>
             <div>
               <TextField
                 margin="dense"
@@ -181,14 +181,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 open={Boolean(tryitMenu)}
                 anchorPosition={tryitMenu?.getBoundingClientRect()}
                 anchorReference="anchorPosition"
-                onClose={() => setTryitMenu()}
+                onClose={() => setTryitMenu(undefined)}
               >
                 <MenuItem disabled divider>
                   <b>Try mindLAMP out as a...</b>
                 </MenuItem>
                 <MenuItem
                   onClick={(event) => {
-                    setTryitMenu()
+                    setTryitMenu(undefined)
                     handleLogin(event, "researcher")
                   }}
                 >
@@ -197,7 +197,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 <MenuItem
                   divider
                   onClick={(event) => {
-                    setTryitMenu()
+                    setTryitMenu(undefined)
                     handleLogin(event, "clinician")
                   }}
                 >
@@ -205,7 +205,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 </MenuItem>
                 <MenuItem
                   onClick={(event) => {
-                    setTryitMenu()
+                    setTryitMenu(undefined)
                     handleLogin(event, "participant")
                   }}
                 >
@@ -213,7 +213,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 </MenuItem>
                 <MenuItem
                   onClick={(event) => {
-                    setTryitMenu()
+                    setTryitMenu(undefined)
                     handleLogin(event, "patient")
                   }}
                 >

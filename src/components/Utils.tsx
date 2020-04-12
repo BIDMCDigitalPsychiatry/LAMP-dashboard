@@ -3,15 +3,32 @@ import React from "react"
 import { Paper, useTheme, useMediaQuery } from "@material-ui/core"
 
 //
-export const ResponsiveMargin = React.forwardRef((props, ref) => {
+export const ResponsiveMargin = React.forwardRef((props: any, ref) => {
   let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   return <div {...props} style={{ ...props.style, width: sm ? "98%" : props.style.width }} ref={ref} />
 })
 
-export const ResponsivePaper = React.forwardRef((props, ref) => {
+export const ResponsivePaper = React.forwardRef((props: any, ref) => {
   let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   return <Paper {...props} elevation={sm ? 0 : props.elevation} ref={ref} />
 })
+
+declare global {
+  interface Array<T> {
+    flat(depth: number): T[]
+    groupBy(key: string): T[]
+  }
+  interface ArrayConstructor {
+    rangeTo(max: number): number[]
+  }
+  interface Date {
+    isValid(): boolean
+  }
+  interface DateConstructor {
+    formatUTC(timestampUTC: number, formatObj?: Intl.DateTimeFormatOptions): string
+    formatStyle(formatObj?: string): Intl.DateTimeFormatOptions
+  }
+}
 
 // Stubbed code for .flat() which is an ES7 function...
 // eslint-disable-next-line
@@ -41,15 +58,17 @@ Object.defineProperty(Array.prototype, "groupBy", {
 // eslint-disable-next-line
 Object.defineProperty(Array, "rangeTo", {
   value: function (max) {
-    return [...Array(max).keys()]
+    return [...(Array(max).keys() as any)]
   },
 })
 
 // An invalid date object returns NaN for getTime() and NaN is the only object not strictly equal to itself.
 // eslint-disable-next-line
-Date.prototype.isValid = function () {
-  return this.getTime() === this.getTime()
-}
+Object.defineProperty(Date.prototype, "isValid", {
+  value: function () {
+    return this.getTime() === this.getTime()
+  },
+})
 
 // Easier Date-string formatting using Date.formatUTC
 // eslint-disable-next-line
@@ -62,10 +81,25 @@ Object.defineProperty(Date, "formatUTC", {
 // Easier Date-string formatting using Date.formatUTC
 // eslint-disable-next-line
 Object.defineProperty(Date, "formatStyle", {
-  value: function (formatObj = {}) {
-    if (formatObj === "short") formatObj = { year: "2-digit", month: "2-digit", day: "2-digit" }
-    else if (formatObj === "timeOnly") formatObj = { hour: "numeric", minute: "numeric", hour12: true }
-    else if (formatObj === "dateOnly") formatObj = { year: "numeric", month: "long", day: "numeric" }
+  value: function (formatObj: any = {}) {
+    if (formatObj === "short")
+      formatObj = {
+        year: "2-digit",
+        month: "2-digit",
+        day: "2-digit",
+      }
+    else if (formatObj === "timeOnly")
+      formatObj = {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      }
+    else if (formatObj === "dateOnly")
+      formatObj = {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }
     else if (formatObj === "hourOnly")
       formatObj = {
         weekday: "long",

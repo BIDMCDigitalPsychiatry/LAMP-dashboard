@@ -36,9 +36,9 @@ export default function ActivityCard({
     .map((x) => x.type)
     .filter((x) => [null, "text", "paragraph"].includes(x))
 
-  const [visibleSlice, setVisibleSlice] = useState()
-  const [helpAnchor, setHelpAnchor] = useState()
-  const [showGrid, setShowGrid] = useState(forceDefaultGrid || Boolean(freeText.length))
+  const [visibleSlice, setVisibleSlice] = useState<any>()
+  const [helpAnchor, setHelpAnchor] = useState<Element>()
+  const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
 
   return (
     <React.Fragment>
@@ -51,7 +51,7 @@ export default function ActivityCard({
           </Tooltip>
         ) : (
           <Tooltip title="Go Back">
-            <IconButton onClick={(event) => setVisibleSlice()}>
+            <IconButton onClick={(event) => setVisibleSlice(undefined)}>
               <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
@@ -146,7 +146,7 @@ export default function ActivityCard({
               .reduce((x, y) => x.concat(y), [])
               .groupBy("item")
           )
-            .map((v) => Object.assign({}, ...v))
+            .map((v: any) => Object.assign({}, ...v))
             .reduce((x, y) => x.concat(y), [])}
         />
       ) : (
@@ -161,7 +161,8 @@ export default function ActivityCard({
             x: new Date(d.timestamp),
             y: strategies[d.static_data.survey_name !== undefined ? "lamp.survey" : "lamp.jewels_a"](
               d.temporal_slices,
-              activity
+              activity,
+              undefined
             ),
             slice: d.temporal_slices,
             missing: d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
@@ -180,7 +181,7 @@ export default function ActivityCard({
           vertical: "top",
           horizontal: "left",
         }}
-        onClose={(event) => setHelpAnchor()}
+        onClose={(event) => setHelpAnchor(undefined)}
         disableRestoreFocus
       >
         {activity.spec === "lamp.survey" ? ( // eslint-disable-next-line

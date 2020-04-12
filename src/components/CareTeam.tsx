@@ -5,7 +5,7 @@ import { Grid, Icon, Button, Collapse, Typography, Divider, useTheme, useMediaQu
 // Local Imports
 import LAMP from "lamp-core"
 import AvatarCircleGroup from "./AvatarCircleGroup"
-import CredentialManager from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import Messages from "./Messages"
 import ResponsiveDialog from "./ResponsiveDialog"
 
@@ -18,8 +18,9 @@ export default function CareTeam({ participant, ...props }) {
 
   useEffect(() => {
     ;(async function () {
-      let ext = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles.external")).data
-      let int = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles")).data
+      const prefix = "lamp.dashboard.credential_roles"
+      let ext = ((await LAMP.Type.getAttachment(participant.id, `${prefix}.external`)) as any).data
+      let int = ((await LAMP.Type.getAttachment(participant.id, `${prefix}`)) as any).data
       setAccounts([
         {
           id: 0,
@@ -29,20 +30,20 @@ export default function CareTeam({ participant, ...props }) {
           children: ["ME"],
           style: { background: theme.palette.primary.main },
         },
-        ...Object.entries(ext || {}).map((x, idx) => ({
+        ...Object.entries(ext ?? {}).map((x: any, idx) => ({
           id: idx + 1,
           name: `${idx + 1}`,
-          email: x[0],
-          tooltip: (x[1] || {}).role || "No role specified",
-          image: (x[1] || {}).photo,
+          email: x?.[0],
+          tooltip: x?.[1]?.role ?? "No role specified",
+          image: x?.[1]?.photo,
         })),
-        ...Object.entries(int || {}).map((x, idx) => ({
+        ...Object.entries(int ?? {}).map((x: any, idx) => ({
           id: idx + 1,
           name: `${idx + 1}`,
           onClick: () => setShowCredentials((x) => !x),
-          email: x[0],
-          tooltip: (x[1] || {}).role || "No role specified",
-          image: (x[1] || {}).photo,
+          email: x?.[0],
+          tooltip: x?.[1]?.role ?? "No role specified",
+          image: x?.[1]?.photo,
         })),
         {
           id: 99,
@@ -106,7 +107,7 @@ export default function CareTeam({ participant, ...props }) {
           participant={participant.id}
         />
       </Collapse>
-      <ResponsiveDialog transient open={showCredentials} onClose={() => setShowCredentials()}>
+      <ResponsiveDialog transient open={showCredentials} onClose={() => setShowCredentials(undefined)}>
         <CredentialManager id={participant.id} style={{ margin: 16 }} />
       </ResponsiveDialog>
     </React.Fragment>

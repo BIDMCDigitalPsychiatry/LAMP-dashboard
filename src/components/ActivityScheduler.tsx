@@ -28,7 +28,7 @@ const manyDates = (items) =>
 
 function InlineMenu({ customTimes, onChange, ...props }) {
   const [items, setItems] = useState(customTimes ?? [])
-  const [open, setOpen] = useState()
+  const [open, setOpen] = useState<Element>()
   const [current, setCurrent] = useState(new Date())
 
   return (
@@ -40,7 +40,10 @@ function InlineMenu({ customTimes, onChange, ...props }) {
         keepMounted
         open={Boolean(open)}
         anchorEl={open}
-        onClose={() => setOpen() || onChange(Array.from(items))}
+        onClose={() => {
+          setOpen(undefined)
+          onChange(Array.from(items))
+        }}
         MenuListProps={{ dense: true }}
       >
         <MenuItem disabled divider>
@@ -190,12 +193,12 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
         onRowAdd: async (newData) => {
           onChange([...schedules, newData])
         },
-        onRowUpdate: async (newData, oldData) => {
+        onRowUpdate: async (newData, oldData: any) => {
           let x = Array.from(schedules) // clone
           x[oldData.tableData.id] = newData
           onChange(x)
         },
-        onRowDelete: async (oldData) => {
+        onRowDelete: async (oldData: any) => {
           let x = Array.from(schedules) // clone
           x.splice(oldData.tableData.id, 1)
           onChange(x)

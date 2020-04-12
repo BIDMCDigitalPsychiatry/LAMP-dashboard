@@ -4,7 +4,6 @@ import { Typography, makeStyles } from "@material-ui/core"
 
 // Local Imports
 import useInterval from "./useInterval"
-import useAudio from "./useAudio"
 
 const useStyles = makeStyles((theme) => ({
   "@keyframes Pulse": {

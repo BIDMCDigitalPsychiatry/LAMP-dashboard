@@ -38,7 +38,7 @@ const reorder = (list, startIndex, endIndex) => {
 
 function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
   const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x.id === selected)[0] : null)
-  const [anchorEl, setAnchorEl] = useState()
+  const [anchorEl, setAnchorEl] = useState<Element>()
   useEffect(() => {
     if (_selected !== selected) onSave && onSave(_selected.id)
   }, [_selected])
@@ -70,11 +70,11 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
               </Button>
             </ButtonGroup>
           </Tooltip>
-          <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl()}>
+          <Menu open={Boolean(anchorEl)} anchorEl={anchorEl} onClose={() => setAnchorEl(undefined)}>
             {activities.map((activity) => (
               <MenuItem
                 onClick={() => {
-                  setAnchorEl()
+                  setAnchorEl(undefined)
                   setSelected(activity)
                 }}
               >
@@ -88,7 +88,16 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   )
 }
 
-export default function GroupCreator({ activities, value, onSave, ...props }) {
+export default function GroupCreator({
+  activities,
+  value,
+  onSave,
+  ...props
+}: {
+  activities?: any[]
+  value?: any
+  onSave?: any
+}) {
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])

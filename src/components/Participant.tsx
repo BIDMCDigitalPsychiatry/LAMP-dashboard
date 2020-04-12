@@ -52,14 +52,14 @@ function _shouldRestrict() {
 // TODO: all SensorEvents?
 
 export default function Participant({ participant, ...props }) {
-  const [state, setState] = useState({})
+  const [state, setState] = useState<any>({})
   const [activities, setActivities] = useState([])
   const [visualizations, setVisualizations] = useState({})
-  const [survey, setSurvey] = useState()
+  const [survey, setSurvey] = useState<any>()
   const [submission, setSubmission] = useState(0)
   const [hiddenEvents, setHiddenEvents] = useState([])
-  const [launchedActivity, setLaunchedActivity] = useState()
-  const [sidebarOpen, setSidebarOpen] = useState()
+  const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const [tab, setTab] = useState("prevent")
 
@@ -71,9 +71,9 @@ export default function Participant({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       let visualizations = {}
-      for (let attachmentID of (await LAMP.Type.listAttachments(participant.id)).data) {
+      for (let attachmentID of ((await LAMP.Type.listAttachments(participant.id)) as any).data) {
         if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
-        let bstr = (await LAMP.Type.getAttachment(participant.id, attachmentID)).data
+        let bstr = ((await LAMP.Type.getAttachment(participant.id, attachmentID)) as any).data
         visualizations[attachmentID] = bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}` // defaults
       }
       setVisualizations(visualizations)
@@ -83,7 +83,7 @@ export default function Participant({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       // Refresh hidden events list.
-      let _hidden = await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")
+      let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
       _hidden = !!_hidden.error ? [] : _hidden.data
       setHiddenEvents(_hidden)
 
@@ -109,7 +109,7 @@ export default function Participant({ participant, ...props }) {
             activity_spec: (x.activity || { spec: "" }).spec || "",
           }))
           .groupBy("activity"),
-        sensor_events: (await LAMP.SensorEvent.allByParticipant(participant.id)).groupBy("sensor"),
+        sensor_events: ((await LAMP.SensorEvent.allByParticipant(participant.id)) as any).groupBy("sensor"),
       }
 
       // Perform datetime coalescing to either days or weeks.
@@ -121,7 +121,7 @@ export default function Participant({ participant, ...props }) {
           }))
           .groupBy("timestamp")
       )
-        .map((x) =>
+        .map((x: any[]) =>
           x.reduce(
             (a, b) =>
               !!a.timestamp
@@ -146,7 +146,7 @@ export default function Participant({ participant, ...props }) {
         ..._state,
         activity_counts: Object.assign(
           {},
-          ...Object.entries(_state.activity_events || {}).map(([k, v]) => ({
+          ...Object.entries(_state.activity_events || {}).map(([k, v]: [string, any[]]) => ({
             [k]: v.length,
           }))
         ),
@@ -160,11 +160,11 @@ export default function Participant({ participant, ...props }) {
 
   //
   useEffect(() => {
-    if (activities.length === 0) return setSurvey()
+    if (activities.length === 0) return setSurvey(undefined)
 
     // Splice together all selected activities & their tags.
     Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description"))).then(
-      (res) => {
+      (res: any) => {
         let spliced = res.map((y, idx) =>
           spliceActivity({
             raw: activities[idx],
@@ -192,13 +192,13 @@ export default function Participant({ participant, ...props }) {
 
   //
   const hideEvent = async (timestamp, activity) => {
-    let _hidden = await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")
+    let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
     let _events = !!_hidden.error ? [] : _hidden.data
     if (hiddenEvents.includes(`${timestamp}/${activity}`)) return
-    let _setEvents = await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.hidden_events", [
+    let _setEvents = (await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.hidden_events", [
       ..._events,
       `${timestamp}/${activity}`,
-    ])
+    ])) as any
     if (!!_setEvents.error) return
     //setHiddenEvents([..._events, `${timestamp}/${activity}`])
     setSubmission((x) => x + 1)
@@ -206,7 +206,7 @@ export default function Participant({ participant, ...props }) {
 
   //
   const submitSurvey = (response, overwritingTimestamp) => {
-    setSurvey()
+    setSurvey(undefined)
 
     //
     let events = response.map((x, idx) => ({
@@ -385,7 +385,7 @@ export default function Participant({ participant, ...props }) {
                 )),
             ]}
           </Launcher.Section>
-          <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey()}>
+          <ResponsiveDialog transient animate fullScreen open={!!survey} onClose={() => setSurvey(undefined)}>
             <Box py={8} px={2}>
               <Grid container direction="row">
                 <Grid item style={{ width: "100%" }}>
@@ -405,7 +405,12 @@ export default function Participant({ participant, ...props }) {
                 </Grid>
                 {supportsSidebar && !_patientMode() && (
                   <Grid item>
-                    <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen()}>
+                    <Drawer
+                      anchor="right"
+                      variant="temporary"
+                      open={!!sidebarOpen}
+                      onClose={() => setSidebarOpen(undefined)}
+                    >
                       <Box flexGrow={1} />
                       <Divider />
                       <Messages refresh={!!survey} expandHeight privateOnly participant={participant.id} />
@@ -465,15 +470,21 @@ export default function Participant({ participant, ...props }) {
           </Launcher.Section>
         </Box>
       )}
-      <ResponsiveDialog transient animate fullScreen open={!!launchedActivity} onClose={() => setLaunchedActivity()}>
+      <ResponsiveDialog
+        transient
+        animate
+        fullScreen
+        open={!!launchedActivity}
+        onClose={() => setLaunchedActivity(undefined)}
+      >
         {
           {
-            breathe: <Breathe onComplete={() => setLaunchedActivity()} />,
-            jewels: <Jewels onComplete={() => setLaunchedActivity()} />,
-            journal: <Journal onComplete={() => setLaunchedActivity()} />,
-            hopebox: <Hopebox onComplete={() => setLaunchedActivity()} />,
-            resources: <Resources onComplete={() => setLaunchedActivity()} />,
-            tips: <Tips onComplete={() => setLaunchedActivity()} />,
+            breathe: <Breathe onComplete={() => setLaunchedActivity(undefined)} />,
+            jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
+            journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
+            hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
+            resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
+            tips: <Tips onComplete={() => setLaunchedActivity(undefined)} />,
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -560,7 +571,7 @@ export default function Participant({ participant, ...props }) {
           {(state.activities || [])
             .filter((x) => (state.selectedCharts || []).includes(x.name))
             .map((activity) => (
-              <Card key={activity.id} style={{ marginTop: 16, marginBotton: 16 }}>
+              <Card key={activity.id} style={{ marginTop: 16, marginBottom: 16 }}>
                 <ActivityCard
                   activity={activity}
                   events={(state.activity_events || {})[activity.name] || []}
@@ -608,7 +619,7 @@ export default function Participant({ participant, ...props }) {
           {!(state.selectedPassive || []).includes("Environmental Context") ? (
             <React.Fragment />
           ) : (
-            <Card style={{ marginTop: 16, marginBotton: 16 }}>
+            <Card style={{ marginTop: 16, marginBottom: 16 }}>
               <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 Environmental Context
               </Typography>
@@ -619,7 +630,7 @@ export default function Participant({ participant, ...props }) {
           {!(state.selectedPassive || []).includes("Step Count") ? (
             <React.Fragment />
           ) : (
-            <Card style={{ marginTop: 16, marginBotton: 16 }}>
+            <Card style={{ marginTop: 16, marginBottom: 16 }}>
               <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 Step Count
               </Typography>
@@ -639,7 +650,7 @@ export default function Participant({ participant, ...props }) {
             </Card>
           )}
           {(state.selectedExperimental || []).map((x) => (
-            <Card key={x} style={{ marginTop: 16, marginBotton: 16 }}>
+            <Card key={x} style={{ marginTop: 16, marginBottom: 16 }}>
               <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
                 {x}
               </Typography>
@@ -657,8 +668,8 @@ export default function Participant({ participant, ...props }) {
         </React.Fragment>
       )}
       <Drawer
+        open
         anchor={supportsSidebar ? "left" : "bottom"}
-        open="true"
         variant="permanent"
         PaperProps={{
           style: {

@@ -4,7 +4,7 @@ import { Box, Container, TextField, Button, Grid, Icon } from "@material-ui/core
 import { KeyboardDatePicker } from "@material-ui/pickers"
 import { useSnackbar } from "notistack"
 
-export default function Journal() {
+export default function Journal({ onComplete, ...props }) {
   const [selectedDate, setSelectedDate] = useState(new Date("2020-04-25T21:11:54"))
   const { enqueueSnackbar } = useSnackbar()
   useEffect(() => {

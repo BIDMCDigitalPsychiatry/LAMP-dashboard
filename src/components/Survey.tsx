@@ -38,7 +38,22 @@ const CSV_stringify = (x) => (Array.isArray(x) ? JSON.stringify(x).slice(1, -1) 
 // TODO: DateTime/Calendar, Dropdown variants, Required vs. optional, Image prompt + choices (?)
 // TODO: section-by-section, question-by-question modes -> track time taken + answer changes
 
-function Banner({ heading, text, description, large, prefillTimestamp, onChangeTimestamp, ...props }) {
+function Banner({
+  heading,
+  text,
+  description,
+  large,
+  prefillTimestamp,
+  onChangeTimestamp,
+  ...props
+}: {
+  heading?: string
+  text: string
+  description?: string
+  large?: boolean
+  prefillTimestamp?: Date
+  onChangeTimestamp?(Date): void
+}) {
   return (
     <Box {...props} p={2}>
       <Grid container direction="row" justify="space-between" alignItems="center">
@@ -72,7 +87,16 @@ function Banner({ heading, text, description, large, prefillTimestamp, onChangeT
   )
 }
 
-function TextResponse({ onChange, multiline, value, ...props }) {
+function TextResponse({
+  onChange,
+  multiline,
+  value,
+  ...props
+}: {
+  onChange?(value: string): void
+  multiline?: boolean
+  value?: string
+}) {
   return (
     <TextField
       {...props}

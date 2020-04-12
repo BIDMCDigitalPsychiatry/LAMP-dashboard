@@ -6,16 +6,16 @@ import { useSnackbar } from "notistack"
 
 // Local Imports
 import LAMP from "lamp-core"
-import CredentialManager from "./CredentialManager"
+import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
 
-export default function Root({ onChange, ...props }) {
+export default function Root({ ...props }) {
   const [researchers, setResearchers] = useState([])
   //const [names, setNames] = useState({})
-  const [passwordChange, setPasswordChange] = useState()
+  const [passwordChange, setPasswordChange] = useState<boolean>()
   const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function Root({ onChange, ...props }) {
           }
           editable={{
             onRowAdd: async (newData) => {
-              if ((await LAMP.Researcher.create(newData)).error === undefined)
+              if (((await LAMP.Researcher.create(newData)) as any).error === undefined)
                 enqueueSnackbar(`Successfully created a new Researcher.`, {
                   variant: "success",
                 })
@@ -46,7 +46,7 @@ export default function Root({ onChange, ...props }) {
               setResearchers(await LAMP.Researcher.all())
             },
             onRowUpdate: async (newData, oldData) => {
-              if ((await LAMP.Researcher.update(oldData.id, newData)).error === undefined)
+              if (((await LAMP.Researcher.update(oldData.id, newData)) as any).error === undefined)
                 enqueueSnackbar(`Successfully updated the Researcher.`, {
                   variant: "success",
                 })
@@ -57,7 +57,7 @@ export default function Root({ onChange, ...props }) {
               setResearchers(await LAMP.Researcher.all())
             },
             onRowDelete: async (oldData) => {
-              if ((await LAMP.Researcher.delete(oldData.id)).error === undefined)
+              if (((await LAMP.Researcher.delete(oldData.id)) as any).error === undefined)
                 enqueueSnackbar(`Successfully deleted the Researcher.`, {
                   variant: "success",
                 })
@@ -91,7 +91,7 @@ export default function Root({ onChange, ...props }) {
           components={{ Container: (props) => <Box {...props} /> }}
         />
       </ResponsivePaper>
-      <Dialog open={!!passwordChange} onClose={() => setPasswordChange()}>
+      <Dialog open={!!passwordChange} onClose={() => setPasswordChange(undefined)}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={passwordChange} />
         </DialogContent>

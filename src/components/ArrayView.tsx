@@ -16,7 +16,7 @@ export default function ArrayView({ ...props }) {
         <TableHead>
           <TableRow>
             {displayKeys().map((key) => (
-              <TableCell key={key} style={{ borderBottom: 0 }} tooltip={humanize(key)}>
+              <TableCell key={key} style={{ borderBottom: 0 }} title={humanize(key)}>
                 {humanize(key)}
               </TableCell>
             ))}

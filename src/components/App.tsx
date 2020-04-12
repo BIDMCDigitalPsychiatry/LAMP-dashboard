@@ -137,16 +137,16 @@ function AppRouter({ ...props }) {
     }
   }, [state])
 
-  let reset = async (identity) => {
+  let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity)
-    if (!!identity)
+    if (!!identity) {
       setState((state) => ({
         ...state,
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
         authType: LAMP.Auth._type,
       }))
-    else
+    } else {
       setState((state) => ({
         ...state,
         identity: null,
@@ -156,11 +156,16 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
+    }
   }
 
   let getResearcher = (id) => {
-    if (id === "me" && state.authType === "researcher") id = state.identity.id
-    if (!id || id === "me") return null //props.history.replace(`/`)
+    if (id === "me" && state.authType === "researcher" && !Array.isArray(state.identity)) {
+      id = state.identity.id
+    }
+    if (!id || id === "me") {
+      return null //props.history.replace(`/`)
+    }
     if (!!store.researchers[id]) {
       return store.researchers[id]
     } else if (!storeRef.current.includes(id)) {
@@ -176,8 +181,12 @@ function AppRouter({ ...props }) {
   }
 
   let getParticipant = (id) => {
-    if (id === "me" && state.authType === "participant") id = state.identity.id
-    if (!id || id === "me") return null //props.history.replace(`/`)
+    if (id === "me" && state.authType === "participant" && !Array.isArray(state.identity)) {
+      id = state.identity.id
+    }
+    if (!id || id === "me") {
+      return null //props.history.replace(`/`)
+    }
     if (!!store.participants[id]) {
       return store.participants[id]
     } else if (!storeRef.current.includes(id)) {
@@ -260,12 +269,7 @@ function AppRouter({ ...props }) {
           ) : (
             <React.Fragment>
               <PageTitle>Administrator</PageTitle>
-              <NavigationLayout
-                title="Administrator"
-                profile={state.authType === "admin" ? {} : state.identity}
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-              >
+              <NavigationLayout title="Administrator" goBack={props.history.goBack} onLogout={() => reset()}>
                 <Root {...props} />
               </NavigationLayout>
             </React.Fragment>
@@ -295,7 +299,6 @@ function AppRouter({ ...props }) {
               <NavigationLayout
                 id={props.match.params.id}
                 title={`${getResearcher(props.match.params.id).name}`}
-                profile={state.authType === "admin" ? {} : state.identity}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
@@ -330,10 +333,8 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
               <NavigationLayout
-                enableMessaging
                 id={props.match.params.id}
                 title={`Patient ${getParticipant(props.match.params.id).id}`}
-                profile={state.authType === "admin" ? {} : state.identity}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
@@ -369,21 +370,12 @@ export default function App({ ...props }) {
   return (
     <ThemeProvider
       theme={createMuiTheme({
-        typography: {
-          useNextVariants: true,
-        },
         palette: {
           primary: blue,
           secondary: red,
           background: {
             default: "#fff",
           },
-        },
-        appBar: {
-          height: 48,
-        },
-        ripple: {
-          color: red,
         },
       })}
     >

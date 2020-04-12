@@ -1,11 +1,22 @@
 // Core Imports
 import React from "react"
-import { Dialog, Icon, IconButton, Slide, useTheme, useMediaQuery } from "@material-ui/core"
+import { Dialog, DialogProps, Icon, IconButton, Slide, useTheme, useMediaQuery } from "@material-ui/core"
 
-const SlideUp = React.forwardRef((props, ref) => <Slide direction="up" {...props} ref={ref} />)
+const SlideUp: any = React.forwardRef((props: any, ref) => <Slide direction="up" {...props} ref={ref} />)
 
 //
-export default function ResponsiveDialog({ transient, animate, fullScreen, children, ...props }) {
+export default function ResponsiveDialog({
+  transient,
+  animate,
+  fullScreen,
+  children,
+  ...props
+}: {
+  transient?: boolean
+  animate?: boolean
+  fullScreen?: boolean
+  children?: any
+} & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   return (
     <Dialog {...props} fullScreen={!!fullScreen ? true : sm} TransitionComponent={!!animate ? SlideUp : undefined}>
@@ -19,7 +30,7 @@ export default function ResponsiveDialog({ transient, animate, fullScreen, child
             WebkitBackdropFilter: "blur(5px)",
             zIndex: 99999,
           }}
-          onClick={props.onClose}
+          onClick={props.onClose as any}
           aria-label="Close"
         >
           <Icon>close</Icon>

@@ -74,7 +74,7 @@ const tileData = [
   },
 ]
 
-export default function AdvancedGridList() {
+export default function HopeBox({ onComplete, ...props }) {
   return (
     <div
       style={{

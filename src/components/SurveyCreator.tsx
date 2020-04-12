@@ -222,14 +222,23 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   )
 }
 
-export default function SurveyCreator({ value, onSave, onCancel, ...props }) {
+export default function SurveyCreator({
+  value,
+  onSave,
+  onCancel,
+  ...props
+}: {
+  value?: any
+  onSave?: any
+  onCancel?: any
+}) {
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
 
   return (
-    <Grid container direction="column" spacing={2}>
+    <Grid container direction="column" spacing={2} {...props}>
       <Grid item>
         <Typography variant="h4">
           {!!value ? "Modify an existing survey instrument." : "Create a new survey instrument."}

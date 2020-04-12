@@ -60,9 +60,20 @@ function MessageItem({ from, date, text, flipped, ...props }) {
   )
 }
 
-export default function Messages({ privateOnly, expandHeight, ...props }) {
+export default function Messages({
+  privateOnly,
+  expandHeight,
+  ...props
+}: {
+  privateOnly?: boolean
+  expandHeight?: boolean
+  participant?: string
+  participantOnly?: boolean
+  refresh?: boolean
+  style?: any
+}) {
   const [messages, setMessages] = useState({})
-  const [currentMessage, setCurrentMessage] = useState()
+  const [currentMessage, setCurrentMessage] = useState<string>()
   const [messageTab, setMessageTab] = useState(!!privateOnly ? 1 : 0)
   const theme = useTheme()
   const sm = useMediaQuery(theme.breakpoints.down("sm"))
@@ -88,7 +99,7 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
       text: msg,
     })
     LAMP.Type.setAttachment(props.participant, "me", "lamp.messaging", all)
-    setCurrentMessage()
+    setCurrentMessage(undefined)
     setMessages({ ...(messages || {}), [props.participant]: all })
   }
 
@@ -104,8 +115,8 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
             ])
           )
         )
-          .filter((x) => x[1].message !== "404.object-not-found")
-          .map((x) => [x[0], x[1].data])
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
       )
     )
   }
@@ -128,8 +139,8 @@ export default function Messages({ privateOnly, expandHeight, ...props }) {
             indicatorColor="primary"
             textColor="primary"
           >
-            <Tab label="Messages" index={0} />
-            <Tab label={!!props.participantOnly ? "My Journal" : "Patient Notes"} index={1} />
+            <Tab label="Messages" />
+            <Tab label={!!props.participantOnly ? "My Journal" : "Patient Notes"} />
           </Tabs>
         </Grid>
         <Grid item hidden={!!privateOnly}>
