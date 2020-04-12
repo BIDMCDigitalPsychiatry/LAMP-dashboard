@@ -1,18 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Icon,
-  IconButton,
-  Typography,
-  Divider,
-  Grid,
-  Tooltip,
-  Collapse,
-  Paper,
-  ButtonBase,
-  useTheme,
-} from "@material-ui/core"
+import { Box, Icon, Typography, Divider, Grid, Tooltip, Paper, ButtonBase, useTheme } from "@material-ui/core"
 
 var Launcher: any = {}
 
@@ -88,6 +76,7 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
 }
 
 Launcher.Section = function Section({ title, children, ...props }) {
+  // eslint-disable-next-line
   const [expanded, setExpanded] = useState(false)
   // eslint-disable-next-line
   const [scroll, setScroll] = useState(false)

@@ -244,6 +244,7 @@ function Question({ onResponse, hideHeader, number, text, type, options, value, 
     { label: "Several Times", value: 1 },
     { label: "Not at all", value: 0 },
   ]
+  // eslint-disable-next-line
   const _boolOpts = _useTernaryBool() ? _ternaryOpts : _binaryOpts // FIXME DEPRECATED
 
   // FIXME: CheckboxResponse, SwitchResponse

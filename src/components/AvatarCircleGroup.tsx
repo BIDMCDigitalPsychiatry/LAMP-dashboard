@@ -1,14 +1,14 @@
 import * as React from "react"
-import { Avatar, Menu, MenuItem, Tooltip, ButtonBase } from "@material-ui/core"
+import { Avatar, Menu, Tooltip, ButtonBase } from "@material-ui/core"
 import { isFragment } from "react-is"
 import clsx from "clsx"
 import { makeStyles, createStyles } from "@material-ui/core"
 
-const createTestAccount = (id) => ({
+/*const createTestAccount = (id) => ({
   id,
   name: `${id}`,
   image: "/images/test.jpg",
-})
+})*/
 
 export const useMenu = (): any => {
   const [anchor, setAnchor] = React.useState({ id: null, anchorEl: null })
@@ -277,6 +277,7 @@ export default function AvatarCircleGroup({
   onResetPassword = undefined,
   classes = undefined,
 }: AvatarCircleGroupProps) {
+  // eslint-disable-next-line
   const [anchor, handleOpen, handleClose] = useMenu()
   /*const onAdd = React.useCallback(
     account => {

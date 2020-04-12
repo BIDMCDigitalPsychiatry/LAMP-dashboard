@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Paper, List, ListItem, ListItemText, Divider } from "@material-ui/core"
+import { Paper, List, ListItem, ListItemText } from "@material-ui/core"
 import {
   XYChart,
   theme,
@@ -121,7 +121,7 @@ const styles = {
 }
 
 export default withParentSize(function Sparkline({ ...props }) {
-  const [rand, setRand] = useState(Math.random())
+  const [rand] = useState(Math.random())
 
   const renderTooltip = ({ datum, series }) => (
     <List dense>

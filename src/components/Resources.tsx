@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React from "react"
 import {
   Typography,
   makeStyles,

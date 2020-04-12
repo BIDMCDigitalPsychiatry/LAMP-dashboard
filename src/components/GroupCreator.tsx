@@ -1,28 +1,15 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import {
-  Card,
   Tooltip,
   Typography,
   Grid,
   Fab,
   Divider,
-  IconButton,
   Icon,
   Button,
   ButtonGroup,
   TextField,
-  InputAdornment,
-  Stepper,
-  Step,
-  StepLabel,
-  StepButton,
-  StepContent,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormGroup,
-  Checkbox,
   Menu,
   MenuItem,
 } from "@material-ui/core"
@@ -98,7 +85,6 @@ export default function GroupCreator({
   value?: any
   onSave?: any
 }) {
-  const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
 

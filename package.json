@@ -55,7 +55,7 @@
     "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
     "start-sw": "http-server ./build",
     "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
-    "format": "prettier --write 'src/**/*.{js,ts,jsx,tsx}'"
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'"
   },
   "husky": {
     "hooks": {
@@ -63,21 +63,8 @@
     }
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.ts": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.jsx": [
-      "prettier --write",
-      "git add"
-    ],
-    "*.tsx": [
-      "prettier --write",
-      "git add"
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss}": [
+      "prettier --write"
     ]
   },
   "prettier": {
@@ -95,6 +82,16 @@
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended",
       "prettier/@typescript-eslint"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.ts?(x)"
+        ],
+        "rules": {
+          "react-hooks/exhaustive-deps": "off"
+        }
+      }
     ]
   },
   "browserslist": [

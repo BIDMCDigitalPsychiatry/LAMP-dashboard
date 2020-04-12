@@ -1,17 +1,6 @@
 // Core Imports
 import React, { useState, useEffect, useCallback } from "react"
-import {
-  IconButton,
-  Box,
-  Icon,
-  Button,
-  Typography,
-  Dialog,
-  DialogActions,
-  Slide,
-  Menu,
-  MenuItem,
-} from "@material-ui/core"
+import { Box, Button, Typography, Dialog, DialogActions, Menu, MenuItem } from "@material-ui/core"
 import MaterialTable from "material-table"
 import { useSnackbar } from "notistack"
 
@@ -284,7 +273,7 @@ export default function ActivityList({ studyID, title, ...props }) {
         console.dir("deleted tag " + JSON.stringify(tag))
       }
       let raw = await LAMP.Activity.delete(activity.id)
-      //console.dir(raw)
+      console.dir(raw)
     }
     enqueueSnackbar("Successfully deleted the selected Activities.", {
       variant: "success",
@@ -360,6 +349,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   //
   const updateSchedule = async (x) => {
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
+    console.dir(result)
     let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
     let all = await LAMP.Activity.allByStudy(studyID)
     setActivities(all) // need to resave below to trigger detail panel correctly!

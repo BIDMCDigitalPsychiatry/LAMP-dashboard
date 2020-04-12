@@ -66,6 +66,7 @@ Object.defineProperty(Array, "rangeTo", {
 // eslint-disable-next-line
 Object.defineProperty(Date.prototype, "isValid", {
   value: function () {
+    // eslint-disable-next-line
     return this.getTime() === this.getTime()
   },
 })

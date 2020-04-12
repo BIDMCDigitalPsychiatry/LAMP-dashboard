@@ -191,6 +191,7 @@ export default function ActivityCard({
           /> // eslint-disable-next-line
         ) : (
           <img
+            alt="Activity Screenshot from mindLAMP v1.x"
             style={{ width: 300, height: 600 }}
             src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${activity.name
               .toLowerCase()

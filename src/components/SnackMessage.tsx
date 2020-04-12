@@ -1,19 +1,8 @@
 import React, { useState } from "react"
-import PropTypes from "prop-types"
-import classnames from "classnames"
+import { Collapse, Paper, Typography, Card, CardActions, IconButton, Icon } from "@material-ui/core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import Collapse from "@material-ui/core/Collapse"
-import Paper from "@material-ui/core/Paper"
-import Typography from "@material-ui/core/Typography"
-import Card from "@material-ui/core/Card"
-import CardActions from "@material-ui/core/CardActions"
-import Button from "@material-ui/core/Button"
-import IconButton from "@material-ui/core/IconButton"
-import CloseIcon from "@material-ui/icons/Close"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
-import CheckCircleIcon from "@material-ui/icons/CheckCircle"
-import { colors } from "@material-ui/core"
+import classnames from "classnames"
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -82,10 +71,10 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
             })}
             onClick={handleExpandClick}
           >
-            <ExpandMoreIcon />
+            <Icon>expand_more</Icon>
           </IconButton>
           <IconButton className={classes.expand} onClick={handleDismiss}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </div>
       </CardActions>

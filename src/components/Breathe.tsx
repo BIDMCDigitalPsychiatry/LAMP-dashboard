@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React from "react"
 import { Typography, makeStyles } from "@material-ui/core"
 
 // Local Imports

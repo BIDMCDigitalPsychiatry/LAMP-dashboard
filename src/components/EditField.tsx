@@ -25,7 +25,7 @@ export default function EditField({ participant, onUpdate, ...props }: { partici
       )
       .then((res) => setAlias((oldValue.current = res)))
       .catch((err) =>
-        enqueueSnackbar(`Failed to load ${participant.id}'s alias: \'${err.message}\'`, { variant: "error" })
+        enqueueSnackbar(`Failed to load ${participant.id}'s alias: '${err.message}'`, { variant: "error" })
       )
   }, [])
 
@@ -41,12 +41,12 @@ export default function EditField({ participant, onUpdate, ...props }: { partici
             variant: "success",
           })
         else
-          enqueueSnackbar(`Set ${participant.id}'s alias to \'${alias}\'.`, {
+          enqueueSnackbar(`Set ${participant.id}'s alias to '${alias}'.`, {
             variant: "success",
           })
       })
       .catch((err) =>
-        enqueueSnackbar(`Failed to change ${participant.id}'s alias: \'${err.message}\'`, { variant: "error" })
+        enqueueSnackbar(`Failed to change ${participant.id}'s alias: '${err.message}'`, { variant: "error" })
       )
   }, [editing])
 

@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Fab, Button, Icon, ThemeProvider, createMuiTheme } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -25,11 +25,11 @@ import NavigationLayout from "./NavigationLayout"
 /* TODO: /participant/:participant_id/messaging -> messaging */
 
 //
-const srcLock = () => {
+/*const srcLock = () => {
   let query = window.location.hash.split("?") || []
   let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
   return typeof src === "string" && src.length > 0
-}
+}*/
 
 function PageTitle({ children, ...props }) {
   useEffect(() => {

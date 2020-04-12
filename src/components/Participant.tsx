@@ -13,8 +13,6 @@ import {
   useTheme,
   useMediaQuery,
   Tooltip,
-  Paper,
-  BottomNavigation,
   BottomNavigationAction,
 } from "@material-ui/core"
 import { blue } from "@material-ui/core/colors"

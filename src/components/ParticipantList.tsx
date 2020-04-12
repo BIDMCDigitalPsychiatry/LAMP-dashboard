@@ -1,17 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  IconButton,
-  Icon,
-  Button,
-  TextField,
-  Popover,
-  MenuItem,
-  Chip,
-  Tooltip,
-  Typography,
-  Grid,
-} from "@material-ui/core"
+import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip, Grid } from "@material-ui/core"
 import { green } from "@material-ui/core/colors"
 import MaterialTable from "material-table"
 import { useSnackbar } from "notistack"
