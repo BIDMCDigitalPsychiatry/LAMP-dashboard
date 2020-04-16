@@ -1,6 +1,6 @@
 // Core Imports
 import React from "react"
-import { GridList, GridListTile } from "@material-ui/core"
+import { Box, GridList, GridListTile } from "@material-ui/core"
 
 const tileData = [
   {
@@ -76,7 +76,7 @@ const tileData = [
 
 export default function HopeBox({ onComplete, ...props }) {
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -93,6 +93,6 @@ export default function HopeBox({ onComplete, ...props }) {
           </GridListTile>
         ))}
       </GridList>
-    </div>
+    </Box>
   )
 }

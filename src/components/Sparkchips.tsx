@@ -1,10 +1,10 @@
 // Core Imports
 import React from "react"
-import { Chip, Tooltip } from "@material-ui/core"
+import { Box, Chip, Tooltip } from "@material-ui/core"
 
 export default function Sparkchips({ ...props }) {
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -25,6 +25,6 @@ export default function Sparkchips({ ...props }) {
           />
         </Tooltip>
       ))}
-    </div>
+    </Box>
   )
 }

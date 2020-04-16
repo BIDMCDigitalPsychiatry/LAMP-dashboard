@@ -66,7 +66,7 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
           </ButtonBase>
         </Paper>
       </Tooltip>
-      <Box textAlign="center" padding style={{ width: 150 }}>
+      <Box textAlign="center" style={{ width: 150 }}>
         <Typography variant="overline" style={{ lineHeight: "normal" }}>
           {!!notification || !!favorite ? <b>{title}</b> : title}
         </Typography>

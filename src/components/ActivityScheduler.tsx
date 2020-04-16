@@ -1,6 +1,7 @@
 // Core Imports
 import React, { useState } from "react"
 import {
+  Box,
   Button,
   Menu,
   MenuItem,
@@ -218,7 +219,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
         pageSize: 3,
         pageSizeOptions: [3, 5, 10],
       }}
-      components={{ Container: (props) => <div {...props} /> }}
+      components={{ Container: (props) => <Box {...props} /> }}
     />
   )
 }

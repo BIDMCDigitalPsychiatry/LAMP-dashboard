@@ -39,7 +39,7 @@ export default function Tips({ ...props }) {
   return (
     <Grid container direction="row">
       <Box p={4} my={4} width="100%">
-        <div className={classes.root}>
+        <Box className={classes.root}>
           <ExpansionPanel>
             <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
               <Typography className={classes.heading}>Sleep</Typography>
@@ -242,7 +242,7 @@ export default function Tips({ ...props }) {
               </Grid>
             </ExpansionPanelDetails>
           </ExpansionPanel>
-        </div>
+        </Box>
       </Box>
     </Grid>
   )

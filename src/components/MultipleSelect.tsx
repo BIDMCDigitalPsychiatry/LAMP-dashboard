@@ -6,7 +6,7 @@ import { Chip, Tooltip, Badge } from "@material-ui/core"
 
 export default function MultipleSelect({ ...props }) {
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -43,6 +43,6 @@ export default function MultipleSelect({ ...props }) {
           </Badge>
         </Tooltip>
       ))}
-    </div>
+    </Box>
   )
 }

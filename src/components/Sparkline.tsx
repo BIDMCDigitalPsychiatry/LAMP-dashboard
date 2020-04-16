@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Paper, List, ListItem, ListItemText } from "@material-ui/core"
+import { Paper, List, ListItem, ListItemText, Box, useMediaQuery } from "@material-ui/core"
 import {
   XYChart,
   theme,
@@ -21,17 +21,21 @@ import {
 
 function PaperTooltip({ top, left, ...props }) {
   return (
-    <Paper
-      {...props}
-      elevation={4}
-      style={{
-        ...props.style,
-        position: "absolute",
-        pointerEvents: "none",
-        top,
-        left,
-      }}
-    />
+    <Box clone displayPrint="none">
+      <Paper
+        {...props}
+        elevation={4}
+        style={{
+          ...props.style,
+          position: "absolute",
+          pointerEvents: "none",
+          background: "white",
+          top,
+          left,
+          width: 196,
+        }}
+      />
+    </Box>
   )
 }
 
@@ -122,12 +126,13 @@ const styles = {
 
 export default withParentSize(function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
+  const print = useMediaQuery("print")
 
   const renderTooltip = ({ datum, series }) => (
     <List dense>
       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
         <ListItemText
-          primaryTypographyProps={{ variant: "overline" }}
+          primaryTypographyProps={{ variant: "overline", style: { lineHeight: "1.4" } }}
           secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
         >
           {datum.x.toLocaleString("en-US", Date.formatStyle("full"))}
@@ -138,12 +143,12 @@ export default withParentSize(function Sparkline({ ...props }) {
           <ListItemText
             primaryTypographyProps={{
               variant: "overline",
-              style: { lineHeight: "1em" },
+              style: { lineHeight: "1.4" },
             }}
             secondaryTypographyProps={{
               variant: "overline",
               display: "block",
-              style: { color: "#f00", fontWeight: 900, lineHeight: "1em" },
+              style: { color: "#f00", fontWeight: 900, lineHeight: "1.4" },
             }}
             secondary={series[props.YAxisLabel ?? "Data"]?.missing ? "Missing Data" : undefined}
           >
@@ -167,7 +172,7 @@ export default withParentSize(function Sparkline({ ...props }) {
         <XYChart
           theme={theme}
           ariaLabel="Chart"
-          width={Math.max(props.minWidth, props.parentWidth)}
+          width={Math.max(props.minWidth, props.parentWidth + (print ? 128 : 0))}
           height={Math.max(props.minHeight, props.parentHeight)}
           eventTrigger={"container"}
           eventTriggerRefs={props.eventTriggerRefs}

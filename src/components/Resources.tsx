@@ -33,7 +33,7 @@ export default function Resources({ ...props }) {
   const classes = useStyles()
   return (
     <Box p={4} my={4} width="100%">
-      <div className={classes.root}>
+      <Box className={classes.root}>
         <ExpansionPanel>
           <ExpansionPanelSummary expandIcon={<Icon>expand_more</Icon>}>
             <Typography className={classes.heading}>Department of Mental Health (DMH)</Typography>
@@ -60,7 +60,7 @@ export default function Resources({ ...props }) {
             <Link href="https://namimass.org/">NAMI Massachussetts</Link>
           </ExpansionPanelDetails>
         </ExpansionPanel>
-      </div>
+      </Box>
     </Box>
   )
 }

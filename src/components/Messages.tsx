@@ -61,6 +61,9 @@ function MessageItem({ from, date, text, flipped, ...props }) {
 }
 
 export default function Messages({
+  refresh,
+  participant,
+  participantOnly,
   privateOnly,
   expandHeight,
   ...props
@@ -82,25 +85,25 @@ export default function Messages({
     () => {
       refreshMessages()
     },
-    !!props.refresh ? 10 * 1000 /* 10s */ : null,
+    !!refresh ? 10 * 1000 /* 10s */ : null,
     true
   )
 
   const sendMessage = async () => {
     let msg = (currentMessage || "").trim()
-    if (msg.length === 0 || !props.participant) return
+    if (msg.length === 0 || !participant) return
 
     await refreshMessages()
     let all = getMessages()
     all.push({
-      from: !!props.participantOnly ? "participant" : "researcher",
+      from: !!participantOnly ? "participant" : "researcher",
       type: (messageTab || 0) === 1 ? "note" : "message",
       date: new Date(),
       text: msg,
     })
-    LAMP.Type.setAttachment(props.participant, "me", "lamp.messaging", all)
+    LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
-    setMessages({ ...(messages || {}), [props.participant]: all })
+    setMessages({ ...(messages || {}), [participant]: all })
   }
 
   const refreshMessages = async () => {
@@ -109,7 +112,7 @@ export default function Messages({
       Object.fromEntries(
         (
           await Promise.all(
-            [props.participant || ""].map(async (x) => [
+            [participant || ""].map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => []),
             ])
@@ -122,7 +125,7 @@ export default function Messages({
   }
 
   const getMessages = () => {
-    let x = (messages || {})[props.participant || ""] || []
+    let x = (messages || {})[participant || ""] || []
     return !Array.isArray(x) ? [] : x
   }
 
@@ -140,7 +143,7 @@ export default function Messages({
             textColor="primary"
           >
             <Tab label="Messages" />
-            <Tab label={!!props.participantOnly ? "My Journal" : "Patient Notes"} />
+            <Tab label={!!participantOnly ? "My Journal" : "Patient Notes"} />
           </Tabs>
         </Grid>
         <Grid item hidden={!!privateOnly}>
@@ -161,14 +164,13 @@ export default function Messages({
                   .filter((x) =>
                     (messageTab || 0) === 0
                       ? x.type === "message"
-                      : x.type === "note" && x.from === (!!props.participantOnly ? "participant" : "researcher")
+                      : x.type === "note" && x.from === (!!participantOnly ? "participant" : "researcher")
                   )
                   .map((x) => (
                     <MessageItem
                       {...x}
                       flipped={
-                        (!!props.participantOnly && x.from === "researcher") ||
-                        (!props.participantOnly && x.from === "participant")
+                        (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
                       }
                       key={JSON.stringify(x)}
                     />
@@ -183,7 +185,7 @@ export default function Messages({
                 placeholder="Message..."
                 value={currentMessage || ""}
                 onChange={(event) => setCurrentMessage(event.target.value)}
-                helperText={`Your ${!!props.participantOnly ? "clinician" : "patient"} will ${
+                helperText={`Your ${!!participantOnly ? "clinician" : "patient"} will ${
                   (messageTab || 0) === 0
                     ? "be able to see your messages when they log in."
                     : "not be able to see this message."

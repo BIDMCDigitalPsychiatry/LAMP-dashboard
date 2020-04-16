@@ -44,10 +44,11 @@ export default function NavigationLayout({
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const print = useMediaQuery("print")
 
   return (
-    <div>
-      {!!noToolbar ? (
+    <Box>
+      {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
         <AppBar position="static" style={{ height: 48, background: "transparent", boxShadow: "none" }}>
@@ -63,7 +64,7 @@ export default function NavigationLayout({
               <Icon>arrow_back</Icon>
             </IconButton>
             <Box flexGrow={1} />
-            <div>
+            <Box>
               <Tooltip title="Notifications">
                 <IconButton color="default" onClick={() => {}}>
                   <Badge badgeContent={0} color="secondary">
@@ -122,11 +123,11 @@ export default function NavigationLayout({
                   <b style={{ color: colors.grey["600"] }}>Contact Us</b>
                 </MenuItem>
               </Menu>
-            </div>
+            </Box>
           </Toolbar>
         </AppBar>
       )}
-      <div
+      <Box
         style={{
           marginTop: 0,
           paddingBottom: 56,
@@ -144,7 +145,7 @@ export default function NavigationLayout({
         >
           {props.children}
         </ResponsiveMargin>
-      </div>
+      </Box>
       <Dialog
         open={!!confirmLogout}
         onClose={() => setConfirmLogout(false)}
@@ -178,6 +179,6 @@ export default function NavigationLayout({
           <CredentialManager id={id} />
         </DialogContent>
       </Dialog>
-    </div>
+    </Box>
   )
 }

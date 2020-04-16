@@ -2,7 +2,7 @@ import * as React from "react"
 import { Avatar, Menu, Tooltip, ButtonBase } from "@material-ui/core"
 import { isFragment } from "react-is"
 import clsx from "clsx"
-import { makeStyles, createStyles } from "@material-ui/core"
+import { Box, makeStyles, createStyles } from "@material-ui/core"
 
 /*const createTestAccount = (id) => ({
   id,
@@ -99,9 +99,9 @@ const OnCircle = ({ children, root, line, parent, avatarWidth, classes = {} as a
           avatarWidth={avatarWidth}
         />
       )}
-      <div ref={(el) => setRef(el)} className={clsx(useStyles(props).circle, classes.circle)}>
+      <Box ref={(el) => setRef(el)} className={clsx(useStyles(props).circle, classes.circle)}>
         {children}
-      </div>
+      </Box>
     </>
   )
 }
@@ -199,7 +199,7 @@ const Line = (props: any) => {
   const length = Math.sqrt(dx * dx + dy * dy) - avatarWidth / 2
 
   const classes = useStyles({ y0, x0, length, angle })
-  return <div className={clsx(classes.linePosition, classes.line, className)} />
+  return <Box className={clsx(classes.linePosition, classes.line, className)} />
 }
 
 const AvatarMesh = React.forwardRef(function AvatarMesh(
@@ -229,7 +229,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
   }
 
   return (
-    <div className={clsx(classes.root, className)} ref={handleSetRef} {...other}>
+    <Box className={clsx(classes.root, className)} ref={handleSetRef} {...other}>
       {children.map((c: any, i) => (
         <OnCircle
           key={i}
@@ -252,7 +252,7 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
           })}
         </OnCircle>
       ))}
-    </div>
+    </Box>
   )
 })
 

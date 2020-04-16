@@ -414,7 +414,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           pageSize: 10,
           pageSizeOptions: [10, 25, 50, 100],
         }}
-        components={{ Container: (props) => <div {...props} /> }}
+        components={{ Container: (props) => <Box {...props} /> }}
       />
       <Menu
         keepMounted
@@ -477,7 +477,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           data={importFile || []}
           columns={[{ title: "Activity Name", field: "name" }]}
           options={{ search: false, selection: false }}
-          components={{ Container: (props) => <div {...props} /> }}
+          components={{ Container: (props) => <Box {...props} /> }}
         />
         <DialogActions>
           <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>

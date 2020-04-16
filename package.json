@@ -4,6 +4,7 @@
   "author": "BIDMC Division of Digital Psychiatry",
   "description": "LAMP Dashboard",
   "private": true,
+  "homepage": ".",
   "devDependencies": {
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
@@ -52,7 +53,7 @@
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {
-    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` PUBLIC_URL=dashboard.lamp.digital react-scripts start",
+    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
     "start-sw": "http-server ./build",
     "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'"

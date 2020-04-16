@@ -42,7 +42,7 @@ export default function ActivityCard({
 
   return (
     <React.Fragment>
-      <Box display="flex" justifyContent="space-between" alignContent="center" m={2}>
+      <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
         {!Boolean(visibleSlice) ? (
           <Tooltip title="Switch Views">
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
@@ -63,7 +63,7 @@ export default function ActivityCard({
               : visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))}
           </Typography>
         </Tooltip>
-        <div>
+        <Box>
           {!Boolean(visibleSlice) && (
             <Tooltip title="Show App Screenshot">
               <IconButton onClick={(event) => setHelpAnchor(event.currentTarget)}>
@@ -92,7 +92,7 @@ export default function ActivityCard({
               </IconButton>
             </Tooltip>
           )}
-        </div>
+        </Box>
       </Box>
       <Divider />
       {Boolean(visibleSlice) ? (

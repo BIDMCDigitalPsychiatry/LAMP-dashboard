@@ -1,6 +1,7 @@
 // Core Imports
 import React from "react"
 import ReactDOM from "react-dom"
+import LAMP from "lamp-core"
 
 // Local Imports
 import App from "./components/App"
@@ -18,7 +19,8 @@ var css = document.createElement("style")
 document.head.appendChild(css)
 document.body.appendChild(root)
 css.type = "text/css"
-css.innerHTML = `* {
+css.innerHTML = `
+* {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -34,6 +36,35 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
     user-select: text;
     cursor: text;
 }`
+
+// IE9+ CustomEvent polyfill.
+;(function () {
+  if (typeof window.CustomEvent === "function") return false
+  function CustomEvent(event, params) {
+    params = params || { bubbles: false, cancelable: false, detail: null }
+    var evt = document.createEvent("CustomEvent")
+    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail)
+    return evt
+  }
+  ;(window.CustomEvent as any) = CustomEvent
+})()
+
+// Tie-in for the mobile apps.
+// Login only if we are a participant.
+LAMP.addEventListener("LOGIN", ({ detail }) => {
+  // Tie-in for the mobile apps.
+  if (LAMP.Auth._type === "participant") {
+    ;(window as any)?.webkit?.messageHandlers?.login?.postMessage?.(detail)
+    ;(window as any)?.login?.postMessage?.(JSON.stringify(detail))
+  }
+})
+
+// Tie-in for the mobile apps.
+// FIXME: Logout only if we were a participant... right now the app should ignore erroneous logouts.
+LAMP.addEventListener("LOGOUT", ({ detail }) => {
+  ;(window as any)?.webkit?.messageHandlers?.logout?.postMessage?.(detail)
+  ;(window as any)?.logout?.postMessage?.(JSON.stringify(detail))
+})
 
 ReactDOM.render(<App />, root)
 serviceWorker.register({

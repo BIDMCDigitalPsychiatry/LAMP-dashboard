@@ -319,7 +319,7 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
   return (
     <ResponsivePaper {...props} elevation={noHeader ? 0 : 4}>
       {noHeader !== true && <Banner heading={`Section ${index}`} text={value.name} />}
-      <div>
+      <Box>
         <Stepper nonLinear activeStep={activeStep} orientation="vertical">
           {value.settings.map((x, idx) => (
             <Step key={idx}>
@@ -369,14 +369,14 @@ function Section({ noHeader, onResponse, index, value, prefillData, ...props }) 
             </Step>
           ))}
         </Stepper>
-      </div>
+      </Box>
     </ResponsivePaper>
   )
 }
 
 // eslint-disable-next-line
 function TabPanel({ index, value, children }) {
-  return <div hidden={value !== index}>{children}</div>
+  return <Box hidden={value !== index}>{children}</Box>
 }
 
 export default function Survey({
