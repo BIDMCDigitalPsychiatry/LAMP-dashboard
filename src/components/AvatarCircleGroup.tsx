@@ -99,9 +99,9 @@ const OnCircle = ({ children, root, line, parent, avatarWidth, classes = {} as a
           avatarWidth={avatarWidth}
         />
       )}
-      <Box ref={(el) => setRef(el)} className={clsx(useStyles(props).circle, classes.circle)}>
+      <div ref={(el) => setRef(el)} className={clsx(useStyles(props).circle, classes.circle)}>
         {children}
-      </Box>
+      </div>
     </>
   )
 }

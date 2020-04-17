@@ -186,7 +186,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           onMouseMove={onMouseMove}
           onMouseLeave={onMouseLeave}
           renderTooltip={null}
-          snapTooltipToDataX
+          snapTooltipToData={false}
           tooltipData={tooltipData}
           xScale={{
             type: "time",
@@ -249,7 +249,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           <PointSeries data={props.data.filter((x) => x.missing)} fill="#ff0000" fillOpacity={1} strokeWidth={0} />
           <CrossHair
             fullHeight
-            showHorizontalLine={false}
+            showHorizontalLine={true}
             stroke={props.color}
             strokeDasharray="3 1"
             circleSize={(d) => (d.y === tooltipData.datum.y ? 8 : 4)}

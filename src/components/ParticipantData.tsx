@@ -20,337 +20,17 @@ function _hideExperimental() {
 
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
-  let custom = [
-    {
-      name: "[BAARS-IV SR Current] Inattention",
+  let custom =
+    ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
+      ...x,
       spec: "lamp.dashboard.custom_survey_group",
       schedule: {},
-      settings: [
-        {
-          activity: "BAARS-SR Current",
-          question: "Fail to give close attention to details or make careless mistakes in my work or other activities",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Difficulty sustaining my attention in tasks or fun activities",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Don’t listen when spoken to directly",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Don’t follow through on instructions and fail to finish work or chores",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Have difficulty organizing tasks and activities",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Avoid, dislike, or am reluctant to engage in tasks that require sustained mental effort",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Lose things necessary for tasks or activities",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Easily distracted by extraneous stimuli or irrelevant thoughts",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Forgetful in daily activities",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Current] Hyperactivity-Impulsivity",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "BAARS-SR Current",
-          question: "Fidget with hands or feet or squirm in seat",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Leave my seat in classrooms or in other situations in which remaining seated is expected",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Shift around excessively or feel restless or hemmed in",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Have difficulty engaging in leisure activities quietly (feel uncomfortable, or am loud or noisy)",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: 'I am "on the go" or act as if "driven by motor" ',
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Talk excessively (in social situations)",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question:
-            "Blurt out answers before questions have been completed, complete others’ sentences, or jump the gun",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Have difficulty awaiting my turn",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Interrupt or intrude on others (butt into conversations or activities without permission)",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Current] Sluggish Cognitive Tempo",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "BAARS-SR Current",
-          question: "Prone to daydreaming when I should have been\r\nconcentrating on something or working",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Have trouble staying alert or awake in boring situations",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Easily confused",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Easily bored",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: 'Spacey or "in a fog"',
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Lethargic, more tired than others",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Underactive or have less energy than others",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "Slow moving",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "I don’t seem to process information as quickly or as\r\naccurately as others.",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Current] Other",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "BAARS-SR Current",
-          question: 'Did you experience any symptoms at least "often" or more frequently?',
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "If so, how old were you when these symptoms began?",
-        },
-        {
-          activity: "BAARS-SR Current",
-          question: "If so, in which of these settings did those symptoms impair your functioning?",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Childhood] Inattention",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "AARS-SR Child",
-          question:
-            "Failed to give close attention to details or made careless\r\nmistakes in my work or other activities",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Had difficulty sustaining my attention in tasks or fun\r\nactivities",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Didn’t listen when spoken to directly",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Didn’t follow through on instructions and failed to finish\r\nwork or chores.",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Had difficulty organizing tasks and activities",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Avoided, disliked, or was reluctant to engage in tasks that\r\nrequired sustained mental effort",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Lost things necessary for tasks or activities",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Was easily distracted by extraneous stimuli or irrelevant\r\nthoughts.",
-        },
-        {
-          activity: "AARS-SR Child",
-          question: "Was forgetful in daily activities",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Childhood] Hyperactivity-Impulsivity",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "AARS-SR Child",
-          question: "Fidgeted with hands or feet or squirmed in seat",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Left my seat in classrooms or in other situations in which\r\nremaining seated was expected",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Shifted around excessively or felt restless or hemmed in",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question:
-            "Had difficulty engaging in leisure activities quietly (felt\r\nuncomfortable, or was loud or noisy)",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Was “on the go” or acted as if “driven by a motor”",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Talked excessively",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Blurted out answers before questions had been completed,\r\ncompleted others’ sentences",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Had difficulty awaiting my turn",
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "Interrupted or intruded on others (butted into conversations\r\nor activities without permission)",
-        },
-      ],
-    },
-    {
-      name: "[BAARS-IV SR Childhood] Other",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "AARS-SR Child",
-          question: 'Did you experience any of these symptoms at least "often" or more frequently?',
-        },
-
-        {
-          activity: "AARS-SR Child",
-          question: "If so, in which of these settings did those symptoms impair your functioning?",
-        },
-      ],
-    },
-    {
-      name: "[SCT SR Childhood] Sluggish Cognitive Tempo",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "SCT SR Child",
-          question: "Prone to daydreaming when I should have been\r\nconcentrating on something or working",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Had trouble staying alert or awake in boring situations",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Easily confused",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Easily bored",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: 'Spacey or "in a fog"',
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Lethargic, more tired than others",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Underactive or had less energy than others",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "Slow moving",
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "I didn’t seem to process information as quickly or as\r\naccurately as others.",
-        },
-      ],
-    },
-    {
-      name: "[SCT SR Childhood] Other",
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: [
-        {
-          activity: "SCT SR Child",
-          question: 'Did you experience any of these symptoms at least "often" or "more frequently"?',
-        },
-
-        {
-          activity: "SCT SR Child",
-          question: "If so, in which settings did those symptoms impair your functioning?",
-        },
-      ],
-    },
-  ]
-  return [...original, ...custom] // original.filter((x) => x.spec !== "lamp.survey")
+      settings: x.settings.map((y) => ({
+        ...y,
+        ...original.find((z) => z.name === y.activity)?.settings.find((a) => a.text === y.question),
+      })),
+    })) ?? [] // original.filter((x) => x.spec !== "lamp.survey")
+  return [...original, ...custom]
 }
 
 async function getVisualizations(participant: ParticipantObj) {
@@ -372,11 +52,7 @@ async function getActivityEvents(
   let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
     .map((x) => ({
       ...x,
-      activity: _activities.find(
-        (y) =>
-          x.activity === y.id ||
-          (!!x.static_data.survey_name && x.static_data.survey_name.toLowerCase() === y.name.toLowerCase())
-      ),
+      activity: _activities.find((y) => x.activity === y.id),
     }))
     .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
     .sort((x, y) => x.timestamp - y.timestamp)
@@ -385,11 +61,43 @@ async function getActivityEvents(
       activity: (x.activity || { name: "" }).name,
     }))
     .groupBy("activity") as any
-  let custom = _activities
+  let customEvents = _activities
     .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
-    .map((x) => x.settings.map((y) => ({})))
+    .map((x) =>
+      x?.settings?.map((y, idx) =>
+        original?.[y.activity]
+          ?.map((z) => ({
+            idx: idx,
+            timestamp: z.timestamp,
+            duration: z.duration,
+            activity: x.name,
+            slices: z.temporal_slices.find((a) => a.item === y.question),
+          }))
+          .filter((y) => y.slices !== undefined)
+      )
+    )
+    .filter((x) => x !== undefined)
+    .flat(2)
     .groupBy("activity")
-  return original
+  let customGroups = Object.entries(customEvents).map(([k, x]) => [
+    k,
+    Object.values(x.groupBy("timestamp")).map((z: any) => ({
+      timestamp: z?.[0].timestamp,
+      duration: z?.[0].duration,
+      activity: z?.[0].activity,
+      static_data: { survey_name: "__lamp.dashboard.custom_survey_group__" },
+      temporal_slices: Array.from(
+        z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
+          length:
+            z
+              .map((a) => a.idx)
+              .sort()
+              .slice(-1)[0] + 1,
+        })
+      ).map((a) => (a === undefined ? {} : a)),
+    })),
+  ])
+  return Object.fromEntries([...Object.entries(original), ...customGroups])
 }
 
 // Perform event coalescing/grouping by sensor or activity type.

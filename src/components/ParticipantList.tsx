@@ -62,8 +62,6 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
 
   useEffect(() => {
     ;(async function () {
-      if (participants.length > 0)
-        LAMP.SensorEvent.allByParticipant(participants[0].id, "lamp.analytics").then(console.dir)
       let data = (
         await Promise.all(
           participants.map(async (x) => ({

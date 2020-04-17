@@ -50,10 +50,13 @@ Object.defineProperty(Array.prototype, "flat", {
 Object.defineProperty(Array.prototype, "groupBy", {
   value: function (key) {
     return this.reduce(
-      (result, item) => ({
-        ...result,
-        [item[key]]: [...(result[item[key]] || []), item],
-      }),
+      (result, item) =>
+        item === undefined
+          ? result
+          : {
+              ...result,
+              [item?.[key]]: [...(result[item?.[key]] || []), item],
+            },
       {}
     )
   },

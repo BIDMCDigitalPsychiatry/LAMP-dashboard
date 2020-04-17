@@ -162,13 +162,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
     _setTab(newTab)
   }
   const tabDirection = (currentTab) => {
-    return tab > lastTab && currentTab !== tab
-      ? !supportsSidebar
-        ? "down"
-        : "right"
-      : !supportsSidebar
-      ? "up"
-      : "left"
+    return tab > lastTab && currentTab !== tab ? (supportsSidebar ? "down" : "right") : supportsSidebar ? "up" : "left"
   }
 
   useEffect(() => {
@@ -194,7 +188,6 @@ export default function Participant({ participant, ...props }: { participant: Pa
       timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : new Date().getTime(),
       duration: 0,
       activity: visibleActivities[idx].id,
-      static_data: { survey_name: visibleActivities[idx].name },
       temporal_slices: (x || []).map((y) => ({
         item: y !== undefined ? y.item : null,
         value: y !== undefined ? y.value : null,

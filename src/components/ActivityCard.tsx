@@ -7,6 +7,7 @@ import { blue } from "@material-ui/core/colors"
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 
+// TODO: move strategies to ParticipantData & deprecate survey_name !!!
 const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     slices
@@ -106,7 +107,7 @@ export default function ActivityCard({
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
               value: x.value,
-              time_taken: (x.duration / 1000).toFixed(1) + "s",
+              time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
         )
