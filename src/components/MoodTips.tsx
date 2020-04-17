@@ -1,16 +1,6 @@
 // Core Imports
 import React from "react"
-import {
-  Typography,
-  makeStyles,
-  Box,
-  Link,
-  Card,
-  CardActionArea,
-  CardMedia,
-  CardContent,
-  Grid,
-} from "@material-ui/core"
+import { Typography, makeStyles, Box, Grid, Card, CardMedia, CardActionArea, CardContent } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,7 +8,6 @@ const useStyles = makeStyles((theme) => ({
   },
   root2: {
     maxWidth: 345,
-    minWidth: 344,
     margin: "16px",
     maxLength: 500,
   },
@@ -31,8 +20,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function Resources({ ...props }) {
+export default function Tips({ ...props }) {
   const classes = useStyles()
+
   return (
     <Grid container direction="row">
       <Box p={4} my={4} width="100%">
@@ -41,20 +31,19 @@ export default function Resources({ ...props }) {
             <CardActionArea>
               <CardMedia
                 className={classes.media}
-                image="https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/ca2246dc9b9d93d74e481c52903e7fea"
+                image="https://agingwithdignity.org/wp-content/uploads/2017/11/culture-of-hope.jpg"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  Department of Mental Health (DMH)
+                  Hope
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
-                  {
-                    //option for description text
-                  }
+                  What gives you hope? This can look different for everyone. For some it is gardening, for others it is
+                  making progress towards a goal. Life always has its ups and downs, but hope can push us through the
+                  low moments. Think about what makes you hopeful and cultivate it. Take a few minutes to write about
+                  what gives you hope. Next time you feel down, look for what you wrote to remind yourself that even
+                  when things get tough there is hope for a better day.
                 </Typography>
-                <Link href="https://www.mass.gov/orgs/massachusetts-department-of-mental-health">
-                  Department of Mental Health (DMH)
-                </Link>
               </CardContent>
             </CardActionArea>
           </Card>
@@ -62,18 +51,18 @@ export default function Resources({ ...props }) {
             <CardActionArea>
               <CardMedia
                 className={classes.media}
-                image="https://media-exp1.licdn.com/dms/image/C4D1BAQF0aQaDZZqoBg/company-background_10000/0?e=2159024400&v=beta&t=wng_qIGKZEkBnziD9RRSdEB60m-o_yICs1EN5WL9wWE"
+                image="https://content.linkedin.com/content/dam/me/learning/blog/2017/april/Goal-Setting.jpg"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  National Alliance on Mental Illness (NAMI)
+                  Goals
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
-                  {
-                    //option for description text
-                  }
+                  Some goals can feel unattainable. To make the goal seem more reasonable follow these steps. First,
+                  choose one goal you hope to achieve. Next, create a plan consisting of small actions that move you
+                  closer to your goal. The last and most important step is to write down 3 short statements to remind
+                  you that you are capable. For example, “I have potential.”
                 </Typography>
-                <Link href="https://www.nami.org/#">National Alliance on Mental Illness (NAMI)</Link>
               </CardContent>
             </CardActionArea>
           </Card>
@@ -81,18 +70,17 @@ export default function Resources({ ...props }) {
             <CardActionArea>
               <CardMedia
                 className={classes.media}
-                image="https://media-exp1.licdn.com/dms/image/C4D1BAQF0aQaDZZqoBg/company-background_10000/0?e=2159024400&v=beta&t=wng_qIGKZEkBnziD9RRSdEB60m-o_yICs1EN5WL9wWE"
+                image="https://s23916.pcdn.co/wp-content/uploads/2017/12/how-to-encourage-optimism-and-positive-thoughts-in-children.jpeg"
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  NAMI Massachussetts
+                  Optimism
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
-                  {
-                    //option for description text
-                  }
+                  Look at the glass half full today. Write down three things every day that weren't so bad. Try to shift
+                  your focus from the bad to the good. This can help bring positivity into your life. Think about what
+                  you're grateful for, such as the ability to walk, having a place to stay, and food to eat.
                 </Typography>
-                <Link href="https://namimass.org/">NAMI Massachussetts</Link>
               </CardContent>
             </CardActionArea>
           </Card>

@@ -27,9 +27,24 @@ import Jewels from "./Jewels"
 import { spliceActivity } from "./ActivityList"
 import Journal from "./Journal"
 import Resources from "./Resources"
-import Tips from "./Tips"
+import MoodTips from "./MoodTips"
+import SleepTips from "./SleepTips"
+import SocialTips from "./SocialTips"
 import Hopebox from "./Hopebox"
 import ParticipantData from "./ParticipantData"
+import BookRecommendations from "./BookRecommendations"
+import Definitions from "./Definitions"
+import { ReactComponent as Books } from "../icons/Books.svg"
+import { ReactComponent as Mood } from "../icons/Mood.svg"
+import { ReactComponent as Sleep } from "../icons/Sleep.svg"
+import { ReactComponent as MentalHealth } from "../icons/MentalHealth.svg"
+import { ReactComponent as Information } from "../icons/Information.svg"
+import { ReactComponent as Social } from "../icons/Social.svg"
+import { ReactComponent as Surveys } from "../icons/Surveys.svg"
+import { ReactComponent as Hope } from "../icons/Hope.svg"
+import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
+import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
+import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 
 function _hideCareTeam() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
@@ -216,94 +231,148 @@ export default function Participant({ participant, ...props }: { participant: Pa
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Launcher.Section>
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Tips"
-                icon={<Icon fontSize="large">flare</Icon>}
-                onClick={() => setLaunchedActivity("tips")}
-              />
-            )}
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Resources"
-                icon={<Icon fontSize="large">menu_book</Icon>}
-                onClick={() => setLaunchedActivity("resources")}
-              />
-            )}
+            <Grid container direction="row" spacing={4}>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Mood Tips"
+                    icon={<Mood style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("moodtips")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Sleep Tips"
+                    icon={<Sleep style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("sleeptips")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Social Tips"
+                    icon={<Social style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("socialtips")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Mental Health Resources"
+                    icon={<MentalHealth style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("resources")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Book Recommendations"
+                    icon={<Books style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("bookrecommendations")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Definitions"
+                    icon={<Information style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("definitions")}
+                  />
+                )}
+              </Grid>
+            </Grid>
           </Launcher.Section>
         </Box>
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Launcher.Section>
-            {[
-              ...(activities || [])
-                .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-                .map((y) => (
-                  <Launcher.Button
-                    key={y.name}
-                    notification
-                    title={y.name}
-                    icon={<Icon fontSize="large">menu_open</Icon>}
-                    onClick={() =>
-                      setVisibleActivities(
-                        (activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
-                      )
-                    }
-                  />
-                )),
-              ...(activities || [])
-                .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-                .map((y) => (
-                  <Launcher.Button
-                    key={y.name}
-                    favorite
-                    title={y.name}
-                    icon={<Icon fontSize="large">assignment</Icon>}
-                    onClick={() => setVisibleActivities([y])}
-                  />
-                )),
-            ]}
+            <Grid container direction="row" spacing={4}>
+              {[
+                ...(activities || [])
+                  .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+                  .map((y) => (
+                    <Grid item xs={3}>
+                      <Launcher.Button
+                        key={y.name}
+                        notification
+                        title={y.name}
+                        icon={<Surveys style={{ width: "100%", height: "100%" }} />}
+                        onClick={() =>
+                          setVisibleActivities(
+                            (activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
+                          )
+                        }
+                      />
+                    </Grid>
+                  )),
+                ...(activities || [])
+                  .filter(
+                    (x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
+                  )
+                  .map((y) => (
+                    <Grid item xs={3}>
+                      <Launcher.Button
+                        key={y.name}
+                        favorite={false}
+                        title={y.name}
+                        icon={<Surveys style={{ width: "100%", height: "100%" }} />}
+                        onClick={() => setVisibleActivities([y])}
+                      />
+                    </Grid>
+                  )),
+              ]}
+            </Grid>
           </Launcher.Section>
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Launcher.Section>
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Breathe"
-                icon={<Icon fontSize="large">spa</Icon>}
-                onClick={() => setLaunchedActivity("breathe")}
-              />
-            )}
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Jewels"
-                icon={<Icon fontSize="large">videogame_asset</Icon>}
-                onClick={() => setLaunchedActivity("jewels")}
-              />
-            )}
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Journal"
-                icon={<Icon fontSize="large">import_contacts</Icon>}
-                onClick={() => setLaunchedActivity("journal")}
-              />
-            )}
-            {!_hideCareTeam() && (
-              <Launcher.Button
-                favorite
-                title="Hope Box"
-                icon={<Icon fontSize="large">launch</Icon>}
-                onClick={() => setLaunchedActivity("hopebox")}
-              />
-            )}
+            <Grid container direction="row" spacing={4}>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Breathe"
+                    icon={<BreatheIcon style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("breathe")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Jewels"
+                    icon={<JewelsIcon style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("jewels")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Journal"
+                    icon={<JournalIcon style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("journal")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Hope Box"
+                    icon={<Hope style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("hopebox")}
+                  />
+                )}
+              </Grid>
+            </Grid>
           </Launcher.Section>
         </Box>
       </Slide>
@@ -367,7 +436,11 @@ export default function Participant({ participant, ...props }: { participant: Pa
             journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
             hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            tips: <Tips onComplete={() => setLaunchedActivity(undefined)} />,
+            sleeptips: <SleepTips onComplete={() => setLaunchedActivity(undefined)} />,
+            moodtips: <MoodTips onComplete={() => setLaunchedActivity(undefined)} />,
+            socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
+            bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
+            definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
