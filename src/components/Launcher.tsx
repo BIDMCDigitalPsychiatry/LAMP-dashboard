@@ -51,8 +51,9 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
         <Paper
           elevation={2}
           style={{
-            width: 150,
-            height: 150,
+            width: "100%",
+            height: 0,
+            paddingBottom: "100%",
             borderRadius: 8,
             background: color,
             color: !!notification || !!favorite ? "#fff" : theme.palette.text.primary,
@@ -66,8 +67,8 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
           </ButtonBase>
         </Paper>
       </Tooltip>
-      <Box textAlign="center" padding style={{ width: 150 }}>
-        <Typography variant="overline" style={{ lineHeight: "normal" }}>
+      <Box textAlign="center" padding style={{ width: "100%" }}>
+        <Typography variant="button" style={{ lineHeight: "normal" }}>
           {!!notification || !!favorite ? <b>{title}</b> : title}
         </Typography>
       </Box>
