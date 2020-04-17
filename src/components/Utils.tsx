@@ -1,16 +1,21 @@
 // Core Imports
 import React from "react"
-import { Paper, useTheme, useMediaQuery } from "@material-ui/core"
+import { Box, Paper, useTheme, useMediaQuery } from "@material-ui/core"
+
+// Convert underscore case into human-readable strings.
+export const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && " ") + $2.toUpperCase())
 
 //
 export const ResponsiveMargin = React.forwardRef((props: any, ref) => {
-  let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
-  return <div {...props} style={{ ...props.style, width: sm ? "98%" : props.style.width }} ref={ref} />
+  const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
+  const print = useMediaQuery("print")
+  return <Box {...props} style={{ ...props.style, width: sm || print ? "98%" : props.style.width }} ref={ref} />
 })
 
 export const ResponsivePaper = React.forwardRef((props: any, ref) => {
-  let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
-  return <Paper {...props} elevation={sm ? 0 : props.elevation} ref={ref} />
+  const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
+  const print = useMediaQuery("print")
+  return <Paper {...props} elevation={sm || print ? 0 : props.elevation} ref={ref} />
 })
 
 declare global {
@@ -45,10 +50,13 @@ Object.defineProperty(Array.prototype, "flat", {
 Object.defineProperty(Array.prototype, "groupBy", {
   value: function (key) {
     return this.reduce(
-      (result, item) => ({
-        ...result,
-        [item[key]]: [...(result[item[key]] || []), item],
-      }),
+      (result, item) =>
+        item === undefined
+          ? result
+          : {
+              ...result,
+              [item?.[key]]: [...(result[item?.[key]] || []), item],
+            },
       {}
     )
   },

@@ -1,6 +1,18 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { IconButton, Icon, Button, TextField, Popover, MenuItem, Chip, Tooltip, Grid } from "@material-ui/core"
+import {
+  Box,
+  IconButton,
+  Icon,
+  Button,
+  TextField,
+  Popover,
+  MenuItem,
+  Chip,
+  Tooltip,
+  Grid,
+  Fab,
+} from "@material-ui/core"
 import { green } from "@material-ui/core/colors"
 import MaterialTable from "material-table"
 import { useSnackbar } from "notistack"
@@ -55,9 +67,9 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           participants.map(async (x) => ({
             id: x.id,
             res:
-              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics"))?.filter(
-                (z) => z.sensor === "lamp.analytics"
-              ) ?? [],
+              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics"))
+                ?.filter((z) => z.sensor === "lamp.analytics")
+                .sort((a: any, b: any) => parseInt(b.timestamp) - parseInt(a.timestamp)) ?? [],
           }))
         )
       ).filter((y) => y.res.length > 0)
@@ -82,7 +94,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             content: (key: string, message: string) => (
               <SnackMessage id={key} message={message}>
                 <TextField variant="outlined" size="small" label="Temporary email address" value={`${id}@lamp.com`} />
-                <div style={{ height: 16 }} />
+                <Box style={{ height: 16 }} />
                 <TextField variant="outlined" size="small" label="Temporary password" value={`${id}`} />
                 <Grid item>
                   <TextField
@@ -162,6 +174,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
     relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
     absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
     device: (logins[id] || { data: {} }).data.device_type || "an unknown device",
+    userAgent: (logins[id] || { data: {} }).data.user_agent || "unknown device model",
   })
 
   return (
@@ -173,14 +186,26 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           {
             title: "Name",
             field: "id",
-            render: (x) => <EditField participant={x} />,
+            render: (x) => (
+              <Tooltip title="Tap the pencil icon to edit this patient's alias.">
+                <EditField participant={x} />
+              </Tooltip>
+            ),
           },
           {
             title: "Last Active",
             field: "last_active",
             searchable: false,
             render: (rowData) => (
-              <Tooltip title={dateInfo(rowData.id).absolute}>
+              <Tooltip
+                title={
+                  <span>
+                    {dateInfo(rowData.id).absolute}
+                    <br />
+                    {dateInfo(rowData.id).userAgent}
+                  </span>
+                }
+              >
                 <span>
                   {dateInfo(rowData.id).relative !== "in NaN years" &&
                     `${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}
@@ -193,7 +218,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             field: "data_health",
             searchable: false,
             render: (rowData) => (
-              <div>
+              <Box>
                 <Tooltip title={"Data is optimal."}>
                   <Chip
                     label="Data Quality"
@@ -215,7 +240,12 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                     <Icon>vpn_key</Icon>
                   </IconButton>
                 </Tooltip>
-              </div>
+                <Tooltip title="View Patient Data">
+                  <Fab color="primary" aria-label="go">
+                    <Icon>arrow_forward_rounded</Icon>
+                  </Fab>
+                </Tooltip>
+              </Box>
             ),
           },
         ]}
@@ -271,10 +301,10 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           pageSize: 10,
           pageSizeOptions: [10, 25, 50, 100],
         }}
-        components={{ Container: (props) => <div {...props} /> }}
+        components={{ Container: (props) => <Box {...props} /> }}
       />
       {/*detailPanel={rowData => 
-          <div style={{ margin: 8 }}>
+          <Box style={{ margin: 8 }}>
             <Typography style={{ width: '100%', textAlign: 'center' }}>
               <b>Patient Health</b>
             </Typography>
@@ -297,7 +327,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
                           'Health status is okay.')))
                 }))
             } />
-          </div>
+          </Box>
         }*/}
       <Popover
         open={Boolean(state.popoverAttachElement)}
@@ -319,7 +349,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             <MenuItem onClick={() => downloadFiles("json")}>JSON</MenuItem>
           </React.Fragment>
         ) : state.selectedIcon === "add" ? (
-          <div style={{ padding: "20px" }}>
+          <Box style={{ padding: "20px" }}>
             <TextField
               label="Number of participants to add:"
               value={state.newCount}
@@ -333,15 +363,15 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             <IconButton aria-label="Create" color="primary" onClick={addParticipant}>
               <Icon>check_circle</Icon>
             </IconButton>
-          </div>
+          </Box>
         ) : state.selectedIcon === "delete" ? (
-          <div style={{ padding: "20px" }}>
+          <Box style={{ padding: "20px" }}>
             <Button variant="contained" color="secondary" onClick={deleteParticipants}>
               Are you sure you want to delete these participants?
             </Button>
-          </div>
+          </Box>
         ) : (
-          <div />
+          <Box />
         )}
       </Popover>
       <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging(undefined)}>

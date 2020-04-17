@@ -1,8 +1,7 @@
 import React, { useState } from "react"
-import { Collapse, Paper, Typography, Card, CardActions, IconButton, Icon } from "@material-ui/core"
-import { makeStyles } from "@material-ui/core/styles"
+import { Box, Collapse, Paper, Typography, Card, CardActions, IconButton, Icon, makeStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import classnames from "classnames"
+import classnames from "classnames" // FIXME
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -63,7 +62,7 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
         <Typography variant="subtitle2" className={classes.typography}>
           {props.message}
         </Typography>
-        <div className={classes.icons}>
+        <Box className={classes.icons}>
           <IconButton
             aria-label="Show more"
             className={classnames(classes.expand, {
@@ -76,7 +75,7 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
           <IconButton className={classes.expand} onClick={handleDismiss}>
             <Icon>close</Icon>
           </IconButton>
-        </div>
+        </Box>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <Paper className={classes.collapse}>{props.children}</Paper>

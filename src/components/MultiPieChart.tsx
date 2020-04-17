@@ -2,14 +2,14 @@
 import React from "react"
 import { RadialChart, ArcSeries, ArcLabel, multiHueScaleFactory } from "@data-ui/radial-chart"
 import { LegendOrdinal } from "@vx/legend"
-import { useTheme, useMediaQuery } from "@material-ui/core"
+import { Box, useTheme, useMediaQuery } from "@material-ui/core"
 
 const categoryColorScale = multiHueScaleFactory()
 
 export default function MultiPieChart(props) {
   let sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexDirection: sm ? "column" : "row",
@@ -24,12 +24,12 @@ export default function MultiPieChart(props) {
         height={400}
         margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
         renderTooltip={({ datum, fraction }) => (
-          <div>
-            <div>
+          <Box>
+            <Box>
               <strong style={{ color: categoryColorScale(datum.label) }}>{datum.label}</strong>
-            </div>
-            <div>{(fraction * 100).toFixed()}%</div>
-          </div>
+            </Box>
+            <Box>{(fraction * 100).toFixed()}%</Box>
+          </Box>
         )}
       >
         <ArcSeries
@@ -62,12 +62,12 @@ export default function MultiPieChart(props) {
         height={400}
         margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
         renderTooltip={({ datum, fraction }) => (
-          <div>
-            <div>
+          <Box>
+            <Box>
               <strong style={{ color: categoryColorScale(datum.label) }}>{datum.label}</strong>
-            </div>
-            <div>{(fraction * 100).toFixed()}%</div>
-          </div>
+            </Box>
+            <Box>{(fraction * 100).toFixed()}%</Box>
+          </Box>
         )}
       >
         <ArcSeries
@@ -86,6 +86,6 @@ export default function MultiPieChart(props) {
           cornerRadius={5}
         />
       </RadialChart>
-    </div>
+    </Box>
   )
 }

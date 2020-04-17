@@ -1,6 +1,6 @@
 // Core Imports
 import React from "react"
-import { Typography, makeStyles } from "@material-ui/core"
+import { Box, Typography, makeStyles } from "@material-ui/core"
 
 // Local Imports
 import useInterval from "./useInterval"
@@ -98,23 +98,23 @@ export default function Breathe({ onComplete, ...props }) {
   useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
 
   return (
-    <div className={classes.Background}>
-      <div className={classes.Face}>
-        <div className={classes.Circle} />
-        <div className={classes.Circle} />
-        <div className={classes.Circle} />
-        <div className={classes.Circle} />
-        <div className={classes.Circle} />
-        <div className={classes.Circle} />
-      </div>
-      <div style={{ marginTop: 75 }}>
+    <Box className={classes.Background}>
+      <Box className={classes.Face}>
+        <Box className={classes.Circle} />
+        <Box className={classes.Circle} />
+        <Box className={classes.Circle} />
+        <Box className={classes.Circle} />
+        <Box className={classes.Circle} />
+        <Box className={classes.Circle} />
+      </Box>
+      <Box style={{ marginTop: 75 }}>
         <Typography variant="overline" className={classes.InhaleContainer}>
           Inhale
         </Typography>
         <Typography variant="overline" className={classes.ExhaleContainer}>
           Exhale
         </Typography>
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }

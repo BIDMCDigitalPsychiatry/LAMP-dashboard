@@ -1,6 +1,7 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import {
+  Box,
   Tooltip,
   Typography,
   Grid,
@@ -32,7 +33,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   return (
     <Draggable draggableId={`${index}`} index={index} {...props}>
       {(provided) => (
-        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+        <Box ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <Tooltip
             enterDelay={1000}
             title="Drag the handle on the left to change the order in which this Activity appears in the group."
@@ -69,7 +70,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
               </MenuItem>
             ))}
           </Menu>
-        </div>
+        </Box>
       )}
     </Draggable>
   )
@@ -116,7 +117,7 @@ export default function GroupCreator({
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="list">
             {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
+              <Box ref={provided.innerRef} {...provided.droppableProps}>
                 {items.map((x, idx) => (
                   <ActivitySelector
                     index={idx}
@@ -140,7 +141,7 @@ export default function GroupCreator({
                   />
                 ))}
                 {provided.placeholder}
-              </div>
+              </Box>
             )}
           </Droppable>
         </DragDropContext>

@@ -1,12 +1,12 @@
 // Core Imports
 import React from "react"
-import { Chip, Tooltip, Badge } from "@material-ui/core"
+import { Box, Chip, Tooltip, Badge } from "@material-ui/core"
 
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 
 export default function MultipleSelect({ ...props }) {
   return (
-    <div
+    <Box
       style={{
         display: "flex",
         flexWrap: "wrap",
@@ -43,6 +43,6 @@ export default function MultipleSelect({ ...props }) {
           </Badge>
         </Tooltip>
       ))}
-    </div>
+    </Box>
   )
 }

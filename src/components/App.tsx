@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme, makeStyles } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -140,12 +140,13 @@ function AppRouter({ ...props }) {
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity)
     if (!!identity) {
-      setState((state) => ({
-        ...state,
+      let type = {
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
         authType: LAMP.Auth._type,
-      }))
+      }
+      setState((state) => ({ ...state, ...type }))
+      return type
     } else {
       setState((state) => ({
         ...state,
@@ -156,6 +157,7 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
+      return null
     }
   }
 
@@ -377,11 +379,19 @@ export default function App({ ...props }) {
             default: "#fff",
           },
         },
+        overrides: {
+          MuiBottomNavigationAction: {
+            label: {
+              letterSpacing: `0.1em`,
+              textTransform: "uppercase",
+            },
+          },
+        },
       })}
     >
       <CssBaseline />
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <SnackbarProvider maxSnack={3}>
+        <SnackbarProvider>
           <HashRouter>
             <AppRouter {...props} />
           </HashRouter>

@@ -1,14 +1,20 @@
-// Core Imports
 import React from "react"
 import { Table, TableBody, TableHead, TableCell, TableRow } from "@material-ui/core"
+import { humanize } from "./Utils"
 
-// Expects a homogenous array (!!) and produces a Table.
-export default function ArrayView({ ...props }) {
-  // Convert underscore case into human-readable strings.
-  const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && " ") + $2.toUpperCase())
-
-  // Get all the keys we'll be displaying from the array.
-  const displayKeys = () => Object.keys(props.value[0] || {}).filter((x) => !(props.hiddenKeys || []).includes(x))
+export default function ArrayView({
+  value,
+  hiddenKeys,
+  hasSpanningRowForIndex,
+  spanningRowForIndex,
+  ...props
+}: {
+  value: any[]
+  hiddenKeys?: string[]
+  hasSpanningRowForIndex?: (index: number) => boolean
+  spanningRowForIndex?: (index: number) => any
+}) {
+  const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
 
   return (
     <div style={{ overflowX: "auto" }}>
@@ -16,14 +22,14 @@ export default function ArrayView({ ...props }) {
         <TableHead>
           <TableRow>
             {displayKeys().map((key) => (
-              <TableCell key={key} style={{ borderBottom: 0 }} title={humanize(key)}>
+              <TableCell key={key} title={humanize(key)}>
                 {humanize(key)}
               </TableCell>
             ))}
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.value.map((row, index) => (
+          {value.map((row, index) => (
             <React.Fragment>
               <TableRow hover key={index}>
                 {displayKeys().map((key) =>
@@ -32,15 +38,13 @@ export default function ArrayView({ ...props }) {
                   ) : !!row[key] && typeof row[key] === "object" ? (
                     <ArrayView value={[row[key]]} />
                   ) : (
-                    <TableCell key={row[key]} style={{ borderBottom: 0 }}>
-                      {row[key]}
-                    </TableCell>
+                    <TableCell key={row[key]}>{row[key]}</TableCell>
                   )
                 )}
               </TableRow>
-              {!!props.hasSpanningRowForIndex && !!props.spanningRowForIndex && props.hasSpanningRowForIndex(index) && (
+              {hasSpanningRowForIndex?.(index) && (
                 <TableRow key={`${index}-optional`}>
-                  <TableCell colSpan={displayKeys().length}>{props.spanningRowForIndex(index)}</TableCell>
+                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(index)}</TableCell>
                 </TableRow>
               )}
             </React.Fragment>

@@ -31,14 +31,14 @@ export default function Journal({ onComplete, ...props }) {
       <Box border={1} borderColor="grey.300" borderRadius={8} bgcolor="#fff">
         <TextField label="Type Here" variant="outlined" multiline rows="15" fullWidth />
       </Box>
-      <div>
+      <Box>
         <Button startIcon={<Icon fontSize="large">save</Icon>} variant="contained">
           Save
         </Button>
         <Button startIcon={<Icon fontSize="large">delete</Icon>} variant="contained">
           Delete
         </Button>
-      </div>
+      </Box>
     </Container>
   )
 }

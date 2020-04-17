@@ -1,6 +1,18 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Icon, Typography, Divider, Grid, Tooltip, Paper, ButtonBase, useTheme } from "@material-ui/core"
+import {
+  Box,
+  Icon,
+  Typography,
+  Divider,
+  Grid,
+  Tooltip,
+  Paper,
+  Button,
+  ButtonBase,
+  useTheme,
+  IconButton,
+} from "@material-ui/core"
 
 var Launcher: any = {}
 
@@ -33,7 +45,7 @@ Launcher.Placeholder = function Placeholder({ ...props }) {
   )
 }
 
-Launcher.Button = function Button({ notification, favorite, icon, title, onClick, ...props }) {
+Launcher.Button = function _Button({ notification, favorite, icon, title, onClick, ...props }) {
   const theme = useTheme()
   const color = !!notification
     ? theme.palette.secondary.main
@@ -59,16 +71,11 @@ Launcher.Button = function Button({ notification, favorite, icon, title, onClick
             color: !!notification || !!favorite ? "#fff" : theme.palette.text.primary,
           }}
         >
-          <ButtonBase style={{ width: "100%", height: "100%" }} onClick={onClick || (() => {})}>
-            <Grid container direction="column" justify="center" alignItems="center" style={{ height: "100%" }}>
-              <Grid item>{icon || <Icon fontSize="large">more_horiz</Icon>}</Grid>
-              <Grid item />
-            </Grid>
-          </ButtonBase>
+          <Button onClick={onClick || (() => {})}>{icon || <Icon fontSize="large">more_horiz</Icon>}</Button>
         </Paper>
       </Tooltip>
       <Box textAlign="center" padding style={{ width: "100%" }}>
-        <Typography variant="button" style={{ lineHeight: "normal" }}>
+        <Typography variant="button" style={{ lineHeight: "normal", lineBreak: "anywhere" }}>
           {!!notification || !!favorite ? <b>{title}</b> : title}
         </Typography>
       </Box>

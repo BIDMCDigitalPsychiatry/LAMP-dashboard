@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Typography, ButtonBase } from "@material-ui/core"
+import { Box, Typography, ButtonBase } from "@material-ui/core"
 
 // TODO: Settings!
 
@@ -33,7 +33,7 @@ export default function Jewels({ onComplete, ...props }) {
   }
 
   return (
-    <div>
+    <Box>
       {jewels.map((x) => (
         <ButtonBase
           key={x.i}
@@ -55,6 +55,6 @@ export default function Jewels({ onComplete, ...props }) {
           </Typography>
         </ButtonBase>
       ))}
-    </div>
+    </Box>
   )
 }

@@ -4,7 +4,6 @@ import {
   Typography,
   makeStyles,
   Box,
-  Icon,
   Link,
   Card,
   CardActionArea,

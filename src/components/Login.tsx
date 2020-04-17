@@ -1,6 +1,7 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import {
+  Box,
   Typography,
   TextField,
   Button,
@@ -13,6 +14,7 @@ import {
   colors,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
+import LAMP from "lamp-core"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
@@ -50,6 +52,16 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
       .then((res) => {
+        if (res.authType === "participant") {
+          LAMP.SensorEvent.create(res.identity.id, {
+            timestamp: Date.now(),
+            sensor: "lamp.analytics",
+            data: {
+              device_type: "Dashboard",
+              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+            },
+          } as any).then((res) => console.dir(res))
+        }
         onComplete()
       })
       .catch((err) => {
@@ -120,7 +132,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             mindLAMP
           </Typography>
           <form onSubmit={(e) => handleLogin(e)}>
-            <div>
+            <Box>
               <TextField
                 margin="dense"
                 size="small"
@@ -237,7 +249,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   }}
                 />
               </Button>
-            </div>
+            </Box>
           </form>
         </ResponsivePaper>
       </ResponsiveMargin>

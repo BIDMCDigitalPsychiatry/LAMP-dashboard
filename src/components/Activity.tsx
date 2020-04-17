@@ -42,7 +42,7 @@ function JewelsSettings({ value, onSave, ...props }) {
         showTitle: false,
         paging: false,
       }}
-      components={{ Container: (props) => <div {...props} /> }}
+      components={{ Container: (props) => <Box {...props} /> }}
     />
   )
 }
