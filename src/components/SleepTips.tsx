@@ -1,6 +1,16 @@
 // Core Imports
 import React from "react"
-import { Typography, makeStyles, Box, Grid, Card, CardMedia, CardActionArea, CardContent } from "@material-ui/core"
+import {
+  Typography,
+  Link,
+  makeStyles,
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardActionArea,
+  CardContent,
+} from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     maxLength: 500,
   },
   media: {
-    height: 140,
+    height: 200,
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
@@ -42,6 +52,9 @@ export default function SleepTips({ ...props }) {
                 can help both your physical and mental health over time. For the next seven days, try waking up at the
                 same time every day.
               </Typography>
+              <Link href="https://www.insider.com/things-that-are-not-helping-your-mental-health-2018-9#those-retail-therapy-sessions-might-make-you-feel-poor-in-more-ways-than-one-5">
+                More information
+              </Link>
             </CardContent>
           </CardActionArea>
         </Card>
@@ -62,6 +75,9 @@ export default function SleepTips({ ...props }) {
                 sleep can negatively impact your mood. Try sleeping the suggested amount of sleep tonight and note how
                 you feel when you wake up.
               </Typography>
+              <Link href="https://www.forbes.com/sites/nomanazish/2018/09/25/how-to-overcome-mental-fatigue-according-to-an-expert/#1dd602164454">
+                More information
+              </Link>
             </CardContent>
           </CardActionArea>
         </Card>
@@ -80,6 +96,9 @@ export default function SleepTips({ ...props }) {
                 “taking breaks help prevent tunnel vision.” A break can clear your mind. Taking time for yourself can
                 make you more productive. Try to take a few 10-minute breaks today and reflect on how you feel.
               </Typography>
+              <Link href="https://www.forbes.com/sites/nomanazish/2018/09/25/how-to-overcome-mental-fatigue-according-to-an-expert/#3b51c9751644">
+                More information
+              </Link>
             </CardContent>
           </CardActionArea>
         </Card>

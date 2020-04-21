@@ -34,6 +34,10 @@ import Hopebox from "./Hopebox"
 import ParticipantData from "./ParticipantData"
 import BookRecommendations from "./BookRecommendations"
 import Definitions from "./Definitions"
+import PhysicalTips from "./PhysicalTips"
+import StressTips from "./StressTips"
+import Motivation from "./Motivation"
+import Welcome from "./Welcome"
 import { ReactComponent as Books } from "../icons/Books.svg"
 import { ReactComponent as Mood } from "../icons/Mood.svg"
 import { ReactComponent as Sleep } from "../icons/Sleep.svg"
@@ -45,6 +49,9 @@ import { ReactComponent as Hope } from "../icons/Hope.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
+import { ReactComponent as PhysicalWellness } from "../icons/PhysicalWellness.svg"
+import { ReactComponent as Stress } from "../icons/Stress.svg"
+import { ReactComponent as MotivationIcon } from "../icons/Motivation.svg"
 
 function _hideCareTeam() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
@@ -171,6 +178,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
   const [lastTab, _setLastTab] = useState(3)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
+  const [openDialog, setOpen] = useState(true)
 
   const setTab = (newTab) => {
     _setLastTab(tab)
@@ -284,6 +292,33 @@ export default function Participant({ participant, ...props }: { participant: Pa
                     title="Definitions"
                     icon={<Information style={{ width: "100%", height: "100%" }} />}
                     onClick={() => setLaunchedActivity("definitions")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Physical Wellness Tips"
+                    icon={<PhysicalWellness style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("physicalwellness")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Stress Tips"
+                    icon={<Stress style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("stresstips")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!_hideCareTeam() && (
+                  <Launcher.Button
+                    title="Motivation"
+                    icon={<MotivationIcon style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("motivation")}
                   />
                 )}
               </Grid>
@@ -442,6 +477,9 @@ export default function Participant({ participant, ...props }: { participant: Pa
             socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
             bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
             definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
+            physicalwellness: <PhysicalTips onComplete={() => setLaunchedActivity(undefined)} />,
+            stresstips: <StressTips onComplete={() => setLaunchedActivity(undefined)} />,
+            motivation: <Motivation onComplete={() => setLaunchedActivity(undefined)} />,
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -494,6 +532,9 @@ export default function Participant({ participant, ...props }: { participant: Pa
           />
         </Drawer>
       </Box>
+      <ResponsiveDialog open={!!openDialog} transient animate fullScreen onClose={() => setOpen((x) => !x)}>
+        <Welcome />
+      </ResponsiveDialog>
     </React.Fragment>
   )
 }
