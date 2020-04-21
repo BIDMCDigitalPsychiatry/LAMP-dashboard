@@ -375,37 +375,35 @@ export default function ParticipantData({
               />
             </Card>
           ))}
-        {(selectedSensors || []).includes("Environmental Context") ||
-          (!!printView && (
-            <Card style={{ marginTop: 16, marginBottom: 16 }}>
-              <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
-                Environmental Context
-              </Typography>
-              <Divider />
-              <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-            </Card>
-          ))}
-        {(selectedSensors || []).includes("Step Count") ||
-          (!!printView && (
-            <Card style={{ marginTop: 16, marginBottom: 16 }}>
-              <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
-                Step Count
-              </Typography>
-              <Divider />
-              <Sparkline
-                minWidth={250}
-                minHeight={250}
-                XAxisLabel="Time"
-                YAxisLabel="Steps Taken"
-                color={colors.blue[500]}
-                startDate={earliestDate()}
-                data={((sensorEvents || {})["lamp.steps"] || []).map((d) => ({
-                  x: new Date(parseInt(d.timestamp)),
-                  y: d.data.value || 0,
-                }))}
-              />
-            </Card>
-          ))}
+        {((selectedSensors || []).includes("Environmental Context") || !!printView) && (
+          <Card style={{ marginTop: 16, marginBottom: 16 }}>
+            <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
+              Environmental Context
+            </Typography>
+            <Divider />
+            <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+          </Card>
+        )}
+        {((selectedSensors || []).includes("Step Count") || !!printView) && (
+          <Card style={{ marginTop: 16, marginBottom: 16 }}>
+            <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
+              Step Count
+            </Typography>
+            <Divider />
+            <Sparkline
+              minWidth={250}
+              minHeight={250}
+              XAxisLabel="Time"
+              YAxisLabel="Steps Taken"
+              color={colors.blue[500]}
+              startDate={earliestDate()}
+              data={((sensorEvents || {})["lamp.steps"] || []).map((d) => ({
+                x: new Date(parseInt(d.timestamp)),
+                y: d.data.value || 0,
+              }))}
+            />
+          </Card>
+        )}
         {(selectedExperimental || []).map((x) => (
           <Card key={x} style={{ marginTop: 16, marginBottom: 16 }}>
             <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
