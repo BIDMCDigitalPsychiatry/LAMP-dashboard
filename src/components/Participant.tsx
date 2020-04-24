@@ -34,6 +34,11 @@ import Hopebox from "./Hopebox"
 import ParticipantData from "./ParticipantData"
 import BookRecommendations from "./BookRecommendations"
 import Definitions from "./Definitions"
+import PhysicalTips from "./PhysicalTips"
+import StressTips from "./StressTips"
+import Motivation from "./Motivation"
+import Welcome from "./Welcome"
+import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as Books } from "../icons/Books.svg"
 import { ReactComponent as Mood } from "../icons/Mood.svg"
 import { ReactComponent as Sleep } from "../icons/Sleep.svg"
@@ -45,6 +50,10 @@ import { ReactComponent as Hope } from "../icons/Hope.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
+import { ReactComponent as PhysicalWellness } from "../icons/PhysicalWellness.svg"
+import { ReactComponent as Stress } from "../icons/Stress.svg"
+import { ReactComponent as MotivationIcon } from "../icons/Motivation.svg"
+import { ReactComponent as Medication } from "../icons/Medication.svg"
 
 function _hideCareTeam() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
@@ -54,6 +63,20 @@ function _patientMode() {
 }
 function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
+}
+async function getShowWelcome(participant: ParticipantObj): Promise<boolean> {
+  if (!_patientMode()) return false
+  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.welcome_dismissed")) as any
+  return !!_hidden.error ? true : !(_hidden.data as boolean)
+}
+async function setShowWelcome(participant: ParticipantObj): Promise<void> {
+  await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.welcome_dismissed", true)
+}
+
+async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
+  if (_hideCareTeam()) return true
+  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard._nancy")) as any
+  return !!_hidden.error ? false : (_hidden.data as boolean)
 }
 
 // Refresh hidden events list.
@@ -167,10 +190,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [tab, _setTab] = useState(3)
-  const [lastTab, _setLastTab] = useState(3)
+  const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
+  const [lastTab, _setLastTab] = useState(_patientMode() ? 1 : 3)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
+  const [openDialog, setOpen] = useState(false)
+  const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
 
   const setTab = (newTab) => {
     _setLastTab(tab)
@@ -183,6 +208,8 @@ export default function Participant({ participant, ...props }: { participant: Pa
   useEffect(() => {
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
+    getShowWelcome(participant).then(setOpen)
+    tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
   const hideEvent = async (timestamp?: number, activity?: string) => {
@@ -234,7 +261,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
           <Launcher.Section>
             <Grid container direction="row" spacing={4}>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Mood Tips"
                     icon={<Mood style={{ width: "100%", height: "100%" }} />}
@@ -243,7 +270,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Sleep Tips"
                     icon={<Sleep style={{ width: "100%", height: "100%" }} />}
@@ -252,7 +279,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Social Tips"
                     icon={<Social style={{ width: "100%", height: "100%" }} />}
@@ -261,7 +288,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Mental Health Resources"
                     icon={<MentalHealth style={{ width: "100%", height: "100%" }} />}
@@ -270,7 +297,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Book Recommendations"
                     icon={<Books style={{ width: "100%", height: "100%" }} />}
@@ -279,11 +306,38 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Definitions"
                     icon={<Information style={{ width: "100%", height: "100%" }} />}
                     onClick={() => setLaunchedActivity("definitions")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!hideCareTeam && (
+                  <Launcher.Button
+                    title="Physical Wellness Tips"
+                    icon={<PhysicalWellness style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("physicalwellness")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!hideCareTeam && (
+                  <Launcher.Button
+                    title="Stress Tips"
+                    icon={<Stress style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("stresstips")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!hideCareTeam && (
+                  <Launcher.Button
+                    title="Motivation"
+                    icon={<MotivationIcon style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("motivation")}
                   />
                 )}
               </Grid>
@@ -338,7 +392,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
           <Launcher.Section>
             <Grid container direction="row" spacing={4}>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Breathe"
                     icon={<BreatheIcon style={{ width: "100%", height: "100%" }} />}
@@ -347,7 +401,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Jewels"
                     icon={<JewelsIcon style={{ width: "100%", height: "100%" }} />}
@@ -356,7 +410,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Journal"
                     icon={<JournalIcon style={{ width: "100%", height: "100%" }} />}
@@ -365,11 +419,20 @@ export default function Participant({ participant, ...props }: { participant: Pa
                 )}
               </Grid>
               <Grid item xs={3}>
-                {!_hideCareTeam() && (
+                {!hideCareTeam && (
                   <Launcher.Button
                     title="Hope Box"
                     icon={<Hope style={{ width: "100%", height: "100%" }} />}
                     onClick={() => setLaunchedActivity("hopebox")}
+                  />
+                )}
+              </Grid>
+              <Grid item xs={3}>
+                {!hideCareTeam && (
+                  <Launcher.Button
+                    title="Medication Tracker"
+                    icon={<Medication style={{ width: "100%", height: "100%" }} />}
+                    onClick={() => setLaunchedActivity("medicationtracker")}
                   />
                 )}
               </Grid>
@@ -379,7 +442,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
       </Slide>
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box>
-          {!_hideCareTeam() && (
+          {!hideCareTeam && (
             <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="white" p={2} my={4} displayPrint="none">
               <CareTeam participant={participant} />
             </Box>
@@ -442,6 +505,10 @@ export default function Participant({ participant, ...props }: { participant: Pa
             socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
             bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
             definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
+            physicalwellness: <PhysicalTips onComplete={() => setLaunchedActivity(undefined)} />,
+            stresstips: <StressTips onComplete={() => setLaunchedActivity(undefined)} />,
+            motivation: <Motivation onComplete={() => setLaunchedActivity(undefined)} />,
+            medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -494,6 +561,15 @@ export default function Participant({ participant, ...props }: { participant: Pa
           />
         </Drawer>
       </Box>
+      <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
+        <Welcome
+          activities={activities}
+          onClose={() => {
+            setOpen(false)
+            setShowWelcome(participant)
+          }}
+        />
+      </ResponsiveDialog>
     </React.Fragment>
   )
 }

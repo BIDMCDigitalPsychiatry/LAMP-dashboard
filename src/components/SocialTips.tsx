@@ -1,6 +1,16 @@
 // Core Imports
 import React from "react"
-import { Typography, makeStyles, Box, Grid, Card, CardMedia, CardActionArea, CardContent } from "@material-ui/core"
+import {
+  Typography,
+  Link,
+  makeStyles,
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardActionArea,
+  CardContent,
+} from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -12,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     maxLength: 500,
   },
   media: {
-    height: 140,
+    height: 200,
   },
   heading: {
     fontSize: theme.typography.pxToRem(15),
@@ -40,6 +50,9 @@ export default function SleepTips({ ...props }) {
                 exercise, and provide room to socialize. Whether it’s going to the store or going to the mailbox, try to
                 leave the house.
               </Typography>
+              <Link href="https://earthobservatory.nasa.gov/images/145305/green-space-is-good-for-mental-health">
+                More information
+              </Link>
             </CardContent>
           </CardActionArea>
         </Card>
@@ -58,6 +71,7 @@ export default function SleepTips({ ...props }) {
                 up with or contact someone this week. To connect with people far away, consider using web-based methods
                 of communication such as social media, email, or text.
               </Typography>
+              <Link href="https://www.mhanational.org/stay-connected">More information</Link>
             </CardContent>
           </CardActionArea>
         </Card>
@@ -78,6 +92,46 @@ export default function SleepTips({ ...props }) {
                 week use an app to track how much time you spend on social media each day. Then, set a goal to reduce
                 this number. At the end of the week, reflect on your mood and the impact this modification has had.
               </Typography>
+              <Link href="https://www.helpguide.org/articles/mental-health/social-media-and-mental-health.htm">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1545396047-67fb8c80f6e5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Family and friends
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Connect with family and friends either in-person or virtually through a call, text, or video chat.
+              </Typography>
+              <Link href="https://www.purewow.com/wellness/ways-to-mitigate-anxiety?amphtml=true">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1485182708500-e8f1f318ba72?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Increase social interactions
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Low level of social interaction was found to have an impact on lifespan equivalent to smoking nearly a
+                pack of cigarettes a day or being an alcoholic, and was twice as harmful as being obese.
+              </Typography>
+              <Link href="https://www.mhanational.org/stay-connected">More information</Link>
             </CardContent>
           </CardActionArea>
         </Card>
