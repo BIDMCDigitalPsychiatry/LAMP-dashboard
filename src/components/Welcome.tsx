@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { Typography, Fab, Box, Slide, Container, Icon } from "@material-ui/core"
+import { Typography, Fab, Box, Slide, Container, Icon, Card, Grid } from "@material-ui/core"
 
-export default function Welcome({ ...props }) {
+export default function Welcome({ activities, onClose, ...props }) {
   const [checked, setChecked] = useState(0)
 
   return (
@@ -28,6 +28,22 @@ export default function Welcome({ ...props }) {
             Here are all the activities you'll receive notifications for when you use mindLAMP.
           </Typography>
           <br />
+          <Grid container direction="row" spacing={4}>
+            {activities.map((x) => (
+              <Grid item xs={3}>
+                <Card
+                  raised={true}
+                  elevation={5}
+                  style={{ padding: "6px 0", height: "50px", width: "150px", margin: "auto" }}
+                >
+                  <Typography align="center" variant="body1" style={{ height: "100%" }}>
+                    {x.name}
+                  </Typography>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+          <br />
           <Fab color="primary" onClick={() => setChecked(0)}>
             <Icon>arrow_backward</Icon>
           </Fab>
@@ -38,13 +54,14 @@ export default function Welcome({ ...props }) {
       </Slide>
       <Slide direction="left" in={checked === 2} mountOnEnter unmountOnExit>
         <Box p={4} my={4} width="100%">
-          <Typography variant="h1">Sensors </Typography>
-          <Typography variant="h4">
-            Here are all the sensors that will be enabled when you use mindLAMP as part of your research study.
-          </Typography>
+          <Typography variant="h1">Let's go! </Typography>
+          <Typography variant="h4">You're ready to start using mindLAMP.</Typography>
           <br />
           <Fab color="primary" onClick={() => setChecked(1)}>
             <Icon>arrow_backward</Icon>
+          </Fab>
+          <Fab color="primary" onClick={onClose}>
+            <Icon>done</Icon>
           </Fab>
         </Box>
       </Slide>

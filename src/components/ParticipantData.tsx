@@ -18,6 +18,21 @@ function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 
+const strategies = {
+  "lamp.survey": (slices, activity, scopedItem) =>
+    (slices ?? [])
+      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      .map((x, idx) => {
+        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
+        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else return parseInt(x.value) || 0
+      })
+      .reduce((prev, curr) => prev + curr, 0),
+  "lamp.jewels_a": (slices, activity, scopedItem) =>
+    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
+}
+
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
   let custom =
@@ -323,6 +338,22 @@ export default function ParticipantData({
             />
           </React.Fragment>
         )}
+      </Box>
+      <Box display="none" displayPrint="block">
+        {activities.map((x) => (
+          <Card style={{ padding: 8, margin: 16 }}>
+            <Typography variant="h6">{x.name}</Typography>
+            <Typography variant="subtitle2" color="primary">
+              {((activityEvents || {})[x.name] || []).slice(-1).length > 0
+                ? strategies["lamp.survey"](
+                    ((activityEvents || {})[x.name] || []).slice(-1)?.[0]?.temporal_slices,
+                    x,
+                    undefined
+                  )
+                : "No Data"}
+            </Typography>
+          </Card>
+        ))}
       </Box>
       {(selectedActivities || []).length + (selectedSensors || []).length + (selectedExperimental || []).length ===
         0 && (

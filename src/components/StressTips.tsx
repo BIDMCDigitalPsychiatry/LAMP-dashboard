@@ -135,7 +135,77 @@ export default function SleepTips({ ...props }) {
                 Low level of social interaction was found to have an impact on lifespan equivalent to smoking nearly a
                 pack of cigarettes a day or being an alcoholic, and was twice as harmful as being obese.
               </Typography>
-              <Link href="ttps://www.purewow.com/wellness/ways-to-mitigate-anxiety?amphtml=true">More information</Link>
+              <Link href="https://ggia.berkeley.edu/practice/mindful_breathing">More information</Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1480694313141-fce5e697ee25?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Log out of all your social media
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Social media can be a fun way to connect with others, but too much time spent on it can cause anxiety
+                and reduce productivity. It is known to cause feelings of inadequacy and loneliness. Log out of your
+                accounts for a period of time to give your mind a break. Logging out will slow down your access to
+                social media or stop you from seeing it altogether. Reflect on how you feel during your time away from
+                these accounts.
+              </Typography>
+              <Link href="https://www.healthline.com/health/mindfulness-tricks-to-reduce-anxiety#5">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1522881451255-f59ad836fdfb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Journaling can be healing
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Whether it’s writing what you are grateful for or what you did today, the act of writing in a journal
+                can be very therapeutic. There is no right or wrong topic to write about, making journaling care-free.
+                Sharing your thoughts can help ease your mind. Get out a piece of paper or open up the notes section in
+                your phone and write about anything for five minutes. Let your mind wander as you write, and then think
+                about what you wrote. If you prefer having something to write about consider getting a guided journal,
+                or search ‘Journal’ in your phone’s app store.
+              </Typography>
+              <Link href="https://www.healthline.com/health/mindfulness-tricks-to-reduce-anxiety#5">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Reduce your screen time
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Whether it’s playing games or scrolling through social media, time flies while using our smartphones.
+                Stepping away from your phone can reduce the pressures that come with it. Minimize the amount of time
+                you spend by putting your phone on ‘do not disturb’ or ‘silent’. If you still want to receive
+                notifications from some features on your phone, another method is to turn off notifications from
+                specific apps. This can be done through the app itself or through the settings apps on your phone.
+              </Typography>
+              <Link href="https://www.cnet.com/how-to/screen-time-is-rising-and-its-ruining-us-here-are-11-ways-to-cut-back/">
+                More information
+              </Link>
             </CardContent>
           </CardActionArea>
         </Card>

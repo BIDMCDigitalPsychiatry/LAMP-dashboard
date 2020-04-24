@@ -102,6 +102,89 @@ export default function SleepTips({ ...props }) {
             </CardContent>
           </CardActionArea>
         </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Memory and learning are connected to sleep
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                The deepest stage of sleep is known as Rapid Eye Movement (REM). This stage of sleep affects the parts
+                of the brain that are used for learning. Research shows that people deprived of REM sleep struggle with
+                recalling what they have learned. Uninterrupted sleep can help you think more clearly and remember more.
+              </Typography>
+              <Link href="https://www.neurocorecenters.com/blog/10-facts-might-not-know-sleep-mental-health">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Avoid caffeine before bed
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Caffeine is a stimulant that helps people feel alert. It is found in coffee, tea, chocolate, and more.
+                Although caffeine is safe to consume, it takes hours for half of it to be removed from the body. Having
+                food or drinks with high levels of caffeine close to your bedtime can make you feel anxious, irritable,
+                and disturb your sleep entirely. Get a more restful sleep by stopping your caffeine intake a few hours
+                before bed.
+              </Typography>
+              <Link href="https://www.sleepfoundation.org/articles/caffeine-and-sleep">More information</Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Use your bedroom only for sleep
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Treat your bed and bedroom as your sanctuary. It is your safe space away from all of the stresses in
+                your life. Try not to work or use electronics in your bedroom. Over time the brain will learn to
+                associate the room or the bed with sleeping, and therefore, makes it easier for you to fall asleep.
+              </Typography>
+              <Link href="https://www.sleepfoundation.org/press-release/americans-bedrooms-are-key-better-sleep-according-new-national-sleep-foundation-poll">
+                More information
+              </Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
+        <Card className={classes.root2}>
+          <CardActionArea>
+            <CardMedia
+              className={classes.media}
+              image="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="h2">
+                Establish a regular bedtime routine
+              </Typography>
+              <Typography variant="body2" color="textSecondary" component="p">
+                Routines help promote health and wellness. Think about the kind of bedtime routine that would help you
+                feel more relaxed before bed. Whether it’s not using electronics after a certain time or taking a warm
+                bath before bed, doing the same thing every night will help your brain and body know it’s time to rest.
+                Other examples include reading a book, meditating, and journaling.
+              </Typography>
+              <Link href="https://www.sleepfoundation.org/articles/caffeine-and-sleep">More information</Link>
+            </CardContent>
+          </CardActionArea>
+        </Card>
       </Grid>
     </Box>
   )
