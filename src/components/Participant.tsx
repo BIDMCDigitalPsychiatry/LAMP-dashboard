@@ -230,7 +230,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
       timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : new Date().getTime(),
       duration: 0,
       activity: visibleActivities[idx].id,
-      static_data: { survey_name: visibleActivities[idx].name }, // FIXME: deprecated
+      static_data: {},
       temporal_slices: (x || []).map((y) => ({
         item: y !== undefined ? y.item : null,
         value: y !== undefined ? y.value : null,

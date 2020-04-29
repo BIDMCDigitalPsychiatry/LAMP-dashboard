@@ -18,7 +18,7 @@ function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 
-const strategies = {
+export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
@@ -100,7 +100,7 @@ async function getActivityEvents(
       timestamp: z?.[0].timestamp,
       duration: z?.[0].duration,
       activity: z?.[0].activity,
-      static_data: { survey_name: "__lamp.dashboard.custom_survey_group__" },
+      static_data: {},
       temporal_slices: Array.from(
         z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
           length:
@@ -259,15 +259,14 @@ export default function ParticipantData({
     getVisualizations(participant).then(setVisualizations)
     ;(async () => {
       let activities = await getActivities(participant)
-      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-      let sensorEvents = await getSensorEvents(participant)
-      let activityEventCount = getActivityEventCount(activityEvents)
-      let sensorEventCount = getSensorEventCount(sensorEvents)
-
       setActivities(activities)
+      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       setActivityEvents(activityEvents)
-      setSensorEvents(sensorEvents)
+      let activityEventCount = getActivityEventCount(activityEvents)
       setActivityCounts(activityEventCount)
+      let sensorEvents = await getSensorEvents(participant)
+      setSensorEvents(sensorEvents)
+      let sensorEventCount = getSensorEventCount(sensorEvents)
       setSensorCounts(sensorEventCount)
     })()
   }, [])
