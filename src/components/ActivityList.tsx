@@ -85,7 +85,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   useEffect(() => {
     LAMP.Activity.allByStudy(studyID).then(setActivities)
     LAMP.ActivitySpec.all().then((res) =>
-      setActivitySpecs(res.filter((x) => !["lamp.activity_group", "lamp.group", "lamp.survey"].includes(x.name)))
+      setActivitySpecs(res.filter((x: any) => !["lamp.group", "lamp.survey"].includes(x.id)))
     )
   }, [])
   const onChange = () => LAMP.Activity.allByStudy(studyID).then(setActivities)
@@ -449,7 +449,7 @@ export default function ActivityList({ studyID, title, ...props }) {
           </MenuItem>,
           ...activitySpecs.map((x) => (
             <MenuItem
-              key={x?.name}
+              key={x?.id}
               onClick={() => {
                 setCreateMenu(undefined)
                 saveCTest(x)
