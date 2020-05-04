@@ -163,13 +163,15 @@ function getActivityEventCount(activity_events: { [groupName: string]: ActivityE
 // Perform count coalescing on processed events grouped by type.
 function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventObj[] }) {
   return {
-    "Environmental Context": ((sensor_events || {})["lamp.gps.contextual"] || []).length,
-    "Step Count": ((sensor_events || {})["lamp.steps"] || []).length,
+    "Environmental Context":
+      sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social)
+        ?.length ?? 0,
+    "Step Count": sensor_events?.["lamp.steps"]?.length ?? 0,
   }
 }
 
 function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
-  gps_events = gps_events ?? [] // Catch missing data.
+  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
   return [
     [
       {
@@ -427,10 +429,12 @@ export default function ParticipantData({
               YAxisLabel="Steps Taken"
               color={colors.blue[500]}
               startDate={earliestDate()}
-              data={((sensorEvents || {})["lamp.steps"] || []).map((d) => ({
-                x: new Date(parseInt(d.timestamp)),
-                y: d.data.value || 0,
-              }))}
+              data={
+                sensorEvents?.["lamp.steps"]?.map((d) => ({
+                  x: new Date(parseInt(d.timestamp)),
+                  y: d.data.value || 0,
+                })) ?? []
+              }
             />
           </Card>
         )}

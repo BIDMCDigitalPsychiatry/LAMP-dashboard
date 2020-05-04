@@ -66,10 +66,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         await Promise.all(
           participants.map(async (x) => ({
             id: x.id,
-            res:
-              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics"))
-                ?.filter((z) => z.sensor === "lamp.analytics")
-                .sort((a: any, b: any) => parseInt(b.timestamp) - parseInt(a.timestamp)) ?? [],
+            res: (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics", undefined, undefined, 1)) ?? [],
           }))
         )
       ).filter((y) => y.res.length > 0)
