@@ -13,7 +13,7 @@ import {
   Grid,
   Fab,
 } from "@material-ui/core"
-import { green } from "@material-ui/core/colors"
+import { green, yellow, red, grey } from "@material-ui/core/colors"
 import MaterialTable from "material-table"
 import { useSnackbar } from "notistack"
 
@@ -54,6 +54,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
   const [openMessaging, setOpenMessaging] = useState()
   const [openPasswordReset, setOpenPasswordReset] = useState()
   const [logins, setLogins] = useState({})
+  const [passive, setPassive] = useState({})
   const { enqueueSnackbar } = useSnackbar()
   useEffect(() => {
     LAMP.Participant.allByStudy(studyID).then(setParticipants)
@@ -67,10 +68,25 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           participants.map(async (x) => ({
             id: x.id,
             res: (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics", undefined, undefined, 1)) ?? [],
+            passive: {
+              gps:
+                (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.gps", undefined, undefined, 5)).slice(-1)[0] ??
+                (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.gps", undefined, undefined, 5)).slice(-1)[0] ??
+                [],
+              accel:
+                (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.accelerometer", undefined, undefined, 5)).slice(
+                  -1
+                )[0] ??
+                (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.accelerometer", undefined, undefined, 5)).slice(
+                  -1
+                )[0] ??
+                [],
+            },
           }))
         )
       ).filter((y) => y.res.length > 0)
       setLogins((logins) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
+      setPassive((passive) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.passive }), setPassive))
     })()
   }, [participants])
 
@@ -167,6 +183,29 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
     }))
   }
 
+  const daysSinceLast = (id) => ({
+    gpsString: timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)),
+    accelString: timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)),
+    gps:
+      (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
+      (1000 * 3600 * 24),
+    accel:
+      (new Date().getTime() - new Date(parseInt(((passive[id] || {}).accel || {}).timestamp)).getTime()) /
+      (1000 * 3600 * 24),
+  })
+
+  const dataQuality = (id) => ({
+    title: `GPS: ${daysSinceLast(id).gpsString}, Accelerometer: ${daysSinceLast(id).accelString}`,
+    color:
+      daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
+        ? green[500]
+        : daysSinceLast(id).gps <= 7 || daysSinceLast(id).accel <= 7
+        ? yellow[500]
+        : daysSinceLast(id).gps <= 30 || daysSinceLast(id).accel <= 30
+        ? red[500]
+        : grey[800],
+  })
+
   const dateInfo = (id) => ({
     relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
     absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
@@ -216,12 +255,12 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             searchable: false,
             render: (rowData) => (
               <Box>
-                <Tooltip title={"Data is optimal."}>
+                <Tooltip title={dataQuality(rowData.id).title}>
                   <Chip
                     label="Data Quality"
                     style={{
                       margin: 4,
-                      backgroundColor: green[500],
+                      backgroundColor: dataQuality(rowData.id).color,
                       color: "#fff",
                     }}
                   />
