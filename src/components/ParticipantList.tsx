@@ -197,13 +197,13 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
   const dataQuality = (id) => ({
     title: `GPS: ${daysSinceLast(id).gpsString}, Accelerometer: ${daysSinceLast(id).accelString}`,
     color:
-      daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
+      isNaN(daysSinceLast(id).gps) && isNaN(daysSinceLast(id).accel)
+        ? grey[800]
+        : daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
         ? green[500]
         : daysSinceLast(id).gps <= 7 || daysSinceLast(id).accel <= 7
         ? yellow[500]
-        : daysSinceLast(id).gps <= 30 || daysSinceLast(id).accel <= 30
-        ? red[500]
-        : grey[800],
+        : red[500],
   })
 
   const dateInfo = (id) => ({
