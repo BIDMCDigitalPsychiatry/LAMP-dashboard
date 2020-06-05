@@ -19,6 +19,7 @@ import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
+import VegaGraph from "./VegaGraph" 
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
@@ -221,7 +222,18 @@ function AppRouter({ ...props }) {
   }
 
   return (
-    <Switch>
+    <Switch>     
+      {/* Route vega-graph for showing Vega graphs. */}
+      <Route
+        exact
+        path="/vega-graph"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <VegaGraph goBack={props.history.goBack}/>
+            </React.Fragment>
+        }
+      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact

@@ -50,7 +50,8 @@
     "regenerator-runtime": "^0.13.3",
     "swagger-ui-react": "^3.23.3",
     "typeface-roboto": "0.0.75",
-    "url-search-params-polyfill": "^7.0.0"
+    "url-search-params-polyfill": "^7.0.0",
+    "vega": "^5.13.0"
   },
   "scripts": {
     "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",

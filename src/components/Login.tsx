@@ -15,6 +15,8 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
+import { Link } from 'react-router-dom';
+
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
@@ -248,6 +250,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     opacity: 0,
                   }}
                 />
+              </Button>
+            </Box>
+            <Box m={3} style={{ textAlign: "center"}}>
+              <Button component={Link} to="/vega-graph" variant="outlined" color="primary" style={{ width: "100%", cursor: "pointer" }}>
+                Vega Graphs
               </Button>
             </Box>
           </form>
