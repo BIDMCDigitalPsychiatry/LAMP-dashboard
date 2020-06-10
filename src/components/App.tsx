@@ -226,7 +226,7 @@ function AppRouter({ ...props }) {
       {/* Route vega-graph for showing Vega graphs. */}
       <Route
         exact
-        path="/vega-graph"
+        path="/visualizations"
         render={(props) =>
           <React.Fragment>
               <PageTitle>mindLAMP | Graphs</PageTitle>
