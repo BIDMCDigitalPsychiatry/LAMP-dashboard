@@ -12,8 +12,10 @@ import {
   Paper,
   MenuItem,
   Select,
-  InputLabel
+  InputLabel,
+  CircularProgress
 } from "@material-ui/core"; 
+import {Alert, AlertTitle} from '@material-ui/lab/';
 import { Vega } from 'react-vega';
 
 const useStyles = makeStyles((theme) => ({
@@ -33,9 +35,15 @@ const useStyles = makeStyles((theme) => ({
           margin: theme.spacing(1),
           minWidth: 120,
         },
+        loaderIcon: {
+          margin: "30px",
+          textAlign: "center" 
+        }
       }));  
 export default function VegaGraph({goBack}: {goBack?: any})
 {
+  const apiBaseUrl = "https://api.lamp.digital/";
+  const apiAuthorization = "admin:LAMPLAMP";
   const classes = useStyles();
   const [chartType, setChartType] = React.useState('');
   const [vegaGraphArray, setVegaGraphArray] = React.useState('');
@@ -43,11 +51,15 @@ export default function VegaGraph({goBack}: {goBack?: any})
   const [barData, setBarData] = React.useState('');
   const [pieData, setPieData] = React.useState('');
   const [vegaSpecArray, setVegaSpecArray]:any = React.useState([]);
+  const [lampApiError, setLampApiError] = React.useState(false);
+  const [loadingIcon, setLoadingIcon] = React.useState(false);
   let specs: any = {};
   let vegaDataArray: any;
   let dataArray: any ;
   const createGraph = () => {
     setVegaGraphArray('');
+    setVegaSpecArray([]);
+    setLampApiError(false);
     if(chartType == "line_chart"){
       generateLineChart();  
     }else if(chartType == "bar_chart"){
@@ -58,6 +70,7 @@ export default function VegaGraph({goBack}: {goBack?: any})
   }
   
   const handleChartType = (event) => {
+    setLampApiError(false);
     setChartType(event.target.value); 
     if(event.target.value == "line_chart"){
       generateLineChart();
@@ -80,6 +93,38 @@ export default function VegaGraph({goBack}: {goBack?: any})
     }else if(chartType == "pie_chart"){
       setPieData(event.target.value);
     }
+  }
+
+  // API call
+  const getLampQueryAPI = (specs) => {
+    setLoadingIcon(true);
+    let specBody: any;
+    if(typeof specs == "object"){
+      specBody = JSON.stringify(specs)
+    }else{
+      specBody = specs;
+    }
+
+    fetch(apiBaseUrl, {
+      "method": "POST",
+      "headers": {
+        "Authorization": apiAuthorization
+      },
+      "body":  specBody
+    })
+    .then(response => response.json())
+    .then(response => {
+      setLoadingIcon(false); 
+      if(response.hasOwnProperty('error')){
+        setLampApiError(true);
+      }
+      setVegaSpecArray(response);
+      setVegaGraphArray(JSON.stringify(response, undefined, 1));
+    })
+    .catch(err => {
+      setLoadingIcon(false); 
+      setLampApiError(true)
+	  });
   }
   
   //  Line Chart
@@ -172,17 +217,16 @@ export default function VegaGraph({goBack}: {goBack?: any})
           }
         },
       ]
-    };  
+    };
     if(lineData == ''){
       setLineData(JSON.stringify(specs, undefined, 1));
       dataArray = JSON.stringify(specs, undefined, 1);
       vegaDataArray = specs;
     }else{
       dataArray = lineData;
-      vegaDataArray = JSON.parse(dataArray);
+      vegaDataArray = dataArray;
     }
-    setVegaSpecArray(vegaDataArray);
-    setVegaGraphArray(dataArray);
+    getLampQueryAPI(vegaDataArray);
   };
 
   //  Bar Chart
@@ -285,10 +329,9 @@ export default function VegaGraph({goBack}: {goBack?: any})
       vegaDataArray = specs;
     }else{
       dataArray = barData;
-      vegaDataArray = JSON.parse(dataArray);
+      vegaDataArray = dataArray;
     }
-    setVegaSpecArray(vegaDataArray);
-    setVegaGraphArray(dataArray);
+    getLampQueryAPI(vegaDataArray);
   };
   
   //   Pie Chart 
@@ -361,10 +404,9 @@ export default function VegaGraph({goBack}: {goBack?: any})
       vegaDataArray = specs;
     }else{
       dataArray = pieData;
-      vegaDataArray = JSON.parse(dataArray);
-    }
-    setVegaSpecArray(vegaDataArray);  
-    setVegaGraphArray(dataArray);
+      vegaDataArray = dataArray;  
+    } 
+    getLampQueryAPI(vegaDataArray); 
   };
   
   return (
@@ -383,7 +425,13 @@ export default function VegaGraph({goBack}: {goBack?: any})
       </AppBar>
       <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
         mindLAMP - Graphs
-      </Typography>        
+      </Typography>
+      { lampApiError ? 
+        <Alert variant="filled" severity="error">
+          <AlertTitle>Error</AlertTitle>
+          An error occured while fetching the data.
+        </Alert>
+      : ''}
       <Grid container spacing={1}>
         <Grid item xs={5}>
           <Paper className={classes.paper} variant="outlined">
@@ -413,7 +461,14 @@ export default function VegaGraph({goBack}: {goBack?: any})
                 <MenuItem value={"pie_chart"}>Pie Chart</MenuItem>
               </Select>
             </Box>
-            <Button variant="contained" color="primary" onClick={createGraph} >Generate</Button>
+            <Box component="span" m={1}>
+              <Button variant="contained" color="primary" onClick={createGraph} >Generate</Button>
+            </Box>
+            { loadingIcon ? 
+            <Box component="span" m={1}>
+              <CircularProgress className={classes.loaderIcon} color="secondary"/>
+            </Box>
+            : '' }
           </Paper>
         </Grid>
         <Grid item xs={5}>
