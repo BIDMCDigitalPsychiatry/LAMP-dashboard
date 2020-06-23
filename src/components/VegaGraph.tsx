@@ -42,8 +42,8 @@ const useStyles = makeStyles((theme) => ({
       }));  
 export default function VegaGraph({goBack}: {goBack?: any})
 {
-  const apiBaseUrl = "https://api.lamp.digital/";
-  const apiAuthorization = "admin:LAMPLAMP";
+  const apiBaseUrl = process.env.LAMP_API_BASE_URL;
+  const apiAuthorization = process.env.LAMP_API_AUTHORIZATION;
   const classes = useStyles();
   const [chartType, setChartType] = React.useState('');
   const [vegaGraphArray, setVegaGraphArray] = React.useState('');
