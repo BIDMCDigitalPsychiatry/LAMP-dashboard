@@ -1,4 +1,5 @@
 import React from "react";
+import LAMP from "lamp-core"
 import {
   Box,
   Button,
@@ -16,7 +17,7 @@ import {
   CircularProgress
 } from "@material-ui/core"; 
 import {Alert, AlertTitle} from '@material-ui/lab/';
-import { Vega } from 'react-vega';
+import { Vega } from 'react-vega';  
 
 const useStyles = makeStyles((theme) => ({
         root: {
@@ -42,8 +43,7 @@ const useStyles = makeStyles((theme) => ({
       }));  
 export default function VegaGraph({goBack}: {goBack?: any})
 {
-  const apiBaseUrl = process.env.LAMP_API_BASE_URL;
-  const apiAuthorization = process.env.LAMP_API_AUTHORIZATION;
+  const apiAuthorization = process.env.REACT_APP_LAMP_API_AUTHORIZATION;
   const classes = useStyles();
   const [chartType, setChartType] = React.useState('');
   const [vegaGraphArray, setVegaGraphArray] = React.useState('');
@@ -95,6 +95,11 @@ export default function VegaGraph({goBack}: {goBack?: any})
     }
   }
 
+  const getSpecEventData = async (specBody): Promise<{ [groupName: string]: any }> => {
+    LAMP.API.configuration.authorization = apiAuthorization;
+    return (await LAMP.API.query(specBody) );
+  }
+
   // API call
   const getLampQueryAPI = (specs) => {
     setLoadingIcon(true);
@@ -103,29 +108,17 @@ export default function VegaGraph({goBack}: {goBack?: any})
       specBody = JSON.stringify(specs)
     }else{
       specBody = specs;
-    }
-
-    fetch(apiBaseUrl, {
-      "method": "POST",
-      "headers": {
-        "Authorization": apiAuthorization
-      },
-      "body":  specBody
-    })
-    .then(response => response.json())
-    .then(response => {
-      setLoadingIcon(false); 
-      if(response.hasOwnProperty('error')){
+    } 
+    getSpecEventData(specBody)
+      .then( response => {
+        setLoadingIcon(false); 
+        setVegaSpecArray(response);
+        setVegaGraphArray(JSON.stringify(response, undefined, 1));
+      })
+      .catch(error => {
         setLampApiError(true);
-      }
-      setVegaSpecArray(response);
-      setVegaGraphArray(JSON.stringify(response, undefined, 1));
-    })
-    .catch(err => {
-      setLoadingIcon(false); 
-      setLampApiError(true)
-	  });
-  }
+      });
+  } 
   
   //  Line Chart
   const generateLineChart = () => {
