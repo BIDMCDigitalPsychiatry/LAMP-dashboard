@@ -15,10 +15,15 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
+import Home from "./Home"
+import TipNotification from "./TipNotification"
+import Feed from "./Feed"
+
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
+// import VegaGraph from "./VegaGraph"
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
@@ -40,16 +45,23 @@ function PageTitle({ children, ...props }) {
 
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  let activeTab = (newTab?: any) => {
+    setState((state) => ({
+      ...state,
+      activeTab: newTab,
+    }))
+  }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
     authType: LAMP.Auth._type,
     lastDomain: undefined,
+    activeTab: null,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
-
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -222,10 +234,63 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
-      {/* Route index => login or home (which redirects based on user type). */}
+      {/* Route vega-graph for showing Vega graphs. */}
+      {/* <Route
+        exact
+        path="/vega-graph"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Graphs</PageTitle>
+            <VegaGraph goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      /> */}
       <Route
         exact
         path="/"
+        render={(props) =>
+          !(window.location.hash.split("?").length > 1 && !state.identity) ? (
+            !state.identity ? (
+              <React.Fragment>
+                <PageTitle>mindLAMP | Home</PageTitle>
+                <Home />
+              </React.Fragment>
+            ) : state.authType === "admin" ? (
+              <Redirect to="/researcher" />
+            ) : state.authType === "researcher" ? (
+              <Redirect to="/researcher/me" />
+            ) : (
+              <Redirect to="/participant/me" />
+            )
+          ) : (
+            <React.Fragment />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/tip"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Today's Tip</PageTitle>
+            <TipNotification />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/Feed"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Feed</PageTitle>
+            <Feed />
+          </React.Fragment>
+        )}
+      />
+      {/* Route index => login or home (which redirects based on user type). */}
+      <Route
+        exact
+        path="/Login"
         render={(props) =>
           !(window.location.hash.split("?").length > 1 && !state.identity) ? (
             !state.identity ? (
@@ -339,8 +404,9 @@ function AppRouter({ ...props }) {
                 title={`Patient ${getParticipant(props.match.params.id).id}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab={state.activeTab}
               >
-                <Participant participant={getParticipant(props.match.params.id)} />
+                <Participant participant={getParticipant(props.match.params.id)} activeTab={activeTab} />
               </NavigationLayout>
             </React.Fragment>
           )

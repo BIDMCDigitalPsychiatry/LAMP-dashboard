@@ -1,6 +1,9 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+
 import {
+  Container,
   Box,
   Divider,
   Grid,
@@ -12,9 +15,11 @@ import {
   Tooltip,
   BottomNavigationAction,
   Slide,
+  Typography,
+  Card,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 // Local Imports
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import CareTeam from "./CareTeam"
@@ -27,8 +32,8 @@ import Jewels from "./Jewels"
 import { spliceActivity } from "./ActivityList"
 import Journal from "./Journal"
 import Resources from "./Resources"
-import MoodTips from "./MoodTips"
-import SleepTips from "./SleepTips"
+import MoodTipsSection from "./MoodTips"
+import SleepTipsSecion from "./SleepTips"
 import SocialTips from "./SocialTips"
 import Hopebox from "./Hopebox"
 import ParticipantData from "./ParticipantData"
@@ -39,21 +44,164 @@ import StressTips from "./StressTips"
 import Motivation from "./Motivation"
 import Welcome from "./Welcome"
 import MedicationTracker from "./MedicationTracker"
-import { ReactComponent as Books } from "../icons/Books.svg"
-import { ReactComponent as Mood } from "../icons/Mood.svg"
-import { ReactComponent as Sleep } from "../icons/Sleep.svg"
-import { ReactComponent as MentalHealth } from "../icons/MentalHealth.svg"
-import { ReactComponent as Information } from "../icons/Information.svg"
-import { ReactComponent as Social } from "../icons/Social.svg"
+import { ReactComponent as Book } from "../icons/Book.svg"
+import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
+import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
+
+import { ReactComponent as Chat } from "../icons/Chat.svg"
+import { ReactComponent as Wellness } from "../icons/Wellness.svg"
+import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
+import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Surveys } from "../icons/Surveys.svg"
 import { ReactComponent as Hope } from "../icons/Hope.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
-import { ReactComponent as PhysicalWellness } from "../icons/PhysicalWellness.svg"
-import { ReactComponent as Stress } from "../icons/Stress.svg"
-import { ReactComponent as MotivationIcon } from "../icons/Motivation.svg"
+import { ReactComponent as Lightning } from "../icons/Lightning.svg"
+import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
+import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
+import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
+
+import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
+import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
+
+import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
+import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
+
 import { ReactComponent as Medication } from "../icons/Medication.svg"
+import { ReactComponent as Learn } from "../icons/learn.svg"
+import { ReactComponent as Assess } from "../icons/assess.svg"
+import { ReactComponent as Manage } from "../icons/manage.svg"
+import { ReactComponent as Prevent } from "../icons/prevent.svg"
+import { ReactComponent as Data1 } from "../icons/Data1.svg"
+import { ReactComponent as Data2 } from "../icons/Data2.svg"
+import { ReactComponent as SocialContext } from "../icons/SocialContext.svg"
+import { ReactComponent as EnvContext } from "../icons/EnvContext.svg"
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: "100%",
+    },
+    customheader: {
+      backgroundColor: "white",
+      boxShadow: "none",
+
+      "& h5": { color: "#555555", fontFamily: "Inter", fontSize: 25, fontWeight: "bold" },
+    },
+    toolbar: {
+      minHeight: 90,
+      alignItems: "flex-start",
+      paddingTop: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+    },
+    title: {
+      flexGrow: 1,
+      alignSelf: "flex-end",
+    },
+    learn: {
+      background: "#FFF9E5",
+      padding: "10px 0",
+      minHeight: 180,
+      textAlign: "center",
+      boxShadow: "none",
+      borderRadius: 18,
+      position: "relative",
+    },
+
+    cardlabel: {
+      fontSize: 16,
+      fontFamily: "inter",
+      padding: "0 18px",
+      bottom: 15,
+      position: "absolute",
+      width: "100%",
+    },
+    preventlabel: {
+      fontSize: 16,
+      fontFamily: "inter",
+      padding: "0 18px",
+      marginTop: 5,
+
+      width: "100%",
+    },
+    assess: {
+      background: "#E7F8F2",
+      padding: "10px 0",
+      minHeight: 180,
+      textAlign: "center",
+      boxShadow: "none",
+      borderRadius: 18,
+      position: "relative",
+    },
+    manage: {
+      background: "#FFEFEC",
+      padding: "10px 0",
+      minHeight: 180,
+      textAlign: "center",
+      boxShadow: "none",
+      borderRadius: 18,
+      position: "relative",
+    },
+    prevent: {
+      background: "#ECF4FF",
+      padding: "10px 0",
+      minHeight: 200,
+      textAlign: "center",
+      boxShadow: "none",
+      borderRadius: 18,
+      position: "relative",
+    },
+    navigation: {
+      "& svg": { width: 36, height: 36, padding: 6, borderRadius: "50%", opacity: 0.5 },
+    },
+
+    navigationLearnSelected: {
+      "& svg": {
+        background: "#FFD645 !important",
+        opacity: 1,
+      },
+      "& span": { color: "black" },
+    },
+    navigationManageSelected: {
+      "& svg": {
+        background: "#FE8470 !important",
+        opacity: 1,
+      },
+      "& span": { color: "black" },
+    },
+    navigationAssessSelected: {
+      "& svg": {
+        background: "#65D2AA !important",
+        opacity: 1,
+      },
+      "& span": { color: "black" },
+    },
+    navigationPreventSelected: {
+      "& svg": {
+        background: "#7DB2FF !important",
+        opacity: 1,
+      },
+      "& span": { color: "black" },
+    },
+    navigationLabel: {
+      textTransform: "capitalize",
+      fontSize: "12px !important",
+      fontFamily: "Inter",
+      letterSpacing: 0,
+      color: "rgba(0, 0, 0, 0.4)",
+    },
+    addicon: { float: "right", color: '#6083E7' },
+    preventHeader: {
+      "& h5": {
+        fontWeight: 600,
+        fontSize: 18,
+        color: "rgba(0, 0, 0, 0.4)",
+        fontFamily: "inter",
+      },
+    },
+  })
+)
 
 function _hideCareTeam() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
@@ -185,7 +333,7 @@ function SurveyInstrument({ id, group, onComplete, ...props }) {
   )
 }
 
-export default function Participant({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Participant({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
   const [activities, setActivities] = useState([])
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
@@ -196,19 +344,42 @@ export default function Participant({ participant, ...props }: { participant: Pa
   const { enqueueSnackbar } = useSnackbar()
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
+  const classes = useStyles()
 
   const setTab = (newTab) => {
     _setLastTab(tab)
     _setTab(newTab)
+    const tabName = getTabName(newTab)
+    props.activeTab(tabName)
+  }
+  const getTabName = (newTab: number) => {
+    let tabName = ""
+    switch (newTab) {
+      case 0:
+        tabName = "Learn"
+        break
+      case 1:
+        tabName = "Assess"
+        break
+      case 2:
+        tabName = "Manage"
+        break
+      case 3:
+        tabName = "Prevent"
+        break
+    }
+    return tabName
   }
   const tabDirection = (currentTab) => {
     return tab > lastTab && currentTab !== tab ? (supportsSidebar ? "down" : "right") : supportsSidebar ? "up" : "left"
   }
 
   useEffect(() => {
+    const tabName = getTabName(tab)
+    props.activeTab(tabName)
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
-    getShowWelcome(participant).then(setOpen)
+    //  getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -258,97 +429,96 @@ export default function Participant({ participant, ...props }: { participant: Pa
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Launcher.Section>
-            <Grid container direction="row" spacing={4}>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Mood Tips"
-                    icon={<Mood style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("moodtips")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Sleep Tips"
-                    icon={<Sleep style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("sleeptips")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Social Tips"
-                    icon={<Social style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("socialtips")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Mental Health Resources"
-                    icon={<MentalHealth style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("resources")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Book Recommendations"
-                    icon={<Books style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("bookrecommendations")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Definitions"
-                    icon={<Information style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("definitions")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Physical Wellness Tips"
-                    icon={<PhysicalWellness style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("physicalwellness")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Stress Tips"
-                    icon={<Stress style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("stresstips")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Motivation"
-                    icon={<MotivationIcon style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("motivation")}
-                  />
-                )}
-              </Grid>
+          <Container>
+            <Grid container spacing={2}>
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("moodtips")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <MoodTips />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Mood Tips</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("sleeptips")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <SleepTips />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Sleep Tips</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("socialtips")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <Chat />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Social Tips</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("resources")}>
+                  <Card className={classes.learn}>
+                    <Box mt={1}>
+                      <Info />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Mental Health Resources</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("physicalwellness")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <Wellness />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Physical Wellness</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("bookrecommendations")}>
+                  <Card className={classes.learn}>
+                    <Box mt={1}>
+                      <Book />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Suggested Reading</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("motivation")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <PaperLens />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Motivation</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("stresstips")}>
+                  <Card className={classes.learn}>
+                    <Box mt={2} mb={1}>
+                      <Lightning />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Stress Tips</Typography>
+                  </Card>
+                </Grid>
+              )}
             </Grid>
-          </Launcher.Section>
+          </Container>
         </Box>
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Launcher.Section>
-            <Grid container direction="row" spacing={4}>
+          <Container>
+            <Grid container spacing={2}>
               {[
                 ...(activities || [])
                   .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
@@ -372,114 +542,152 @@ export default function Participant({ participant, ...props }: { participant: Pa
                     (x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
                   )
                   .map((y) => (
-                    <Grid item xs={3}>
-                      <Launcher.Button
-                        key={y.name}
-                        favorite={false}
-                        title={y.name}
-                        icon={<Surveys style={{ width: "100%", height: "100%" }} />}
-                        onClick={() => setVisibleActivities([y])}
-                      />
+                    <Grid item xs={6} md={4} lg={3} onClick={() => setVisibleActivities([y])}>
+                      <Card className={classes.assess}>
+                        <Box mt={1} mb={1}>
+                          {y.name == "Mood" && <AssessMood />}
+                          {y.name == "Sleep and Social" && <AssessSleep />}
+                          {y.name == "Anxiety" && <AssessAnxiety />}
+                          {y.name == "App Usability" && <AssessUsability />}
+                          {y.name == "Water and Nutrition" && <AssessNutrition />}
+                          {y.name == "Psychosis and Social" && <AssessSocial />}
+                        </Box>
+                        <Typography className={classes.cardlabel}>{y.name}</Typography>
+                      </Card>
                     </Grid>
                   )),
               ]}
             </Grid>
-          </Launcher.Section>
+          </Container>
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Launcher.Section>
-            <Grid container direction="row" spacing={4}>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Breathe"
-                    icon={<BreatheIcon style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("breathe")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Jewels"
-                    icon={<JewelsIcon style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("jewels")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Journal"
-                    icon={<JournalIcon style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("journal")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Hope Box"
-                    icon={<Hope style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("hopebox")}
-                  />
-                )}
-              </Grid>
-              <Grid item xs={3}>
-                {!hideCareTeam && (
-                  <Launcher.Button
-                    title="Medication Tracker"
-                    icon={<Medication style={{ width: "100%", height: "100%" }} />}
-                    onClick={() => setLaunchedActivity("medicationtracker")}
-                  />
-                )}
-              </Grid>
+          <Container>
+            <Grid container spacing={2}>
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("breathe")}>
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <BreatheIcon />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Mood Tips</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("jewels")}>
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <JewelsIcon />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Jewels</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("journal")}>
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <JournalIcon />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Journal</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("hopebox")}>
+                  <Card className={classes.manage}>
+                    <Box mt={1}>
+                      <HopeBoxIcon />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Hope Box</Typography>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("medicationtracker")}>
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <Medication />
+                    </Box>
+                    <Typography className={classes.cardlabel}>Medication Tracker</Typography>
+                  </Card>
+                </Grid>
+              )}
             </Grid>
-          </Launcher.Section>
+          </Container>
         </Box>
       </Slide>
+
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-        <Box>
-          {!hideCareTeam && (
-            <Box border={1} borderColor="grey.300" borderRadius={4} bgcolor="white" p={2} my={4} displayPrint="none">
-              <CareTeam participant={participant} />
-            </Box>
-          )}
-          <ParticipantData
-            participant={participant}
-            hiddenEvents={hiddenEvents}
-            enableEditMode={!_patientMode()}
-            onEditAction={(activity, data) =>
-              setVisibleActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                  prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
-                },
-              ])
-            }
-            onCopyAction={(activity, data) =>
-              setVisibleActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                },
-              ])
-            }
-            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
-          />
+        <Box my={4}>
+          <Container>
+            <Grid container spacing={2}>
+              <Grid item xs={10} md={4} lg={3} className={classes.preventHeader}>
+                <Typography variant="h5">Activity</Typography>
+              </Grid>
+              <Grid item xs={2} md={4} lg={3}>
+                <AddCircleOutlineIcon className={classes.addicon} />
+              </Grid>
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3}>
+                  <Card className={classes.prevent}>
+                    <Typography className={classes.preventlabel}>Mood (23)</Typography>
+                    <Box mt={4} mb={1}>
+                      <Data1 />
+                    </Box>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3}>
+                  <Card className={classes.prevent}>
+                    <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
+                    <Box mt={2} mb={1}>
+                      <Data2 />
+                    </Box>
+                  </Card>
+                </Grid>
+              )}
+              <Grid item xs={11} md={4} lg={3} className={classes.preventHeader}>
+                <Typography variant="h5">Sensors</Typography>
+              </Grid>
+              <Grid item xs={1} md={4} lg={3}>
+                <AddCircleOutlineIcon className={classes.addicon} />
+              </Grid>
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3}>
+                  <Card className={classes.prevent}>
+                    <Typography className={classes.preventlabel}>Social Context (9)</Typography>
+                    <Box mt={2} mb={1}>
+                      <SocialContext />
+                    </Box>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3}>
+                  <Card className={classes.prevent}>
+                    <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
+                    <Box mt={1}>
+                      <EnvContext />
+                    </Box>
+                  </Card>
+                </Grid>
+              )}
+              {!hideCareTeam && (
+                <Grid item xs={6} md={4} lg={3}>
+                  <Card className={classes.prevent}>
+                    <Typography className={classes.preventlabel}>Step Count(5)</Typography>
+                    <Box mt={2} mb={1}>
+                      <Data2 />
+                    </Box>
+                  </Card>
+                </Grid>
+              )}
+            </Grid>
+          </Container>
         </Box>
       </Slide>
       <ResponsiveDialog
@@ -500,8 +708,8 @@ export default function Participant({ participant, ...props }: { participant: Pa
             journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
             hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            sleeptips: <SleepTips onComplete={() => setLaunchedActivity(undefined)} />,
-            moodtips: <MoodTips onComplete={() => setLaunchedActivity(undefined)} />,
+            sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
+            moodtips: <MoodTipsSection onComplete={() => setLaunchedActivity(undefined)} />,
             socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
             bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
             definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
@@ -521,7 +729,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
             style: {
               flexDirection: supportsSidebar ? "column" : "row",
               justifyContent: !supportsSidebar ? "center" : undefined,
-              height: !supportsSidebar ? 56 : undefined,
+              height: !supportsSidebar ? 80 : undefined,
               width: supportsSidebar ? 80 : undefined,
               transition: "all 500ms ease-in-out",
             },
@@ -532,7 +740,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
             selected={tab === 0}
             label="Learn"
             value={0}
-            icon={<Icon>bookmark_border</Icon>}
+            classes={{
+              root: classes.navigation,
+              selected: classes.navigationLearnSelected,
+              label: classes.navigationLabel,
+            }}
+            icon={<Learn />}
             onChange={(_, newTab) => setTab(newTab)}
           />
           <BottomNavigationAction
@@ -540,7 +753,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
             selected={tab === 1}
             label="Assess"
             value={1}
-            icon={<Icon>assessment</Icon>}
+            classes={{
+              root: classes.navigation,
+              selected: classes.navigationAssessSelected,
+              label: classes.navigationLabel,
+            }}
+            icon={<Assess />}
             onChange={(_, newTab) => setTab(newTab)}
           />
           <BottomNavigationAction
@@ -548,7 +766,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
             selected={tab === 2}
             label="Manage"
             value={2}
-            icon={<Icon>create_outlined</Icon>}
+            classes={{
+              root: classes.navigation,
+              selected: classes.navigationManageSelected,
+              label: classes.navigationLabel,
+            }}
+            icon={<Manage />}
             onChange={(_, newTab) => setTab(newTab)}
           />
           <BottomNavigationAction
@@ -556,7 +779,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
             selected={tab === 3}
             label="Prevent"
             value={3}
-            icon={<Icon>speaker_notes_outlined</Icon>}
+            classes={{
+              root: classes.navigation,
+              selected: classes.navigationPreventSelected,
+              label: classes.navigationLabel,
+            }}
+            icon={<Prevent />}
             onChange={(_, newTab) => setTab(newTab)}
           />
         </Drawer>

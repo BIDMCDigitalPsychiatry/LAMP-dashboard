@@ -18,19 +18,42 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Typography,
   colors,
 } from "@material-ui/core"
 
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
+import { ReactComponent as Message } from "../icons/message.svg"
+import { ReactComponent as User } from "../icons/User.svg"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    toolbar: {
+      minHeight: 75,
+      alignItems: "flex-start",
+      paddingTop: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+      "& h5": {
+        color: "#555555",
+        fontFamily: "Inter",
+        fontSize: 25,
+        fontWeight: "bold",
+        position: "absolute",
+        bottom: 0,
+      },
+    },
+  })
+)
 export default function NavigationLayout({
   title,
   id,
   noToolbar,
   goBack,
   onLogout,
+  activeTab,
   ...props
 }: {
   title?: string
@@ -38,6 +61,7 @@ export default function NavigationLayout({
   noToolbar?: boolean
   goBack?: any
   onLogout?: any
+  activeTab?: string
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -45,30 +69,41 @@ export default function NavigationLayout({
   const [passwordChange, setPasswordChange] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
+  const classes = useStyles()
 
   return (
     <Box>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
-        <AppBar position="static" style={{ height: 48, background: "transparent", boxShadow: "none" }}>
-          <Toolbar>
-            <IconButton
-              onClick={goBack}
-              color="default"
-              aria-label="Menu"
+        <AppBar position="static" style={{ background: "transparent", boxShadow: "none" }}>
+          <Toolbar className={classes.toolbar}>
+            {activeTab === "" && (
+              <IconButton
+                onClick={goBack}
+                color="default"
+                aria-label="Menu"
+                style={{
+                  marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,
+                }}
+              >
+                <Icon>arrow_back</Icon>
+              </IconButton>
+            )}
+            <Typography
+              variant="h5"
               style={{
                 marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,
               }}
             >
-              <Icon>arrow_back</Icon>
-            </IconButton>
+              {activeTab}
+            </Typography>
             <Box flexGrow={1} />
             <Box>
               <Tooltip title="Notifications">
                 <IconButton color="default" onClick={() => {}}>
                   <Badge badgeContent={0} color="secondary">
-                    <Icon>notifications</Icon>
+                    <Message />
                   </Badge>
                 </IconButton>
               </Tooltip>
@@ -79,7 +114,7 @@ export default function NavigationLayout({
                   onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                   color="default"
                 >
-                  <Icon>account_circle</Icon>
+                  <User />
                 </IconButton>
               </Tooltip>
               <Menu
