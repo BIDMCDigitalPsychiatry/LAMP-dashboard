@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 25,
         fontWeight: 600,
         color: "rgba(0, 0, 0, 0.75)",
-        fontFamily: "inter",
       },
     },
     tipscontentarea: {
@@ -44,12 +43,11 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "bold",
         fontSize: "16px",
         marginBottom: "15px",
-        fontFamily: "inter",
       },
       "& p": {
         fontSize: "16px",
         lineheight: "24px",
-        fontFamily: "inter",
+
         color: "rgba(0, 0, 0, 0.75)",
       },
     },
@@ -86,7 +84,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
       lineHeight: "38px",
       marginTop: "15%",
-      fontFamily: "inter",
+
       textTransform: "capitalize",
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",

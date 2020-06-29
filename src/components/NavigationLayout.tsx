@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingBottom: theme.spacing(1),
       "& h5": {
         color: "#555555",
-        fontFamily: "Inter",
+
         fontSize: 25,
         fontWeight: "bold",
         position: "absolute",

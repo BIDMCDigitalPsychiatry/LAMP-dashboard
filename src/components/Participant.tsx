@@ -28,6 +28,8 @@ import Launcher from "./Launcher"
 import Survey from "./Survey"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Breathe from "./Breathe"
+import Prevent from "./Prevent"
+
 import Jewels from "./Jewels"
 import { spliceActivity } from "./ActivityList"
 import Journal from "./Journal"
@@ -72,7 +74,7 @@ import { ReactComponent as Medication } from "../icons/Medication.svg"
 import { ReactComponent as Learn } from "../icons/learn.svg"
 import { ReactComponent as Assess } from "../icons/assess.svg"
 import { ReactComponent as Manage } from "../icons/manage.svg"
-import { ReactComponent as Prevent } from "../icons/prevent.svg"
+import { ReactComponent as PreventIcon } from "../icons/prevent.svg"
 import { ReactComponent as Data1 } from "../icons/Data1.svg"
 import { ReactComponent as Data2 } from "../icons/Data2.svg"
 import { ReactComponent as SocialContext } from "../icons/SocialContext.svg"
@@ -87,7 +89,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: "white",
       boxShadow: "none",
 
-      "& h5": { color: "#555555", fontFamily: "Inter", fontSize: 25, fontWeight: "bold" },
+      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
     },
     toolbar: {
       minHeight: 90,
@@ -111,7 +113,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
     cardlabel: {
       fontSize: 16,
-      fontFamily: "inter",
+
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
@@ -119,7 +121,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     preventlabel: {
       fontSize: 16,
-      fontFamily: "inter",
+
       padding: "0 18px",
       marginTop: 5,
 
@@ -155,7 +157,6 @@ const useStyles = makeStyles((theme: Theme) =>
     navigation: {
       "& svg": { width: 36, height: 36, padding: 6, borderRadius: "50%", opacity: 0.5 },
     },
-
     navigationLearnSelected: {
       "& svg": {
         background: "#FFD645 !important",
@@ -187,17 +188,16 @@ const useStyles = makeStyles((theme: Theme) =>
     navigationLabel: {
       textTransform: "capitalize",
       fontSize: "12px !important",
-      fontFamily: "Inter",
+
       letterSpacing: 0,
       color: "rgba(0, 0, 0, 0.4)",
     },
-    addicon: { float: "right", color: '#6083E7' },
+    addicon: { float: "right", color: "#6083E7" },
     preventHeader: {
       "& h5": {
         fontWeight: 600,
         fontSize: 18,
         color: "rgba(0, 0, 0, 0.4)",
-        fontFamily: "inter",
       },
     },
   })
@@ -622,72 +622,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
 
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Container>
-            <Grid container spacing={2}>
-              <Grid item xs={10} md={4} lg={3} className={classes.preventHeader}>
-                <Typography variant="h5">Activity</Typography>
-              </Grid>
-              <Grid item xs={2} md={4} lg={3}>
-                <AddCircleOutlineIcon className={classes.addicon} />
-              </Grid>
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3}>
-                  <Card className={classes.prevent}>
-                    <Typography className={classes.preventlabel}>Mood (23)</Typography>
-                    <Box mt={4} mb={1}>
-                      <Data1 />
-                    </Box>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3}>
-                  <Card className={classes.prevent}>
-                    <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
-                    <Box mt={2} mb={1}>
-                      <Data2 />
-                    </Box>
-                  </Card>
-                </Grid>
-              )}
-              <Grid item xs={11} md={4} lg={3} className={classes.preventHeader}>
-                <Typography variant="h5">Sensors</Typography>
-              </Grid>
-              <Grid item xs={1} md={4} lg={3}>
-                <AddCircleOutlineIcon className={classes.addicon} />
-              </Grid>
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3}>
-                  <Card className={classes.prevent}>
-                    <Typography className={classes.preventlabel}>Social Context (9)</Typography>
-                    <Box mt={2} mb={1}>
-                      <SocialContext />
-                    </Box>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3}>
-                  <Card className={classes.prevent}>
-                    <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
-                    <Box mt={1}>
-                      <EnvContext />
-                    </Box>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3}>
-                  <Card className={classes.prevent}>
-                    <Typography className={classes.preventlabel}>Step Count(5)</Typography>
-                    <Box mt={2} mb={1}>
-                      <Data2 />
-                    </Box>
-                  </Card>
-                </Grid>
-              )}
-            </Grid>
-          </Container>
+          <Prevent participant={participant} />
         </Box>
       </Slide>
       <ResponsiveDialog
@@ -784,7 +719,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
               selected: classes.navigationPreventSelected,
               label: classes.navigationLabel,
             }}
-            icon={<Prevent />}
+            icon={<PreventIcon />}
             onChange={(_, newTab) => setTab(newTab)}
           />
         </Drawer>

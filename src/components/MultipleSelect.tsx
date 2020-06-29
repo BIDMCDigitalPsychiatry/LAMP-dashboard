@@ -1,10 +1,32 @@
 // Core Imports
 import React from "react"
 import { Box, Chip, Tooltip, Badge } from "@material-ui/core"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    badgeCount: {
+      color: "#6083E7",
+      paddingLeft: 10,
+    },
+    multiselect: {
+      border: "1px solid #C6C6C6",
+      background: "#fff",
+      color: "rgba(0, 0, 0, 0.4)",
+    },
+    multiselectdelete: {
+      background: "#ECF4FF",
+      border: 0,
+      color: "rgba(0, 0, 0, 0.75)",
+      "&:focus": { background: "#ECF4FF" },
+    },
+  })
+)
+
 export default function MultipleSelect({ ...props }) {
+  const classes = useStyles()
   return (
     <Box
       style={{
@@ -21,26 +43,26 @@ export default function MultipleSelect({ ...props }) {
           disableHoverListener={!props.tooltips}
           title={(props.tooltips || {})[item] || props.defaultTooltip || item}
         >
-          <Badge
-            showZero={props.showZeroBadges}
-            badgeContent={(props.badges || {})[item] || props.defaultBadge || 0}
-            color="primary"
-          >
-            <Chip
-              label={item}
-              color={(props.selected || []).indexOf(item) >= 0 ? "primary" : undefined}
-              onClick={
-                (props.selected || []).indexOf(item) >= 0
-                  ? () => {}
-                  : () => props.onChange(!!props.singleSelect ? [item] : [...(props.selected || []), item])
-              }
-              onDelete={
-                (props.selected || []).indexOf(item) < 0
-                  ? undefined
-                  : () => props.onChange((props.selected || []).filter((x) => x !== item))
-              }
-            />
-          </Badge>
+          <Chip
+            classes={{ root: classes.multiselect, colorPrimary: classes.multiselectdelete }}
+            label={
+              <section>
+                {item}
+                <span className={classes.badgeCount}>{(props.badges || {})[item] || props.defaultBadge || 0}</span>
+              </section>
+            }
+            color={(props.selected || []).indexOf(item) >= 0 ? "primary" : undefined}
+            onClick={
+              (props.selected || []).indexOf(item) >= 0
+                ? () => {}
+                : () => props.onChange(!!props.singleSelect ? [item] : [...(props.selected || []), item])
+            }
+            onDelete={
+              (props.selected || []).indexOf(item) < 0
+                ? undefined
+                : () => props.onChange((props.selected || []).filter((x) => x !== item))
+            }
+          />
         </Tooltip>
       ))}
     </Box>

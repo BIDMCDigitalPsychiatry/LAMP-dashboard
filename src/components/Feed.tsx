@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { StepConnector } from "@material-ui/core"
 
 import {
   BottomNavigationAction,
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: "white",
       boxShadow: "none",
 
-      "& h5": { color: "#555555", fontFamily: "Inter", fontSize: 25, fontWeight: "bold" },
+      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
     },
     button: {
       marginTop: theme.spacing(1),
@@ -100,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
     feedtasks: {
       "& h5": {
         fontSize: 16,
-        fontFamily: "inter",
+
         fontWeight: 600,
         color: "rgba(0, 0, 0, 0.75)",
       },
@@ -137,6 +138,18 @@ const useStyles = makeStyles((theme: Theme) =>
         background: "black",
         top: 100,
       },
+    },
+    customsteppercontent: {
+      marginLeft: 15,
+      marginTop: -30,
+      paddingTop: 44,
+      marginBottom: -35,
+      paddingBottom: 52,
+    },
+    customstepperconnecter: {
+      minHeight: 0,
+      padding: 0,
+      "& span": { minHeight: 0 },
     },
   })
 )
@@ -263,7 +276,12 @@ export default function Feed() {
       <Toolbar className={classes.toolbar} />
 
       <WeekView />
-      <Stepper activeStep={activeStep} orientation="vertical" className={classes.customstepper}>
+      <Stepper
+        activeStep={activeStep}
+        orientation="vertical"
+        classes={{ root: classes.customstepper }}
+        connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
+      >
         {steps.map((label, index) => (
           <Step>
             <StepLabel
@@ -273,7 +291,8 @@ export default function Feed() {
             >
               {label}
             </StepLabel>
-            <StepContent>
+
+            <StepContent classes={{ root: classes.customsteppercontent }}>
               <Typography>{getStepContent(index)}</Typography>
               <div className={classes.actionsContainer}>
                 <div>
