@@ -28,23 +28,27 @@ import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Message } from "../icons/message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
-      minHeight: 75,
+      paddingLeft: 20,
+      paddingRight: 20,
       alignItems: "flex-start",
       paddingTop: theme.spacing(1),
       paddingBottom: theme.spacing(1),
       "& h5": {
         color: "#555555",
-
         fontSize: 25,
         fontWeight: "bold",
         position: "absolute",
         bottom: 0,
       },
     },
+    toolbardashboard: { minHeight: 75 },
+    toolbarinner: { minHeight: 95 },
+    backbtn: { paddingLeft: 0, paddingRight: 0 },
   })
 )
 export default function NavigationLayout({
@@ -71,17 +75,23 @@ export default function NavigationLayout({
   const print = useMediaQuery("print")
   const classes = useStyles()
 
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent"]
+  const selectedClass =
+    dashboardMenus.indexOf(activeTab) < 0
+      ? classnames(classes.toolbar, classes.toolbarinner)
+      : classnames(classes.toolbar, classes.toolbardashboard)
   return (
     <Box>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
         <AppBar position="static" style={{ background: "transparent", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbar}>
-            {activeTab === "" && (
+          <Toolbar className={selectedClass}>
+            {dashboardMenus.indexOf(activeTab) < 0 && (
               <IconButton
                 onClick={goBack}
                 color="default"
+                className={classes.backbtn}
                 aria-label="Menu"
                 style={{
                   marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,

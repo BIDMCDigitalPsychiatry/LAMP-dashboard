@@ -31,13 +31,12 @@ import { ReactComponent as Medication } from "../icons/Medicationsm.svg"
 import { ReactComponent as PencilPaper } from "../icons/pencil_paper.svg"
 import { ReactComponent as SadBoard } from "../icons/SadBoard.svg"
 import { ReactComponent as LineGraph } from "../icons/LineGraph.svg"
-import { ReactComponent as Learn } from "../icons/learn.svg"
-import { ReactComponent as Assess } from "../icons/assess.svg"
-import { ReactComponent as Manage } from "../icons/manage.svg"
-import { ReactComponent as Prevent } from "../icons/prevent.svg"
+
 import { ReactComponent as Message } from "../icons/message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import WeekView from "./WeekView"
+import BottomMenu from "./BottomMenu"
+
 import LAMP from "lamp-core"
 import DoneIcon from "@material-ui/icons/Done"
 const useStyles = makeStyles((theme: Theme) =>
@@ -250,7 +249,7 @@ export default function Feed() {
   const handleReset = () => {
     setActiveStep(0)
   }
-  const setTab = (newTab) => {
+  let activeTab = (newTab?: any) => {
     _setLastTab(tab)
     _setTab(newTab)
   }
@@ -259,10 +258,22 @@ export default function Feed() {
   }
 
   return (
-    <div className={classes.root}>
+    <div
+      className={classes.root}
+      style={{
+        paddingLeft: supportsSidebar ? 64 : undefined,
+      }}
+    >
       <AppBar className={classes.customheader}>
         <Toolbar className={classes.toolbar}>
-          <Typography className={classes.title} variant="h5" noWrap>
+          <Typography
+            className={classes.title}
+            variant="h5"
+            noWrap
+            style={{
+              paddingLeft: supportsSidebar ? 64 : undefined,
+            }}
+          >
             Feed
           </Typography>
           <IconButton aria-label="search" color="inherit">
@@ -317,56 +328,7 @@ export default function Feed() {
           </Button>
         </Paper>
       )}
-
-      <Box clone displayPrint="none">
-        <Drawer
-          open
-          anchor={supportsSidebar ? "left" : "bottom"}
-          variant="permanent"
-          PaperProps={{
-            style: {
-              flexDirection: supportsSidebar ? "column" : "row",
-              justifyContent: !supportsSidebar ? "center" : undefined,
-              height: !supportsSidebar ? 56 : undefined,
-              width: supportsSidebar ? 80 : undefined,
-              transition: "all 500ms ease-in-out",
-            },
-          }}
-        >
-          <BottomNavigationAction
-            showLabel
-            selected={tab === 0}
-            label="Learn"
-            value={0}
-            icon={<Learn />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
-          <BottomNavigationAction
-            showLabel
-            selected={tab === 1}
-            label="Assess"
-            value={1}
-            icon={<Assess />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
-          <BottomNavigationAction
-            showLabel
-            selected={tab === 2}
-            label="Manage"
-            value={2}
-            icon={<Manage />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
-          <BottomNavigationAction
-            showLabel
-            selected={tab === 3}
-            label="Prevent"
-            value={3}
-            icon={<Prevent />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
-        </Drawer>
-      </Box>
+      <BottomMenu activeTab={activeTab} />
     </div>
   )
 }

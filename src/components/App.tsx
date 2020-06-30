@@ -22,6 +22,8 @@ import Feed from "./Feed"
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
+import PreventData from "./PreventData"
+
 import NavigationLayout from "./NavigationLayout"
 // import VegaGraph from "./VegaGraph"
 
@@ -287,6 +289,24 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
+      <Route
+        exact
+        path="/participant/:id/prevent-data"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Prevent</PageTitle>
+            <NavigationLayout
+              id={props.match.params.id}
+              title={`Patient ${getParticipant(props.match.params.id).id}`}
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Mood"
+            >
+              <PreventData />
+            </NavigationLayout>
+          </React.Fragment>
+        )}
+      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
@@ -316,6 +336,39 @@ function AppRouter({ ...props }) {
           )
         }
       />
+      {/* <Route
+        exact
+        path="/participant/:id/prevent-data"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : !getParticipant(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
+              <NavigationLayout
+                id={props.match.params.id}
+                title={`Patient ${getParticipant(props.match.params.id).id}`}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+                activeTab={state.activeTab}
+              >
+                <PreventData />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      /> */}
 
       {/* Route authenticated routes. */}
       <Route

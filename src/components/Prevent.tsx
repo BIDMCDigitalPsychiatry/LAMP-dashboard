@@ -11,7 +11,10 @@ import {
   DialogContent,
   IconButton,
   Button,
+  DialogActions,
 } from "@material-ui/core"
+// import { browserHistory } from 'react-router';
+
 import { Sparkline, LineSeries } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
@@ -24,8 +27,10 @@ import LAMP, {
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
-import PreventData from "./PreventData"
+// import PreventData from "./PreventData"
 import ResponsiveDialog from "./ResponsiveDialog"
+import { Link as RouterLink } from "react-router-dom"
+import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -300,6 +305,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const handleClose = () => {
     setOpen(false)
   }
+
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
@@ -322,7 +328,6 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       setSensorCounts(sensorEventCount)
     })()
   }, [])
-
   return (
     <Container>
       <Grid container xs={12} spacing={0} className={classes.activityhd}>
@@ -336,56 +341,60 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchSection("mood")}>
-          <Card className={classes.prevent}>
-            <Typography className={classes.preventlabel}>Mood (23)</Typography>
-            <Box mt={3} mb={1} className={classes.maxw150}>
-              <Sparkline
-                ariaLabel="Mood "
-                margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                width={126}
-                height={70}
-                data={[50, 100, 5, 75, 200, 15]}
-                valueAccessor={(datum) => datum}
-              >
-                <svg>
-                  <defs>
-                    <LinearGradientFill />
-                  </defs>
-                </svg>
-                <LineSeries
-                  showArea={true}
-                  fill={`url(#gradient)`}
-                  stroke="#3C5DDD"
-                  strokeWidth={2}
-                  strokeLinecap="butt"
-                />
-              </Sparkline>
-            </Box>
-          </Card>
+        <Grid item xs={6} md={4} lg={3}>
+          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+            <Card className={classes.prevent}>
+              <Typography className={classes.preventlabel}>Mood (23)</Typography>
+              <Box mt={3} mb={1} className={classes.maxw150}>
+                <Sparkline
+                  ariaLabel="Mood "
+                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                  width={126}
+                  height={70}
+                  data={[50, 100, 5, 75, 200, 15]}
+                  valueAccessor={(datum) => datum}
+                >
+                  <svg>
+                    <defs>
+                      <LinearGradientFill />
+                    </defs>
+                  </svg>
+                  <LineSeries
+                    showArea={true}
+                    fill={`url(#gradient)`}
+                    stroke="#3C5DDD"
+                    strokeWidth={2}
+                    strokeLinecap="butt"
+                  />
+                </Sparkline>
+              </Box>
+            </Card>
+          </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchSection("sleep_social")}>
-          <Card className={classes.prevent}>
-            <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
-            <Box mt={3} mb={1} className={classes.maxw150}>
-              <Sparkline
-                ariaLabel="Sleep & Social "
-                margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                width={126}
-                height={70}
-                data={[50, 200, 35, 125, 20, 15]}
-                valueAccessor={(datum) => datum}
-              >
-                <LineSeries
-                  showArea={true}
-                  fill={`url(#gradient)`}
-                  stroke="#3C5DDD"
-                  strokeWidth={2}
-                  strokeLinecap="butt"
-                />
-              </Sparkline>
-            </Box>
-          </Card>
+        <Grid item xs={6} md={4} lg={3}>
+          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+            <Card className={classes.prevent}>
+              <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
+              <Box mt={3} mb={1} className={classes.maxw150}>
+                <Sparkline
+                  ariaLabel="Sleep & Social "
+                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                  width={126}
+                  height={70}
+                  data={[50, 200, 35, 125, 20, 15]}
+                  valueAccessor={(datum) => datum}
+                >
+                  <LineSeries
+                    showArea={true}
+                    fill={`url(#gradient)`}
+                    stroke="#3C5DDD"
+                    strokeWidth={2}
+                    strokeLinecap="butt"
+                  />
+                </Sparkline>
+              </Box>
+            </Card>
+          </Link>
         </Grid>
       </Grid>
 
@@ -401,67 +410,57 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       </Grid>
 
       <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchSection("social_context")}>
-          <Card className={classes.prevent}>
-            <Typography className={classes.preventlabel}>Social Context (9)</Typography>
-            <Box>
-              <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-            </Box>
-          </Card>
+        <Grid item xs={6} md={4} lg={3}>
+          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+            <Card className={classes.prevent}>
+              <Typography className={classes.preventlabel}>Social Context (9)</Typography>
+              <Box>
+                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+              </Box>
+            </Card>
+          </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchSection("env_context")}>
-          <Card className={classes.prevent}>
-            <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
-            <Box>
-              <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-            </Box>
-          </Card>
+        <Grid item xs={6} md={4} lg={3}>
+          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+            <Card className={classes.prevent}>
+              <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
+              <Box>
+                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+              </Box>
+            </Card>
+          </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchSection("step_count")}>
-          <Card className={classes.prevent}>
-            <Typography className={classes.preventlabel}>Step Count(5)</Typography>
-            <Box mt={3} mb={1} className={classes.maxw150}>
-              <Sparkline
-                ariaLabel="Step count"
-                margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                width={126}
-                height={70}
-                data={[30, 250, 70, 135, 25, 20, 115]}
-                valueAccessor={(datum) => datum}
-              >
-                <LineSeries
-                  showArea={true}
-                  fill={`url(#gradient)`}
-                  stroke="#3C5DDD"
-                  strokeWidth={2}
-                  strokeLinecap="butt"
-                />
-              </Sparkline>
-            </Box>
-          </Card>
+        <Grid item xs={6} md={4} lg={3}>
+          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+            <Card className={classes.prevent}>
+              <Typography className={classes.preventlabel}>Step Count(5)</Typography>
+              <Box mt={3} mb={1} className={classes.maxw150}>
+                <Sparkline
+                  ariaLabel="Step count"
+                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                  width={126}
+                  height={70}
+                  data={[30, 250, 70, 135, 25, 20, 115]}
+                  valueAccessor={(datum) => datum}
+                >
+                  <LineSeries
+                    showArea={true}
+                    fill={`url(#gradient)`}
+                    stroke="#3C5DDD"
+                    strokeWidth={2}
+                    strokeLinecap="butt"
+                  />
+                </Sparkline>
+              </Box>
+            </Card>
+          </Link>
         </Grid>
       </Grid>
-      <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!launchSection}
-        onClose={() => {
-          setLaunchSection(undefined)
-        }}
-      >
-        {
-          <PreventData
-            id={participant.id}
-            type={launchSection}
-            sensorEvents={sensorEvents}
-            activityEvents={activityEvents}
-          />
-        }
-      </ResponsiveDialog>
+
       <Dialog
         open={open}
         onClose={handleClose}
+        scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
         className={classes.activitydatapop}
@@ -471,11 +470,11 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box mb={4}>
+          <Box mt={2}>
             <Typography>Choose the data you want to see in your dashboard.</Typography>
           </Box>
+        </DialogTitle>
+        <DialogContent dividers={false}>
           {dialogueType === 0 ? (
             <MultipleSelect
               selected={selectedActivities}
@@ -493,12 +492,14 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               onChange={(x) => setSelectedSensors(x)}
             />
           )}
-          <Box textAlign="center" mt={3} mb={3}>
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="center" width={1} mt={1} mb={1}>
             <Button onClick={handleClose} color="primary">
               Done
             </Button>
           </Box>
-        </DialogContent>
+        </DialogActions>
       </Dialog>
     </Container>
   )

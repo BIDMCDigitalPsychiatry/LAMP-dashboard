@@ -1,6 +1,6 @@
 import React from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Paper, Grid, Box } from "@material-ui/core"
+import { Paper, Grid, Box, useMediaQuery, useTheme } from "@material-ui/core"
 
 import classnames from "classnames"
 
@@ -59,6 +59,7 @@ export default function WeekView() {
   const classes = useStyles()
   const days = getDays()
   const dates = getDates()
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   let grids = []
   let i = 1
   for (let day of days) {
@@ -76,7 +77,12 @@ export default function WeekView() {
     i++
   }
   return (
-    <Box mt={2}>
+    <Box
+      mt={2}
+      style={{
+        marginLeft: supportsSidebar ? 64 : undefined,
+      }}
+    >
       <Grid container spacing={0}>
         {grids}
       </Grid>

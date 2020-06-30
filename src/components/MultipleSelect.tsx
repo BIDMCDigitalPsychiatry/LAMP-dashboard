@@ -13,14 +13,16 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     multiselect: {
       border: "1px solid #C6C6C6",
-      background: "#fff",
+      background: "#FFFFFF",
       color: "rgba(0, 0, 0, 0.4)",
+      "&:focus": { background: "#FFFFFF !important" },
     },
-    multiselectdelete: {
-      background: "#ECF4FF",
+    multiselectPrimary: {
+      background: "#ECF4FF !important",
       border: 0,
       color: "rgba(0, 0, 0, 0.75)",
-      "&:focus": { background: "#ECF4FF" },
+      fontWeight: 500,
+      "&:focus": { background: "#ECF4FF !important" },
     },
   })
 )
@@ -44,7 +46,7 @@ export default function MultipleSelect({ ...props }) {
           title={(props.tooltips || {})[item] || props.defaultTooltip || item}
         >
           <Chip
-            classes={{ root: classes.multiselect, colorPrimary: classes.multiselectdelete }}
+            classes={{ root: classes.multiselect, colorPrimary: classes.multiselectPrimary }}
             label={
               <section>
                 {item}
@@ -54,13 +56,8 @@ export default function MultipleSelect({ ...props }) {
             color={(props.selected || []).indexOf(item) >= 0 ? "primary" : undefined}
             onClick={
               (props.selected || []).indexOf(item) >= 0
-                ? () => {}
+                ? () => props.onChange((props.selected || []).filter((x) => x !== item))
                 : () => props.onChange(!!props.singleSelect ? [item] : [...(props.selected || []), item])
-            }
-            onDelete={
-              (props.selected || []).indexOf(item) < 0
-                ? undefined
-                : () => props.onChange((props.selected || []).filter((x) => x !== item))
             }
           />
         </Tooltip>

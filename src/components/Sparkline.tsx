@@ -178,8 +178,8 @@ export default withParentSize(function Sparkline({ ...props }) {
           eventTriggerRefs={props.eventTriggerRefs}
           margin={{
             top: 8,
-            left: 50,
-            right: !!props.YAxisLabel ? 46 : 0,
+            left: 45,
+            right: 20,
             bottom: !!props.XAxisLabel ? 50 : 0,
           }}
           onClick={({ datum }) => !!props.onClick && props.onClick(datum)}
