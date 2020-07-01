@@ -47,6 +47,8 @@ function PageTitle({ children, ...props }) {
 
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+
+  // To set page titile for active tab for menu
   let activeTab = (newTab?: any) => {
     setState((state) => ({
       ...state,
@@ -236,17 +238,7 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
-      {/* Route vega-graph for showing Vega graphs. */}
-      {/* <Route
-        exact
-        path="/vega-graph"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Graphs</PageTitle>
-            <VegaGraph goBack={props.history.goBack} />
-          </React.Fragment>
-        )}
-      /> */}
+      {/* Route home screen. */}
       <Route
         exact
         path="/"
@@ -269,6 +261,7 @@ function AppRouter({ ...props }) {
           )
         }
       />
+      {/* Route Today's tip page. */}
       <Route
         exact
         path="/tip"
@@ -279,6 +272,7 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
+      {/* Route feed page */}
       <Route
         exact
         path="/Feed"
@@ -289,6 +283,7 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
+      {/* Route prevent-tab inner page ; done with static data for now. */}
       <Route
         exact
         path="/participant/:id/prevent-data"
@@ -336,39 +331,6 @@ function AppRouter({ ...props }) {
           )
         }
       />
-      {/* <Route
-        exact
-        path="/participant/:id/prevent-data"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | Login</PageTitle>
-              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                <Login
-                  setIdentity={async (identity) => await reset(identity)}
-                  lastDomain={state.lastDomain}
-                  onComplete={() => props.history.replace("/")}
-                />
-              </NavigationLayout>
-            </React.Fragment>
-          ) : !getParticipant(props.match.params.id) ? (
-            <React.Fragment />
-          ) : (
-            <React.Fragment>
-              <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
-              <NavigationLayout
-                id={props.match.params.id}
-                title={`Patient ${getParticipant(props.match.params.id).id}`}
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-                activeTab={state.activeTab}
-              >
-                <PreventData />
-              </NavigationLayout>
-            </React.Fragment>
-          )
-        }
-      /> */}
 
       {/* Route authenticated routes. */}
       <Route

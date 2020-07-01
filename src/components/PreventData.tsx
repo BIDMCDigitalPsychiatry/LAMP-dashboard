@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React from "react"
 import {
   Typography,
   makeStyles,
@@ -12,8 +12,6 @@ import {
   TableCell,
   TableContainer,
   TableRow,
-  Paper,
-  Card,
   CardContent,
   Container,
 } from "@material-ui/core"
@@ -69,10 +67,10 @@ function createData(dateVal: string, timeVal: string, value: number) {
 
 const rows = [
   createData("Oct 7", "5.56pm", 11),
-  createData("Oct 6", "5.56pm", 11),
-  createData("Oct 7", "5.56pm", 11),
-  createData("Oct 7", "5.56pm", 11),
-  createData("Oct 7", "5.56pm", 11),
+  createData("Oct 6", "6.00pm", 21),
+  createData("Oct 5", "6.50pm", 16),
+  createData("Sep 30", "4.00pm", 7),
+  createData("Sep 15", "3.30pm", 10),
 ]
 
 export default function PreventData({ ...props }) {

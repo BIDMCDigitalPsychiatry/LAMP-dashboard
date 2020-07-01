@@ -1,16 +1,11 @@
 import React from "react"
 import {
-  Container,
   Typography,
   makeStyles,
   createStyles,
   Theme,
-  CardActions,
-  Card,
   IconButton,
-  CardActionArea,
   CardContent,
-  Link,
   Button,
   Grid,
   Box,
@@ -100,7 +95,6 @@ export default function TipNotification() {
     <div>
       <div className={classes.header}>
         <SadHappy className={classes.topicon} />
-
         <Typography variant="h2">Todays's Tip : Mood</Typography>
       </div>
 

@@ -1,26 +1,9 @@
-// Core Imports
-import React, { useState, useEffect } from "react"
-import {
-  Box,
-  Avatar,
-  Container,
-  Typography,
-  Divider,
-  Button,
-  Link,
-  makeStyles,
-  createStyles,
-  Grid,
-} from "@material-ui/core"
-import { useSnackbar } from "notistack"
-import LAMP from "lamp-core"
+import React from "react"
+import { Typography, Button, Link, makeStyles, createStyles, Grid } from "@material-ui/core"
 import { Link as Linkref } from "react-router-dom"
-import { ReactComponent as Logo } from "../icons/logo.svg"
+import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
-
-// Local Imports
-import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,25 +49,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-// const useStyles = makeStyles(() => createStyles({} as any))
 export default function Home() {
-  const [srcLocked, setSrcLocked] = useState(false)
-  const [tryitMenu, setTryitMenu] = useState<Element>()
-  const [helpMenu, setHelpMenu] = useState<Element>()
-  const { enqueueSnackbar } = useSnackbar()
-
-  useEffect(() => {}, [])
-
   const classes = useStyles()
+
   return (
     <Grid container direction="row" justify="center" alignItems="center" style={{ height: "100vh" }}>
       <Grid item className={classes.loginmain}>
         <div>
-          {" "}
           <Logo />
         </div>
         <div className={classes.logotext}>
-          {" "}
           <Logotext />
         </div>
         <Grid container spacing={0}>
@@ -93,7 +67,6 @@ export default function Home() {
           <Grid item xs={3} className={classes.linered}></Grid>
           <Grid item xs={3} className={classes.lineblue}></Grid>
         </Grid>
-
         <Button component={Linkref} to="/login" variant="contained" color="primary" className={classes.btnprimary}>
           Login
         </Button>

@@ -1,7 +1,6 @@
 import React from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Paper, Grid, Box, useMediaQuery, useTheme } from "@material-ui/core"
-
 import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -44,38 +43,50 @@ function range(start, end) {
 }
 function currentDay() {
   let date = new Date()
-  console.log(date.getDay())
   return date.getDay()
 }
 
 function getDates() {
-  let date = new Date()
-  let day = date.getDay()
-  let dateNo = date.getDate()
-  return range(dateNo - day + 1, dateNo - day + 8)
+  let curr = new Date()
+  let week = []
+  let first = curr.getDate() - curr.getDay() + 7
+  let day = new Date(curr.setDate(first))
+  week.push(day.getDate())
+  curr = new Date()
+  for (let i = 1; i < 7; i++) {
+    first = curr.getDate() - curr.getDay() + i
+    let day = new Date(curr.setDate(first))
+    week.push(day.getDate())
+  }
+  return week
 }
 
 export default function WeekView() {
   const classes = useStyles()
-  const days = getDays()
-  const dates = getDates()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  let grids = []
-  let i = 1
-  for (let day of days) {
-    i = i == 7 ? 0 : i
-    const selectedClass = i == currentDay() ? classes.selected : ""
-    let classNameVal = classnames(selectedClass, classes.paper)
-    grids.push(
-      <Grid item xs>
-        <Paper className={classNameVal}>
-          <Box component="span"> {day}</Box>
-          {dates[i]}
-        </Paper>
-      </Grid>
-    )
-    i++
+
+  let dateView = () => {
+    const days = getDays()
+    const dates = getDates()
+    let grids = []
+    let i = 1
+    for (let day of days) {
+      i = i == 7 ? 0 : i
+      const selectedClass = i == currentDay() ? classes.selected : ""
+      let classNameVal = classnames(selectedClass, classes.paper)
+      grids.push(
+        <Grid item xs>
+          <Paper className={classNameVal}>
+            <Box component="span">{day}</Box>
+            {dates[i]}
+          </Paper>
+        </Grid>
+      )
+      i++
+    }
+    return grids
   }
+
   return (
     <Box
       mt={2}
@@ -84,7 +95,7 @@ export default function WeekView() {
       }}
     >
       <Grid container spacing={0}>
-        {grids}
+        {dateView()}
       </Grid>
     </Box>
   )

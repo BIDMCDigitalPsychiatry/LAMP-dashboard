@@ -25,7 +25,7 @@ import {
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as Message } from "../icons/message.svg"
+import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"

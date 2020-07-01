@@ -17,8 +17,6 @@ import {
   PatternLines,
 } from "@data-ui/xy-chart"
 
-// TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot
-
 function PaperTooltip({ top, left, ...props }) {
   return (
     <Box clone displayPrint="none">

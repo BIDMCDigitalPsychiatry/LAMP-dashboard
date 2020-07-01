@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { StepConnector } from "@material-ui/core"
 
 import {
-  BottomNavigationAction,
-  Slide,
-  Drawer,
   Card,
   Step,
   Stepper,
   StepLabel,
   Paper,
   Typography,
-  CardContent,
-  Icon,
   Box,
   IconButton,
   Container,
@@ -28,11 +23,11 @@ import {
 
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as Medication } from "../icons/Medicationsm.svg"
-import { ReactComponent as PencilPaper } from "../icons/pencil_paper.svg"
+import { ReactComponent as PencilPaper } from "../icons/PencilPaper.svg"
 import { ReactComponent as SadBoard } from "../icons/SadBoard.svg"
 import { ReactComponent as LineGraph } from "../icons/LineGraph.svg"
 
-import { ReactComponent as Message } from "../icons/message.svg"
+import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import WeekView from "./WeekView"
 import BottomMenu from "./BottomMenu"
@@ -96,6 +91,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     image: {
       width: 65,
+      marginRight: "10px",
     },
     feedtasks: {
       "& h5": {
@@ -166,7 +162,6 @@ function getSteps(classes: any) {
     { type: "manage", time: "8.30am", title: "Daily journal entry", icon: "pencil", description: "" },
     { type: "assess", time: "8.30am", title: "Anxiety survey", icon: "board", description: "10mins" },
     { type: "prevent", time: "8.30am", title: "Review today’s stats", icon: "linegraph", description: "" },
-    { type: "learn", time: "8.30am", title: "Today's tip", icon: "sad-happy", description: "" },
   ]
   let stepData = []
   Object.keys(feedData).forEach((key) => {
@@ -191,6 +186,7 @@ function getSteps(classes: any) {
             {feedData[key].icon === "sad-happy" && <SadHappy />}
             {feedData[key].icon === "medication" && <Medication />}
             {feedData[key].icon === "pencil" && <PencilPaper />}
+            {/* {feedData[key].icon === "board" && <PencilPaper />} */}
             {feedData[key].icon === "board" && <SadBoard />}
             {feedData[key].icon === "linegraph" && <LineGraph />}
           </Grid>

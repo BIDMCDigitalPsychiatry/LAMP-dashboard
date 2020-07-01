@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { scaleOrdinal } from "@vx/scale"
 
-import { color as colors } from "@data-ui/theme"
 import { RadialChart, ArcSeries, ArcLabel } from "@data-ui/radial-chart"
 
 const colorScale = scaleOrdinal({ range: ["#CFE3FF", "#7DB2FF", "#5784EE", "#3C5DDD"] })

@@ -1,7 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-
 import {
   Container,
   Box,
@@ -13,13 +12,11 @@ import {
   useTheme,
   useMediaQuery,
   Tooltip,
-  BottomNavigationAction,
   Slide,
   Typography,
   Card,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 // Local Imports
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
@@ -38,7 +35,6 @@ import MoodTipsSection from "./MoodTips"
 import SleepTipsSecion from "./SleepTips"
 import SocialTips from "./SocialTips"
 import Hopebox from "./Hopebox"
-import ParticipantData from "./ParticipantData"
 import BookRecommendations from "./BookRecommendations"
 import Definitions from "./Definitions"
 import PhysicalTips from "./PhysicalTips"
@@ -49,13 +45,11 @@ import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as Book } from "../icons/Book.svg"
 import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
 import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
-
 import { ReactComponent as Chat } from "../icons/Chat.svg"
 import { ReactComponent as Wellness } from "../icons/Wellness.svg"
 import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Surveys } from "../icons/Surveys.svg"
-import { ReactComponent as Hope } from "../icons/Hope.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
@@ -63,22 +57,11 @@ import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
 import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
-
 import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
 import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
-
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
-
 import { ReactComponent as Medication } from "../icons/Medication.svg"
-import { ReactComponent as Learn } from "../icons/learn.svg"
-import { ReactComponent as Assess } from "../icons/assess.svg"
-import { ReactComponent as Manage } from "../icons/manage.svg"
-import { ReactComponent as PreventIcon } from "../icons/prevent.svg"
-import { ReactComponent as Data1 } from "../icons/Data1.svg"
-import { ReactComponent as Data2 } from "../icons/Data2.svg"
-import { ReactComponent as SocialContext } from "../icons/SocialContext.svg"
-import { ReactComponent as EnvContext } from "../icons/EnvContext.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -301,7 +284,6 @@ export default function Participant({ participant, ...props }: { participant: Pa
   const [visibleActivities, setVisibleActivities] = useState([])
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
-  const [lastTab, _setLastTab] = useState(_patientMode() ? 1 : 3)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const [openDialog, setOpen] = useState(false)
@@ -309,17 +291,11 @@ export default function Participant({ participant, ...props }: { participant: Pa
   const classes = useStyles()
 
   let activeTab = (newTab?: any) => {
-    _setLastTab(tab)
     _setTab(newTab)
     const tabName = getTabName(newTab)
     props.activeTab(tabName)
   }
-  // const setTab = (newTab) => {
-  //   _setLastTab(tab)
-  //   _setTab(newTab)
-  //   const tabName = getTabName(newTab)
-  //
-  // }
+
   const getTabName = (newTab: number) => {
     let tabName = ""
     switch (newTab) {
@@ -379,7 +355,6 @@ export default function Participant({ participant, ...props }: { participant: Pa
       })),
     }))
 
-    //
     Promise.all(
       events
         .filter((x) => x.temporal_slices.length > 0)

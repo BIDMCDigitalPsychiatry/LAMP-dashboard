@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React from "react"
 import {
   Container,
   Typography,
@@ -13,9 +13,8 @@ import {
   Button,
   DialogActions,
 } from "@material-ui/core"
-// import { browserHistory } from 'react-router';
 
-import { Sparkline, LineSeries } from "@data-ui/sparkline"
+import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP, {
@@ -27,8 +26,6 @@ import LAMP, {
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
-// import PreventData from "./PreventData"
-import ResponsiveDialog from "./ResponsiveDialog"
 import { Link as RouterLink } from "react-router-dom"
 import Link from "@material-ui/core/Link"
 
@@ -250,6 +247,7 @@ async function getActivityEvents(
   ])
   return Object.fromEntries([...Object.entries(original), ...customGroups])
 }
+
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
   let custom =
@@ -288,20 +286,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
-  const [launchSection, setLaunchSection] = useState<string>()
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
     setOpen(true)
   }
-  const LinearGradientFill = (stopColor) => {
-    return (
-      <linearGradient id="gradient" gradientTransform="rotate(90)">
-        <stop offset="80%" stopColor="white" stopOpacity="100%" />
-        <stop offset="100%" stopColor="white" stopOpacity="0%" />
-      </linearGradient>
-    )
-  }
+
   const handleClose = () => {
     setOpen(false)
   }
@@ -311,7 +301,6 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const [activities, setActivities] = React.useState([])
   const [sensorEvents, setSensorEvents] = React.useState({})
   const [selectedSensors, setSelectedSensors] = React.useState([])
-  const [activityEvents, setActivityEvents] = React.useState({})
   const [sensorCounts, setSensorCounts] = React.useState({})
 
   React.useEffect(() => {
@@ -319,7 +308,6 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       let activities = await getActivities(participant)
       setActivities(activities)
       let activityEvents = await getActivityEvents(participant, activities)
-      setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
       setActivityCounts(activityEventCount)
       let sensorEvents = await getSensorEvents(participant)
@@ -328,6 +316,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       setSensorCounts(sensorEventCount)
     })()
   }, [])
+
   return (
     <Container>
       <Grid container xs={12} spacing={0} className={classes.activityhd}>
@@ -354,11 +343,16 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                   data={[50, 100, 5, 75, 200, 15]}
                   valueAccessor={(datum) => datum}
                 >
-                  <svg>
-                    <defs>
-                      <LinearGradientFill />
-                    </defs>
-                  </svg>
+                  <LinearGradient
+                    id="gredient"
+                    from="#ECF4FF"
+                    to="#FFFFFF"
+                    fromOffset="30%"
+                    fromOpacity="1"
+                    toOpacity="1"
+                    toOffset="100%"
+                    rotate={90}
+                  />
                   <LineSeries
                     showArea={true}
                     fill={`url(#gradient)`}
