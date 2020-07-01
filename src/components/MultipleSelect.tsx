@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     multiselectPrimary: {
       background: "#ECF4FF !important",
-      border: 0,
+      border: "1px solid #ECF4FF",
       color: "rgba(0, 0, 0, 0.75)",
       fontWeight: 500,
       "&:focus": { background: "#ECF4FF !important" },
