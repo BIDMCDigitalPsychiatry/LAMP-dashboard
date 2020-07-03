@@ -21,8 +21,11 @@ import { useSnackbar } from "notistack"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Messages from "./Messages"
-import Launcher from "./Launcher"
+import { Link as RouterLink } from "react-router-dom"
+import Link from "@material-ui/core/Link"
+import SurveyPage from "./SurveyPage"
 import Survey from "./Survey"
+
 import ResponsiveDialog from "./ResponsiveDialog"
 import Breathe from "./Breathe"
 import Prevent from "./Prevent"
@@ -240,7 +243,7 @@ function SurveyInstrument({ id, group, onComplete, ...props }) {
     <Box py={8} px={2}>
       <Grid container direction="row">
         <Grid item style={{ width: "100%" }}>
-          <Survey
+          <SurveyPage
             validate
             partialValidationOnly
             content={survey}
@@ -460,48 +463,52 @@ export default function Participant({ participant, ...props }: { participant: Pa
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Container>
-            <Grid container spacing={2}>
+          <Survey participant={participant} />
+          {/* <Container> */}
+
+          {/* <Grid container spacing={2}>
               {[
                 ...(activities || [])
                   .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
                   .map((y) => (
-                    <Grid item xs={3}>
-                      <Launcher.Button
-                        key={y.name}
-                        notification
-                        title={y.name}
-                        icon={<Surveys style={{ width: "100%", height: "100%" }} />}
-                        onClick={() =>
-                          setVisibleActivities(
-                            (activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
-                          )
-                        }
-                      />
-                    </Grid>
+                    <Grid item xs={3}>sdf</Grid>
+                    //   <Launcher.Button
+                    //     key={y.name}
+                    //     notification
+                    //     title={y.name}
+                    //     icon={<Surveys style={{ width: "100%", height: "100%" }} />}
+                    //     onClick={() =>
+                    //       setVisibleActivities(
+                    //         (activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
+                    //       )
+                    //     }
+                    //   />
+                    // sdf</Grid>
                   )),
                 ...(activities || [])
                   .filter(
                     (x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
                   )
                   .map((y) => (
-                    <Grid item xs={6} md={4} lg={3} onClick={() => setVisibleActivities([y])}>
-                      <Card className={classes.assess}>
-                        <Box mt={1} mb={1}>
-                          {y.name == "Mood" && <AssessMood />}
-                          {y.name == "Sleep and Social" && <AssessSleep />}
-                          {y.name == "Anxiety" && <AssessAnxiety />}
-                          {y.name == "App Usability" && <AssessUsability />}
-                          {y.name == "Water and Nutrition" && <AssessNutrition />}
-                          {y.name == "Psychosis and Social" && <AssessSocial />}
-                        </Box>
-                        <Typography className={classes.cardlabel}>{y.name}</Typography>
-                      </Card>
-                    </Grid>
+                    // <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+                      <Grid item xs={6} md={4} lg={3} onClick={() => setVisibleActivities([y])}>
+                        <Card className={classes.assess}>
+                          <Box mt={1} mb={1}>
+                            {y.name == "Mood" && <AssessMood />}
+                            {y.name == "Sleep and Social" && <AssessSleep />}
+                            {y.name == "Anxiety" && <AssessAnxiety />}
+                            {y.name == "App Usability" && <AssessUsability />}
+                            {y.name == "Water and Nutrition" && <AssessNutrition />}
+                            {y.name == "Psychosis and Social" && <AssessSocial />}
+                          </Box>
+                          <Typography className={classes.cardlabel}>{y.name}</Typography>
+                        </Card>
+                      </Grid>
+                    // </Link>
                   )),
               ]}
-            </Grid>
-          </Container>
+            </Grid> */}
+          {/* </Container> */}
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
@@ -580,7 +587,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
       >
         {
           {
-            survey: <SurveyInstrument id={participant.id} group={visibleActivities} onComplete={submitSurvey} />,
+            // survey: <SurveyInstrument id={participant.id} group={visibleActivities} onComplete={submitSurvey} />,
             breathe: <Breathe onComplete={() => setLaunchedActivity(undefined)} />,
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,

@@ -331,7 +331,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       </Grid>
       <Grid container spacing={2}>
         <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+          <Link component={RouterLink} to={`/participant/me/prevent-data/mood`} underline="none">
             <Card className={classes.prevent}>
               <Typography className={classes.preventlabel}>Mood (23)</Typography>
               <Box mt={3} mb={1} className={classes.maxw150}>
@@ -366,7 +366,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Link>
         </Grid>
         <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+          <Link component={RouterLink} to={`/participant/me/prevent-data/sleep_social`} underline="none">
             <Card className={classes.prevent}>
               <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
               <Box mt={3} mb={1} className={classes.maxw150}>
@@ -405,7 +405,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
 
       <Grid container spacing={2}>
         <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+          <Link component={RouterLink} to={`/participant/me/prevent-data/social_context`} underline="none">
             <Card className={classes.prevent}>
               <Typography className={classes.preventlabel}>Social Context (9)</Typography>
               <Box>
@@ -415,7 +415,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Link>
         </Grid>
         <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+          <Link component={RouterLink} to={`/participant/me/prevent-data/environmental_context`} underline="none">
             <Card className={classes.prevent}>
               <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
               <Box>
@@ -425,7 +425,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Link>
         </Grid>
         <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
+          <Link component={RouterLink} to={`/participant/me/prevent-data/step_count`} underline="none">
             <Card className={classes.prevent}>
               <Typography className={classes.preventlabel}>Step Count(5)</Typography>
               <Box mt={3} mb={1} className={classes.maxw150}>

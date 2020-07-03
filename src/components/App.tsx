@@ -219,6 +219,16 @@ function AppRouter({ ...props }) {
     return null
   }
 
+  const titlecase = (str) => {
+    return str
+      .toLowerCase()
+      .split("_")
+      .map(function (word) {
+        return word.replace(word[0], word[0].toUpperCase())
+      })
+      .join(" ")
+  }
+
   const promptInstall = () => {
     if (deferredPrompt === null) return
     deferredPrompt.prompt()
@@ -238,30 +248,6 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
-      {/* Route home screen. */}
-      <Route
-        exact
-        path="/"
-        render={(props) =>
-          !(window.location.hash.split("?").length > 1 && !state.identity) ? (
-            !state.identity ? (
-              <React.Fragment>
-                <PageTitle>mindLAMP | Home</PageTitle>
-                <Home />
-              </React.Fragment>
-            ) : state.authType === "admin" ? (
-              <Redirect to="/researcher" />
-            ) : state.authType === "researcher" ? (
-              <Redirect to="/researcher/me" />
-            ) : (
-              <Redirect to="/participant/me" />
-            )
-          ) : (
-            <React.Fragment />
-          )
-        }
-      />
-      {/* Route Today's tip page. */}
       <Route
         exact
         path="/tip"
@@ -283,21 +269,24 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
+
       {/* Route prevent-tab inner page ; done with static data for now. */}
       <Route
         exact
-        path="/participant/:id/prevent-data"
+        path="/participant/:id/prevent-data/:type"
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Prevent</PageTitle>
             <NavigationLayout
               id={props.match.params.id}
-              title={`Patient ${getParticipant(props.match.params.id).id}`}
+              title={
+                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
+              }
               goBack={props.history.goBack}
               onLogout={() => reset()}
-              activeTab="Mood"
+              activeTab={`${titlecase(props.match.params.type)}`}
             >
-              <PreventData />
+              <PreventData type={props.match.params.type} />
             </NavigationLayout>
           </React.Fragment>
         )}
@@ -305,7 +294,7 @@ function AppRouter({ ...props }) {
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
-        path="/Login"
+        path="/"
         render={(props) =>
           !(window.location.hash.split("?").length > 1 && !state.identity) ? (
             !state.identity ? (

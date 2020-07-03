@@ -2,22 +2,84 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
-  Typography,
   TextField,
   Button,
-  Avatar,
   Slide,
   Menu,
   MenuItem,
   Icon,
   IconButton,
   colors,
+  Grid,
+  makeStyles,
+  createStyles,
+  Link,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
+import { Link as RouterLink } from "react-router-dom"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
+import { ReactComponent as Logo } from "../icons/Logo.svg"
+import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
+import { Theme } from "@material-ui/core/styles"
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    loginmain: {
+      textAlign: "center",
+    },
+    btnprimary: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      minWidth: "45%",
+      boxShadow: " 0px 10px 15px rgba(96, 131, 231, 0.2)",
+      lineHeight: "38px",
+      fontFamily: "inter",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      float: "right",
+      cursor: "pointer",
+    },
+    btnTry: {
+      borderRadius: "40px",
+      minWidth: "45%",
+      boxShadow: " 0px 10px 15px rgba(96, 131, 231, 0.2)",
+      lineHeight: "38px",
+      fontFamily: "inter",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      float: "left",
+      cursor: "pointer",
+    },
+    register: {
+      color: "#6083E7",
+      marginTop: "20px",
+      display: "block",
+      fontFamily: "inter",
+    },
+    lineyellow: {
+      background: "#FFD645",
+      height: "6px",
+    },
+    linegreen: {
+      background: "#65CEBF",
+      height: "6px",
+    },
+    linered: {
+      background: "#FF775B",
+      height: "6px",
+    },
+    lineblue: {
+      background: "#86B6FF",
+      height: "6px",
+    },
+    logotext: {
+      margin: "25px 0 10px 0",
+    },
+  })
+)
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
@@ -25,6 +87,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -85,7 +148,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           margin: "0 auto",
         }}
       >
-        <ResponsivePaper elevation={12} style={{ padding: "16px" }}>
+        <ResponsivePaper elevation={12} style={{ padding: "16px", minHeight: "600px" }}>
           <IconButton
             style={{ position: "absolute", top: 8, right: 8 }}
             onClick={(event) => setHelpMenu(event.currentTarget)}
@@ -127,12 +190,20 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               </MenuItem>
             </Menu>
           </IconButton>
-          <Avatar alt="mindLAMP" src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin: "auto" }} />
-          <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
-            mindLAMP
-          </Typography>
           <form onSubmit={(e) => handleLogin(e)}>
-            <Box>
+            <Box className={classes.loginmain}>
+              <div>
+                <Logo height="70px" />
+              </div>
+              <div className={classes.logotext}>
+                <Logotext />
+              </div>
+              <Grid container spacing={0} style={{ marginBottom: "20px" }}>
+                <Grid item xs={3} className={classes.lineyellow}></Grid>
+                <Grid item xs={3} className={classes.linegreen}></Grid>
+                <Grid item xs={3} className={classes.linered}></Grid>
+                <Grid item xs={3} className={classes.lineblue}></Grid>
+              </Grid>
               <TextField
                 margin="dense"
                 size="small"
@@ -178,7 +249,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               <Button
                 variant="outlined"
                 color="default"
-                style={{ width: "45%" }}
+                style={{ float: "left" }}
+                className={classes.btnTry}
                 onClick={(event) => setTryitMenu(event.currentTarget)}
               >
                 Try It
@@ -231,7 +303,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 variant="contained"
                 color="primary"
                 type="submit"
-                style={{ float: "right", width: "45%" }}
+                className={classes.btnprimary}
                 onClick={handleLogin}
               >
                 Login
