@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Box, useMediaQuery, useTheme, Drawer, BottomNavigationAction } from "@material-ui/core"
 import { ReactComponent as Learn } from "../icons/Learn.svg"

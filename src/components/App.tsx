@@ -18,7 +18,7 @@ import Login from "./Login"
 import Home from "./Home"
 import TipNotification from "./TipNotification"
 import Feed from "./Feed"
-
+import SurveyQuestions from "./SurveyQuestions"
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
@@ -44,7 +44,9 @@ function PageTitle({ children, ...props }) {
   })
   return <React.Fragment />
 }
-
+function _patientMode() {
+  return LAMP.Auth._type === "participant"
+}
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
 
@@ -269,6 +271,16 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
+      <Route
+        exact
+        path="/participant/:id/survey/:type"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Survey</PageTitle>
+            <SurveyQuestions type={props.match.params.type} goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
 
       {/* Route prevent-tab inner page ; done with static data for now. */}
       <Route
@@ -410,7 +422,11 @@ function AppRouter({ ...props }) {
                 onLogout={() => reset()}
                 activeTab={state.activeTab}
               >
-                <Participant participant={getParticipant(props.match.params.id)} activeTab={activeTab} />
+                <Participant
+                  participant={getParticipant(props.match.params.id)}
+                  activeTab={activeTab}
+                  tabValue={state.activeTab}
+                />
               </NavigationLayout>
             </React.Fragment>
           )

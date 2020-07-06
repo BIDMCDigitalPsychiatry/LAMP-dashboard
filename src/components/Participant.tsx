@@ -58,12 +58,7 @@ import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
-import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
-import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
-import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
-import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
-import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
+
 import { ReactComponent as Medication } from "../icons/Medication.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -281,22 +276,50 @@ function SurveyInstrument({ id, group, onComplete, ...props }) {
   )
 }
 
-export default function Participant({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Participant({
+  participant,
+  ...props
+}: {
+  participant: ParticipantObj
+  activeTab: Function
+  tabValue: string
+}) {
   const [activities, setActivities] = useState([])
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
+
+  const getTab = () => {
+    let tabNum
+    switch (props.tabValue) {
+      case "Learn":
+        tabNum = 0
+        break
+      case "Assess":
+        tabNum = 1
+        break
+      case "Manage":
+        tabNum = 2
+        break
+      case "Prevent":
+        tabNum = 3
+        break
+      default:
+        tabNum = _patientMode() ? 1 : 3
+        break
+    }
+    return tabNum
+  }
+
+  const [tab, _setTab] = useState(getTab())
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const classes = useStyles()
 
-  let activeTab = (newTab?: any) => {
-    _setTab(newTab)
-    const tabName = getTabName(newTab)
-    props.activeTab(tabName)
+  const tabDirection = (currentTab) => {
+    return supportsSidebar ? "up" : "left"
   }
 
   const getTabName = (newTab: number) => {
@@ -317,9 +340,6 @@ export default function Participant({ participant, ...props }: { participant: Pa
     }
     return tabName
   }
-  const tabDirection = (currentTab) => {
-    return supportsSidebar ? "up" : "left"
-  }
 
   useEffect(() => {
     const tabName = getTabName(tab)
@@ -329,6 +349,12 @@ export default function Participant({ participant, ...props }: { participant: Pa
     getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
+
+  const activeTab = (newTab) => {
+    _setTab(newTab)
+    const tabName = getTabName(newTab)
+    props.activeTab(tabName)
+  }
 
   const hideEvent = async (timestamp?: number, activity?: string) => {
     if (timestamp === undefined && activity === undefined) {
@@ -464,51 +490,6 @@ export default function Participant({ participant, ...props }: { participant: Pa
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Survey participant={participant} />
-          {/* <Container> */}
-
-          {/* <Grid container spacing={2}>
-              {[
-                ...(activities || [])
-                  .filter((x) => x.spec === "lamp.group" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-                  .map((y) => (
-                    <Grid item xs={3}>sdf</Grid>
-                    //   <Launcher.Button
-                    //     key={y.name}
-                    //     notification
-                    //     title={y.name}
-                    //     icon={<Surveys style={{ width: "100%", height: "100%" }} />}
-                    //     onClick={() =>
-                    //       setVisibleActivities(
-                    //         (activities ?? []).filter((x) => x.spec === "lamp.survey" && y.settings.includes(x.id))
-                    //       )
-                    //     }
-                    //   />
-                    // sdf</Grid>
-                  )),
-                ...(activities || [])
-                  .filter(
-                    (x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true)
-                  )
-                  .map((y) => (
-                    // <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
-                      <Grid item xs={6} md={4} lg={3} onClick={() => setVisibleActivities([y])}>
-                        <Card className={classes.assess}>
-                          <Box mt={1} mb={1}>
-                            {y.name == "Mood" && <AssessMood />}
-                            {y.name == "Sleep and Social" && <AssessSleep />}
-                            {y.name == "Anxiety" && <AssessAnxiety />}
-                            {y.name == "App Usability" && <AssessUsability />}
-                            {y.name == "Water and Nutrition" && <AssessNutrition />}
-                            {y.name == "Psychosis and Social" && <AssessSocial />}
-                          </Box>
-                          <Typography className={classes.cardlabel}>{y.name}</Typography>
-                        </Card>
-                      </Grid>
-                    // </Link>
-                  )),
-              ]}
-            </Grid> */}
-          {/* </Container> */}
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
@@ -605,7 +586,7 @@ export default function Participant({ participant, ...props }: { participant: Pa
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
-      <BottomMenu activeTab={activeTab} />
+      <BottomMenu activeTab={activeTab} tabValue={props.tabValue} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

@@ -9,10 +9,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  IconButton,
+  CardContent,
   Button,
   DialogActions,
 } from "@material-ui/core"
+import { Link as RouterLink } from "react-router-dom"
+
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, {
   Participant as ParticipantObj,
@@ -55,6 +57,9 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+    },
+    MuiDialogPaperScrollPaper: {
+      maxHeight: "100% !important",
     },
     toolbar: {
       minHeight: 90,
@@ -113,6 +118,48 @@ const useStyles = makeStyles((theme: Theme) =>
     activitydatapop: {
       maxHeight: "70vh",
     },
+    header: {
+      background: "#E7F8F2",
+      padding: 20,
+
+      "& h2": {
+        fontSize: 25,
+        fontWeight: 600,
+        color: "rgba(0, 0, 0, 0.75)",
+      },
+    },
+    tipscontentarea: {
+      padding: 20,
+      "& h3": {
+        fontWeight: "bold",
+        fontSize: "16px",
+        marginBottom: "15px",
+      },
+      "& p": {
+        fontSize: "16px",
+        lineheight: "24px",
+
+        color: "rgba(0, 0, 0, 0.75)",
+      },
+    },
+    btngreen: {
+      background: "#92E7CA",
+      borderRadius: "40px",
+      minWidth: "200px",
+      boxShadow: " 0px 10px 15px rgba(146, 231, 202, 0.25)",
+      lineHeight: "38px",
+      marginTop: "15%",
+
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "rgba(0, 0, 0, 0.75)",
+      "&:hover": { background: "#cea000" },
+    },
+    topicon: {
+      minWidth: 200,
+      minHeight: 200,
+      marginLeft: "50px",
+    },
   })
 )
 
@@ -148,11 +195,10 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
 export default function Prevent({ participant, ...props }: { participant: ParticipantObj }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
-  const [dialogueType, setDialogueType] = React.useState(0)
+  const [dialogueType, setDialogueType] = React.useState("")
   const [activities, setActivities] = useState([])
-  const [hiddenEvents, setHiddenEvents] = React.useState([])
 
-  const handleClickOpen = (type: number) => {
+  const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
   }
@@ -160,11 +206,9 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const handleClose = () => {
     setOpen(false)
   }
-  const [visibleActivities, setVisibleActivities] = useState([])
 
   useEffect(() => {
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
-    getHiddenEvents(participant).then(setHiddenEvents)
   }, [])
 
   return (
@@ -174,8 +218,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           ...(activities || [])
             .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
             .map((y) => (
-              // <Link component={RouterLink} to={`/participant/${participant.id}/prevent-data`} underline="none">
-              <Grid item xs={6} md={4} lg={3} onClick={() => setVisibleActivities([y])}>
+              <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen(y.name)}>
                 <Card className={classes.assess}>
                   <Box mt={1} mb={1}>
                     {y.name == "Mood" && <AssessMood />}
@@ -188,7 +231,6 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                   <Typography className={classes.cardlabel}>{y.name}</Typography>
                 </Card>
               </Grid>
-              // </Link>
             )),
         ]}
       </Grid>
@@ -200,22 +242,39 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
         className={classes.activitydatapop}
+        classes={{ paperScrollPaper: classes.MuiDialogPaperScrollPaper }}
       >
         <DialogTitle id="alert-dialog-slide-title">
-          {dialogueType === 0 ? "Activity data" : "Sensor Data"}
-          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-          <Box mt={2}>
-            <Typography>Choose the data you want to see in your dashboard.</Typography>
-          </Box>
+          <div className={classes.header}>
+            {dialogueType == "Mood" && <AssessMood className={classes.topicon} />}
+            {dialogueType == "Sleep and Social" && <AssessSleep className={classes.topicon} />}
+            {dialogueType == "Anxiety" && <AssessAnxiety className={classes.topicon} />}
+            {dialogueType == "App Usability" && <AssessUsability className={classes.topicon} />}
+            {dialogueType == "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
+            {dialogueType == "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
+            <Typography variant="h6">Survey</Typography>
+            <Typography variant="h2">{dialogueType}</Typography>
+          </div>
         </DialogTitle>
-        <DialogContent dividers={false}></DialogContent>
+        <DialogContent>
+          <Typography variant="h4" gutterBottom>
+            12 questions (10 mins)
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            The following survey will assess your sleep and social behavior. For each of the statements, rate which is
+            true for you.
+          </Typography>
+        </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={1}>
-            <Button onClick={handleClose} color="primary">
-              Done
-            </Button>
+            <Link
+              component={RouterLink}
+              to={`/participant/me/survey/${dialogueType.replace(/\s/g, "_")}`}
+              underline="none"
+              className={classes.btngreen}
+            >
+              Start survey
+            </Link>
           </Box>
         </DialogActions>
       </Dialog>
