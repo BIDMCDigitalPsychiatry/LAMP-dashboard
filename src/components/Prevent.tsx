@@ -94,7 +94,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
     activitydatapop: {
-      maxHeight: "70vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    activityContent: {
+      maxHeight: "280px",
     },
   })
 )
@@ -468,7 +473,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
             <Typography>Choose the data you want to see in your dashboard.</Typography>
           </Box>
         </DialogTitle>
-        <DialogContent dividers={false}>
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           {dialogueType === 0 ? (
             <MultipleSelect
               selected={selectedActivities}

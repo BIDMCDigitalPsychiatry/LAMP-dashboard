@@ -64,6 +64,7 @@ function AppRouter({ ...props }) {
     authType: LAMP.Auth._type,
     lastDomain: undefined,
     activeTab: null,
+    surveyDone: false,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -230,6 +231,12 @@ function AppRouter({ ...props }) {
       })
       .join(" ")
   }
+  const submitSurvey = () => {
+    setState((state) => ({
+      ...state,
+      surveyDone: true,
+    }))
+  }
 
   const promptInstall = () => {
     if (deferredPrompt === null) return
@@ -277,7 +284,7 @@ function AppRouter({ ...props }) {
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Survey</PageTitle>
-            <SurveyQuestions type={props.match.params.type} goBack={props.history.goBack} />
+            <SurveyQuestions type={props.match.params.type} goBack={props.history.goBack} submitSurvey={submitSurvey} />
           </React.Fragment>
         )}
       />
@@ -426,6 +433,8 @@ function AppRouter({ ...props }) {
                   participant={getParticipant(props.match.params.id)}
                   activeTab={activeTab}
                   tabValue={state.activeTab}
+                  surveyDone={state.surveyDone}
+                  submitSurvey={submitSurvey}
                 />
               </NavigationLayout>
             </React.Fragment>

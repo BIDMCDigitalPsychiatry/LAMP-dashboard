@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
     backbtn: { paddingLeft: 0, paddingRight: 0 },
   })
 )
+
 export default function NavigationLayout({
   title,
   id,

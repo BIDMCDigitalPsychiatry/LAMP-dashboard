@@ -249,9 +249,6 @@ export default function Feed() {
     _setLastTab(tab)
     _setTab(newTab)
   }
-  const tabDirection = (currentTab) => {
-    return tab > lastTab && currentTab !== tab ? (supportsSidebar ? "down" : "right") : supportsSidebar ? "up" : "left"
-  }
 
   return (
     <div
@@ -324,7 +321,7 @@ export default function Feed() {
           </Button>
         </Paper>
       )}
-      <BottomMenu activeTab={activeTab} />
+      <BottomMenu activeTab={activeTab} tabValue={tab} />
     </div>
   )
 }

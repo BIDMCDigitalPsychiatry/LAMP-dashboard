@@ -283,6 +283,8 @@ export default function Participant({
   participant: ParticipantObj
   activeTab: Function
   tabValue: string
+  surveyDone: boolean
+  submitSurvey: Function
 }) {
   const [activities, setActivities] = useState([])
   const [hiddenEvents, setHiddenEvents] = React.useState([])
@@ -489,7 +491,7 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Survey participant={participant} />
+          <Survey participant={participant} surveyDone={props.surveyDone} submitSurvey={submitSurvey} />
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
@@ -586,7 +588,7 @@ export default function Participant({
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
-      <BottomMenu activeTab={activeTab} tabValue={props.tabValue} />
+      <BottomMenu activeTab={activeTab} tabValue={getTab()} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

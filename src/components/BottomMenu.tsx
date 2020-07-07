@@ -50,14 +50,10 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
-
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
+  const [tab, _setTab] = useState(props.tabValue)
 
   const setTab = (newTab) => {
     _setTab(newTab)

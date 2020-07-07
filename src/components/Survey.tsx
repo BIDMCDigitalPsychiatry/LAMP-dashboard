@@ -12,6 +12,7 @@ import {
   CardContent,
   Button,
   DialogActions,
+  IconButton,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 
@@ -29,12 +30,18 @@ import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
 import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
+import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
+import classnames from "classnames"
+
 import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
+    },
+    linkButton: {
+      padding: "15px 25px 15px 25px",
     },
     customheader: {
       backgroundColor: "white",
@@ -115,17 +122,26 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "0 0 15px 0",
     },
     maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
-    activitydatapop: {
-      maxHeight: "70vh",
+    dialogueStyle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
     },
     header: {
       background: "#E7F8F2",
-      padding: 20,
+      padding: "25px 20px 10px",
+      textAlign: "center",
 
       "& h2": {
         fontSize: 25,
         fontWeight: 600,
         color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "left",
+      },
+      "& h6": {
+        fontSize: "14px",
+        fontWeight: "normal",
+        textAlign: "left",
       },
     },
     tipscontentarea: {
@@ -147,19 +163,27 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: "40px",
       minWidth: "200px",
       boxShadow: " 0px 10px 15px rgba(146, 231, 202, 0.25)",
-      lineHeight: "38px",
-      marginTop: "15%",
-
+      lineHeight: "22px",
+      // marginTop: "15%",
+      display: "inline-block",
       textTransform: "capitalize",
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
-      "&:hover": { background: "#cea000" },
+      fontWeight: "bold",
+      "&:hover": {
+        boxShadow:
+          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+      },
     },
+
     topicon: {
-      minWidth: 200,
-      minHeight: 200,
-      marginLeft: "50px",
+      minWidth: 120,
     },
+    surveytextarea: {
+      padding: 20,
+      "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
+    },
+    dialogtitle: { padding: 0 },
   })
 )
 
@@ -192,9 +216,17 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
-export default function Prevent({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Survey({
+  participant,
+  ...props
+}: {
+  participant: ParticipantObj
+  submitSurvey: Function
+  surveyDone: boolean
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
+  const [openComplete, setOpenComplete] = React.useState(props.surveyDone)
   const [dialogueType, setDialogueType] = React.useState("")
   const [activities, setActivities] = useState([])
 
@@ -205,6 +237,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
 
   const handleClose = () => {
     setOpen(false)
+    setOpenComplete(false)
   }
 
   useEffect(() => {
@@ -241,10 +274,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.activitydatapop}
-        classes={{ paperScrollPaper: classes.MuiDialogPaperScrollPaper }}
+        className={classes.dialogueStyle}
       >
-        <DialogTitle id="alert-dialog-slide-title">
+        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
           <div className={classes.header}>
             {dialogueType == "Mood" && <AssessMood className={classes.topicon} />}
             {dialogueType == "Sleep and Social" && <AssessSleep className={classes.topicon} />}
@@ -256,7 +291,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
             <Typography variant="h2">{dialogueType}</Typography>
           </div>
         </DialogTitle>
-        <DialogContent>
+        <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
             12 questions (10 mins)
           </Typography>
@@ -266,17 +301,42 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={1}>
+          <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
               to={`/participant/me/survey/${dialogueType.replace(/\s/g, "_")}`}
               underline="none"
-              className={classes.btngreen}
+              className={classnames(classes.btngreen, classes.linkButton)}
             >
               Start survey
             </Link>
           </Box>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openComplete}
+        onClose={handleClose}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        className={classes.dialogueStyle}
+        classes={{ paperScrollPaper: classes.MuiDialogPaperScrollPaper }}
+      >
+        <DialogTitle>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="h3" gutterBottom>
+            Nice work!
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            You’re on a streak, keep it going
+          </Typography>
+          <Ribbon />
+        </DialogContent>
       </Dialog>
     </Container>
   )
