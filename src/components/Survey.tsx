@@ -327,7 +327,7 @@ export default function Survey({
       </Dialog>
 
       <Dialog
-        open={true}
+        open={openComplete}
         onClose={handleClose}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
