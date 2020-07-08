@@ -184,6 +184,18 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
     },
     dialogtitle: { padding: 0 },
+    gotit: {
+      color: "#6083E7",
+      fontSize: "16px",
+      marginTop: "20px",
+      padding: "25px",
+    },
+    ribbonText: {
+      fontSize: "16px",
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: "bold",
+      marginBottom: "30px",
+    },
   })
 )
 
@@ -315,7 +327,7 @@ export default function Survey({
       </Dialog>
 
       <Dialog
-        open={openComplete}
+        open={true}
         onClose={handleClose}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
@@ -329,13 +341,18 @@ export default function Survey({
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="h3" gutterBottom>
-            Nice work!
-          </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            You’re on a streak, keep it going
-          </Typography>
-          <Ribbon />
+          <Box textAlign="center">
+            <Typography variant="h5" gutterBottom>
+              Nice work!
+            </Typography>
+            <Typography className={classes.ribbonText} component="p">
+              You’re on a streak, keep it going
+            </Typography>
+            <Box textAlign="center">
+              <Ribbon />
+            </Box>
+            <Button className={classes.gotit}>Got it</Button>
+          </Box>
         </DialogContent>
       </Dialog>
     </Container>

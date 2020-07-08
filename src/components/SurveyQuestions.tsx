@@ -60,14 +60,19 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
   },
+  sliderActionsContainer: {
+    bottom: "5%",
+    position: "absolute",
+    textAlign: "center",
+  },
   actionsContainer: {
-    marginBottom: theme.spacing(0),
+    textAlign: "center",
   },
   resetContainer: {
     padding: theme.spacing(3),
   },
   radioroot: {
-    padding: "16px",
+    padding: "23px",
   },
   icon: {
     borderRadius: "50%",
@@ -116,7 +121,7 @@ const useStyles = makeStyles((theme) => ({
   btngreen: {
     background: "#92E7CA",
     borderRadius: "40px",
-    minWidth: "200px",
+    minWidth: "150px",
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
     lineHeight: "38px",
     marginTop: "5%",
@@ -197,7 +202,7 @@ const useStyles = makeStyles((theme) => ({
   },
   btnBack: {
     borderRadius: "40px",
-    minWidth: "200px",
+    minWidth: "150px",
     boxShadow: " 0px 10px 15px rgba(96, 131, 231, 0.2)",
     lineHeight: "38px",
     fontFamily: "inter",
@@ -218,6 +223,28 @@ const useStyles = makeStyles((theme) => ({
   },
   timeSelect: { minWidth: 55, margin: "0 10px", "& svg": { display: "none" } },
   timeselectInput: { margin: 0, padding: "10px 0 !important", fontSize: 40 },
+
+  questionTrack: {
+    fontSize: "14px",
+    color: "#2F9D7E",
+    fontWeight: "bold",
+    margin: "-10px 0 50px 0",
+  },
+  radioGroup: {
+    marginTop: "30px",
+  },
+  textAreaControl: {
+    width: "100%",
+  },
+  textArea: {
+    borderRadius: "10px",
+  },
+  sliderResponse: {
+    marginTop: "30px",
+    "& h4": {
+      color: "#22977B",
+    },
+  },
 }))
 
 function getSteps(questions: any) {
@@ -308,7 +335,7 @@ export default function SurveyQuestions({ ...props }) {
             }
 
             stepData.push(
-              <FormControl component="fieldset">
+              <FormControl component="fieldset" className={classes.radioGroup}>
                 <RadioGroup
                   defaultValue="option0"
                   aria-label="options"
@@ -323,7 +350,7 @@ export default function SurveyQuestions({ ...props }) {
             break
           case "text":
             stepData.push(
-              <FormControl component="fieldset">
+              <FormControl component="fieldset" className={classes.textAreaControl}>
                 <TextField
                   id="standard-multiline-flexible"
                   multiline
@@ -335,6 +362,7 @@ export default function SurveyQuestions({ ...props }) {
                     maxLength: CHARACTER_LIMIT,
                   }}
                   onChange={(event) => handleChange("textArea", event.target.value)}
+                  className={classes.textArea}
                 />
               </FormControl>
             )
@@ -450,10 +478,12 @@ export default function SurveyQuestions({ ...props }) {
                     </Typography>
                   </Grid>
                 </Grid>
-                <Typography variant="caption" display="block" gutterBottom>
-                  Your response:
-                </Typography>
-                <Typography variant="h4">{getSliderValue()}</Typography>
+                <Box className={classes.sliderResponse}>
+                  <Typography variant="caption" display="block" gutterBottom>
+                    Your response:
+                  </Typography>
+                  <Typography variant="h4">{getSliderValue()}</Typography>
+                </Box>
               </Box>
             )
             break
@@ -509,7 +539,7 @@ export default function SurveyQuestions({ ...props }) {
 
     {
       value: 50,
-      label: "neutral",
+      label: "Neutral",
     },
     {
       value: 60,
@@ -636,10 +666,15 @@ export default function SurveyQuestions({ ...props }) {
           {steps.map((label, index) => (
             <Slide in={tab === index} direction={tabDirection(index)} mountOnEnter unmountOnExit>
               <Box my={4}>
+                <Box textAlign="center">
+                  <Typography gutterBottom align="center" classes={{ root: classes.questionTrack }}>
+                    Question {index + 1} of {steps.length}
+                  </Typography>
+                </Box>
                 <Container>
                   {label}
                   {getStepContent(index)}
-                  <div className={classes.actionsContainer}>
+                  <div className={classes.sliderActionsContainer}>
                     {index > 0 && (
                       <Button onClick={handleSliderBack} className={classes.btnBack}>
                         Back
