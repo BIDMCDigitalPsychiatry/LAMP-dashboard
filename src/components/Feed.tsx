@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { StepConnector } from "@material-ui/core"
 
 import {
   Card,
@@ -19,6 +18,7 @@ import {
   useTheme,
   Toolbar,
   AppBar,
+  StepConnector,
 } from "@material-ui/core/"
 
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
@@ -140,6 +140,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingTop: 44,
       marginBottom: -35,
       paddingBottom: 52,
+      borderLeft: "2px solid #bdbdbd",
     },
     customstepperconnecter: {
       minHeight: 0,

@@ -10,7 +10,6 @@ import {
   RadioGroup,
   FormControl,
   FormControlLabel,
-  FormLabel,
   useMediaQuery,
   useTheme,
   Button,
@@ -31,8 +30,12 @@ import {
   StepLabel,
   StepContent,
   StepConnector,
+  Menu,
   MenuItem,
   Select,
+  ListItemText,
+  ListItem,
+  List,
 } from "@material-ui/core"
 import classnames from "classnames"
 
@@ -64,6 +67,8 @@ const useStyles = makeStyles((theme) => ({
     bottom: "5%",
     position: "absolute",
     textAlign: "center",
+    width: "100%",
+    left: 0,
   },
   actionsContainer: {
     textAlign: "center",
@@ -124,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "150px",
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
     lineHeight: "38px",
-    marginTop: "5%",
+    margin: "5% 5px 0 5px",
 
     textTransform: "capitalize",
     fontSize: "16px",
@@ -188,6 +193,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: 44,
     marginBottom: -35,
     paddingBottom: 52,
+    borderLeft: "2px solid #bdbdbd",
   },
   customstepperconnecter: {
     minHeight: 0,
@@ -203,14 +209,14 @@ const useStyles = makeStyles((theme) => ({
   btnBack: {
     borderRadius: "40px",
     minWidth: "150px",
-    boxShadow: " 0px 10px 15px rgba(96, 131, 231, 0.2)",
+    boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.05)",
     lineHeight: "38px",
     fontFamily: "inter",
     textTransform: "capitalize",
     fontSize: "16px",
-    float: "left",
+
     cursor: "pointer",
-    marginTop: "5%",
+    margin: "5% 5px 0 5px",
   },
   minutes: {
     padding: "10px",
@@ -227,42 +233,77 @@ const useStyles = makeStyles((theme) => ({
   questionTrack: {
     fontSize: "14px",
     color: "#2F9D7E",
-    fontWeight: "bold",
+    fontWeight: "normal",
     margin: "-10px 0 50px 0",
   },
   radioGroup: {
     marginTop: "30px",
+    marginLeft: -15,
   },
   textAreaControl: {
     width: "100%",
+    marginTop: 35,
+    background: "#f5f5f5",
+    "& p": { position: "absolute", bottom: 15, right: 0 },
   },
   textArea: {
     borderRadius: "10px",
+    "& fieldset": { borderWidth: 0 },
   },
   sliderResponse: {
-    marginTop: "30px",
+    marginTop: "60px",
     "& h4": {
       color: "#22977B",
+      fontSize: 25,
+      fontWeight: 600,
     },
+  },
+  surveyquestions: {
+    padding: 10,
+    "& h5": { fontSize: 18 },
+  },
+  questionhead: {
+    "& h5": { fontSize: 18, fontWeight: 600 },
+    "& span": {
+      marginTop: 15,
+      fontSize: 12,
+      color: "rgba(0, 0, 0, 0.5)",
+    },
+  },
+  sample: { border: 0 },
+  timeHours: {
+    padding: 0,
+    borderBottom: "#BCEFDD solid 2px",
+    minWidth: 57,
+
+    "& div": { padding: 0, margin: 0 },
+    "& p": { fontSize: 40, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "center" },
+  },
+
+  textCaption: { color: "rgba(0, 0, 0, 0.5)", fontSize: 10 },
+  centerBar: { height: 4, background: "#BCEFDD" },
+  customTrack: { width: 4, height: 4, borderRadius: "50%", background: "#65DEB4" },
+  customThumb: { width: 24, height: 24, marginTop: -10, marginLeft: -10 },
+  menuPaper: {
+    background: "#F5F5F5",
+    boxShadow: "none",
+    marginTop: 54,
+    maxHeight: 300,
+    minWidth: 57,
+    borderRadius: 0,
+    "& ul": { padding: 0 },
+    "& li": {
+      fontSize: 25,
+      maxWidth: 57,
+      padding: "0 12px",
+    },
+  },
+  timeWrapper: { fontSize: 25 },
+  listSelected: {
+    background: "#E7F8F2 !important",
   },
 }))
 
-function getSteps(questions: any) {
-  let stepData = []
-  Object.keys(questions).forEach((key) => {
-    stepData.push(
-      <Box>
-        <Typography variant="h5">{questions[key].question}</Typography>
-        <Typography variant="caption" display="block" gutterBottom>
-          {questions[key].helpText}
-        </Typography>
-      </Box>
-    )
-  })
-  return stepData
-}
-
-// Inspired by blueprintjs
 function StyledRadio(props: RadioProps) {
   const classes = useStyles()
 
@@ -278,7 +319,58 @@ function StyledRadio(props: RadioProps) {
     />
   )
 }
+
+function range(start, stop, step = 1) {
+  return [...Array(stop - start).keys()].map((v, i) =>
+    start + i * step < 10 ? "0" + (start + i * step) : start + i * step
+  )
+}
+
 export default function SurveyQuestions({ ...props }) {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [anchorE2, setAnchorE2] = React.useState<null | HTMLElement>(null)
+  const [anchorE3, setAnchorE3] = React.useState<null | HTMLElement>(null)
+  const [hourSelectedIndex, setHourSelectedIndex] = React.useState("01")
+  const [minuteSelectedIndex, setMinuteSelectedIndex] = React.useState("00")
+  const [ampmSelectedIndex, setAmPmSelectedIndex] = React.useState("am")
+
+  const handleClickHours = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+  const handleClickMinutes = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorE2(event.currentTarget)
+  }
+
+  const handleClickAmPm = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorE3(event.currentTarget)
+  }
+
+  const handleMenuItemClick = (event: React.MouseEvent<HTMLElement>, index: any, type: number) => {
+    switch (type) {
+      case 0:
+        setHourSelectedIndex(index)
+        setAnchorEl(null)
+        break
+      case 1:
+        setMinuteSelectedIndex(index)
+        setAnchorE2(null)
+        break
+      case 2:
+        setAmPmSelectedIndex(index)
+        setAnchorE3(null)
+        break
+    }
+  }
+  const handleHoursClose = () => {
+    setAnchorEl(null)
+  }
+  const handleMinutesClose = () => {
+    setAnchorE2(null)
+  }
+  const handleAmPmClose = () => {
+    setAnchorE3(null)
+  }
+
   const classes = useStyles()
   const [tab, _setTab] = useState(0)
   const [progressValue, setProgressValue] = useState(25)
@@ -308,6 +400,20 @@ export default function SurveyQuestions({ ...props }) {
       values: ["terrible", "neutral", "excellent"],
     },
   ]
+  const getSteps = (questions: any) => {
+    let stepData = []
+    Object.keys(questions).forEach((key) => {
+      stepData.push(
+        <Box className={classes.questionhead}>
+          <Typography variant="h5">{questions[key].question}</Typography>
+          <Typography variant="caption" display="block" gutterBottom>
+            {questions[key].helpText}
+          </Typography>
+        </Box>
+      )
+    })
+    return stepData
+  }
 
   const steps = getSteps(questions)
 
@@ -322,14 +428,14 @@ export default function SurveyQuestions({ ...props }) {
 
   const getStepContent = (step: number) => {
     let stepData = []
-    Object.keys(questions).forEach((key) => {
-      if (parseInt(key) === step) {
-        switch (questions[key].type) {
+    Object.keys(questions).forEach((index) => {
+      if (parseInt(index) === step) {
+        switch (questions[index].type) {
           case "options":
             let i = 0
             let data = []
 
-            for (let option of questions[key].options) {
+            for (let option of questions[index].options) {
               data.push(<FormControlLabel value={`option${i}`} control={<StyledRadio />} label={option} />)
               i++
             }
@@ -350,97 +456,137 @@ export default function SurveyQuestions({ ...props }) {
             break
           case "text":
             stepData.push(
-              <FormControl component="fieldset" className={classes.textAreaControl}>
-                <TextField
-                  id="standard-multiline-flexible"
-                  multiline
-                  rows={4}
-                  variant="filled"
-                  value={values.textArea}
-                  helperText={`${values.textArea.length}/${CHARACTER_LIMIT} max characters`}
-                  inputProps={{
-                    maxLength: CHARACTER_LIMIT,
+              <Box m={-2}>
+                <FormControl
+                  component="fieldset"
+                  classes={{
+                    root: classes.textAreaControl,
                   }}
-                  onChange={(event) => handleChange("textArea", event.target.value)}
-                  className={classes.textArea}
-                />
-              </FormControl>
+                >
+                  <TextField
+                    id="standard-multiline-flexible"
+                    multiline
+                    rows={10}
+                    variant="outlined"
+                    value={values.textArea}
+                    helperText={`${values.textArea.length}/${CHARACTER_LIMIT} max characters`}
+                    inputProps={{
+                      maxLength: CHARACTER_LIMIT,
+                    }}
+                    onChange={(event) => handleChange("textArea", event.target.value)}
+                    classes={{ root: classes.textArea }}
+                  />
+                </FormControl>
+              </Box>
             )
             break
           case "time":
-            const hours = []
-            const minutes = []
             const ampm = []
 
-            for (let i = 1; i <= 12; i++) {
-              hours.push(
-                <MenuItem value={i} classes={{ root: classes.hours }}>
-                  {i < 10 ? "0" + i : i}
-                </MenuItem>
-              )
-            }
-
-            for (let i = 0; i <= 60; i++) {
-              minutes.push(
-                <MenuItem value={i} classes={{ root: classes.minutes }}>
-                  {i < 10 ? "0" + i : i}
-                </MenuItem>
-              )
-            }
+            let hourvalues = range(1, 13)
+            let minutevalues = range(0, 4, 15)
 
             ampm.push(
-              <MenuItem value="am" classes={{ root: classes.ampm }}>
+              <MenuItem
+                key="am"
+                selected={"am" === ampmSelectedIndex}
+                onClick={(event) => handleMenuItemClick(event, "am", 2)}
+                classes={{ selected: classes.listSelected }}
+              >
                 am
               </MenuItem>
             )
             ampm.push(
-              <MenuItem value="pm" classes={{ root: classes.ampm }}>
+              <MenuItem
+                key="pm"
+                selected={"pm" === ampmSelectedIndex}
+                onClick={(event) => handleMenuItemClick(event, "pm", 2)}
+                classes={{ selected: classes.listSelected }}
+              >
                 pm
               </MenuItem>
             )
 
             stepData.push(
               <Box textAlign="center">
-                <FormControl className={classes.timeSelect}>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={values.hour}
-                    onChange={(event) => handleChange("hour", event.target.value as string)}
-                    classes={{ root: classes.timeselectInput }}
-                  >
-                    {hours}
-                  </Select>
-                </FormControl>
-                :
-                <FormControl className={classes.timeSelect}>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={values.minutes}
-                    onChange={(event) => handleChange("minutes", event.target.value as string)}
-                    classes={{ root: classes.timeselectInput }}
-                  >
-                    {minutes}
-                  </Select>
-                </FormControl>
-                <FormControl className={classes.timeSelect}>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={values.ampm}
-                    onChange={(event) => handleChange("ampm", event.target.value as string)}
-                    classes={{ root: classes.timeselectInput }}
-                  >
-                    {ampm}
-                  </Select>
-                </FormControl>
+                <Grid container justify="center" alignItems="center" spacing={2} className={classes.timeWrapper}>
+                  <Grid item>
+                    <List component="nav" className={classes.timeHours}>
+                      <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClickHours}>
+                        <ListItemText secondary={hourSelectedIndex} />
+                      </ListItem>
+                    </List>
+                    <Menu
+                      id="lock-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleHoursClose}
+                      classes={{ paper: classes.menuPaper }}
+                    >
+                      {hourvalues.map((option, index) => (
+                        <MenuItem
+                          key={option}
+                          selected={option === hourSelectedIndex}
+                          onClick={(event) => handleMenuItemClick(event, option, 0)}
+                          classes={{ selected: classes.listSelected }}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Grid>
+                  :
+                  <Grid item>
+                    <List component="nav" className={classes.timeHours} aria-label="Device settings">
+                      <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClickMinutes}>
+                        <ListItemText secondary={minuteSelectedIndex} />
+                      </ListItem>
+                    </List>
+                    <Menu
+                      id="lock-menu"
+                      anchorEl={anchorE2}
+                      keepMounted
+                      open={Boolean(anchorE2)}
+                      onClose={handleMinutesClose}
+                      classes={{ paper: classes.menuPaper }}
+                    >
+                      {minutevalues.map((option, index) => (
+                        <MenuItem
+                          key={option}
+                          selected={option === minuteSelectedIndex}
+                          onClick={(event) => handleMenuItemClick(event, option, 1)}
+                          classes={{ selected: classes.listSelected }}
+                        >
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Menu>
+                  </Grid>
+                  <Grid item>
+                    <List component="nav" className={classes.timeHours} aria-label="Device settings">
+                      <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClickAmPm}>
+                        <ListItemText secondary={ampmSelectedIndex} />
+                      </ListItem>
+                    </List>
+                    <Menu
+                      id="lock-menu"
+                      classes={{ paper: classes.menuPaper }}
+                      anchorEl={anchorE3}
+                      keepMounted
+                      open={Boolean(anchorE3)}
+                      onClose={handleAmPmClose}
+                    >
+                      {ampm}
+                    </Menu>
+                  </Grid>
+                </Grid>
               </Box>
             )
             break
           case "rating":
             stepData.push(
-              <Box textAlign="center">
+              <Box textAlign="center" mt={5}>
                 <Slider
                   defaultValue={values.sliderValue}
                   getAriaValueText={valuetext}
@@ -451,7 +597,12 @@ export default function SurveyQuestions({ ...props }) {
                   min={0}
                   max={100}
                   track={false}
-                  classes={{ root: classes.slider }}
+                  classes={{
+                    root: classes.slider,
+                    rail: classes.centerBar,
+                    mark: classes.customTrack,
+                    thumb: classes.customThumb,
+                  }}
                   onChange={handleSliderChange}
                 />
                 <Grid
@@ -463,17 +614,17 @@ export default function SurveyQuestions({ ...props }) {
                   alignItems="center"
                 >
                   <Grid item xs={4}>
-                    <Typography variant="caption" display="block" gutterBottom>
+                    <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
                       terrible
                     </Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant="caption" display="block" gutterBottom>
+                    <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
                       neutral
                     </Typography>
                   </Grid>
                   <Grid item xs={4}>
-                    <Typography variant="caption" display="block" gutterBottom>
+                    <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
                       excellent
                     </Typography>
                   </Grid>
