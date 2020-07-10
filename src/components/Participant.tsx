@@ -4,26 +4,17 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import {
   Container,
   Box,
-  Divider,
-  Grid,
-  Fab,
-  Drawer,
-  Icon,
+  Grid, 
   useTheme,
   useMediaQuery,
-  Tooltip,
   Slide,
   Typography,
   Card,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj} from "lamp-core"
 import BottomMenu from "./BottomMenu"
-import Messages from "./Messages"
-import { Link as RouterLink } from "react-router-dom"
-import Link from "@material-ui/core/Link"
-import SurveyPage from "./SurveyPage"
 import Survey from "./Survey"
 
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -31,7 +22,6 @@ import Breathe from "./Breathe"
 import Prevent from "./Prevent"
 
 import Jewels from "./Jewels"
-import { spliceActivity } from "./ActivityList"
 import Journal from "./Journal"
 import Resources from "./Resources"
 import MoodTipsSection from "./MoodTips"
@@ -52,36 +42,18 @@ import { ReactComponent as Chat } from "../icons/Chat.svg"
 import { ReactComponent as Wellness } from "../icons/Wellness.svg"
 import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
-import { ReactComponent as Surveys } from "../icons/Surveys.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-
 import { ReactComponent as Medication } from "../icons/Medication.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
-    toolbar: {
-      minHeight: 90,
-      alignItems: "flex-start",
-      paddingTop: theme.spacing(1),
-      paddingBottom: theme.spacing(1),
-    },
-    title: {
-      flexGrow: 1,
-      alignSelf: "flex-end",
-    },
+    },    
     learn: {
       background: "#FFF9E5",
       padding: "10px 0",
@@ -91,32 +63,13 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: 18,
       position: "relative",
     },
-
     cardlabel: {
       fontSize: 16,
-
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
       width: "100%",
-    },
-    preventlabel: {
-      fontSize: 16,
-
-      padding: "0 18px",
-      marginTop: 5,
-
-      width: "100%",
-    },
-    assess: {
-      background: "#E7F8F2",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
+    },   
     manage: {
       background: "#FFEFEC",
       padding: "10px 0",
@@ -125,24 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
-    },
-    prevent: {
-      background: "#ECF4FF",
-      padding: "10px 0",
-      minHeight: 200,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
-    addicon: { float: "right", color: "#6083E7" },
-    preventHeader: {
-      "& h5": {
-        fontWeight: 600,
-        fontSize: 18,
-        color: "rgba(0, 0, 0, 0.4)",
-      },
-    },
+    }
   })
 )
 
@@ -151,9 +87,6 @@ function _hideCareTeam() {
 }
 function _patientMode() {
   return LAMP.Auth._type === "participant"
-}
-function _shouldRestrict() {
-  return _patientMode() && _hideCareTeam()
 }
 async function getShowWelcome(participant: ParticipantObj): Promise<boolean> {
   if (!_patientMode()) return false
@@ -170,112 +103,6 @@ async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
   return !!_hidden.error ? false : (_hidden.data as boolean)
 }
 
-// Refresh hidden events list.
-async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  return !!_hidden.error ? [] : (_hidden.data as string[])
-}
-
-async function addHiddenEvent(
-  participant: ParticipantObj,
-  timestamp: number,
-  activityName: string
-): Promise<string[] | undefined> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  let _events = !!_hidden.error ? [] : _hidden.data
-  if (_events.includes(`${timestamp}/${activityName}`)) return _events
-  let new_events = [..._events, `${timestamp}/${activityName}`]
-  let _setEvents = (await LAMP.Type.setAttachment(
-    participant.id,
-    "me",
-    "lamp.dashboard.hidden_events",
-    new_events
-  )) as any
-  if (!!_setEvents.error) return undefined
-  return new_events
-}
-
-// Splice together all selected activities & their tags.
-async function getSplicedSurveys(activities) {
-  let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
-  let spliced = res.map((y: any, idx) =>
-    spliceActivity({
-      raw: activities[idx],
-      tag: !!y.error ? undefined : y.data,
-    })
-  )
-  // Short-circuit the main title & description if there's only one survey.
-  const main = {
-    name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
-    description: spliced.length === 1 ? spliced[0].description : "Please complete all sections below. Thank you.",
-  }
-  if (spliced.length === 1) spliced[0].name = spliced[0].description = undefined
-  return {
-    name: main.name,
-    description: main.description,
-    sections: spliced,
-  }
-}
-
-function SurveyInstrument({ id, group, onComplete, ...props }) {
-  const [survey, setSurvey] = useState<any>()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const { enqueueSnackbar } = useSnackbar()
-
-  useEffect(() => {
-    if (group.length === 0) return setSurvey(undefined)
-    getSplicedSurveys(group).then((spliced) =>
-      setSurvey({
-        ...spliced,
-        prefillData: !_patientMode() ? group[0].prefillData : undefined,
-        prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
-      })
-    )
-  }, [group])
-
-  return (
-    <Box py={8} px={2}>
-      <Grid container direction="row">
-        <Grid item style={{ width: "100%" }}>
-          <SurveyPage
-            validate
-            partialValidationOnly
-            content={survey}
-            prefillData={!!survey ? survey.prefillData : undefined}
-            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-            onValidationFailure={() =>
-              enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
-                variant: "error",
-              })
-            }
-            onResponse={onComplete}
-          />
-        </Grid>
-        {supportsSidebar && !_patientMode() && (
-          <Grid item>
-            <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
-              <Box flexGrow={1} />
-              <Divider />
-              <Messages refresh={!!survey} expandHeight privateOnly participant={id} />
-            </Drawer>
-            <Tooltip title="Patient Notes" placement="left">
-              <Fab
-                color="primary"
-                aria-label="Patient Notes"
-                style={{ position: "fixed", bottom: 85, right: 24 }}
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Icon>note_add</Icon>
-              </Fab>
-            </Tooltip>
-          </Grid>
-        )}
-      </Grid>
-    </Box>
-  )
-}
-
 export default function Participant({
   participant,
   ...props
@@ -287,7 +114,6 @@ export default function Participant({
   submitSurvey: Function
 }) {
   const [activities, setActivities] = useState([])
-  const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
   const [launchedActivity, setLaunchedActivity] = useState<string>()
 
@@ -346,8 +172,6 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    LAMP.Activity.allByParticipant(participant.id).then(setActivities)
-    getHiddenEvents(participant).then(setHiddenEvents)
     getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
@@ -358,45 +182,8 @@ export default function Participant({
     props.activeTab(tabName)
   }
 
-  const hideEvent = async (timestamp?: number, activity?: string) => {
-    if (timestamp === undefined && activity === undefined) {
-      setHiddenEvents(hiddenEvents) // trigger a reload for dependent components only
-      return
-    }
-    let result = await addHiddenEvent(participant, timestamp, activity)
-    if (!!result) {
-      setHiddenEvents(result)
-    } else {
-      enqueueSnackbar("Failed to hide this event.", { variant: "error" })
-    }
-  }
-
   const submitSurvey = (response, overwritingTimestamp) => {
-    let events = response.map((x, idx) => ({
-      timestamp: !!overwritingTimestamp ? overwritingTimestamp + 1000 /* 1sec */ : new Date().getTime(),
-      duration: 0,
-      activity: visibleActivities[idx].id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: 0,
-      })),
-    }))
-
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
-    ).then((x) => {
-      setVisibleActivities([])
-
-      // If a timestamp was provided to overwrite data, hide the original event too.
-      if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
-      else hideEvent() // trigger a reload of dependent components anyway
-    })
+    
   }
 
   return (
@@ -570,7 +357,6 @@ export default function Participant({
       >
         {
           {
-            // survey: <SurveyInstrument id={participant.id} group={visibleActivities} onComplete={submitSurvey} />,
             breathe: <Breathe onComplete={() => setLaunchedActivity(undefined)} />,
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,

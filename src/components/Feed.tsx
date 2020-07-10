@@ -33,7 +33,7 @@ import WeekView from "./WeekView"
 import BottomMenu from "./BottomMenu"
 
 import LAMP from "lamp-core"
-import DoneIcon from "@material-ui/icons/Done"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -187,7 +187,6 @@ function getSteps(classes: any) {
             {feedData[key].icon === "sad-happy" && <SadHappy />}
             {feedData[key].icon === "medication" && <Medication />}
             {feedData[key].icon === "pencil" && <PencilPaper />}
-            {/* {feedData[key].icon === "board" && <PencilPaper />} */}
             {feedData[key].icon === "board" && <SadBoard />}
             {feedData[key].icon === "linegraph" && <LineGraph />}
           </Grid>
@@ -232,7 +231,6 @@ export default function Feed() {
   const [activeStep, setActiveStep] = React.useState(0)
   const steps = getSteps(classes)
   const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
-  const [lastTab, _setLastTab] = useState(_patientMode() ? 1 : 3)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const handleNext = () => {
@@ -247,7 +245,6 @@ export default function Feed() {
     setActiveStep(0)
   }
   let activeTab = (newTab?: any) => {
-    _setLastTab(tab)
     _setTab(newTab)
   }
 

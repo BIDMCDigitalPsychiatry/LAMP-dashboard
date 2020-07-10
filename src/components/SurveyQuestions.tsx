@@ -32,7 +32,6 @@ import {
   StepConnector,
   Menu,
   MenuItem,
-  Select,
   ListItemText,
   ListItem,
   List,
@@ -64,17 +63,14 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   sliderActionsContainer: {
-    bottom: "5%",
     position: "absolute",
     textAlign: "center",
     width: "100%",
     left: 0,
-  },
-  actionsContainer: {
-    textAlign: "center",
-  },
-  resetContainer: {
-    padding: theme.spacing(3),
+    marginBottom: 15,
+    [theme.breakpoints.down("xs")]: {
+      bottom: "5%",
+    },
   },
   radioroot: {
     padding: "23px",
@@ -102,9 +98,6 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: 120,
   },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
   checkedIcon: {
     backgroundColor: "#2F9D7E",
     borderColor: "#2F9D7E",
@@ -113,15 +106,11 @@ const useStyles = makeStyles((theme) => ({
       display: "block",
       width: 32,
       height: 32,
-
       content: '""',
     },
     "input:hover ~ &": {
       backgroundColor: "#2F9D7E",
     },
-  },
-  bottom: {
-    color: theme.palette.grey[theme.palette.type === "light" ? 200 : 700],
   },
   btngreen: {
     background: "#92E7CA",
@@ -130,10 +119,12 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
     lineHeight: "38px",
     margin: "5% 5px 0 5px",
-
     textTransform: "capitalize",
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
+    [theme.breakpoints.up("md")]: {
+      marginTop: 30,
+    },
     "&:hover": { background: "#92E7CA" },
   },
   toolbar: {
@@ -194,17 +185,15 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: -35,
     paddingBottom: 52,
     borderLeft: "2px solid #bdbdbd",
+    [theme.breakpoints.up("md")]: {
+      paddingLeft: 50,
+      paddingBottom: 75,
+    },
   },
   customstepperconnecter: {
     minHeight: 0,
     padding: 0,
     "& span": { minHeight: 0 },
-  },
-  closeButton: {
-    position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
   },
   btnBack: {
     borderRadius: "40px",
@@ -214,9 +203,11 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: "inter",
     textTransform: "capitalize",
     fontSize: "16px",
-
     cursor: "pointer",
     margin: "5% 5px 0 5px",
+    [theme.breakpoints.up("md")]: {
+      marginTop: 30,
+    },
   },
   minutes: {
     padding: "10px",
@@ -239,11 +230,15 @@ const useStyles = makeStyles((theme) => ({
   radioGroup: {
     marginTop: "30px",
     marginLeft: -15,
+    [theme.breakpoints.up("md")]: {
+      marginTop: 0,
+    },
   },
   textAreaControl: {
     width: "100%",
     marginTop: 35,
     background: "#f5f5f5",
+    borderRadius: 10,
     "& p": { position: "absolute", bottom: 15, right: 0 },
   },
   textArea: {
@@ -270,16 +265,13 @@ const useStyles = makeStyles((theme) => ({
       color: "rgba(0, 0, 0, 0.5)",
     },
   },
-  sample: { border: 0 },
   timeHours: {
     padding: 0,
     borderBottom: "#BCEFDD solid 2px",
     minWidth: 57,
-
     "& div": { padding: 0, margin: 0 },
     "& p": { fontSize: 40, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "center" },
   },
-
   textCaption: { color: "rgba(0, 0, 0, 0.5)", fontSize: 10 },
   centerBar: { height: 4, background: "#BCEFDD" },
   customTrack: { width: 4, height: 4, borderRadius: "50%", background: "#65DEB4" },
@@ -298,7 +290,14 @@ const useStyles = makeStyles((theme) => ({
       padding: "0 12px",
     },
   },
-  timeWrapper: { fontSize: 25 },
+  timeWrapper: {
+    fontSize: 25,
+    marginTop: 50,
+    [theme.breakpoints.up("md")]: {
+      justifyContent: "left",
+    },
+  },
+  textfieldwrapper: { marginLeft: -12, marginRight: -12 },
   listSelected: {
     background: "#E7F8F2 !important",
   },
@@ -434,12 +433,10 @@ export default function SurveyQuestions({ ...props }) {
           case "options":
             let i = 0
             let data = []
-
             for (let option of questions[index].options) {
               data.push(<FormControlLabel value={`option${i}`} control={<StyledRadio />} label={option} />)
               i++
             }
-
             stepData.push(
               <FormControl component="fieldset" className={classes.radioGroup}>
                 <RadioGroup
@@ -456,7 +453,7 @@ export default function SurveyQuestions({ ...props }) {
             break
           case "text":
             stepData.push(
-              <Box m={-2}>
+              <Box className={classes.textfieldwrapper}>
                 <FormControl
                   component="fieldset"
                   classes={{
@@ -794,7 +791,6 @@ export default function SurveyQuestions({ ...props }) {
 
               <StepContent classes={{ root: classes.customsteppercontent }}>
                 <Typography>{getStepContent(index)}</Typography>
-                <div className={classes.actionsContainer}>
                   {activeStep > 0 && (
                     <Button onClick={handleBack} className={classes.btnBack}>
                       Back
@@ -806,8 +802,7 @@ export default function SurveyQuestions({ ...props }) {
                     className={classes.btngreen}
                   >
                     {activeStep === steps.length - 1 ? "Submit" : "Next"}
-                  </Button>
-                </div>
+                  </Button>               
               </StepContent>
             </Step>
           ))}

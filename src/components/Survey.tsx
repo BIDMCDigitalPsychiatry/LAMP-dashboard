@@ -9,19 +9,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  CardContent,
   Button,
   DialogActions,
   IconButton,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
-
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, {
   Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-  SensorEvent as SensorEventObj,
 } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
@@ -32,7 +27,6 @@ import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import classnames from "classnames"
-
 import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,12 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
-    cardlabel: {
+     cardlabel: {
       fontSize: 16,
 
       padding: "0 18px",
@@ -67,61 +56,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     MuiDialogPaperScrollPaper: {
       maxHeight: "100% !important",
-    },
-    toolbar: {
-      minHeight: 90,
-      alignItems: "flex-start",
-      paddingTop: theme.spacing(1),
-      paddingBottom: theme.spacing(1),
-    },
-    title: {
-      flexGrow: 1,
-      alignSelf: "flex-end",
-    },
-
-    preventlabel: {
-      fontSize: 16,
-      minHeight: 48,
-      padding: "0 18px",
-      marginTop: 5,
-      width: "100%",
-    },
-
-    prevent: {
-      background: "#ECF4FF",
-      padding: "10px 0",
-      minHeight: 200,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
-
-    addicon: { float: "right", color: "#6083E7" },
-    preventHeader: {
-      "& h5": {
-        fontWeight: 600,
-        fontSize: 18,
-        color: "rgba(0, 0, 0, 0.4)",
-      },
-    },
+    },  
     closeButton: {
       position: "absolute",
       right: theme.spacing(1),
       top: theme.spacing(1),
       color: theme.palette.grey[500],
     },
-    addbtnmain: {
-      maxWidth: 24,
-      "& button": { padding: 0 },
-    },
-    sensorhd: {
-      margin: "25px 0 15px 0",
-    },
-    activityhd: {
-      margin: "0 0 15px 0",
-    },
-    maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
     dialogueStyle: {
       display: "flex",
       alignItems: "center",
@@ -143,28 +84,13 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "normal",
         textAlign: "left",
       },
-    },
-    tipscontentarea: {
-      padding: 20,
-      "& h3": {
-        fontWeight: "bold",
-        fontSize: "16px",
-        marginBottom: "15px",
-      },
-      "& p": {
-        fontSize: "16px",
-        lineheight: "24px",
-
-        color: "rgba(0, 0, 0, 0.75)",
-      },
-    },
+    },   
     btngreen: {
       background: "#92E7CA",
       borderRadius: "40px",
       minWidth: "200px",
       boxShadow: " 0px 10px 15px rgba(146, 231, 202, 0.25)",
       lineHeight: "22px",
-      // marginTop: "15%",
       display: "inline-block",
       textTransform: "capitalize",
       fontSize: "16px",
@@ -175,7 +101,6 @@ const useStyles = makeStyles((theme: Theme) =>
           "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
       },
     },
-
     topicon: {
       minWidth: 120,
     },
@@ -207,25 +132,6 @@ function _patientMode() {
 }
 function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
-}
-async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id)
-  let custom =
-    ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
-      ...x,
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: x.settings.map((y) => ({
-        ...y,
-        ...original.find((z) => z.name === y.activity)?.settings.find((a) => a.text === y.question),
-      })),
-    })) ?? [] // original.filter((x) => x.spec !== "lamp.survey")
-  return [...original, ...custom]
-}
-// Refresh hidden events list.
-async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
 export default function Survey({
@@ -351,7 +257,7 @@ export default function Survey({
             <Box textAlign="center">
               <Ribbon />
             </Box>
-            <Button className={classes.gotit}>Got it</Button>
+            <Button className={classes.gotit} onClick={handleClose}>Got it</Button>
           </Box>
         </DialogContent>
       </Dialog>
