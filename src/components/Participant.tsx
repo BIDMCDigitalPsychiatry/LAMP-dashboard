@@ -18,23 +18,20 @@ import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
 
 import ResponsiveDialog from "./ResponsiveDialog"
-import Breathe from "./Breathe"
-import Prevent from "./Prevent"
 
-import Jewels from "./Jewels"
-import Journal from "./Journal"
-import Resources from "./Resources"
+import Prevent from "./Prevent"
+import Manage from "./Manage"
+
+
 import MoodTipsSection from "./MoodTips"
 import SleepTipsSecion from "./SleepTips"
 import SocialTips from "./SocialTips"
-import Hopebox from "./Hopebox"
 import BookRecommendations from "./BookRecommendations"
 import Definitions from "./Definitions"
 import PhysicalTips from "./PhysicalTips"
 import StressTips from "./StressTips"
 import Motivation from "./Motivation"
 import Welcome from "./Welcome"
-import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as Book } from "../icons/Book.svg"
 import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
 import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
@@ -42,12 +39,8 @@ import { ReactComponent as Chat } from "../icons/Chat.svg"
 import { ReactComponent as Wellness } from "../icons/Wellness.svg"
 import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
-import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
-import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
-import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-import { ReactComponent as Medication } from "../icons/Medication.svg"
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -172,7 +165,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    getShowWelcome(participant).then(setOpen)
+   // getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -283,60 +276,7 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Container>
-            <Grid container spacing={2}>
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("breathe")}>
-                  <Card className={classes.manage}>
-                    <Box mt={2} mb={1}>
-                      <BreatheIcon />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Mood Tips</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("jewels")}>
-                  <Card className={classes.manage}>
-                    <Box mt={2} mb={1}>
-                      <JewelsIcon />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Jewels</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("journal")}>
-                  <Card className={classes.manage}>
-                    <Box mt={2} mb={1}>
-                      <JournalIcon />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Journal</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("hopebox")}>
-                  <Card className={classes.manage}>
-                    <Box mt={1}>
-                      <HopeBoxIcon />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Hope Box</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("medicationtracker")}>
-                  <Card className={classes.manage}>
-                    <Box mt={2} mb={1}>
-                      <Medication />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Medication Tracker</Typography>
-                  </Card>
-                </Grid>
-              )}
-            </Grid>
-          </Container>
+        <Manage participant={participant} />
         </Box>
       </Slide>
 
@@ -357,12 +297,7 @@ export default function Participant({
       >
         {
           {
-            breathe: <Breathe onComplete={() => setLaunchedActivity(undefined)} />,
-            jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
-            journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
-            hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
-            resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
+              sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
             moodtips: <MoodTipsSection onComplete={() => setLaunchedActivity(undefined)} />,
             socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
             bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
@@ -370,7 +305,6 @@ export default function Participant({
             physicalwellness: <PhysicalTips onComplete={() => setLaunchedActivity(undefined)} />,
             stresstips: <StressTips onComplete={() => setLaunchedActivity(undefined)} />,
             motivation: <Motivation onComplete={() => setLaunchedActivity(undefined)} />,
-            medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
           }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
         }
       </ResponsiveDialog>
