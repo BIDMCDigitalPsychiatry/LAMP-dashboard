@@ -791,18 +791,18 @@ export default function SurveyQuestions({ ...props }) {
 
               <StepContent classes={{ root: classes.customsteppercontent }}>
                 <Typography>{getStepContent(index)}</Typography>
-                  {activeStep > 0 && (
-                    <Button onClick={handleBack} className={classes.btnBack}>
-                      Back
-                    </Button>
-                  )}
-                  <Button
-                    variant="contained"
-                    onClick={activeStep === steps.length - 1 ? handleSubmit : handleStepperNext}
-                    className={classes.btngreen}
-                  >
-                    {activeStep === steps.length - 1 ? "Submit" : "Next"}
-                  </Button>               
+                {activeStep > 0 && (
+                  <Button onClick={handleBack} className={classes.btnBack}>
+                    Back
+                  </Button>
+                )}
+                <Button
+                  variant="contained"
+                  onClick={activeStep === steps.length - 1 ? handleSubmit : handleStepperNext}
+                  className={classes.btngreen}
+                >
+                  {activeStep === steps.length - 1 ? "Submit" : "Next"}
+                </Button>
               </StepContent>
             </Step>
           ))}

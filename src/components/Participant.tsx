@@ -1,19 +1,10 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import {
-  Container,
-  Box,
-  Grid, 
-  useTheme,
-  useMediaQuery,
-  Slide,
-  Typography,
-  Card,
-} from "@material-ui/core"
+import { Container, Box, Grid, useTheme, useMediaQuery, Slide, Typography, Card } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
-import LAMP, { Participant as ParticipantObj} from "lamp-core"
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
 
@@ -21,7 +12,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 
 import Prevent from "./Prevent"
 import Manage from "./Manage"
-
 
 import MoodTipsSection from "./MoodTips"
 import SleepTipsSecion from "./SleepTips"
@@ -41,12 +31,11 @@ import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },    
+    },
     learn: {
       background: "#FFF9E5",
       padding: "10px 0",
@@ -62,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: 15,
       position: "absolute",
       width: "100%",
-    },   
+    },
     manage: {
       background: "#FFEFEC",
       padding: "10px 0",
@@ -71,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
-    }
+    },
   })
 )
 
@@ -165,7 +154,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-   // getShowWelcome(participant).then(setOpen)
+    // getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -175,9 +164,7 @@ export default function Participant({
     props.activeTab(tabName)
   }
 
-  const submitSurvey = (response, overwritingTimestamp) => {
-    
-  }
+  const submitSurvey = (response, overwritingTimestamp) => {}
 
   return (
     <React.Fragment>
@@ -276,7 +263,7 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
-        <Manage participant={participant} />
+          <Manage participant={participant} />
         </Box>
       </Slide>
 
@@ -297,7 +284,7 @@ export default function Participant({
       >
         {
           {
-              sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
+            sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
             moodtips: <MoodTipsSection onComplete={() => setLaunchedActivity(undefined)} />,
             socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
             bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,

@@ -15,9 +15,7 @@ import {
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import LAMP, {
-  Participant as ParticipantObj,
-} from "lamp-core"
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
 import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
@@ -37,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
-     cardlabel: {
+    cardlabel: {
       fontSize: 16,
 
       padding: "0 18px",
@@ -56,7 +54,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     MuiDialogPaperScrollPaper: {
       maxHeight: "100% !important",
-    },  
+    },
     closeButton: {
       position: "absolute",
       right: theme.spacing(1),
@@ -84,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "normal",
         textAlign: "left",
       },
-    },   
+    },
     btngreen: {
       background: "#92E7CA",
       borderRadius: "40px",
@@ -257,7 +255,9 @@ export default function Survey({
             <Box textAlign="center">
               <Ribbon />
             </Box>
-            <Button className={classes.gotit} onClick={handleClose}>Got it</Button>
+            <Button className={classes.gotit} onClick={handleClose}>
+              Got it
+            </Button>
           </Box>
         </DialogContent>
       </Dialog>
