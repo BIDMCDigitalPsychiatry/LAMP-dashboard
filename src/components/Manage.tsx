@@ -27,7 +27,6 @@ import MedicationTracker from "./MedicationTracker"
 import Hopebox from "./Hopebox"
 
 import ResponsiveDialog from "./ResponsiveDialog"
-import Breathe from "./Breathe"
 import Journal from "./Journal"
 import Resources from "./Resources"
 
@@ -171,7 +170,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Box mt={2} mb={1}>
               <BreatheIcon />
             </Box>
-            <Typography className={classes.cardlabel}>Mood Tips</Typography>
+            <Typography className={classes.cardlabel}>Breathe</Typography>
           </Card>
         </Grid>
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Jewels")}>
@@ -218,7 +217,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
       >
         {
           {
-            breathe: <Breathe onComplete={() => setLaunchedActivity(undefined)} />,
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
             hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
@@ -261,7 +259,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
-              to={`/participant/me/survey/${dialogueType.replace(/\s/g, "_")}`}
+              to="/participant/me/breathe"
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >

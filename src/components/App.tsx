@@ -18,6 +18,9 @@ import Login from "./Login"
 import Home from "./Home"
 import TipNotification from "./TipNotification"
 import Feed from "./Feed"
+import Breathe from "./Breathe"
+import JournalEntries from "./JournalEntries"
+
 import SurveyQuestions from "./SurveyQuestions"
 import Root from "./Root"
 import Researcher from "./Researcher"
@@ -25,6 +28,8 @@ import Participant from "./Participant"
 import PreventData from "./PreventData"
 
 import NavigationLayout from "./NavigationLayout"
+import ScratchImage from "./ScratchImage"
+
 // import VegaGraph from "./VegaGraph"
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
@@ -65,6 +70,7 @@ function AppRouter({ ...props }) {
     lastDomain: undefined,
     activeTab: null,
     surveyDone: false,
+    welcome: true,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -275,6 +281,37 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | Feed</PageTitle>
             <Feed />
+          </React.Fragment>
+        )}
+      />
+
+      <Route
+        exact
+        path="/participant/:id/breathe"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Breathe</PageTitle>
+            <Breathe />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/journals"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Journals</PageTitle>
+            <JournalEntries />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/scratch"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Scratch Card</PageTitle>
+            <ScratchImage />
           </React.Fragment>
         )}
       />
