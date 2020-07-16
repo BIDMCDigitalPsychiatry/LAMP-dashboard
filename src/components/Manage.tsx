@@ -24,7 +24,6 @@ import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as Medication } from "../icons/Medication.svg"
 import Jewels from "./Jewels"
 import MedicationTracker from "./MedicationTracker"
-import Hopebox from "./Hopebox"
 
 import ResponsiveDialog from "./ResponsiveDialog"
 import Journal from "./Journal"
@@ -181,21 +180,27 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Typography className={classes.cardlabel}>Jewels</Typography>
           </Card>
         </Grid>
+
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Journals")}>
-          <Card className={classes.manage}>
-            <Box mt={2} mb={1}>
-              <JournalIcon />
-            </Box>
-            <Typography className={classes.cardlabel}>Journal</Typography>
-          </Card>
+          <Link component={RouterLink} to={`/participant/me/journals`} underline="none">
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <JournalIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Journal</Typography>
+            </Card>
+          </Link>
         </Grid>
+
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("HopeBox")}>
-          <Card className={classes.manage}>
-            <Box mt={1}>
-              <HopeBoxIcon />
-            </Box>
-            <Typography className={classes.cardlabel}>Hope Box</Typography>
-          </Card>
+          <Link component={RouterLink} to={`/participant/me/hopebox`} underline="none">
+            <Card className={classes.manage}>
+              <Box mt={1}>
+                <HopeBoxIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Hope Box</Typography>
+            </Card>
+          </Link>
         </Grid>
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Medication Tracker")}>
           <Card className={classes.manage}>
@@ -218,8 +223,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
         {
           {
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
-            journal: <Journal onComplete={() => setLaunchedActivity(undefined)} />,
-            hopebox: <Hopebox onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
           }[launchedActivity ?? ""]

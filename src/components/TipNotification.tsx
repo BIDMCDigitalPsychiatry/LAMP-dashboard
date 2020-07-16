@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Typography,
   makeStyles,
@@ -13,6 +13,7 @@ import {
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
+import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,13 +65,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     likebtn: {
       fontStyle: "italic",
-      "&:hover": { background: "#FFD645" },
-
       "& label": {
         position: "absolute",
         bottom: -18,
         fontSize: 12,
       },
+    },
+    active: {
+      background: "#FFD645",
     },
     btnyellow: {
       background: "#FFD645",
@@ -90,6 +92,11 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function TipNotification() {
   const classes = useStyles()
+  const [status, setStatus] = useState("Yes")
+
+  const handleClickStatus = (statusVal: string) => {
+    setStatus(statusVal)
+  }
 
   return (
     <div>
@@ -122,11 +129,17 @@ export default function TipNotification() {
           Was this helpful today?
         </Box>
         <Box textAlign="center">
-          <IconButton className={classes.likebtn}>
+          <IconButton
+            onClick={() => handleClickStatus("Yes")}
+            className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+          >
             <ThumbsUp />
             <label>Yes</label>
           </IconButton>
-          <IconButton className={classes.likebtn}>
+          <IconButton
+            onClick={() => handleClickStatus("No")}
+            className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+          >
             <ThumbsDown />
             <label>No</label>
           </IconButton>

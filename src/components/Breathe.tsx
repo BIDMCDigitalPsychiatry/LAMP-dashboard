@@ -41,6 +41,8 @@ import useInterval from "./useInterval"
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
+import Link from "@material-ui/core/Link"
+import classnames from "classnames"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -64,15 +66,28 @@ const useStyles = makeStyles((theme) => ({
   },
   likebtn: {
     fontStyle: "italic",
-    "&:hover": { background: "#FFD645" },
-
+    width: 36,
+    height: 36,
+    padding: 9,
+    margin: "0 5px",
     "& label": {
       position: "absolute",
       bottom: -18,
       fontSize: 12,
     },
   },
-  toolbardashboard: { minHeight: 75 },
+  active: { background: "#FE8470" },
+
+  toolbardashboard: {
+    minHeight: 65,
+    "& h5": {
+      color: "rgba(0, 0, 0, 0.75)",
+      textAlign: "center",
+      fontWeight: "600",
+      fontSize: 18,
+      width: "100%",
+    },
+  },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   btnpeach: {
     background: "#FFAC98",
@@ -89,23 +104,24 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+      textDecoration: "none",
     },
   },
   lineyellow: {
     background: "#FFD645",
-    height: "6px",
+    height: "3px",
   },
   linegreen: {
     background: "#65CEBF",
-    height: "6px",
+    height: "3px",
   },
   linered: {
     background: "#FF775B",
-    height: "6px",
+    height: "3px",
   },
   lineblue: {
     background: "#86B6FF",
-    height: "6px",
+    height: "3px",
   },
   "@keyframes Pulse": {
     "0%": { transform: "scale(.15) rotate(180deg)" },
@@ -162,6 +178,7 @@ const useStyles = makeStyles((theme) => ({
     height: "125px",
     width: "125px",
     animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
+    margin: "50px auto",
   },
   Circle: {
     height: "125px",
@@ -190,6 +207,11 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "-2rem",
     animation: "$ExhaleText 8s ease infinite",
   },
+  flower: { width: "100%", maxWidth: 375 },
+  breatheReview: {
+    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25 },
+    "& p": { fontStyle: "italic", color: "rgba(0, 0, 0, 0.5)", margin: 15 },
+  },
 }))
 
 export default function Breathe({ ...props }) {
@@ -201,7 +223,7 @@ export default function Breathe({ ...props }) {
   // useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tab, _setTab] = useState(0)
-  const [timer, setTimer] = useState(null)
+  const [status, setStatus] = useState("Yes")
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -227,39 +249,23 @@ export default function Breathe({ ...props }) {
       if (progressValue < 100) {
         setTimeout(setValueUpdate, 1000)
       } else {
-        console.log("sdfg")
         handleNext()
       }
     }
   }, [progressValue])
 
+  const handleClickStatus = (statusVal: string) => {
+    setStatus(statusVal)
+  }
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton
-            onClick={props.goBack}
-            color="default"
-            className={classes.backbtn}
-            aria-label="Menu"
-            style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-            }}
-          >
+          <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
 
-          <Typography
-            variant="h5"
-            style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-              color: "rgba(0, 0, 0, 0.75)",
-              textAlign: "center",
-              width: "100%",
-            }}
-          >
-            Breathe
-          </Typography>
+          <Typography variant="h5">Breathe</Typography>
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
@@ -267,13 +273,14 @@ export default function Breathe({ ...props }) {
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
           <Box my={4}>
             <Box textAlign="center">
-              <Lotus />
-              <Typography variant="h5">Get ready</Typography>
-
-              <Typography variant="body2" component="p">
-                Get yourself comfortable and when you’re ready tap the start button.
-              </Typography>
-              <Box textAlign="center" width={1} mt={1} mb={4}>
+              <Lotus className={classes.flower} />
+              <Typography variant="h6">Get ready</Typography>
+              <Box textAlign="center" px={4} pt={2} pb={5}>
+                <Typography variant="body2" component="p">
+                  Get yourself comfortable and when you’re ready tap the start button.
+                </Typography>
+              </Box>
+              <Box textAlign="center" mt={1}>
                 <Button className={classes.btnpeach} onClick={handleNext}>
                   Start
                 </Button>
@@ -282,8 +289,15 @@ export default function Breathe({ ...props }) {
           </Box>
         </Slide>
         <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
-          <Box my={4}>
-            <Box textAlign="center">
+          <Grid
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minHeight: "80vh" }}
+          >
+            <Grid item>
               <Box className={classes.Face}>
                 <Box className={classes.Circle} />
                 <Box className={classes.Circle} />
@@ -292,7 +306,7 @@ export default function Breathe({ ...props }) {
                 <Box className={classes.Circle} />
                 <Box className={classes.Circle} />
               </Box>
-              <Box style={{ marginTop: 75 }}>
+              <Box mt={5} textAlign="center">
                 <Typography variant="overline" className={classes.InhaleContainer}>
                   Inhale
                 </Typography>
@@ -300,37 +314,41 @@ export default function Breathe({ ...props }) {
                   Exhale
                 </Typography>
               </Box>
-            </Box>
-          </Box>
+            </Grid>
+          </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
           <Box my={4}>
-            <Box textAlign="center">
-              <Lotus />
+            <Box textAlign="center" className={classes.breatheReview}>
+              <Lotus className={classes.flower} />
               <Typography variant="h4">Nicely done!</Typography>
-              <Grid container spacing={0} style={{ marginBottom: "20px" }}>
-                <Grid item xs={2} className={classes.lineyellow}></Grid>
-                <Grid item xs={2} className={classes.linegreen}></Grid>
-                <Grid item xs={2} className={classes.linered}></Grid>
-                <Grid item xs={2} className={classes.lineblue}></Grid>
+              <Grid container direction="row" justify="center" alignItems="center">
+                <Grid item xs={1} className={classes.lineyellow}></Grid>
+                <Grid item xs={1} className={classes.linegreen}></Grid>
+                <Grid item xs={1} className={classes.linered}></Grid>
+                <Grid item xs={1} className={classes.lineblue}></Grid>
               </Grid>
-              <Box fontStyle="italic" textAlign="center" fontSize={16}>
-                Was this helpful today?
-              </Box>
-              <Box textAlign="center">
-                <IconButton className={classes.likebtn}>
+              <Typography variant="body2">Was this helpful today?</Typography>
+              <Box textAlign="center" mb={5}>
+                <IconButton
+                  onClick={() => handleClickStatus("Yes")}
+                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
                   <ThumbsUp />
                   <label>Yes</label>
                 </IconButton>
-                <IconButton className={classes.likebtn}>
+                <IconButton
+                  onClick={() => handleClickStatus("No")}
+                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
                   <ThumbsDown />
                   <label>No</label>
                 </IconButton>
               </Box>
               <Box textAlign="center">
-                <Button variant="contained" color="primary" className={classes.btnpeach}>
+                <Link href="#" className={classes.btnpeach}>
                   Done
-                </Button>
+                </Link>
               </Box>{" "}
             </Box>
           </Box>

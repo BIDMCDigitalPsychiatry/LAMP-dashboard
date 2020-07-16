@@ -29,6 +29,7 @@ import PreventData from "./PreventData"
 
 import NavigationLayout from "./NavigationLayout"
 import ScratchImage from "./ScratchImage"
+import HopeBox from "./HopeBox"
 
 // import VegaGraph from "./VegaGraph"
 
@@ -301,10 +302,29 @@ function AppRouter({ ...props }) {
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Journals</PageTitle>
-            <JournalEntries />
+            <NavigationLayout
+              id={props.match.params.id}
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Journals"
+            >
+              <JournalEntries />
+            </NavigationLayout>
           </React.Fragment>
         )}
       />
+
+      <Route
+        exact
+        path="/participant/:id/hopebox"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <HopeBox />
+          </React.Fragment>
+        )}
+      />
+
       <Route
         exact
         path="/scratch"
