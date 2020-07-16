@@ -19,7 +19,17 @@ import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
-
+import VegaGraph from "./VegaGraph" 
+import DataStudio from "./DataStudio"
+import DataStudioValueIndicator from "./DataStudioValueIndicator"
+import DataStudioLineChart from "./DataStudioLineChart"
+import DataStudioBarChart from "./DataStudioBarChart"
+import DataStudioSelection from "./DataStudioSelection"
+import DataStudioCanvas from "./DataStudioCanvas"
+import DataStudioCanvasBody from "./DataStudioCanvasBody"
+import DataStudioValueDataIndicator from "./DataStudioValueDataIndicator"
+import DataStudioList from "./DataStudioList"
+  
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
@@ -222,6 +232,126 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
+      
+      {/* Route canvas for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudio />
+            </React.Fragment>
+        }
+      />
+      
+      {/* Route canvas for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/canvas"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioCanvas />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route canvas for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/data-value-indicator"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioValueDataIndicator />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route canvas for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/data-list"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioList />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route canvas for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/canvas-body"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioCanvasBody />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route data-selection for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/data-selection"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioSelection />
+            </React.Fragment>
+        }
+      />
+        
+      {/* Route value-indicator for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/value-indicator"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioValueIndicator />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route line-chart for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/line-chart"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioLineChart />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route bar-chart for showing Data Studio. */}
+      <Route
+        exact
+        path="/data-studio/bar-chart"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <DataStudioBarChart />
+            </React.Fragment>
+        }
+      />
+
+      {/* Route vega-graph for showing Vega graphs. */}
+      <Route
+        exact
+        path="/visualizations"
+        render={(props) =>
+          <React.Fragment>
+              <PageTitle>mindLAMP | Graphs</PageTitle>
+              <VegaGraph goBack={props.history.goBack}/>
+            </React.Fragment>
+        }
+      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
