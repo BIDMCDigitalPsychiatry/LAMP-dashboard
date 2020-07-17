@@ -231,9 +231,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "30px",
     marginLeft: -15,
     [theme.breakpoints.up("md")]: {
-      marginTop: 0,
-    },
-  },
+      marginTop: 0, 
+    }, 
+  }, 
   textAreaControl: {
     width: "100%",
     marginTop: 35,
