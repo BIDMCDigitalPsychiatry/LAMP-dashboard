@@ -171,14 +171,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
               <Box mt={1}>
                 <HopeBoxIcon />
               </Box>
-              <Typography className={classes.cardlabel}>Hope Box</Typography>
+              <Typography className={classes.cardlabel}>Hope box</Typography>
             </Card>
           </Link>
         </Grid>
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Scratch card")}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
-              <ScratchCard width="100" height="100"/>
+              <ScratchCard width="100" height="100" />
             </Box>
             <Typography className={classes.cardlabel}>Scratch card</Typography>
           </Card>
@@ -188,7 +188,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Box mt={2} mb={1}>
               <Medication />
             </Box>
-            <Typography className={classes.cardlabel}>Medication Tracker</Typography>
+            <Typography className={classes.cardlabel}>Medication tracker</Typography>
           </Card>
         </Grid>
       </Grid>
