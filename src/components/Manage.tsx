@@ -178,6 +178,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
         <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Scratch card")}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
+              <ScratchCard width="100" height="100"/>
+            </Box>
+            <Typography className={classes.cardlabel}>Scratch card</Typography>
+          </Card>
+        </Grid>
+        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("medicationtracker")}>
+          <Card className={classes.manage}>
+            <Box mt={2} mb={1}>
               <Medication />
             </Box>
             <Typography className={classes.cardlabel}>Medication Tracker</Typography>
