@@ -1,197 +1,37 @@
 import React, { useState, useEffect } from "react"
 import { ReactComponent as Background } from "../icons/scratch/Background.svg"
-import {
-  Typography,
-  makeStyles,
-  Box,
-  Slide,
-  Radio,
-  RadioProps,
-  RadioGroup,
-  FormControl,
-  FormControlLabel,
-  useMediaQuery,
-  useTheme,
-  Button,
-  Container,
-  TextField,
-  LinearProgress,
-  createStyles,
-  withStyles,
-  Theme,
-  AppBar,
-  Icon,
-  IconButton,
-  Toolbar,
-  Grid,
-  Slider,
-  Step,
-  Stepper,
-  StepLabel,
-  StepContent,
-  StepConnector,
-  Menu,
-  MenuItem,
-  ListItemText,
-  ListItem,
-  List,
-} from "@material-ui/core"
+import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar } from "@material-ui/core"
 
-const noop = (o) => o
-// export default function ScratchImage({...props}) {
-//   const [isDrawing, setIsDrawing] = useState(false);
-//   const [lastPoint, setLastPoint] = useState(null);
-//   const [context, setContext] = useState(null);
-//   let canvas;
-//   let brush = new Image();
-//   let cover = new Image();
-//   const noop = (o) => o
+const useStyles = makeStyles((theme) => ({
+  toolbardashboard: {
+    minHeight: 65,
+    "& h5": {
+      color: "rgba(0, 0, 0, 0.75)",
+      textAlign: "center",
+      fontWeight: "600",
+      fontSize: 18,
+      width: "100%",
+    },
+  },
+  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  background: {
+    background: "#e0e0e0",
+    minHeight: "1000px",
+  },
+}))
 
-//   const defaultProps = {
-//     onReveal: noop,
-//   }
+export default function ScratchImage({ ...props }) {
+  let lastPoint, isDrawing, context
+  const [canvas, setCanvas] = useState(null)
+  const [visibility, setVisibility] = useState(false)
+  let brush = new Image()
+  let cover = new Image()
+  const classes = useStyles()
+  let area = 0
+  let val = 0
 
-//   useEffect(() => {
-//      if(canvas != null) {
-//         canvas.width = window.innerWidth
-//         canvas.height = window.innerHeight
-
-//         canvas.addEventListener("mousedown", touchStart)
-//         canvas.addEventListener("touchstart", touchStart)
-//         canvas.addEventListener("mousemove", touchMove)
-//         canvas.addEventListener("touchmove", touchMove)
-//         canvas.addEventListener("mouseup", touchEnd)
-//         canvas.addEventListener("touchend", touchEnd)
-//         setContext(canvas.getContext('2d'));
-
-//      }
-
-// }, []);
-
-// useEffect(() => {
-
-//   if(canvas != null && context != null ) {
-//     brush.src = require("../icons/scratch/circle.svg")
-//     cover.src = require("../icons/scratch/ScratchCover.svg")
-//     cover.onload = () => context.drawImage(cover, 0, 0, canvas.width, canvas.height)
-//   }
-
-// }, [context]);
-
-// const getPosition = (event:any) => {
-//   let target = canvas
-//   let offsetX = 0
-//   let offsetY = 0
-
-//   if (target.offsetParent !== undefined) {
-//     while ((target = target.offsetParent)) {
-//       offsetX += target.offsetLeft
-//       offsetY += target.offsetTop
-//     }
-//   }
-
-//   const x = (event.pageX || event.touches[0].clientX) - offsetX
-//   const y = (event.pageY || event.touches[0].clientY) - offsetY
-//   return { x, y }
-// }
-
-// const touchStart = (event:any) => {
-//   setIsDrawing(true)
-//   setLastPoint(getPosition(event))
-//   context.globalCompositeOperation = "destination-out"
-// }
-
-// const touchMove = (event:any) => {
-//   if (!isDrawing) return
-//   event.preventDefault()
-
-//   const ctx = context
-//   const a = lastPoint
-//   const b = getPosition(event)
-//   const dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2))
-//   const angle = Math.atan2(b.x - a.x, b.y - a.y)
-//   const offsetX = brush.width / 2
-//   const offsetY = brush.height / 2
-
-//   for (let x, y, i = 0; i < dist; i++) {
-//     x = a.x + Math.sin(angle) * i - offsetX
-//     y = a.y + Math.cos(angle) * i - offsetY
-//     ctx.drawImage(this.brush, x, y)
-//   }
-
-//   setLastPoint(b);
-// }
-
-// const touchEnd = (event : any) => {
-//   setIsDrawing(false);
-// }
-
-// return (
-//     <div><canvas
-//     style={{ position: "absolute", zIndex: 2, width: "100%", height: "100%" }}
-//         ref={(el) => (canvas = el)}
-//       />
-//       <div className="secret absolute fill no-select flex justify-center items-center">
-//         <Background />
-//       </div>
-//   </div>
-// )
-// }
-
-export default class ScratchImage extends React.PureComponent {
-  private isDrawing
-  private lastPoint
-  private canvas
-  private ctx
-  private brush
-  private cover
-  static defaultProps = {
-    onReveal: noop,
-  }
-
-  constructor(props) {
-    super(props)
-    this.isDrawing = false
-    this.lastPoint = null
-    this.touchStart = this.touchStart.bind(this)
-    this.touchMove = this.touchMove.bind(this)
-    this.touchEnd = this.touchEnd.bind(this)
-  }
-
-  componentDidMount() {
-    const canvas = this.canvas
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
-
-    canvas.addEventListener("mousedown", this.touchStart)
-    canvas.addEventListener("touchstart", this.touchStart)
-    canvas.addEventListener("mousemove", this.touchMove)
-    canvas.addEventListener("touchmove", this.touchMove)
-    canvas.addEventListener("mouseup", this.touchEnd)
-    canvas.addEventListener("touchend", this.touchEnd)
-
-    this.ctx = canvas.getContext("2d")
-
-    this.brush = new Image()
-    this.brush.src = require("../icons/scratch/circle.svg")
-
-    this.cover = new Image()
-    this.cover.src = require("../icons/scratch/ScratchCover.svg")
-    this.cover.onload = () => this.ctx.drawImage(this.cover, 0, 0, canvas.width, canvas.height)
-  }
-
-  componentWillUnmount() {
-    const canvas = this.canvas
-    canvas.removeEventListener("mousedown", this.touchStart)
-    canvas.removeEventListener("touchstart", this.touchStart)
-    canvas.removeEventListener("mousemove", this.touchMove)
-    canvas.removeEventListener("touchmove", this.touchMove)
-    canvas.removeEventListener("mouseup", this.touchEnd)
-    canvas.removeEventListener("touchend", this.touchEnd)
-  }
-
-  getPosition(event) {
-    let target = this.canvas
+  const getPosition = (event: any) => {
+    let target = canvas
     let offsetX = 0
     let offsetY = 0
 
@@ -207,77 +47,79 @@ export default class ScratchImage extends React.PureComponent {
     return { x, y }
   }
 
-  touchStart(event) {
-    this.isDrawing = true
-    this.lastPoint = this.getPosition(event)
-    this.ctx.globalCompositeOperation = "destination-out"
-  }
-
-  touchMove(event) {
-    if (!this.isDrawing) return
+  const touchMove = (event: any) => {
+    if (!isDrawing) return
     event.preventDefault()
-
-    const ctx = this.ctx
-    const a = this.lastPoint
-    const b = this.getPosition(event)
-    const dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2))
-    const angle = Math.atan2(b.x - a.x, b.y - a.y)
-    const offsetX = (this.brush.width - 80) / 2
-    const offsetY = (this.brush.height - 49) / 2
-
-    for (let x, y, i = 0; i < dist; i++) {
-      x = a.x + Math.sin(angle) * i
-      y = a.y + Math.cos(angle) * i
-      ctx.drawImage(this.brush, x, y, 80, 80)
+    if (lastPoint != null) {
+      const a = lastPoint
+      const b = getPosition(event)
+      const dist = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2))
+      const angle = Math.atan2(b.x - a.x, b.y - a.y)
+      const offsetX = (brush.width - 80) / 2
+      const offsetY = (brush.height - 40) / 2
+      for (let x, y, i = 0; i < dist; i++) {
+        x = a.x + Math.sin(angle) * i - offsetX
+        y = a.y + Math.cos(angle) * i - offsetY
+        context.drawImage(brush, x, y, 80, 80)
+        val = val + 1
+        area = canvas.width * canvas.height
+        if (val > area / 150) {
+          canvas.remove()
+        }
+      }
+      lastPoint = b
     }
-
-    this.lastPoint = b
   }
 
-  touchEnd(event) {
-    this.isDrawing = false
+  const touchEnd = (event: any) => {
+    isDrawing = false
   }
 
-  render() {
-    return (
-      <div>
-        {/* <AppBar position="static" style={{ background: "#E7F8F2", boxShadow: "none" }}>
+  useEffect(() => {
+    if (canvas != null) {
+      canvas.width = window.innerWidth
+      canvas.height = document.getElementById("canvasDiv").clientHeight
+      context = canvas.getContext("2d")
+      canvas.addEventListener("mousedown", touchStart)
+      canvas.addEventListener("touchstart", touchStart)
+      canvas.addEventListener("mousemove", touchMove)
+      canvas.addEventListener("touchmove", touchMove)
+      canvas.addEventListener("mouseup", touchEnd)
+      canvas.addEventListener("touchend", touchEnd)
+      brush.src = require("../icons/scratch/circle.svg")
+      cover.src = require("../icons/scratch/ScratchCover.svg")
+      cover.onload = () => context.drawImage(cover, 0, 0, canvas.width, canvas.height)
+    }
+  }, [canvas])
+
+  const touchStart = (event: any) => {
+    isDrawing = true
+    setVisibility(true)
+    lastPoint = getPosition(event)
+    if (context != null) {
+      context.globalCompositeOperation = "destination-out"
+    }
+  }
+
+  return (
+    <div>
+      <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton
-            onClick={props.goBack}
-            color="default"
-            className={classes.backbtn}
-            aria-label="Menu"
-            style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-            }}
-          >
+          <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-
-          <Typography
-            variant="h5"
-            style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-              color: "rgba(0, 0, 0, 0.75)",
-              textAlign: "center",
-              width: "100%",
-            }}
-          >
-            {`${props.type.replace(/_/g, " ")}`}
-          </Typography>
+          <Typography variant="h5">Scratch card</Typography>
         </Toolbar>
-     
-      </AppBar> */}
-
+      </AppBar>
+      <div id="canvasDiv" className={classes.background}>
         <canvas
           style={{ position: "absolute", zIndex: 2, width: "100%", height: "100%" }}
-          ref={(el) => (this.canvas = el)}
+          ref={(el) => setCanvas(el)}
         />
-        <div className="secret absolute fill no-select flex justify-center items-center">
+        <Box style={{ display: visibility ? "block" : "none" }}>
           <Background />
-        </div>
+        </Box>
       </div>
-    )
-  }
+    </div>
+  )
 }

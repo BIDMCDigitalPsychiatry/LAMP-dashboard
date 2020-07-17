@@ -24,19 +24,14 @@ import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as Medication } from "../icons/Medication.svg"
 import Jewels from "./Jewels"
 import MedicationTracker from "./MedicationTracker"
-
+import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
-import Journal from "./Journal"
 import Resources from "./Resources"
-
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      width: "100%",
-    },
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
@@ -48,18 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
     },
-    assess: {
-      background: "#E7F8F2",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
-    MuiDialogPaperScrollPaper: {
-      maxHeight: "100% !important",
-    },
+
     closeButton: {
       position: "absolute",
       right: theme.spacing(1),
@@ -88,6 +72,14 @@ const useStyles = makeStyles((theme: Theme) =>
         textAlign: "left",
       },
     },
+    scratch: {
+      "& h2": {
+        textAlign: "center !important",
+      },
+      "& h6": {
+        textAlign: "center !important",
+      },
+    },
     btnpeach: {
       background: "#FFAC98",
       borderRadius: "40px",
@@ -112,18 +104,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
     },
     dialogtitle: { padding: 0 },
-    gotit: {
-      color: "#6083E7",
-      fontSize: "16px",
-      marginTop: "20px",
-      padding: "25px",
-    },
-    ribbonText: {
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
-      marginBottom: "30px",
-    },
     manage: {
       background: "#FFEFEC",
       padding: "10px 0",
@@ -136,24 +116,17 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _hideCareTeam() {
-  return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
-}
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
-function _shouldRestrict() {
-  return _patientMode() && _hideCareTeam()
-}
-
 export default function Manage({ participant, ...props }: { participant: ParticipantObj }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [classType, setClassType] = useState("")
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
+    let classT = type == "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
+    setClassType(classT)
     setOpen(true)
   }
 
@@ -202,7 +175,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Medication Tracker")}>
+        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Scratch card")}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <Medication />
@@ -240,29 +213,35 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-          <div className={classes.header}>
+          <div className={classType}>
             {dialogueType == "Breathe" && <BreatheIcon className={classes.topicon} />}
-            {dialogueType == "Jewels" && <JewelsIcon className={classes.topicon} />}
-            {dialogueType == "Journals" && <JournalIcon className={classes.topicon} />}
-            {dialogueType == "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
-            {dialogueType == "Medication Tracker" && <Medication className={classes.topicon} />}
-            <Typography variant="h6">Games</Typography>
+            {dialogueType == "Scratch card" && <ScratchCard className={classes.topicon} />}
+            {dialogueType == "Scratch card" && <Typography variant="h6">Meditation exercises</Typography>}
+            {dialogueType == "Breathe" && <Typography variant="h6">Games</Typography>}
             <Typography variant="h2">{dialogueType}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          <Typography variant="h4" gutterBottom>
-            Breathing exercise (2 mins)
-          </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            Follow the motion of the lotus flower opening and closing to control your breaths in and out.
-          </Typography>
+          {dialogueType == "Breathe" && (
+            <Typography variant="h4" gutterBottom>
+              Breathing exercise (2 mins)
+            </Typography>
+          )}
+
+          {dialogueType == "Scratch card" && (
+            <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
+          )}
+          {dialogueType == "Breathe" && (
+            <Typography variant="body2" color="textSecondary" component="p">
+              Follow the motion of the lotus flower opening and closing to control your breaths in and out.
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
-              to="/participant/me/breathe"
+              to={dialogueType == "Breathe" ? "/participant/me/breathe" : "/participant/me/scratch"}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >

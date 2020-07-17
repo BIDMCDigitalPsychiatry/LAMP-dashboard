@@ -77,7 +77,6 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   active: { background: "#FE8470" },
-
   toolbardashboard: {
     minHeight: 65,
     "& h5": {
@@ -218,9 +217,6 @@ export default function Breathe({ ...props }) {
   const classes = useStyles()
   const [started, setStarted] = useState(false)
   const [progressValue, setProgressValue] = useState(0)
-  //const [playing, setPlaying] = useAudio('/calm.mp3', true, true)
-  //useEffect(() => () => setPlaying(false), [])
-  // useInterval(() => navigator.vibrate && navigator.vibrate([25, 400, 75, 400, 25]), 4000, true)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tab, _setTab] = useState(0)
   const [status, setStatus] = useState("Yes")
@@ -264,7 +260,6 @@ export default function Breathe({ ...props }) {
           <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-
           <Typography variant="h5">Breathe</Typography>
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
@@ -349,7 +344,7 @@ export default function Breathe({ ...props }) {
                 <Link href="#" className={classes.btnpeach}>
                   Done
                 </Link>
-              </Box>{" "}
+              </Box>
             </Box>
           </Box>
         </Slide>

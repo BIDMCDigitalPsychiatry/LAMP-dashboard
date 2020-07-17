@@ -292,7 +292,7 @@ function AppRouter({ ...props }) {
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Breathe</PageTitle>
-            <Breathe />
+            <Breathe goBack={props.history.goBack} />
           </React.Fragment>
         )}
       />
@@ -308,7 +308,7 @@ function AppRouter({ ...props }) {
               onLogout={() => reset()}
               activeTab="Journals"
             >
-              <JournalEntries />
+              <JournalEntries goBack={props.history.goBack} />
             </NavigationLayout>
           </React.Fragment>
         )}
@@ -320,18 +320,18 @@ function AppRouter({ ...props }) {
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Hope Box</PageTitle>
-            <HopeBox />
+            <HopeBox goBack={props.history.goBack} />
           </React.Fragment>
         )}
       />
 
       <Route
         exact
-        path="/scratch"
+        path="/participant/:id/scratch"
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Scratch Card</PageTitle>
-            <ScratchImage />
+            <ScratchImage goBack={props.history.goBack} />
           </React.Fragment>
         )}
       />
