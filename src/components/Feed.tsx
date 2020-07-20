@@ -124,6 +124,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     customstepper: {
       position: "relative",
+      maxWidth: 500,
       "&::after": {
         content: "",
         position: "absolute",
@@ -146,6 +147,12 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: 0,
       padding: 0,
       "& span": { minHeight: 0 },
+    },
+
+    large_calendar: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
     },
   })
 )
@@ -252,7 +259,7 @@ export default function Feed() {
     <div
       className={classes.root}
       style={{
-        paddingLeft: supportsSidebar ? 64 : undefined,
+        paddingLeft: supportsSidebar ? 150 : undefined,
       }}
     >
       <AppBar className={classes.customheader}>
@@ -262,7 +269,7 @@ export default function Feed() {
             variant="h5"
             noWrap
             style={{
-              paddingLeft: supportsSidebar ? 64 : undefined,
+              paddingLeft: supportsSidebar ? 150 : undefined,
             }}
           >
             Feed
@@ -278,39 +285,50 @@ export default function Feed() {
       <Toolbar className={classes.toolbar} />
 
       <WeekView />
-      <Stepper
-        activeStep={activeStep}
-        orientation="vertical"
-        classes={{ root: classes.customstepper }}
-        connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
-      >
-        {steps.map((label, index) => (
-          <Step>
-            <StepLabel
-              StepIconProps={{
-                classes: { root: classes.stepIcon, active: classes.stepIconActive, completed: classes.stepIconActive },
-              }}
-            >
-              {label}
-            </StepLabel>
 
-            <StepContent classes={{ root: classes.customsteppercontent }}>
-              <Typography>{getStepContent(index)}</Typography>
-              <div className={classes.actionsContainer}>
-                <div>
-                  <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                    Back
-                  </Button>
-                  <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
-                    {activeStep === steps.length - 1 ? "Ok" : "Next"}
-                  </Button>
-                </div>
-              </div>
-            </StepContent>
-          </Step>
-        ))}
-      </Stepper>
+      <Grid container>
+        <Grid item xs>
+          <Stepper
+            activeStep={activeStep}
+            orientation="vertical"
+            classes={{ root: classes.customstepper }}
+            connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
+          >
+            {steps.map((label, index) => (
+              <Step>
+                <StepLabel
+                  StepIconProps={{
+                    classes: {
+                      root: classes.stepIcon,
+                      active: classes.stepIconActive,
+                      completed: classes.stepIconActive,
+                    },
+                  }}
+                >
+                  {label}
+                </StepLabel>
 
+                <StepContent classes={{ root: classes.customsteppercontent }}>
+                  <Typography>{getStepContent(index)}</Typography>
+                  <div className={classes.actionsContainer}>
+                    <div>
+                      <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+                        Back
+                      </Button>
+                      <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
+                        {activeStep === steps.length - 1 ? "Ok" : "Next"}
+                      </Button>
+                    </div>
+                  </div>
+                </StepContent>
+              </Step>
+            ))}
+          </Stepper>
+        </Grid>
+        <Grid item xs className={classes.large_calendar}>
+          ddsds
+        </Grid>
+      </Grid>
       {activeStep === steps.length && (
         <Paper square elevation={0} className={classes.resetContainer}>
           <Typography>All steps completed - you&apos;re finished</Typography>

@@ -1,15 +1,20 @@
 import React, { useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Box, useMediaQuery, useTheme, Drawer, BottomNavigationAction } from "@material-ui/core"
+import { Box, useMediaQuery, useTheme, Drawer, BottomNavigationAction, Grid } from "@material-ui/core"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
+import { ReactComponent as Logo } from "../icons/Logo.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     navigation: {
       "& svg": { width: 36, height: 36, padding: 6, borderRadius: "50%", opacity: 0.5 },
+      [theme.breakpoints.up("md")]: {
+        flex: "none",
+        minHeight: 125,
+      },
     },
     navigationLearnSelected: {
       "& svg": {
@@ -46,6 +51,15 @@ const useStyles = makeStyles((theme: Theme) =>
       letterSpacing: 0,
       color: "rgba(0, 0, 0, 0.4)",
     },
+    leftbarLogo: {
+      textAlign: "center",
+      "& svg": {
+        maxWidth: 30,
+      },
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
+    },
   })
 )
 
@@ -70,11 +84,16 @@ export default function BottomMenu({ ...props }) {
             flexDirection: supportsSidebar ? "column" : "row",
             justifyContent: !supportsSidebar ? "center" : undefined,
             height: !supportsSidebar ? 80 : undefined,
-            width: supportsSidebar ? 80 : undefined,
+            width: supportsSidebar ? 100 : undefined,
             transition: "all 500ms ease-in-out",
+            background: "#F8F8F8",
+            border: 0,
           },
         }}
       >
+        <Grid className={classes.leftbarLogo}>
+          <Logo />
+        </Grid>
         <BottomNavigationAction
           showLabel
           selected={tab === 0}
