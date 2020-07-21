@@ -15,7 +15,7 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
-import Home from "./Home"
+import Conversations from "./Conversations"
 import TipNotification from "./TipNotification"
 import Feed from "./Feed"
 import Breathe from "./Breathe"
@@ -285,7 +285,16 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
-
+      <Route
+        exact
+        path="/participant/:id/messages"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Conversations</PageTitle>
+            <Conversations goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
       <Route
         exact
         path="/participant/:id/breathe"

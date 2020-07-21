@@ -95,7 +95,8 @@ export default function NavigationLayout({
                 className={classes.backbtn}
                 aria-label="Menu"
                 style={{
-                  marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,
+                  marginLeft:
+                    supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
                 }}
               >
                 <Icon>arrow_back</Icon>
@@ -104,7 +105,8 @@ export default function NavigationLayout({
             <Typography
               variant="h5"
               style={{
-                marginLeft: supportsSidebar && title.startsWith("Patient") ? 64 : undefined,
+                marginLeft:
+                  supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
               }}
             >
               {activeTab}
