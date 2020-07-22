@@ -22,14 +22,7 @@ import PhysicalTips from "./PhysicalTips"
 import StressTips from "./StressTips"
 import Motivation from "./Motivation"
 import Welcome from "./Welcome"
-import { ReactComponent as Book } from "../icons/Book.svg"
-import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
-import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
-import { ReactComponent as Chat } from "../icons/Chat.svg"
-import { ReactComponent as Wellness } from "../icons/Wellness.svg"
-import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
-import { ReactComponent as Info } from "../icons/Info.svg"
-import { ReactComponent as Lightning } from "../icons/Lightning.svg"
+import Learn from "./Learn"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -154,7 +147,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    getShowWelcome(participant).then(setOpen)
+    // getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -170,90 +163,7 @@ export default function Participant({
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Container>
-            <Grid container spacing={2}>
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("moodtips")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <MoodTips />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Mood Tips</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("sleeptips")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <SleepTips />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Sleep Tips</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("socialtips")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <Chat />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Social Tips</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("resources")}>
-                  <Card className={classes.learn}>
-                    <Box mt={1}>
-                      <Info />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Mental Health Resources</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("physicalwellness")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <Wellness />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Physical Wellness</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("bookrecommendations")}>
-                  <Card className={classes.learn}>
-                    <Box mt={1}>
-                      <Book />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Suggested Reading</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("motivation")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <PaperLens />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Motivation</Typography>
-                  </Card>
-                </Grid>
-              )}
-              {!hideCareTeam && (
-                <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("stresstips")}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      <Lightning />
-                    </Box>
-                    <Typography className={classes.cardlabel}>Stress Tips</Typography>
-                  </Card>
-                </Grid>
-              )}
-            </Grid>
-          </Container>
+          <Learn participant={participant} />
         </Box>
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>

@@ -20,7 +20,7 @@ import TipNotification from "./TipNotification"
 import Feed from "./Feed"
 import Breathe from "./Breathe"
 import JournalEntries from "./JournalEntries"
-
+import LearnTips from "./LearnTips"
 import SurveyQuestions from "./SurveyQuestions"
 import Root from "./Root"
 import Researcher from "./Researcher"
@@ -291,7 +291,17 @@ function AppRouter({ ...props }) {
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Conversations</PageTitle>
-            <Conversations goBack={props.history.goBack} />
+            <NavigationLayout
+              id={props.match.params.id}
+              title={
+                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
+              }
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Conversations"
+            >
+              <Conversations goBack={props.history.goBack} />
+            </NavigationLayout>
           </React.Fragment>
         )}
       />
@@ -351,6 +361,26 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | Survey</PageTitle>
             <SurveyQuestions type={props.match.params.type} goBack={props.history.goBack} submitSurvey={submitSurvey} />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/LearnTips/:type"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Learn</PageTitle>
+            <NavigationLayout
+              id={props.match.params.id}
+              title={
+                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
+              }
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab={`${titlecase(props.match.params.type)}`}
+            >
+              <LearnTips type={props.match.params.type} goBack={props.history.goBack} />
+            </NavigationLayout>
           </React.Fragment>
         )}
       />

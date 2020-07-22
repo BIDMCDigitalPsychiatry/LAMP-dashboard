@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
 import {
   Box,
   useMediaQuery,
@@ -16,6 +16,7 @@ import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
+import Tooltip, { TooltipProps } from "@material-ui/core/Tooltip"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       right: theme.spacing(1),
       top: theme.spacing(1),
-      color: theme.palette.grey[500],
+      color: "rgba(255, 255, 255, 0.75)",
     },
     navigationLearnSelected: {
       "& svg": {
@@ -85,14 +86,44 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    popover: {
-      pointerEvents: "none",
-    },
+    // popover: {
+    //   pointerEvents: "none",
+    // },
     paper: {
-      padding: theme.spacing(1),
+      padding: "25px 20px",
+      boxShadow: "none",
+      background: "rgba(228, 103, 89, 0.95)",
+      borderRadius: 10,
+      // top: 'auto !important',
+      // bottom: 95,
+      "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+      "& p": { color: "white", fontWeight: 300, marginTop: 10 },
     },
+
+    customarrow: {},
   })
 )
+
+const HtmlTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(228, 103, 89, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    right: 10,
+    "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+  },
+  arrow: {
+    color: "#E56F61",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "19px !important",
+    },
+  },
+}))(Tooltip)
 
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
@@ -114,32 +145,6 @@ export default function BottomMenu({ ...props }) {
   }
   return (
     <div>
-      <Popover
-        id="mouse-over-popover"
-        className={classes.popover}
-        classes={{
-          paper: classes.paper,
-        }}
-        open={open}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        onClose={handlePopoverClose}
-        disableRestoreFocus
-      >
-        <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-          <CloseIcon />
-        </IconButton>
-        <Typography variant="h6">Welcome to the Manage section.</Typography>
-        <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
-      </Popover>
-
       <Box clone displayPrint="none">
         <Drawer
           open
@@ -188,20 +193,40 @@ export default function BottomMenu({ ...props }) {
             icon={<Assess />}
             onChange={(_, newTab) => setTab(newTab)}
           />
-          <BottomNavigationAction
-            showLabel
-            selected={tab === 2}
-            label="Manage"
-            value={2}
-            classes={{
-              root: classes.navigation,
-              selected: classes.navigationManageSelected,
-              label: classes.navigationLabel,
-            }}
-            icon={<Manage />}
-            onChange={(_, newTab) => setTab(newTab)}
-            // onClick={handlePopoverOpen}
-          />
+          <HtmlTooltip
+            open={open}
+            interactive={true}
+            title={
+              <React.Fragment>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+                <Typography variant="h6">
+                  Welcome to the <Box component="span">Manage</Box> section.
+                </Typography>
+                <Typography variant="body1">Here you can take steps to refocus, reflect, and recovera.</Typography>
+              </React.Fragment>
+            }
+            arrow={true}
+            placement={supportsSidebar ? "right" : "top"}
+          >
+            <BottomNavigationAction
+              showLabel
+              selected={tab === 2}
+              label="Manage"
+              value={2}
+              classes={{
+                root: classes.navigation,
+                selected: classes.navigationManageSelected,
+                label: classes.navigationLabel,
+              }}
+              icon={<Manage />}
+              onChange={(event, newTab) => {
+                setTab(newTab)
+                handlePopoverOpen(event)
+              }}
+            />
+          </HtmlTooltip>
           <BottomNavigationAction
             showLabel
             selected={tab === 3}
@@ -213,7 +238,10 @@ export default function BottomMenu({ ...props }) {
               label: classes.navigationLabel,
             }}
             icon={<PreventIcon />}
-            onChange={(_, newTab) => setTab(newTab)}
+            onChange={(event, newTab) => {
+              setTab(newTab)
+              handlePopoverOpen(event)
+            }}
           />
         </Drawer>
       </Box>

@@ -285,8 +285,7 @@ export default function Feed() {
         </Toolbar>
       </AppBar>
       <Toolbar className={classes.toolbar} />
-
-      <WeekView />
+      {!supportsSidebar && <WeekView />}
 
       <Grid container>
         <Grid item xs>

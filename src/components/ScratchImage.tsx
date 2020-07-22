@@ -16,7 +16,10 @@ const useStyles = makeStyles((theme) => ({
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   background: {
     background: "#e0e0e0",
-    minHeight: "1000px",
+    minHeight: "calc(100vh - 65px)",
+  },
+  svgouter: {
+    "& svg": { width: "100%" },
   },
 }))
 
@@ -112,11 +115,8 @@ export default function ScratchImage({ ...props }) {
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
-        <canvas
-          style={{ position: "absolute", zIndex: 2, width: "100%", height: "100%" }}
-          ref={(el) => setCanvas(el)}
-        />
-        <Box style={{ display: visibility ? "block" : "none" }}>
+        <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+        <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
           <Background />
         </Box>
       </div>

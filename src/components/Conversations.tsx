@@ -135,7 +135,7 @@ export default function Conversations({ ...props }) {
   const [conversations, setConversations] = useState([])
   const [open, setOpen] = useState(false)
   const [conversation, setConversation] = useState("")
-  const [jounalDate, setJounalDate] = useState(null)
+  const [sender, setSender] = useState(null)
   const [details, setDetails] = useState(null)
 
   useEffect(() => {
@@ -163,19 +163,10 @@ export default function Conversations({ ...props }) {
                 marginRight: conversations[key].messages[msgIndex].sendType === 0 ? "10%" : "",
               }}
             >
-              <Grid container spacing={3}>
-                <Grid item xs={11}>
-                  <Typography variant="h6">{conversations[key].sender}</Typography>
-                </Grid>
-                <Grid item xs={1}>
-                  <Typography variant="caption">{duration(new Date(conversations[key].date))}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="caption">{conversations[key].messages[msgIndex].message}</Typography>
-                </Grid>
-              </Grid>
+              <Typography variant="caption">{conversations[key].messages[msgIndex].message}</Typography>
             </Card>
           )
+          setSender(conversations[key].sender)
         })
       }
     })
@@ -224,6 +215,14 @@ export default function Conversations({ ...props }) {
           setOpen(false)
         }}
       >
+        <AppBar position="static" style={{ background: "#FFFFFF", boxShadow: "none" }}>
+          <Toolbar className={classes.toolbardashboard}>
+            <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
+              <Icon>arrow_back</Icon>
+            </IconButton>
+            <Typography variant="h5">{sender}</Typography>
+          </Toolbar>
+        </AppBar>
         <Box px={3} style={{ marginTop: "5%" }}>
           {details}
         </Box>

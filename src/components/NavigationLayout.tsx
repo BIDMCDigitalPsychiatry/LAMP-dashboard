@@ -20,7 +20,9 @@ import {
   DialogActions,
   Typography,
   colors,
+  Link,
 } from "@material-ui/core"
+import { Link as RouterLink } from "react-router-dom"
 
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
@@ -114,11 +116,11 @@ export default function NavigationLayout({
             <Box flexGrow={1} />
             <Box>
               <Tooltip title="Notifications">
-                <IconButton color="default" onClick={() => {}}>
+                <Link component={RouterLink} to={`/participant/me/messages`} underline="none">
                   <Badge badgeContent={0} color="secondary">
                     <Message />
                   </Badge>
-                </IconButton>
+                </Link>
               </Tooltip>
               <Tooltip title="Profile & Settings">
                 <IconButton
