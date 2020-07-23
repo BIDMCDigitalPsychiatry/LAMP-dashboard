@@ -22,27 +22,29 @@ const useStyles = makeStyles((theme) => ({
   addicon: { float: "left", color: "#E46759" },
   conversationStyle: {
     borderRadius: "10px",
-    padding: "0px 20px 20px 20px",
+    padding: "10px 20px 20px 20px",
     textAlign: "justify",
-    marginBottom: 20,
-    border: "1px solid #C6C6C6",
+    marginTop: 20,
+
     "& span": {
       color: "rgba(0, 0, 0, 0.4)",
       fontSize: "12px",
       lineHeight: "40px",
     },
+    "& p": { lineHeight: "20px", color: "rgba(0, 0, 0, 0.75)", fontSize: 14 },
+    "& h6": { fontSize: 16 },
   },
   innerMessage: {
-    borderRadius: "20px 0px 20px 20px",
-    padding: "0px 20px 20px 20px",
-    textAlign: "justify",
+    padding: "15px 20px 20px 20px",
+
     marginBottom: 20,
-    border: "1px solid #C6C6C6",
+
     "& span": {
       color: "rgba(0, 0, 0, 0.4)",
       fontSize: "12px",
       lineHeight: "40px",
     },
+    "& p": { lineHeight: "20px", fontSize: 14 },
   },
   toolbardashboard: {
     minHeight: 65,
@@ -55,6 +57,13 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
+  conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
+  inlineHeader: {
+    background: "#FFFFFF",
+    boxShadow: "none",
+
+    "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+  },
 }))
 
 const getConversations = () => {
@@ -154,17 +163,19 @@ export default function Conversations({ ...props }) {
       if (key == index) {
         Object.keys(conversations[key].messages).forEach((msgIndex) => {
           content.push(
-            <Card
-              variant="outlined"
+            <Box
               className={classes.innerMessage}
               style={{
-                background: conversations[key].messages[msgIndex].sendType === 0 ? "#F7F7F7" : "#5784EE",
+                background: conversations[key].messages[msgIndex].sendType === 0 ? "#F6F6F6" : "#5784EE",
                 marginLeft: conversations[key].messages[msgIndex].sendType === 0 ? "" : "10%",
                 marginRight: conversations[key].messages[msgIndex].sendType === 0 ? "10%" : "",
+                borderRadius:
+                  conversations[key].messages[msgIndex].sendType === 0 ? "0px 20px 20px 20px" : "20px 0px 20px 20px",
+                color: conversations[key].messages[msgIndex].sendType === 0 ? "rgba(0, 0, 0, 0.75)" : "white",
               }}
             >
-              <Typography variant="caption">{conversations[key].messages[msgIndex].message}</Typography>
-            </Card>
+              <Typography>{conversations[key].messages[msgIndex].message}</Typography>
+            </Box>
           )
           setSender(conversations[key].sender)
         })
@@ -179,24 +190,29 @@ export default function Conversations({ ...props }) {
     Object.keys(conversations).forEach((key) => {
       const msg = conversations[key].messages[0].message
       content.push(
-        <Card
-          variant="outlined"
+        <Box
+          border={0}
           className={classes.conversationStyle}
           onClick={() => getDetails(key)}
-          style={{ background: conversations[key].status === 0 ? "#F7F7F7" : "#FFFFFF" }}
+          style={{
+            background: conversations[key].status === 0 ? "#F7F7F7" : "#FFFFFF",
+            border: conversations[key].status === 0 ? "0" : "1px solid #C6C6C6",
+          }}
         >
-          <Grid container spacing={3}>
-            <Grid item xs={11}>
-              <Typography variant="h6">{conversations[key].sender}</Typography>
+          <Grid container>
+            <Grid item xs>
+              <Typography variant="h6" style={{ fontWeight: conversations[key].status === 0 ? "bold" : "normal" }}>
+                {conversations[key].sender}
+              </Typography>
             </Grid>
-            <Grid item xs={1}>
-              <Typography variant="caption">{duration(new Date(conversations[key].date))}</Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="caption">{msg}</Typography>
+            <Grid item xs className={classes.conversationtime} justify="space-between">
+              <Typography align="right">{duration(new Date(conversations[key].date))}</Typography>
             </Grid>
           </Grid>
-        </Card>
+          <Box width={1} pt={1}>
+            <Typography>{msg}</Typography>
+          </Box>
+        </Box>
       )
     })
 
@@ -215,16 +231,19 @@ export default function Conversations({ ...props }) {
           setOpen(false)
         }}
       >
-        <AppBar position="static" style={{ background: "#FFFFFF", boxShadow: "none" }}>
+        <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">{sender}</Typography>
           </Toolbar>
+          <Typography variant="h5">{sender}</Typography>
         </AppBar>
         <Box px={3} style={{ marginTop: "5%" }}>
           {details}
+          <Typography variant="caption" style={{ color: "rgba(0, 0, 0, 0.4)" }}>
+            Aug 19: 3:00pm
+          </Typography>
         </Box>
       </ResponsiveDialog>
     </Container>

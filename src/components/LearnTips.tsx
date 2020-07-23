@@ -4,19 +4,16 @@ import {
   Typography,
   makeStyles,
   Box,
-  Card,
   Grid,
   IconButton,
-  TextField,
-  Button,
-  FormControl,
+  useTheme,
   Container,
   AppBar,
   Toolbar,
   Icon,
   CardContent,
+  useMediaQuery,
 } from "@material-ui/core"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as Book } from "../icons/Book.svg"
 import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
@@ -26,16 +23,23 @@ import { ReactComponent as Wellness } from "../icons/Wellness.svg"
 import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
+import ChevronRightIcon from "@material-ui/icons/ChevronRight"
+import BottomMenu from "./BottomMenu"
+
 const useStyles = makeStyles((theme) => ({
   topicon: {
     minWidth: 200,
     minHeight: 200,
-    marginLeft: "50px",
+
+    [theme.breakpoints.down("xs")]: {
+      minWidth: 180,
+      minHeight: 180,
+    },
   },
 
   header: {
     background: "#FFF9E5",
-    padding: 20,
+    padding: "0 20px 20px 20px",
 
     "& h2": {
       fontSize: 25,
@@ -43,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       color: "rgba(0, 0, 0, 0.75)",
     },
   },
+  headerIcon: { textAlign: "center" },
   tipscontentarea: {
     padding: 20,
     "& h3": {
@@ -51,9 +56,8 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: "15px",
     },
     "& p": {
-      fontSize: "16px",
-      lineheight: "24px",
-
+      fontSize: "14px",
+      lineHeight: "20px",
       color: "rgba(0, 0, 0, 0.75)",
     },
   },
@@ -62,7 +66,9 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
     padding: "20px 20px 20px 20px",
     textAlign: "justify",
-    marginBottom: 20,
+    maxWidth: 500,
+    margin: "0 auto 20px",
+    "& h6": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
   },
   toolbardashboard: {
     minHeight: 65,
@@ -75,6 +81,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
+  rightArrow: { maxWidth: 50, padding: "15px 12px 11px 12px !important", "& svg": { color: "rgba(0, 0, 0, 0.5)" } },
 }))
 const data = {
   Sleep: [
@@ -152,12 +159,13 @@ const data = {
   ],
 }
 
-export default function LearnTips({ ...props }) {
+export default function LearnTips({ ...props }, { activeTab: Function}) {
   const classes = useStyles()
-  const [open, setOpen] = useState(false)
+  const [openDialog, setOpenDialog] = useState(false)
   const [icon, setIcon] = useState(null)
   const [title, setTitle] = useState(null)
   const [details, setDetails] = useState(null)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   useEffect(() => {
     setIcon(getIcon())
@@ -183,6 +191,11 @@ export default function LearnTips({ ...props }) {
         return <SleepTips className={classes.topicon} />
     }
   }
+  
+  const activeTab = () => {    
+    props.activeTab('Manage')
+  }
+
   const getTips = (type: string) => {
     let details = []
     Object.keys(data).forEach((key) => {
@@ -192,12 +205,26 @@ export default function LearnTips({ ...props }) {
             <Box
               className={classes.tipStyle}
               onClick={() => {
-                setOpen(true)
+                setOpenDialog(true)
                 setTitle(detail.title)
                 setDetails(detail.text)
               }}
             >
-              <Typography variant="h6">{detail.title}</Typography>
+              {supportsSidebar ? (
+                <div>
+                  {/* <BottomMenu tabValue={0} activeTab={activeTab}/> */}
+                  <Grid container spacing={3}>
+                    <Grid item xs>
+                      <Typography variant="h6">{detail.title}</Typography>
+                    </Grid>
+                    <Grid item xs justify="center" className={classes.rightArrow}>
+                      <ChevronRightIcon />
+                    </Grid>
+                  </Grid>
+                </div>
+              ) : (
+                <Typography variant="h6">{detail.title}</Typography>
+              )}
             </Box>
           )
         })
@@ -213,32 +240,32 @@ export default function LearnTips({ ...props }) {
         transient={false}
         animate
         fullScreen
-        open={open}
+        open={openDialog}
         onClose={() => {
-          setOpen(false)
+          setOpenDialog(false)
         }}
       >
         <AppBar position="static" style={{ background: "#FFF9E5", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
+            <IconButton onClick={() => setOpenDialog(false)} color="default" className={classes.backbtn} aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
         </AppBar>
 
-        <div>
-          <div className={classes.header}>
+        <Box className={classes.header}>
+          <Box width={1} className={classes.headerIcon}>
             {icon}
-            <Typography variant="caption">Tip</Typography>
-            <Typography variant="h2">{title}</Typography>
-          </div>
+          </Box>
+          <Typography variant="caption">Tip</Typography>
+          <Typography variant="h2">{title}</Typography>
+        </Box>
 
-          <CardContent className={classes.tipscontentarea}>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {details}
-            </Typography>
-          </CardContent>
-        </div>
+        <CardContent className={classes.tipscontentarea}>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {details}
+          </Typography>
+        </CardContent>
       </ResponsiveDialog>
     </Container>
   )

@@ -293,9 +293,6 @@ function AppRouter({ ...props }) {
             <PageTitle>mindLAMP | Conversations</PageTitle>
             <NavigationLayout
               id={props.match.params.id}
-              title={
-                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
-              }
               goBack={props.history.goBack}
               onLogout={() => reset()}
               activeTab="Conversations"
@@ -378,8 +375,9 @@ function AppRouter({ ...props }) {
               goBack={props.history.goBack}
               onLogout={() => reset()}
               activeTab={`${titlecase(props.match.params.type)}`}
+              sameLineTitle={true}
             >
-              <LearnTips type={props.match.params.type} goBack={props.history.goBack} />
+              <LearnTips type={props.match.params.type} goBack={props.history.goBack} activeTab={activeTab}/>
             </NavigationLayout>
           </React.Fragment>
         )}

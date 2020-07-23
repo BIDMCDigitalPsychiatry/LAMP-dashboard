@@ -1,22 +1,13 @@
 import React, { useState } from "react"
 import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
-import {
-  Box,
-  useMediaQuery,
-  useTheme,
-  Drawer,
-  BottomNavigationAction,
-  Popover,
-  IconButton,
-  Typography,
-} from "@material-ui/core"
+import { Box, useMediaQuery, useTheme, Drawer, BottomNavigationAction, IconButton, Typography } from "@material-ui/core"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
-import Tooltip, { TooltipProps } from "@material-ui/core/Tooltip"
+import Tooltip from "@material-ui/core/Tooltip"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -86,21 +77,14 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    // popover: {
-    //   pointerEvents: "none",
-    // },
     paper: {
       padding: "25px 20px",
       boxShadow: "none",
       background: "rgba(228, 103, 89, 0.95)",
       borderRadius: 10,
-      // top: 'auto !important',
-      // bottom: 95,
       "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
       "& p": { color: "white", fontWeight: 300, marginTop: 10 },
     },
-
-    customarrow: {},
   })
 )
 
@@ -128,21 +112,15 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [tab, _setTab] = useState(props.tabValue)
-  const [open, setOpen] = useState(props.tabValue === 2 ? true : false)
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [tabVal, _setTab] = useState(props.tabValue)
+  const [openTab, setOpenTab] = useState(props.tabValue === 2 ? true : false)
 
   const setTab = (newTab) => {
     _setTab(newTab)
-    newTab === 2 ? setOpen(true) : setOpen(false)
+    newTab === 2 ? setOpenTab(true) : setOpenTab(false)
     props.activeTab(newTab)
   }
-  const handlePopoverOpen = (event) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handlePopoverClose = () => {
-    setAnchorEl(null)
-  }
+
   return (
     <div>
       <Box clone displayPrint="none">
@@ -166,7 +144,7 @@ export default function BottomMenu({ ...props }) {
           </IconButton>
           <BottomNavigationAction
             showLabel
-            selected={tab === 0}
+            selected={tabVal === 0}
             label="Learn"
             value={0}
             classes={{
@@ -175,14 +153,11 @@ export default function BottomMenu({ ...props }) {
               label: classes.navigationLabel,
             }}
             icon={<Learn />}
-            onChange={(event, newTab) => {
-              setTab(newTab)
-              handlePopoverOpen(event)
-            }}
+            onChange={(_, newTab) => setTab(newTab)}
           />
           <BottomNavigationAction
             showLabel
-            selected={tab === 1}
+            selected={tabVal === 1}
             label="Assess"
             value={1}
             classes={{
@@ -194,11 +169,11 @@ export default function BottomMenu({ ...props }) {
             onChange={(_, newTab) => setTab(newTab)}
           />
           <HtmlTooltip
-            open={open}
+            open={openTab}
             interactive={true}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenTab(false)}>
                   <CloseIcon />
                 </IconButton>
                 <Typography variant="h6">
@@ -212,7 +187,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tab === 2}
+              selected={tabVal === 2}
               label="Manage"
               value={2}
               classes={{
@@ -221,15 +196,12 @@ export default function BottomMenu({ ...props }) {
                 label: classes.navigationLabel,
               }}
               icon={<Manage />}
-              onChange={(event, newTab) => {
-                setTab(newTab)
-                handlePopoverOpen(event)
-              }}
+              onChange={(_, newTab) => setTab(newTab)}
             />
           </HtmlTooltip>
           <BottomNavigationAction
             showLabel
-            selected={tab === 3}
+            selected={tabVal === 3}
             label="Prevent"
             value={3}
             classes={{
@@ -238,10 +210,7 @@ export default function BottomMenu({ ...props }) {
               label: classes.navigationLabel,
             }}
             icon={<PreventIcon />}
-            onChange={(event, newTab) => {
-              setTab(newTab)
-              handlePopoverOpen(event)
-            }}
+            onChange={(_, newTab) => setTab(newTab)}
           />
         </Drawer>
       </Box>

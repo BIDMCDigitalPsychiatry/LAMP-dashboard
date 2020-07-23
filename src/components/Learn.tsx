@@ -3,7 +3,7 @@ import React from "react"
 import { Container, Typography, Grid, Card, Box } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import  { Participant as ParticipantObj } from "lamp-core"
+import { Participant as ParticipantObj } from "lamp-core"
 import { ReactComponent as Book } from "../icons/Book.svg"
 import { ReactComponent as MoodTips } from "../icons/MoodTips.svg"
 import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
@@ -19,11 +19,13 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     cardlabel: {
       fontSize: 16,
-
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
       width: "100%",
+      [theme.breakpoints.up("lg")]: {
+        fontSize: 18,
+      },
     },
     learn: {
       background: "#FFF9E5",
@@ -33,17 +35,28 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          width: 150,
+          height: 150,
+        },
+      },
+
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+      },
     },
+    thumbMain: { maxWidth: 255 },
   })
 )
 
-export default function Manage({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Learn({ participant, ...props }: { participant: ParticipantObj }) {
   const classes = useStyles()
 
   return (
     <Container>
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3}>
+      <Grid container spacing={2} direction="row" justify="center" alignItems="center">
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Mood`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>
@@ -53,7 +66,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Sleep`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>
@@ -63,7 +76,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Social`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>
@@ -73,7 +86,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Resources`} underline="none">
             <Card className={classes.learn}>
               <Box mt={1}>
@@ -83,7 +96,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Physical_WellNess`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>
@@ -93,7 +106,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Books`} underline="none">
             <Card className={classes.learn}>
               <Box mt={1}>
@@ -103,7 +116,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Motivation`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>
@@ -113,7 +126,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3}>
+        <Grid item xs={6} md={3} lg={3} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/LearnTips/Stress`} underline="none">
             <Card className={classes.learn}>
               <Box mt={2} mb={1}>

@@ -51,6 +51,11 @@ const useStyles = makeStyles((theme: Theme) =>
     toolbardashboard: { minHeight: 75 },
     toolbarinner: { minHeight: 95 },
     backbtn: { paddingLeft: 0, paddingRight: 0 },
+    notification: {
+      borderRadius: "50%",
+      padding: "8px",
+      background: "#CFE4FF",
+    },
   })
 )
 
@@ -61,6 +66,7 @@ export default function NavigationLayout({
   goBack,
   onLogout,
   activeTab,
+  sameLineTitle,
   ...props
 }: {
   title?: string
@@ -69,6 +75,7 @@ export default function NavigationLayout({
   goBack?: any
   onLogout?: any
   activeTab?: string
+  sameLineTitle?: boolean
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -77,12 +84,15 @@ export default function NavigationLayout({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
-
+  //sameLineTitle
+  console.log(sameLineTitle)
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent"]
   const selectedClass =
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
       : classnames(classes.toolbar, classes.toolbardashboard)
+
+  console.log(activeTab)
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -102,78 +112,98 @@ export default function NavigationLayout({
                 }}
               >
                 <Icon>arrow_back</Icon>
+                {sameLineTitle && (
+                  <Typography
+                    variant="h5"
+                    style={{
+                      marginLeft:
+                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
+                    }}
+                  >
+                    {activeTab}
+                  </Typography>
+                )}
               </IconButton>
             )}
-            <Typography
-              variant="h5"
-              style={{
-                marginLeft:
-                  supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
-              }}
-            >
-              {activeTab}
-            </Typography>
-            <Box flexGrow={1} />
-            <Box>
-              <Tooltip title="Notifications">
-                <Link component={RouterLink} to={`/participant/me/messages`} underline="none">
-                  <Badge badgeContent={0} color="secondary">
-                    <Message />
-                  </Badge>
-                </Link>
-              </Tooltip>
-              <Tooltip title="Profile & Settings">
-                <IconButton
-                  aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
-                  aria-haspopup="true"
-                  onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
-                  color="default"
-                >
-                  <User />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                id="menu-appbar"
-                anchorEl={showCustomizeMenu}
-                open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
-                onClose={() => setShowCustomizeMenu(undefined)}
+            {!sameLineTitle && (
+              <Typography
+                variant="h5"
+                style={{
+                  marginLeft:
+                    supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
+                }}
               >
-                <MenuItem disabled divider>
-                  <b>{title}</b>
-                </MenuItem>
-                {!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
-                <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                  Logout
-                </MenuItem>
-                <MenuItem
-                  dense
-                  onClick={() => {
-                    setShowCustomizeMenu(undefined)
-                    window.open("https://docs.lamp.digital", "_blank")
-                  }}
+                {activeTab}
+              </Typography>
+            )}
+            <Box flexGrow={1} />
+            {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
+              <Box>
+                <Tooltip title="Notifications">
+                  <Link
+                    component={RouterLink}
+                    to={`/participant/me/messages`}
+                    underline="none"
+                    className={classes.notification}
+                  >
+                    <Badge badgeContent={2} color="primary">
+                      <Message />
+                    </Badge>
+                  </Link>
+                </Tooltip>
+                <Tooltip title="Profile & Settings">
+                  <IconButton
+                    aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
+                    aria-haspopup="true"
+                    onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
+                    color="default"
+                  >
+                    <User />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  id="menu-appbar"
+                  anchorEl={showCustomizeMenu}
+                  open={!!showCustomizeMenu && !confirmLogout && !passwordChange}
+                  onClose={() => setShowCustomizeMenu(undefined)}
                 >
-                  <b style={{ color: colors.grey["600"] }}>Help & Support</b>
-                </MenuItem>
-                <MenuItem
-                  dense
-                  onClick={() => {
-                    setShowCustomizeMenu(undefined)
-                    window.open("https://community.lamp.digital", "_blank")
-                  }}
-                >
-                  <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
-                </MenuItem>
-                <MenuItem
-                  dense
-                  onClick={() => {
-                    setShowCustomizeMenu(undefined)
-                    window.open("mailto:team@digitalpsych.org", "_blank")
-                  }}
-                >
-                  <b style={{ color: colors.grey["600"] }}>Contact Us</b>
-                </MenuItem>
-              </Menu>
-            </Box>
+                  <MenuItem disabled divider>
+                    <b>{title}</b>
+                  </MenuItem>
+                  {!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
+                  <MenuItem divider onClick={() => setConfirmLogout(true)}>
+                    Logout
+                  </MenuItem>
+                  <MenuItem
+                    dense
+                    onClick={() => {
+                      setShowCustomizeMenu(undefined)
+                      window.open("https://docs.lamp.digital", "_blank")
+                    }}
+                  >
+                    <b style={{ color: colors.grey["600"] }}>Help & Support</b>
+                  </MenuItem>
+                  <MenuItem
+                    dense
+                    onClick={() => {
+                      setShowCustomizeMenu(undefined)
+                      window.open("https://community.lamp.digital", "_blank")
+                    }}
+                  >
+                    <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
+                  </MenuItem>
+                  <MenuItem
+                    dense
+                    onClick={() => {
+                      setShowCustomizeMenu(undefined)
+                      window.open("mailto:team@digitalpsych.org", "_blank")
+                    }}
+                  >
+                    <b style={{ color: colors.grey["600"] }}>Contact Us</b>
+                  </MenuItem>
+                </Menu>
+              </Box>
+            )}
           </Toolbar>
         </AppBar>
       )}
