@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, makeStyles } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -36,6 +36,13 @@ import HopeBox from "./HopeBox"
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
+
+/*
+// colors as a gradient:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(101,206,191,1) 33%, rgba(255,119,91,1) 66%, rgba(134,182,255,1) 100%);
+// colors as a bar:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%);
+*/
 
 //
 /*const srcLock = () => {
@@ -377,7 +384,7 @@ function AppRouter({ ...props }) {
               activeTab={`${titlecase(props.match.params.type)}`}
               sameLineTitle={true}
             >
-              <LearnTips type={props.match.params.type} goBack={props.history.goBack} activeTab={activeTab}/>
+              <LearnTips type={props.match.params.type} goBack={props.history.goBack} activeTab={activeTab} />
             </NavigationLayout>
           </React.Fragment>
         )}

@@ -1,18 +1,15 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Container, Box, Grid, useTheme, useMediaQuery, Slide, Typography, Card } from "@material-ui/core"
+import { Box, useTheme, useMediaQuery, Slide } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
-
 import ResponsiveDialog from "./ResponsiveDialog"
-
 import Prevent from "./Prevent"
 import Manage from "./Manage"
-
 import MoodTipsSection from "./MoodTips"
 import SleepTipsSecion from "./SleepTips"
 import SocialTips from "./SocialTips"
@@ -176,7 +173,6 @@ export default function Participant({
           <Manage participant={participant} />
         </Box>
       </Slide>
-
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Prevent participant={participant} />

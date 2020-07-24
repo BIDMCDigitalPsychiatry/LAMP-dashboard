@@ -5,16 +5,10 @@ import {
   makeStyles,
   Box,
   Slide,
-  Radio,
-  RadioProps,
-  RadioGroup,
-  FormControl,
-  FormControlLabel,
   useMediaQuery,
   useTheme,
   Button,
   Container,
-  TextField,
   LinearProgress,
   createStyles,
   withStyles,
@@ -24,17 +18,6 @@ import {
   IconButton,
   Toolbar,
   Grid,
-  Slider,
-  Step,
-  Stepper,
-  StepLabel,
-  StepContent,
-  StepConnector,
-  Menu,
-  MenuItem,
-  ListItemText,
-  ListItem,
-  List,
 } from "@material-ui/core"
 // Local Imports
 import useInterval from "./useInterval"
@@ -105,22 +88,6 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
       textDecoration: "none",
     },
-  },
-  lineyellow: {
-    background: "#FFD645",
-    height: "3px",
-  },
-  linegreen: {
-    background: "#65CEBF",
-    height: "3px",
-  },
-  linered: {
-    background: "#FF775B",
-    height: "3px",
-  },
-  lineblue: {
-    background: "#86B6FF",
-    height: "3px",
   },
   "@keyframes Pulse": {
     "0%": { transform: "scale(.15) rotate(180deg)" },
@@ -317,12 +284,14 @@ export default function Breathe({ ...props }) {
             <Box textAlign="center" className={classes.breatheReview}>
               <Lotus className={classes.flower} />
               <Typography variant="h4">Nicely done!</Typography>
-              <Grid container direction="row" justify="center" alignItems="center">
-                <Grid item xs={1} className={classes.lineyellow}></Grid>
-                <Grid item xs={1} className={classes.linegreen}></Grid>
-                <Grid item xs={1} className={classes.linered}></Grid>
-                <Grid item xs={1} className={classes.lineblue}></Grid>
-              </Grid>
+              <div
+                style={{
+                  height: 3,
+                  margin: "0% 20%",
+                  background:
+                    "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                }}
+              />
               <Typography variant="body2">Was this helpful today?</Typography>
               <Box textAlign="center" mb={5}>
                 <IconButton

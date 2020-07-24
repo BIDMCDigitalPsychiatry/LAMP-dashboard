@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Container,
   Typography,
@@ -9,13 +9,12 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Button,
   DialogActions,
   IconButton,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+import { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
@@ -125,7 +124,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
-    let classT = type == "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
+    let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
     setClassType(classT)
     setOpen(true)
   }
@@ -222,24 +221,24 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <CloseIcon />
           </IconButton>
           <div className={classType}>
-            {dialogueType == "Breathe" && <BreatheIcon className={classes.topicon} />}
-            {dialogueType == "Scratch card" && <ScratchCard className={classes.topicon} />}
-            {dialogueType == "Scratch card" && <Typography variant="h6">Meditation exercises</Typography>}
-            {dialogueType == "Breathe" && <Typography variant="h6">Games</Typography>}
+            {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
+            {dialogueType === "Scratch card" && <ScratchCard className={classes.topicon} />}
+            {dialogueType === "Scratch card" && <Typography variant="h6">Meditation exercises</Typography>}
+            {dialogueType === "Breathe" && <Typography variant="h6">Games</Typography>}
             <Typography variant="h2">{dialogueType}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {dialogueType == "Breathe" && (
+          {dialogueType === "Breathe" && (
             <Typography variant="h4" gutterBottom>
               Breathing exercise (2 mins)
             </Typography>
           )}
 
-          {dialogueType == "Scratch card" && (
+          {dialogueType === "Scratch card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
           )}
-          {dialogueType == "Breathe" && (
+          {dialogueType === "Breathe" && (
             <Typography variant="body2" color="textSecondary" component="p">
               Follow the motion of the lotus flower opening and closing to control your breaths in and out.
             </Typography>
@@ -249,7 +248,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
-              to={dialogueType == "Breathe" ? "/participant/me/breathe" : "/participant/me/scratch"}
+              to={dialogueType === "Breathe" ? "/participant/me/breathe" : "/participant/me/scratch"}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >

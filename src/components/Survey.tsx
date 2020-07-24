@@ -170,12 +170,12 @@ export default function Survey({
               <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen(y.name)}>
                 <Card className={classes.assess}>
                   <Box mt={1} mb={1}>
-                    {y.name == "Mood" && <AssessMood />}
-                    {y.name == "Sleep and Social" && <AssessSleep />}
-                    {y.name == "Anxiety" && <AssessAnxiety />}
-                    {y.name == "App Usability" && <AssessUsability />}
-                    {y.name == "Water and Nutrition" && <AssessNutrition />}
-                    {y.name == "Psychosis and Social" && <AssessSocial />}
+                    {y.name === "Mood" && <AssessMood />}
+                    {y.name === "Sleep and Social" && <AssessSleep />}
+                    {y.name === "Anxiety" && <AssessAnxiety />}
+                    {y.name === "App Usability" && <AssessUsability />}
+                    {y.name === "Water and Nutrition" && <AssessNutrition />}
+                    {y.name === "Psychosis and Social" && <AssessSocial />}
                   </Box>
                   <Typography className={classes.cardlabel}>{y.name}</Typography>
                 </Card>
@@ -197,12 +197,12 @@ export default function Survey({
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
-            {dialogueType == "Mood" && <AssessMood className={classes.topicon} />}
-            {dialogueType == "Sleep and Social" && <AssessSleep className={classes.topicon} />}
-            {dialogueType == "Anxiety" && <AssessAnxiety className={classes.topicon} />}
-            {dialogueType == "App Usability" && <AssessUsability className={classes.topicon} />}
-            {dialogueType == "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
-            {dialogueType == "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
+            {dialogueType === "Mood" && <AssessMood className={classes.topicon} />}
+            {dialogueType === "Sleep and Social" && <AssessSleep className={classes.topicon} />}
+            {dialogueType === "Anxiety" && <AssessAnxiety className={classes.topicon} />}
+            {dialogueType === "App Usability" && <AssessUsability className={classes.topicon} />}
+            {dialogueType === "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
+            {dialogueType === "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
             <Typography variant="h6">Survey</Typography>
             <Typography variant="h2">{dialogueType}</Typography>
           </div>

@@ -7,7 +7,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     paper: {
       textAlign: "center",
-
       height: 50,
       width: 50,
       background: "transparent",
@@ -15,7 +14,6 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 9,
       fontSize: 10,
       color: "rgba(0, 0, 0, 0.25)",
-
       "& span": {
         display: "block",
         fontSize: "12px",
@@ -27,7 +25,6 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#7599FF",
       borderRadius: "50%",
       color: "rgba(255, 255, 255, 0.5)",
-
       "& span": { color: "white" },
     },
   })
@@ -37,10 +34,6 @@ function getDays() {
   return ["M", "T", "W", "T", "F", "S", "S"]
 }
 
-function range(start, end) {
-  if (start === end) return [start]
-  return [start, ...range(start + 1, end)]
-}
 function currentDay() {
   let date = new Date()
   return date.getDay()
@@ -71,8 +64,8 @@ export default function WeekView() {
     let grids = []
     let i = 1
     for (let day of days) {
-      i = i == 7 ? 0 : i
-      const selectedClass = i == currentDay() ? classes.selected : ""
+      i = i === 7 ? 0 : i
+      const selectedClass = i === currentDay() ? classes.selected : ""
       let classNameVal = classnames(selectedClass, classes.paper)
       grids.push(
         <Grid item xs>

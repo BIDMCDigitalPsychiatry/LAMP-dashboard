@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Typography, Fab, Box, Slide, Container, Icon, Card, Grid } from "@material-ui/core"
 
 export default function Welcome({ activities, onClose, ...props }) {

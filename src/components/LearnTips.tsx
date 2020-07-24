@@ -24,7 +24,6 @@ import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
-import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme) => ({
   topicon: {
@@ -159,7 +158,7 @@ const data = {
   ],
 }
 
-export default function LearnTips({ ...props }, { activeTab: Function}) {
+export default function LearnTips({ ...props }, { activeTab: Function }) {
   const classes = useStyles()
   const [openDialog, setOpenDialog] = useState(false)
   const [icon, setIcon] = useState(null)
@@ -191,15 +190,11 @@ export default function LearnTips({ ...props }, { activeTab: Function}) {
         return <SleepTips className={classes.topicon} />
     }
   }
-  
-  const activeTab = () => {    
-    props.activeTab('Manage')
-  }
 
   const getTips = (type: string) => {
     let details = []
     Object.keys(data).forEach((key) => {
-      if (key == type) {
+      if (key === type) {
         details = data[key].map((detail) => {
           return (
             <Box
@@ -247,7 +242,12 @@ export default function LearnTips({ ...props }, { activeTab: Function}) {
       >
         <AppBar position="static" style={{ background: "#FFF9E5", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpenDialog(false)} color="default" className={classes.backbtn} aria-label="Menu">
+            <IconButton
+              onClick={() => setOpenDialog(false)}
+              color="default"
+              className={classes.backbtn}
+              aria-label="Menu"
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>

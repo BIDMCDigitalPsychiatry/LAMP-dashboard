@@ -6,7 +6,7 @@ import { blue } from "@material-ui/core/colors"
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
-import { strategies } from "./ParticipantData"
+import { getStrategy } from "./ParticipantData"
 
 export default function ActivityCard({
   activity,
@@ -110,11 +110,7 @@ export default function ActivityCard({
               color={blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
-                y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
-                  d.temporal_slices,
-                  activity,
-                  idx
-                ),
+                y: getStrategy(activity)(d.temporal_slices, activity, idx),
                 slice: d.temporal_slices,
                 missing: [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null), // sometimes the slice itself is missing, not set to null
               }))}
@@ -145,11 +141,7 @@ export default function ActivityCard({
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),
-            y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
-              d.temporal_slices,
-              activity,
-              undefined
-            ),
+            y: getStrategy(activity)(d.temporal_slices, activity, undefined),
             slice: d.temporal_slices,
             missing: d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
           }))}
