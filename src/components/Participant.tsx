@@ -13,14 +13,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Prevent from "./Prevent"
 import Manage from "./Manage"
 
-import MoodTipsSection from "./MoodTips"
-import SleepTipsSecion from "./SleepTips"
-import SocialTips from "./SocialTips"
-import BookRecommendations from "./BookRecommendations"
-import Definitions from "./Definitions"
-import PhysicalTips from "./PhysicalTips"
-import StressTips from "./StressTips"
-import Motivation from "./Motivation"
 import Welcome from "./Welcome"
 import Learn from "./Learn"
 
@@ -181,30 +173,7 @@ export default function Participant({
         <Box my={4}>
           <Prevent participant={participant} />
         </Box>
-      </Slide>
-      <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!launchedActivity || visibleActivities.length > 0}
-        onClose={() => {
-          setLaunchedActivity(undefined)
-          setVisibleActivities([])
-        }}
-      >
-        {
-          {
-            sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
-            moodtips: <MoodTipsSection onComplete={() => setLaunchedActivity(undefined)} />,
-            socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
-            bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
-            definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
-            physicalwellness: <PhysicalTips onComplete={() => setLaunchedActivity(undefined)} />,
-            stresstips: <StressTips onComplete={() => setLaunchedActivity(undefined)} />,
-            motivation: <Motivation onComplete={() => setLaunchedActivity(undefined)} />,
-          }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
+      </Slide>     
       <BottomMenu activeTab={activeTab} tabValue={getTab()} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome

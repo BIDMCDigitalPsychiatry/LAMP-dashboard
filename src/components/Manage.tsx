@@ -26,7 +26,6 @@ import Jewels from "./Jewels"
 import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
-import Resources from "./Resources"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 
@@ -145,7 +144,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Typography className={classes.cardlabel}>Breathe</Typography>
           </Card>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Jewels")}>
+        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("Jewels")}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <JewelsIcon />
@@ -204,7 +203,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
         {
           {
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
-            resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
           }[launchedActivity ?? ""]
         }
