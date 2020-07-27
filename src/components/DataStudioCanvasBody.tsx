@@ -9,9 +9,6 @@ import {
 } from "@material-ui/core"
 import AddCircleIcon from "@material-ui/icons/AddCircle"
 import DataStudioSelection from "./DataStudioSelection"
-import DataStudioLineChart from "./DataStudioLineChart"
-import DataStudioBarChart from "./DataStudioBarChart"
-import DataStudioPieChart from "./DataStudioPieChart"
 import DataStudioValueIndicator from "./DataStudioValueIndicator"
 import DataStudioValueDataIndicator from "./DataStudioValueDataIndicator"
 import DataStudioList from "./DataStudioList"
@@ -20,6 +17,13 @@ import Dialog from "@material-ui/core/Dialog"
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon"
 import { Slide } from "@material-ui/core"
 import Tooltip from '@material-ui/core/Tooltip';
+import LAMP, {
+  Activity as ActivityObj,
+  ActivityEvent as ActivityEventObj, 
+} from "lamp-core"
+import DataStudioGraphChart from "./DataStudioGraphChart"
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { useLocation  } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,24 +55,70 @@ const useStyles = makeStyles((theme) => ({
     "& h5": { fontSize: 27, color: "#444444", fontWeight: 500, "& span": { color: "#4696eb" } },
     "& h6": { fontWeight: "300", fontSize: 20, "& svg": { color: "#eb384b" } },
   },
+  loader: {
+    display: "flex",
+    flexDirection: "column",
+    height: 400,
+    textAlign: "center",
+    "& h5": { fontSize: 27, color: "#444444", fontWeight: 500, "& span": { color: "#4696eb" } },
+    "& h6": { fontWeight: "300", fontSize: 20, "& svg": { color: "#eb384b" } },
+  },
 }))
 
-export default function DataStudioCanvasBody(props: any) {
+async function getActivities(participantId) {
+  let original = await LAMP.Activity.allByParticipant(participantId)
+  let custom = original.filter((x) => x.spec === "lamp.survey")
+  return custom
+}
+
+// Perform event coalescing/grouping by sensor or activity type.
+async function getActivityEvents(
+  participantId,
+  _activities: ActivityObj[],
+  ): Promise<{ [groupName: string]: ActivityEventObj[] }> {
+
+  let original = (await LAMP.ActivityEvent.allByParticipant(participantId))
+    .map((x) => ({
+      ...x,
+      activity: _activities.find((y) => x.activity === y.id),
+    }))
+    .sort((x, y) => x.timestamp - y.timestamp)
+    .map((x) => ({
+      ...x,
+      activity: (x.activity || { name: "" }).name,
+    }))
+    .groupBy("activity") as any;
+  delete original[''];
+    
+  return original;
+}
+
+export default function DataStudioCanvasBody(props: any)
+{
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const classes = useStyles()
   const [openModal, setOpenModal] = React.useState(false)
   const [openIndicatorModal, setOpenIndicatorModal] = React.useState(false)
-  //const [dataObjValue, setDataObjValue] = React.useState([])
+  const [indicatorClicked, setIndicatorClicked] = React.useState(false)
+  const [currentGraphType, setCurrentGraphType] = React.useState('')
   const [selectedItemArray, setSelectedItemArray] = React.useState([])
   const [selectedValItemArray, setSelectedValItemArray] = React.useState([])
+  const [dataArrayForVega, setDataArrayForVega] = React.useState([])
+  const [dataAggregateForVega, setDataAggregateForVega] = React.useState('')
   const [valIndicateArray, setValIndicateArray] = React.useState([])
   const [selectedItemCount, setSelectedItemCount] = React.useState(0)
   const [remainingDataIndicator, setRemainingDataIndicator] = React.useState([])
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateDataArray = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id)) : null
+  const [valueDataIndicator, setValueDataIndicator] = React.useState([])
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateDataArray = templateId != null 
+                              ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null;
   
   React.useEffect(() => {
-    //let itemArray = selectedItemArray
     let selItemCount = 0
     if (templateDataArray != null) {
       let newItemArray = []
@@ -87,7 +137,11 @@ export default function DataStudioCanvasBody(props: any) {
       if (templateDataArray.hasOwnProperty("listing")) {
         newItemArray.push("listing")
         selItemCount++
-      } 
+      }
+      if (templateDataArray.hasOwnProperty("value_indicator")) {
+        newItemArray.push("value_indicator")
+        selItemCount++
+      }
       setSelectedItemArray(newItemArray)
       setSelectedItemCount(selectedItemCount + selItemCount)
     }
@@ -123,18 +177,22 @@ export default function DataStudioCanvasBody(props: any) {
 
   // Data items based on selection
   const handleChangeSelection = (val) => {
-    //setDataObjValue(val)
     if (!selectedItemArray.includes(val)) {
       let newItemArray = selectedItemArray
       newItemArray.push(val)
       setSelectedItemArray(newItemArray)
-      if (val !== "val-indicate") {
+      if((val == "line") || (val == "pie") || (val == "bar")){
+        setCurrentGraphType(val);
+      }
+      if (val !== "value_indicator") {
         setSelectedItemCount(selectedItemCount + 1)
       }
     }
     setOpenModal(false)
-    if (val === "val-indicate") {
-      setOpenIndicatorModal(true)
+    if (val === "value_indicator") {
+      dataValueIndicatorAPI();
+      setIndicatorClicked(true);
+      document.body.style.opacity = "0.5";
     }else{
       enqueueSnackbar("Successfully created a item.", {
         variant: "success",
@@ -146,6 +204,18 @@ export default function DataStudioCanvasBody(props: any) {
       })
     }
   }
+  
+  // API for Getting Activities and Activity Events
+  const dataValueIndicatorAPI = () => {
+    ;(async () => {              
+      let activities = await getActivities(participantId)
+      let activityEvents:any = await getActivityEvents(participantId, activities);
+      setValueDataIndicator(activityEvents)
+      setOpenIndicatorModal(true);
+      setIndicatorClicked(false);      
+      document.body.style.opacity = "1";
+    })()
+  } 
 
   // Data based on Vale indicator selection
   const handleValueIndicator = (arrayVal) => {
@@ -173,59 +243,41 @@ export default function DataStudioCanvasBody(props: any) {
     setOpenIndicatorModal(false)
   }
 
-  // Get and Store Line chart Spec from/to LocalStorage
-  const handleLineChartSpec = (val) => {
-    let templateData =
-      templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-          : {}
-        : null
-    if (props.dataSelectedTemplate != null) {
-      templateData.line_chart = val
-      localStorage.setItem("template_" + props.dataSelectedTemplate, JSON.stringify(templateData))
-    }
-  }
-  
-  // Get and Store Bar chart Spec from/to LocalStorage
-  const handleBarChartSpec = (val) => {
-    let templateData =
-      templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-          : {}
-        : null
-    if (props.dataSelectedTemplate != null) {
-      templateData.bar_chart = val
-      localStorage.setItem("template_" + props.dataSelectedTemplate, JSON.stringify(templateData))
-    }
-  }
-
-  // Get and Store Pie chart Spec from/to LocalStorage
-  const handlePieChartSpec = (val) => {
-    let templateData =
-      templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-          : {}
-        : null
-    if (props.dataSelectedTemplate != null) {
-      templateData.pie_chart = val
-      localStorage.setItem("template_" + props.dataSelectedTemplate, JSON.stringify(templateData))
-    }
-  }
-
   // Get and Store List data from/to LocalStorage
   const handleTableListData = (val) => {
     let templateData =
       templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
+        ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+          ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
           : {}
         : null
     if (props.dataSelectedTemplate != null) { 
       templateData.listing = val
-      localStorage.setItem("template_" + props.dataSelectedTemplate, JSON.stringify(templateData))
+      localStorage.setItem("template_" + props.dataSelectedTemplate+"_"+participantId, JSON.stringify(templateData))
+    }
+  }
+
+  // Get and Store List data from/to LocalStorage
+  const handleGraphChartSpec = (dataArray) => {      
+    let templateData =
+        templateId != null
+          ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+            ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
+            : {}
+          : null
+    if (props.dataSelectedTemplate != null) {
+      let graphSpec = dataArray.specs;
+      let graphDataType = dataArray.graphDataType;
+      if(graphDataType === 'line'){
+        templateData.line_chart = graphSpec
+      }
+      if(graphDataType === 'bar'){
+        templateData.bar_chart = graphSpec
+      }
+      if(graphDataType === 'pie'){
+        templateData.pie_chart = graphSpec
+      }
+      localStorage.setItem("template_" + props.dataSelectedTemplate+"_"+participantId, JSON.stringify(templateData))
     }
   }
 
@@ -234,8 +286,23 @@ export default function DataStudioCanvasBody(props: any) {
     setRemainingDataIndicator(val)
   }
 
+  const handleSurveyDataArray = (itemDataVal) => {
+    setDataArrayForVega(itemDataVal);
+  }
+
+  const handleSataAggregate = (aggr) => {
+    setDataAggregateForVega(aggr); 
+  }
+    
   return (
-    <React.Fragment>
+    <React.Fragment>      
+      { (indicatorClicked) ?
+        <Box className={classes.loader} alignItems="center" justifyContent="center">
+          <CircularProgress /> Loading
+        </Box>
+            : ''
+      } 
+
       {((props.templateChanged) || ((openModal === false) && selectedItemCount === 0 && remainingDataIndicator.length === 0)) ? (
         <Box className={classes.welcomemsg} alignItems="center" justifyContent="center">
           <Typography variant="h5">
@@ -249,7 +316,7 @@ export default function DataStudioCanvasBody(props: any) {
       ) : (
         ""
       )}
-
+      
       <Tooltip title="Add Data Items">
         <SpeedDialIcon className={classes.btnAdd} color="secondary" onClick={addVisualizationObject} />
       </Tooltip>
@@ -258,43 +325,47 @@ export default function DataStudioCanvasBody(props: any) {
         <DataStudioSelection selectedItemsObj={handleChangeSelection} closeSelectionModal={handleClose} />
       ) : (
         ""
-      )}
+      )}      
 
       {! openModal && !(props.templateChanged) ? (
       <Container maxWidth="xl">
-        <Grid container spacing={3}>
-          {selectedItemArray.indexOf("line") > -1 ? (
-            <DataStudioLineChart
-              lineChartSpecArray={handleLineChartSpec}
-              delLineSelectionElement={deleteSelectedElement}
-            />
-          ) : (
-            ""
-          )}
+        <Grid container spacing={3} >
+          { selectedItemArray.indexOf("line") > -1 ? (
+            <DataStudioGraphChart  selectedGraphType={'line'}
+                  graphChartSpecArray={handleGraphChartSpec} delLineSelectionElement={deleteSelectedElement} />
+            ) : (
+          "" )}
 
-          {selectedItemArray.indexOf("bar") > -1 ? (
-            <DataStudioBarChart barChartSpecArray={handleBarChartSpec} delBarSelectionElement={deleteSelectedElement} />
-          ) : (
-            ""
-          )}
+          { selectedItemArray.indexOf("bar") > -1 ? (
+            <DataStudioGraphChart selectedGraphType={'bar'}
+                  graphChartSpecArray={handleGraphChartSpec} delLineSelectionElement={deleteSelectedElement} />
+            ) : (
+          "" )}
 
-          {selectedItemArray.indexOf("pie") > -1 ? (
-            <DataStudioPieChart pieChartSpecArray={handlePieChartSpec} delPieSelectionElement={deleteSelectedElement} />
-          ) : (
-            ""
-          )}
-
+          { selectedItemArray.indexOf("pie") > -1 ? (
+            <DataStudioGraphChart selectedGraphType={'pie'}
+                  graphChartSpecArray={handleGraphChartSpec} delLineSelectionElement={deleteSelectedElement} />
+            ) : (
+          "" )}
+          
           {selectedItemArray.indexOf("listing") > -1 ? (
             <DataStudioList tableListData={handleTableListData} delListingSelectionElement={deleteSelectedElement} />
           ) : (
             ""
           )}
-            
-          <DataStudioValueDataIndicator
-            valueDataIndicateArray={valIndicateArray}
-            valueIndicatorObj={selectedValItemArray}
-            dataIndicatorArray={handleRemainingDataArray}
-          />
+
+          {selectedItemArray.indexOf("value_indicator") > -1 ? (
+            <DataStudioValueDataIndicator
+              valueDataIndicateArray={valIndicateArray}
+              valueIndicatorObj={selectedValItemArray}
+              dataIndicatorArray={handleRemainingDataArray}
+              dataValArrayForVega={dataArrayForVega}
+              dataValAggregateForVega={dataAggregateForVega}
+              updatedDateVal={new Date()}
+            />         
+          ) : (
+            ""
+          )}      
 
           <Dialog
             open={openIndicatorModal}
@@ -307,6 +378,9 @@ export default function DataStudioCanvasBody(props: any) {
               valueIndicatorObj={handleValueIndicator}
               closeValIndicatornModal={handleCloseValIndicator}
               dataIndicatorArray={handleRemainingDataArray}
+              dataValDataIndicator={valueDataIndicator}
+              dataSurveyArray={ handleSurveyDataArray }
+              dataAggregateData={ handleSataAggregate }
             />
           </Dialog>
         </Grid>

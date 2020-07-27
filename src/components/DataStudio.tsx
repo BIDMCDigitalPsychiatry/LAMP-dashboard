@@ -11,6 +11,9 @@ import DataStudioCanvas from "./DataStudioCanvas";
 import Logo from "../icons/logo.png";
 import Menu from "@material-ui/core/Menu"
 import { ConfirmProvider } from "material-ui-confirm";
+import LAMP, { 
+  Participant as ParticipantObj
+} from "lamp-core"
 
 const useStyles = makeStyles((theme) => ({
   body: { backgroundColor: "f0f4f7 !important" },
@@ -53,26 +56,26 @@ const useStyles = makeStyles((theme) => ({
     right: 0,
     left: "auto !important",
   }
-}))
+})) 
 
-export default function DataStudio() {
+export default function DataStudio({ participant, ...props }: { participant: ParticipantObj }) 
+{
   const classes = useStyles()
+  const [userActivityEvents, setUserActivityEvents] = React.useState([]);
+  localStorage.setItem("participant_id", JSON.stringify(participant));
 
   // Adding Background color to Body
   React.useEffect(() => {
-    document.body.style.backgroundColor = "#f0f4f7"
-  })
-
+    document.body.style.backgroundColor = "#f0f4f7";
+  })  
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
-
   const handleClose = () => {
     setAnchorEl(null)
   }
-
+  
   return (
     <React.Fragment>
       <AppBar position="static" className={classes.headerwhite}>
@@ -102,4 +105,4 @@ export default function DataStudio() {
       </ConfirmProvider>
     </React.Fragment>
   )
-}
+} 

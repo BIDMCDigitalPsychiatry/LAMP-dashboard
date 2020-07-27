@@ -11,6 +11,7 @@ import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
+import { useLocation  } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -50,10 +51,16 @@ const useStyles = makeStyles((theme) => ({
   maxWidth: { width: "100%" },
 }))
 
-export default function DataStudioPointsSingle(props: any) {
+export default function DataStudioPointsSingle(props: any) 
+{
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
   const [selectedPoints, setSelectedPoints] = React.useState("")
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id)) : null
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null
   const selectedTempPoints = templateId != null ? templateData.pie_selected_item : ""
   const [selectedDataPoints, setSelectedDataPoints] = React.useState(selectedTempPoints)
   const classes = useStyles()
@@ -114,26 +121,26 @@ export default function DataStudioPointsSingle(props: any) {
     } else if (selectedPoints === "sleep") {
       propDataPoint = sleepArray
     }
-    let templateId = JSON.parse(localStorage.getItem("template_id"))
+    let templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
     let templateData =
       templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
+        ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+          ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
           : null
         : null
     if (templateData != null) {
       templateData.pie_selected_item = selectedPoints
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(templateData))
+      localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateData))
     }
     props.dataPointSelected(propDataPoint)
   }
-
+    
   return (
     <React.Fragment>
       <Grid className={classes.popup_head}>
         <Box display="flex">
           <Box flexGrow={1} mt={2}>
-            <Typography variant="h3">Data points for Pie Graph</Typography>{" "}
+            <Typography variant="h3">Data points for Pie Chart</Typography>{" "}
           </Box>
           <Box>
             <Tooltip title="Close">

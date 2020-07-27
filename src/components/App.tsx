@@ -21,15 +21,7 @@ import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import VegaGraph from "./VegaGraph" 
 import DataStudio from "./DataStudio"
-import DataStudioValueIndicator from "./DataStudioValueIndicator"
-import DataStudioLineChart from "./DataStudioLineChart"
-import DataStudioBarChart from "./DataStudioBarChart"
-import DataStudioSelection from "./DataStudioSelection"
-import DataStudioCanvas from "./DataStudioCanvas"
-import DataStudioCanvasBody from "./DataStudioCanvasBody"
-import DataStudioValueDataIndicator from "./DataStudioValueDataIndicator"
-import DataStudioList from "./DataStudioList"
-  
+
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
@@ -233,18 +225,6 @@ function AppRouter({ ...props }) {
   return (
     <Switch>
       
-      {/* Route canvas for showing Data Studio. */}
-      <Route
-        exact
-        path="/data-studio"
-        render={(props) =>
-          <React.Fragment>
-              <PageTitle>mindLAMP | Graphs</PageTitle>
-              <DataStudio />
-            </React.Fragment>
-        }
-      />      
-
       {/* Route vega-graph for showing Vega graphs. */}
       <Route
         exact
@@ -375,6 +355,39 @@ function AppRouter({ ...props }) {
                 onLogout={() => reset()}
               >
                 <Participant participant={getParticipant(props.match.params.id)} />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/participant/:id/data-studio"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : !getParticipant(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
+              <NavigationLayout
+                id={props.match.params.id}
+                title={`Patient ${getParticipant(props.match.params.id).id}`}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+              <DataStudio participant={getParticipant(props.match.params.id)} />
               </NavigationLayout>
             </React.Fragment>
           )

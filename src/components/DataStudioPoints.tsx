@@ -11,7 +11,8 @@ import {
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from '@material-ui/core/Tooltip';
-
+import { useLocation  } from "react-router";
+  
 // Reordering the result
 const reorder = (list, startIndex, endIndex, destDrop, sourDrop) => {
   const result = Array.from(list)
@@ -100,9 +101,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function DataStudioPoints(props: any) {
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateLineData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id)) : null
+export default function DataStudioPoints(props: any) 
+{  
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateDataArray = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null
   const chartType = props.chartType
   const classes = useStyles()
   let itemsArray = [
@@ -110,15 +117,15 @@ export default function DataStudioPoints(props: any) {
     { id: "sleep", content: "Sleep Score" },
     { id: "anxiety", content: "Anxiety Score" },
   ]
-
+    
   // Get Item Data from local Storage
   const getItemStateData = () => {
-    if (templateLineData != null) {
+    if (templateDataArray != null) {
       if (chartType === "line") {
-        if (templateLineData.line_item != null) return templateLineData.line_item
+        if (templateDataArray.line_item != null) return templateDataArray.line_item
       }
       if (chartType === "bar") {
-        if (templateLineData.bar_item != null) return templateLineData.bar_item
+        if (templateDataArray.bar_item != null) return templateDataArray.bar_item
       }
     }
     if (props.selItemNewData.length > 0) {
@@ -130,12 +137,12 @@ export default function DataStudioPoints(props: any) {
 
   // Get selected item from local Storage
   const getSelectedItemStateData = () => {
-    if (templateLineData != null) {
+    if (templateDataArray != null) {
       if (chartType === "line") {
-        if (templateLineData.line_selected_item != null) return templateLineData.line_selected_item
+        if (templateDataArray.line_selected_item != null) return templateDataArray.line_selected_item
       }
       if (chartType === "bar") {
-        if (templateLineData.bar_selected_item != null) return templateLineData.bar_selected_item
+        if (templateDataArray.bar_selected_item != null) return templateDataArray.bar_selected_item
       }
     }
     if (props.selItemNewData.length > 0) {
@@ -220,8 +227,8 @@ export default function DataStudioPoints(props: any) {
       let state = { items }
       let templateData =
         templateId != null
-          ? localStorage.getItem("template_" + templateId.id)
-            ? JSON.parse(localStorage.getItem("template_" + templateId.id))
+          ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+            ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
             : null
           : null
       if (destination.droppableId === "droppable") {
@@ -240,7 +247,7 @@ export default function DataStudioPoints(props: any) {
           templateData["bar_selected_item"] = items
         }
       }
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(templateData))
+      localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateData))
     } else {
       const result: any = move(getList(source.droppableId), getList(destination.droppableId), source, destination)
       setItemsData(result.droppable)
@@ -248,8 +255,8 @@ export default function DataStudioPoints(props: any) {
 
       let templateData =
         templateId != null
-          ? localStorage.getItem("template_" + templateId.id)
-            ? JSON.parse(localStorage.getItem("template_" + templateId.id))
+          ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+            ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
             : null
           : null
       if (templateData != null) {
@@ -284,25 +291,29 @@ export default function DataStudioPoints(props: any) {
     props.dataPointSelected(selectDataPointArray)
     let templateData =
       templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
+        ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+          ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
           : null
-        : null;
+        : null;    
     if (chartType === "line") {
-      let templateNewData = templateData;      
-      templateNewData.line_item = lineDataPoints['line_item'];
-      templateNewData.line_selected_item = lineDataPoints['line_selected_item'];
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(templateNewData))
+      let templateLineData = templateData;
+      if(Object.keys(lineDataPoints).length > 0){
+        templateLineData.line_item = lineDataPoints['line_item'];
+        templateLineData.line_selected_item = lineDataPoints['line_selected_item'];
+        localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateLineData))
+      }
       let tempItemData = templateData.line_item != null ? templateData.line_item : itemsData
       let tempItemSelData = templateData.line_selected_item != null ? templateData.line_selected_item : selectedData
       props.dataItemsData(tempItemData)
       props.dataItemsSelData(tempItemSelData)
     } 
     if (chartType === "bar") {
-      let templateNewData = templateData;      
-      templateNewData.bar_item = barDataPoints['bar_item'];
-      templateNewData.bar_selected_item = barDataPoints['bar_selected_item'];
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(templateNewData))
+      let templateBarData = templateData;     
+      if(Object.keys(barDataPoints).length > 0){ 
+        templateBarData.bar_item = barDataPoints['bar_item'];
+        templateBarData.bar_selected_item = barDataPoints['bar_selected_item'];
+        localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateBarData))
+      } 
       let tempItemData = templateData.bar_item != null ? templateData.bar_item : itemsData
       let tempItemSelData = templateData.bar_selected_item != null ? templateData.bar_selected_item : selectedData
       props.dataItemsData(tempItemData)
@@ -315,7 +326,7 @@ export default function DataStudioPoints(props: any) {
       <Grid className={classes.popup_head}>
         <Box display="flex">
           <Box flexGrow={1} mt={2}>
-            <Typography variant="h3">Data points for { props.chartType === "line" ? "Line" : "Bar"} Graph </Typography>
+            <Typography variant="h3">Data points for { props.chartType === "line" ? "Line" : "Bar"} Chart </Typography>
           </Box>
           <Box>
             <Tooltip title="Close">
@@ -366,8 +377,7 @@ export default function DataStudioPoints(props: any) {
               <Paper variant="outlined" className={classes.selectedWrapper}>
                 <Box component="span" className={classes.selectedhd}>
                   <h4>Selected Points</h4>
-                </Box>
-
+                </Box>  
                 <Droppable droppableId="droppable2">
                   {(provided, snapshot) => (
                     <div

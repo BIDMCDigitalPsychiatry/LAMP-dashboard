@@ -20,6 +20,7 @@ import RefreshIcon from "@material-ui/icons/Refresh"
 import { useConfirm } from "material-ui-confirm";
 import { useSnackbar } from "notistack"
 import Tooltip from '@material-ui/core/Tooltip';
+import { useLocation  } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   btnAdd: {
@@ -86,27 +87,28 @@ export default function DataStudioCanvas() {
   const [openFromDatePicker, setOpenFromDatePicker] = React.useState(false);
   const [openToDatePicker, setOpenToDatePicker] = React.useState(false);
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-  const [changedTemplate, setChangedTemplate] = React.useState(false)
-
-  // Adding Background color to Body
-  React.useEffect(() => {
-    document.body.style.backgroundColor = "#f0f4f7"
-  })
+  const [changedTemplate, setChangedTemplate] = React.useState(false)  
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;  
 
   // Get Template List from local storage
   const getTemplateArray = () => {
-    return localStorage.getItem("template_list")
-              ? JSON.parse(localStorage.getItem("template_list")) : [{ id: 1, template: "Dashboard View 01" }]
+    return localStorage.getItem("template_list"+"_"+participantId)
+              ? JSON.parse(localStorage.getItem("template_list"+"_"+participantId)) : 
+                [{ id: 1, template: "Dashboard View 01"}]
   }
 
   // Get Selected Template data from local storage
   const getSelectedTemplateArray = () => {
-    if (localStorage.getItem("template_id")) {
-      return JSON.parse(localStorage.getItem("template_id")).id
+    if (localStorage.getItem("template_id"+"_"+participantId)) {
+      return JSON.parse(localStorage.getItem("template_id"+"_"+participantId)).id
     } else {
       let newTemplateVal: any = { id: 1, template: "Dashboard View 01" }
-      localStorage.setItem("template_id", JSON.stringify(newTemplateVal))
-      localStorage.setItem("template_list", JSON.stringify([newTemplateVal]))
+      localStorage.setItem("template_id"+"_"+participantId, JSON.stringify(newTemplateVal))
+      localStorage.setItem("template_list"+"_"+participantId, JSON.stringify([newTemplateVal]))
       return 1
     }
   }
@@ -133,7 +135,7 @@ export default function DataStudioCanvas() {
     let temp = event.target.value
     let templateVal = temp >= 9 ? temp : "0" + temp
     let newTemplateVal: any = { id: temp, template: "Dashboard View " + templateVal }
-    localStorage.setItem("template_id", JSON.stringify(newTemplateVal))
+    localStorage.setItem("template_id"+"_"+participantId, JSON.stringify(newTemplateVal))
     window.location.reload(false)
   }
 
@@ -146,9 +148,9 @@ export default function DataStudioCanvas() {
     let newTemplate: any = { id: newTempVal, template: "Dashboard View " + templateVal }
     updatedTemplate = [...templateArray, newTemplate]
     setTemplateArray(updatedTemplate)
-    localStorage.setItem("template_id", JSON.stringify(newTemplate))
+    localStorage.setItem("template_id"+"_"+participantId, JSON.stringify(newTemplate))
     setSelectedTemplate(newTempVal)
-    localStorage.setItem("template_list", JSON.stringify(updatedTemplate))
+    localStorage.setItem("template_list"+"_"+participantId, JSON.stringify(updatedTemplate))
     enqueueSnackbar("Successfully created a template.", {
       variant: "success",
       action: (key) => (
@@ -162,7 +164,7 @@ export default function DataStudioCanvas() {
 
   // Remove Selected Template
   const removeSavedTemplate = () => {
-    let templateId = JSON.parse(localStorage.getItem('template_id'));
+    let templateId = JSON.parse(localStorage.getItem('template_id'+"_"+participantId));
     confirm({ 
       title: ``,
       description: `Are you sure you want to delete this?`,
@@ -170,16 +172,16 @@ export default function DataStudioCanvas() {
       cancellationText:  `No`
     })
     .then(() =>{
-      let templateList = JSON.parse(localStorage.getItem("template_list"));
+      let templateList = JSON.parse(localStorage.getItem("template_list"+"_"+participantId));
       if(templateList.length > 1){
         // get index of object with id:1
         var removeIndex = templateList.map(function(item) { return item.id; }).indexOf(templateId.id);
         templateList.splice(removeIndex, 1);      
-        localStorage.setItem("template_list", JSON.stringify(templateList));
-        let newTemplateList = JSON.parse(localStorage.getItem("template_list"));
+        localStorage.setItem("template_list"+"_"+participantId, JSON.stringify(templateList));
+        let newTemplateList = JSON.parse(localStorage.getItem("template_list"+"_"+participantId));
         let firstTemplate = newTemplateList[0];
-        localStorage.setItem("template_id", JSON.stringify(firstTemplate));
-        localStorage.removeItem('template_'+templateId.id); 
+        localStorage.setItem("template_id"+"_"+participantId, JSON.stringify(firstTemplate));
+        localStorage.removeItem('template_'+templateId.id+"_"+participantId); 
         enqueueSnackbar("Successfully deleted the template.", {
           variant: "success",
           action: (key) => (
@@ -222,7 +224,7 @@ export default function DataStudioCanvas() {
     <React.Fragment>
       <Container maxWidth="xl" className={classes.contentarea}>
         <Grid container spacing={3}>
-          <Grid item lg={3}>
+          <Grid item lg={4}>
             <Paper className={classes.paper}>
               <Grid container spacing={1}>
                 <Grid item xs>
@@ -316,7 +318,8 @@ export default function DataStudioCanvas() {
           </Grid>
         </Grid>
       </Container>
-      <DataStudioCanvasBody dataSelectedTemplate={selectedTemplate} templateChanged={ changedTemplate }/>
+      <DataStudioCanvasBody dataSelectedTemplate={selectedTemplate} 
+            templateChanged={ changedTemplate }/> 
     </React.Fragment>
   ) 
 }

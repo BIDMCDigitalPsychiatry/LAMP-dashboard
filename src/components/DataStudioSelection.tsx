@@ -8,7 +8,6 @@ import {
   Paper,
   Container,
 } from "@material-ui/core"
-
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CardMedia from "@material-ui/core/CardMedia"
@@ -124,7 +123,7 @@ export default function DataStudioSelection(props: any)
               </Card>
             </Grid>
             <Grid item lg={2} md={3} sm={4} xs={6}>
-              <Card elevation={2} className={classes.card} onClick={() => saveSelectedItems("val-indicate")}>
+              <Card elevation={2} className={classes.card} onClick={() => saveSelectedItems("value_indicator")}>
                 <CardMedia className={classes.media}>
                   <img src={ValueIndicator} alt="Value Indicator"/>
                 </CardMedia>

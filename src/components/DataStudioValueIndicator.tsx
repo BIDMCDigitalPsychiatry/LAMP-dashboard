@@ -5,14 +5,15 @@ import {
   Typography,
   IconButton,
   makeStyles,
+  Container,
   Grid,
 } from "@material-ui/core"
-
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from '@material-ui/core/Tooltip';
-
+import { useLocation  } from "react-router";
+  
 const useStyles = makeStyles((theme) => ({
   media: {
     // this is the`className` passed to `CardMedia` later
@@ -36,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
   },
   box_btn: {
     float: "right",
+    padding: "20px"
   },
   btn: {
     cursor: "pointer",
@@ -69,74 +71,65 @@ const useStyles = makeStyles((theme) => ({
     padding: 20,
     borderTop: "#f4f4f4 solid 1px",
   },
+  errorMsg: {
+    color: "red"
+  }
 }))
 
-export default function DataStudioValueIndicator(props: any) {
+export default function DataStudioValueIndicator(props: any) 
+{
   const classes = useStyles()
+  const [itemsArray, setItemsArray] = React.useState([])
+  const [updatedItemArray, setUpdatedItemArray] = React.useState([])
+  const dataValDataIndicator = props.dataValDataIndicator;
+  
+  React.useEffect(() => {
+    let dataValArray = Object.keys(dataValDataIndicator)
+                        .map(key => (
+                          {id: key, value: ((dataValDataIndicator[key][0]['temporal_slices']))}                     
+                        ));                        
+    setItemsArray(dataValArray);    
+    let newdataArray = Object.keys(dataValDataIndicator)
+    .map(key => (
+      { id: key, value: 
+        Object.keys(dataValDataIndicator[key])
+        .map(keyVal => (
+            (dataValDataIndicator[key][keyVal]['temporal_slices']).reduce((a, {value}) => a + value, 0)
+        ))  
+      }         
+    ));
+    setUpdatedItemArray(newdataArray);  
+  }, [])
+
+  const [dataIndicatorError, setDataIndicatorError] = React.useState(false)
+  const [dataAggregateError, setDataAggregateError] = React.useState(false)
   const [closeModal, setCloseModal] = React.useState(false)
+  const [showAggValIndicator, setShowAggValIndicator] = React.useState(false)
+  const [showDataValIndicator, setShowDataValIndicator] = React.useState(true)
   const [selectedPoint, setSelectedPoint] = React.useState("")
   const [selectedDataIndicator, setSelectedDataIndicator] = React.useState("")
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateData =
-    templateId != null
-      ? localStorage.getItem("template_" + templateId.id)
-        ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-        : null
-      : null
-  const templateValIndicator =
-    templateData != null ? (templateData.hasOwnProperty("value_indicator") ? templateData.value_indicator : null) : null
-  const [moodArray, setMoodArray] = React.useState([
-    { x: 0, y: 10, c: 0 },
-    { x: 1, y: 11, c: 0 },
-    { x: 2, y: 12, c: 0 },
-    { x: 3, y: 13, c: 0 },
-    { x: 4, y: 14, c: 0 },
-    { x: 5, y: 15, c: 0 },
-    { x: 6, y: 16, c: 0 },
-    { x: 7, y: 17, c: 0 },
-  ])
-  const [sleepArray, setSleepArray] = React.useState([
-    { x: 0, y: 20, c: 1 },
-    { x: 1, y: 21, c: 1 },
-    { x: 2, y: 22, c: 1 },
-    { x: 3, y: 23, c: 1 },
-    { x: 4, y: 24, c: 1 },
-    { x: 5, y: 25, c: 1 },
-    { x: 6, y: 26, c: 1 },
-    { x: 7, y: 27, c: 1 },
-  ])
-  const [anxietyArray, setAnxietyArray] = React.useState([
-    { x: 0, y: 30, c: 2 },
-    { x: 1, y: 31, c: 2 },
-    { x: 2, y: 32, c: 2 },
-    { x: 3, y: 33, c: 2 },
-    { x: 4, y: 34, c: 2 },
-    { x: 5, y: 35, c: 2 },
-    { x: 6, y: 36, c: 2 },
-    { x: 7, y: 37, c: 2 },
-  ])
+  const [selectedAggregate, setSelectedAggregate] = React.useState("")
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;  
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateData = (templateId != null)
+                          ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+                            ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
+                            : null
+                          : null
+  const templateValIndicator = templateData != null ? 
+                                  (templateData.hasOwnProperty("value_indicator") ? templateData.value_indicator : []) : [];
 
-  // Calculate Average of Array Value
-  const calcAverage = (itemArray) => {
-    let avg = itemArray.reduce((a, { y }) => a + y, 0) / itemArray.length
-    return avg
-  }
-
-  // Calculate Sum of Array Value
-  const calSum = (itemArray) => {
-    let sum = itemArray.reduce((a, { y }) => a + y, 0)
-    return sum
-  }
-
-  const itemsArray = [
-    { id: "avg-mood", content: "Average Of Mood Score", calculation: calcAverage(moodArray) },
-    { id: "avg-anxiety", content: "Average of Anxiety Score", calculation: calcAverage(anxietyArray) },
-    { id: "avg-sleep", content: "Average of Sleep Score", calculation: calcAverage(sleepArray) },
-    { id: "sum-mood", content: "Sum Of Mood Score", calculation: calSum(moodArray) },
-    { id: "sum-anxiety", content: "Sum of Anxiety Score", calculation: calSum(anxietyArray) },
-    { id: "sum-sleep", content: "Sum of Sleep Score", calculation: calSum(sleepArray) },
+  const aggregateArray = [
+    { id: "min", content: "Minimum"},
+    { id: "max", content: "Maximum"},
+    { id: "sum", content: "Sum"},
+    { id: "average", content: "Average "},
   ]
-
+  
   // Set value Indaictor
   const saveValueIndicator = (val) => {
     setSelectedDataIndicator(val)
@@ -148,70 +141,163 @@ export default function DataStudioValueIndicator(props: any) {
     setCloseModal(true)
     props.closeValIndicatornModal(true)
   }
-
-  // Save the Selectde Data Value indicator to local storage
+  
   const saveSelectedDataIndicator = () => {
-    if (selectedDataIndicator) {
-      let valIndicator = itemsArray.filter((itemVal) => selectedDataIndicator.includes(itemVal.id))
+    if(Object.keys(dataValDataIndicator).length > 0){
+      if(selectedPoint == ""){
+        if(templateValIndicator.length > 0){
+          setSelectedDataIndicator(templateValIndicator[0].id)
+          setSelectedPoint(templateValIndicator[0].id)
+          setShowDataValIndicator(false);
+          setShowAggValIndicator(true);
+        }else{
+          setDataIndicatorError(true);
+        }
+      }else{
+        setShowDataValIndicator(false);
+        setShowAggValIndicator(true);
+      }
+    }else{
+      setDataIndicatorError(true);
+    }
+  }
+  
+  const saveAggregateValueIndicator = (id) => {
+    setSelectedAggregate(id);
+  }
+  
+  const saveSelectedAggregate = () => {
+    if(selectedAggregate == ""){
+      setDataAggregateError(true);
+    }else{
+      let itemsRemData = updatedItemArray;  
+      let itemsRemData1 = itemsRemData.filter(function(number) {
+        return number.id == selectedDataIndicator
+      });
+      let indexedItem = itemsRemData1[0];                          
+      let itemDataVal = Object.keys(indexedItem.value)
+                        .map(key => ( {"x":Number(key), "y": indexedItem.value[key]} ));
       let templateData =
-        templateId != null
-          ? localStorage.getItem("template_" + templateId.id)
-            ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-            : {}
-          : null  
+          templateId != null
+            ? localStorage.getItem("template_" + templateId.id+"_"+participantId)
+              ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId))
+              : {}
+            : null;
+      
       if (templateData != null) {
         if (templateData.hasOwnProperty("value_indicator")) {
-          let currentValIndicator = templateData.value_indicator
-          currentValIndicator.push(valIndicator[0])
-          templateData.value_indicator = currentValIndicator
+          let currentValIndicator = templateData.value_indicator;
+          let valIndicatorExists = currentValIndicator.some(el => (el.id === selectedDataIndicator) && (el.aggregate === selectedAggregate));
+          if(!valIndicatorExists){
+            currentValIndicator.push({"id":selectedDataIndicator,"aggregate":selectedAggregate,"calculation":itemDataVal})
+            templateData.value_indicator = currentValIndicator
+          }
         } else {
-          templateData.value_indicator = [valIndicator[0]]
-        }
-        localStorage.setItem("template_" + templateId.id, JSON.stringify(templateData))
+          templateData.value_indicator = [{"id":selectedDataIndicator,"aggregate":selectedAggregate,"calculation":itemDataVal}];
+        } 
+        props.dataIndicatorArray(templateData.value_indicator);
+        localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateData))
       }
-      props.valueIndicatorObj(valIndicator)
-      props.dataIndicatorArray(templateData.value_indicator)
+      props.dataSurveyArray(itemDataVal);
+      props.dataAggregateData(selectedAggregate);
+      handleClosePopup();
     }
   }
 
   return (
     <React.Fragment>
-      <Grid className={classes.popup_head}>
-        <Box display="flex">
-          <Box flexGrow={1} mt={2}>
-            <Typography variant="h3"> Data points for Value Indicator</Typography>{" "}
+      <Container maxWidth="xl" style={{display: (showDataValIndicator) ? 'block' : 'none' }}>          
+        <Grid className={classes.popup_head} >
+            <Box display="flex">
+              <Box flexGrow={1} mt={2}>
+                <Typography variant="h3"> Value Indicators</Typography>{" "}
+              </Box>  
+              <Box>
+                <Tooltip title="Close">
+                  <IconButton onClick={handleClosePopup}>
+                    <CloseIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+          </Grid> 
+          <Grid item xs={12}>
+            <Typography align="center">Select the value indicator</Typography>
+          </Grid>
+          { (dataIndicatorError) ?  
+            <Grid item xs={12} className={classes.errorMsg}>
+              <Typography align="center">Select one indicator to continue.</Typography>
+            </Grid>
+          : ""} 
+          <Box p={3}>
+            <Grid container spacing={2} className={classes.gridRow} alignItems="center" justify="center">
+              {itemsArray.length > 0
+                ? itemsArray.map((selected) => (  
+                    <Grid item sm={3} xs={12} key={selected.id} >
+                      {
+                        <Card
+                          variant="outlined" 
+                          onClick={() => saveValueIndicator(selected.id)} 
+                          className={ ((templateValIndicator.some(el => el.id === selected.id)) || (selectedPoint === selected.id)) ? classes.selectedCard : '' } 
+                        >
+                          <CardContent>
+                            <Typography color="textSecondary" align="center">                              
+                              {selected.id}
+                            </Typography> 
+                          </CardContent>
+                        </Card>
+                      }
+                    </Grid>
+                  ))
+                : ""}
+            </Grid>
           </Box>
-          <Box>
-            <Tooltip title="Close">
-              <IconButton onClick={handleClosePopup}>
-                <CloseIcon />
-              </IconButton>
-            </Tooltip>
+          <Grid className={classes.popfooter}>
+            <Box className={classes.box_btn}>
+              <Button variant="contained" className={classes.btn} onClick={handleClosePopup}>
+                Cancel
+              </Button>
+              <Button variant="contained" className={classes.btn} color="primary" onClick={saveSelectedDataIndicator}>
+                Save
+              </Button>
+            </Box>
+          </Grid>
+      </Container>
+      <Container maxWidth="xl" style={{display: (showAggValIndicator) ? 'block' : 'none' }}>
+        <Grid className={classes.popup_head}>
+          <Box display="flex">
+            <Box flexGrow={1} mt={2}>
+              <Typography variant="h3"> Data points for Value Indicator</Typography>{" "}
+            </Box>
+            <Box>
+              <Tooltip title="Close">
+                <IconButton onClick={handleClosePopup}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
-        </Box>
-      </Grid> 
-      <Grid item xs={12}>
-        <Typography align="center">Select the value indicator</Typography>
-      </Grid>
-      <Box p={3}>
-        <Grid container spacing={2} className={classes.gridRow}>
-          {itemsArray.length > 0
-            ? itemsArray.map((selected) => (
-                <Grid item sm={2} xs={12} key={selected.id}>
-                  {templateValIndicator != null ? (
-                    templateValIndicator.some((el) => el.id === selected.id) ? (
-                      <Card variant="outlined" className={classes.active}>
-                        <CardContent>
-                          <Typography color="textSecondary" align="center">
-                            {selected.content}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    ) : (
+        </Grid> 
+        <Grid item xs={12}> 
+          <Typography align="center">Select the aggregate for { selectedPoint }</Typography>
+        </Grid>
+        { (dataAggregateError) ?  
+          <Grid item xs={12} className={classes.errorMsg}>
+            <Typography align="center">Select one aggregate to continue.</Typography>
+          </Grid>
+        : ""} 
+        <Box p={3}>
+          <Grid container spacing={2} className={classes.gridRow} alignItems="center" justify="center"> 
+            {aggregateArray.length > 0
+              ? aggregateArray.map((selected) => (
+                  <Grid item sm={3} xs={12} key={selected.id}>                    
                       <Card
-                        variant="outlined"
-                        className={selectedPoint === selected.id ? classes.selectedCard : ""}
-                        onClick={() => saveValueIndicator(selected.id)}
+                        variant="outlined" 
+                        onClick={() => saveAggregateValueIndicator(selected.id)} 
+                        className={                         
+                         ((templateValIndicator.some(el => (el.aggregate === selected.id) && (el.id === selectedPoint)) 
+                         || (selectedAggregate == selected.id)))
+                         ? classes.selectedCard : '' }
                       >
                         <CardContent>
                           <Typography color="textSecondary" align="center">
@@ -219,35 +305,22 @@ export default function DataStudioValueIndicator(props: any) {
                           </Typography>
                         </CardContent>
                       </Card>
-                    )
-                  ) : (
-                    <Card
-                      variant="outlined"
-                      className={selectedPoint === selected.id ? classes.selectedCard : ""}
-                      onClick={() => saveValueIndicator(selected.id)}
-                    >
-                      <CardContent>
-                        <Typography color="textSecondary" align="center">
-                          {selected.content}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  )}
-                </Grid>
-              ))
-            : ""}
-        </Grid>
-      </Box>
-      <Grid className={classes.popfooter}>
-        <Box className={classes.box_btn}>
-          <Button variant="contained" className={classes.btn} onClick={handleClosePopup}>
-            Cancel
-          </Button>
-          <Button variant="contained" className={classes.btn} color="primary" onClick={saveSelectedDataIndicator}>
-            Save
-          </Button>
+                  </Grid>
+                ))
+              : ""}
+          </Grid>
         </Box>
-      </Grid>
+        <Grid className={classes.popfooter}>
+          <Box className={classes.box_btn}>
+            <Button variant="contained" className={classes.btn} onClick={handleClosePopup}>
+              Cancel
+            </Button>
+            <Button variant="contained" className={classes.btn} color="primary" onClick={saveSelectedAggregate}>
+              Save
+            </Button>
+          </Box>
+        </Grid>
+      </Container>
     </React.Fragment>
   )
 }

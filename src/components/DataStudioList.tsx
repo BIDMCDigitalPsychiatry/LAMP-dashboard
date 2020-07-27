@@ -6,20 +6,25 @@ import AspectRatioIcon from "@material-ui/icons/AspectRatio"
 import { useSnackbar } from "notistack"
 import { useConfirm } from "material-ui-confirm"
 import Tooltip from '@material-ui/core/Tooltip';
+import { useLocation  } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
   chartwrapperHeader: { padding: 10, marginBottom: 20, borderBottom: "#f0f0f0 solid 1px" },
   databtn: { backgroundColor: "#4696eb", textTransform: "capitalize", paddingRight: 12, "& span": { marginLeft: 0 } },
 }))
-
+  
 export default function DataStudioList(props) {
   const confirm = useConfirm()
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const classes = useStyles()
   const [maximized, setMaximized] = React.useState(false)
-
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id)) : null
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;  
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null
 
   const [columns, setColumns]: any = React.useState([
     { title: "Name", field: "name" },
@@ -64,7 +69,7 @@ export default function DataStudioList(props) {
   const updateLocalStorageData = (userData) => {
     if (userData.length > 0) {
       templateData.listing = userData
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(templateData))
+      localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateData))
     }
   }
 
@@ -77,10 +82,10 @@ export default function DataStudioList(props) {
       cancellationText: `No`,
     })
     .then(() => {
-      let templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id)) : null
+      let templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null
       let listData = templateData
       delete listData.listing
-      localStorage.setItem("template_" + templateId.id, JSON.stringify(listData))
+      localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(listData))
       props.delListingSelectionElement("listing")
       enqueueSnackbar("Successfully deleted the item.", {
         variant: "success",
@@ -109,7 +114,7 @@ export default function DataStudioList(props) {
   const maximizeComponent = () => {
     (maximized === true) ? setMaximized(false) : setMaximized(true) ;
   }
-
+  
   return (
     <React.Fragment>
       <Grid item xs={12} sm={6} lg={ maximized ? 12 : 6}>

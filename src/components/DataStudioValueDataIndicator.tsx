@@ -2,28 +2,24 @@ import React from "react"
 import {
   Box,
   Button,
-  Typography,
   IconButton,
   makeStyles,
   Grid,
 } from "@material-ui/core"
-
+import { Vega } from "react-vega"
 import Card from "@material-ui/core/Card"
 import CardContent from "@material-ui/core/CardContent"
 import CloseIcon from "@material-ui/icons/Close"
-//import AspectRatioIcon from "@material-ui/icons/AspectRatio"
 import { useConfirm } from "material-ui-confirm"
 import { useSnackbar } from "notistack"
 import moodScore from "../icons/moodScore.png"
 import stepScore from "../icons/stepScore.png"
 import greenScore from "../icons/greenScore.png"
 import vioScore from "../icons/vioScore.png"
-import yellowScore from "../icons/yellowScore.png"
-import orangeScore from "../icons/yellowScore.png"
 import Tooltip from '@material-ui/core/Tooltip';
+import { useLocation  } from "react-router";
 
 const useStyles = makeStyles((theme) => ({
-
   cardheader: { border: "#f0f0f0 solid 1px" },
   valueindicatorcard: {
     "& h6": { fontSize: 18, color: "#444", fontWeight: "500", textAlign: "center" },
@@ -51,49 +47,153 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function DataStudioValueDataIndicator(props: any) {
+export default function DataStudioValueDataIndicator(props: any) 
+{
+  const classes = useStyles()
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const confirm = useConfirm()
-  const classes = useStyles()
-  let selectedDataIndicator = []
-  const selectedDataArray = props.valueDataIndicateArray
-  const [valDataIndicator, setValDataIndicator] = React.useState([])
-  const [requestData, setRequestData] = React.useState(new Date())
-  const templateId = JSON.parse(localStorage.getItem("template_id"))
-  const templateData =
-    templateId != null
-      ? localStorage.getItem("template_" + templateId.id)
-        ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-        : {}
-      : null
-  if (templateData != null) {
-    if (templateData.hasOwnProperty("value_indicator")) {
-      selectedDataIndicator = templateData.value_indicator
-    } else {
-      if (selectedDataArray.length > 0) selectedDataIndicator = selectedDataArray.value_indicator
+  const [vegaSpecArray, setVegaSpecArray]: any = React.useState([])
+  const [requestData, setRequestData] = React.useState(new Date());
+  const participantData = JSON.parse(localStorage.getItem("participant_id"))
+  const currentLocation = useLocation();
+  const locationPathname = currentLocation.pathname;
+  const splitLocation = locationPathname.split("/");
+  const participantId = (splitLocation.length > 2) ? splitLocation[2] : participantData.id;  
+  const templateId = JSON.parse(localStorage.getItem("template_id"+"_"+participantId))
+  const templateData = templateId != null ? JSON.parse(localStorage.getItem("template_" + templateId.id+"_"+participantId)) : null
+  const tempValIndicator = (templateData === null || templateData === undefined || templateData === {}) ? 
+                              [] : 
+                              (templateData.hasOwnProperty("value_indicator") ? templateData.value_indicator : [] );
+  
+  React.useEffect(() => {
+    handleVegaSpecData();
+    props.dataIndicatorArray(tempValIndicator)
+  }, [tempValIndicator.length])
+  
+  // Handle Vega spec for Value indicator
+  const handleVegaSpecData = () => {
+    setVegaSpecArray([]);
+    if(tempValIndicator.length > 0){
+      for (var i = 0; i < tempValIndicator.length; i++) {
+        vegaSpec(tempValIndicator[i]); 
+      } 
     }
   }
 
-  React.useEffect(() => {
-    const templateId = JSON.parse(localStorage.getItem("template_id"))
-    const templateData =
-      templateId != null
-        ? localStorage.getItem("template_" + templateId.id)
-          ? JSON.parse(localStorage.getItem("template_" + templateId.id))
-          : {}
-        : null
-    if (templateData != null) {
-      if (templateData.hasOwnProperty("value_indicator")) {
-        setValDataIndicator(templateData.value_indicator)
-        props.dataIndicatorArray(templateData.value_indicator)
-      } else {
-        if (selectedDataArray.length > 0) {
-          setValDataIndicator(selectedDataArray.value_indicator)
-          props.dataIndicatorArray(templateData.value_indicator)
-        }
+  // Generate Data indicator based on Aggregate functions
+  const vegaSpec = (tempValIndicator) => {    
+    let vegaDataArray: any
+    let specs;   
+    let aggregateDataArray =  (() => {
+      switch (tempValIndicator.aggregate) {
+        case "min": return 'Minimum Of ';
+        case "max": return 'Maximum Of ';
+        case "sum": return 'Sum Of ';
+        case "average": return 'Average Of ';
       }
-    }
-  }, [requestData])
+    })();  
+    let aggregateType = (() => {
+      switch (tempValIndicator.aggregate) {
+        case "min":   return moodScore;
+        case "max": return stepScore;
+        case "sum": return vioScore;
+        case "average":  return greenScore;
+      }
+    })();
+    specs= {
+      "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+      "width": 130,
+      "height": 200,
+      "padding": 5,
+      "autosize": "pad",
+      "data": [{
+        "name": "dataObj",
+        "values": tempValIndicator.calculation,
+        "transform": [{
+          "type": "aggregate",
+          "fields": ["y"],
+          "ops": [tempValIndicator.aggregate],
+          "as": ["y"]
+        }]
+      }],
+      "layout": {
+        "padding": 10,
+        "columns": 1,
+        "align": "all"
+      },
+      "marks": [
+        {
+          "type": "group",
+          "marks": [
+            {
+              "type": "text",
+              "encode": {
+                "update": {
+                  "x": {"value": 0},
+                  "y": {"value": 0},
+                  "text": {"value": aggregateDataArray + tempValIndicator.id},
+                  "fill": {"value": "#444"},
+                  "fontSize": {"value": 20},
+                  "font": {"value": "Roboto"},
+                  "align": {"value": "center"},
+                  "fontWeight": {"value": 500}
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "marks": [
+            {
+              "type": "text",
+              "encode": {
+                "update": {
+                  "x": {"value": 0},
+                  "y": {"value": 45},
+                  "text": {"value": "units"},
+                  "fill": {"value": "#444"},
+                  "fontSize": {"value": 20},
+                  "align": {"value": "center"},
+                  "font": {"value": "Roboto"}
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "from": {"data": "dataObj"},
+          "encode": {
+            "enter": {
+              "text": {"field": "y", "signal": "round(datum.y, 2)"},
+              "fontSize": {"value": 60},
+              "fill": {"value": "#4696eb"},
+              "baseline": {"value": "middle"},
+              "align": {"value": "center"},
+              "x": {"value": 0},
+              "y": {"value": 55}
+            }
+          }
+        },
+        { 
+          "type": "image",
+          "encode": {
+            "enter": {
+              "url": {"value": aggregateType},
+              "x": {"value": 0},
+              "align": {"value": "center"},
+              "y": {"value": 80}
+            }
+          }
+        }
+      ]
+    };   
+    vegaDataArray = specs;
+    let vegaSpecs = {};
+    Object.assign(vegaSpecs, { id: tempValIndicator.id, aggregate: tempValIndicator.aggregate, specs: specs })
+    setVegaSpecArray(state => [...state, vegaSpecs])
+  }
 
   // Remove the selected Value Indicator
   const removeSelectedValueIndicator = (id) => {
@@ -106,25 +206,12 @@ export default function DataStudioValueDataIndicator(props: any) {
     .then(() => {
       if (templateData.hasOwnProperty("value_indicator")) {
         let tempValIndicator = templateData.value_indicator
-        let removeIndex = tempValIndicator
-          .map(function (item) {
-            return item.id
-          })
-          .indexOf(id)
-        // remove object
-        tempValIndicator.splice(removeIndex, 1)
-        templateData.value_indicator = tempValIndicator
-        localStorage.setItem("template_" + templateId.id, JSON.stringify(templateData))
-        props.dataIndicatorArray(tempValIndicator)
+        tempValIndicator.splice(id, 1);
+        if(tempValIndicator.length === 0){
+          delete templateData.value_indicator
+        }
+        localStorage.setItem("template_" + templateId.id+"_"+participantId, JSON.stringify(templateData))        
         setRequestData(new Date())
-        enqueueSnackbar("Successfully deleted the item.", {
-          variant: "success",
-          action: (key) => (
-            <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-              Dismiss
-            </Button>
-          ),
-        })
       }
     })
     .catch((e) => {
@@ -143,56 +230,25 @@ export default function DataStudioValueDataIndicator(props: any) {
 
   return (
     <React.Fragment>
-      {selectedDataIndicator.length > 0
-        ? selectedDataIndicator.map((selected) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={selected.id}>
-              <Card className={
-              (() => {
-                switch (selected.id) {
-                  case "avg-mood":   return classes.moodScore;
-                  case "avg-anxiety": return classes.stepScore;
-                  case "avg-sleep":  return classes.greenScore;
-                  case "sum-mood":  return classes.vioScore;
-                  case "sum-anxiety":  return classes.yellowScore;
-                  case "sum-sleep":  return classes.orangeScore;
-                }
-              })() + " " + classes.valueindicatorcard}>
-                 
+      {(vegaSpecArray.length > 0) ? 
+          vegaSpecArray.map((selected, key) => (          
+            <Grid item xs={12} sm={6} md={4} lg={3} key={key}>
+              <Card className={ classes.valueindicatorcard}>
                 <Box display="flex" py={1} borderBottom={1} className={classes.cardheader} justifyContent="flex-end">
-                  {/*
-                    <IconButton aria-label="Maximize">
-                      <AspectRatioIcon />
+                  <Tooltip title="Delete">
+                    <IconButton aria-label="Close" onClick={() => removeSelectedValueIndicator(key)}>
+                      <CloseIcon />
                     </IconButton>
-                  */}
-								<Tooltip title="Delete">
-                  <IconButton aria-label="Close" onClick={() => removeSelectedValueIndicator(selected.id)}>
-                    <CloseIcon />
-                  </IconButton>
-								</Tooltip>
+                  </Tooltip>
                 </Box>
                 <CardContent>
-                  <Typography variant="h6">{selected.content}</Typography>
-                  <Typography variant="h2" align="center">
-                    {selected.calculation}
-                  </Typography>
-                  <Typography variant="h5" align="center">
-                    units
-                  </Typography>
-                </CardContent>                  
-                <img src={(() => {
-                  switch (selected.id) {
-                    case "avg-mood":   return moodScore;
-                    case "avg-anxiety": return stepScore;
-                    case "avg-sleep":  return greenScore;
-                    case "sum-mood":  return vioScore;
-                    case "sum-anxiety":  return yellowScore;
-                    case "sum-sleep":  return orangeScore;
-                  }
-                })()} />                
+                  <Vega data={selected.specs.data} spec={selected.specs} />
+                </CardContent>
               </Card>
             </Grid>
           ))
-        : ""}
+        : ""
+      }
     </React.Fragment>
   )
 }
