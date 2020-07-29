@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
         flex: "none",
         minHeight: 125,
       },
+      width: "100%",
     },
     closeButton: {
       position: "absolute",
@@ -40,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: 1,
       },
       "& span": { color: "black" },
+      width: "100%",
     },
     navigationManageSelected: {
       "& svg": {
@@ -47,6 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: 1,
       },
       "& span": { color: "black" },
+      width: "100%",
     },
     navigationAssessSelected: {
       "& svg": {
@@ -54,6 +57,7 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: 1,
       },
       "& span": { color: "black" },
+      width: "100%",
     },
     navigationPreventSelected: {
       "& svg": {
@@ -61,6 +65,7 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: 1,
       },
       "& span": { color: "black" },
+      width: "100%",
     },
     navigationLabel: {
       textTransform: "capitalize",
@@ -68,6 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
       letterSpacing: 0,
       color: "rgba(0, 0, 0, 0.4)",
+      width: "100%",
     },
     leftbar: {
       "& div": {
@@ -87,6 +93,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         display: "none",
       },
+      width: "100%",
     },
     paper: {
       padding: "25px 20px",
@@ -150,15 +157,12 @@ export default function BottomMenu({ ...props }) {
             },
           }}
         >
-          <IconButton aria-label="logo" className={classes.leftbarLogo}>
-            <Logo />
-          </IconButton>
-          <Link
-            component={RouterLink}
-            to="/participant/me"
-            underline="none"
-            // className={classnames(classes.btngreen, classes.linkButton)}
-          >
+          <Link component={RouterLink} to="/feed" underline="none">
+            <IconButton aria-label="logo" className={classes.leftbarLogo}>
+              <Logo />
+            </IconButton>
+          </Link>
+          <Link component={RouterLink} to="/participant/me" underline="none">
             <BottomNavigationAction
               showLabel
               selected={tabVal === 0}
@@ -173,12 +177,7 @@ export default function BottomMenu({ ...props }) {
               onChange={(_, newTab) => setTab(newTab)}
             />
           </Link>
-          <Link
-            component={RouterLink}
-            to="/participant/me"
-            underline="none"
-            // className={classnames(classes.btngreen, classes.linkButton)}
-          >
+          <Link component={RouterLink} to="/participant/me" underline="none">
             <BottomNavigationAction
               showLabel
               selected={tabVal === 1}
@@ -204,18 +203,13 @@ export default function BottomMenu({ ...props }) {
                 <Typography variant="h6">
                   Welcome to the <Box component="span">Manage</Box> section.
                 </Typography>
-                <Typography variant="body1">Here you can take steps to refocus, reflect, and recovera.</Typography>
+                <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
               </React.Fragment>
             }
             arrow={true}
             placement={supportsSidebar ? "right" : "top"}
           >
-            <Link
-              component={RouterLink}
-              to="/participant/me"
-              underline="none"
-              // className={classnames(classes.btngreen, classes.linkButton)}
-            >
+            <Link component={RouterLink} to="/participant/me" underline="none">
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 2}
@@ -231,12 +225,7 @@ export default function BottomMenu({ ...props }) {
               />
             </Link>
           </HtmlTooltip>
-          <Link
-            component={RouterLink}
-            to="/participant/me"
-            underline="none"
-            // className={classnames(classes.btngreen, classes.linkButton)}
-          >
+          <Link component={RouterLink} to="/participant/me" underline="none">
             <BottomNavigationAction
               showLabel
               selected={tabVal === 3}

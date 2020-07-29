@@ -5,7 +5,6 @@ import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
-import "typeface-roboto"
 
 // External Imports
 import DateFnsUtils from "@date-io/date-fns"
@@ -516,6 +515,9 @@ export default function App({ ...props }) {
   return (
     <ThemeProvider
       theme={createMuiTheme({
+        typography: {
+          fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
+        },
         palette: {
           primary: blue,
           secondary: red,
