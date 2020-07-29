@@ -12,8 +12,13 @@ import {
   Button,
   DialogActions,
   IconButton,
+  AppBar,
+  Toolbar,
+  Icon,
 } from "@material-ui/core"
-import { Link as RouterLink } from "react-router-dom"
+import ResponsiveDialog from "./ResponsiveDialog"
+import SurveyQuestions from "./SurveyQuestions"
+
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
@@ -32,6 +37,28 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       width: "100%",
     },
+    customheader: {
+      backgroundColor: "white",
+      boxShadow: "none",
+      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
+    },
+    inlineHeader: {
+      background: "#FFFFFF",
+      boxShadow: "none",
+
+      "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+    },
+    toolbardashboard: {
+      minHeight: 65,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "center",
+        fontWeight: "600",
+        fontSize: 18,
+        width: "100%",
+      },
+    },
+    backbtn: { paddingLeft: 0, paddingRight: 0 },
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
@@ -51,6 +78,16 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          width: 150,
+          height: 150,
+        },
+      },
+
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+      },
     },
     MuiDialogPaperScrollPaper: {
       maxHeight: "100% !important",
@@ -119,6 +156,8 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: "bold",
       marginBottom: "30px",
     },
+    thumbMain: { maxWidth: 255 },
+    thumbContainer: { maxWidth: 1055 },
   })
 )
 
@@ -142,9 +181,13 @@ export default function Survey({
 }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
-  const [openComplete, setOpenComplete] = React.useState(props.surveyDone)
+  const [openComplete, setOpenComplete] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [activities, setActivities] = useState([])
+  const [openData, setOpenData] = React.useState(false)
+  const [surveyType, setSurveyType] = useState(null)
+  const [visibleActivities, setVisibleActivities] = useState([])
+  const [questionCount, setQuestionCount] = useState(0)
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -160,14 +203,50 @@ export default function Survey({
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
   }, [])
 
+  const submitSurvey = (response) => {
+    let events = response.map((x, idx) => ({
+      timestamp: new Date().getTime(),
+      duration: 0,
+      activity: visibleActivities[idx].id,
+      static_data: {},
+      temporal_slices: (x || []).map((y) => ({
+        item: y !== undefined ? y.item : null,
+        value: y !== undefined ? y.value : null,
+        type: null,
+        level: null,
+        duration: 0,
+      })),
+    }))
+    Promise.all(
+      events
+        .filter((x) => x.temporal_slices.length > 0)
+        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
+    ).then((x) => {
+      setOpenData(false)
+      setOpenComplete(true)
+    })
+  }
+
   return (
-    <Container>
-      <Grid container spacing={2}>
+    <Container className={classes.thumbContainer}>
+      <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
             .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
             .map((y) => (
-              <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen(y.name)}>
+              <Grid
+                item
+                xs={6}
+                sm={4}
+                md={3}
+                lg={3}
+                onClick={() => {
+                  setVisibleActivities([y])
+                  setQuestionCount(y.settings.length)
+                  handleClickOpen(y.name)
+                }}
+                className={classes.thumbMain}
+              >
                 <Card className={classes.assess}>
                   <Box mt={1} mb={1}>
                     {y.name == "Mood" && <AssessMood />}
@@ -186,6 +265,7 @@ export default function Survey({
 
       <Dialog
         open={open}
+        maxWidth="xs"
         onClose={handleClose}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
@@ -209,7 +289,7 @@ export default function Survey({
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
-            12 questions (10 mins)
+            {questionCount} questions (10 mins)
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
             The following survey will assess your sleep and social behavior. For each of the statements, rate which is
@@ -219,8 +299,12 @@ export default function Survey({
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
-              component={RouterLink}
-              to={`/participant/me/survey/${dialogueType.replace(/\s/g, "_")}`}
+              onClick={() => {
+                setOpenData(true)
+                setOpen(false)
+                setOpenComplete(false)
+                setSurveyType(dialogueType.replace(/\s/g, "_"))
+              }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
             >
@@ -261,6 +345,23 @@ export default function Survey({
           </Box>
         </DialogContent>
       </Dialog>
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={openData}
+        onClose={() => {
+          setOpenData(false)
+        }}
+      >
+        <SurveyQuestions
+          participant={participant}
+          type={surveyType}
+          onComplete={submitSurvey}
+          activities={visibleActivities}
+          closeDialog={() => setOpenData(false)}
+        />
+      </ResponsiveDialog>
     </Container>
   )
 }

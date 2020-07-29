@@ -1,5 +1,5 @@
 // Core Imports
-import React, {useState} from "react"
+import React, { useState } from "react"
 import {
   Typography,
   makeStyles,
@@ -68,20 +68,25 @@ function createData(dateVal: string, timeVal: string, value: number) {
 }
 
 const getPreventData = (data: JSON, flag: boolean, type: number) => {
-  let  rows = []  
-  var options = { month: 'short', day: 'numeric' };
+  let rows = []
+  var options = { month: "short", day: "numeric" }
   let i = 0
-  data = type == 1? data[0] : data
-  Object.keys(data).forEach((key) => {  
-    if(flag || (!flag && i < 7)) {
-      if(type == 1) {
-        rows.push(createData(data[key].label,'', data[key].value))
+  data = type == 1 ? data[0] : data
+  Object.keys(data).forEach((key) => {
+    if (flag || (!flag && i < 7)) {
+      if (type == 1) {
+        rows.push(createData(data[key].label, "", data[key].value))
       } else {
         let date = new Date(data[key].x)
-        rows.push(createData(date.toLocaleDateString('en-US', options), date.toLocaleTimeString('en-US',
-          { hour12: true, hour: '2-digit', minute: '2-digit' }),  data[key].y))
+        rows.push(
+          createData(
+            date.toLocaleDateString("en-US", options),
+            date.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" }),
+            data[key].y
+          )
+        )
       }
-      i++    
+      i++
     }
   })
   return rows
@@ -96,7 +101,7 @@ export default function PreventData({
   activityData: any
   graphType: number
 }) {
-  const classes = useStyles() 
+  const classes = useStyles()
   const [seeAll, setSeeAll] = useState(false)
   const preventData = getPreventData(props.activityData, seeAll, props.graphType)
 
@@ -132,7 +137,9 @@ export default function PreventData({
             </Grid>
             <Grid item xs>
               <Typography align="right">
-                <Link href="#" onClick={() => setSeeAll(true)}>See all</Link>
+                <Link href="#" onClick={() => setSeeAll(true)}>
+                  See all
+                </Link>
               </Typography>
             </Grid>
           </Grid>

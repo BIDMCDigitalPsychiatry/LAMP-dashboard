@@ -352,21 +352,7 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
-      <Route
-        exact
-        path="/participant/:id/survey/:type"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Survey</PageTitle>
-            <SurveyQuestions
-              participant={getParticipant(props.match.params.id)}
-              type={props.match.params.type}
-              goBack={props.history.goBack}
-              submitSurvey={submitSurvey}
-            />
-          </React.Fragment>
-        )}
-      />
+      
       <Route
         exact
         path="/participant/:id/LearnTips/:type"
@@ -390,27 +376,7 @@ function AppRouter({ ...props }) {
         )}
       />
 
-      {/* Route prevent-tab inner page ; done with static data for now. */}
-      {/* <Route
-        exact
-        path="/participant/:id/prevent-data/:type"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Prevent</PageTitle>
-            <NavigationLayout
-              id={props.match.params.id}
-              title={
-                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
-              }
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab={`${titlecase(props.match.params.type)}`}
-            >
-              <PreventData participant={getParticipant(props.match.params.id)} type={props.match.params.type}/>
-            </NavigationLayout>
-          </React.Fragment>
-        )}
-      /> */}
+      
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact

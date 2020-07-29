@@ -12,7 +12,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 
 import Prevent from "./Prevent"
 import Manage from "./Manage"
-
 import Welcome from "./Welcome"
 import Learn from "./Learn"
 
@@ -139,7 +138,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    // getShowWelcome(participant).then(setOpen)
+    //getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -168,13 +167,12 @@ export default function Participant({
           <Manage participant={participant} />
         </Box>
       </Slide>
-
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Prevent participant={participant} />
         </Box>
-      </Slide>     
-      <BottomMenu activeTab={activeTab} tabValue={getTab()} />
+      </Slide>
+      <BottomMenu activeTab={activeTab} tabValue={tab} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

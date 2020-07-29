@@ -21,6 +21,7 @@ import {
   Typography,
   colors,
   Link,
+  Container,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 
@@ -38,23 +39,49 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingLeft: 20,
       paddingRight: 20,
       alignItems: "flex-start",
-      paddingTop: theme.spacing(1),
+      paddingTop: 15,
       paddingBottom: theme.spacing(1),
       "& h5": {
         color: "#555555",
         fontSize: 25,
         fontWeight: "bold",
-        position: "absolute",
+        paddingTop: 15,
+        // position: "absolute",
         bottom: 0,
+        [theme.breakpoints.down("sm")]: {
+          marginTop: 30,
+        },
       },
     },
     toolbardashboard: { minHeight: 75 },
     toolbarinner: { minHeight: 95 },
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: {
+      paddingLeft: 0,
+      paddingRight: 0,
+      position: "absolute",
+      [theme.breakpoints.up("md")]: {
+        marginTop: 8,
+      },
+    },
     notification: {
       borderRadius: "50%",
       padding: "8px",
       background: "#CFE4FF",
+      display: "inline-block",
+    },
+    thumbContainer: {
+      maxWidth: 1055,
+      left: 0,
+      right: 0,
+      position: "absolute",
+      height: 50,
+      // zIndex: -1,
+      [theme.breakpoints.up("md")]: {
+        paddingLeft: 125,
+      },
+      [theme.breakpoints.up("lg")]: {
+        paddingLeft: 24,
+      },
     },
   })
 )
@@ -101,40 +128,44 @@ export default function NavigationLayout({
         <AppBar position="static" style={{ background: "transparent", boxShadow: "none" }}>
           <Toolbar className={selectedClass}>
             {dashboardMenus.indexOf(activeTab) < 0 && (
-              <IconButton
-                onClick={goBack}
-                color="default"
-                className={classes.backbtn}
-                aria-label="Menu"
-                style={{
-                  marginLeft:
-                    supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
-                }}
-              >
-                <Icon>arrow_back</Icon>
+              <Container className={classes.thumbContainer}>
+                <IconButton
+                  onClick={goBack}
+                  color="default"
+                  className={classes.backbtn}
+                  aria-label="Menu"
+                  style={{
+                    marginLeft:
+                      supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                  }}
+                >
+                  <Icon>arrow_back</Icon>
+                </IconButton>
+
                 {sameLineTitle && (
                   <Typography
                     variant="h5"
                     style={{
-                      marginLeft:
-                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
+                      marginLeft: supportsSidebar ? 35 : undefined,
                     }}
                   >
                     {activeTab}
                   </Typography>
                 )}
-              </IconButton>
+              </Container>
             )}
             {!sameLineTitle && (
-              <Typography
-                variant="h5"
-                style={{
-                  marginLeft:
-                    supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 90 : undefined,
-                }}
-              >
-                {activeTab}
-              </Typography>
+              <Container className={classes.thumbContainer}>
+                <Typography
+                  variant="h5"
+                  style={{
+                    marginLeft:
+                      supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                  }}
+                >
+                  {activeTab}
+                </Typography>
+              </Container>
             )}
             <Box flexGrow={1} />
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (

@@ -32,7 +32,6 @@ import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -395,7 +394,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                     activity.name,
                     activityEvents?.[activity.name]?.map((d) => ({
                       x: new Date(d.timestamp),
-                      y: d.duration/1000,
+                      y: d.duration / 1000,
                     }))
                   )
                 }
@@ -412,7 +411,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                     startDate={earliestDate()}
                     data={activityEvents?.[activity.name]?.map((d) => ({
                       x: new Date(d.timestamp),
-                      y: d.duration/1000,
+                      y: d.duration / 1000,
                     }))}
                   >
                     <LinearGradient
@@ -600,7 +599,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpenData(false)} color="default" className={classes.backbtn} aria-label="Menu">
+            <IconButton
+              onClick={() => setOpenData(false)}
+              color="default"
+              className={classes.backbtn}
+              aria-label="Menu"
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
