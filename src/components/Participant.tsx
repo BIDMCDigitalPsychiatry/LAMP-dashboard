@@ -154,22 +154,27 @@ export default function Participant({
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Learn participant={participant} />
+          <Learn participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Survey participant={participant} surveyDone={props.surveyDone} submitSurvey={submitSurvey} />
+          <Survey
+            participant={participant}
+            surveyDone={props.surveyDone}
+            activeTab={activeTab}
+            submitSurvey={submitSurvey}
+          />
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Manage participant={participant} />
+          <Manage participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Prevent participant={participant} />
+          <Prevent participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <BottomMenu activeTab={activeTab} tabValue={tab} />

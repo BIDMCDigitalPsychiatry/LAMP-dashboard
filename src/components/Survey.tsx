@@ -12,13 +12,12 @@ import {
   Button,
   DialogActions,
   IconButton,
-  AppBar,
-  Toolbar,
-  Icon,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyQuestions from "./SurveyQuestions"
-
+import BottomMenu from "./BottomMenu"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
@@ -178,6 +177,7 @@ export default function Survey({
   participant: ParticipantObj
   submitSurvey: Function
   surveyDone: boolean
+  activeTab: Function
 }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
@@ -188,6 +188,7 @@ export default function Survey({
   const [surveyType, setSurveyType] = useState(null)
   const [visibleActivities, setVisibleActivities] = useState([])
   const [questionCount, setQuestionCount] = useState(0)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -353,7 +354,9 @@ export default function Survey({
         onClose={() => {
           setOpenData(false)
         }}
+        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
+        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />}
         <SurveyQuestions
           participant={participant}
           type={surveyType}

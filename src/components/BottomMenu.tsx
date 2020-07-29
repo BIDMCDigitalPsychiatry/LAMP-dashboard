@@ -1,6 +1,15 @@
 import React, { useState } from "react"
 import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
-import { Box, useMediaQuery, useTheme, Drawer, BottomNavigationAction, IconButton, Typography } from "@material-ui/core"
+import {
+  Box,
+  useMediaQuery,
+  useTheme,
+  Drawer,
+  BottomNavigationAction,
+  IconButton,
+  Typography,
+  Link,
+} from "@material-ui/core"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
@@ -8,6 +17,7 @@ import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
+import { Link as RouterLink } from "react-router-dom"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -69,6 +79,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     leftbarLogo: {
       textAlign: "center",
+      paddingTop: 0,
       "&:hover": { backgroundColor: "transparent !important" },
       "& svg": {
         maxWidth: 30,
@@ -114,7 +125,7 @@ export default function BottomMenu({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
   const [openTab, setOpenTab] = useState(props.tabValue === 2 ? true : false)
-
+  console.log(props.tabValue)
   const setTab = (newTab) => {
     _setTab(newTab)
     newTab === 2 ? setOpenTab(true) : setOpenTab(false)
@@ -142,32 +153,46 @@ export default function BottomMenu({ ...props }) {
           <IconButton aria-label="logo" className={classes.leftbarLogo}>
             <Logo />
           </IconButton>
-          <BottomNavigationAction
-            showLabel
-            selected={tabVal === 0}
-            label="Learn"
-            value={0}
-            classes={{
-              root: classes.navigation,
-              selected: classes.navigationLearnSelected,
-              label: classes.navigationLabel,
-            }}
-            icon={<Learn />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
-          <BottomNavigationAction
-            showLabel
-            selected={tabVal === 1}
-            label="Assess"
-            value={1}
-            classes={{
-              root: classes.navigation,
-              selected: classes.navigationAssessSelected,
-              label: classes.navigationLabel,
-            }}
-            icon={<Assess />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
+          <Link
+            component={RouterLink}
+            to="/participant/me"
+            underline="none"
+            // className={classnames(classes.btngreen, classes.linkButton)}
+          >
+            <BottomNavigationAction
+              showLabel
+              selected={tabVal === 0}
+              label="Learn"
+              value={0}
+              classes={{
+                root: classes.navigation,
+                selected: classes.navigationLearnSelected,
+                label: classes.navigationLabel,
+              }}
+              icon={<Learn />}
+              onChange={(_, newTab) => setTab(newTab)}
+            />
+          </Link>
+          <Link
+            component={RouterLink}
+            to="/participant/me"
+            underline="none"
+            // className={classnames(classes.btngreen, classes.linkButton)}
+          >
+            <BottomNavigationAction
+              showLabel
+              selected={tabVal === 1}
+              label="Assess"
+              value={1}
+              classes={{
+                root: classes.navigation,
+                selected: classes.navigationAssessSelected,
+                label: classes.navigationLabel,
+              }}
+              icon={<Assess />}
+              onChange={(_, newTab) => setTab(newTab)}
+            />
+          </Link>
           <HtmlTooltip
             open={openTab}
             interactive={true}
@@ -185,33 +210,47 @@ export default function BottomMenu({ ...props }) {
             arrow={true}
             placement={supportsSidebar ? "right" : "top"}
           >
+            <Link
+              component={RouterLink}
+              to="/participant/me"
+              underline="none"
+              // className={classnames(classes.btngreen, classes.linkButton)}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 2}
+                label="Manage"
+                value={2}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationManageSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Manage />}
+                onChange={(_, newTab) => setTab(newTab)}
+              />
+            </Link>
+          </HtmlTooltip>
+          <Link
+            component={RouterLink}
+            to="/participant/me"
+            underline="none"
+            // className={classnames(classes.btngreen, classes.linkButton)}
+          >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 2}
-              label="Manage"
-              value={2}
+              selected={tabVal === 3}
+              label="Prevent"
+              value={3}
               classes={{
                 root: classes.navigation,
-                selected: classes.navigationManageSelected,
+                selected: classes.navigationPreventSelected,
                 label: classes.navigationLabel,
               }}
-              icon={<Manage />}
+              icon={<PreventIcon />}
               onChange={(_, newTab) => setTab(newTab)}
             />
-          </HtmlTooltip>
-          <BottomNavigationAction
-            showLabel
-            selected={tabVal === 3}
-            label="Prevent"
-            value={3}
-            classes={{
-              root: classes.navigation,
-              selected: classes.navigationPreventSelected,
-              label: classes.navigationLabel,
-            }}
-            icon={<PreventIcon />}
-            onChange={(_, newTab) => setTab(newTab)}
-          />
+          </Link>
         </Drawer>
       </Box>
     </div>

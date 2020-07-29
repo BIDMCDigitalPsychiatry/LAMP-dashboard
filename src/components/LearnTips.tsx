@@ -24,7 +24,6 @@ import { ReactComponent as PaperLens } from "../icons/PaperLens.svg"
 import { ReactComponent as Info } from "../icons/Info.svg"
 import { ReactComponent as Lightning } from "../icons/Lightning.svg"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
-import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme) => ({
   topicon: {
@@ -66,7 +65,6 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
     padding: "20px 20px 20px 20px",
     textAlign: "justify",
-    maxWidth: 500,
     margin: "0 auto 20px",
     "& h6": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
   },
@@ -159,7 +157,7 @@ const data = {
   ],
 }
 
-export default function LearnTips({ ...props }, { activeTab: Function}) {
+export default function LearnTips({ ...props }) {
   const classes = useStyles()
   const [openDialog, setOpenDialog] = useState(false)
   const [icon, setIcon] = useState(null)
@@ -191,10 +189,6 @@ export default function LearnTips({ ...props }, { activeTab: Function}) {
         return <SleepTips className={classes.topicon} />
     }
   }
-  
-  const activeTab = () => {    
-    props.activeTab('Manage')
-  }
 
   const getTips = (type: string) => {
     let details = []
@@ -202,30 +196,33 @@ export default function LearnTips({ ...props }, { activeTab: Function}) {
       if (key == type) {
         details = data[key].map((detail) => {
           return (
-            <Box
-              className={classes.tipStyle}
-              onClick={() => {
-                setOpenDialog(true)
-                setTitle(detail.title)
-                setDetails(detail.text)
-              }}
-            >
-              {supportsSidebar ? (
-                <div>
-                  {/* <BottomMenu tabValue={0} activeTab={activeTab}/> */}
-                  <Grid container spacing={3}>
-                    <Grid item xs>
-                      <Typography variant="h6">{detail.title}</Typography>
-                    </Grid>
-                    <Grid item xs justify="center" className={classes.rightArrow}>
-                      <ChevronRightIcon />
-                    </Grid>
-                  </Grid>
-                </div>
-              ) : (
-                <Typography variant="h6">{detail.title}</Typography>
-              )}
-            </Box>
+            <Grid container direction="row" justify="center" alignItems="center">
+              <Grid item lg={6} sm={12} xs={12}>
+                <Box
+                  className={classes.tipStyle}
+                  onClick={() => {
+                    setOpenDialog(true)
+                    setTitle(detail.title)
+                    setDetails(detail.text)
+                  }}
+                >
+                  {supportsSidebar ? (
+                    <div>
+                      <Grid container spacing={3}>
+                        <Grid item xs>
+                          <Typography variant="h6">{detail.title}</Typography>
+                        </Grid>
+                        <Grid item xs justify="center" className={classes.rightArrow}>
+                          <ChevronRightIcon />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    <Typography variant="h6">{detail.title}</Typography>
+                  )}
+                </Box>
+              </Grid>
+            </Grid>
           )
         })
       }
@@ -247,7 +244,12 @@ export default function LearnTips({ ...props }, { activeTab: Function}) {
       >
         <AppBar position="static" style={{ background: "#FFF9E5", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpenDialog(false)} color="default" className={classes.backbtn} aria-label="Menu">
+            <IconButton
+              onClick={() => setOpenDialog(false)}
+              color="default"
+              className={classes.backbtn}
+              aria-label="Menu"
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>

@@ -137,7 +137,7 @@ const useStyles = makeStyles((theme) => ({
       bottom: 0,
     },
   },
-  toolbardashboard: { 
+  toolbardashboard: {
     minHeight: 65,
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
@@ -145,7 +145,8 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "600",
       fontSize: 18,
       width: "100%",
-    } },
+    },
+  },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   slider: { width: "80%", color: "#2F9D7E" },
   sliderRail: {

@@ -15,10 +15,12 @@ import {
   AppBar,
   Toolbar,
   Icon,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import PreventData from "./PreventData"
-
+import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
@@ -313,7 +315,7 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-export default function Prevent({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Prevent({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
@@ -345,6 +347,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const [sensorCounts, setSensorCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
   const [selectedActivity, setSelectedActivity] = React.useState(null)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   React.useEffect(() => {
     ;(async () => {
@@ -596,6 +599,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         onClose={() => {
           setOpenData(false)
         }}
+        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
@@ -610,6 +614,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Toolbar>
           <Typography variant="h5">{selectedActivity}</Typography>
         </AppBar>
+        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
         <PreventData
           participant={participant}
           type={selectedActivity}
