@@ -252,7 +252,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
         onClose={() => {
           setOpenData(false)
         }}
-        style={{ paddingLeft: "100px" }}
+        style={{paddingLeft: supportsSidebar ? "100px" :""}}
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
