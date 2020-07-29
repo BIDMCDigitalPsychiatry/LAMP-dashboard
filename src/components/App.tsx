@@ -26,7 +26,7 @@ import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import PreventData from "./PreventData"
-
+import BottomMenu from "./BottomMenu"
 import NavigationLayout from "./NavigationLayout"
 import ScratchImage from "./ScratchImage"
 import HopeBox from "./HopeBox"
@@ -303,6 +303,7 @@ function AppRouter({ ...props }) {
               goBack={props.history.goBack}
               onLogout={() => reset()}
               activeTab="Conversations"
+              sameLineTitle={true}
             >
               <Conversations goBack={props.history.goBack} />
             </NavigationLayout>
@@ -355,59 +356,6 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | Scratch Card</PageTitle>
             <ScratchImage goBack={props.history.goBack} />
-          </React.Fragment>
-        )}
-      />
-      <Route
-        exact
-        path="/participant/:id/survey/:type"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Survey</PageTitle>
-            <SurveyQuestions type={props.match.params.type} goBack={props.history.goBack} submitSurvey={submitSurvey} />
-          </React.Fragment>
-        )}
-      />
-      <Route
-        exact
-        path="/participant/:id/LearnTips/:type"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Learn</PageTitle>
-            <NavigationLayout
-              id={props.match.params.id}
-              title={
-                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
-              }
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab={`${titlecase(props.match.params.type)}`}
-              sameLineTitle={true}
-            >
-              <LearnTips type={props.match.params.type} goBack={props.history.goBack} activeTab={activeTab} />
-            </NavigationLayout>
-          </React.Fragment>
-        )}
-      />
-
-      {/* Route prevent-tab inner page ; done with static data for now. */}
-      <Route
-        exact
-        path="/participant/:id/prevent-data/:type"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Prevent</PageTitle>
-            <NavigationLayout
-              id={props.match.params.id}
-              title={
-                getParticipant(props.match.params.id) !== null && `Patient ${getParticipant(props.match.params.id).id}`
-              }
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab={`${titlecase(props.match.params.type)}`}
-            >
-              <PreventData type={props.match.params.type} />
-            </NavigationLayout>
           </React.Fragment>
         )}
       />
@@ -533,7 +481,7 @@ function AppRouter({ ...props }) {
                 <Participant
                   participant={getParticipant(props.match.params.id)}
                   activeTab={activeTab}
-                  tabValue={state.activeTab}
+                  tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
                   surveyDone={state.surveyDone}
                   submitSurvey={submitSurvey}
                 />

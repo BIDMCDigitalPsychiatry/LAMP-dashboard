@@ -111,11 +111,23 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          width: 150,
+          height: 150,
+        },
+      },
+
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+      },
     },
+    thumbMain: { maxWidth: 255 },
+    thumbContainer: { maxWidth: 1055 },
   })
 )
 
-export default function Manage({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Manage({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -134,9 +146,9 @@ export default function Manage({ participant, ...props }: { participant: Partici
   }
 
   return (
-    <Container>
+    <Container className={classes.thumbContainer}>
       <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Breathe")}>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <BreatheIcon />
@@ -144,7 +156,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Typography className={classes.cardlabel}>Breathe</Typography>
           </Card>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Jewels")}>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Jewels")} className={classes.thumbMain}>
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <JewelsIcon />
@@ -153,7 +165,15 @@ export default function Manage({ participant, ...props }: { participant: Partici
           </Card>
         </Grid>
 
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Journals")}>
+        <Grid
+          item
+          xs={6}
+          sm={4}
+          md={3}
+          lg={3}
+          onClick={() => handleClickOpen("Journals")}
+          className={classes.thumbMain}
+        >
           <Link component={RouterLink} to={`/participant/me/journals`} underline="none">
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
@@ -164,7 +184,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           </Link>
         </Grid>
 
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("HopeBox")}>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
           <Link component={RouterLink} to={`/participant/me/hopebox`} underline="none">
             <Card className={classes.manage}>
               <Box mt={1}>
@@ -174,7 +194,15 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </Link>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => handleClickOpen("Scratch card")}>
+        <Grid
+          item
+          xs={6}
+          sm={4}
+          md={3}
+          lg={3}
+          onClick={() => handleClickOpen("Scratch card")}
+          className={classes.thumbMain}
+        >
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <ScratchCard width="100" height="100" />
@@ -182,7 +210,15 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Typography className={classes.cardlabel}>Scratch card</Typography>
           </Card>
         </Grid>
-        <Grid item xs={6} md={4} lg={3} onClick={() => setLaunchedActivity("medicationtracker")}>
+        <Grid
+          item
+          xs={6}
+          sm={4}
+          md={3}
+          lg={3}
+          onClick={() => setLaunchedActivity("medicationtracker")}
+          className={classes.thumbMain}
+        >
           <Card className={classes.manage}>
             <Box mt={2} mb={1}>
               <Medication />

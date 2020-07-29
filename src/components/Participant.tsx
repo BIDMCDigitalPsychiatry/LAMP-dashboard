@@ -10,14 +10,6 @@ import Survey from "./Survey"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Prevent from "./Prevent"
 import Manage from "./Manage"
-import MoodTipsSection from "./MoodTips"
-import SleepTipsSecion from "./SleepTips"
-import SocialTips from "./SocialTips"
-import BookRecommendations from "./BookRecommendations"
-import Definitions from "./Definitions"
-import PhysicalTips from "./PhysicalTips"
-import StressTips from "./StressTips"
-import Motivation from "./Motivation"
 import Welcome from "./Welcome"
 import Learn from "./Learn"
 
@@ -144,7 +136,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    // getShowWelcome(participant).then(setOpen)
+    //getShowWelcome(participant).then(setOpen)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
@@ -160,48 +152,30 @@ export default function Participant({
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Learn participant={participant} />
+          <Learn participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Survey participant={participant} surveyDone={props.surveyDone} submitSurvey={submitSurvey} />
+          <Survey
+            participant={participant}
+            surveyDone={props.surveyDone}
+            activeTab={activeTab}
+            submitSurvey={submitSurvey}
+          />
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Manage participant={participant} />
+          <Manage participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Prevent participant={participant} />
+          <Prevent participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
-      <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!launchedActivity || visibleActivities.length > 0}
-        onClose={() => {
-          setLaunchedActivity(undefined)
-          setVisibleActivities([])
-        }}
-      >
-        {
-          {
-            sleeptips: <SleepTipsSecion onComplete={() => setLaunchedActivity(undefined)} />,
-            moodtips: <MoodTipsSection onComplete={() => setLaunchedActivity(undefined)} />,
-            socialtips: <SocialTips onComplete={() => setLaunchedActivity(undefined)} />,
-            bookrecommendations: <BookRecommendations onComplete={() => setLaunchedActivity(undefined)} />,
-            definitions: <Definitions onComplete={() => setLaunchedActivity(undefined)} />,
-            physicalwellness: <PhysicalTips onComplete={() => setLaunchedActivity(undefined)} />,
-            stresstips: <StressTips onComplete={() => setLaunchedActivity(undefined)} />,
-            motivation: <Motivation onComplete={() => setLaunchedActivity(undefined)} />,
-          }[visibleActivities.length > 0 ? "survey" : launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
-      <BottomMenu activeTab={activeTab} tabValue={getTab()} />
+      <BottomMenu activeTab={activeTab} tabValue={tab} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

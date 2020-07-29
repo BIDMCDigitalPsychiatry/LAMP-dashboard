@@ -12,8 +12,15 @@ import {
   IconButton,
   Button,
   DialogActions,
+  AppBar,
+  Toolbar,
+  Icon,
+  useMediaQuery,
+  useTheme,
 } from "@material-ui/core"
-
+import ResponsiveDialog from "./ResponsiveDialog"
+import PreventData from "./PreventData"
+import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
@@ -26,8 +33,6 @@ import LAMP, {
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
-import { Link as RouterLink } from "react-router-dom"
-import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,6 +44,23 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
     },
+    inlineHeader: {
+      background: "#FFFFFF",
+      boxShadow: "none",
+
+      "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+    },
+    toolbardashboard: {
+      minHeight: 65,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "center",
+        fontWeight: "600",
+        fontSize: 18,
+        width: "100%",
+      },
+    },
+    backbtn: { paddingLeft: 0, paddingRight: 0 },
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
@@ -104,7 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
+function getSocialContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
   return [
     [
@@ -129,6 +151,12 @@ function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
         value: gps_events.filter((x) => x.data.context.social === "crowd").length,
       },
     ],
+  ]
+}
+
+function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
+  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
+  return [
     [
       {
         label: "Home",
@@ -281,16 +309,19 @@ function getActivityEventCount(activity_events: { [groupName: string]: ActivityE
 function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventObj[] }) {
   return {
     "Environmental Context":
-      sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social)
-        ?.length ?? 0,
+      sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.environment)?.length ?? 0,
+    "Social Context": sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.social)?.length ?? 0,
     "Step Count": sensor_events?.["lamp.steps"]?.length ?? 0,
   }
 }
 
-export default function Prevent({ participant, ...props }: { participant: ParticipantObj }) {
+export default function Prevent({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
+  const [openData, setOpenData] = React.useState(false)
+  const [activityData, setActivityData] = React.useState(null)
+  const [graphType, setGraphType] = React.useState(0)
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -301,18 +332,29 @@ export default function Prevent({ participant, ...props }: { participant: Partic
     setOpen(false)
   }
 
+  const openDetails = (activity: string, data: any, graphType?: number) => {
+    setGraphType(graphType ?? 0)
+    setSelectedActivity(activity)
+    setActivityData(data)
+    setOpenData(true)
+  }
+
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
   const [sensorEvents, setSensorEvents] = React.useState({})
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [sensorCounts, setSensorCounts] = React.useState({})
+  const [activityEvents, setActivityEvents] = React.useState({})
+  const [selectedActivity, setSelectedActivity] = React.useState(null)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   React.useEffect(() => {
     ;(async () => {
       let activities = await getActivities(participant)
       setActivities(activities)
       let activityEvents = await getActivityEvents(participant, activities)
+      setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
       setActivityCounts(activityEventCount)
       let sensorEvents = await getSensorEvents(participant)
@@ -321,6 +363,15 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       setSensorCounts(sensorEventCount)
     })()
   }, [])
+
+  const earliestDate = () =>
+    (activities || [])
+      .filter((x) => (selectedActivities || []).includes(x.name))
+      .map((x) => (activityEvents || {})[x.name] || [])
+      .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
+      .sort((a, b) => a - b /* min */)
+      .slice(0, 1)
+      .map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
   return (
     <Container>
@@ -335,18 +386,141 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/me/prevent-data/mood`} underline="none">
-            <Card className={classes.prevent}>
-              <Typography className={classes.preventlabel}>Mood (23)</Typography>
+        {(activities || [])
+          .filter((x) => (selectedActivities || []).includes(x.name))
+          .map((activity) => (
+            <Grid item xs={6} md={4} lg={3}>
+              <Card
+                className={classes.prevent}
+                onClick={() =>
+                  openDetails(
+                    activity.name,
+                    activityEvents?.[activity.name]?.map((d) => ({
+                      x: new Date(d.timestamp),
+                      y: d.duration / 1000,
+                    }))
+                  )
+                }
+              >
+                <Typography className={classes.preventlabel}>
+                  {activity.name} ({activityCounts[activity.name]})
+                </Typography>
+                <Box mt={3} mb={1} className={classes.maxw150}>
+                  <Sparkline
+                    ariaLabel={activity.name}
+                    margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                    width={126}
+                    height={70}
+                    startDate={earliestDate()}
+                    data={activityEvents?.[activity.name]?.map((d) => ({
+                      x: new Date(d.timestamp),
+                      y: d.duration / 1000,
+                    }))}
+                  >
+                    <LinearGradient
+                      id="gredient"
+                      from="#ECF4FF"
+                      to="#FFFFFF"
+                      fromOffset="30%"
+                      fromOpacity="1"
+                      toOpacity="1"
+                      toOffset="100%"
+                      rotate={90}
+                    />
+                    <LineSeries
+                      showArea={true}
+                      fill={`url(#gradient)`}
+                      stroke="#3C5DDD"
+                      strokeWidth={2}
+                      strokeLinecap="butt"
+                    />
+                  </Sparkline>
+                </Box>
+              </Card>
+            </Grid>
+          ))}
+      </Grid>
+
+      <Grid container xs={12} spacing={0} className={classes.sensorhd}>
+        <Grid item xs className={classes.preventHeader}>
+          <Typography variant="h5">Sensors</Typography>
+        </Grid>
+        <Grid item xs className={classes.addbtnmain}>
+          <IconButton onClick={() => handleClickOpen(1)}>
+            <AddCircleOutlineIcon className={classes.addicon} />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Grid container spacing={2}>
+        {(selectedSensors || []).includes("Social Context") && (
+          <Grid item xs={6} md={4} lg={3}>
+            <Card
+              className={classes.prevent}
+              onClick={() =>
+                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+              }
+            >
+              <Typography className={classes.preventlabel}>
+                Social Context ({sensorCounts["Social Context"]})
+              </Typography>
+              <Box>
+                <RadialDonutChart data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+              </Box>
+            </Card>
+          </Grid>
+        )}
+        {(selectedSensors || []).includes("Environmental Context") && (
+          <Grid item xs={6} md={4} lg={3}>
+            <Card
+              className={classes.prevent}
+              onClick={() =>
+                openDetails(
+                  "Environmental Context",
+                  getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
+                  1
+                )
+              }
+            >
+              <Typography className={classes.preventlabel}>
+                Environmental Context ({sensorCounts["Environmental Context"]})
+              </Typography>
+              <Box>
+                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+              </Box>
+            </Card>
+          </Grid>
+        )}
+
+        {(selectedSensors || []).includes("Step Count") && (
+          <Grid item xs={6} md={4} lg={3}>
+            <Card
+              className={classes.prevent}
+              onClick={() =>
+                openDetails(
+                  "Step Count",
+                  sensorEvents?.["lamp.steps"]?.map((d) => ({
+                    x: new Date(parseInt(d.timestamp)),
+                    y: d.data.value || 0,
+                  })) ?? []
+                )
+              }
+            >
+              <Typography className={classes.preventlabel}>Step Count({sensorCounts["Step Count"]})</Typography>
               <Box mt={3} mb={1} className={classes.maxw150}>
                 <Sparkline
-                  ariaLabel="Mood "
+                  ariaLabel="Step count"
                   margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
                   width={126}
                   height={70}
-                  data={[50, 100, 5, 75, 200, 15]}
-                  valueAccessor={(datum) => datum}
+                  XAxisLabel="Time"
+                  YAxisLabel="Steps Taken"
+                  startDate={earliestDate()}
+                  data={
+                    sensorEvents?.["lamp.steps"]?.map((d) => ({
+                      x: new Date(parseInt(d.timestamp)),
+                      y: d.data.value || 0,
+                    })) ?? []
+                  }
                 >
                   <LinearGradient
                     id="gredient"
@@ -368,92 +542,8 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                 </Sparkline>
               </Box>
             </Card>
-          </Link>
-        </Grid>
-        <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/me/prevent-data/sleep_social`} underline="none">
-            <Card className={classes.prevent}>
-              <Typography className={classes.preventlabel}>Sleep & Social (9)</Typography>
-              <Box mt={3} mb={1} className={classes.maxw150}>
-                <Sparkline
-                  ariaLabel="Sleep & Social "
-                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                  width={126}
-                  height={70}
-                  data={[50, 200, 35, 125, 20, 15]}
-                  valueAccessor={(datum) => datum}
-                >
-                  <LineSeries
-                    showArea={true}
-                    fill={`url(#gradient)`}
-                    stroke="#3C5DDD"
-                    strokeWidth={2}
-                    strokeLinecap="butt"
-                  />
-                </Sparkline>
-              </Box>
-            </Card>
-          </Link>
-        </Grid>
-      </Grid>
-
-      <Grid container xs={12} spacing={0} className={classes.sensorhd}>
-        <Grid item xs className={classes.preventHeader}>
-          <Typography variant="h5">Sensors</Typography>
-        </Grid>
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton onClick={() => handleClickOpen(1)}>
-            <AddCircleOutlineIcon className={classes.addicon} />
-          </IconButton>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={2}>
-        <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/me/prevent-data/social_context`} underline="none">
-            <Card className={classes.prevent}>
-              <Typography className={classes.preventlabel}>Social Context (9)</Typography>
-              <Box>
-                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-              </Box>
-            </Card>
-          </Link>
-        </Grid>
-        <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/me/prevent-data/environmental_context`} underline="none">
-            <Card className={classes.prevent}>
-              <Typography className={classes.preventlabel}>Environmental Context (9)</Typography>
-              <Box>
-                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-              </Box>
-            </Card>
-          </Link>
-        </Grid>
-        <Grid item xs={6} md={4} lg={3}>
-          <Link component={RouterLink} to={`/participant/me/prevent-data/step_count`} underline="none">
-            <Card className={classes.prevent}>
-              <Typography className={classes.preventlabel}>Step Count(5)</Typography>
-              <Box mt={3} mb={1} className={classes.maxw150}>
-                <Sparkline
-                  ariaLabel="Step count"
-                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                  width={126}
-                  height={70}
-                  data={[30, 250, 70, 135, 25, 20, 115]}
-                  valueAccessor={(datum) => datum}
-                >
-                  <LineSeries
-                    showArea={true}
-                    fill={`url(#gradient)`}
-                    stroke="#3C5DDD"
-                    strokeWidth={2}
-                    strokeLinecap="butt"
-                  />
-                </Sparkline>
-              </Box>
-            </Card>
-          </Link>
-        </Grid>
+          </Grid>
+        )}
       </Grid>
 
       <Dialog
@@ -500,6 +590,38 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Box>
         </DialogActions>
       </Dialog>
+
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={openData}
+        onClose={() => {
+          setOpenData(false)
+        }}
+        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
+      >
+        <AppBar position="static" className={classes.inlineHeader}>
+          <Toolbar className={classes.toolbardashboard}>
+            <IconButton
+              onClick={() => setOpenData(false)}
+              color="default"
+              className={classes.backbtn}
+              aria-label="Menu"
+            >
+              <Icon>arrow_back</Icon>
+            </IconButton>
+          </Toolbar>
+          <Typography variant="h5">{selectedActivity}</Typography>
+        </AppBar>
+        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
+        <PreventData
+          participant={participant}
+          type={selectedActivity}
+          activityData={activityData}
+          graphType={graphType}
+        />
+      </ResponsiveDialog>
     </Container>
   )
 }

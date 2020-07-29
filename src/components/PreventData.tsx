@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useState } from "react"
 import {
   Typography,
   makeStyles,
@@ -15,8 +15,9 @@ import {
   CardContent,
   Container,
 } from "@material-ui/core"
-
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import Sparkline from "./Sparkline"
+import RadialDonutChart from "./RadialDonutChart"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -59,175 +60,75 @@ const useStyles = makeStyles((theme) => ({
     padding: "0 20px",
     "& h5": { fontSize: 18, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 10 },
   },
+  graphcontainer: { height: "auto" },
 }))
 
 function createData(dateVal: string, timeVal: string, value: number) {
   return { dateVal, timeVal, value }
 }
 
-const getPreventData = (type: string) => {
-  let data = []
-  let graphData, rows
-  switch (type) {
-    case "mood":
-      graphData = [
-        { x: new Date(2017, 0), y: 250 },
-        { x: new Date(2017, 1), y: 279 },
-        { x: new Date(2017, 2), y: 428 },
-        { x: new Date(2017, 3), y: 324 },
-        { x: new Date(2017, 4), y: 352 },
-        { x: new Date(2017, 5), y: 339 },
-        { x: new Date(2017, 6), y: 400 },
-        { x: new Date(2017, 7), y: 525 },
-        { x: new Date(2017, 8), y: 323 },
-        { x: new Date(2017, 9), y: 420 },
-        { x: new Date(2017, 10), y: 370 },
-        { x: new Date(2017, 11), y: 380 },
-      ]
-      rows = [
-        createData("Oct 7", "5.56pm", 11),
-        createData("Oct 6", "6.00pm", 21),
-        createData("Oct 5", "6.50pm", 16),
-        createData("Sep 30", "4.00pm", 7),
-        createData("Sep 15", "3.30pm", 10),
-      ]
-      data.push({
-        title: "Your Mood",
-        description:
-          "Varying circumstances will cause you mood to change over time, that’s human. But erratic spikes and dips in " +
-          "mood can be signs of a more serious problem.",
-        data: rows,
-        graphData: graphData,
-      })
-      break
-    case "sleep_social":
-      graphData = [
-        { x: new Date(2017, 0), y: 150 },
-        { x: new Date(2020, 1), y: 249 },
-        { x: new Date(2020, 2), y: 400 },
-        { x: new Date(2020, 3), y: 344 },
-        { x: new Date(2020, 4), y: 42 },
-        { x: new Date(2020, 5), y: 349 },
-      ]
-      rows = [
-        createData("Feb 7", "5.00pm", 1),
-        createData("Feb 6", "4.00pm", 10),
-        createData("Oct 5", "6.00pm", 10),
-        createData("Mar 30", "4.00pm", 27),
-        createData("Sep 15", "3.30pm", 1),
-      ]
-      data.push({
-        title: "Sleep & Social",
-        description: "Test desc for sleep and social.",
-        data: rows,
-        graphData: graphData,
-      })
-      break
-    case "social_context":
-      graphData = [
-        { x: new Date(2020, 0), y: 50 },
-        { x: new Date(2020, 1), y: 49 },
-        { x: new Date(2020, 2), y: 400 },
-        { x: new Date(2020, 3), y: 304 },
-        { x: new Date(2020, 4), y: 40 },
-        { x: new Date(2020, 5), y: 309 },
-        { x: new Date(2020, 9), y: 420 },
-        { x: new Date(2020, 10), y: 370 },
-        { x: new Date(2020, 11), y: 380 },
-      ]
-      rows = [
-        createData("Jan 7", "6.00pm", 15),
-        createData("Jan 6", "5.00pm", 90),
-        createData("Oct 5", "3.00pm", 20),
-        createData("Oct 30", "1.00pm", 29),
-        createData("Sep 15", "1.30pm", 13),
-      ]
-      data.push({
-        title: "Social context",
-        description: "Test desc for social context.",
-        data: rows,
-        graphData: graphData,
-      })
-      break
-    case "env_context":
-      graphData = [
-        { x: new Date(2017, 0), y: 50 },
-        { x: new Date(2017, 1), y: 79 },
-        { x: new Date(2017, 2), y: 28 },
-        { x: new Date(2017, 3), y: 324 },
-        { x: new Date(2017, 4), y: 35 },
-        { x: new Date(2017, 5), y: 33 },
-        { x: new Date(2017, 6), y: 40 },
-        { x: new Date(2017, 7), y: 52 },
-        { x: new Date(2017, 8), y: 323 },
-        { x: new Date(2017, 9), y: 42 },
-        { x: new Date(2017, 10), y: 30 },
-        { x: new Date(2017, 11), y: 30 },
-      ]
-      rows = [
-        createData("Oct 7", "5.56pm", 11),
-        createData("Oct 6", "6.00pm", 21),
-        createData("Oct 5", "6.50pm", 16),
-        createData("Sep 30", "4.00pm", 7),
-        createData("Sep 15", "3.30pm", 10),
-      ]
-      data.push({
-        title: "Environmental Context",
-        description: "Test desc for Environmental Context.",
-        data: rows,
-        graphData: graphData,
-      })
-      break
-    case "step_count":
-      graphData = [
-        { x: new Date(2017, 0), y: 50 },
-        { x: new Date(2017, 1), y: 79 },
-        { x: new Date(2017, 2), y: 28 },
-        { x: new Date(2017, 3), y: 24 },
-        { x: new Date(2017, 4), y: 52 },
-        { x: new Date(2017, 5), y: 319 },
-        { x: new Date(2017, 6), y: 410 },
-        { x: new Date(2017, 7), y: 515 },
-        { x: new Date(2017, 8), y: 313 },
-        { x: new Date(2017, 9), y: 410 },
-        { x: new Date(2017, 10), y: 270 },
-        { x: new Date(2017, 11), y: 280 },
-      ]
-      rows = [
-        createData("Jan 7", "8.00pm", 5),
-        createData("Mar 6", "7.00pm", 12),
-        createData("Mar 5", "6.00pm", 16),
-        createData("Mar 30", "4.00pm", 17),
-        createData("Sep 15", "3.30pm", 20),
-      ]
-      data.push({ title: "Step count", description: "Test desc for Step count.", data: rows, graphData: graphData })
-      break
-  }
-  return data
+const getPreventData = (data: JSON, flag: boolean, type: number) => {
+  let rows = []
+  var options = { month: "short", day: "numeric" }
+  let i = 0
+  data = type == 1 ? data[0] : data
+  Object.keys(data).forEach((key) => {
+    if (flag || (!flag && i < 7)) {
+      if (type == 1) {
+        rows.push(createData(data[key].label, "", data[key].value))
+      } else {
+        let date = new Date(data[key].x)
+        rows.push(
+          createData(
+            date.toLocaleDateString("en-US", options),
+            date.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" }),
+            data[key].y
+          )
+        )
+      }
+      i++
+    }
+  })
+  return rows
 }
 
-export default function PreventData({ ...props }) {
+export default function PreventData({
+  participant,
+  ...props
+}: {
+  participant: ParticipantObj
+  type: string
+  activityData: any
+  graphType: number
+}) {
   const classes = useStyles()
-  const preventData = getPreventData(props.type)[0]
+  const [seeAll, setSeeAll] = useState(false)
+  const preventData = getPreventData(props.activityData, seeAll, props.graphType)
 
   return (
     <Box>
       <Grid container>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {preventData.title}: <Box component="span">fluctuating</Box>
+            {props.type}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>{preventData.description}</Typography>
+          <Typography>Test desc for {props.type}</Typography>
         </CardContent>
       </Grid>
-      <Sparkline
-        minWidth={250}
-        minHeight={220}
-        XAxisLabel="Time"
-        YAxisLabel="  "
-        color={colors.blue[500]}
-        data={preventData.graphData}
-      />
+      <Box className={classes.graphcontainer}>
+        {props.graphType === 1 ? (
+          <RadialDonutChart data={props.activityData} />
+        ) : (
+          <Sparkline
+            minWidth={250}
+            minHeight={220}
+            XAxisLabel="Time"
+            YAxisLabel="  "
+            color={colors.blue[500]}
+            data={props.activityData}
+          />
+        )}
+      </Box>
       <Box>
         <Container className={classes.recentstoreshd}>
           <Grid container xs={12} spacing={0}>
@@ -236,7 +137,9 @@ export default function PreventData({ ...props }) {
             </Grid>
             <Grid item xs>
               <Typography align="right">
-                <Link href="#">See all</Link>
+                <Link href="#" onClick={() => setSeeAll(true)}>
+                  See all
+                </Link>
               </Typography>
             </Grid>
           </Grid>
@@ -245,7 +148,7 @@ export default function PreventData({ ...props }) {
         <TableContainer>
           <Table className={classes.table} aria-label="simple table">
             <TableBody>
-              {preventData.data.map((row) => (
+              {preventData.map((row) => (
                 <TableRow key={row.dateVal}>
                   <TableCell component="th" style={{ width: "20%" }}>
                     {row.dateVal}
