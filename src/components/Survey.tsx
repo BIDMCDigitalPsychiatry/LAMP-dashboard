@@ -14,6 +14,7 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyQuestions from "./SurveyQuestions"
@@ -77,6 +78,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      width: "100%",
       "& svg": {
         [theme.breakpoints.up("lg")]: {
           width: 150,
@@ -157,6 +159,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
+    fullwidthBtn: { width: "100%" },
   })
 )
 
@@ -248,17 +251,19 @@ export default function Survey({
                 }}
                 className={classes.thumbMain}
               >
-                <Card className={classes.assess}>
-                  <Box mt={1} mb={1}>
-                    {y.name === "Mood" && <AssessMood />}
-                    {y.name === "Sleep and Social" && <AssessSleep />}
-                    {y.name === "Anxiety" && <AssessAnxiety />}
-                    {y.name === "App Usability" && <AssessUsability />}
-                    {y.name === "Water and Nutrition" && <AssessNutrition />}
-                    {y.name === "Psychosis and Social" && <AssessSocial />}
-                  </Box>
-                  <Typography className={classes.cardlabel}>{y.name}</Typography>
-                </Card>
+                <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                  <Card className={classes.assess}>
+                    <Box mt={1} mb={1}>
+                      {y.name === "Mood" && <AssessMood />}
+                      {y.name === "Sleep and Social" && <AssessSleep />}
+                      {y.name === "Anxiety" && <AssessAnxiety />}
+                      {y.name === "App Usability" && <AssessUsability />}
+                      {y.name === "Water and Nutrition" && <AssessNutrition />}
+                      {y.name === "Psychosis and Social" && <AssessSocial />}
+                    </Box>
+                    <Typography className={classes.cardlabel}>{y.name}</Typography>
+                  </Card>
+                </ButtonBase>
               </Grid>
             )),
         ]}

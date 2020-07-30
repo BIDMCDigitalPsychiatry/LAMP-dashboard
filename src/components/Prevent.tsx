@@ -17,6 +17,7 @@ import {
   Icon,
   useMediaQuery,
   useTheme,
+  ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import PreventData from "./PreventData"
@@ -88,6 +89,18 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      width: "100%",
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          width: 150,
+          height: 150,
+        },
+      },
+
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+        maxHeight: 240,
+      },
     },
 
     addicon: { float: "right", color: "#6083E7" },
@@ -123,8 +136,15 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       maxHeight: "280px",
     },
+    thumbMain: { maxWidth: 255 },
+    thumbContainer: { maxWidth: 1055 },
+    fullwidthBtn: { width: "100%" },
   })
 )
+
+function _patientMode() {
+  return LAMP.Auth._type === "participant"
+}
 
 function getSocialContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
@@ -229,13 +249,15 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
 // Perform event coalescing/grouping by sensor or activity type.
 async function getActivityEvents(
   participant: ParticipantObj,
-  _activities: ActivityObj[]
+  _activities: ActivityObj[],
+  _hidden: string[]
 ): Promise<{ [groupName: string]: ActivityEventObj[] }> {
   let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
     .map((x) => ({
       ...x,
       activity: _activities.find((y) => x.activity === y.id),
     }))
+    .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
     .sort((x, y) => x.timestamp - y.timestamp)
     .map((x) => ({
       ...x,
@@ -315,6 +337,24 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
+async function addHiddenEvent(
+  participant: ParticipantObj,
+  timestamp: number,
+  activityName: string
+): Promise<string[] | undefined> {
+  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
+  let _events = !!_hidden.error ? [] : _hidden.data
+  if (_events.includes(`${timestamp}/${activityName}`)) return _events
+  let new_events = [..._events, `${timestamp}/${activityName}`]
+  let _setEvents = (await LAMP.Type.setAttachment(
+    participant.id,
+    "me",
+    "lamp.dashboard.hidden_events",
+    new_events
+  )) as any
+  if (!!_setEvents.error) return undefined
+  return new_events
+}
 export default function Prevent({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
@@ -322,6 +362,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
+  const [hiddenEvents, setHiddenEvents] = React.useState([])
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -332,13 +373,26 @@ export default function Prevent({ participant, ...props }: { participant: Partic
     setOpen(false)
   }
 
-  const openDetails = (activity: string, data: any, graphType?: number) => {
+  const openDetails = (activity: any, data: any, graphType?: number) => {
     setGraphType(graphType ?? 0)
     setSelectedActivity(activity)
+    if (!graphType) setSelectedActivityName(activity.name)
     setActivityData(data)
     setOpenData(true)
   }
 
+  const hideEvent = async (timestamp?: number, activity?: string) => {
+    if (timestamp === undefined && activity === undefined) {
+      setHiddenEvents(hiddenEvents) // trigger a reload for dependent components only
+      return
+    }
+    let result = await addHiddenEvent(participant, timestamp, activity)
+    if (!!result) {
+      setHiddenEvents(result)
+    } else {
+      //   enqueueSnackbar("Failed to hide this event.", { variant: "error" })
+    }
+  }
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
@@ -346,14 +400,15 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [sensorCounts, setSensorCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
-  const [selectedActivity, setSelectedActivity] = React.useState(null)
+  const [selectedActivity, setSelectedActivity] = React.useState({})
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [selectedActivityName, setSelectedActivityName] = React.useState(null)
 
   React.useEffect(() => {
     ;(async () => {
       let activities = await getActivities(participant)
       setActivities(activities)
-      let activityEvents = await getActivityEvents(participant, activities)
+      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
       setActivityCounts(activityEventCount)
@@ -389,33 +444,134 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
           .map((activity) => (
-            <Grid item xs={6} md={4} lg={3}>
+            <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.prevent} onClick={() => openDetails(activity, activityEvents)}>
+                  <Typography className={classes.preventlabel}>
+                    {activity.name} ({activityCounts[activity.name]})
+                  </Typography>
+                  <Box mt={3} mb={1} className={classes.maxw150}>
+                    <Sparkline
+                      ariaLabel={activity.name}
+                      margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                      width={126}
+                      height={70}
+                      startDate={earliestDate()}
+                      data={activityEvents?.[activity.name]?.map((d) => ({
+                        x: new Date(d.timestamp),
+                        y: d.duration / 1000,
+                      }))}
+                    >
+                      <LinearGradient
+                        id="gredient"
+                        from="#ECF4FF"
+                        to="#FFFFFF"
+                        fromOffset="30%"
+                        fromOpacity="1"
+                        toOpacity="1"
+                        toOffset="100%"
+                        rotate={90}
+                      />
+                      <LineSeries
+                        showArea={true}
+                        fill={`url(#gradient)`}
+                        stroke="#3C5DDD"
+                        strokeWidth={2}
+                        strokeLinecap="butt"
+                      />
+                    </Sparkline>
+                  </Box>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))}
+      </Grid>
+
+      <Grid container xs={12} spacing={0} className={classes.sensorhd}>
+        <Grid item xs className={classes.preventHeader}>
+          <Typography variant="h5">Sensors</Typography>
+        </Grid>
+        <Grid item xs className={classes.addbtnmain}>
+          <IconButton onClick={() => handleClickOpen(1)}>
+            <AddCircleOutlineIcon className={classes.addicon} />
+          </IconButton>
+        </Grid>
+      </Grid>
+      <Grid container spacing={2}>
+        {(selectedSensors || []).includes("Social Context") && (
+          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card
+                className={classes.prevent}
+                onClick={() =>
+                  openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+                }
+              >
+                <Typography className={classes.preventlabel}>
+                  Social Context ({sensorCounts["Social Context"]})
+                </Typography>
+                <Box>
+                  <RadialDonutChart data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+                </Box>
+              </Card>
+            </ButtonBase>
+          </Grid>
+        )}
+        {(selectedSensors || []).includes("Environmental Context") && (
+          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
                 onClick={() =>
                   openDetails(
-                    activity.name,
-                    activityEvents?.[activity.name]?.map((d) => ({
-                      x: new Date(d.timestamp),
-                      y: d.duration / 1000,
-                    }))
+                    "Environmental Context",
+                    getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
+                    1
                   )
                 }
               >
                 <Typography className={classes.preventlabel}>
-                  {activity.name} ({activityCounts[activity.name]})
+                  Environmental Context ({sensorCounts["Environmental Context"]})
                 </Typography>
+                <Box>
+                  <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+                </Box>
+              </Card>
+            </ButtonBase>
+          </Grid>
+        )}
+
+        {(selectedSensors || []).includes("Step Count") && (
+          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card
+                className={classes.prevent}
+                onClick={() =>
+                  openDetails(
+                    "Step Count",
+                    sensorEvents?.["lamp.steps"]?.map((d) => ({
+                      x: new Date(parseInt(d.timestamp)),
+                      y: d.data.value || 0,
+                    })) ?? []
+                  )
+                }
+              >
+                <Typography className={classes.preventlabel}>Step Count({sensorCounts["Step Count"]})</Typography>
                 <Box mt={3} mb={1} className={classes.maxw150}>
                   <Sparkline
-                    ariaLabel={activity.name}
+                    ariaLabel="Step count"
                     margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
                     width={126}
                     height={70}
+                    XAxisLabel="Time"
+                    YAxisLabel="Steps Taken"
                     startDate={earliestDate()}
-                    data={activityEvents?.[activity.name]?.map((d) => ({
-                      x: new Date(d.timestamp),
-                      y: d.duration / 1000,
-                    }))}
+                    data={
+                      sensorEvents?.["lamp.steps"]?.map((d) => ({
+                        x: new Date(parseInt(d.timestamp)),
+                        y: d.data.value || 0,
+                      })) ?? []
+                    }
                   >
                     <LinearGradient
                       id="gredient"
@@ -437,111 +593,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                   </Sparkline>
                 </Box>
               </Card>
-            </Grid>
-          ))}
-      </Grid>
-
-      <Grid container xs={12} spacing={0} className={classes.sensorhd}>
-        <Grid item xs className={classes.preventHeader}>
-          <Typography variant="h5">Sensors</Typography>
-        </Grid>
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton onClick={() => handleClickOpen(1)}>
-            <AddCircleOutlineIcon className={classes.addicon} />
-          </IconButton>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2}>
-        {(selectedSensors || []).includes("Social Context") && (
-          <Grid item xs={6} md={4} lg={3}>
-            <Card
-              className={classes.prevent}
-              onClick={() =>
-                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
-              }
-            >
-              <Typography className={classes.preventlabel}>
-                Social Context ({sensorCounts["Social Context"]})
-              </Typography>
-              <Box>
-                <RadialDonutChart data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-              </Box>
-            </Card>
-          </Grid>
-        )}
-        {(selectedSensors || []).includes("Environmental Context") && (
-          <Grid item xs={6} md={4} lg={3}>
-            <Card
-              className={classes.prevent}
-              onClick={() =>
-                openDetails(
-                  "Environmental Context",
-                  getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
-                  1
-                )
-              }
-            >
-              <Typography className={classes.preventlabel}>
-                Environmental Context ({sensorCounts["Environmental Context"]})
-              </Typography>
-              <Box>
-                <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
-              </Box>
-            </Card>
-          </Grid>
-        )}
-
-        {(selectedSensors || []).includes("Step Count") && (
-          <Grid item xs={6} md={4} lg={3}>
-            <Card
-              className={classes.prevent}
-              onClick={() =>
-                openDetails(
-                  "Step Count",
-                  sensorEvents?.["lamp.steps"]?.map((d) => ({
-                    x: new Date(parseInt(d.timestamp)),
-                    y: d.data.value || 0,
-                  })) ?? []
-                )
-              }
-            >
-              <Typography className={classes.preventlabel}>Step Count({sensorCounts["Step Count"]})</Typography>
-              <Box mt={3} mb={1} className={classes.maxw150}>
-                <Sparkline
-                  ariaLabel="Step count"
-                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                  width={126}
-                  height={70}
-                  XAxisLabel="Time"
-                  YAxisLabel="Steps Taken"
-                  startDate={earliestDate()}
-                  data={
-                    sensorEvents?.["lamp.steps"]?.map((d) => ({
-                      x: new Date(parseInt(d.timestamp)),
-                      y: d.data.value || 0,
-                    })) ?? []
-                  }
-                >
-                  <LinearGradient
-                    id="gredient"
-                    from="#ECF4FF"
-                    to="#FFFFFF"
-                    fromOffset="30%"
-                    fromOpacity="1"
-                    toOpacity="1"
-                    toOffset="100%"
-                    rotate={90}
-                  />
-                  <LineSeries
-                    showArea={true}
-                    fill={`url(#gradient)`}
-                    stroke="#3C5DDD"
-                    strokeWidth={2}
-                    strokeLinecap="butt"
-                  />
-                </Sparkline>
-              </Box>
-            </Card>
+            </ButtonBase>
           </Grid>
         )}
       </Grid>
@@ -612,14 +664,44 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
-          <Typography variant="h5">{selectedActivity}</Typography>
+          <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
         {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
         <PreventData
           participant={participant}
-          type={selectedActivity}
-          activityData={activityData}
+          activity={selectedActivity}
+          events={graphType == 1 ? activityData : (activityData || {})[selectedActivityName] || []}
           graphType={graphType}
+          earliestDate={earliestDate}
+          enableEditMode={!_patientMode()}
+          onEditAction={(activity, data) =>
+            setActivities([
+              {
+                ...activity,
+                prefillData: [
+                  data.slice.map(({ item, value }) => ({
+                    item,
+                    value,
+                  })),
+                ],
+                prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
+              },
+            ])
+          }
+          onCopyAction={(activity, data) =>
+            setActivities([
+              {
+                ...activity,
+                prefillData: [
+                  data.slice.map(({ item, value }) => ({
+                    item,
+                    value,
+                  })),
+                ],
+              },
+            ])
+          }
+          onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
         />
       </ResponsiveDialog>
     </Container>

@@ -15,6 +15,8 @@ import "swagger-ui-react/swagger-ui.css"
 import LAMP from "lamp-core"
 import Login from "./Login"
 import Conversations from "./Conversations"
+import Messages from "./Messages"
+
 import TipNotification from "./TipNotification"
 import Feed from "./Feed"
 import Breathe from "./Breathe"
@@ -304,7 +306,13 @@ function AppRouter({ ...props }) {
               activeTab="Conversations"
               sameLineTitle={true}
             >
-              <Conversations goBack={props.history.goBack} />
+              {/* <Conversations goBack={props.history.goBack} /> */}
+              <Messages
+                style={{ margin: "0px -16px -16px -16px" }}
+                refresh={true}
+                participantOnly
+                participant={getParticipant(props.match.params.id).id}
+              />
             </NavigationLayout>
           </React.Fragment>
         )}

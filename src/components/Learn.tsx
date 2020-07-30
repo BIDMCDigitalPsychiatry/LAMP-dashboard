@@ -12,6 +12,7 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  ButtonBase,
 } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Participant as ParticipantObj } from "lamp-core"
@@ -66,6 +67,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      width: "100%",
       "& svg": {
         [theme.breakpoints.up("lg")]: {
           width: 150,
@@ -79,6 +81,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
+    fullwidthBtn: { width: "100%" },
   })
 )
 
@@ -103,12 +106,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <MoodTips />
-            </Box>
-            <Typography className={classes.cardlabel}>Mood Tips</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <MoodTips />
+              </Box>
+              <Typography className={classes.cardlabel}>Mood Tips</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -122,12 +127,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <SleepTips />
-            </Box>
-            <Typography className={classes.cardlabel}>Sleep Tips</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <SleepTips />
+              </Box>
+              <Typography className={classes.cardlabel}>Sleep Tips</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -141,12 +148,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <Chat />
-            </Box>
-            <Typography className={classes.cardlabel}>Social Tips</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <Chat />
+              </Box>
+              <Typography className={classes.cardlabel}>Social Tips</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -160,12 +169,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={1}>
-              <Info />
-            </Box>
-            <Typography className={classes.cardlabel}>Mental Health Resources</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={1}>
+                <Info />
+              </Box>
+              <Typography className={classes.cardlabel}>Mental Health Resources</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -179,12 +190,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <Wellness />
-            </Box>
-            <Typography className={classes.cardlabel}>Physical Wellness</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <Wellness />
+              </Box>
+              <Typography className={classes.cardlabel}>Physical Wellness</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -198,12 +211,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={1}>
-              <Book />
-            </Box>
-            <Typography className={classes.cardlabel}>Suggested Reading</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={1}>
+                <Book />
+              </Box>
+              <Typography className={classes.cardlabel}>Suggested Reading</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -217,12 +232,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <PaperLens />
-            </Box>
-            <Typography className={classes.cardlabel}>Motivation</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <PaperLens />
+              </Box>
+              <Typography className={classes.cardlabel}>Motivation</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -236,12 +253,14 @@ export default function Learn({ participant, ...props }: { participant: Particip
             setOpenData(true)
           }}
         >
-          <Card className={classes.learn}>
-            <Box mt={2} mb={1}>
-              <Lightning />
-            </Box>
-            <Typography className={classes.cardlabel}>Stress Tips</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.learn}>
+              <Box mt={2} mb={1}>
+                <Lightning />
+              </Box>
+              <Typography className={classes.cardlabel}>Stress Tips</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
       </Grid>
       <ResponsiveDialog
@@ -252,7 +271,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
         onClose={() => {
           setOpenData(false)
         }}
-        style={{paddingLeft: supportsSidebar ? "100px" :""}}
+        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>

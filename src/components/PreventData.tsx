@@ -15,9 +15,10 @@ import {
   CardContent,
   Container,
 } from "@material-ui/core"
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
 import RadialDonutChart from "./RadialDonutChart"
+import ActivityCard from "./ActivityCard"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -67,6 +68,10 @@ function createData(dateVal: string, timeVal: string, value: number) {
   return { dateVal, timeVal, value }
 }
 
+function _hideExperimental() {
+  return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
+}
+
 const getPreventData = (data: JSON, flag: boolean, type: number) => {
   let rows = []
   var options = { month: "short", day: "numeric" }
@@ -94,73 +99,94 @@ const getPreventData = (data: JSON, flag: boolean, type: number) => {
 
 export default function PreventData({
   participant,
+  activity,
+  events,
+  graphType,
+  earliestDate,
+  enableEditMode,
+  onEditAction,
+  onCopyAction,
+  onDeleteAction,
   ...props
 }: {
   participant: ParticipantObj
-  type: string
-  activityData: any
+  activity: any
+  events: any
   graphType: number
+  earliestDate: any
+  enableEditMode: boolean
+  onEditAction: (activity: ActivityObj, data: any) => void
+  onCopyAction: (activity: ActivityObj, data: any) => void
+  onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
   const [seeAll, setSeeAll] = useState(false)
-  const preventData = getPreventData(props.activityData, seeAll, props.graphType)
 
   return (
     <Box>
       <Grid container>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {props.type}: <Box component="span">fluctuating</Box>
+            {graphType == 1 ? activity : activity.name}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>Test desc for {props.type}</Typography>
+          <Typography>Test desc for {graphType == 1 ? activity : activity.name}</Typography>
         </CardContent>
       </Grid>
       <Box className={classes.graphcontainer}>
-        {props.graphType === 1 ? (
-          <RadialDonutChart data={props.activityData} />
+        {graphType === 1 ? (
+          <RadialDonutChart data={getPreventData(events, seeAll, graphType)} />
         ) : (
-          <Sparkline
-            minWidth={250}
-            minHeight={220}
-            XAxisLabel="Time"
-            YAxisLabel="  "
-            color={colors.blue[500]}
-            data={props.activityData}
+          <ActivityCard
+            activity={activity}
+            events={events}
+            startDate={earliestDate}
+            forceDefaultGrid={_hideExperimental()}
+            onEditAction={
+              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onEditAction(activity, data)
+            }
+            onCopyAction={
+              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onCopyAction(activity, data)
+            }
+            onDeleteAction={
+              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onDeleteAction(activity, data)
+            }
           />
         )}
       </Box>
-      <Box>
-        <Container className={classes.recentstoreshd}>
-          <Grid container xs={12} spacing={0}>
-            <Grid item xs>
-              <Typography variant="h5">Recent Scores</Typography>
+      {graphType === 1 && (
+        <Box>
+          <Container className={classes.recentstoreshd}>
+            <Grid container xs={12} spacing={0}>
+              <Grid item xs>
+                <Typography variant="h5">Recent Scores</Typography>
+              </Grid>
+              <Grid item xs>
+                <Typography align="right">
+                  <Link href="#" onClick={() => setSeeAll(true)}>
+                    See all
+                  </Link>
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid item xs>
-              <Typography align="right">
-                <Link href="#" onClick={() => setSeeAll(true)}>
-                  See all
-                </Link>
-              </Typography>
-            </Grid>
-          </Grid>
-        </Container>
+          </Container>
 
-        <TableContainer>
-          <Table className={classes.table} aria-label="simple table">
-            <TableBody>
-              {preventData.map((row) => (
-                <TableRow key={row.dateVal}>
-                  <TableCell component="th" style={{ width: "20%" }}>
-                    {row.dateVal}
-                  </TableCell>
-                  <TableCell style={{ width: "40%" }}>{row.timeVal}</TableCell>
-                  <TableCell align="right">{row.value}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+          <TableContainer>
+            <Table className={classes.table} aria-label="simple table">
+              <TableBody>
+                {getPreventData(activity, seeAll, graphType).map((row) => (
+                  <TableRow key={row.dateVal}>
+                    <TableCell component="th" style={{ width: "20%" }}>
+                      {row.dateVal}
+                    </TableCell>
+                    <TableCell style={{ width: "40%" }}>{row.timeVal}</TableCell>
+                    <TableCell align="right">{row.value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      )}
     </Box>
   )
 }

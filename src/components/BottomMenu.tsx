@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
 import {
   Box,
@@ -9,6 +9,7 @@ import {
   IconButton,
   Typography,
   Link,
+  ClickAwayListener,
 } from "@material-ui/core"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
@@ -81,6 +82,12 @@ const useStyles = makeStyles((theme: Theme) =>
           background: "#F8F8F8",
           border: 0,
         },
+
+        "& a": {
+          [theme.breakpoints.down("sm")]: {
+            flex: 1,
+          },
+        },
       },
     },
     leftbarLogo: {
@@ -106,7 +113,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const HtmlTooltip = withStyles((theme: Theme) => ({
+const ManageTooltip = withStyles((theme: Theme) => ({
   tooltip: {
     zIndex: 999,
     padding: "25px 20px",
@@ -117,11 +124,101 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
     right: 10,
     "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
     "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
   },
   arrow: {
     color: "#E56F61",
     fontSize: 15,
     [theme.breakpoints.down("sm")]: {
+      marginLeft: "5px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "19px !important",
+    },
+  },
+}))(Tooltip)
+
+const LearnTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(255, 214, 69, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    right: -10,
+    "& h6": { color: "#6f5c1b", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "#6f5c1b", fontWeight: 300, marginTop: 10 },
+    "& svg": { color: "#6f5c1b" },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
+  },
+  arrow: {
+    color: "rgba(255, 214, 69, 0.95)",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "-35px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "-10px !important",
+    },
+  },
+}))(Tooltip)
+
+const AssesTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(101, 210, 170, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    right: -10,
+    "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+    "& svg": { color: "white" },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
+  },
+  arrow: {
+    color: "rgba(101, 210, 170, 0.95)",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "-35px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "-10px !important",
+    },
+  },
+}))(Tooltip)
+
+const PreventTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(125, 178, 255, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    right: 10,
+    "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+    "& svg": { color: "white" },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
+  },
+  arrow: {
+    color: "rgba(125, 178, 255, 0.95)",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "0px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
       marginLeft: "19px !important",
     },
   },
@@ -131,11 +228,16 @@ export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
-  const [openTab, setOpenTab] = useState(props.tabValue === 2 ? true : false)
-  console.log(props.tabValue)
+  const [openTabs, setOpenTabs] = useState([
+    props.tabValue === 0 ? true : false,
+    props.tabValue === 1 ? true : false,
+    props.tabValue === 2 ? true : false,
+    props.tabValue === 3 ? true : false,
+  ])
+
   const setTab = (newTab) => {
     _setTab(newTab)
-    newTab === 2 ? setOpenTab(true) : setOpenTab(false)
+    setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
     props.activeTab(newTab)
   }
 
@@ -151,95 +253,174 @@ export default function BottomMenu({ ...props }) {
             style: {
               flexDirection: supportsSidebar ? "column" : "row",
               justifyContent: !supportsSidebar ? "center" : undefined,
+              alignItems: "center",
               height: !supportsSidebar ? 80 : undefined,
               width: supportsSidebar ? 100 : undefined,
               transition: "all 500ms ease-in-out",
             },
           }}
         >
-          <Link component={RouterLink} to="/feed" underline="none">
-            <IconButton aria-label="logo" className={classes.leftbarLogo}>
+          <Link component={RouterLink} to="/feed" underline="none" className={classes.leftbarLogo}>
+            <IconButton aria-label="logo">
               <Logo />
             </IconButton>
           </Link>
-          <Link component={RouterLink} to="/participant/me" underline="none">
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 0}
-              label="Learn"
-              value={0}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationLearnSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<Learn />}
-              onChange={(_, newTab) => setTab(newTab)}
-            />
-          </Link>
-          <Link component={RouterLink} to="/participant/me" underline="none">
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 1}
-              label="Assess"
-              value={1}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationAssessSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<Assess />}
-              onChange={(_, newTab) => setTab(newTab)}
-            />
-          </Link>
-          <HtmlTooltip
-            open={openTab}
-            interactive={true}
-            title={
-              <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenTab(false)}>
-                  <CloseIcon />
-                </IconButton>
-                <Typography variant="h6">
-                  Welcome to the <Box component="span">Manage</Box> section.
-                </Typography>
-                <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
-              </React.Fragment>
-            }
-            arrow={true}
-            placement={supportsSidebar ? "right" : "top"}
-          >
-            <Link component={RouterLink} to="/participant/me" underline="none">
-              <BottomNavigationAction
-                showLabel
-                selected={tabVal === 2}
-                label="Manage"
-                value={2}
-                classes={{
-                  root: classes.navigation,
-                  selected: classes.navigationManageSelected,
-                  label: classes.navigationLabel,
-                }}
-                icon={<Manage />}
-                onChange={(_, newTab) => setTab(newTab)}
-              />
-            </Link>
-          </HtmlTooltip>
-          <Link component={RouterLink} to="/participant/me" underline="none">
-            <BottomNavigationAction
-              showLabel
-              selected={tabVal === 3}
-              label="Prevent"
-              value={3}
-              classes={{
-                root: classes.navigation,
-                selected: classes.navigationPreventSelected,
-                label: classes.navigationLabel,
-              }}
-              icon={<PreventIcon />}
-              onChange={(_, newTab) => setTab(newTab)}
-            />
-          </Link>
+          <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 0: false })}>
+            <LearnTooltip
+              open={openTabs[0]}
+              interactive={true}
+              title={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenTabs({ ...openTabs, 0: false })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6">
+                    Welcome to the <Box component="span">Learn</Box> section.
+                  </Typography>
+                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <Link component={RouterLink} to="/participant/me" underline="none">
+                <BottomNavigationAction
+                  showLabel
+                  selected={tabVal === 0}
+                  label="Learn"
+                  value={0}
+                  classes={{
+                    root: classes.navigation,
+                    selected: classes.navigationLearnSelected,
+                    label: classes.navigationLabel,
+                  }}
+                  icon={<Learn />}
+                  onChange={(_, newTab) => setTab(newTab)}
+                />
+              </Link>
+            </LearnTooltip>
+          </ClickAwayListener>
+          <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 1: false })}>
+            <AssesTooltip
+              open={openTabs[1]}
+              interactive={true}
+              title={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenTabs({ ...openTabs, 1: false })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6">
+                    Welcome to the <Box component="span">Assess</Box> section.
+                  </Typography>
+                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <Link component={RouterLink} to="/participant/me" underline="none">
+                <BottomNavigationAction
+                  showLabel
+                  selected={tabVal === 1}
+                  label="Assess"
+                  value={1}
+                  classes={{
+                    root: classes.navigation,
+                    selected: classes.navigationAssessSelected,
+                    label: classes.navigationLabel,
+                  }}
+                  icon={<Assess />}
+                  onChange={(_, newTab) => setTab(newTab)}
+                />
+              </Link>
+            </AssesTooltip>
+          </ClickAwayListener>
+          <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 2: false })}>
+            <ManageTooltip
+              open={openTabs[2]}
+              interactive={true}
+              title={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenTabs({ ...openTabs, 2: false })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6">
+                    Welcome to the <Box component="span">Manage</Box> section.
+                  </Typography>
+                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <Link component={RouterLink} to="/participant/me" underline="none">
+                <BottomNavigationAction
+                  showLabel
+                  selected={tabVal === 2}
+                  label="Manage"
+                  value={2}
+                  classes={{
+                    root: classes.navigation,
+                    selected: classes.navigationManageSelected,
+                    label: classes.navigationLabel,
+                  }}
+                  icon={<Manage />}
+                  onChange={(_, newTab) => setTab(newTab)}
+                />
+              </Link>
+            </ManageTooltip>
+          </ClickAwayListener>
+          <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 3: false })}>
+            <PreventTooltip
+              open={openTabs[3]}
+              interactive={true}
+              title={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenTabs({ ...openTabs, 3: false })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6">
+                    Welcome to the <Box component="span">Prevent</Box> section.
+                  </Typography>
+                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <Link component={RouterLink} to="/participant/me" underline="none">
+                <BottomNavigationAction
+                  showLabel
+                  selected={tabVal === 3}
+                  label="Prevent"
+                  value={3}
+                  classes={{
+                    root: classes.navigation,
+                    selected: classes.navigationPreventSelected,
+                    label: classes.navigationLabel,
+                  }}
+                  icon={<PreventIcon />}
+                  onChange={(_, newTab) => setTab(newTab)}
+                />
+              </Link>
+            </PreventTooltip>
+          </ClickAwayListener>
         </Drawer>
       </Box>
     </div>

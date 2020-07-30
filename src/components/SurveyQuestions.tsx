@@ -711,11 +711,13 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
   const [activeStep, setActiveStep] = useState(0)
   const classes = useStyles()
   const [tab, _setTab] = useState(0)
+  const [scrollValue, setScrollValue] = useState(0)
   const [progressValue, setProgressValue] = useState(100 / value.settings.length)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
+    window.addEventListener("scroll", handleChange, true)
     onResponse(Array.from({ ...responses.current, length: value.settings.length }))
   }, [])
   const isComplete = (idx) => !!responses.current[idx]?.value
@@ -733,9 +735,21 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
     return supportsSidebar ? "up" : "left"
   }
 
+  const handleChange = (event) => {
+    const target = event.target
+    const newscrollVal = target.scrollHeight - target.scrollTop
+    setScrollValue(newscrollVal)
+    const newValue =
+      newscrollVal > scrollValue
+        ? progressValue - 100 / value.settings.length
+        : progressValue + 100 / value.settings.length
+    setProgressValue(newValue)
+    // window.addEventListener('scroll', handleChange, true);
+    console.log("sd", newValue, newscrollVal)
+  }
   return (
     <Box>
-      <AppBar position="static" style={{ background: "#E7F8F2", boxShadow: "none" }}>
+      <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
           <IconButton
             color="default"
@@ -763,53 +777,96 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
-      {value.settings.map((x, idx) => (
-        <Slide in={tab === idx} direction={tabDirection(idx)} mountOnEnter unmountOnExit>
-          <Box my={4}>
-            <Box textAlign="center">
-              <Typography gutterBottom align="center" classes={{ root: classes.questionTrack }}>
-                Question {idx + 1} of {value.settings.length}
-              </Typography>
+      {supportsSidebar
+        ? value.settings.map((x, idx) => (
+            <Box my={4} onScroll={handleChange}>
+              <Box textAlign="center">
+                <Typography gutterBottom align="center" classes={{ root: classes.questionTrack }}>
+                  Question {idx + 1} of {value.settings.length}
+                </Typography>
+              </Box>
+
+              <Container>
+                <Question
+                  number={idx + 1}
+                  text={x.text}
+                  type={x.type}
+                  options={x.options?.map((y) => ({ ...y, label: y.value }))}
+                  value={responses.current[idx]}
+                  onResponse={(response) => {
+                    responses.current[idx] = response
+
+                    if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
+
+                    onResponse(
+                      Array.from({
+                        ...responses.current,
+                        length: value.settings.length,
+                      })
+                    )
+                  }}
+                />
+                <div className={classes.sliderActionsContainer}>
+                  {idx === value.settings.length - 1 && (
+                    <Button
+                      variant="contained"
+                      onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
+                      className={classes.btngreen}
+                    >
+                      "Submit"
+                    </Button>
+                  )}
+                </div>
+              </Container>
             </Box>
+          ))
+        : value.settings.map((x, idx) => (
+            <Slide in={tab === idx} direction={tabDirection(idx)} mountOnEnter unmountOnExit>
+              <Box my={4}>
+                <Box textAlign="center">
+                  <Typography gutterBottom align="center" classes={{ root: classes.questionTrack }}>
+                    Question {idx + 1} of {value.settings.length}
+                  </Typography>
+                </Box>
 
-            <Container>
-              <Question
-                number={idx + 1}
-                text={x.text}
-                type={x.type}
-                options={x.options?.map((y) => ({ ...y, label: y.value }))}
-                value={responses.current[idx]}
-                onResponse={(response) => {
-                  responses.current[idx] = response
+                <Container>
+                  <Question
+                    number={idx + 1}
+                    text={x.text}
+                    type={x.type}
+                    options={x.options?.map((y) => ({ ...y, label: y.value }))}
+                    value={responses.current[idx]}
+                    onResponse={(response) => {
+                      responses.current[idx] = response
 
-                  if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
+                      if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
-                  onResponse(
-                    Array.from({
-                      ...responses.current,
-                      length: value.settings.length,
-                    })
-                  )
-                }}
-              />
-              <div className={classes.sliderActionsContainer}>
-                {idx > 0 && (
-                  <Button onClick={handleBack} className={classes.btnBack}>
-                    Back
-                  </Button>
-                )}
-                <Button
-                  variant="contained"
-                  onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-                  className={classes.btngreen}
-                >
-                  {idx === value.settings.length - 1 ? "Submit" : "Next"}
-                </Button>
-              </div>
-            </Container>
-          </Box>
-        </Slide>
-      ))}
+                      onResponse(
+                        Array.from({
+                          ...responses.current,
+                          length: value.settings.length,
+                        })
+                      )
+                    }}
+                  />
+                  <div className={classes.sliderActionsContainer}>
+                    {idx > 0 && (
+                      <Button onClick={handleBack} className={classes.btnBack}>
+                        Back
+                      </Button>
+                    )}
+                    <Button
+                      variant="contained"
+                      onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
+                      className={classes.btngreen}
+                    >
+                      {idx === value.settings.length - 1 ? "Submit" : "Next"}
+                    </Button>
+                  </div>
+                </Container>
+              </Box>
+            </Slide>
+          ))}
     </Box>
   )
 }

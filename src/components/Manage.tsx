@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  ButtonBase,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
@@ -111,6 +112,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
+      width: "100%",
       "& svg": {
         [theme.breakpoints.up("lg")]: {
           width: 150,
@@ -124,6 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
+    fullwidthBtn: { width: "100%" },
   })
 )
 
@@ -149,20 +152,24 @@ export default function Manage({ participant, ...props }: { participant: Partici
     <Container className={classes.thumbContainer}>
       <Grid container spacing={2}>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
-          <Card className={classes.manage}>
-            <Box mt={2} mb={1}>
-              <BreatheIcon />
-            </Box>
-            <Typography className={classes.cardlabel}>Breathe</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <BreatheIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Breathe</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Jewels")} className={classes.thumbMain}>
-          <Card className={classes.manage}>
-            <Box mt={2} mb={1}>
-              <JewelsIcon />
-            </Box>
-            <Typography className={classes.cardlabel}>Jewels</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <JewelsIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Jewels</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
 
         <Grid
@@ -174,25 +181,39 @@ export default function Manage({ participant, ...props }: { participant: Partici
           onClick={() => handleClickOpen("Journals")}
           className={classes.thumbMain}
         >
-          <Link component={RouterLink} to={`/participant/me/journals`} underline="none">
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <JournalIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Journal</Typography>
-            </Card>
-          </Link>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Link
+              component={RouterLink}
+              to={`/participant/me/journals`}
+              underline="none"
+              className={classes.fullwidthBtn}
+            >
+              <Card className={classes.manage}>
+                <Box mt={2} mb={1}>
+                  <JournalIcon />
+                </Box>
+                <Typography className={classes.cardlabel}>Journal</Typography>
+              </Card>
+            </Link>
+          </ButtonBase>
         </Grid>
 
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
-          <Link component={RouterLink} to={`/participant/me/hopebox`} underline="none">
-            <Card className={classes.manage}>
-              <Box mt={1}>
-                <HopeBoxIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Hope box</Typography>
-            </Card>
-          </Link>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Link
+              component={RouterLink}
+              to={`/participant/me/hopebox`}
+              underline="none"
+              className={classes.fullwidthBtn}
+            >
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <HopeBoxIcon />
+                </Box>
+                <Typography className={classes.cardlabel}>Hope box</Typography>
+              </Card>
+            </Link>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -203,12 +224,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
           onClick={() => handleClickOpen("Scratch card")}
           className={classes.thumbMain}
         >
-          <Card className={classes.manage}>
-            <Box mt={2} mb={1}>
-              <ScratchCard width="100" height="100" />
-            </Box>
-            <Typography className={classes.cardlabel}>Scratch card</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <ScratchCard width="100" height="100" />
+              </Box>
+              <Typography className={classes.cardlabel}>Scratch card</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
         <Grid
           item
@@ -219,12 +242,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
           onClick={() => setLaunchedActivity("medicationtracker")}
           className={classes.thumbMain}
         >
-          <Card className={classes.manage}>
-            <Box mt={2} mb={1}>
-              <Medication />
-            </Box>
-            <Typography className={classes.cardlabel}>Medication tracker</Typography>
-          </Card>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <Medication />
+              </Box>
+              <Typography className={classes.cardlabel}>Medication tracker</Typography>
+            </Card>
+          </ButtonBase>
         </Grid>
       </Grid>
       <ResponsiveDialog
