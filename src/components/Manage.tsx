@@ -22,6 +22,7 @@ import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as Medication } from "../icons/Medication.svg"
+import { ReactComponent as InfoIcon } from "../icons/Info.svg"
 import Jewels from "./Jewels"
 import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
@@ -29,6 +30,15 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+
+const demoActivities = {
+  "Balloon Risk": "balloonrisk",
+  "Box Game": "boxgame",
+  "Cats n Dogs": "catsndogs",
+  "Dot Touch": "dottouch",
+  Jewels: "jewels",
+  "Pop The Bubbles": "popthebubbles",
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -135,6 +145,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
 
   const handleClickOpen = (type: string) => {
@@ -146,6 +157,13 @@ export default function Manage({ participant, ...props }: { participant: Partici
 
   const handleClose = () => {
     setOpen(false)
+  }
+
+  const activateEmbeddedActivity = async (id) => {
+    let response = await fetch(
+      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
+    )
+    setEmbeddedActivity(atob(await response.text()))
   }
 
   return (
@@ -240,7 +258,45 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </ButtonBase>
         </Grid>
+        {Object.entries(demoActivities).map((entry) => (
+          <Grid
+            item
+            xs={6}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => activateEmbeddedActivity(entry[1])}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={2} mb={1}>
+                  <InfoIcon />
+                </Box>
+                <Typography className={classes.cardlabel}>{entry[0]}</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+        ))}
       </Grid>
+      <ResponsiveDialog
+        transient
+        animate
+        fullScreen
+        open={!!embeddedActivity}
+        onClose={() => {
+          setEmbeddedActivity(undefined)
+        }}
+      >
+        <div style={{ display: "flex", width: "100%", height: "100%", flexDirection: "column", overflow: "hidden" }}>
+          <iframe
+            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
+            sandbox="allow-scripts"
+            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
+            srcDoc={embeddedActivity}
+          />
+        </div>
+      </ResponsiveDialog>
       <ResponsiveDialog
         transient
         animate
