@@ -6,7 +6,22 @@ import { blue } from "@material-ui/core/colors"
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
-import { strategies } from "./ParticipantData"
+
+
+export const strategies = {
+  "lamp.survey": (slices, activity, scopedItem) =>
+    (slices ?? [])
+      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      .map((x, idx) => {
+        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
+        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else return parseInt(x.value) || 0
+      })
+      .reduce((prev, curr) => prev + curr, 0),
+  "lamp.jewels_a": (slices, activity, scopedItem) =>
+    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
+}
 
 export default function ActivityCard({
   activity,
@@ -25,7 +40,16 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
-
+console.log(events, events.map((d) => ({
+  x: new Date(d.timestamp),
+  y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
+    d.temporal_slices,
+    activity,
+    undefined
+  ),
+  slice: d.temporal_slices,
+  missing: d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
+})));
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
@@ -179,9 +203,9 @@ export default function ActivityCard({
           <img
             alt="Activity Screenshot from mindLAMP v1.x"
             style={{ width: 300, height: 600 }}
-            src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${activity.name
-              .toLowerCase()
-              .replace(/[^0-9a-z]/gi, "")}.png`}
+            // src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${activity.name
+            //   .toLowerCase()
+            //   .replace(/[^0-9a-z]/gi, "")}.png`}
           />
         )}
       </Popover>

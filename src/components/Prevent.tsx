@@ -374,7 +374,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   }
 
   const openDetails = (activity: any, data: any, graphType?: number) => {
-    setGraphType(graphType ?? 0)
+    setGraphType(graphType)
     setSelectedActivity(activity)
     if (!graphType) setSelectedActivityName(activity.name)
     setActivityData(data)
@@ -446,7 +446,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           .map((activity) => (
             <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.prevent} onClick={() => openDetails(activity, activityEvents)}>
+                <Card className={classes.prevent} onClick={() => openDetails(activity, activityEvents, 0)}>
                   <Typography className={classes.preventlabel}>
                     {activity.name} ({activityCounts[activity.name]})
                   </Typography>
@@ -511,7 +511,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                   Social Context ({sensorCounts["Social Context"]})
                 </Typography>
                 <Box>
-                  <RadialDonutChart data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+                  <RadialDonutChart data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])} detailPage={false} width={150} height={150}/>
                 </Box>
               </Card>
             </ButtonBase>
@@ -534,7 +534,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                   Environmental Context ({sensorCounts["Environmental Context"]})
                 </Typography>
                 <Box>
-                  <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />
+                  <RadialDonutChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} detailPage={false} width={150} height={150}/>
                 </Box>
               </Card>
             </ButtonBase>
@@ -552,7 +552,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                     sensorEvents?.["lamp.steps"]?.map((d) => ({
                       x: new Date(parseInt(d.timestamp)),
                       y: d.data.value || 0,
-                    })) ?? []
+                    })) ?? [], 2
                   )
                 }
               >
@@ -670,7 +670,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         <PreventData
           participant={participant}
           activity={selectedActivity}
-          events={graphType == 1 ? activityData : (activityData || {})[selectedActivityName] || []}
+          events={graphType == 0 ? (activityData || {})[selectedActivityName] || [] : activityData }
           graphType={graphType}
           earliestDate={earliestDate}
           enableEditMode={!_patientMode()}

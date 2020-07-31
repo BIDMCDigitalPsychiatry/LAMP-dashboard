@@ -1,19 +1,12 @@
 // Core Imports
-import React, { useState } from "react"
+import React from "react"
 import {
   Typography,
   makeStyles,
   Box,
   Grid,
-  Link,
   colors,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-  CardContent,
-  Container,
+  CardContent
 } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
@@ -72,31 +65,6 @@ function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 
-const getPreventData = (data: JSON, flag: boolean, type: number) => {
-  let rows = []
-  var options = { month: "short", day: "numeric" }
-  let i = 0
-  data = type == 1 ? data[0] : data
-  Object.keys(data).forEach((key) => {
-    if (flag || (!flag && i < 7)) {
-      if (type == 1) {
-        rows.push(createData(data[key].label, "", data[key].value))
-      } else {
-        let date = new Date(data[key].x)
-        rows.push(
-          createData(
-            date.toLocaleDateString("en-US", options),
-            date.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" }),
-            data[key].y
-          )
-        )
-      }
-      i++
-    }
-  })
-  return rows
-}
-
 export default function PreventData({
   participant,
   activity,
@@ -120,22 +88,31 @@ export default function PreventData({
   onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
-  const [seeAll, setSeeAll] = useState(false)
 
   return (
     <Box>
       <Grid container>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {graphType == 1 ? activity : activity.name}: <Box component="span">fluctuating</Box>
+            {graphType == 0 ? activity.name : activity}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>Test desc for {graphType == 1 ? activity : activity.name}</Typography>
+          <Typography>Test desc for {graphType == 0 ? activity.name : activity}</Typography>
         </CardContent>
       </Grid>
       <Box className={classes.graphcontainer}>
         {graphType === 1 ? (
-          <RadialDonutChart data={getPreventData(events, seeAll, graphType)} />
+          <RadialDonutChart data={events} detailPage={true} width={300} height={300}/>
         ) : (
+          graphType === 2 ? 
+          <Sparkline
+            minWidth={250}
+            minHeight={220}
+            XAxisLabel="Time"
+            YAxisLabel="  "
+            color={colors.blue[500]}
+            data={events}
+          />
+          :
           <ActivityCard
             activity={activity}
             events={events}
@@ -152,41 +129,7 @@ export default function PreventData({
             }
           />
         )}
-      </Box>
-      {graphType === 1 && (
-        <Box>
-          <Container className={classes.recentstoreshd}>
-            <Grid container xs={12} spacing={0}>
-              <Grid item xs>
-                <Typography variant="h5">Recent Scores</Typography>
-              </Grid>
-              <Grid item xs>
-                <Typography align="right">
-                  <Link href="#" onClick={() => setSeeAll(true)}>
-                    See all
-                  </Link>
-                </Typography>
-              </Grid>
-            </Grid>
-          </Container>
-
-          <TableContainer>
-            <Table className={classes.table} aria-label="simple table">
-              <TableBody>
-                {getPreventData(activity, seeAll, graphType).map((row) => (
-                  <TableRow key={row.dateVal}>
-                    <TableCell component="th" style={{ width: "20%" }}>
-                      {row.dateVal}
-                    </TableCell>
-                    <TableCell style={{ width: "40%" }}>{row.timeVal}</TableCell>
-                    <TableCell align="right">{row.value}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      )}
+      </Box>      
     </Box>
   )
 }
