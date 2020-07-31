@@ -23,7 +23,6 @@ import {
   Link,
   Container,
 } from "@material-ui/core"
-import { Link as RouterLink } from "react-router-dom"
 
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
@@ -112,14 +111,12 @@ export default function NavigationLayout({
   const print = useMediaQuery("print")
   const classes = useStyles()
   //sameLineTitle
-  console.log(sameLineTitle)
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent"]
   const selectedClass =
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
       : classnames(classes.toolbar, classes.toolbardashboard)
 
-  console.log(activeTab)
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -171,16 +168,9 @@ export default function NavigationLayout({
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
               <Box>
                 <Tooltip title="Notifications">
-                  <Link
-                    component={RouterLink}
-                    to={`/participant/me/messages`}
-                    underline="none"
-                    className={classes.notification}
-                  >
-                    <Badge badgeContent={2} color="primary">
-                      <Message />
-                    </Badge>
-                  </Link>
+                  <Badge badgeContent={undefined} color="primary">
+                    <Message />
+                  </Badge>
                 </Tooltip>
                 <Tooltip title="Profile & Settings">
                   <IconButton

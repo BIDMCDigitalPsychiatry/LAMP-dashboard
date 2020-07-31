@@ -18,7 +18,6 @@ import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
-import { Link as RouterLink } from "react-router-dom"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -260,11 +259,9 @@ export default function BottomMenu({ ...props }) {
             },
           }}
         >
-          <Link component={RouterLink} to="/feed" underline="none" className={classes.leftbarLogo}>
-            <IconButton aria-label="logo">
-              <Logo />
-            </IconButton>
-          </Link>
+          <IconButton aria-label="logo" className={classes.leftbarLogo}>
+            <Logo />
+          </IconButton>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 0: false })}>
             <LearnTooltip
               open={openTabs[0]}
@@ -287,21 +284,19 @@ export default function BottomMenu({ ...props }) {
               arrow={true}
               placement={supportsSidebar ? "right" : "top"}
             >
-              <Link component={RouterLink} to="/participant/me" underline="none">
-                <BottomNavigationAction
-                  showLabel
-                  selected={tabVal === 0}
-                  label="Learn"
-                  value={0}
-                  classes={{
-                    root: classes.navigation,
-                    selected: classes.navigationLearnSelected,
-                    label: classes.navigationLabel,
-                  }}
-                  icon={<Learn />}
-                  onChange={(_, newTab) => setTab(newTab)}
-                />
-              </Link>
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 0}
+                label="Learn"
+                value={0}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationLearnSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Learn />}
+                onChange={(_, newTab) => setTab(newTab)}
+              />
             </LearnTooltip>
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 1: false })}>
@@ -326,21 +321,19 @@ export default function BottomMenu({ ...props }) {
               arrow={true}
               placement={supportsSidebar ? "right" : "top"}
             >
-              <Link component={RouterLink} to="/participant/me" underline="none">
-                <BottomNavigationAction
-                  showLabel
-                  selected={tabVal === 1}
-                  label="Assess"
-                  value={1}
-                  classes={{
-                    root: classes.navigation,
-                    selected: classes.navigationAssessSelected,
-                    label: classes.navigationLabel,
-                  }}
-                  icon={<Assess />}
-                  onChange={(_, newTab) => setTab(newTab)}
-                />
-              </Link>
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 1}
+                label="Assess"
+                value={1}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationAssessSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Assess />}
+                onChange={(_, newTab) => setTab(newTab)}
+              />
             </AssesTooltip>
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 2: false })}>
@@ -365,21 +358,19 @@ export default function BottomMenu({ ...props }) {
               arrow={true}
               placement={supportsSidebar ? "right" : "top"}
             >
-              <Link component={RouterLink} to="/participant/me" underline="none">
-                <BottomNavigationAction
-                  showLabel
-                  selected={tabVal === 2}
-                  label="Manage"
-                  value={2}
-                  classes={{
-                    root: classes.navigation,
-                    selected: classes.navigationManageSelected,
-                    label: classes.navigationLabel,
-                  }}
-                  icon={<Manage />}
-                  onChange={(_, newTab) => setTab(newTab)}
-                />
-              </Link>
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 2}
+                label="Manage"
+                value={2}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationManageSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<Manage />}
+                onChange={(_, newTab) => setTab(newTab)}
+              />
             </ManageTooltip>
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 3: false })}>
@@ -404,21 +395,19 @@ export default function BottomMenu({ ...props }) {
               arrow={true}
               placement={supportsSidebar ? "right" : "top"}
             >
-              <Link component={RouterLink} to="/participant/me" underline="none">
-                <BottomNavigationAction
-                  showLabel
-                  selected={tabVal === 3}
-                  label="Prevent"
-                  value={3}
-                  classes={{
-                    root: classes.navigation,
-                    selected: classes.navigationPreventSelected,
-                    label: classes.navigationLabel,
-                  }}
-                  icon={<PreventIcon />}
-                  onChange={(_, newTab) => setTab(newTab)}
-                />
-              </Link>
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 3}
+                label="Prevent"
+                value={3}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationPreventSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={<PreventIcon />}
+                onChange={(_, newTab) => setTab(newTab)}
+              />
             </PreventTooltip>
           </ClickAwayListener>
         </Drawer>

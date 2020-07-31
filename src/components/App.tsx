@@ -14,20 +14,15 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
-import Conversations from "./Conversations"
 import Messages from "./Messages"
 
 import TipNotification from "./TipNotification"
 import Feed from "./Feed"
 import Breathe from "./Breathe"
 import JournalEntries from "./JournalEntries"
-import LearnTips from "./LearnTips"
-import SurveyQuestions from "./SurveyQuestions"
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
-import PreventData from "./PreventData"
-import BottomMenu from "./BottomMenu"
 import NavigationLayout from "./NavigationLayout"
 import ScratchImage from "./ScratchImage"
 import HopeBox from "./HopeBox"
@@ -285,7 +280,7 @@ function AppRouter({ ...props }) {
       {/* Route feed page */}
       <Route
         exact
-        path="/Feed"
+        path="/feed"
         render={(props) => (
           <React.Fragment>
             <PageTitle>mindLAMP | Feed</PageTitle>

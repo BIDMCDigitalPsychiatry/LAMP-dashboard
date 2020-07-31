@@ -161,17 +161,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </ButtonBase>
         </Grid>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Jewels")} className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <JewelsIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Jewels</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-
         <Grid
           item
           xs={6}
@@ -184,7 +173,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Link
               component={RouterLink}
-              to={`/participant/me/journals`}
+              to={`/participant/${participant.id}/journals`}
               underline="none"
               className={classes.fullwidthBtn}
             >
@@ -202,7 +191,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Link
               component={RouterLink}
-              to={`/participant/me/hopebox`}
+              to={`/participant/${participant.id}/hopebox`}
               underline="none"
               className={classes.fullwidthBtn}
             >
@@ -309,7 +298,11 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
-              to={dialogueType === "Breathe" ? "/participant/me/breathe" : "/participant/me/scratch"}
+              to={
+                dialogueType === "Breathe"
+                  ? `/participant/${participant.id}/breathe`
+                  : `/participant/${participant.id}/scratch`
+              }
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >

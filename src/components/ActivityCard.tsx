@@ -156,35 +156,6 @@ export default function ActivityCard({
           onClick={(datum) => setVisibleSlice(datum)}
         />
       )}
-      <Popover
-        open={Boolean(helpAnchor)}
-        anchorEl={helpAnchor}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
-        }}
-        onClose={(event) => setHelpAnchor(undefined)}
-        disableRestoreFocus
-      >
-        {activity.spec === "lamp.survey" ? ( // eslint-disable-next-line
-          <img
-            style={{ width: 300, height: 600 }}
-            src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/survey.png`}
-          /> // eslint-disable-next-line
-        ) : (
-          <img
-            alt="Activity Screenshot from mindLAMP v1.x"
-            style={{ width: 300, height: 600 }}
-            src={`https://lamp-splash.s3.us-east-2.amazonaws.com/sample/${activity.name
-              .toLowerCase()
-              .replace(/[^0-9a-z]/gi, "")}.png`}
-          />
-        )}
-      </Popover>
     </React.Fragment>
   )
 }

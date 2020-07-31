@@ -129,10 +129,13 @@ export default function PreventData({
           <Typography variant="h5">
             {graphType == 1 ? activity : activity.name}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>Test desc for {graphType == 1 ? activity : activity.name}</Typography>
+          <Typography>Viewing charts for {graphType == 1 ? activity : activity.name}</Typography>
         </CardContent>
       </Grid>
-      <Box className={classes.graphcontainer}>
+      <Box
+        className={classes.graphcontainer}
+        style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
+      >
         {graphType === 1 ? (
           <RadialDonutChart data={getPreventData(events, seeAll, graphType)} />
         ) : (
