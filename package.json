@@ -49,7 +49,6 @@
     "react-router-dom": "^5.0.1",
     "regenerator-runtime": "^0.13.3",
     "swagger-ui-react": "^3.23.3",
-    "typeface-roboto": "0.0.75",
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {

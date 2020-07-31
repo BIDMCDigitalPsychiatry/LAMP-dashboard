@@ -1,11 +1,10 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, makeStyles } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
-import "typeface-roboto"
 
 // External Imports
 import DateFnsUtils from "@date-io/date-fns"
@@ -15,14 +14,31 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
+import Messages from "./Messages"
+
+import TipNotification from "./TipNotification"
+import Feed from "./Feed"
+import Breathe from "./Breathe"
+import JournalEntries from "./JournalEntries"
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
+import ScratchImage from "./ScratchImage"
+import HopeBox from "./HopeBox"
+
+// import VegaGraph from "./VegaGraph"
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
+
+/*
+// colors as a gradient:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(101,206,191,1) 33%, rgba(255,119,91,1) 66%, rgba(134,182,255,1) 100%);
+// colors as a bar:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%);
+*/
 
 //
 /*const srcLock = () => {
@@ -37,19 +53,32 @@ function PageTitle({ children, ...props }) {
   })
   return <React.Fragment />
 }
-
+function _patientMode() {
+  return LAMP.Auth._type === "participant"
+}
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+
+  // To set page titile for active tab for menu
+  let activeTab = (newTab?: any) => {
+    setState((state) => ({
+      ...state,
+      activeTab: newTab,
+    }))
+  }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
     authType: LAMP.Auth._type,
     lastDomain: undefined,
+    activeTab: null,
+    surveyDone: false,
+    welcome: true,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
-
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -203,6 +232,22 @@ function AppRouter({ ...props }) {
     return null
   }
 
+  const titlecase = (str) => {
+    return str
+      .toLowerCase()
+      .split("_")
+      .map(function (word) {
+        return word.replace(word[0], word[0].toUpperCase())
+      })
+      .join(" ")
+  }
+  const submitSurvey = () => {
+    setState((state) => ({
+      ...state,
+      surveyDone: true,
+    }))
+  }
+
   const promptInstall = () => {
     if (deferredPrompt === null) return
     deferredPrompt.prompt()
@@ -222,6 +267,100 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
+      <Route
+        exact
+        path="/tip"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Today's Tip</PageTitle>
+            <TipNotification />
+          </React.Fragment>
+        )}
+      />
+      {/* Route feed page */}
+      <Route
+        exact
+        path="/feed"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Feed</PageTitle>
+            <Feed />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/messages"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Conversations</PageTitle>
+            <NavigationLayout
+              id={props.match.params.id}
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Conversations"
+              sameLineTitle={true}
+            >
+              {/* <Conversations goBack={props.history.goBack} /> */}
+              <Messages
+                style={{ margin: "0px -16px -16px -16px" }}
+                refresh={true}
+                participantOnly
+                participant={getParticipant(props.match.params.id).id}
+              />
+            </NavigationLayout>
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/breathe"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Breathe</PageTitle>
+            <Breathe goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/journals"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Journals</PageTitle>
+            <NavigationLayout
+              id={props.match.params.id}
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Journals"
+            >
+              <JournalEntries goBack={props.history.goBack} />
+            </NavigationLayout>
+          </React.Fragment>
+        )}
+      />
+
+      <Route
+        exact
+        path="/participant/:id/hopebox"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <HopeBox goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
+
+      <Route
+        exact
+        path="/participant/:id/scratch"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Scratch Card</PageTitle>
+            <ScratchImage goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
@@ -339,8 +478,15 @@ function AppRouter({ ...props }) {
                 title={`Patient ${getParticipant(props.match.params.id).id}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab={state.activeTab}
               >
-                <Participant participant={getParticipant(props.match.params.id)} />
+                <Participant
+                  participant={getParticipant(props.match.params.id)}
+                  activeTab={activeTab}
+                  tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
+                  surveyDone={state.surveyDone}
+                  submitSurvey={submitSurvey}
+                />
               </NavigationLayout>
             </React.Fragment>
           )
@@ -372,6 +518,9 @@ export default function App({ ...props }) {
   return (
     <ThemeProvider
       theme={createMuiTheme({
+        typography: {
+          fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
+        },
         palette: {
           primary: blue,
           secondary: red,

@@ -1,23 +1,28 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import {
+  Fab,
   Box,
-  Typography,
   TextField,
   Button,
-  Avatar,
   Slide,
   Menu,
   MenuItem,
   Icon,
   IconButton,
   colors,
+  Grid,
+  makeStyles,
+  createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
+import { ReactComponent as Logo } from "../icons/Logo.svg"
+import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
+import { Theme } from "@material-ui/core/styles"
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
@@ -85,9 +90,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           margin: "0 auto",
         }}
       >
-        <ResponsivePaper elevation={12} style={{ padding: "16px" }}>
+        <div style={{ padding: "16px", minHeight: "600px" }}>
           <IconButton
-            style={{ position: "absolute", top: 8, right: 8 }}
+            style={{ position: "fixed", top: 8, right: 8 }}
             onClick={(event) => setHelpMenu(event.currentTarget)}
           >
             <Icon>help</Icon>
@@ -127,12 +132,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               </MenuItem>
             </Menu>
           </IconButton>
-          <Avatar alt="mindLAMP" src={`${process.env.PUBLIC_URL}/logo.png`} style={{ margin: "auto" }} />
-          <Typography variant="h4" align="center" style={{ fontWeight: 400, paddingBottom: 20, paddingTop: 10 }}>
-            mindLAMP
-          </Typography>
           <form onSubmit={(e) => handleLogin(e)}>
-            <Box>
+            <Box style={{ textAlign: "center" }}>
+              <div>
+                <Logo height="70px" />
+              </div>
+              <div style={{ margin: "25px 0 10px 0" }}>
+                <Logotext />
+              </div>
+              <div
+                style={{
+                  height: 6,
+                  marginBottom: 20,
+                  background:
+                    "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                }}
+              />
               <TextField
                 margin="dense"
                 size="small"
@@ -175,14 +190,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 InputLabelProps={{ shrink: true }}
               />
               <br />
-              <Button
-                variant="outlined"
+              <Fab
+                variant="extended"
                 color="default"
-                style={{ width: "45%" }}
+                style={{ width: "45%", float: "left", backgroundColor: "#fff" }}
                 onClick={(event) => setTryitMenu(event.currentTarget)}
               >
                 Try It
-              </Button>
+              </Fab>
               <Menu
                 keepMounted
                 open={Boolean(tryitMenu)}
@@ -227,11 +242,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   Patient
                 </MenuItem>
               </Menu>
-              <Button
-                variant="contained"
+              <Fab
+                variant="extended"
                 color="primary"
                 type="submit"
-                style={{ float: "right", width: "45%" }}
+                style={{ width: "45%", float: "right" }}
                 onClick={handleLogin}
               >
                 Login
@@ -248,10 +263,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     opacity: 0,
                   }}
                 />
-              </Button>
+              </Fab>
             </Box>
           </form>
-        </ResponsivePaper>
+        </div>
       </ResponsiveMargin>
     </Slide>
   )

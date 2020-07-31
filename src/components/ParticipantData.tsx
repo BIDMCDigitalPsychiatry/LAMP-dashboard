@@ -5,7 +5,6 @@ import LAMP, {
   Activity as ActivityObj,
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
-  Activity,
 } from "lamp-core"
 import { useSnackbar } from "notistack"
 import ActivityCard from "./ActivityCard"
@@ -19,18 +18,8 @@ function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 
-const strategies = {
+export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
-        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else return parseInt(x.value) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
-  "lamp.dashboard.custom_survey_group": (slices, activity, scopedItem) =>
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
@@ -42,17 +31,6 @@ const strategies = {
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
-  __default__: (slices, activity, scopedItem) =>
-    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
-}
-
-export function getStrategy(activity: Activity) {
-  // FIXME: we need this patch because we don't have strategies for anything other than surveys + custom groups.
-  return strategies[
-    ["lamp.dashboard.custom_survey_group", "lamp.survey", "lamp.jewels_a"].includes(activity.spec)
-      ? activity.spec
-      : "__default__"
-  ]
 }
 
 async function getActivities(participant: ParticipantObj) {

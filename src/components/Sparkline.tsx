@@ -17,8 +17,6 @@ import {
   PatternLines,
 } from "@data-ui/xy-chart"
 
-// TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot
-
 function PaperTooltip({ top, left, ...props }) {
   return (
     <Box clone displayPrint="none">
@@ -80,7 +78,7 @@ const styles = {
   },
   tick: {
     stroke: "#bdbdbd",
-    length: 8,
+    length: 18,
     label: {
       bottom: {
         pointerEvents: "none",
@@ -178,8 +176,8 @@ export default withParentSize(function Sparkline({ ...props }) {
           eventTriggerRefs={props.eventTriggerRefs}
           margin={{
             top: 8,
-            left: 8,
-            right: !!props.YAxisLabel ? 46 : 0,
+            left: 45,
+            right: 20,
             bottom: !!props.XAxisLabel ? 50 : 0,
           }}
           onClick={({ datum }) => !!props.onClick && props.onClick(datum)}
@@ -190,10 +188,10 @@ export default withParentSize(function Sparkline({ ...props }) {
           tooltipData={tooltipData}
           xScale={{
             type: "time",
-            domain:
-              props.data.length <= 0
-                ? undefined
-                : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
+            // domain:
+            //   props.data.length <= 0
+            //     ? undefined
+            //     : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
           }}
           yScale={{ type: "linear" }}
         >
@@ -206,24 +204,15 @@ export default withParentSize(function Sparkline({ ...props }) {
             orientation={["diagonal"]}
           />
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
-          {props.XAxisLabel && (
-            <XAxis
-              label={props.XAxisLabel}
-              numTicks={5}
-              rangePadding={4}
-              axisStyles={styles.axis}
-              tickStyles={styles.tick}
-            />
-          )}
-          {props.YAxisLabel && (
-            <YAxis
-              label={props.YAxisLabel}
-              numTicks={4}
-              rangePadding={4}
-              axisStyles={styles.axis}
-              tickStyles={styles.tick}
-            />
-          )}
+          <YAxis
+            label={null}
+            numTicks={7}
+            rangePadding={4}
+            axisStyles={styles.axis}
+            tickStyles={styles.tick}
+            orientation="left"
+          />
+          <XAxis label={null} numTicks={7} rangePadding={4} axisStyles={styles.axis} tickStyles={styles.tick} />
           <LineSeries
             data={props.data}
             seriesKey={props.YAxisLabel ?? "Data"}

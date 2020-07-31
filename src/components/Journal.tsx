@@ -1,4 +1,3 @@
-// Core Imports
 import React, { useState, useEffect } from "react"
 import { Box, Container, TextField, Button, Grid, Icon } from "@material-ui/core"
 import { KeyboardDatePicker } from "@material-ui/pickers"
