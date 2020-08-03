@@ -22,7 +22,6 @@ import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as Medication } from "../icons/Medication.svg"
-import { ReactComponent as InfoIcon } from "../icons/Info.svg"
 import Jewels from "./Jewels"
 import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
@@ -30,15 +29,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
-
-const demoActivities = {
-  "Balloon Risk": "balloonrisk",
-  "Box Game": "boxgame",
-  "Cats n Dogs": "catsndogs",
-  "Dot Touch": "dottouch",
-  Jewels: "jewels",
-  "Pop The Bubbles": "popthebubbles",
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -109,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
     topicon: {
       minWidth: 120,
     },
-    surveytextarea: {
+    dialogueContent: {
       padding: 20,
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
     },
@@ -145,7 +135,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
 
   const handleClickOpen = (type: string) => {
@@ -157,13 +146,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
 
   const handleClose = () => {
     setOpen(false)
-  }
-
-  const activateEmbeddedActivity = async (id) => {
-    let response = await fetch(
-      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
-    )
-    setEmbeddedActivity(atob(await response.text()))
   }
 
   return (
@@ -179,6 +161,17 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </ButtonBase>
         </Grid>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Jewels")} className={classes.thumbMain}>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <JewelsIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Jewels</Typography>
+            </Card>
+          </ButtonBase>
+        </Grid>
+
         <Grid
           item
           xs={6}
@@ -191,7 +184,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Link
               component={RouterLink}
-              to={`/participant/${participant.id}/journals`}
+              to={`/participant/me/journals`}
               underline="none"
               className={classes.fullwidthBtn}
             >
@@ -209,7 +202,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Link
               component={RouterLink}
-              to={`/participant/${participant.id}/hopebox`}
+              to={`/participant/me/hopebox`}
               underline="none"
               className={classes.fullwidthBtn}
             >
@@ -258,45 +251,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Card>
           </ButtonBase>
         </Grid>
-        {Object.entries(demoActivities).map((entry) => (
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={3}
-            lg={3}
-            onClick={() => activateEmbeddedActivity(entry[1])}
-            className={classes.thumbMain}
-          >
-            <ButtonBase focusRipple className={classes.fullwidthBtn}>
-              <Card className={classes.manage}>
-                <Box mt={2} mb={1}>
-                  <InfoIcon />
-                </Box>
-                <Typography className={classes.cardlabel}>{entry[0]}</Typography>
-              </Card>
-            </ButtonBase>
-          </Grid>
-        ))}
       </Grid>
-      <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!embeddedActivity}
-        onClose={() => {
-          setEmbeddedActivity(undefined)
-        }}
-      >
-        <div style={{ display: "flex", width: "100%", height: "100%", flexDirection: "column", overflow: "hidden" }}>
-          <iframe
-            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-            sandbox="allow-scripts"
-            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
-            srcDoc={embeddedActivity}
-          />
-        </div>
-      </ResponsiveDialog>
       <ResponsiveDialog
         transient
         animate
@@ -334,7 +289,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Typography variant="h2">{dialogueType}</Typography>
           </div>
         </DialogTitle>
-        <DialogContent className={classes.surveytextarea}>
+        <DialogContent className={classes.dialogueContent}>
           {dialogueType === "Breathe" && (
             <Typography variant="h4" gutterBottom>
               Breathing exercise (2 mins)
@@ -354,11 +309,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               component={RouterLink}
-              to={
-                dialogueType === "Breathe"
-                  ? `/participant/${participant.id}/breathe`
-                  : `/participant/${participant.id}/scratch`
-              }
+              to={dialogueType === "Breathe" ? "/participant/me/breathe" : "/participant/me/scratch"}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >
