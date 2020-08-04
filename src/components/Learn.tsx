@@ -744,7 +744,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
       case "Suggested_Reading":
         return <Book className={classes.tipicon} />
       case "Mood_Tips":
-        return <MoodTips className={classes.topicon} />
+        return <MoodTips className={classes.tipicon} />
       case "Stress_Tips":
         return <Lightning className={classes.tipicon} />
       case "Motivation":

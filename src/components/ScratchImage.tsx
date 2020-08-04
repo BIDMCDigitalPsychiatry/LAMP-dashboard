@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { ReactComponent as Background } from "../icons/scratch/Background.svg"
-import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar } from "@material-ui/core"
+import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -13,6 +13,23 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
+  btnpeach: {
+    background: "#FFAC98",
+    padding: "15px 25px 15px 25px",
+    borderRadius: "40px",
+    minWidth: "200px",
+    boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
+    lineHeight: "22px",
+    display: "inline-block",
+    textTransform: "capitalize",
+    fontSize: "16px",
+    color: "rgba(0, 0, 0, 0.75)",
+    fontWeight: "bold",
+    "&:hover": {
+      boxShadow:
+        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    },
+  },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   background: {
     background: "#e0e0e0",
@@ -20,13 +37,28 @@ const useStyles = makeStyles((theme) => ({
   },
   svgouter: {
     "& svg": { width: "100%" },
+    background: "#FFF",
   },
+  scratchCompleteMsg: {
+    minHeight: "calc(100vh - 65px)",
+    background: "rgba(255,255,255,0.9)",
+
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    textAlign: "center",
+    position: "absolute",
+    "& h4": { fontSize: 30, fontWeight: 600, marginBottom: 60 },
+  },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
 }))
 
 export default function ScratchImage({ ...props }) {
   let lastPoint, isDrawing, context
   const [canvas, setCanvas] = useState(null)
   const [visibility, setVisibility] = useState(false)
+  const [done, setDone] = useState(false)
+
   let brush = new Image()
   let cover = new Image()
   const classes = useStyles()
@@ -67,6 +99,7 @@ export default function ScratchImage({ ...props }) {
         val = val + 1
         area = canvas.width * canvas.height
         if (val > area / 150) {
+          setDone(true)
           canvas.remove()
         }
       }
@@ -108,7 +141,7 @@ export default function ScratchImage({ ...props }) {
     <div>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Scratch card</Typography>
@@ -118,6 +151,25 @@ export default function ScratchImage({ ...props }) {
         <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
         <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
           <Background />
+        </Box>
+        <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
+          <Box width={1}>
+            <Typography variant="h4">Well done!</Typography>
+            <Button className={classes.btnpeach} onClick={props.onComplete}>
+              Close
+            </Button>
+            <Box width={1} mt={3}>
+              <Link
+                className={classes.linkpeach}
+                onClick={() => {
+                  setVisibility(false)
+                  setDone(false)
+                }}
+              >
+                Do another one
+              </Link>
+            </Box>
+          </Box>
         </Box>
       </div>
     </div>

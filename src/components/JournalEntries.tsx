@@ -13,13 +13,38 @@ import {
   AppBar,
   Toolbar,
   Icon,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Link,
 } from "@material-ui/core"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
-import ResponsiveDialog from "./ResponsiveDialog"
-
+import CloseIcon from "@material-ui/icons/Close"
+import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
+import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
+import classnames from "classnames"
 const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
   addicon: { float: "left", color: "#E46759" },
-
+  likebtn: {
+    fontStyle: "italic",
+    padding: 6,
+    margin: "0 5px",
+    "& label": {
+      position: "absolute",
+      bottom: -18,
+      fontSize: 12,
+    },
+  },
+  dialogtitle: { padding: 0 },
+  active: {
+    background: "#FFAC98",
+  },
+  linkButton: {
+    padding: "15px 25px 15px 25px",
+  },
   journalHeader: {
     "& h5": {
       fontWeight: 600,
@@ -27,6 +52,20 @@ const useStyles = makeStyles((theme) => ({
       color: "rgba(0, 0, 0, 0.75)",
       marginLeft: 15,
     },
+  },
+  dialogueContent: {
+    padding: "10px 20px 35px 20px",
+    textAlign: "center",
+    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 15 },
+    "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
+  },
+  dialogueStyle: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeButton: {
+    color: theme.palette.grey[500],
   },
   addbtnmain: {
     maxWidth: 24,
@@ -73,6 +112,7 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
     "&:hover": {
+      background: "#FFAC98",
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
@@ -90,6 +130,9 @@ const useStyles = makeStyles((theme) => ({
   },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
+  btnNav: { marginBottom: 45 },
 }))
 
 const getJournals = () => {
@@ -141,17 +184,22 @@ export default function JournalEntries({ ...props }) {
   const [journals, setJournals] = useState([])
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
-  const [jounalDate, setJounalDate] = useState(null)
+  const [status, setStatus] = useState("Yes")
 
-  useEffect(() => {
-    setJournals(getJournals())
-  }, [])
-
+  const handleClickStatus = (statusVal: string) => {
+    setStatus(statusVal)
+  }
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return weekday[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
   }
+
+  const [jounalDate, setJounalDate] = useState(getDateString(new Date()))
+
+  useEffect(() => {
+    setJournals(getJournals())
+  }, [])
 
   const handleOpen = (text: string, date?: string) => {
     if (text) setJounalValue(text)
@@ -198,37 +246,17 @@ export default function JournalEntries({ ...props }) {
   }
 
   return (
-    <Container>
-      <Grid container xs={12} spacing={0} className={classes.journalhd} onClick={() => handleOpen("")}>
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton>
-            <AddCircleOutlineIcon className={classes.addicon} />
+    <div className={classes.root}>
+      <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
+        <Toolbar className={classes.toolbardashboard}>
+          <IconButton onClick={() => setOpen(true)} color="default" className={classes.backbtn} aria-label="Menu">
+            <Icon>arrow_back</Icon>
           </IconButton>
-        </Grid>
-        <Grid item xs className={classes.journalHeader}>
-          <Typography variant="h5">Add a new journal entry </Typography>
-        </Grid>
-      </Grid>
-      <Box>{getContent}</Box>
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={open}
-        onClose={() => {
-          setOpen(false)
-        }}
-      >
-        <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">New journal entry</Typography>
-          </Toolbar>
-        </AppBar>
-
-        <Box className={classes.textfieldwrapper} px={3}>
+          <Typography variant="h5">New journal entry</Typography>
+        </Toolbar>
+      </AppBar>
+      <Container>
+        <Box className={classes.textfieldwrapper} px={2}>
           <FormControl
             component="fieldset"
             classes={{
@@ -247,12 +275,70 @@ export default function JournalEntries({ ...props }) {
               onChange={(event) => setJounalValue(event.target.value)}
               classes={{ root: classes.textArea }}
             />
-            <Box textAlign="center" mt={3}>
+            <Box className={classes.howFeel}>How do you feel today?</Box>
+            <Grid className={classes.btnNav}>
+              <Box textAlign="center">
+                <IconButton
+                  onClick={() => handleClickStatus("Yes")}
+                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
+                  <ThumbsUp />
+                  <label>Good</label>
+                </IconButton>
+                <IconButton
+                  onClick={() => handleClickStatus("No")}
+                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
+                  <ThumbsDown />
+                  <label>Bad</label>
+                </IconButton>
+              </Box>
+            </Grid>
+            <Box textAlign="center" mt={4}>
               <Button className={classes.btnpeach}>Submit</Button>
             </Box>
           </FormControl>
         </Box>
-      </ResponsiveDialog>
-    </Container>
+
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          scroll="paper"
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+          className={classes.dialogueStyle}
+        >
+          <Box display="flex" justifyContent="flex-end">
+            <Box>
+              <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
+
+          <DialogContent className={classes.dialogueContent}>
+            <Typography variant="h4">Leaving so soon?</Typography>
+            <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+          </DialogContent>
+          <Grid>
+            <Box textAlign="center" width={1} mt={1} mb={3}>
+              <Link
+                underline="none"
+                onClick={() => setOpen(false)}
+                className={classnames(classes.btnpeach, classes.linkButton)}
+              >
+                No, don’t leave yet
+              </Link>
+            </Box>
+            <Box textAlign="center" width={1} mb={4}>
+              <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
+                {" "}
+                Yes, leave
+              </Link>
+            </Box>
+          </Grid>
+        </Dialog>
+      </Container>
+    </div>
   )
 }

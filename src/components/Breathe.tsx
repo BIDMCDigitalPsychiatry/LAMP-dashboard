@@ -20,7 +20,6 @@ import {
   Grid,
 } from "@material-ui/core"
 // Local Imports
-import useInterval from "./useInterval"
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
@@ -224,7 +223,7 @@ export default function Breathe({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Breathe</Typography>

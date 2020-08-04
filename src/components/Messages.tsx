@@ -188,6 +188,7 @@ export default function Messages({
 
   const getMessages = () => {
     let x = (messages || {})[participant || ""] || []
+    console.log(x)
     return !Array.isArray(x) ? [] : x
   }
 

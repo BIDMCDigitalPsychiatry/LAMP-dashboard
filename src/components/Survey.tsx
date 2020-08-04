@@ -359,9 +359,9 @@ export default function Survey({
         onClose={() => {
           setOpenData(false)
         }}
-        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
+        //style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
-        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />}
+        {/* {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />} */}
         <SurveyQuestions
           participant={participant}
           type={surveyType}

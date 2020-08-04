@@ -19,17 +19,20 @@ import { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
-import { ReactComponent as JewelsIcon } from "../icons/Jewels.svg"
+import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as Medication } from "../icons/Medication.svg"
 import { ReactComponent as InfoIcon } from "../icons/Info.svg"
 import Jewels from "./Jewels"
+import ScratchImage from "./ScratchImage"
 import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+import JournalEntries from "./JournalEntries"
+import Breathe from "./Breathe"
 
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
@@ -189,22 +192,24 @@ export default function Manage({ participant, ...props }: { participant: Partici
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Link
-              component={RouterLink}
-              to={`/participant/${participant.id}/journals`}
-              underline="none"
-              className={classes.fullwidthBtn}
-            >
-              <Card className={classes.manage}>
-                <Box mt={2} mb={1}>
-                  <JournalIcon />
-                </Box>
-                <Typography className={classes.cardlabel}>Journal</Typography>
-              </Card>
-            </Link>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <JournalIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Journal</Typography>
+            </Card>
           </ButtonBase>
         </Grid>
-
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card className={classes.manage}>
+              <Box mt={2} mb={1}>
+                <GoalIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>New goal</Typography>
+            </Card>
+          </ButtonBase>
+        </Grid>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Link
@@ -228,7 +233,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           sm={4}
           md={3}
           lg={3}
-          onClick={() => handleClickOpen("Scratch card")}
+          onClick={() => handleClickOpen("Scratch_card")}
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -298,7 +303,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
         </div>
       </ResponsiveDialog>
       <ResponsiveDialog
-        transient
+        transient={false}
         animate
         fullScreen
         open={!!launchedActivity}
@@ -308,6 +313,30 @@ export default function Manage({ participant, ...props }: { participant: Partici
       >
         {
           {
+            Journals: (
+              <JournalEntries
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            Scratch_card: (
+              <ScratchImage
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            Breathe: (
+              <Breathe
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
@@ -328,10 +357,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
           </IconButton>
           <div className={classType}>
             {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
-            {dialogueType === "Scratch card" && <ScratchCard className={classes.topicon} />}
-            {dialogueType === "Scratch card" && <Typography variant="h6">Meditation exercises</Typography>}
-            {dialogueType === "Breathe" && <Typography variant="h6">Games</Typography>}
-            <Typography variant="h2">{dialogueType}</Typography>
+            {dialogueType === "Scratch_card" && (
+              <Box>
+                <ScratchCard className={classes.topicon} />
+                <Typography variant="h6">Meditation exercises</Typography>
+              </Box>
+            )}
+            {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
+            <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
@@ -341,7 +374,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Typography>
           )}
 
-          {dialogueType === "Scratch card" && (
+          {dialogueType === "Scratch_card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
           )}
           {dialogueType === "Breathe" && (
@@ -353,12 +386,9 @@ export default function Manage({ participant, ...props }: { participant: Partici
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
-              component={RouterLink}
-              to={
-                dialogueType === "Breathe"
-                  ? `/participant/${participant.id}/breathe`
-                  : `/participant/${participant.id}/scratch`
-              }
+              onClick={() => {
+                setLaunchedActivity(dialogueType)
+              }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >

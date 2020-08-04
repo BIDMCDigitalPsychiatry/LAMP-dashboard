@@ -681,7 +681,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         <PreventData
           participant={participant}
           activity={selectedActivity}
-          events={graphType == 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
+          events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
           graphType={graphType}
           earliestDate={earliestDate}
           enableEditMode={!_patientMode()}
