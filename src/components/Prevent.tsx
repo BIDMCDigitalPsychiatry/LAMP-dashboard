@@ -20,6 +20,8 @@ import {
   ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
+import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
+import { ReactComponent as WaterBlue } from "../icons/water_blue.svg"
 import PreventData from "./PreventData"
 import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
@@ -76,20 +78,22 @@ const useStyles = makeStyles((theme: Theme) =>
     preventlabel: {
       fontSize: 16,
       minHeight: 48,
-      padding: "0 18px",
-      marginTop: 5,
+      padding: "0 0 0 15px",
+      marginTop: 8,
       width: "100%",
+      textAlign: "left",
     },
 
     prevent: {
       background: "#ECF4FF",
       padding: "10px 0",
-      minHeight: 200,
+      minHeight: 180,
       textAlign: "center",
       boxShadow: "none",
       borderRadius: 18,
       position: "relative",
       width: "100%",
+      "& h6": { color: "#4C66D6", fontSize: 12, position: "absolute", bottom: 10, width: "100%" },
       "& svg": {
         [theme.breakpoints.up("lg")]: {
           width: 150,
@@ -139,6 +143,14 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
+    preventGraph: {
+      marginTop: -35,
+      maxHeight: 100,
+      "& h2": { fontWeight: 600, fontSize: 75, color: "#4C66D6", marginTop: 22 },
+    },
+    preventRightSVG: {
+      "& svg": { maxWidth: 40, maxHeight: 40 },
+    },
   })
 )
 
@@ -485,6 +497,60 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               </ButtonBase>
             </Grid>
           ))}
+      </Grid>
+      <Grid container spacing={2}>
+        <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card
+              className={classes.prevent}
+              onClick={() =>
+                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+              }
+            >
+              <Box display="flex">
+                <Box flexGrow={1}>
+                  <Typography className={classes.preventlabel}>Journal</Typography>
+                </Box>
+                <Box mr={1} className={classes.preventRightSVG}>
+                  <JournalBlue />
+                </Box>
+              </Box>
+              <Box className={classes.preventGraph}>
+                <Typography variant="h2">14</Typography>
+              </Box>
+              <Typography variant="h6">entries this month</Typography>
+            </Card>
+          </ButtonBase>
+        </Grid>
+
+        <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>
+            <Card
+              className={classes.prevent}
+              onClick={() =>
+                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+              }
+            >
+              <Box display="flex">
+                <Box flexGrow={1}>
+                  <Typography className={classes.preventlabel}>Water</Typography>
+                </Box>
+                <Box mr={1} className={classes.preventRightSVG}>
+                  <WaterBlue />
+                </Box>
+              </Box>
+              <Box className={classes.preventGraph}>
+                <RadialDonutChart
+                  data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
+                  detailPage={false}
+                  width={135}
+                  height={135}
+                />
+              </Box>
+              <Typography variant="h6">12/16 this month</Typography>
+            </Card>
+          </ButtonBase>
+        </Grid>
       </Grid>
 
       <Grid container xs={12} spacing={0} className={classes.sensorhd}>

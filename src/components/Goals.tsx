@@ -12,28 +12,29 @@ import {
   DialogActions,
   IconButton,
   ButtonBase,
+  AppBar,
+  Toolbar,
+  Icon,
 } from "@material-ui/core"
 import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
+import { ReactComponent as Exercise } from "../icons/Exercise.svg"
+import { ReactComponent as Reading } from "../icons/Reading.svg"
+import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
+import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
+import { ReactComponent as Meditation } from "../icons/Meditation.svg"
+import { ReactComponent as Emotions } from "../icons/Emotions.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
-import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
-import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-import { ReactComponent as Medication } from "../icons/Medication.svg"
-import { ReactComponent as InfoIcon } from "../icons/Info.svg"
-import Jewels from "./Jewels"
-import ScratchImage from "./ScratchImage"
-import MedicationTracker from "./MedicationTracker"
-import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
+import { ReactComponent as Savings } from "../icons/Savings.svg"
+import { ReactComponent as Weight } from "../icons/Weight.svg"
+import { ReactComponent as Custom } from "../icons/Custom.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
-import Resources from "./Resources"
+import NewGoals from "./NewGoal"
+
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
-import JournalEntries from "./JournalEntries"
-import Breathe from "./Breathe"
-import Goals from "./Goals"
 
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
@@ -46,16 +47,30 @@ const demoActivities = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    toolbardashboard: {
+      minHeight: 65,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "center",
+        fontWeight: "600",
+        fontSize: 18,
+        width: "100%",
+      },
+    },
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
     cardlabel: {
-      fontSize: 16,
+      fontSize: 14,
 
       padding: "0 18px",
-      bottom: 15,
+      bottom: 8,
       position: "absolute",
       width: "100%",
+      [theme.breakpoints.up("md")]: {
+        bottom: 15,
+      },
     },
 
     closeButton: {
@@ -121,10 +136,10 @@ const useStyles = makeStyles((theme: Theme) =>
     manage: {
       background: "#FFEFEC",
       padding: "10px 0",
-      minHeight: 180,
+      minHeight: 105,
       textAlign: "center",
       boxShadow: "none",
-      borderRadius: 18,
+      borderRadius: 10,
       position: "relative",
       width: "100%",
       "& svg": {
@@ -132,8 +147,19 @@ const useStyles = makeStyles((theme: Theme) =>
           width: 150,
           height: 150,
         },
+        [theme.breakpoints.down("md")]: {
+          width: 130,
+          height: 130,
+        },
+        [theme.breakpoints.down("xs")]: {
+          width: 60,
+          height: 60,
+        },
       },
 
+      [theme.breakpoints.up("sm")]: {
+        minHeight: 230,
+      },
       [theme.breakpoints.up("lg")]: {
         minHeight: 240,
       },
@@ -141,10 +167,19 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
+    goalHeading: {
+      textAlign: "center",
+      "& h5": { fontSize: 18, fontWeight: 600, margin: "25px 0 15px", color: "rgba(0, 0, 0, 0.75)" },
+      "& h6": {
+        fontSize: 14,
+        color: "rgba(0, 0, 0, 0.4)",
+        marginBottom: 15,
+      },
+    },
   })
 )
 
-export default function Manage({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Goals({ ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -171,121 +206,200 @@ export default function Manage({ participant, ...props }: { participant: Partici
   }
 
   return (
-    <Container className={classes.thumbContainer}>
-      <Grid container spacing={2}>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <BreatheIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Breathe</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => handleClickOpen("Journals")}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <JournalIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Journal</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <GoalIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>New goal</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Link
-              component={RouterLink}
-              to={`/participant/${participant.id}/hopebox`}
-              underline="none"
-              className={classes.fullwidthBtn}
-            >
-              <Card className={classes.manage}>
-                <Box mt={1}>
-                  <HopeBoxIcon />
-                </Box>
-                <Typography className={classes.cardlabel}>Hope box</Typography>
-              </Card>
-            </Link>
-          </ButtonBase>
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => handleClickOpen("Scratch_card")}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <ScratchCard width="100" height="100" />
-              </Box>
-              <Typography className={classes.cardlabel}>Scratch card</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => setLaunchedActivity("medicationtracker")}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <Medication />
-              </Box>
-              <Typography className={classes.cardlabel}>Medication tracker</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        {Object.entries(demoActivities).map((entry) => (
+    <div>
+      <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
+        <Toolbar className={classes.toolbardashboard}>
+          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
+            <Icon>arrow_back</Icon>
+          </IconButton>
+          <Typography variant="h5">Create goal</Typography>
+        </Toolbar>
+      </AppBar>
+      <Box className={classes.goalHeading}>
+        <Typography variant="h5">What type of goal?</Typography>
+        <Typography variant="subtitle1">Choose a category</Typography>
+      </Box>
+      <Container className={classes.thumbContainer}>
+        <Grid container spacing={2}>
           <Grid
             item
-            xs={6}
+            xs={4}
             sm={4}
             md={3}
             lg={3}
-            onClick={() => activateEmbeddedActivity(entry[1])}
+            onClick={() => handleClickOpen("Exercise")}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
                 <Box mt={2} mb={1}>
-                  <InfoIcon />
+                  <Exercise />
                 </Box>
-                <Typography className={classes.cardlabel}>{entry[0]}</Typography>
+                <Typography className={classes.cardlabel}>Exercise</Typography>
               </Card>
             </ButtonBase>
           </Grid>
-        ))}
-      </Grid>
-      <ResponsiveDialog
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Weight")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Weight />
+                </Box>
+                <Typography className={classes.cardlabel}>Weight</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Nutrition")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Nutrition />
+                </Box>
+                <Typography className={classes.cardlabel}>Nutrition</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid item xs={4} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Sleep")} className={classes.thumbMain}>
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Sleeping />
+                </Box>
+                <Typography className={classes.cardlabel}>Sleep</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Medication")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <BreatheIcon />
+                </Box>
+                <Typography className={classes.cardlabel}>Medication</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => setLaunchedActivity("Reading")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Reading />
+                </Box>
+                <Typography className={classes.cardlabel}>Reading</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Finances")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Savings />
+                </Box>
+                <Typography className={classes.cardlabel}>Finances</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid item xs={4} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Mood")} className={classes.thumbMain}>
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Emotions />
+                </Box>
+                <Typography className={classes.cardlabel}>Mood</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Meditation")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Meditation />
+                </Box>
+                <Typography className={classes.cardlabel}>Meditation</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            sm={4}
+            md={3}
+            lg={3}
+            onClick={() => handleClickOpen("Custom")}
+            className={classes.thumbMain}
+          >
+            <ButtonBase focusRipple className={classes.fullwidthBtn}>
+              <Card className={classes.manage}>
+                <Box mt={1}>
+                  <Custom />
+                </Box>
+                <Typography className={classes.cardlabel}>Custom</Typography>
+              </Card>
+            </ButtonBase>
+          </Grid>
+        </Grid>
+        <ResponsiveDialog
+          transient={false}
+          animate
+          fullScreen
+          open={open}
+          onClose={() => {
+            setOpen(false)
+          }}
+        >
+          <NewGoals />
+        </ResponsiveDialog>
+
+        {/* <ResponsiveDialog
         transient
         animate
         fullScreen
@@ -314,14 +428,6 @@ export default function Manage({ participant, ...props }: { participant: Partici
       >
         {
           {
-            Goals: (
-              <Goals
-                onComplete={() => {
-                  setOpen(false)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
             Journals: (
               <JournalEntries
                 onComplete={() => {
@@ -405,7 +511,8 @@ export default function Manage({ participant, ...props }: { participant: Partici
             </Link>
           </Box>
         </DialogActions>
-      </Dialog>
-    </Container>
+      </Dialog> */}
+      </Container>
+    </div>
   )
 }

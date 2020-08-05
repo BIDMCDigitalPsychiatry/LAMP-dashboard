@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react"
-import { ReactComponent as Background } from "../icons/scratch/Background.svg"
+import { ReactComponent as Background01 } from "../icons/scratch/Background-01.svg"
+import { ReactComponent as Background02 } from "../icons/scratch/Background-02.svg"
+import { ReactComponent as Background03 } from "../icons/scratch/Background-03.svg"
+import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
+import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
+import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
 import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
@@ -26,6 +31,7 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
     "&:hover": {
+      background: "#FFAC98",
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
@@ -53,11 +59,27 @@ const useStyles = makeStyles((theme) => ({
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
 }))
 
+function CanvasElement({ setCanvas, ...props }) {
+  return <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+}
+const background = () => {
+  const images = [
+    <Background01 />,
+    <Background02 />,
+    <Background03 />,
+    <Background04 />,
+    <Background05 />,
+    <Background06 />,
+  ]
+  return images[Math.floor(Math.random() * images.length)]
+}
 export default function ScratchImage({ ...props }) {
   let lastPoint, isDrawing, context
   const [canvas, setCanvas] = useState(null)
   const [visibility, setVisibility] = useState(false)
   const [done, setDone] = useState(false)
+  const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
+  const [image, setImage] = useState(null)
 
   let brush = new Image()
   let cover = new Image()
@@ -77,8 +99,8 @@ export default function ScratchImage({ ...props }) {
       }
     }
 
-    const x = (event.pageX || event.touches[0].clientX) - offsetX
-    const y = (event.pageY || event.touches[0].clientY) - offsetY
+    const x = (event.pageX || (event.touches && event.touches[0].clientX)) - offsetX
+    const y = (event.pageY || (event.touches && event.touches[0].clientY)) - offsetY
     return { x, y }
   }
 
@@ -100,6 +122,7 @@ export default function ScratchImage({ ...props }) {
         area = canvas.width * canvas.height
         if (val > area / 150) {
           setDone(true)
+          setCanvasComponent(null)
           canvas.remove()
         }
       }
@@ -112,6 +135,7 @@ export default function ScratchImage({ ...props }) {
   }
 
   useEffect(() => {
+    setImage(background())
     if (canvas != null) {
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
@@ -124,7 +148,14 @@ export default function ScratchImage({ ...props }) {
       canvas.addEventListener("touchend", touchEnd)
       brush.src = require("../icons/scratch/circle.svg")
       cover.src = require("../icons/scratch/ScratchCover.svg")
-      cover.onload = () => context.drawImage(cover, 0, 0, canvas.width, canvas.height)
+      cover.onload = () => {
+        context.drawImage(cover, 0, 0, canvas.width, canvas.height)
+        context.textAlign = "center"
+        context.font = "bold 30px inter"
+        context.fillText("Swipe around the", canvas.width / 2, canvas.height / 2 - 35)
+        context.fillText("screen to reveal", canvas.width / 2, canvas.height / 2)
+        context.fillText("the hidden image", canvas.width / 2, canvas.height / 2 + 35)
+      }
     }
   }, [canvas])
 
@@ -148,9 +179,9 @@ export default function ScratchImage({ ...props }) {
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
-        <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+        {canvasComponent}
         <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
-          <Background />
+          {image}
         </Box>
         <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
           <Box width={1}>
@@ -162,6 +193,7 @@ export default function ScratchImage({ ...props }) {
               <Link
                 className={classes.linkpeach}
                 onClick={() => {
+                  setCanvasComponent(<CanvasElement setCanvas={setCanvas} />)
                   setVisibility(false)
                   setDone(false)
                 }}
