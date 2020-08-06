@@ -36,6 +36,7 @@ import LAMP, {
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
+import Journal from "./Journal"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -51,7 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#FFFFFF",
       boxShadow: "none",
 
-      "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+      "& h5": { fontSize: 25, paddingLeft: 16, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
     toolbardashboard: {
       minHeight: 65,
@@ -106,9 +107,47 @@ const useStyles = makeStyles((theme: Theme) =>
         maxHeight: 240,
       },
     },
+    preventFull: {
+      background: "#ECF4FF",
+      padding: "10px 0",
+      minHeight: 180,
+      textAlign: "center",
+      boxShadow: "none",
+      borderRadius: 18,
+      position: "relative",
+      width: "100%",
+      [theme.breakpoints.down("xs")]: {
+        minHeight: "auto",
+      },
+
+      "& h6": {
+        color: "#4C66D6",
+        fontSize: 12,
+        textAlign: "right",
+        padding: "0 15px",
+        [theme.breakpoints.up("sm")]: {
+          position: "absolute",
+          bottom: 10,
+          right: 10,
+        },
+      },
+    },
+    preventlabelFull: {
+      minHeight: "auto",
+      fontSize: 16,
+
+      padding: "0 0 0 15px",
+      marginTop: 8,
+      width: "100%",
+      textAlign: "left",
+    },
 
     addicon: { float: "right", color: "#6083E7" },
     preventHeader: {
+      [theme.breakpoints.up("sm")]: {
+        flexGrow: "initial",
+        paddingRight: 10,
+      },
       "& h5": {
         fontWeight: 600,
         fontSize: 18,
@@ -132,6 +171,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "0 0 15px 0",
     },
     maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
+    maxw300: { maxWidth: 300, marginLeft: "auto", marginRight: "auto" },
     activitydatapop: {
       display: "flex",
       alignItems: "center",
@@ -140,7 +180,9 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       maxHeight: "280px",
     },
-    thumbMain: { maxWidth: 255 },
+    thumbMain: {
+      // maxWidth: 255
+    },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     preventGraph: {
@@ -441,7 +483,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
       .map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
   return (
-    <Container>
+    <Container className={classes.thumbContainer}>
       <Grid container xs={12} spacing={0} className={classes.activityhd}>
         <Grid item xs className={classes.preventHeader}>
           <Typography variant="h5">Activity</Typography>
@@ -456,17 +498,17 @@ export default function Prevent({ participant, ...props }: { participant: Partic
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
           .map((activity) => (
-            <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+            <Grid item xs={12} sm={6} md={6} lg={6} className={classes.thumbMain}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.prevent} onClick={() => openDetails(activity, activityEvents, 0)}>
-                  <Typography className={classes.preventlabel}>
+                <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
+                  <Typography className={classes.preventlabelFull}>
                     {activity.name} ({activityCounts[activity.name]})
                   </Typography>
-                  <Box mt={3} mb={1} className={classes.maxw150}>
+                  <Box className={classes.maxw300}>
                     <Sparkline
                       ariaLabel={activity.name}
-                      margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                      width={126}
+                      margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
+                      width={300}
                       height={70}
                       startDate={earliestDate()}
                       data={activityEvents?.[activity.name]?.map((d) => ({
@@ -493,19 +535,20 @@ export default function Prevent({ participant, ...props }: { participant: Partic
                       />
                     </Sparkline>
                   </Box>
+                  <Typography variant="h6">this month</Typography>
                 </Card>
               </ButtonBase>
             </Grid>
           ))}
-      </Grid>
-      <Grid container spacing={2}>
-        <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+
+        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
-              onClick={() =>
-                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
-              }
+              onClick={() => {
+                setSelectedActivityName("Journal entries")
+                setOpenData(true)
+              }}
             >
               <Box display="flex">
                 <Box flexGrow={1}>
@@ -523,13 +566,13 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </ButtonBase>
         </Grid>
 
-        <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
-              onClick={() =>
-                openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
-              }
+              // onClick={() =>
+              //   openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+              // }
             >
               <Box display="flex">
                 <Box flexGrow={1}>
@@ -744,42 +787,47 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
         {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
-        <PreventData
-          participant={participant}
-          activity={selectedActivity}
-          events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
-          graphType={graphType}
-          earliestDate={earliestDate}
-          enableEditMode={!_patientMode()}
-          onEditAction={(activity, data) =>
-            setActivities([
-              {
-                ...activity,
-                prefillData: [
-                  data.slice.map(({ item, value }) => ({
-                    item,
-                    value,
-                  })),
-                ],
-                prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
-              },
-            ])
-          }
-          onCopyAction={(activity, data) =>
-            setActivities([
-              {
-                ...activity,
-                prefillData: [
-                  data.slice.map(({ item, value }) => ({
-                    item,
-                    value,
-                  })),
-                ],
-              },
-            ])
-          }
-          onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
-        />
+
+        {selectedActivityName === "Journal entries" ? (
+          <Journal />
+        ) : (
+          <PreventData
+            participant={participant}
+            activity={selectedActivity}
+            events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
+            graphType={graphType}
+            earliestDate={earliestDate}
+            enableEditMode={!_patientMode()}
+            onEditAction={(activity, data) =>
+              setActivities([
+                {
+                  ...activity,
+                  prefillData: [
+                    data.slice.map(({ item, value }) => ({
+                      item,
+                      value,
+                    })),
+                  ],
+                  prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
+                },
+              ])
+            }
+            onCopyAction={(activity, data) =>
+              setActivities([
+                {
+                  ...activity,
+                  prefillData: [
+                    data.slice.map(({ item, value }) => ({
+                      item,
+                      value,
+                    })),
+                  ],
+                },
+              ])
+            }
+            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
+          />
+        )}
       </ResponsiveDialog>
     </Container>
   )

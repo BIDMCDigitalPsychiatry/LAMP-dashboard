@@ -213,7 +213,7 @@ export default function JournalEntries({ ...props }) {
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const [hourSelectedIndex, setHourSelectedIndex] = React.useState("01")
+  const [selectedIndex, setSelectedIndex] = React.useState("Ounces")
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
@@ -276,14 +276,14 @@ export default function JournalEntries({ ...props }) {
     })
     return content
   }
-  const handleHoursClose = () => {
+  const handleClose = () => {
     setAnchorEl(null)
   }
   const handleMenuItemClick = (event: React.MouseEvent<HTMLElement>, index: any) => {
-    setHourSelectedIndex(index)
+    setSelectedIndex(index)
     setAnchorEl(null)
   }
-  const handleClickHours = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
   return (
@@ -304,38 +304,43 @@ export default function JournalEntries({ ...props }) {
               root: classes.textAreaControl,
             }}
           >
-            <TextField
-              id="standard-number"
-              label="Number"
-              type="number"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <List component="nav" className={classes.timeHours}>
-              <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClickHours}>
-                <ListItemText secondary={hourSelectedIndex} />
-              </ListItem>
-            </List>
-            <Menu
-              id="lock-menu"
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={handleHoursClose}
-              classes={{ paper: classes.menuPaper }}
-            >
-              {units.map((option, index) => (
-                <MenuItem
-                  key={option}
-                  selected={option === hourSelectedIndex}
-                  onClick={(event) => handleMenuItemClick(event, option)}
-                >
-                  {option}
-                </MenuItem>
-              ))}
-            </Menu>
             <Grid container className={classes.root} spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  id="standard-number"
+                  label="Number"
+                  type="number"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <List component="nav" className={classes.timeHours}>
+                  <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClick}>
+                    <ListItemText secondary={selectedIndex} />
+                  </ListItem>
+                </List>
+                <Menu
+                  id="lock-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                  classes={{ paper: classes.menuPaper }}
+                >
+                  {units.map((option, index) => (
+                    <MenuItem
+                      key={option}
+                      selected={option === selectedIndex}
+                      onClick={(event) => handleMenuItemClick(event, option)}
+                    >
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Grid>
+
               <Grid item xs={12}>
                 <Grid container justify="center" spacing={2}>
                   {frequency.map((value) => (
@@ -354,39 +359,26 @@ export default function JournalEntries({ ...props }) {
                   ))}
                 </Grid>
               </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Start date</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Start date</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Duration</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Duration</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Reminders</Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <Typography variant="body2">Reminders</Typography>
+              </Grid>
             </Grid>
 
-            <Typography variant="caption" className={classes.todaydate}>
-              {jounalDate}
-            </Typography>
-            <TextField
-              id="standard-multiline-flexible"
-              multiline
-              rows={10}
-              variant="outlined"
-              value={journalValue}
-              onChange={(event) => setJounalValue(event.target.value)}
-              classes={{ root: classes.textArea }}
-            />
-            <Box className={classes.howFeel}>How do you feel today?</Box>
-            <Grid className={classes.btnNav}>
-              <Box textAlign="center">
-                <IconButton
-                  onClick={() => handleClickStatus("Yes")}
-                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsUp />
-                  <label>Good</label>
-                </IconButton>
-                <IconButton
-                  onClick={() => handleClickStatus("No")}
-                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsDown />
-                  <label>Bad</label>
-                </IconButton>
-              </Box>
-            </Grid>
             <Box textAlign="center" mt={4}>
               <Button className={classes.btnpeach}>Submit</Button>
             </Box>

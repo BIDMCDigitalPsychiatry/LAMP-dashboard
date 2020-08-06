@@ -234,7 +234,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
 
   return (
     <div className={classes.root}>
-      {!supportsSidebar && <WeekView />}
+      {!supportsSidebar && <WeekView type="feed" />}
 
       <Grid container>
         <Grid item xs>

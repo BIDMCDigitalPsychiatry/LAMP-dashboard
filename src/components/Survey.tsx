@@ -343,7 +343,7 @@ export default function Survey({
               You’re on a streak, keep it going
             </Typography>
             <Box textAlign="center">
-              <Ribbon />
+              <Ribbon width="170" height="226" />
             </Box>
             <Button className={classes.gotit} onClick={handleClose}>
               Got it

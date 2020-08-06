@@ -769,7 +769,7 @@ function Questions({
               onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
               className={classes.btngreen}
             >
-              "Submit"
+              Submit
             </Button>
           )}
         </div>

@@ -34,6 +34,7 @@ import Link from "@material-ui/core/Link"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"
+import HopeBox from "./HopeBox"
 
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
@@ -112,6 +113,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     topicon: {
       minWidth: 120,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
     },
     dialogueContent: {
       padding: 20,
@@ -213,19 +218,19 @@ export default function Manage({ participant, ...props }: { participant: Partici
         </Grid>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Link
+            {/* <Link
               component={RouterLink}
               to={`/participant/${participant.id}/hopebox`}
               underline="none"
               className={classes.fullwidthBtn}
-            >
-              <Card className={classes.manage}>
-                <Box mt={1}>
-                  <HopeBoxIcon />
-                </Box>
-                <Typography className={classes.cardlabel}>Hope box</Typography>
-              </Card>
-            </Link>
+            > */}
+            <Card className={classes.manage}>
+              <Box mt={1}>
+                <HopeBoxIcon />
+              </Box>
+              <Typography className={classes.cardlabel}>Hope box</Typography>
+            </Card>
+            {/* </Link> */}
           </ButtonBase>
         </Grid>
         <Grid
@@ -346,6 +351,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
                 }}
               />
             ),
+            HopeBox: (
+              <HopeBox
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
@@ -365,14 +378,13 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <CloseIcon />
           </IconButton>
           <div className={classType}>
-            {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
-            {dialogueType === "Scratch_card" && (
-              <Box>
-                <ScratchCard className={classes.topicon} />
-                <Typography variant="h6">Meditation exercises</Typography>
-              </Box>
-            )}
-            {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
+            <Box mt={2} mb={1}>
+              {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
+              {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
+              {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
+              {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
+              {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
+            </Box>
             <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
           </div>
         </DialogTitle>

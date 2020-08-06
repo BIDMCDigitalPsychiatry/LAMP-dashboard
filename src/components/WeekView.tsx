@@ -35,7 +35,8 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(255, 255, 255, 0.5)",
       "& span": { color: "white" },
     },
-    assesDateview: { color: "#00765C", background: "#BCEFDD" },
+    feedDateview: { color: "#00765C", background: "#BCEFDD", fontWeight: "bold" },
+    journalDateview: { color: "#4C66D6", background: "#ECF4FF", fontWeight: "bold" },
   })
 )
 
@@ -63,7 +64,7 @@ function getDates() {
   return week
 }
 
-export default function WeekView() {
+export default function WeekView({ type, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
@@ -75,7 +76,8 @@ export default function WeekView() {
     for (let day of days) {
       i = i === 7 ? 0 : i
       const selectedClass = i === currentDay() ? classes.selected : ""
-      const selectedDayClass = i !== currentDay() ? classes.assesDateview : ""
+      const selectedDayClass =
+        i !== currentDay() && i != 3 ? (type === "feed" ? classes.feedDateview : classes.journalDateview) : ""
       let classNameVal = classnames(selectedClass, classes.paper)
       grids.push(
         <Grid item xs>

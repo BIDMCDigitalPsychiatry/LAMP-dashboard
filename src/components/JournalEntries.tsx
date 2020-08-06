@@ -295,7 +295,9 @@ export default function JournalEntries({ ...props }) {
               </Box>
             </Grid>
             <Box textAlign="center" mt={4}>
-              <Button className={classes.btnpeach}>Submit</Button>
+              <Button className={classes.btnpeach} onClick={props.onComplete}>
+                Submit
+              </Button>
             </Box>
           </FormControl>
         </Box>

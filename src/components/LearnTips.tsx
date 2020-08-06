@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
     padding: "20px 20px 20px 20px",
     textAlign: "justify",
-    margin: "0 auto 20px",
+    margin: "20px auto 0px",
     "& h6": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
   },
   toolbardashboard: {

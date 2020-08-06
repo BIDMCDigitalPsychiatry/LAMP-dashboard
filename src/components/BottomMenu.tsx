@@ -247,6 +247,35 @@ const PreventTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip)
 
+const FeedTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(117, 152, 255, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    minWidth: 345,
+
+    "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+    "& svg": { color: "white" },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
+  },
+  arrow: {
+    color: "rgba(117, 152, 255, 0.95)",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "0px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "19px !important",
+    },
+  },
+}))(Tooltip)
+
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
@@ -289,7 +318,7 @@ export default function BottomMenu({ ...props }) {
           </IconButton>
 
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 4: false })}>
-            <LearnTooltip
+            <FeedTooltip
               open={openTabs[4]}
               interactive={true}
               title={
@@ -327,7 +356,7 @@ export default function BottomMenu({ ...props }) {
                 }
                 onChange={(_, newTab) => setTab(newTab)}
               />
-            </LearnTooltip>
+            </FeedTooltip>
           </ClickAwayListener>
 
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 0: false })}>

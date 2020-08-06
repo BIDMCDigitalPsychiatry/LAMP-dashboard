@@ -163,14 +163,29 @@ const useStyles = makeStyles((theme) => ({
     "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
     "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
   },
+  inhale_exhale: { position: "relative", height: 100 },
   InhaleContainer: {
     display: "block",
     animation: "$InhaleText 8s ease infinite",
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    position: "absolute",
+    width: "100%",
+    bottom: 30,
+    textTransform: "capitalize",
   },
   ExhaleContainer: {
     display: "block",
     marginTop: "-2rem",
     animation: "$ExhaleText 8s ease infinite",
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    position: "absolute",
+    width: "100%",
+    bottom: 30,
+    textTransform: "capitalize",
   },
   flower: { width: "100%", maxWidth: 375 },
   breatheReview: {
@@ -178,6 +193,43 @@ const useStyles = makeStyles((theme) => ({
     "& p": { fontStyle: "italic", color: "rgba(0, 0, 0, 0.5)", margin: 15 },
   },
 }))
+
+// function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
+//   return (
+//     <Box position="relative" display="inline-flex">
+//       <CircularProgress variant="static" {...props} />
+//       <Box
+//         top={0}
+//         left={0}
+//         bottom={0}
+//         right={0}
+//         position="absolute"
+//         display="flex"
+//         alignItems="center"
+//         justifyContent="center"
+//       >
+//         <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
+//           props.value,
+//         )}%`}</Typography>
+//       </Box>
+//     </Box>
+//   );
+// }
+
+// function CircularStatic() {
+//   const [progress, setProgress] = React.useState(10);
+
+//   React.useEffect(() => {
+//     const timer = setInterval(() => {
+//       setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
+//     }, 800);
+//     return () => {
+//       clearInterval(timer);
+//     };
+//   }, []);
+
+//   return <CircularProgressWithLabel value={progress} />;
+// }
 
 export default function Breathe({ ...props }) {
   const classes = useStyles()
@@ -196,8 +248,8 @@ export default function Breathe({ ...props }) {
   }
 
   const setValueUpdate = () => {
-    let val = progressValue + 0.8
-    setProgressValue(val)
+    let val = progressValue + 15 //0.8
+    setProgressValue(val > 100 ? 100 : val)
   }
 
   useEffect(() => {
@@ -267,7 +319,7 @@ export default function Breathe({ ...props }) {
                 <Box className={classes.Circle} />
                 <Box className={classes.Circle} />
               </Box>
-              <Box mt={5} textAlign="center">
+              <Box mt={5} className={classes.inhale_exhale}>
                 <Typography variant="overline" className={classes.InhaleContainer}>
                   Inhale
                 </Typography>
@@ -309,7 +361,7 @@ export default function Breathe({ ...props }) {
                 </IconButton>
               </Box>
               <Box textAlign="center">
-                <Link href="#" className={classes.btnpeach}>
+                <Link href="#" className={classes.btnpeach} onClick={props.onComplete}>
                   Done
                 </Link>
               </Box>
