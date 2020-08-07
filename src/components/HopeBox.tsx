@@ -133,7 +133,7 @@ export default function HopeBox({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton color="default" className={classes.backbtn} onClick={props.goBack} aria-label="Menu">
+          <IconButton color="default" className={classes.backbtn} onClick={props.onComplete} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Hope Box</Typography>

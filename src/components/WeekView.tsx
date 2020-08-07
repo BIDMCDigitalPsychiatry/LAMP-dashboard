@@ -20,6 +20,14 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "600",
         color: "#777777",
       },
+      "& p": {
+        width: 24,
+        height: 24,
+        margin: "0 auto",
+
+        borderRadius: "50%",
+        paddingTop: 5,
+      },
     },
     selected: {
       background: "#7599FF",
@@ -27,6 +35,8 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(255, 255, 255, 0.5)",
       "& span": { color: "white" },
     },
+    feedDateview: { color: "#00765C", background: "#BCEFDD", fontWeight: "bold" },
+    journalDateview: { color: "#4C66D6", background: "#ECF4FF", fontWeight: "bold" },
   })
 )
 
@@ -54,11 +64,11 @@ function getDates() {
   return week
 }
 
-export default function WeekView() {
+export default function WeekView({ type, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
-  let dateView = () => {
+  const dateView = () => {
     const days = getDays()
     const dates = getDates()
     let grids = []
@@ -66,12 +76,16 @@ export default function WeekView() {
     for (let day of days) {
       i = i === 7 ? 0 : i
       const selectedClass = i === currentDay() ? classes.selected : ""
+      const selectedDayClass =
+        i !== currentDay() && i != 3 ? (type === "feed" ? classes.feedDateview : classes.journalDateview) : ""
       let classNameVal = classnames(selectedClass, classes.paper)
       grids.push(
         <Grid item xs>
           <Paper className={classNameVal}>
             <Box component="span">{day}</Box>
-            {dates[i]}
+            <Box component="p" className={selectedDayClass}>
+              {dates[i]}
+            </Box>
           </Paper>
         </Grid>
       )
@@ -82,7 +96,6 @@ export default function WeekView() {
 
   return (
     <Box
-      mt={2}
       style={{
         marginLeft: supportsSidebar ? 64 : undefined,
       }}

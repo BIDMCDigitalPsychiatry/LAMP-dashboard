@@ -16,15 +16,10 @@ import LAMP from "lamp-core"
 import Login from "./Login"
 import Messages from "./Messages"
 
-import TipNotification from "./TipNotification"
-import Feed from "./Feed"
-import Breathe from "./Breathe"
-import JournalEntries from "./JournalEntries"
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
-import ScratchImage from "./ScratchImage"
 import HopeBox from "./HopeBox"
 
 // import VegaGraph from "./VegaGraph"
@@ -269,27 +264,6 @@ function AppRouter({ ...props }) {
     <Switch>
       <Route
         exact
-        path="/tip"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Today's Tip</PageTitle>
-            <TipNotification />
-          </React.Fragment>
-        )}
-      />
-      {/* Route feed page */}
-      <Route
-        exact
-        path="/feed"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Feed</PageTitle>
-            <Feed />
-          </React.Fragment>
-        )}
-      />
-      <Route
-        exact
         path="/participant/:id/messages"
         render={(props) => (
           <React.Fragment>
@@ -312,33 +286,6 @@ function AppRouter({ ...props }) {
           </React.Fragment>
         )}
       />
-      <Route
-        exact
-        path="/participant/:id/breathe"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Breathe</PageTitle>
-            <Breathe goBack={props.history.goBack} />
-          </React.Fragment>
-        )}
-      />
-      <Route
-        exact
-        path="/participant/:id/journals"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Journals</PageTitle>
-            <NavigationLayout
-              id={props.match.params.id}
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab="Journals"
-            >
-              <JournalEntries goBack={props.history.goBack} />
-            </NavigationLayout>
-          </React.Fragment>
-        )}
-      />
 
       <Route
         exact
@@ -351,16 +298,6 @@ function AppRouter({ ...props }) {
         )}
       />
 
-      <Route
-        exact
-        path="/participant/:id/scratch"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | Scratch Card</PageTitle>
-            <ScratchImage goBack={props.history.goBack} />
-          </React.Fragment>
-        )}
-      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact

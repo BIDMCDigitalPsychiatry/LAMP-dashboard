@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react"
-import { ReactComponent as Background } from "../icons/scratch/Background.svg"
-import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar } from "@material-ui/core"
+import { ReactComponent as Background01 } from "../icons/scratch/Background-01.svg"
+import { ReactComponent as Background02 } from "../icons/scratch/Background-02.svg"
+import { ReactComponent as Background03 } from "../icons/scratch/Background-03.svg"
+import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
+import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
+import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
+import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -13,6 +18,24 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
+  btnpeach: {
+    background: "#FFAC98",
+    padding: "15px 25px 15px 25px",
+    borderRadius: "40px",
+    minWidth: "200px",
+    boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
+    lineHeight: "22px",
+    display: "inline-block",
+    textTransform: "capitalize",
+    fontSize: "16px",
+    color: "rgba(0, 0, 0, 0.75)",
+    fontWeight: "bold",
+    "&:hover": {
+      background: "#FFAC98",
+      boxShadow:
+        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    },
+  },
   backbtn: { paddingLeft: 0, paddingRight: 0 },
   background: {
     background: "#e0e0e0",
@@ -20,13 +43,44 @@ const useStyles = makeStyles((theme) => ({
   },
   svgouter: {
     "& svg": { width: "100%" },
+    background: "#FFF",
   },
+  scratchCompleteMsg: {
+    minHeight: "calc(100vh - 65px)",
+    background: "rgba(255,255,255,0.9)",
+
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    textAlign: "center",
+    position: "absolute",
+    "& h4": { fontSize: 30, fontWeight: 600, marginBottom: 60 },
+  },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
 }))
 
+function CanvasElement({ setCanvas, ...props }) {
+  return <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+}
+const background = () => {
+  const images = [
+    <Background01 />,
+    <Background02 />,
+    <Background03 />,
+    <Background04 />,
+    <Background05 />,
+    <Background06 />,
+  ]
+  return images[Math.floor(Math.random() * images.length)]
+}
 export default function ScratchImage({ ...props }) {
   let lastPoint, isDrawing, context
   const [canvas, setCanvas] = useState(null)
   const [visibility, setVisibility] = useState(false)
+  const [done, setDone] = useState(false)
+  const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
+  const [image, setImage] = useState(null)
+
   let brush = new Image()
   let cover = new Image()
   const classes = useStyles()
@@ -45,8 +99,8 @@ export default function ScratchImage({ ...props }) {
       }
     }
 
-    const x = (event.pageX || event.touches[0].clientX) - offsetX
-    const y = (event.pageY || event.touches[0].clientY) - offsetY
+    const x = (event.pageX || (event.touches && event.touches[0].clientX)) - offsetX
+    const y = (event.pageY || (event.touches && event.touches[0].clientY)) - offsetY
     return { x, y }
   }
 
@@ -67,6 +121,8 @@ export default function ScratchImage({ ...props }) {
         val = val + 1
         area = canvas.width * canvas.height
         if (val > area / 150) {
+          setDone(true)
+          setCanvasComponent(null)
           canvas.remove()
         }
       }
@@ -79,6 +135,7 @@ export default function ScratchImage({ ...props }) {
   }
 
   useEffect(() => {
+    setImage(background())
     if (canvas != null) {
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
@@ -91,7 +148,14 @@ export default function ScratchImage({ ...props }) {
       canvas.addEventListener("touchend", touchEnd)
       brush.src = require("../icons/scratch/circle.svg")
       cover.src = require("../icons/scratch/ScratchCover.svg")
-      cover.onload = () => context.drawImage(cover, 0, 0, canvas.width, canvas.height)
+      cover.onload = () => {
+        context.drawImage(cover, 0, 0, canvas.width, canvas.height)
+        context.textAlign = "center"
+        context.font = "bold 30px inter"
+        context.fillText("Swipe around the", canvas.width / 2, canvas.height / 2 - 35)
+        context.fillText("screen to reveal", canvas.width / 2, canvas.height / 2)
+        context.fillText("the hidden image", canvas.width / 2, canvas.height / 2 + 35)
+      }
     }
   }, [canvas])
 
@@ -108,16 +172,36 @@ export default function ScratchImage({ ...props }) {
     <div>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.goBack} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Scratch card</Typography>
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
-        <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+        {canvasComponent}
         <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
-          <Background />
+          {image}
+        </Box>
+        <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
+          <Box width={1}>
+            <Typography variant="h4">Well done!</Typography>
+            <Button className={classes.btnpeach} onClick={props.onComplete}>
+              Close
+            </Button>
+            <Box width={1} mt={3}>
+              <Link
+                className={classes.linkpeach}
+                onClick={() => {
+                  setCanvasComponent(<CanvasElement setCanvas={setCanvas} />)
+                  setVisibility(false)
+                  setDone(false)
+                }}
+              >
+                Do another one
+              </Link>
+            </Box>
+          </Box>
         </Box>
       </div>
     </div>

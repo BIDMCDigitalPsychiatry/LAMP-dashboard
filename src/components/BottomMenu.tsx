@@ -11,6 +11,7 @@ import {
   Link,
   ClickAwayListener,
 } from "@material-ui/core"
+import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
@@ -18,6 +19,7 @@ import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
+import { renderToStaticMarkup } from "react-dom/server"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,12 +30,33 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 125,
       },
       width: "100%",
+      minWidth: 75,
     },
     closeButton: {
       position: "absolute",
       right: theme.spacing(1),
       top: theme.spacing(1),
       color: "rgba(255, 255, 255, 0.75)",
+    },
+    navigationFeedSelected: {
+      "& div": {
+        transform: "rotate(45deg)",
+        backgroundImage:
+          "linear-gradient(45deg, #FFD645, #FFD645 100%), linear-gradient(135deg, #65DEB4, #65DEB4), linear-gradient(225deg, #FE8470, #FE8470) , linear-gradient(225deg, #7DB2FF, #7DB2FF)",
+        backgroundSize: "50% 50%",
+        backgroundPosition: "0% 0%, 0% 100%, 100% 0%, 100% 100%",
+        backgroundRepeat: "no-repeat",
+        borderRadius: "50%",
+        opacity: "1",
+        width: 36,
+        height: 36,
+        "& svg": { opacity: 1 },
+      },
+      "& svg": {
+        transform: "rotate(-45deg)",
+      },
+      "& span": { color: "black" },
+      width: "100%",
     },
     navigationLearnSelected: {
       "& svg": {
@@ -78,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
     leftbar: {
       "& div": {
         [theme.breakpoints.up("md")]: {
-          background: "#F8F8F8",
+          backgroundColor: "#F8F8F8",
           border: 0,
         },
 
@@ -147,6 +170,7 @@ const LearnTooltip = withStyles((theme: Theme) => ({
     background: "rgba(255, 214, 69, 0.95)",
     borderRadius: 10,
     maxWidth: 345,
+    minWidth: 345,
     right: -10,
     "& h6": { color: "#6f5c1b", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
     "& p": { color: "#6f5c1b", fontWeight: 300, marginTop: 10 },
@@ -223,6 +247,35 @@ const PreventTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip)
 
+const FeedTooltip = withStyles((theme: Theme) => ({
+  tooltip: {
+    zIndex: 999,
+    padding: "25px 20px",
+    boxShadow: "none",
+    background: "rgba(117, 152, 255, 0.95)",
+    borderRadius: 10,
+    maxWidth: 345,
+    minWidth: 345,
+
+    "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
+    "& p": { color: "white", fontWeight: 300, marginTop: 10 },
+    "& svg": { color: "white" },
+    [theme.breakpoints.up("md")]: {
+      right: 0,
+    },
+  },
+  arrow: {
+    color: "rgba(117, 152, 255, 0.95)",
+    fontSize: 15,
+    [theme.breakpoints.down("sm")]: {
+      marginLeft: "0px !important",
+    },
+    [theme.breakpoints.down("xs")]: {
+      marginLeft: "19px !important",
+    },
+  },
+}))(Tooltip)
+
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
@@ -232,6 +285,7 @@ export default function BottomMenu({ ...props }) {
     props.tabValue === 1 ? true : false,
     props.tabValue === 2 ? true : false,
     props.tabValue === 3 ? true : false,
+    props.tabValue === 4 ? true : false,
   ])
 
   const setTab = (newTab) => {
@@ -259,9 +313,52 @@ export default function BottomMenu({ ...props }) {
             },
           }}
         >
-          <IconButton aria-label="logo" className={classes.leftbarLogo}>
+          {/* <IconButton aria-label="logo" className={classes.leftbarLogo}>
             <Logo />
-          </IconButton>
+          </IconButton> */}
+
+          <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 4: false })}>
+            <FeedTooltip
+              open={openTabs[4]}
+              interactive={true}
+              title={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenTabs({ ...openTabs, 4: false })}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="h6">
+                    Welcome to the <Box component="span">Feed</Box> section.
+                  </Typography>
+                  <Typography variant="body1">Here you can see recent activities.</Typography>
+                </React.Fragment>
+              }
+              arrow={true}
+              placement={supportsSidebar ? "right" : "top"}
+            >
+              <BottomNavigationAction
+                showLabel
+                selected={tabVal === 4}
+                label="Feed"
+                value={4}
+                classes={{
+                  root: classes.navigation,
+                  selected: classes.navigationFeedSelected,
+                  label: classes.navigationLabel,
+                }}
+                icon={
+                  <Box>
+                    <Feed />
+                  </Box>
+                }
+                onChange={(_, newTab) => setTab(newTab)}
+              />
+            </FeedTooltip>
+          </ClickAwayListener>
+
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 0: false })}>
             <LearnTooltip
               open={openTabs[0]}

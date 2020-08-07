@@ -31,6 +31,7 @@ import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
+import { Link as RouterLink } from "react-router-dom"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -111,7 +112,7 @@ export default function NavigationLayout({
   const print = useMediaQuery("print")
   const classes = useStyles()
   //sameLineTitle
-  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent"]
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed"]
   const selectedClass =
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)

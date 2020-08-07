@@ -9,6 +9,7 @@ import {
   Button,
   Grid,
   Box,
+  Icon,
 } from "@material-ui/core"
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -65,6 +66,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     likebtn: {
       fontStyle: "italic",
+      padding: 6,
+      margin: "0 5px",
       "& label": {
         position: "absolute",
         bottom: -18,
@@ -87,10 +90,12 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       "&:hover": { background: "#cea000" },
     },
+    backbtn: { paddingLeft: 0, paddingRight: 0, position: "absolute" },
+    howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   })
 )
 
-export default function TipNotification() {
+export default function TipNotification({ ...props }) {
   const classes = useStyles()
   const [status, setStatus] = useState("Yes")
 
@@ -101,7 +106,11 @@ export default function TipNotification() {
   return (
     <div>
       <div className={classes.header}>
+        <IconButton onClick={props.onClose} color="default" className={classes.backbtn} aria-label="Menu">
+          <Icon>arrow_back</Icon>
+        </IconButton>
         <SadHappy className={classes.topicon} />
+        <Typography variant="body2">Tip</Typography>
         <Typography variant="h2">Todays's Tip : Mood</Typography>
       </div>
 
@@ -125,9 +134,7 @@ export default function TipNotification() {
             </Grid>
           </Grid>
         </Box>{" "}
-        <Box fontStyle="italic" textAlign="center" fontSize={16}>
-          Was this helpful today?
-        </Box>
+        <Box className={classes.howFeel}>Was this helpful today?</Box>
         <Box textAlign="center">
           <IconButton
             onClick={() => handleClickStatus("Yes")}

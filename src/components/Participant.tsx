@@ -12,6 +12,7 @@ import Prevent from "./Prevent"
 import Manage from "./Manage"
 import Welcome from "./Welcome"
 import Learn from "./Learn"
+import Feed from "./Feed"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -96,6 +97,9 @@ export default function Participant({
       case "Prevent":
         tabNum = 3
         break
+      case "Feed":
+        tabNum = 4
+        break
       default:
         tabNum = _patientMode() ? 1 : 3
         break
@@ -128,6 +132,9 @@ export default function Participant({
         break
       case 3:
         tabName = "Prevent"
+        break
+      case 4:
+        tabName = "Feed"
         break
     }
     return tabName
@@ -173,6 +180,11 @@ export default function Participant({
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Prevent participant={participant} activeTab={activeTab} />
+        </Box>
+      </Slide>
+      <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+        <Box my={4}>
+          <Feed participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
       <BottomMenu activeTab={activeTab} tabValue={tab} />

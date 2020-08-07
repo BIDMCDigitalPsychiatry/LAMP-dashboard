@@ -6,33 +6,25 @@ import {
   Step,
   Stepper,
   StepLabel,
-  Paper,
   Typography,
   Box,
-  IconButton,
-  Container,
   Grid,
   StepContent,
-  Button,
   useMediaQuery,
   useTheme,
-  Toolbar,
-  AppBar,
   StepConnector,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
-
+import classnames from "classnames"
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as Medication } from "../icons/Medicationsm.svg"
 import { ReactComponent as PencilPaper } from "../icons/PencilPaper.svg"
 import { ReactComponent as SadBoard } from "../icons/SadBoard.svg"
 import { ReactComponent as LineGraph } from "../icons/LineGraph.svg"
-
-import { ReactComponent as Message } from "../icons/Message.svg"
-import { ReactComponent as User } from "../icons/User.svg"
+import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
-import BottomMenu from "./BottomMenu"
-
+import { Participant as ParticipantObj } from "lamp-core"
+import TipNotification from "./TipNotification"
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -40,55 +32,65 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       width: "100%",
     },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
-    button: {
-      marginTop: theme.spacing(1),
-      marginRight: theme.spacing(1),
-    },
-    actionsContainer: {
-      marginBottom: theme.spacing(0),
-    },
-    resetContainer: {
-      padding: theme.spacing(3),
-    },
     learn: {
       background: "#FFF9E5",
-      padding: "10px",
+      padding: "8px 10px",
       borderRadius: 10,
-      border: 0,
+      border: "2px solid transparent",
+    },
+    learnCompleted: {
+      border: "2px solid #FFE27A",
+      padding: "8px 10px",
+      borderRadius: 10,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.5) !important",
+      },
+      "& svg": { opacity: 0.5 },
     },
     assess: {
       background: "#E7F8F2",
-      padding: "10px",
+      padding: "8px 10px",
       borderRadius: 10,
-      border: 0,
+      border: "2px solid transparent",
+    },
+    assessCompleted: {
+      border: "2px solid #65DEB4",
+      padding: "8px 10px",
+      borderRadius: 10,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.5) !important",
+      },
+      "& svg": { opacity: 0.5 },
     },
     manage: {
       background: "#FFEFEC",
-      padding: "10px",
+      padding: "8px 10px",
       borderRadius: 10,
-      border: 0,
+      border: "2px solid transparent",
+    },
+    manageCompleted: {
+      border: "2px solid #FFAC98",
+      padding: "8px 10px",
+      borderRadius: 10,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.5) !important",
+      },
+      "& svg": { opacity: 0.5 },
     },
     prevent: {
       background: "#ECF4FF",
-      padding: "10px",
+      padding: "8px 10px",
       borderRadius: 10,
-      border: 0,
+      border: "2px solid transparent",
     },
-    toolbar: {
-      minHeight: 90,
-      alignItems: "flex-start",
-      paddingTop: theme.spacing(1),
-      paddingBottom: theme.spacing(1),
-    },
-    title: {
-      flexGrow: 1,
-      alignSelf: "flex-end",
+    preventCompleted: {
+      border: "2px solid #7DB2FF",
+      padding: "8px 10px",
+      borderRadius: 10,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.5) !important",
+      },
+      "& svg": { opacity: 0.5 },
     },
     image: {
       width: 65,
@@ -109,23 +111,67 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "white",
       width: 32,
       height: 32,
-      border: "3px solid #C6C6C6",
+      border: "3px solid #FFEFEC",
       borderRadius: "50%",
       marginRight: 10,
       "& text": {
         fill: "#FFF",
       },
     },
-    stepIconActive: {
-      color: "#C6C6C6 !important",
-      border: "0px solid #C6C6C6",
+    stepActiveIcon: {
+      color: "#FFFFFF !important",
       "& text": {
-        fill: "#C6C6C6 !important",
+        fill: "#FFFFFF !important",
+      },
+    },
+    manageIcon: {
+      border: "3px solid #FE8470",
+    },
+
+    manageCompletedIcon: {
+      color: "#FE8470 !important",
+      border: "0px solid #FE8470",
+      "& text": {
+        fill: "#FE8470 !important",
+      },
+    },
+    preventIcon: {
+      border: "3px solid #7DB2FF",
+    },
+
+    preventCompletedIcon: {
+      color: "#7DB2FF !important",
+      border: "0px solid #7DB2FF",
+      "& text": {
+        fill: "#7DB2FF !important",
+      },
+    },
+    assessIcon: {
+      border: "3px solid #65DEB4",
+    },
+
+    assessCompletedIcon: {
+      color: "#65DEB4 !important",
+      border: "0px solid #65DEB4",
+      "& text": {
+        fill: "#65DEB4 !important",
+      },
+    },
+    learnIcon: {
+      border: "3px solid #FFD645",
+    },
+
+    learnCompletedIcon: {
+      color: "#FFD645 !important",
+      border: 0,
+      "& text": {
+        fill: "#FFD645 !important",
       },
     },
     customstepper: {
       position: "relative",
       maxWidth: 500,
+      padding: 18,
       "&::after": {
         content: "",
         position: "absolute",
@@ -138,9 +184,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     customsteppercontent: {
       marginLeft: 15,
-      marginTop: -35,
+      marginTop: -38,
       paddingTop: 44,
-      marginBottom: -35,
+      marginBottom: -38,
       paddingBottom: 52,
       borderLeft: "2px solid #bdbdbd",
     },
@@ -158,7 +204,17 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function getSteps(classes: any) {
+function _patientMode() {
+  return LAMP.Auth._type === "participant"
+}
+
+export default function Feed({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+  const classes = useStyles()
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [date, changeDate] = useState(new Date())
+  const [completed, setCompleted] = useState([])
+  const [open, setOpen] = useState(false)
+
   let feedData = [
     { type: "learn", time: "8.30am", title: "Today's tip : Mood", icon: "sad-happy", description: "" },
     {
@@ -172,155 +228,66 @@ function getSteps(classes: any) {
     { type: "assess", time: "8.30am", title: "Anxiety survey", icon: "board", description: "10mins" },
     { type: "prevent", time: "8.30am", title: "Review today’s stats", icon: "linegraph", description: "" },
   ]
-  let stepData = []
-  Object.keys(feedData).forEach((key) => {
-    stepData.push(
-      <Card className={classes[feedData[key].type]} variant="outlined">
-        <Grid container spacing={0}>
-          <Grid xs container justify="center" direction="column" className={classes.feedtasks} spacing={0}>
-            <Box m={1}>
-              <Typography variant="body2" color="textSecondary">
-                <Box fontStyle="italic" className={classes.smalltext}>
-                  {feedData[key].time}
-                </Box>
-              </Typography>
-              <Typography variant="h5">{feedData[key].title}</Typography>
-              <Typography className={classes.smalltext} color="textSecondary">
-                {feedData[key].description}
-              </Typography>
-            </Box>
-          </Grid>
-
-          <Grid container justify="center" direction="column" className={classes.image}>
-            {feedData[key].icon === "sad-happy" && <SadHappy />}
-            {feedData[key].icon === "medication" && <Medication />}
-            {feedData[key].icon === "pencil" && <PencilPaper />}
-            {feedData[key].icon === "board" && <SadBoard />}
-            {feedData[key].icon === "linegraph" && <LineGraph />}
-          </Grid>
-        </Grid>
-      </Card>
-    )
-  })
-  return stepData
-}
-
-function getStepContent(step: number) {
-  switch (step) {
-    case 0:
-      return (
-        <Container>
-          <Typography>Focus on the good things Challenging situations and obstacles are a part of life. </Typography>
-          <Typography>
-            When you’re faced with one, focus on the good things no matter how small or seemingly insignificant they
-            seem. If you look for it, you can always find the proverbial silver lining in every cloud — even if it’s not
-            immediately obvious. For example, if someone cancels plans, focus on how it frees up time for you to catch
-            up on a TV show or other activity you enjoy.
-          </Typography>
-        </Container>
-      )
-    case 1:
-      return "Exercise has the ability to ease stress, improve mood, and minimize chronic pain. Working out is proven to improve and normalize the neurotransmitter levels in your body. Neurotransmitter levels increased by exercise include serotonin, dopamine, and norepinephrine. This increase in neurotransmitters has a positive impact on your mental health.s."
-    case 2:
-      return `Try out different ad text to see what brings in the most customers,
-              and learn how to enhance your ads using features like ad extensions.
-              If you run into any problems with your ads, find out how to tell if
-              they're running and how to resolve approval issues.`
-    default:
-      return "Unknown step"
-  }
-}
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
-
-export default function Feed() {
-  const classes = useStyles()
-  const [activeStep, setActiveStep] = React.useState(0)
-  const steps = getSteps(classes)
-  const [tab, _setTab] = useState(_patientMode() ? 1 : 3)
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [date, changeDate] = useState(new Date())
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  }
-
-  const handleReset = () => {
-    setActiveStep(0)
-  }
-  let activeTab = (newTab?: any) => {
-    _setTab(newTab)
+  const handleNext = (index: number) => {
+    setCompleted({ ...completed, [index]: true })
   }
 
   return (
-    <div
-      className={classes.root}
-      style={{
-        paddingLeft: supportsSidebar ? 150 : undefined,
-      }}
-    >
-      <AppBar className={classes.customheader}>
-        <Toolbar className={classes.toolbar}>
-          <Typography
-            className={classes.title}
-            variant="h5"
-            noWrap
-            style={{
-              paddingLeft: supportsSidebar ? 150 : undefined,
-            }}
-          >
-            Feed
-          </Typography>
-          <IconButton aria-label="search" color="inherit">
-            <Message />
-          </IconButton>
-          <IconButton aria-label="display more actions" edge="end" color="inherit">
-            <User />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Toolbar className={classes.toolbar} />
-      {!supportsSidebar && <WeekView />}
+    <div className={classes.root}>
+      {!supportsSidebar && <WeekView type="feed" />}
 
       <Grid container>
         <Grid item xs>
           <Stepper
-            activeStep={activeStep}
             orientation="vertical"
             classes={{ root: classes.customstepper }}
             connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
           >
-            {steps.map((label, index) => (
+            {feedData.map((label, index) => (
               <Step>
                 <StepLabel
                   StepIconProps={{
+                    completed: completed[index],
                     classes: {
-                      root: classes.stepIcon,
-                      active: classes.stepIconActive,
-                      completed: classes.stepIconActive,
+                      root: classnames(classes.stepIcon, classes[label.type + "Icon"]),
+                      active: classes.stepActiveIcon,
+                      completed: classes[label.type + "CompletedIcon"],
                     },
                   }}
+                  onClick={() => handleNext(index)}
                 >
-                  {label}
-                </StepLabel>
+                  <Card
+                    className={completed[index] ? classes[label.type + "Completed"] : classes[label.type]}
+                    variant="outlined"
+                    onClick={() => setOpen(true)}
+                  >
+                    <Grid container spacing={0}>
+                      <Grid xs container justify="center" direction="column" className={classes.feedtasks} spacing={0}>
+                        <Box m={1}>
+                          <Typography variant="body2" color="textSecondary">
+                            <Box fontStyle="italic" className={classes.smalltext}>
+                              {label.time}
+                            </Box>
+                          </Typography>
+                          <Typography variant="h5">{label.title}</Typography>
+                          <Typography className={classes.smalltext} color="textSecondary">
+                            {label.description}
+                          </Typography>
+                        </Box>
+                      </Grid>
 
+                      <Grid container justify="center" direction="column" className={classes.image}>
+                        {label.icon === "sad-happy" && <SadHappy />}
+                        {label.icon === "medication" && <Medication />}
+                        {label.icon === "pencil" && <PencilPaper />}
+                        {label.icon === "board" && <SadBoard />}
+                        {label.icon === "linegraph" && <LineGraph />}
+                      </Grid>
+                    </Grid>
+                  </Card>
+                </StepLabel>
                 <StepContent classes={{ root: classes.customsteppercontent }}>
-                  <Typography>{getStepContent(index)}</Typography>
-                  <div className={classes.actionsContainer}>
-                    <div>
-                      <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                        Back
-                      </Button>
-                      <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
-                        {activeStep === steps.length - 1 ? "Ok" : "Next"}
-                      </Button>
-                    </div>
-                  </div>
+                  <div></div>
                 </StepContent>
               </Step>
             ))}
@@ -338,15 +305,17 @@ export default function Feed() {
           />
         </Grid>
       </Grid>
-      {activeStep === steps.length && (
-        <Paper square elevation={0} className={classes.resetContainer}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-          <Button onClick={handleReset} className={classes.button}>
-            Reset
-          </Button>
-        </Paper>
-      )}
-      <BottomMenu activeTab={activeTab} tabValue={tab} />
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={open}
+        onClose={() => {
+          setOpen(false)
+        }}
+      >
+        <TipNotification onClose={() => setOpen(false)} />
+      </ResponsiveDialog>
     </div>
   )
 }

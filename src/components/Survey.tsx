@@ -343,7 +343,7 @@ export default function Survey({
               You’re on a streak, keep it going
             </Typography>
             <Box textAlign="center">
-              <Ribbon />
+              <Ribbon width="170" height="226" />
             </Box>
             <Button className={classes.gotit} onClick={handleClose}>
               Got it
@@ -359,9 +359,9 @@ export default function Survey({
         onClose={() => {
           setOpenData(false)
         }}
-        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
+        //style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
-        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />}
+        {/* {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />} */}
         <SurveyQuestions
           participant={participant}
           type={surveyType}
