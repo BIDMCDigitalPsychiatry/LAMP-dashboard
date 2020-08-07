@@ -313,9 +313,9 @@ export default function BottomMenu({ ...props }) {
             },
           }}
         >
-          <IconButton aria-label="logo" className={classes.leftbarLogo}>
+          {/* <IconButton aria-label="logo" className={classes.leftbarLogo}>
             <Logo />
-          </IconButton>
+          </IconButton> */}
 
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 4: false })}>
             <FeedTooltip

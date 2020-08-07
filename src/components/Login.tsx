@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     inputText: {},
     buttonNav: {
-      "& button": { width: 130, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
+      "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
     linkBlue: { color: "#6083E7", fontWeight: "bold" },
     loginContainer: { height: "90vh" },
@@ -179,20 +179,24 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   />
                 </Box>
 
-                {/* <TextField
-                margin="dense"
-                size="small"
+                <TextField
+                margin="normal"
+                
                 name="serverAddress"
                 variant="outlined"
-                style={{ width: "100%", height: 76 }}
-                label="Domain"
+                style={{ width: "100%", height: 90 }}
+                // label="Domain"
                 placeholder="api.lamp.digital"
                 helperText="Don't enter a domain if you're not sure what this option does."
                 value={state.serverAddress || ""}
                 onChange={handleChange}
                 disabled={srcLocked}
-                InputLabelProps={{ shrink: true }}
-              /> */}
+                InputProps={{
+                  classes: {
+                    root: classes.textfieldStyle,
+                  },
+                }}
+              />
                 {/* <TextField
                 required
                 name="ID"
@@ -251,23 +255,35 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   }}
                 />
 
-                <Grid
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="center"
-                  className={classes.buttonNav}
-                >
-                  <Grid item>
-                    {" "}
-                    <Fab
+                <Box className={classes.buttonNav} width={1} textAlign="center">
+                   <Fab
                       variant="extended"
-                      color="default"
-                      style={{ backgroundColor: "#fff" }}
-                      onClick={(event) => setTryitMenu(event.currentTarget)}
+                      type="submit"
+                      style={{ background: "#7599FF", color: "White" }}
+                      onClick={handleLogin}
                     >
-                      Try It
+                      Login
+                      <input
+                        type="submit"
+                        style={{
+                          cursor: "pointer",
+                          position: "absolute",
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          width: "100%",
+                          opacity: 0,
+                        }}
+                      />
                     </Fab>
+                 
+                </Box>
+
+                <Box textAlign="center" width={1} mt={4} >
+                <Link underline="none" className={classes.linkBlue} onClick={(event) => setTryitMenu(event.currentTarget)}>
+                    Try it
+                    </Link>
                     <Menu
                       keepMounted
                       open={Boolean(tryitMenu)}
@@ -312,37 +328,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         Patient
                       </MenuItem>
                     </Menu>
-                  </Grid>
-                  <Grid item>
-                    {" "}
-                    <Fab
-                      variant="extended"
-                      type="submit"
-                      style={{ background: "#7599FF", color: "White" }}
-                      onClick={handleLogin}
-                    >
-                      Login
-                      <input
-                        type="submit"
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          left: 0,
-                          width: "100%",
-                          opacity: 0,
-                        }}
-                      />
-                    </Fab>
-                  </Grid>
-                </Grid>
-
-                <Box textAlign="center" width={1} mt={4}>
-                  <Link underline="none" className={classes.linkBlue}>
-                    Create an account
-                  </Link>
+                 
+                
                 </Box>
               </Box>
             </form>
