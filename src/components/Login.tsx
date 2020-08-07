@@ -14,6 +14,7 @@ import {
   Grid,
   makeStyles,
   createStyles,
+  Link,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
@@ -24,12 +25,47 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    logoLogin: {
+      width: 90,
+      margin: "0 auto 60px",
+      textAlign: "center",
+      [theme.breakpoints.down("xs")]: {
+        width: 69,
+        marginBottom: 30,
+      },
+    },
+    logoText: {
+      width: "100%",
+      textAlign: "center",
+      [theme.breakpoints.down("xs")]: {
+        width: "80%",
+        margin: "0 auto",
+      },
+      "& svg": { width: "100%", height: 41, marginBottom: 10 },
+    },
+    textfieldStyle: {
+      "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
+      "& fieldset": { border: 0 },
+    },
+    inputText: {},
+    buttonNav: {
+      "& button": { width: 130, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
+    },
+    linkBlue: { color: "#6083E7", fontWeight: "bold" },
+    loginContainer: { height: "90vh" },
+    loginInner: { maxWidth: 280 },
+  })
+)
+
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -81,74 +117,69 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   return (
     <Slide direction="right" in={true} mountOnEnter unmountOnExit>
-      <ResponsiveMargin
-        style={{
-          position: "absolute",
-          width: "33%",
-          left: 0,
-          right: 0,
-          margin: "0 auto",
-        }}
-      >
-        <div style={{ padding: "16px", minHeight: "600px" }}>
-          <IconButton
-            style={{ position: "fixed", top: 8, right: 8 }}
-            onClick={(event) => setHelpMenu(event.currentTarget)}
+      <ResponsiveMargin>
+        <IconButton
+          style={{ position: "fixed", top: 8, right: 8 }}
+          onClick={(event) => setHelpMenu(event.currentTarget)}
+        >
+          <Icon>help</Icon>
+          <Menu
+            keepMounted
+            open={Boolean(helpMenu)}
+            anchorPosition={helpMenu?.getBoundingClientRect()}
+            anchorReference="anchorPosition"
+            onClose={() => setHelpMenu(undefined)}
           >
-            <Icon>help</Icon>
-            <Menu
-              keepMounted
-              open={Boolean(helpMenu)}
-              anchorPosition={helpMenu?.getBoundingClientRect()}
-              anchorReference="anchorPosition"
-              onClose={() => setHelpMenu(undefined)}
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://docs.lamp.digital", "_blank")
+              }}
             >
-              <MenuItem
-                dense
-                onClick={() => {
-                  setHelpMenu(undefined)
-                  window.open("https://docs.lamp.digital", "_blank")
-                }}
-              >
-                <b style={{ color: colors.grey["600"] }}>Help & Support</b>
-              </MenuItem>
-              <MenuItem
-                dense
-                onClick={() => {
-                  setHelpMenu(undefined)
-                  window.open("https://community.lamp.digital", "_blank")
-                }}
-              >
-                <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
-              </MenuItem>
-              <MenuItem
-                dense
-                onClick={() => {
-                  setHelpMenu(undefined)
-                  window.open("mailto:team@digitalpsych.org", "_blank")
-                }}
-              >
-                <b style={{ color: colors.grey["600"] }}>Contact Us</b>
-              </MenuItem>
-            </Menu>
-          </IconButton>
-          <form onSubmit={(e) => handleLogin(e)}>
-            <Box style={{ textAlign: "center" }}>
-              <div>
-                <Logo height="70px" />
-              </div>
-              <div style={{ margin: "25px 0 10px 0" }}>
-                <Logotext />
-              </div>
-              <div
-                style={{
-                  height: 6,
-                  marginBottom: 20,
-                  background:
-                    "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
-                }}
-              />
-              <TextField
+              <b style={{ color: colors.grey["600"] }}>Help & Support</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("https://community.lamp.digital", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setHelpMenu(undefined)
+                window.open("mailto:team@digitalpsych.org", "_blank")
+              }}
+            >
+              <b style={{ color: colors.grey["600"] }}>Contact Us</b>
+            </MenuItem>
+          </Menu>
+        </IconButton>
+
+        <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
+          <Grid item className={classes.loginInner}>
+            <form onSubmit={(e) => handleLogin(e)}>
+              <Box>
+                <Box className={classes.logoLogin}>
+                  <Logo />
+                </Box>
+                <Box className={classes.logoText}>
+                  <Logotext />
+                  <div
+                    style={{
+                      height: 6,
+                      marginBottom: 40,
+                      background:
+                        "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                    }}
+                  />
+                </Box>
+
+                {/* <TextField
                 margin="dense"
                 size="small"
                 name="serverAddress"
@@ -161,112 +192,162 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 onChange={handleChange}
                 disabled={srcLocked}
                 InputLabelProps={{ shrink: true }}
-              />
-              <TextField
+              /> */}
+                {/* <TextField
                 required
-                name="id"
+                name="ID"
                 label="ID"
+                
                 margin="normal"
                 variant="outlined"
-                style={{ width: "100%", height: 76 }}
-                placeholder="my.email@address.com"
-                helperText="Use your email address to login."
+                style={{ width: "100%", height: 50, marginBottom: 10 }}
+                placeholder="Email address"
+                
                 value={state.id || ""}
                 onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                required
-                name="password"
-                label="Password"
-                type="password"
-                margin="normal"
-                variant="outlined"
-                style={{ width: "100%", height: 76, marginBottom: 24 }}
-                placeholder="•••••••••"
-                helperText="Use your password to login."
-                value={state.password || ""}
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-              <br />
-              <Fab
-                variant="extended"
-                color="default"
-                style={{ width: "45%", float: "left", backgroundColor: "#fff" }}
-                onClick={(event) => setTryitMenu(event.currentTarget)}
-              >
-                Try It
-              </Fab>
-              <Menu
-                keepMounted
-                open={Boolean(tryitMenu)}
-                anchorPosition={tryitMenu?.getBoundingClientRect()}
-                anchorReference="anchorPosition"
-                onClose={() => setTryitMenu(undefined)}
-              >
-                <MenuItem disabled divider>
-                  <b>Try mindLAMP out as a...</b>
-                </MenuItem>
-                <MenuItem
-                  onClick={(event) => {
-                    setTryitMenu(undefined)
-                    handleLogin(event, "researcher")
-                  }}
-                >
-                  Researcher
-                </MenuItem>
-                <MenuItem
-                  divider
-                  onClick={(event) => {
-                    setTryitMenu(undefined)
-                    handleLogin(event, "clinician")
-                  }}
-                >
-                  Clinician
-                </MenuItem>
-                <MenuItem
-                  onClick={(event) => {
-                    setTryitMenu(undefined)
-                    handleLogin(event, "participant")
-                  }}
-                >
-                  Participant
-                </MenuItem>
-                <MenuItem
-                  onClick={(event) => {
-                    setTryitMenu(undefined)
-                    handleLogin(event, "patient")
-                  }}
-                >
-                  Patient
-                </MenuItem>
-              </Menu>
-              <Fab
-                variant="extended"
-                color="primary"
-                type="submit"
-                style={{ width: "45%", float: "right" }}
-                onClick={handleLogin}
-              >
-                Login
-                <input
-                  type="submit"
-                  style={{
-                    cursor: "pointer",
-                    position: "absolute",
-                    top: 0,
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    width: "100%",
-                    opacity: 0,
+                InputProps={{
+                  classes: {
+                     root: classes.textfieldStyle,
+                    
+                  }
+               }}
+              /> */}
+
+                <TextField
+                  required
+                  name="id"
+                  // label="ID"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50 }}
+                  placeholder="my.email@address.com"
+                  // helperText="Use your email address to login."
+                  value={state.id || ""}
+                  onChange={handleChange}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
                   }}
                 />
-              </Fab>
-            </Box>
-          </form>
-        </div>
+
+                <TextField
+                  required
+                  name="password"
+                  // label="Password"
+                  type="password"
+                  margin="normal"
+                  variant="outlined"
+                  style={{ width: "100%", height: 50, marginBottom: 40 }}
+                  placeholder="•••••••••"
+                  // helperText="Use your password to login."
+                  value={state.password || ""}
+                  onChange={handleChange}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                  }}
+                />
+
+                <Grid
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="center"
+                  className={classes.buttonNav}
+                >
+                  <Grid item>
+                    {" "}
+                    <Fab
+                      variant="extended"
+                      color="default"
+                      style={{ backgroundColor: "#fff" }}
+                      onClick={(event) => setTryitMenu(event.currentTarget)}
+                    >
+                      Try It
+                    </Fab>
+                    <Menu
+                      keepMounted
+                      open={Boolean(tryitMenu)}
+                      anchorPosition={tryitMenu?.getBoundingClientRect()}
+                      anchorReference="anchorPosition"
+                      onClose={() => setTryitMenu(undefined)}
+                    >
+                      <MenuItem disabled divider>
+                        <b>Try mindLAMP out as a...</b>
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "researcher")
+                        }}
+                      >
+                        Researcher
+                      </MenuItem>
+                      <MenuItem
+                        divider
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "clinician")
+                        }}
+                      >
+                        Clinician
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "participant")
+                        }}
+                      >
+                        Participant
+                      </MenuItem>
+                      <MenuItem
+                        onClick={(event) => {
+                          setTryitMenu(undefined)
+                          handleLogin(event, "patient")
+                        }}
+                      >
+                        Patient
+                      </MenuItem>
+                    </Menu>
+                  </Grid>
+                  <Grid item>
+                    {" "}
+                    <Fab
+                      variant="extended"
+                      type="submit"
+                      style={{ background: "#7599FF", color: "White" }}
+                      onClick={handleLogin}
+                    >
+                      Login
+                      <input
+                        type="submit"
+                        style={{
+                          cursor: "pointer",
+                          position: "absolute",
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          width: "100%",
+                          opacity: 0,
+                        }}
+                      />
+                    </Fab>
+                  </Grid>
+                </Grid>
+
+                <Box textAlign="center" width={1} mt={4}>
+                  <Link underline="none" className={classes.linkBlue}>
+                    Create an account
+                  </Link>
+                </Box>
+              </Box>
+            </form>
+          </Grid>
+        </Grid>
       </ResponsiveMargin>
     </Slide>
   )
