@@ -29,6 +29,8 @@ import {
   ListItemText,
   ListItem,
   List,
+  TableFooter,
+  Fab,
 } from "@material-ui/core"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
@@ -258,6 +260,7 @@ const useStyles = makeStyles((theme) => ({
   listSelected: {
     background: "#E7F8F2 !important",
   },
+  surveyQuestionNav: { textAlign: "center", position: "absolute", width: "100%", bottom: 40 },
 }))
 
 // Splice together all selected activities & their tags.
@@ -748,21 +751,6 @@ function Questions({
           }}
         />
         <div className={classes.sliderActionsContainer}>
-          {!supportsSidebar && idx > 0 && (
-            <Button onClick={handleBack} className={classes.btnBack}>
-              Back
-            </Button>
-          )}
-          {!supportsSidebar && (
-            <Button
-              variant="contained"
-              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-              className={classes.btngreen}
-            >
-              {idx === value.settings.length - 1 ? "Submit" : "Next"}
-            </Button>
-          )}
-
           {supportsSidebar && idx === value.settings.length - 1 && (
             <Button
               variant="contained"
@@ -785,9 +773,29 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
   const [tab, _setTab] = useState(0)
   const [progressValue, setProgressValue] = useState(10)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [index, setIndex] = useState(0)
+  const [slideElements, setSlideElements] = useState(null)
+  const [elementIn, setElementIn] = useState(false)
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
+    const slideElements = value.settings.map((x, idx) => {
+      setElementIn(true)
+      return (
+        <Questions
+          idx={idx}
+          x={x}
+          value={value}
+          responses={responses}
+          setActiveStep={setActiveStep}
+          onResponse={onResponse}
+          handleBack={handleBack}
+          handleNext={handleNext}
+          onComplete={onComplete}
+        />
+      )
+    })
+    setSlideElements(slideElements)
     window.addEventListener("scroll", handleChange, true)
     onResponse(Array.from({ ...responses.current, length: value.settings.length }))
   }, [])
@@ -795,10 +803,20 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
+    setElementIn(false)
+    setTimeout(() => {
+      setElementIn(true)
+      setIndex((index - 1) % slideElements.length)
+    }, 500)
     _setTab(tab - 1)
     setProgressValue(progressValue - 100 / value.settings.length)
   }
   const handleNext = () => {
+    setElementIn(false)
+    setTimeout(() => {
+      setElementIn(true)
+      setIndex((index + 1) % slideElements.length)
+    }, 500)
     _setTab(tab + 1)
     setProgressValue(progressValue + 100 / value.settings.length)
   }
@@ -842,39 +860,41 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
-      {supportsSidebar
-        ? value.settings.map((x, idx) => (
-            <Box my={4} onScroll={handleChange}>
-              <Questions
-                idx={idx}
-                x={x}
-                value={value}
-                responses={responses}
-                setActiveStep={setActiveStep}
-                onResponse={onResponse}
-                handleBack={handleBack}
-                handleNext={handleNext}
-                onComplete={onComplete}
-              />
-            </Box>
-          ))
-        : value.settings.map((x, idx) => (
-            <Slide in={tab === idx} direction={tabDirection(idx)} mountOnEnter unmountOnExit>
-              <Box>
-                <Questions
-                  idx={idx}
-                  x={x}
-                  value={value}
-                  responses={responses}
-                  setActiveStep={setActiveStep}
-                  onResponse={onResponse}
-                  handleBack={handleBack}
-                  handleNext={handleNext}
-                  onComplete={onComplete}
-                />
-              </Box>
-            </Slide>
-          ))}
+      {supportsSidebar ? (
+        value.settings.map((x, idx) => (
+          <Box my={4} onScroll={handleChange}>
+            <Questions
+              idx={idx}
+              x={x}
+              value={value}
+              responses={responses}
+              setActiveStep={setActiveStep}
+              onResponse={onResponse}
+              handleBack={handleBack}
+              handleNext={handleNext}
+              onComplete={onComplete}
+            />
+          </Box>
+        ))
+      ) : (
+        <Box>
+          <Slide in={elementIn} direction={tabDirection(index)} mountOnEnter unmountOnExit>
+            <Box>{slideElements ? slideElements[index] : null}</Box>
+          </Slide>
+          <Box className={classes.surveyQuestionNav}>
+            {!supportsSidebar && index > 0 && (
+              <Fab onClick={handleBack} className={classes.btnBack}>
+                Back
+              </Fab>
+            )}
+            {!supportsSidebar && (
+              <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {index === value.settings.length - 1 ? "Submit" : "Next"}
+              </Fab>
+            )}
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }

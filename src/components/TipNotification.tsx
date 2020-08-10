@@ -10,6 +10,7 @@ import {
   Grid,
   Box,
   Icon,
+  Fab,
 } from "@material-ui/core"
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -84,7 +85,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
       lineHeight: "38px",
       marginTop: "15%",
-
+      cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
@@ -152,9 +153,9 @@ export default function TipNotification({ ...props }) {
           </IconButton>
         </Box>
         <Box textAlign="center">
-          <Button variant="contained" color="primary" className={classes.btnyellow}>
+          <Fab variant="extended" color="primary" className={classes.btnyellow}>
             Completed
-          </Button>
+          </Fab>
         </Box>
       </CardContent>
     </div>
