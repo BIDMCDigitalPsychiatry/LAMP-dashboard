@@ -24,11 +24,15 @@ import {
   ListItemText,
   MenuItem,
   Card,
+  ButtonBase,
+  InputBase,
 } from "@material-ui/core"
+import { DatePicker } from "@material-ui/pickers"
 import CloseIcon from "@material-ui/icons/Close"
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
+import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
+import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -51,13 +55,23 @@ const useStyles = makeStyles((theme) => ({
   linkButton: {
     padding: "15px 25px 15px 25px",
   },
+  goalUnit: { minWidth: 127, marginLeft: 15 },
   timeHours: {
-    padding: 0,
-    borderBottom: "#BCEFDD solid 2px",
+    padding: "3px 10px 5px 0",
+    borderBottom: "#FFCEC2 solid 2px",
     minWidth: 57,
     "& div": { padding: 0, margin: 0 },
-    "& p": { fontSize: 40, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "center" },
+    "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
   },
+  inputText: {
+    borderBottom: "#FFCEC2 solid 2px",
+    fontSize: 30,
+    fontWeight: 600,
+    color: "rgba(0, 0, 0, 0.75)",
+    "& input": { textAlign: "right" },
+  },
+  durationOuter: { margin: "30px 0" },
+  weekdaysOuter: { marginBottom: 50 },
   journalHeader: {
     "& h5": {
       fontWeight: 600,
@@ -71,12 +85,12 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: "none",
     marginTop: 54,
     maxHeight: 300,
-    minWidth: 57,
+
     borderRadius: 0,
     "& ul": { padding: 0 },
     "& li": {
       fontSize: 25,
-      maxWidth: 57,
+
       padding: "0 12px",
     },
   },
@@ -115,17 +129,18 @@ const useStyles = makeStyles((theme) => ({
   },
   textAreaControl: {
     width: "100%",
-    marginTop: 35,
-
+    marginTop: 25,
     borderRadius: 10,
-    "& p": { position: "absolute", bottom: 15, right: 0 },
+    // "& p": { position: "absolute", bottom: 15, right: 0 },
   },
   textArea: {
     borderRadius: "10px",
     "& fieldset": { borderWidth: 0, outline: 0 },
     "& textarea": { lineHeight: "24px" },
   },
-  textfieldwrapper: {},
+  textfieldwrapper: {
+    "& h5": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.4)" },
+  },
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -160,122 +175,51 @@ const useStyles = makeStyles((theme) => ({
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   btnNav: { marginBottom: 45 },
+  weekdays: {
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    background: "#FFCEC2",
+    textAlign: "center",
+    lineHeight: "32px",
+  },
+  duration: { padding: "8px 10px", border: "1px solid #C6C6C6", borderRadius: 20, minWidth: 80, fontSize: 14 },
+  durationActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
+  reminderTime: { float: "right", fontSize: 14 },
+  goalHeader: {
+    marginBottom: 30,
+    marginTop: 25,
+    "& svg": { width: 40, height: 40 },
+    "& h4": { fontSize: 18, fontWeight: 600, paddingLeft: 20 },
+  },
+  goalDetails: {
+    "& p": { fontWeight: 500 },
+    "& input": { fontWeight: 500 },
+  },
 }))
-
-const getJournals = () => {
-  let data = [
-    {
-      "This Week": [
-        {
-          date: "Fri Jul 04, 08:34am",
-          text:
-            "Feeling generally good; slept well and had a good breakfast. I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Wed Jul 05, 10:50am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Mon Jul 06, 05:30pm",
-          text:
-            "Feeling generally good; slept well and had a good breakfast. Woke up thinking about.I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-      ],
-    },
-    {
-      "This Month": [
-        {
-          date: "Fri Jul 04, 08:34am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Wed Jul 05, 10:50am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Mon Jul 06, 05:30pm",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-      ],
-    },
-  ]
-  return data
-}
 
 export default function JournalEntries({ ...props }) {
   const classes = useStyles()
-  const [journals, setJournals] = useState([])
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [selectedIndex, setSelectedIndex] = React.useState("Ounces")
+  const [date, changeDate] = useState(new Date())
+  const [startDateOpen, setStartDateOpen] = useState(false)
+  const [endDateOpen, setEndDateOpen] = useState(false)
+  const [duration, setDuration] = useState(0)
+  const [startDate, setStartDate] = useState(new Date())
 
-  const handleClickStatus = (statusVal: string) => {
-    setStatus(statusVal)
-  }
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    return weekdays[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
+    return monthname[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
   }
   const units = ["Ounces", "mg", "g", "hours", "minutes"]
   const frequency = ["hourly", "daily", "weekly", "monthly"]
 
-  const [jounalDate, setJounalDate] = useState(getDateString(new Date()))
-
-  useEffect(() => {
-    setJournals(getJournals())
-  }, [])
-
-  const handleOpen = (text: string, date?: string) => {
-    if (text) setJounalValue(text)
-    date = typeof date == "undefined" ? getDateString(new Date()) : date
-    setJounalDate(date)
-    setOpen(true)
-  }
-
-  const getContent = () => {
-    let content = []
-
-    Object.keys(journals).forEach((index) => {
-      let eachData = []
-      Object.keys(journals[index]).forEach((key) => {
-        eachData.push(
-          <Box fontWeight="fontWeightBold" className={classes.journalday}>
-            {key}
-          </Box>
-        )
-        Object.keys(journals[index][key]).forEach((keyIndex) => {
-          let fullText = journals[index][key][keyIndex].text
-          let text = fullText.substring(0, 80)
-          text = text.substr(0, Math.min(text.length, text.lastIndexOf(" ")))
-          eachData.push(
-            <Grid item>
-              <Box
-                className={classes.journalStyle}
-                onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
-              >
-                <Typography variant="caption" gutterBottom>
-                  {journals[index][key][keyIndex].date}
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {text}...
-                </Typography>
-              </Box>
-            </Grid>
-          )
-        })
-      })
-      content.push(<Box boxShadow={0}>{eachData}</Box>)
-    })
-    return content
-  }
   const handleClose = () => {
     setAnchorEl(null)
   }
@@ -285,6 +229,16 @@ export default function JournalEntries({ ...props }) {
   }
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
+  }
+  const changeStartDate = (e: any) => {
+    debugger
+    var date = new Date(e)
+    setStartDate(date)
+  }
+  const changeEndDate = (e: any) => {
+    let msDiff = new Date(e).getTime() - startDate.getTime()
+    let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
+    setDuration(daysDiff)
   }
   return (
     <div className={classes.root}>
@@ -297,25 +251,27 @@ export default function JournalEntries({ ...props }) {
         </Toolbar>
       </AppBar>
       <Container>
-        <Box className={classes.textfieldwrapper} px={2}>
+        <Grid container direction="row" justify="flex-start" alignItems="center" className={classes.goalHeader}>
+          <Grid item>
+            <Nutrition />
+          </Grid>
+          <Grid item>
+            <Typography variant="h4">Goal name</Typography>
+          </Grid>
+        </Grid>
+        <Box className={classes.textfieldwrapper}>
+          <Typography variant="h5">Goal details</Typography>
           <FormControl
             component="fieldset"
             classes={{
               root: classes.textAreaControl,
             }}
           >
-            <Grid container className={classes.root} spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  id="standard-number"
-                  label="Number"
-                  type="number"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+            <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
+              <Grid item xs={2}>
+                <InputBase className={classes.inputText} defaultValue="10" />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={5} className={classes.goalUnit}>
                 <List component="nav" className={classes.timeHours}>
                   <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClick}>
                     <ListItemText secondary={selectedIndex} />
@@ -342,45 +298,113 @@ export default function JournalEntries({ ...props }) {
               </Grid>
 
               <Grid item xs={12}>
-                <Grid container justify="center" spacing={2}>
+                <Grid
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="center"
+                  className={classes.durationOuter}
+                >
                   {frequency.map((value) => (
                     <Grid key={value} item>
-                      {value}
+                      <ButtonBase focusRipple className={classes.duration + " " + classes.durationActive}>
+                        {value}
+                      </ButtonBase>
                     </Grid>
                   ))}
                 </Grid>
               </Grid>
+
               <Grid item xs={12}>
-                <Grid container justify="center" spacing={2}>
+                <Grid
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="center"
+                  className={classes.weekdaysOuter}
+                >
                   {weekdays.map((value) => (
-                    <Grid key={value} item>
+                    <Grid key={value} item className={classes.weekdays}>
                       {value.substr(0, 1)}
                     </Grid>
                   ))}
                 </Grid>
               </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Start date</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Start date</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Duration</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Duration</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Reminders</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body2">Reminders</Typography>
-              </Grid>
+              <Box width={1} mb={5}>
+                <Grid container direction="row" justify="space-between" alignItems="center">
+                  <Grid item xs={6}>
+                    <Typography variant="body2">Start date</Typography>
+                  </Grid>
+                  <Grid item xs={6} className={classes.goalDetails}>
+                    <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
+                      {startDate != null ? getDateString(startDate) : getDateString(new Date())}
+                    </Typography>
+                    <DatePicker
+                      autoOk
+                      open={startDateOpen}
+                      onOpen={() => setStartDateOpen(true)}
+                      onClose={() => setStartDateOpen(false)}
+                      value={startDate}
+                      onChange={(e) => changeStartDate(e)}
+                      TextFieldComponent={() => null}
+                      disableToolbar={true}
+                      okLabel=""
+                      cancelLabel=""
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+              <Box width={1} mb={5}>
+                <Grid container direction="row" justify="space-between" alignItems="center">
+                  <Grid item xs={6}>
+                    <Typography variant="body2">Duration</Typography>
+                  </Grid>
+                  <Grid item xs={6} className={classes.goalDetails}>
+                    <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
+                      {duration} days
+                    </Typography>
+                    <DatePicker
+                      autoOk
+                      open={endDateOpen}
+                      onOpen={() => setEndDateOpen(true)}
+                      onClose={() => setEndDateOpen(false)}
+                      value={date}
+                      onChange={(e) => changeEndDate(e)} // Function to be implemented to set duration
+                      TextFieldComponent={() => null}
+                      disableToolbar={true}
+                      okLabel=""
+                      cancelLabel=""
+                      minDate={startDate}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+              <Box width={1} mb={5}>
+                <Grid container direction="row" justify="space-between" alignItems="center">
+                  <Grid item xs={6}>
+                    <Typography variant="body2">Reminders</Typography>
+                  </Grid>
+                  <Grid item xs={6} className={classes.goalDetails}>
+                    <InputBase
+                      id="time"
+                      // label="Alarm clock"
+                      type="time"
+                      defaultValue="07:30"
+                      className={classes.reminderTime}
+                      inputProps={{
+                        step: 300, // 5 min
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
             </Grid>
 
             <Box textAlign="center" mt={4}>
-              <Button className={classes.btnpeach}>Submit</Button>
+              <Button className={classes.btnpeach}>Save</Button>
+            </Box>
+            <Box textAlign="center" width={1} mt={3}>
+              <Link className={classes.linkpeach}>Cancel</Link>
             </Box>
           </FormControl>
         </Box>

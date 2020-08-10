@@ -263,6 +263,7 @@ const useStyles = makeStyles((theme) => ({
   listSelected: {
     background: "#E7F8F2 !important",
   },
+  surveyQuestionNav: { textAlign: "center", position: "absolute", width: "100%", bottom: 40 },
 }))
 
 // Splice together all selected activities & their tags.
@@ -794,9 +795,29 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
   const [tab, _setTab] = useState(0)
   const [progressValue, setProgressValue] = useState(10)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [index, setIndex] = useState(0)
+  const [slideElements, setSlideElements] = useState(null)
+  const [elementIn, setElementIn] = useState(false)
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
+    const slideElements = value.settings.map((x, idx) => {
+      setElementIn(true)
+      return (
+        <Questions
+          idx={idx}
+          x={x}
+          value={value}
+          responses={responses}
+          setActiveStep={setActiveStep}
+          onResponse={onResponse}
+          handleBack={handleBack}
+          handleNext={handleNext}
+          onComplete={onComplete}
+        />
+      )
+    })
+    setSlideElements(slideElements)
     window.addEventListener("scroll", handleChange, true)
     onResponse(Array.from({ ...responses.current, length: value.settings.length }))
   }, [])
@@ -804,10 +825,20 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
+    setElementIn(false)
+    setTimeout(() => {
+      setElementIn(true)
+      setIndex((index - 1) % slideElements.length)
+    }, 500)
     _setTab(tab - 1)
     setProgressValue(progressValue - 100 / value.settings.length)
   }
   const handleNext = () => {
+    setElementIn(false)
+    setTimeout(() => {
+      setElementIn(true)
+      setIndex((index + 1) % slideElements.length)
+    }, 500)
     _setTab(tab + 1)
     setProgressValue(progressValue + 100 / value.settings.length)
   }
