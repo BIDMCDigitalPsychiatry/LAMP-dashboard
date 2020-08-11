@@ -89,7 +89,12 @@ export default function PreventData({
           <Typography variant="h5">
             {graphType == 0 ? activity.name : activity}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>Viewing charts for {graphType == 0 ? activity.name : activity}</Typography>
+          <Typography variant="h5">Summary</Typography>
+          <Typography variant="body2">
+            {" "}
+            You have a good distribution of locations, which means you’re getting out of the house and doing things.
+            Studies show a change of scenery helps keep the mid engaged and positive.
+          </Typography>
         </CardContent>
       </Grid>
       <Box

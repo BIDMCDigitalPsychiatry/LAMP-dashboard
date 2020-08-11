@@ -18,6 +18,7 @@ import {
   IconButton,
   Toolbar,
   Grid,
+  Fab,
 } from "@material-ui/core"
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
@@ -248,7 +249,7 @@ export default function Breathe({ ...props }) {
   }
 
   const setValueUpdate = () => {
-    let val = progressValue + 15 //0.8
+    let val = progressValue + 0.8
     setProgressValue(val > 100 ? 100 : val)
   }
 
@@ -294,9 +295,9 @@ export default function Breathe({ ...props }) {
                 </Typography>
               </Box>
               <Box textAlign="center" mt={1}>
-                <Button className={classes.btnpeach} onClick={handleNext}>
+                <Fab className={classes.btnpeach} onClick={handleNext}>
                   Start
-                </Button>
+                </Fab>
               </Box>
             </Box>
           </Box>
@@ -311,6 +312,10 @@ export default function Breathe({ ...props }) {
             style={{ minHeight: "80vh" }}
           >
             <Grid item>
+              {/* <source src="../videos/Lotus.mp4" type="video/mp4"/>
+            <video src="../videos/Lotus.mp4" width="600" height="300" controls={true} autoPlay={true} />
+
+              <video src="../videos/Lotus.mp4" autoPlay={true} /> */}
               <Box className={classes.Face}>
                 <Box className={classes.Circle} />
                 <Box className={classes.Circle} />

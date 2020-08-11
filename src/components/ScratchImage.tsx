@@ -5,7 +5,7 @@ import { ReactComponent as Background03 } from "../icons/scratch/Background-03.s
 import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
-import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link } from "@material-ui/core"
+import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -186,9 +186,9 @@ export default function ScratchImage({ ...props }) {
         <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
           <Box width={1}>
             <Typography variant="h4">Well done!</Typography>
-            <Button className={classes.btnpeach} onClick={props.onComplete}>
+            <Fab className={classes.btnpeach} onClick={props.onComplete}>
               Close
-            </Button>
+            </Fab>
             <Box width={1} mt={3}>
               <Link
                 className={classes.linkpeach}

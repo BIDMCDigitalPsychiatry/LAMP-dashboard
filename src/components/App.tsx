@@ -14,7 +14,7 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
-import Messages from "./Messages"
+import Conversations from "./Conversations"
 
 import Root from "./Root"
 import Researcher from "./Researcher"
@@ -276,7 +276,7 @@ function AppRouter({ ...props }) {
               sameLineTitle={true}
             >
               {/* <Conversations goBack={props.history.goBack} /> */}
-              <Messages
+              <Conversations
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly

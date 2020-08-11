@@ -4,6 +4,7 @@ import GridList from "@material-ui/core/GridList"
 import GridListTile from "@material-ui/core/GridListTile"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import { ReactComponent as Camera } from "../icons/Camera.svg"
+import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
 
 import { Typography, AppBar, Toolbar, IconButton, Icon, Grid } from "@material-ui/core"
 
@@ -60,7 +61,6 @@ const tileData = [
     img: "https://www.success.com/wp-content/uploads/legacy/sites/default/files/new2.jpg",
     title: "Motivation",
     author: "BrainyQuote",
-    cols: 2,
     featured: true,
   },
   {
@@ -95,7 +95,6 @@ const tileData = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRTs7YrFRD-q0rdaMBN--nPgSXSUA0d2mkouEGTZzY4rfbp-_k3&usqp=CAU",
     title: "",
     author: "jill111",
-    cols: 2,
   },
   {
     img: "https://cdn.mos.cms.futurecdn.net/ntFmJUZ8tw3ULD3tkBaAtf.jpg",
@@ -117,7 +116,6 @@ const tileData = [
   {
     img: "https://material-ui.com/static/images/grid-list/star.jpg",
     title: "Sea star",
-    cols: 2,
     author: "821292",
   },
   {
@@ -138,9 +136,10 @@ export default function HopeBox({ ...props }) {
           </IconButton>
           <Typography variant="h5">Hope Box</Typography>
         </Toolbar>
+        <HopeBoxHeader />
       </AppBar>
 
-      <Grid container xs={12} spacing={0} className={classes.journalhd} alignItems="center" justify="center">
+      {/* <Grid container xs={12} spacing={0} className={classes.journalhd} alignItems="center" justify="center">
         <Grid item xs className={classes.addbtnmain}>
           <IconButton>
             <AddCircleOutlineIcon className={classes.addicon} />
@@ -153,11 +152,11 @@ export default function HopeBox({ ...props }) {
           </IconButton>
           <Typography variant="h5">Add an image</Typography>
         </Grid>
-      </Grid>
+      </Grid> */}
 
-      <GridList cellHeight={180} spacing={2} className={classes.gridList} cols={2}>
+      <GridList cellHeight={180} spacing={2} className={classes.gridList} cols={3}>
         {tileData.map((tile) => (
-          <GridListTile key={tile.img} cols={tile.cols || 1} className={classes.singletile}>
+          <GridListTile key={tile.img} cols={1} className={classes.singletile}>
             <img src={tile.img} alt={tile.title} />
           </GridListTile>
         ))}

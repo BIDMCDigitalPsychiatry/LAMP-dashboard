@@ -18,6 +18,7 @@ import {
   DialogContent,
   DialogActions,
   Link,
+  Fab,
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -295,9 +296,9 @@ export default function JournalEntries({ ...props }) {
               </Box>
             </Grid>
             <Box textAlign="center" mt={4}>
-              <Button className={classes.btnpeach} onClick={props.onComplete}>
+              <Fab className={classes.btnpeach} onClick={props.onComplete}>
                 Submit
-              </Button>
+              </Fab>
             </Box>
           </FormControl>
         </Box>

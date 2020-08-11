@@ -27,7 +27,7 @@ import {
   ButtonBase,
   InputBase,
 } from "@material-ui/core"
-import { DatePicker } from "@material-ui/pickers"
+import { DatePicker, TimePicker } from "@material-ui/pickers"
 import CloseIcon from "@material-ui/icons/Close"
 import classnames from "classnames"
 import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
@@ -36,6 +36,12 @@ import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
+  },
+  goalname: {
+    borderBottom: "#FFCEC2 solid 2px",
+    fontSize: 30,
+    fontWeight: 600,
+    color: "rgba(0, 0, 0, 0.75)",
   },
   addicon: { float: "left", color: "#E46759" },
   likebtn: {
@@ -179,13 +185,21 @@ const useStyles = makeStyles((theme) => ({
     width: 32,
     height: 32,
     borderRadius: "50%",
-    background: "#FFCEC2",
     textAlign: "center",
     lineHeight: "32px",
+    fontSize: 14,
   },
+  weekdaysActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
   duration: { padding: "8px 10px", border: "1px solid #C6C6C6", borderRadius: 20, minWidth: 80, fontSize: 14 },
   durationActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
-  reminderTime: { float: "right", fontSize: 14 },
+  reminderTime: {
+    float: "right",
+    fontSize: 14,
+    height: 28,
+    overflow: "hidden",
+    "& input": { textAlign: "right", fontSize: 14 },
+    "& *": { border: 0 },
+  },
   goalHeader: {
     marginBottom: 30,
     marginTop: 25,
@@ -204,12 +218,16 @@ export default function JournalEntries({ ...props }) {
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const [selectedIndex, setSelectedIndex] = React.useState("Ounces")
+  const [goalValue, setGoalValue] = useState()
+  const [goalUnit, setGoalUnit] = React.useState("Ounces")
   const [date, changeDate] = useState(new Date())
   const [startDateOpen, setStartDateOpen] = useState(false)
   const [endDateOpen, setEndDateOpen] = useState(false)
   const [duration, setDuration] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
+  const [reminderTime, setReminderTime] = useState(new Date())
+  const [selectedFrequency, setSelectedFrequency] = useState("daily")
+  const [selectedDays, setSelectedDays] = useState([])
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -224,14 +242,22 @@ export default function JournalEntries({ ...props }) {
     setAnchorEl(null)
   }
   const handleMenuItemClick = (event: React.MouseEvent<HTMLElement>, index: any) => {
-    setSelectedIndex(index)
+    setGoalUnit(index)
     setAnchorEl(null)
   }
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
+  const setSelectedDaysValue = (val: any) => {
+    var days = selectedDays
+    if (days.indexOf(val) !== -1) {
+      days = days.filter((item) => item !== val)
+    } else {
+      days = days.concat(val)
+    }
+    setSelectedDays(days)
+  }
   const changeStartDate = (e: any) => {
-    debugger
     var date = new Date(e)
     setStartDate(date)
   }
@@ -239,6 +265,31 @@ export default function JournalEntries({ ...props }) {
     let msDiff = new Date(e).getTime() - startDate.getTime()
     let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
     setDuration(daysDiff)
+  }
+
+  const changeReminderTime = (e: any) => {
+    var date = new Date(e)
+    setReminderTime(date)
+  }
+
+  const saveNewGoal = () => {
+    var goals = JSON.parse(localStorage.getItem("goals"))
+    let goalDetails = {
+      name: "name",
+      goalUnit: goalUnit,
+      goalValue: goalValue,
+      frequency: selectedFrequency,
+      weekdays: selectedDays,
+      startDate: startDate,
+      duration: duration,
+      reminderTime: reminderTime,
+    }
+    if (goals != null) {
+      goals.push(goalDetails)
+      localStorage.setItem("goals", JSON.stringify(goals))
+    } else {
+      localStorage.setItem("goals", JSON.stringify(goalDetails))
+    }
   }
   return (
     <div className={classes.root}>
@@ -256,7 +307,10 @@ export default function JournalEntries({ ...props }) {
             <Nutrition />
           </Grid>
           <Grid item>
-            <Typography variant="h4">Goal name</Typography>
+            <Box pl={2}>
+              <InputBase placeholder="Goal Name" />
+            </Box>
+            {/* <Typography variant="h4">Goal name</Typography> */}
           </Grid>
         </Grid>
         <Box className={classes.textfieldwrapper}>
@@ -269,12 +323,16 @@ export default function JournalEntries({ ...props }) {
           >
             <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
               <Grid item xs={2}>
-                <InputBase className={classes.inputText} defaultValue="10" />
+                <InputBase
+                  className={classes.inputText}
+                  value={goalValue}
+                  onChange={(e) => setGoalValue(e.target.value)}
+                />
               </Grid>
               <Grid item xs={5} className={classes.goalUnit}>
                 <List component="nav" className={classes.timeHours}>
                   <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClick}>
-                    <ListItemText secondary={selectedIndex} />
+                    <ListItemText secondary={goalUnit} />
                   </ListItem>
                 </List>
                 <Menu
@@ -288,7 +346,7 @@ export default function JournalEntries({ ...props }) {
                   {units.map((option, index) => (
                     <MenuItem
                       key={option}
-                      selected={option === selectedIndex}
+                      selected={option === goalUnit}
                       onClick={(event) => handleMenuItemClick(event, option)}
                     >
                       {option}
@@ -307,7 +365,15 @@ export default function JournalEntries({ ...props }) {
                 >
                   {frequency.map((value) => (
                     <Grid key={value} item>
-                      <ButtonBase focusRipple className={classes.duration + " " + classes.durationActive}>
+                      <ButtonBase
+                        focusRipple
+                        className={
+                          value == selectedFrequency
+                            ? classes.duration + " " + classes.durationActive
+                            : classes.duration
+                        }
+                        onClick={() => setSelectedFrequency(value)}
+                      >
                         {value}
                       </ButtonBase>
                     </Grid>
@@ -324,8 +390,18 @@ export default function JournalEntries({ ...props }) {
                   className={classes.weekdaysOuter}
                 >
                   {weekdays.map((value) => (
-                    <Grid key={value} item className={classes.weekdays}>
-                      {value.substr(0, 1)}
+                    <Grid key={value} item>
+                      <ButtonBase
+                        focusRipple
+                        className={
+                          selectedDays.includes(value) == true
+                            ? classes.weekdays + " " + classes.weekdaysActive
+                            : classes.weekdays
+                        }
+                        onClick={() => setSelectedDaysValue(value)}
+                      >
+                        {value.substr(0, 1)}
+                      </ButtonBase>
                     </Grid>
                   ))}
                 </Grid>
@@ -369,7 +445,7 @@ export default function JournalEntries({ ...props }) {
                       onOpen={() => setEndDateOpen(true)}
                       onClose={() => setEndDateOpen(false)}
                       value={date}
-                      onChange={(e) => changeEndDate(e)} // Function to be implemented to set duration
+                      onChange={(e) => changeEndDate(e)}
                       TextFieldComponent={() => null}
                       disableToolbar={true}
                       okLabel=""
@@ -379,7 +455,7 @@ export default function JournalEntries({ ...props }) {
                   </Grid>
                 </Grid>
               </Box>
-              <Box width={1} mb={5}>
+              {/* <Box width={1} mb={5}>
                 <Grid container direction="row" justify="space-between" alignItems="center">
                   <Grid item xs={6}>
                     <Typography variant="body2">Reminders</Typography>
@@ -397,11 +473,28 @@ export default function JournalEntries({ ...props }) {
                     />
                   </Grid>
                 </Grid>
+              </Box> */}
+              <Box width={1} mb={5}>
+                <Grid container direction="row" justify="space-between" alignItems="center">
+                  <Grid item xs={6}>
+                    <Typography variant="body2">Reminders</Typography>
+                  </Grid>
+                  <Grid item xs={6} className={classes.goalDetails}>
+                    <TimePicker
+                      value={reminderTime}
+                      onChange={(e) => changeReminderTime(e)}
+                      disableToolbar={false}
+                      className={classes.reminderTime}
+                    />
+                  </Grid>
+                </Grid>
               </Box>
             </Grid>
 
             <Box textAlign="center" mt={4}>
-              <Button className={classes.btnpeach}>Save</Button>
+              <Button className={classes.btnpeach} onClick={() => saveNewGoal()}>
+                Save
+              </Button>
             </Box>
             <Box textAlign="center" width={1} mt={3}>
               <Link className={classes.linkpeach}>Cancel</Link>

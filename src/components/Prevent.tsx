@@ -21,7 +21,7 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
-import { ReactComponent as WaterBlue } from "../icons/water_blue.svg"
+import { ReactComponent as WaterBlue } from "../icons/WaterBlue.svg"
 import PreventData from "./PreventData"
 import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
@@ -37,6 +37,7 @@ import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
+import PreventGoalData from "./PreventGoalData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -570,9 +571,10 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
-              // onClick={() =>
-              //   openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
-              // }
+              onClick={() => {
+                setSelectedActivityName("Goal: Water")
+                setOpenData(true)
+              }}
             >
               <Box display="flex">
                 <Box flexGrow={1}>
@@ -790,6 +792,8 @@ export default function Prevent({ participant, ...props }: { participant: Partic
 
         {selectedActivityName === "Journal entries" ? (
           <Journal />
+        ) : selectedActivityName === "Goal: Water" ? (
+          <PreventGoalData />
         ) : (
           <PreventData
             participant={participant}

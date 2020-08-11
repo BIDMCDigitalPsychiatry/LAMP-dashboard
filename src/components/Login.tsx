@@ -180,23 +180,22 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 </Box>
 
                 <TextField
-                margin="normal"
-                
-                name="serverAddress"
-                variant="outlined"
-                style={{ width: "100%", height: 90 }}
-                // label="Domain"
-                placeholder="api.lamp.digital"
-                helperText="Don't enter a domain if you're not sure what this option does."
-                value={state.serverAddress || ""}
-                onChange={handleChange}
-                disabled={srcLocked}
-                InputProps={{
-                  classes: {
-                    root: classes.textfieldStyle,
-                  },
-                }}
-              />
+                  margin="normal"
+                  name="serverAddress"
+                  variant="outlined"
+                  style={{ width: "100%", height: 90 }}
+                  // label="Domain"
+                  placeholder="api.lamp.digital"
+                  helperText="Don't enter a domain if you're not sure what this option does."
+                  value={state.serverAddress || ""}
+                  onChange={handleChange}
+                  disabled={srcLocked}
+                  InputProps={{
+                    classes: {
+                      root: classes.textfieldStyle,
+                    },
+                  }}
+                />
                 {/* <TextField
                 required
                 name="ID"
@@ -256,80 +255,81 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 />
 
                 <Box className={classes.buttonNav} width={1} textAlign="center">
-                   <Fab
-                      variant="extended"
+                  <Fab
+                    variant="extended"
+                    type="submit"
+                    style={{ background: "#7599FF", color: "White" }}
+                    onClick={handleLogin}
+                  >
+                    Login
+                    <input
                       type="submit"
-                      style={{ background: "#7599FF", color: "White" }}
-                      onClick={handleLogin}
-                    >
-                      Login
-                      <input
-                        type="submit"
-                        style={{
-                          cursor: "pointer",
-                          position: "absolute",
-                          top: 0,
-                          bottom: 0,
-                          right: 0,
-                          left: 0,
-                          width: "100%",
-                          opacity: 0,
-                        }}
-                      />
-                    </Fab>
-                 
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        width: "100%",
+                        opacity: 0,
+                      }}
+                    />
+                  </Fab>
                 </Box>
 
-                <Box textAlign="center" width={1} mt={4} >
-                <Link underline="none" className={classes.linkBlue} onClick={(event) => setTryitMenu(event.currentTarget)}>
+                <Box textAlign="center" width={1} mt={4}>
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => setTryitMenu(event.currentTarget)}
+                  >
                     Try it
-                    </Link>
-                    <Menu
-                      keepMounted
-                      open={Boolean(tryitMenu)}
-                      anchorPosition={tryitMenu?.getBoundingClientRect()}
-                      anchorReference="anchorPosition"
-                      onClose={() => setTryitMenu(undefined)}
+                  </Link>
+                  <Menu
+                    keepMounted
+                    open={Boolean(tryitMenu)}
+                    anchorPosition={tryitMenu?.getBoundingClientRect()}
+                    anchorReference="anchorPosition"
+                    onClose={() => setTryitMenu(undefined)}
+                  >
+                    <MenuItem disabled divider>
+                      <b>Try mindLAMP out as a...</b>
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "researcher")
+                      }}
                     >
-                      <MenuItem disabled divider>
-                        <b>Try mindLAMP out as a...</b>
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "researcher")
-                        }}
-                      >
-                        Researcher
-                      </MenuItem>
-                      <MenuItem
-                        divider
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "clinician")
-                        }}
-                      >
-                        Clinician
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "participant")
-                        }}
-                      >
-                        Participant
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(event) => {
-                          setTryitMenu(undefined)
-                          handleLogin(event, "patient")
-                        }}
-                      >
-                        Patient
-                      </MenuItem>
-                    </Menu>
-                 
-                
+                      Researcher
+                    </MenuItem>
+                    <MenuItem
+                      divider
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "clinician")
+                      }}
+                    >
+                      Clinician
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "participant")
+                      }}
+                    >
+                      Participant
+                    </MenuItem>
+                    <MenuItem
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "patient")
+                      }}
+                    >
+                      Patient
+                    </MenuItem>
+                  </Menu>
                 </Box>
               </Box>
             </form>
