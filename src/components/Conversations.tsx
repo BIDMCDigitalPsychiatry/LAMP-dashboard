@@ -13,16 +13,18 @@ import {
   InputAdornment,
   TextField,
   Tooltip,
+  InputBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
+import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 
 const useStyles = makeStyles((theme) => ({
   addicon: { float: "left", color: "#E46759" },
   conversationStyle: {
     borderRadius: "10px",
-    padding: "10px 20px 20px 20px",
+    padding: "12px 20px 17px 20px",
     textAlign: "justify",
     marginTop: 20,
 
@@ -35,8 +37,7 @@ const useStyles = makeStyles((theme) => ({
     "& h6": { fontSize: 16 },
   },
   innerMessage: {
-    padding: "15px 20px 20px 20px",
-
+    padding: "15px 20px 18px 20px",
     marginBottom: 20,
 
     "& span": {
@@ -45,6 +46,15 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: "40px",
     },
     "& p": { lineHeight: "20px", fontSize: 14 },
+  },
+  composeMsg: {
+    padding: "15px 15px 15px 15px",
+    background: "#ECF4FF",
+    borderRadius: "20px 0 20px 20px",
+    float: "right",
+    "& input": { padding: 0, color: "#4C66D6" },
+    "& svg": { color: "#4C66D6" },
+    "& button": { padding: "0px 15px", color: "#4C66D6" },
   },
   toolbardashboard: {
     minHeight: 65,
@@ -106,7 +116,7 @@ export default function Conversations({
   const [sender, setSender] = useState(null)
   const [lastDate, setLastDate] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
-
+  const [addMsg, setAddMsg] = useState(false)
   useInterval(
     () => {
       refreshMessages()
@@ -152,6 +162,7 @@ export default function Conversations({
     })
     LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
+    setAddMsg(false)
     setConversations({ ...(conversations || {}), [participant]: all })
   }
 
@@ -196,7 +207,7 @@ export default function Conversations({
                     <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
                   </Grid>
                 </Grid>
-                <Box width={1} pt={1}>
+                <Box width={1}>
                   <Typography>{x.text}</Typography>
                 </Box>
               </Box>
@@ -254,12 +265,12 @@ export default function Conversations({
                 <Typography>{x.text}</Typography>
               </Box>
             ))}
-          {lastDate && (
+          {/* {lastDate && (
             <Typography variant="caption" style={{ color: "rgba(0, 0, 0, 0.4)" }}>
               {getDateString(lastDate)}
             </Typography>
-          )}
-          <TextField
+          )} */}
+          {/* <TextField
             label="Send a message"
             style={{ margin: 16, paddingRight: 32 }}
             placeholder="Message..."
@@ -292,7 +303,30 @@ export default function Conversations({
               ],
             }}
             InputLabelProps={{ shrink: true }}
-          />
+          /> */}
+
+          <Box display="flex" className={classes.composeMsg}>
+            <Box width="100%">
+              <InputBase
+                placeholder="text"
+                value={currentMessage || ""}
+                onChange={(event) => setCurrentMessage(event.target.value)}
+                style={{ display: addMsg ? "block" : "none" }}
+              />
+            </Box>
+            <Box flexShrink={1}>
+              <IconButton
+                style={{ display: addMsg ? "block" : "none" }}
+                edge="end"
+                aria-label="send"
+                onClick={sendMessage}
+                onMouseDown={(event) => event.preventDefault()}
+              >
+                <Icon>send</Icon>
+              </IconButton>
+            </Box>
+            <AddCircleOutlineIcon style={{ display: !addMsg ? "block" : "none" }} onClick={() => setAddMsg(true)} />
+          </Box>
         </Box>
       </ResponsiveDialog>
     </Container>

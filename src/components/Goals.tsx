@@ -189,8 +189,10 @@ export default function Goals({ ...props }) {
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
+  const [goalType, setGoalType] = useState("")
 
   const handleClickOpen = (type: string) => {
+    setGoalType(type)
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
     setClassType(classT)
@@ -312,7 +314,7 @@ export default function Goals({ ...props }) {
             sm={4}
             md={3}
             lg={3}
-            onClick={() => setLaunchedActivity("Reading")}
+            onClick={() => handleClickOpen("Reading")}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -399,7 +401,12 @@ export default function Goals({ ...props }) {
             setOpen(false)
           }}
         >
-          <NewGoals />
+          <NewGoals
+            goalType={goalType}
+            onComplete={() => {
+              setOpen(false)
+            }}
+          />
         </ResponsiveDialog>
 
         {/* <ResponsiveDialog

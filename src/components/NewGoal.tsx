@@ -30,194 +30,25 @@ import {
 import { DatePicker, TimePicker } from "@material-ui/pickers"
 import CloseIcon from "@material-ui/icons/Close"
 import classnames from "classnames"
+import { ReactComponent as Exercise } from "../icons/Exercise.svg"
+import { ReactComponent as Reading } from "../icons/Reading.svg"
+import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
 import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
+import { ReactComponent as Meditation } from "../icons/Meditation.svg"
+import { ReactComponent as Emotions } from "../icons/Emotions.svg"
+import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
+import { ReactComponent as Savings } from "../icons/Savings.svg"
+import { ReactComponent as Weight } from "../icons/Weight.svg"
+import { ReactComponent as Custom } from "../icons/Custom.svg"
 import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    width: "100%",
-  },
-  goalname: {
-    borderBottom: "#FFCEC2 solid 2px",
-    fontSize: 30,
-    fontWeight: 600,
-    color: "rgba(0, 0, 0, 0.75)",
-  },
-  addicon: { float: "left", color: "#E46759" },
-  likebtn: {
-    fontStyle: "italic",
-    padding: 6,
-    margin: "0 5px",
-    "& label": {
-      position: "absolute",
-      bottom: -18,
-      fontSize: 12,
-    },
-  },
-  dialogtitle: { padding: 0 },
-  active: {
-    background: "#FFAC98",
-  },
-  linkButton: {
-    padding: "15px 25px 15px 25px",
-  },
-  goalUnit: { minWidth: 127, marginLeft: 15 },
-  timeHours: {
-    padding: "3px 10px 5px 0",
-    borderBottom: "#FFCEC2 solid 2px",
-    minWidth: 57,
-    "& div": { padding: 0, margin: 0 },
-    "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
-  },
-  inputText: {
-    borderBottom: "#FFCEC2 solid 2px",
-    fontSize: 30,
-    fontWeight: 600,
-    color: "rgba(0, 0, 0, 0.75)",
-    "& input": { textAlign: "right" },
-  },
-  durationOuter: { margin: "30px 0" },
-  weekdaysOuter: { marginBottom: 50 },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
-  menuPaper: {
-    background: "#F5F5F5",
-    boxShadow: "none",
-    marginTop: 54,
-    maxHeight: 300,
-
-    borderRadius: 0,
-    "& ul": { padding: 0 },
-    "& li": {
-      fontSize: 25,
-
-      padding: "0 12px",
-    },
-  },
-  dialogueContent: {
-    padding: "10px 20px 35px 20px",
-    textAlign: "center",
-    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 15 },
-    "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
-  },
-  dialogueStyle: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closeButton: {
-    color: theme.palette.grey[500],
-  },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
-  journalStyle: {
-    background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
-    borderRadius: "10px",
-    padding: "0px 20px 20px 20px",
-    textAlign: "justify",
-    marginBottom: 20,
-    "& span": {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: "12px",
-      lineHeight: "40px",
-    },
-  },
-  textAreaControl: {
-    width: "100%",
-    marginTop: 25,
-    borderRadius: 10,
-    // "& p": { position: "absolute", bottom: 15, right: 0 },
-  },
-  textArea: {
-    borderRadius: "10px",
-    "& fieldset": { borderWidth: 0, outline: 0 },
-    "& textarea": { lineHeight: "24px" },
-  },
-  textfieldwrapper: {
-    "& h5": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.4)" },
-  },
-  btnpeach: {
-    background: "#FFAC98",
-    padding: "15px 25px 15px 25px",
-    borderRadius: "40px",
-    minWidth: "200px",
-    boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
-    lineHeight: "22px",
-    display: "inline-block",
-    textTransform: "capitalize",
-    fontSize: "16px",
-    color: "rgba(0, 0, 0, 0.75)",
-    fontWeight: "bold",
-    "&:hover": {
-      background: "#FFAC98",
-      boxShadow:
-        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
-    },
-  },
-  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
-  toolbardashboard: {
-    minHeight: 65,
-    "& h5": {
-      color: "rgba(0, 0, 0, 0.75)",
-      textAlign: "center",
-      fontWeight: "600",
-      fontSize: 18,
-      width: "100%",
-    },
-  },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
-  todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
-  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
-  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
-  btnNav: { marginBottom: 45 },
-  weekdays: {
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    textAlign: "center",
-    lineHeight: "32px",
-    fontSize: 14,
-  },
-  weekdaysActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
-  duration: { padding: "8px 10px", border: "1px solid #C6C6C6", borderRadius: 20, minWidth: 80, fontSize: 14 },
-  durationActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
-  reminderTime: {
-    float: "right",
-    fontSize: 14,
-    height: 28,
-    overflow: "hidden",
-    "& input": { textAlign: "right", fontSize: 14 },
-    "& *": { border: 0 },
-  },
-  goalHeader: {
-    marginBottom: 30,
-    marginTop: 25,
-    "& svg": { width: 40, height: 40 },
-    "& h4": { fontSize: 18, fontWeight: 600, paddingLeft: 20 },
-  },
-  goalDetails: {
-    "& p": { fontWeight: 500 },
-    "& input": { fontWeight: 500 },
-  },
-}))
-
-export default function JournalEntries({ ...props }) {
+export default function NewGoal({ ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [goalName, setGoalName] = useState()
   const [goalValue, setGoalValue] = useState()
   const [goalUnit, setGoalUnit] = React.useState("Ounces")
   const [date, changeDate] = useState(new Date())
@@ -235,8 +66,30 @@ export default function JournalEntries({ ...props }) {
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return monthname[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
   }
-  const units = ["Ounces", "mg", "g", "hours", "minutes"]
+  const units = ["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"]
   const frequency = ["hourly", "daily", "weekly", "monthly"]
+
+  useEffect(() => {
+    props.goalType == "Exercise"
+      ? setGoalUnit("minutes")
+      : props.goalType == "Weight"
+      ? setGoalUnit("Kg")
+      : props.goalType == "Nutrition"
+      ? setGoalUnit("Ounces")
+      : props.goalType == "Medication"
+      ? setGoalUnit("minutes")
+      : props.goalType == "Sleep"
+      ? setGoalUnit("hours")
+      : props.goalType == "Reading"
+      ? setGoalUnit("hours")
+      : props.goalType == "Finances"
+      ? setGoalUnit("$")
+      : props.goalType == "Mood"
+      ? setGoalUnit("minutes")
+      : props.goalType == "Meditation"
+      ? setGoalUnit("minutes")
+      : setGoalUnit("Ounces")
+  }, [])
 
   const handleClose = () => {
     setAnchorEl(null)
@@ -273,9 +126,11 @@ export default function JournalEntries({ ...props }) {
   }
 
   const saveNewGoal = () => {
-    var goals = JSON.parse(localStorage.getItem("goals"))
+    var goals = []
+    goals = JSON.parse(localStorage.getItem("goals"))
     let goalDetails = {
-      name: "name",
+      goalName: goalName,
+      goalType: props.goalType,
       goalUnit: goalUnit,
       goalValue: goalValue,
       frequency: selectedFrequency,
@@ -288,9 +143,34 @@ export default function JournalEntries({ ...props }) {
       goals.push(goalDetails)
       localStorage.setItem("goals", JSON.stringify(goals))
     } else {
-      localStorage.setItem("goals", JSON.stringify(goalDetails))
+      var newGoal = []
+      newGoal.push(goalDetails)
+      localStorage.setItem("goals", JSON.stringify(newGoal))
     }
   }
+  var goalIcon =
+    props.goalType == "Exercise" ? (
+      <Exercise />
+    ) : props.goalType == "Weight" ? (
+      <Weight />
+    ) : props.goalType == "Nutrition" ? (
+      <Nutrition />
+    ) : props.goalType == "Medication" ? (
+      <BreatheIcon />
+    ) : props.goalType == "Sleep" ? (
+      <Sleeping />
+    ) : props.goalType == "Reading" ? (
+      <Reading />
+    ) : props.goalType == "Finances" ? (
+      <Savings />
+    ) : props.goalType == "Mood" ? (
+      <Emotions />
+    ) : props.goalType == "Meditation" ? (
+      <Meditation />
+    ) : (
+      <Custom />
+    )
+
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
@@ -303,12 +183,10 @@ export default function JournalEntries({ ...props }) {
       </AppBar>
       <Container>
         <Grid container direction="row" justify="flex-start" alignItems="center" className={classes.goalHeader}>
-          <Grid item>
-            <Nutrition />
-          </Grid>
+          <Grid item>{goalIcon}</Grid>
           <Grid item>
             <Box pl={2}>
-              <InputBase placeholder="Goal Name" />
+              <InputBase placeholder="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} />
             </Box>
             {/* <Typography variant="h4">Goal name</Typography> */}
           </Grid>
@@ -326,6 +204,7 @@ export default function JournalEntries({ ...props }) {
                 <InputBase
                   className={classes.inputText}
                   value={goalValue}
+                  placeholder="0"
                   onChange={(e) => setGoalValue(e.target.value)}
                 />
               </Grid>
@@ -497,7 +376,9 @@ export default function JournalEntries({ ...props }) {
               </Button>
             </Box>
             <Box textAlign="center" width={1} mt={3}>
-              <Link className={classes.linkpeach}>Cancel</Link>
+              <Link className={classes.linkpeach} onClick={props.onComplete}>
+                Cancel
+              </Link>
             </Box>
           </FormControl>
         </Box>
@@ -544,3 +425,182 @@ export default function JournalEntries({ ...props }) {
     </div>
   )
 }
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    width: "100%",
+  },
+  goalname: {
+    borderBottom: "#FFCEC2 solid 2px",
+    fontSize: 30,
+    fontWeight: 600,
+    color: "rgba(0, 0, 0, 0.75)",
+  },
+  addicon: { float: "left", color: "#E46759" },
+  likebtn: {
+    fontStyle: "italic",
+    padding: 6,
+    margin: "0 5px",
+    "& label": {
+      position: "absolute",
+      bottom: -18,
+      fontSize: 12,
+    },
+  },
+  dialogtitle: { padding: 0 },
+  active: {
+    background: "#FFAC98",
+  },
+  linkButton: {
+    padding: "15px 25px 15px 25px",
+  },
+  goalUnit: { minWidth: 127, marginLeft: 15 },
+  timeHours: {
+    padding: "3px 10px 5px 0",
+    borderBottom: "#FFCEC2 solid 2px",
+    minWidth: 57,
+    "& div": { padding: 0, margin: 0 },
+    "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
+  },
+  inputText: {
+    borderBottom: "#FFCEC2 solid 2px",
+    fontSize: 30,
+    fontWeight: 600,
+    color: "rgba(0, 0, 0, 0.75)",
+    "& input": { textAlign: "right" },
+  },
+  durationOuter: { margin: "30px 0" },
+  weekdaysOuter: { marginBottom: 50 },
+  journalHeader: {
+    "& h5": {
+      fontWeight: 600,
+      fontSize: 16,
+      color: "rgba(0, 0, 0, 0.75)",
+      marginLeft: 15,
+    },
+  },
+  menuPaper: {
+    background: "#F5F5F5",
+    boxShadow: "none",
+    marginTop: 54,
+    maxHeight: 336,
+
+    borderRadius: 0,
+    "& ul": { padding: 0 },
+    "& li": {
+      fontSize: 25,
+
+      padding: "0 12px",
+    },
+  },
+  dialogueContent: {
+    padding: "10px 20px 35px 20px",
+    textAlign: "center",
+    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 15 },
+    "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
+  },
+  dialogueStyle: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeButton: {
+    color: theme.palette.grey[500],
+  },
+  addbtnmain: {
+    maxWidth: 24,
+    "& button": { padding: 0 },
+  },
+  journalhd: {
+    margin: "40px 0 15px 0",
+  },
+  journalStyle: {
+    background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
+    borderRadius: "10px",
+    padding: "0px 20px 20px 20px",
+    textAlign: "justify",
+    marginBottom: 20,
+    "& span": {
+      color: "rgba(0, 0, 0, 0.4)",
+      fontSize: "12px",
+      lineHeight: "40px",
+    },
+  },
+  textAreaControl: {
+    width: "100%",
+    marginTop: 25,
+    borderRadius: 10,
+    // "& p": { position: "absolute", bottom: 15, right: 0 },
+  },
+  textArea: {
+    borderRadius: "10px",
+    "& fieldset": { borderWidth: 0, outline: 0 },
+    "& textarea": { lineHeight: "24px" },
+  },
+  textfieldwrapper: {
+    "& h5": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.4)" },
+  },
+  btnpeach: {
+    background: "#FFAC98",
+    padding: "15px 25px 15px 25px",
+    borderRadius: "40px",
+    minWidth: "200px",
+    boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
+    lineHeight: "22px",
+    display: "inline-block",
+    textTransform: "capitalize",
+    fontSize: "16px",
+    color: "rgba(0, 0, 0, 0.75)",
+    fontWeight: "bold",
+    "&:hover": {
+      background: "#FFAC98",
+      boxShadow:
+        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    },
+  },
+  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
+  toolbardashboard: {
+    minHeight: 65,
+    "& h5": {
+      color: "rgba(0, 0, 0, 0.75)",
+      textAlign: "center",
+      fontWeight: "600",
+      fontSize: 18,
+      width: "100%",
+    },
+  },
+  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
+  btnNav: { marginBottom: 45 },
+  weekdays: {
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    textAlign: "center",
+    lineHeight: "32px",
+    fontSize: 14,
+  },
+  weekdaysActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
+  duration: { padding: "8px 10px", border: "1px solid #C6C6C6", borderRadius: 20, minWidth: 80, fontSize: 14 },
+  durationActive: { background: "#FFCEC2", fontWeight: 600, borderColor: "#FFCEC2" },
+  reminderTime: {
+    float: "right",
+    fontSize: 14,
+    height: 28,
+    overflow: "hidden",
+    "& input": { textAlign: "right", fontSize: 14 },
+    "& *": { border: 0 },
+  },
+  goalHeader: {
+    marginBottom: 30,
+    marginTop: 25,
+    "& svg": { width: 40, height: 40 },
+    "& h4": { fontSize: 18, fontWeight: 600, paddingLeft: 20 },
+  },
+  goalDetails: {
+    "& p": { fontWeight: 500 },
+    "& input": { fontWeight: 500 },
+  },
+}))

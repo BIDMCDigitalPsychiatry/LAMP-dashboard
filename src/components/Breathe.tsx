@@ -26,6 +26,7 @@ import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import Link from "@material-ui/core/Link"
 import classnames from "classnames"
+import CircularProgress, { CircularProgressProps } from "@material-ui/core/CircularProgress"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -121,14 +122,14 @@ const useStyles = makeStyles((theme) => ({
     "0%": { opacity: 0 },
     "10%": { opacity: 1, display: "inline" },
     "30%": { opacity: 1 },
-    "50%": { opacity: 0, display: "none" },
+    "80%": { opacity: 0, display: "none" },
     "100%": { opacity: 0 },
   },
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
-    "50%": { opacity: 0 },
-    "60%": { opacity: 1, display: "inline" },
-    "90%": { opacity: 1 },
+    "30%": { opacity: 0 },
+    "50%": { opacity: 1, display: "inline" },
+    "80%": { opacity: 0 },
     "100%": { opacity: 0, display: "none" },
   },
   Background: {
@@ -167,7 +168,7 @@ const useStyles = makeStyles((theme) => ({
   inhale_exhale: { position: "relative", height: 100 },
   InhaleContainer: {
     display: "block",
-    animation: "$InhaleText 8s ease infinite",
+    animation: "$InhaleText 5s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -179,7 +180,7 @@ const useStyles = makeStyles((theme) => ({
   ExhaleContainer: {
     display: "block",
     marginTop: "-2rem",
-    animation: "$ExhaleText 8s ease infinite",
+    animation: "$ExhaleText 5s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -193,44 +194,42 @@ const useStyles = makeStyles((theme) => ({
     "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25 },
     "& p": { fontStyle: "italic", color: "rgba(0, 0, 0, 0.5)", margin: 15 },
   },
+  progress: {
+    color: "#E46759",
+  },
+  completed: {
+    color: "#FFAC98",
+  },
 }))
 
-// function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
-//   return (
-//     <Box position="relative" display="inline-flex">
-//       <CircularProgress variant="static" {...props} />
-//       <Box
-//         top={0}
-//         left={0}
-//         bottom={0}
-//         right={0}
-//         position="absolute"
-//         display="flex"
-//         alignItems="center"
-//         justifyContent="center"
-//       >
-//         <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
-//           props.value,
-//         )}%`}</Typography>
-//       </Box>
-//     </Box>
-//   );
-// }
-
-// function CircularStatic() {
-//   const [progress, setProgress] = React.useState(10);
-
-//   React.useEffect(() => {
-//     const timer = setInterval(() => {
-//       setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
-//     }, 800);
-//     return () => {
-//       clearInterval(timer);
-//     };
-//   }, []);
-
-//   return <CircularProgressWithLabel value={progress} />;
-// }
+function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
+  const classes = useStyles()
+  return (
+    <Box position="relative" display="inline-flex">
+      <CircularProgress
+        variant="determinate"
+        classes={{ colorPrimary: classes.progress, colorSecondary: classes.completed }}
+        {...props}
+        thickness={3}
+        value={props.value}
+      />
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
+          props.value + 20
+        )}`}</Typography>
+      </Box>
+    </Box>
+  )
+}
 
 export default function Breathe({ ...props }) {
   const classes = useStyles()
@@ -239,6 +238,8 @@ export default function Breathe({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tab, _setTab] = useState(0)
   const [status, setStatus] = useState("Yes")
+  const [stateChange, setStateChange] = useState(true)
+  const [progress, setProgress] = React.useState(100)
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -250,24 +251,48 @@ export default function Breathe({ ...props }) {
 
   const setValueUpdate = () => {
     let val = progressValue + 0.8
+
     setProgressValue(val > 100 ? 100 : val)
   }
+  const setProgressUpdate = () => {
+    let val = progress - 0.8
 
+    setProgress(val < 0 ? 0 : val)
+  }
   useEffect(() => {
     if (started) {
-      setValueUpdate()
+      setProgressUpdate()
     }
   }, [started])
 
+  // useEffect(() => {
+  //   let timer
+  //   if (started) {
+
+  //     if (progressValue < 100) {
+  //       timer = setInterval(() => {
+  //         //setStateChange(!stateChange)
+  //         setProgress(progress - 1)
+  //       }, 800)
+  //       setTimeout(setValueUpdate, 1000)
+  //     } else {
+  //       clearInterval(timer)
+  //       handleNext()
+  //     }
+  //   }
+  // }, [progressValue])
+
   useEffect(() => {
+    let timer
     if (started) {
-      if (progressValue < 100) {
-        setTimeout(setValueUpdate, 1000)
+      if (progress > -20) {
+        setTimeout(setProgressUpdate, 800)
       } else {
+        clearInterval(timer)
         handleNext()
       }
     }
-  }, [progressValue])
+  }, [progress])
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
@@ -312,18 +337,7 @@ export default function Breathe({ ...props }) {
             style={{ minHeight: "80vh" }}
           >
             <Grid item>
-              {/* <source src="../videos/Lotus.mp4" type="video/mp4"/>
-            <video src="../videos/Lotus.mp4" width="600" height="300" controls={true} autoPlay={true} />
-
-              <video src="../videos/Lotus.mp4" autoPlay={true} /> */}
-              <Box className={classes.Face}>
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-              </Box>
+              <video src="videos/Lotus.mp4" width="600" height="300" autoPlay={true} loop></video>
               <Box mt={5} className={classes.inhale_exhale}>
                 <Typography variant="overline" className={classes.InhaleContainer}>
                   Inhale
@@ -333,6 +347,7 @@ export default function Breathe({ ...props }) {
                 </Typography>
               </Box>
             </Grid>
+            <CircularProgressWithLabel value={progress} />
           </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>

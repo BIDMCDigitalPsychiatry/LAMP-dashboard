@@ -431,7 +431,11 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const openDetails = (activity: any, data: any, graphType?: number) => {
     setGraphType(graphType)
     setSelectedActivity(activity)
-    if (!graphType) setSelectedActivityName(activity.name)
+    if (!graphType) {
+      setSelectedActivityName(activity.name)
+    } else {
+      setSelectedActivityName("")
+    }
     setActivityData(data)
     setOpenData(true)
   }
