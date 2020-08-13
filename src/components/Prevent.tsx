@@ -231,6 +231,7 @@ function getSocialContextGroups(gps_events?: SensorEventObj[]) {
 
 function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
+  console.log(gps_events)
   return [
     [
       {
@@ -418,6 +419,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
   const [hiddenEvents, setHiddenEvents] = React.useState([])
+  const [eventsData, setEventsData] = React.useState(null)
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -436,6 +438,19 @@ export default function Prevent({ participant, ...props }: { participant: Partic
     } else {
       setSelectedActivityName("")
     }
+    setActivityData(data)
+    setOpenData(true)
+  }
+
+  const openRadialDetails = (activity: any, events: any, data: any, graphType?: number) => {
+    setGraphType(graphType)
+    setSelectedActivity(activity)
+    if (!graphType) {
+      setSelectedActivityName(activity.name)
+    } else {
+      setSelectedActivityName("")
+    }
+    setEventsData(events)
     setActivityData(data)
     setOpenData(true)
   }
@@ -619,7 +634,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               <Card
                 className={classes.prevent}
                 onClick={() =>
-                  openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+                  openRadialDetails(
+                    "Social Context",
+                    sensorEvents["lamp.gps.contextual"],
+                    getSocialContextGroups(sensorEvents["lamp.gps.contextual"]),
+                    1
+                  )
                 }
               >
                 <Typography className={classes.preventlabel}>
@@ -643,8 +663,9 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               <Card
                 className={classes.prevent}
                 onClick={() =>
-                  openDetails(
+                  openRadialDetails(
                     "Environmental Context",
+                    sensorEvents["lamp.gps.contextual"],
                     getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
                     1
                   )

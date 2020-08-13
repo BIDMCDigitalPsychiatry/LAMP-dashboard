@@ -74,11 +74,23 @@ const useStyles = makeStyles((theme) => ({
   },
   journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
   journalHistory: {
-    marginTop: 30,
+    marginTop: 10,
   },
   linkBlue: {
     color: "#6083E7",
+    fontSize: 16,
+    fontWeight: 600,
+    marginTop: 20,
+    display: "block",
   },
+  preventIcon: {
+    "& svg": { width: 80, height: 80 },
+  },
+  streakDetails: {
+    "& h6": { fontSize: 16, fontWeight: 600, whiteSpace: "nowrap", color: "rgba(0, 0, 0, 0.75)" },
+    "& h5": { fontSize: 16, fontWeight: 600, color: "#618EF7", lineHeight: 1.6 },
+  },
+  preventCalendar: {},
 }))
 
 export default function JournalEntries({ ...props }) {
@@ -89,7 +101,20 @@ export default function JournalEntries({ ...props }) {
   return (
     <div className={classes.root}>
       <Container className={classes.journalHistory}>
-        <Grid container spacing={3}>
+        <Box display="flex">
+          <Box flexShrink={1} className={classes.preventIcon}>
+            <WaterBlue />
+          </Box>
+          <Box width="100%" pl={3} pt={1}>
+            <Typography variant="h6">80 ounces</Typography>
+            <Typography variant="body2">Daily (M, T, W, T, F, S)</Typography>
+            <Link underline="none" className={classes.linkBlue}>
+              Edit goal
+            </Link>
+          </Box>
+        </Box>
+
+        {/* <Grid container spacing={3}>
           <Grid item xs={3}>
             <WaterBlue />
           </Grid>
@@ -100,14 +125,21 @@ export default function JournalEntries({ ...props }) {
               Edit goal
             </Link>
           </Grid>
-        </Grid>
+        </Grid> */}
 
-        <Box>
-          <Typography variant="h6">Current streak</Typography>
-          <Typography variant="h6" color="primary">
-            : 14 days
-          </Typography>
-          <Typography>Goal History</Typography>
+        <Box display="flex" py={5} className={classes.streakDetails}>
+          <Box flexShrink={1}>
+            {" "}
+            <Typography variant="h6">Current streak:</Typography>
+          </Box>
+          <Box width="100%" pl={1}>
+            <Typography variant="h5" color="primary">
+              14 days
+            </Typography>
+          </Box>
+        </Box>
+        <Box className={classes.streakDetails}>
+          <Typography variant="h6">Goal History</Typography>
         </Box>
         <DatePicker
           autoOk
@@ -115,6 +147,7 @@ export default function JournalEntries({ ...props }) {
           variant="static"
           openTo="date"
           value={date}
+          className={classes.preventCalendar}
           onChange={changeDate}
           disableToolbar={true}
           renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {

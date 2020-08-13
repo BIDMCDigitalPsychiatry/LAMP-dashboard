@@ -51,6 +51,11 @@ export default function NewMedication({ ...props }) {
   const [reminderTime, setReminderTime] = useState(new Date())
   const [selectedFrequency, setSelectedFrequency] = useState("daily")
   const [selectedDays, setSelectedDays] = useState([])
+  const [dosageList, setDosageList] = useState([])
+  const [openAddDosage, setOpenAddDosage] = useState(false)
+  const [dosageName, setDosageName] = useState(null)
+  const [dosageValue, setDosageValue] = useState(null)
+  const [dosageTime, setDosageTime] = useState(new Date())
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -69,6 +74,17 @@ export default function NewMedication({ ...props }) {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
+  function getTimeValue(date: Date) {
+    var hours = date.getHours()
+    var minute = date.getMinutes()
+    var ampm = hours >= 12 ? "pm" : "am"
+    hours = hours % 12
+    hours = hours ? hours : 12 // the hour '0' should be '12'
+    var minutes = minute < 10 ? "0" + minute : minute
+    var strTime = hours + ":" + minutes + " " + ampm
+    return strTime
+  }
+
   const setSelectedDaysValue = (val: any) => {
     var days = selectedDays
     if (days.indexOf(val) !== -1) {
@@ -93,17 +109,23 @@ export default function NewMedication({ ...props }) {
     setReminderTime(date)
   }
 
+  const changeDosageTime = (e: any) => {
+    var date = new Date(e)
+    setDosageTime(date)
+  }
+
   const saveNewMedication = () => {
+    debugger
     var medications = []
     medications = JSON.parse(localStorage.getItem("medications"))
     let medicationDetails = {
       medicationName: medicationName,
-      medicationType: props.medicationType,
       frequency: selectedFrequency,
       weekdays: selectedDays,
       startDate: startDate,
       duration: duration,
       reminderTime: reminderTime,
+      dosageList: dosageList,
     }
     if (medications != null) {
       medications.push(medicationDetails)
@@ -115,14 +137,31 @@ export default function NewMedication({ ...props }) {
     }
   }
 
-  const top100Films = [
-    { title: "The Shawshank Redemption", year: 1994 },
-    { title: "The Godfather", year: 1972 },
-    { title: "The Godfather: Part II", year: 1974 },
-    { title: "The Dark Knight", year: 2008 },
-    { title: "12 Angry Men", year: 1957 },
+  const medicationList = [
+    { title: "Aridol (Mannitol Inhalation Powder)" },
+    { title: "Arikayace (Amakacin Liposome Inha.." },
+    { title: "Arimidex (Anastrozole)" },
+    { title: "Aripiprazole (Abilify)" },
+    { title: "Aripiprazole" },
   ]
 
+  const addDosage = () => {
+    var dosage = { Name: dosageName, Value: dosageValue, Time: getTimeValue(dosageTime) }
+    var list = dosageList
+    list = list.concat(dosage)
+    setDosageList(list)
+    setOpenAddDosage(false)
+  }
+
+  const openAddDosageDialog = () => {
+    setDosageName("")
+    setDosageValue("")
+    setDosageTime(new Date())
+    setOpenAddDosage(true)
+  }
+  const closeAddDosageDialog = () => {
+    setOpenAddDosage(false)
+  }
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
@@ -141,14 +180,17 @@ export default function NewMedication({ ...props }) {
               id="free-solo-demo"
               classes={{ popper: classes.autofillpopper, paper: classes.autofillpaper }}
               freeSolo
-              options={top100Films.map((option) => option.title)}
+              value={medicationName}
+              onChange={(event: any, newValue: any) => {
+                setMedicationName(newValue)
+              }}
+              options={medicationList.map((option) => option.title)}
               renderInput={(params) => (
                 <TextField {...params} className={classes.autofill} placeholder="Medication name" variant="outlined" />
               )}
             />
           </Box>
         </Box>
-
         <Box className={classes.textfieldwrapper}>
           <FormControl
             component="fieldset"
@@ -206,41 +248,29 @@ export default function NewMedication({ ...props }) {
               </Grid>
             </Grid>
 
-            <Box width={1} mb={2}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="body2">Dosage 1</Typography>
+            {dosageList.map((dosage) => (
+              <Box width={1} mb={2}>
+                <Grid container direction="row" justify="space-between" alignItems="center">
+                  <Grid item xs={4}>
+                    <Typography variant="body2">{dosage.Name}</Typography>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography variant="body2" align="right">
+                      {dosage.Value}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={4} className={classes.medicationDetails}>
+                    <Typography variant="body2" align="right">
+                      {dosage.Time}
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={4}>
-                  <Typography variant="body2" align="right">
-                    400mg
-                  </Typography>
-                </Grid>
-                <Grid item xs={4} className={classes.medicationDetails}>
-                  <Typography align="right">8:00am</Typography>
-                </Grid>
-              </Grid>
-            </Box>
-
-            <Box width={1} mb={2}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
-                <Grid item xs={4}>
-                  <Typography variant="body2">Dosage 2</Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography variant="body2" align="right">
-                    200mg
-                  </Typography>
-                </Grid>
-                <Grid item xs={4} className={classes.medicationDetails}>
-                  <Typography align="right">8:00am</Typography>
-                </Grid>
-              </Grid>
-            </Box>
+              </Box>
+            ))}
 
             <Box display="flex" justifyContent="center" mb={5}>
               <Box>
-                <Button className={classes.iconButton}>
+                <Button className={classes.iconButton} onClick={() => openAddDosageDialog()}>
                   <AddCircleOutlineIcon /> Add dosage
                 </Button>
               </Box>
@@ -342,7 +372,6 @@ export default function NewMedication({ ...props }) {
             </Box>
           </FormControl>
         </Box>
-
         <Dialog
           open={open}
           onClose={() => setOpen(false)}
@@ -381,6 +410,59 @@ export default function NewMedication({ ...props }) {
             </Box>
           </Grid>
         </Dialog>
+        <Dialog fullWidth={true} open={openAddDosage} onClose={closeAddDosageDialog}>
+          <Box display="flex" justifyContent="flex-end">
+            <Box>
+              <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenAddDosage(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
+
+          <DialogContent className={classes.dialogueContent}>
+            <Typography variant="h4">Add Dosage</Typography>
+            <Box mt={3} mb={4}>
+              <InputBase
+                className={classes.inputText}
+                value={dosageName}
+                placeholder="Name"
+                onChange={(e) => setDosageName(e.target.value)}
+                fullWidth={true}
+                autoFocus
+              />
+            </Box>
+
+            <Box mb={4}>
+              <InputBase
+                className={classes.inputText}
+                value={dosageValue}
+                placeholder="Dose"
+                onChange={(e) => setDosageValue(e.target.value)}
+                fullWidth={true}
+              />
+            </Box>
+
+            <Box>
+              <TimePicker
+                value={dosageTime}
+                onChange={(e) => changeDosageTime(e)}
+                disableToolbar={false}
+                className={classes.reminderTimepopup}
+              />
+            </Box>
+            <Box textAlign="center" mt={5}>
+              <Button className={classes.btnpeach} onClick={() => addDosage()}>
+                Save
+              </Button>
+            </Box>
+            <Box textAlign="center" width={1} mt={3}>
+              <Link className={classes.linkpeach} onClick={closeAddDosageDialog}>
+                Cancel
+              </Link>
+            </Box>
+          </DialogContent>
+        </Dialog>
+        ``
       </Container>
     </div>
   )
@@ -422,11 +504,11 @@ const useStyles = makeStyles((theme) => ({
     "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
   },
   inputText: {
-    borderBottom: "#FFCEC2 solid 2px",
-    fontSize: 30,
+    borderBottom: "#FFCEC2 solid 1px",
+    fontSize: 16,
     fontWeight: 600,
     color: "rgba(0, 0, 0, 0.75)",
-    "& input": { textAlign: "right" },
+    "& input": { textAlign: "center" },
   },
   durationOuter: { margin: "30px 0" },
   weekdaysOuter: { marginBottom: 30 },
@@ -552,6 +634,11 @@ const useStyles = makeStyles((theme) => ({
     overflow: "hidden",
     "& input": { textAlign: "right", fontSize: 14 },
     "& *": { border: 0 },
+  },
+  reminderTimepopup: {
+    height: 25,
+    overflow: "hidden",
+    "& input": { textAlign: "center", fontSize: 16, fontWeight: 600 },
   },
   medicationHeader: {
     marginTop: 25,

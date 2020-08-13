@@ -27,6 +27,8 @@ import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import Link from "@material-ui/core/Link"
 import classnames from "classnames"
 import CircularProgress, { CircularProgressProps } from "@material-ui/core/CircularProgress"
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
+import "react-circular-progressbar/dist/styles.css"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -90,47 +92,51 @@ const useStyles = makeStyles((theme) => ({
       textDecoration: "none",
     },
   },
-  "@keyframes Pulse": {
-    "0%": { transform: "scale(.15) rotate(180deg)" },
-    "100%": { transform: "scale(1)" },
-  },
-  "@keyframes Circle1": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-35px, -50px)" },
-  },
-  "@keyframes Circle2": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(35px, 50px)" },
-  },
-  "@keyframes Circle3": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-60px, 0)" },
-  },
-  "@keyframes Circle4": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(60px, 0)" },
-  },
-  "@keyframes Circle5": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-35px, 50px)" },
-  },
-  "@keyframes Circle6": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(35px, -50px)" },
-  },
-  "@keyframes InhaleText": {
-    "0%": { opacity: 0 },
-    "10%": { opacity: 1, display: "inline" },
-    "30%": { opacity: 1 },
-    "80%": { opacity: 0, display: "none" },
-    "100%": { opacity: 0 },
-  },
+  // "@keyframes Pulse": {
+  //   "0%": { transform: "scale(.15) rotate(180deg)" },
+  //   "100%": { transform: "scale(1)" },
+  // },
+  // "@keyframes Circle1": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-35px, -50px)" },
+  // },
+  // "@keyframes Circle2": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(35px, 50px)" },
+  // },
+  // "@keyframes Circle3": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-60px, 0)" },
+  // },
+  // "@keyframes Circle4": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(60px, 0)" },
+  // },
+  // "@keyframes Circle5": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-35px, 50px)" },
+  // },
+  // "@keyframes Circle6": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(35px, -50px)" },
+  // },
+
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
-    "30%": { opacity: 0 },
-    "50%": { opacity: 1, display: "inline" },
-    "80%": { opacity: 0 },
+    "15%": { opacity: 1 },
+    "40%": { opacity: 1 },
+    "50%": { opacity: 0, display: "inline" },
+    "75%": { opacity: 0 },
     "100%": { opacity: 0, display: "none" },
+  },
+
+  "@keyframes InhaleText": {
+    "0%": { opacity: 0 },
+    "25%": { opacity: 0, display: "none" },
+    "50%": { opacity: 0 },
+    "65%": { opacity: 1, display: "inline" },
+    "80%": { opacity: 1 },
+    "100%": { opacity: 0 },
   },
   Background: {
     background: "#000",
@@ -141,34 +147,34 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     height: "100vh",
   },
-  Face: {
-    height: "125px",
-    width: "125px",
-    animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
-    margin: "50px auto",
-  },
-  Circle: {
-    height: "125px",
-    width: "125px",
-    borderRadius: "50%",
-    position: "absolute",
-    mixBlendMode: "screen",
-    transform: "translate(0, 0)",
-    animation: "center 6s infinite",
+  // Face: {
+  //   height: "125px",
+  //   width: "125px",
+  //   animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
+  //   margin: "50px auto",
+  // },
+  // Circle: {
+  //   height: "125px",
+  //   width: "125px",
+  //   borderRadius: "50%",
+  //   position: "absolute",
+  //   mixBlendMode: "screen",
+  //   transform: "translate(0, 0)",
+  //   animation: "center 6s infinite",
 
-    "&:nth-child(odd)": { background: "#FFAC98" },
-    "&:nth-child(even)": { background: "#E56F61" },
-    "&:nth-child(1)": { animation: "$Circle1 4s ease alternate infinite" },
-    "&:nth-child(2)": { animation: "$Circle2 4s ease alternate infinite" },
-    "&:nth-child(3)": { animation: "$Circle3 4s ease alternate infinite" },
-    "&:nth-child(4)": { animation: "$Circle4 4s ease alternate infinite" },
-    "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
-    "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
-  },
-  inhale_exhale: { position: "relative", height: 100 },
+  //   "&:nth-child(odd)": { background: "#FFAC98" },
+  //   "&:nth-child(even)": { background: "#E56F61" },
+  //   "&:nth-child(1)": { animation: "$Circle1 4s ease alternate infinite" },
+  //   "&:nth-child(2)": { animation: "$Circle2 4s ease alternate infinite" },
+  //   "&:nth-child(3)": { animation: "$Circle3 4s ease alternate infinite" },
+  //   "&:nth-child(4)": { animation: "$Circle4 4s ease alternate infinite" },
+  //   "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
+  //   "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
+  // },
+  inhale_exhale: { position: "relative", height: 50 },
   InhaleContainer: {
     display: "block",
-    animation: "$InhaleText 5s ease infinite",
+    animation: "$InhaleText 6.135s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -180,7 +186,7 @@ const useStyles = makeStyles((theme) => ({
   ExhaleContainer: {
     display: "block",
     marginTop: "-2rem",
-    animation: "$ExhaleText 5s ease infinite",
+    animation: "$ExhaleText 6.135s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -199,6 +205,16 @@ const useStyles = makeStyles((theme) => ({
   },
   completed: {
     color: "#FFAC98",
+  },
+  videoNav: {
+    "& video": {
+      [theme.breakpoints.down("xs")]: {
+        width: "100%",
+      },
+      [theme.breakpoints.up("sm")]: {
+        maxWidth: 400,
+      },
+    },
   },
 }))
 
@@ -238,9 +254,8 @@ export default function Breathe({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tab, _setTab] = useState(0)
   const [status, setStatus] = useState("Yes")
-  const [stateChange, setStateChange] = useState(true)
   const [progress, setProgress] = React.useState(100)
-
+  const [progressLabel, setProgressLabel] = React.useState(120)
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -248,16 +263,9 @@ export default function Breathe({ ...props }) {
     setStarted(!started)
     _setTab(tab + 1)
   }
-
-  const setValueUpdate = () => {
-    let val = progressValue + 0.8
-
-    setProgressValue(val > 100 ? 100 : val)
-  }
   const setProgressUpdate = () => {
-    let val = progress - 0.8
-
-    setProgress(val < 0 ? 0 : val)
+    let val = progressLabel - 1
+    setProgressLabel(val)
   }
   useEffect(() => {
     if (started) {
@@ -265,31 +273,25 @@ export default function Breathe({ ...props }) {
     }
   }, [started])
 
-  // useEffect(() => {
-  //   let timer
-  //   if (started) {
-
-  //     if (progressValue < 100) {
-  //       timer = setInterval(() => {
-  //         //setStateChange(!stateChange)
-  //         setProgress(progress - 1)
-  //       }, 800)
-  //       setTimeout(setValueUpdate, 1000)
-  //     } else {
-  //       clearInterval(timer)
-  //       handleNext()
-  //     }
-  //   }
-  // }, [progressValue])
+  useEffect(() => {
+    let timer
+    if (started) {
+      if (progressLabel > 0) {
+        setTimeout(setProgressUpdate, 1000)
+        let val = progress - 0.83
+        setProgress(val < 0 ? 0 : val)
+      } else {
+        handleNext()
+      }
+    }
+  }, [progressLabel])
 
   useEffect(() => {
     let timer
     if (started) {
-      if (progress > -20) {
-        setTimeout(setProgressUpdate, 800)
-      } else {
-        clearInterval(timer)
-        handleNext()
+      if (progressLabel > 0) {
+        let val = progressValue + 0.8
+        setProgressValue(val > 100 ? 100 : val)
       }
     }
   }, [progress])
@@ -297,6 +299,7 @@ export default function Breathe({ ...props }) {
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
+  const percentage = 66
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
@@ -336,18 +339,31 @@ export default function Breathe({ ...props }) {
             justify="center"
             style={{ minHeight: "80vh" }}
           >
-            <Grid item>
-              <video src="videos/Lotus.mp4" width="600" height="300" autoPlay={true} loop></video>
-              <Box mt={5} className={classes.inhale_exhale}>
-                <Typography variant="overline" className={classes.InhaleContainer}>
-                  Inhale
-                </Typography>
+            <Grid item className={classes.videoNav}>
+              <video src="videos/Lotus.mp4" autoPlay={true} loop></video>
+              <Box className={classes.inhale_exhale}>
                 <Typography variant="overline" className={classes.ExhaleContainer}>
                   Exhale
                 </Typography>
+                <Typography variant="overline" className={classes.InhaleContainer}>
+                  Inhale
+                </Typography>
               </Box>
             </Grid>
-            <CircularProgressWithLabel value={progress} />
+            <Box style={{ width: "100px", height: "100px" }}>
+              <CircularProgressbar
+                value={progress}
+                text={`${progressLabel}`}
+                strokeWidth={8}
+                styles={buildStyles({
+                  strokeLinecap: "butt",
+                  pathColor: "#E46759",
+                  textColor: "#BC453D",
+                  trailColor: "#FFAC98",
+                  textSize: "32px",
+                })}
+              />
+            </Box>
           </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>

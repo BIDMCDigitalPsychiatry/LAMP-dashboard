@@ -1,7 +1,7 @@
 import React from "react"
 import { scaleOrdinal } from "@vx/scale"
 import { LegendOrdinal } from "@vx/legend"
-import { RadialChart, ArcSeries, ArcLabel } from "@data-ui/radial-chart"
+import { RadialChart, ArcLabel, ArcSeries } from "@data-ui/radial-chart"
 import { Box, useMediaQuery, useTheme, Typography } from "@material-ui/core"
 
 const colorScale = scaleOrdinal({ range: ["#CFE3FF", "#7DB2FF", "#5784EE", "#3C5DDD"] })
@@ -46,8 +46,8 @@ export default function RadialDonutChart(props) {
             cornerRadius={5}
             stroke="#fff"
             strokeWidth={1}
-            label={(arc) =>
-              `${arc.data.label} ${arc.data.value.toFixed(1)}%`
+            label={
+              (arc) => (props.detailPage ? `${arc.data.label} - ${arc.data.value.toFixed(1)}%` : "")
               // <div>
               //   <div>
               //     <strong>{arc.data.label}</strong>
@@ -55,14 +55,14 @@ export default function RadialDonutChart(props) {
               //   <div>{arc.data.value.toFixed(1)}%</div>
               // </div>
             }
-            labelComponent={<ArcLabel fontSize={10} color="#000" />}
+            labelComponent={<ArcLabel />}
             innerRadius={(radius) => 0.35 * radius}
             outerRadius={(radius) => 0.6 * radius}
             labelRadius={(radius) => 0.75 * radius}
           />
         </RadialChart>
       </Box>
-      {props.detailPage && (
+      {/* {props.detailPage && (
         <Box style={{ paddingLeft: supportsSidebar ? "10%" : "28%" }}>
           <LegendOrdinal
             direction="column"
@@ -72,7 +72,7 @@ export default function RadialDonutChart(props) {
             labelFormat={(label) => label}
           />
         </Box>
-      )}
+      )} */}
     </Box>
   )
 }

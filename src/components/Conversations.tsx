@@ -117,6 +117,7 @@ export default function Conversations({
   const [lastDate, setLastDate] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
+
   useInterval(
     () => {
       refreshMessages()
@@ -265,46 +266,6 @@ export default function Conversations({
                 <Typography>{x.text}</Typography>
               </Box>
             ))}
-          {/* {lastDate && (
-            <Typography variant="caption" style={{ color: "rgba(0, 0, 0, 0.4)" }}>
-              {getDateString(lastDate)}
-            </Typography>
-          )} */}
-          {/* <TextField
-            label="Send a message"
-            style={{ margin: 16, paddingRight: 32 }}
-            placeholder="Message..."
-            value={currentMessage || ""}
-            onChange={(event) => setCurrentMessage(event.target.value)}
-            // helperText={`Your ${!!participantOnly ? "clinician" : "patient"} will ${
-            //   (messageTab || 0) === 0
-            //     ? "be able to see your messages when they log in."
-            //     : "not be able to see this message."
-            // }`}
-            margin="normal"
-            variant="outlined"
-            multiline
-            fullWidth
-            rowsMax="15"
-            InputProps={{
-              endAdornment: [
-                <InputAdornment key={"end"} position="end">
-                  <Tooltip title="Send Message">
-                    <IconButton
-                      edge="end"
-                      aria-label="send"
-                      onClick={sendMessage}
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>send</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>,
-              ],
-            }}
-            InputLabelProps={{ shrink: true }}
-          /> */}
-
           <Box display="flex" className={classes.composeMsg}>
             <Box width="100%">
               <InputBase
