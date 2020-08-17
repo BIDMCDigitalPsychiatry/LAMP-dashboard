@@ -50,15 +50,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbardashboard: {
       minHeight: 65,
+      padding: "0 10px",
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "center",
         fontWeight: "600",
         fontSize: 18,
-        width: "100%",
+        width: "calc(100% - 96px)",
       },
     },
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: {
+      // paddingLeft: 0, paddingRight: 0
+    },
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
@@ -160,6 +163,7 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
+    dialogueCurve: { borderRadius: 10 },
   })
 )
 
@@ -276,7 +280,10 @@ export default function Survey({
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>

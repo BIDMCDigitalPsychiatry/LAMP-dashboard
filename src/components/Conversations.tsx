@@ -66,7 +66,10 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
   conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
   inlineHeader: {
     background: "#FFFFFF",

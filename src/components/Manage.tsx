@@ -34,7 +34,7 @@ import Link from "@material-ui/core/Link"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"
-import HopeBox from "./HopeBox"
+import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
 
 const demoActivities = {
@@ -113,7 +113,8 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     topicon: {
-      minWidth: 120,
+      minWidth: 150,
+      minHeight: 150,
       [theme.breakpoints.up("lg")]: {
         width: 150,
         height: 150,
@@ -147,6 +148,7 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
+    dialogueCurve: { borderRadius: 10 },
   })
 )
 
@@ -353,7 +355,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
               />
             ),
             HopeBox: (
-              <HopeBox
+              <HopeBoxSelect
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
@@ -372,7 +374,10 @@ export default function Manage({ participant, ...props }: { participant: Partici
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
@@ -387,6 +392,9 @@ export default function Manage({ participant, ...props }: { participant: Partici
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
+            <Typography variant="body2" align="left">
+              Games
+            </Typography>
             <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
           </div>
         </DialogTitle>

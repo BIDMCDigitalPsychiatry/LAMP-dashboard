@@ -65,15 +65,18 @@ const useStyles = makeStyles((theme) => ({
   active: { background: "#FE8470" },
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 10px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: {
+    //paddingLeft: 0, paddingRight: 0
+  },
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -87,6 +90,7 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
     "&:hover": {
+      background: "#FFAC98",
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
       textDecoration: "none",

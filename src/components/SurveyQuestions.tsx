@@ -141,15 +141,18 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 10px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: {
+    // paddingLeft: 0, paddingRight: 0
+  },
   slider: { width: "80%", color: "#2F9D7E" },
   sliderRail: {
     background: "#BCEFDD",
@@ -839,7 +842,7 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
             className={classes.backbtn}
             aria-label="Menu"
             style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
+              marginLeft: supportsSidebar ? 0 : undefined,
             }}
             onClick={closeDialog}
           >
@@ -849,10 +852,7 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
           <Typography
             variant="h5"
             style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-              color: "rgba(0, 0, 0, 0.75)",
-              textAlign: "center",
-              width: "100%",
+              marginLeft: supportsSidebar ? 0 : undefined,
             }}
           >
             {type.replace(/_/g, " ")}

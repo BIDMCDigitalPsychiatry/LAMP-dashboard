@@ -59,6 +59,7 @@ export default function NewGoal({ ...props }) {
   const [reminderTime, setReminderTime] = useState(new Date())
   const [selectedFrequency, setSelectedFrequency] = useState("daily")
   const [selectedDays, setSelectedDays] = useState([])
+  const [units, setUnits] = useState([])
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -66,29 +67,34 @@ export default function NewGoal({ ...props }) {
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return monthname[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
   }
-  const units = ["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"]
+  //var units = ["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"]
   const frequency = ["hourly", "daily", "weekly", "monthly"]
 
   useEffect(() => {
-    props.goalType == "Exercise"
-      ? setGoalUnit("minutes")
-      : props.goalType == "Weight"
-      ? setGoalUnit("Kg")
-      : props.goalType == "Nutrition"
-      ? setGoalUnit("Ounces")
-      : props.goalType == "Medication"
-      ? setGoalUnit("minutes")
-      : props.goalType == "Sleep"
-      ? setGoalUnit("hours")
-      : props.goalType == "Reading"
-      ? setGoalUnit("hours")
-      : props.goalType == "Finances"
-      ? setGoalUnit("$")
-      : props.goalType == "Mood"
-      ? setGoalUnit("minutes")
-      : props.goalType == "Meditation"
-      ? setGoalUnit("minutes")
-      : setGoalUnit("Ounces")
+    if (
+      props.goalType == "Exercise" ||
+      props.goalType == "Medication" ||
+      props.goalType == "Meditation" ||
+      props.goalType == "Mood"
+    ) {
+      setUnits(["hours", "minutes"])
+      setGoalUnit("minutes")
+    } else if (props.goalType == "Weight") {
+      setUnits(["mg", "g", "Kg"])
+      setGoalUnit("Kg")
+    } else if (props.goalType == "Nutrition") {
+      setUnits(["mg", "g", "Ounces"])
+      setGoalUnit("Ounces")
+    } else if (props.goalType == "Sleep" || props.goalType == "Reading") {
+      setUnits(["hours", "minutes"])
+      setGoalUnit("hours")
+    } else if (props.goalType == "Finances") {
+      setUnits(["$"])
+      setGoalUnit("$")
+    } else {
+      setUnits(["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"])
+      setGoalUnit("Ounces")
+    }
   }, [])
 
   const handleClose = () => {
@@ -125,6 +131,17 @@ export default function NewGoal({ ...props }) {
     setReminderTime(date)
   }
 
+  function getTimeValue(date: Date) {
+    var hours = date.getHours()
+    var minute = date.getMinutes()
+    var ampm = hours >= 12 ? "PM" : "AM"
+    hours = hours % 12
+    hours = hours ? hours : 12 // the hour '0' should be '12'
+    var minutes = minute < 10 ? "0" + minute : minute
+    var strTime = hours + ":" + minutes + " " + ampm
+    return strTime
+  }
+
   const saveNewGoal = () => {
     var goals = []
     goals = JSON.parse(localStorage.getItem("goals"))
@@ -137,7 +154,7 @@ export default function NewGoal({ ...props }) {
       weekdays: selectedDays,
       startDate: startDate,
       duration: duration,
-      reminderTime: reminderTime,
+      reminderTime: getTimeValue(reminderTime),
     }
     if (goals != null) {
       goals.push(goalDetails)
@@ -147,6 +164,7 @@ export default function NewGoal({ ...props }) {
       newGoal.push(goalDetails)
       localStorage.setItem("goals", JSON.stringify(newGoal))
     }
+    props.onComplete()
   }
   var goalIcon =
     props.goalType == "Exercise" ? (
@@ -561,15 +579,18 @@ const useStyles = makeStyles((theme) => ({
   journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 10px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: {
+    // paddingLeft: 0, paddingRight: 0
+  },
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },

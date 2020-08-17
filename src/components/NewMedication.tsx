@@ -77,7 +77,7 @@ export default function NewMedication({ ...props }) {
   function getTimeValue(date: Date) {
     var hours = date.getHours()
     var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "pm" : "am"
+    var ampm = hours >= 12 ? "PM" : "AM"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
     var minutes = minute < 10 ? "0" + minute : minute
@@ -115,7 +115,6 @@ export default function NewMedication({ ...props }) {
   }
 
   const saveNewMedication = () => {
-    debugger
     var medications = []
     medications = JSON.parse(localStorage.getItem("medications"))
     let medicationDetails = {
@@ -124,7 +123,7 @@ export default function NewMedication({ ...props }) {
       weekdays: selectedDays,
       startDate: startDate,
       duration: duration,
-      reminderTime: reminderTime,
+      reminderTime: getTimeValue(reminderTime),
       dosageList: dosageList,
     }
     if (medications != null) {
@@ -462,7 +461,6 @@ export default function NewMedication({ ...props }) {
             </Box>
           </DialogContent>
         </Dialog>
-        ``
       </Container>
     </div>
   )

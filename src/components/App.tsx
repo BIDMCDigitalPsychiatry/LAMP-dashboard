@@ -161,7 +161,7 @@ function AppRouter({ ...props }) {
       )
     }
     if (!!state.identity && state.authType === "participant") {
-      // console.log(messages(state.identity))
+      console.log(messages(state.identity))
       // setState((state) => ({
       //   ...state,
       //   messageCount:messages(state.identity)
