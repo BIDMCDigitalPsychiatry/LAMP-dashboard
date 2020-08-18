@@ -19,21 +19,25 @@ import {
   withStyles,
   Theme,
   AppBar,
-  Icon,
-  IconButton,
-  Toolbar,
+  Divider,
   Grid,
+  Fab,
+  Drawer,
+  Toolbar,
   Slider,
   Menu,
   MenuItem,
   ListItemText,
   ListItem,
   List,
+  Tooltip,
+  Icon
 } from "@material-ui/core"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
 import { useSnackbar } from "notistack"
+import Conversations from "./Conversations"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -954,6 +958,8 @@ console.log(type)
   }, [group])
 
   return (
+    <Grid container direction="row">
+        <Grid item style={{ width: "100%" }}>
         <SurveyQuestions
             validate
             partialValidationOnly
@@ -969,6 +975,27 @@ console.log(type)
             setVisibleActivities={setVisibleActivities}
             onResponse={onComplete}
             type={type}
-          />          
+          />   
+          </Grid>
+          {supportsSidebar && !_patientMode() && (
+            <Grid item>
+              <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
+                <Box flexGrow={1} />
+                <Divider />
+                <Conversations refresh={!!survey} expandHeight privateOnly participant={id} />
+              </Drawer>
+              <Tooltip title="Patient Notes" placement="left">
+                <Fab
+                  color="primary"
+                  aria-label="Patient Notes"
+                  style={{ position: "fixed", bottom: 85, right: 24 }}
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <Icon>note_add</Icon>
+                </Fab>
+              </Tooltip>
+            </Grid>
+          )}  
+          </Grid>     
   )
 }
