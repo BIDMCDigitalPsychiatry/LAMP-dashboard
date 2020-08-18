@@ -814,6 +814,9 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
           handleBack={handleBack}
           handleNext={handleNext}
           onComplete={onComplete}
+          toolBarBack={toolBarBack}
+          prefillData={prefillData}
+          prefillTimestamp={prefillTimestamp}
         />
       )
     })

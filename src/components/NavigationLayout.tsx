@@ -32,6 +32,9 @@ import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
 import { Link as RouterLink } from "react-router-dom"
+import ResponsiveDialog from "./ResponsiveDialog"
+import Conversations from "./Conversations"
+import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,6 +55,12 @@ const useStyles = makeStyles((theme: Theme) =>
           marginTop: 30,
         },
       },
+    },
+    inlineHeader: {
+      background: "#FFFFFF",
+      boxShadow: "none",
+
+      "& h5": { fontSize: 25, paddingLeft: 16, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
     toolbardashboard: { minHeight: 75 },
     toolbarinner: { minHeight: 95 },
@@ -108,6 +117,8 @@ export default function NavigationLayout({
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
+  const [openMessages, setOpenMessages] = useState(false)
+
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
@@ -169,7 +180,7 @@ export default function NavigationLayout({
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
               <Box>
                 <Tooltip title="Notifications">
-                  <Badge badgeContent={undefined} color="primary">
+                  <Badge badgeContent={undefined} color="primary" onClick={() => setOpenMessages(true)}>
                     <Message />
                   </Badge>
                 </Tooltip>
@@ -281,6 +292,31 @@ export default function NavigationLayout({
           <CredentialManager id={id} />
         </DialogContent>
       </Dialog>
+
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={openMessages}
+        onClose={() => {
+          setOpenMessages(false)
+        }}
+      >
+        <AppBar position="static" className={classes.inlineHeader}>
+          <Toolbar className={classes.toolbardashboard}>
+            <IconButton
+              onClick={() => setOpenMessages(false)}
+              color="default"
+              className={classes.backbtn}
+              aria-label="Menu"
+            >
+              <Icon>arrow_back</Icon>
+            </IconButton>
+          </Toolbar>
+          <Typography variant="h5">Conversations</Typography>
+        </AppBar>
+        <Conversations style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
+      </ResponsiveDialog>
     </Box>
   )
 }
