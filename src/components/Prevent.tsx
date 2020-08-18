@@ -391,32 +391,26 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-async function addHiddenEvent(
-  participant: ParticipantObj,
-  timestamp: number,
-  activityName: string
-): Promise<string[] | undefined> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  let _events = !!_hidden.error ? [] : _hidden.data
-  if (_events.includes(`${timestamp}/${activityName}`)) return _events
-  let new_events = [..._events, `${timestamp}/${activityName}`]
-  let _setEvents = (await LAMP.Type.setAttachment(
-    participant.id,
-    "me",
-    "lamp.dashboard.hidden_events",
-    new_events
-  )) as any
-  if (!!_setEvents.error) return undefined
-  return new_events
-}
-export default function Prevent({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Prevent({ participant, 
+  activeTab, 
+  hiddenEvents,
+  enableEditMode,
+  onEditAction,
+  onCopyAction,
+  onDeleteAction,...props }:
+   { participant: ParticipantObj
+    activeTab: Function 
+    hiddenEvents: string[]
+    enableEditMode: boolean
+    onEditAction: (activity: ActivityObj, data: any) => void
+    onCopyAction: (activity: ActivityObj, data: any) => void
+    onDeleteAction: (activity: ActivityObj, data: any) => void }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
-  const [hiddenEvents, setHiddenEvents] = React.useState([])
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -435,18 +429,6 @@ export default function Prevent({ participant, ...props }: { participant: Partic
     setOpenData(true)
   }
 
-  const hideEvent = async (timestamp?: number, activity?: string) => {
-    if (timestamp === undefined && activity === undefined) {
-      setHiddenEvents(hiddenEvents) // trigger a reload for dependent components only
-      return
-    }
-    let result = await addHiddenEvent(participant, timestamp, activity)
-    if (!!result) {
-      setHiddenEvents(result)
-    } else {
-      //   enqueueSnackbar("Failed to hide this event.", { variant: "error" })
-    }
-  }
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
@@ -786,7 +768,7 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Toolbar>
           <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
-        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
+        {supportsSidebar && <BottomMenu activeTab={activeTab} tabValue={3} />}
 
         {selectedActivityName === "Journal entries" ? (
           <Journal />
@@ -798,34 +780,9 @@ export default function Prevent({ participant, ...props }: { participant: Partic
             graphType={graphType}
             earliestDate={earliestDate}
             enableEditMode={!_patientMode()}
-            onEditAction={(activity, data) =>
-              setActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                  prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
-                },
-              ])
-            }
-            onCopyAction={(activity, data) =>
-              setActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                },
-              ])
-            }
-            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
+            onEditAction={onEditAction}
+            onCopyAction={onCopyAction}
+            onDeleteAction={onDeleteAction}
           />
         )}
       </ResponsiveDialog>

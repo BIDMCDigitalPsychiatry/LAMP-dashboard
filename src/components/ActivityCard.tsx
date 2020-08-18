@@ -39,19 +39,7 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
-  console.log(
-    events,
-    events.map((d) => ({
-      x: new Date(d.timestamp),
-      y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
-        d.temporal_slices,
-        activity,
-        undefined
-      ),
-      slice: d.temporal_slices,
-      missing: d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
-    }))
-  )
+ 
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>

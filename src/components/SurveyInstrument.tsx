@@ -33,6 +33,7 @@ import {
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
+import { useSnackbar } from "notistack"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -297,14 +298,15 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-
+console.log("xval", selectedValue)
   const classes = useStyles()
+
   return (
     <FormControl component="fieldset" className={classes.radioGroup}>
       <RadioGroup
         {...props}
         name="option"
-        value={selectedValue}
+        value={`${selectedValue}`}
         onChange={(event) => {
           setSelectedValue(event.target.value)
           onChange(event.target.value)
@@ -322,7 +324,7 @@ function RadioOption({ onChange, options, value, ...props }) {
                 color="default"
                 size="medium"
                 onClick={() => {
-                  if (selectedValue === `${x.value}`) {
+                  if (selectedValue == `${x.value}`) {
                     setSelectedValue("")
                     onChange(undefined)
                   }
@@ -672,7 +674,7 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-
+console.log("value" ,value)
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
@@ -714,6 +716,9 @@ function Questions({
   handleBack,
   handleNext,
   onComplete,
+  prefillData,
+  prefillTimestamp,
+  toolBarBack,
   ...props
 }) {
   const classes = useStyles()
@@ -759,7 +764,7 @@ function Questions({
               onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
               className={classes.btngreen}
             >
-              {idx === value.settings.length - 1 ? "Submit" : "Next"}
+              {idx === value.settings.length - 1 ? (!!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit") : "Next"}
             </Button>
           )}
 
@@ -769,7 +774,7 @@ function Questions({
               onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
               className={classes.btngreen}
             >
-              Submit
+               { toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
             </Button>
           )}
         </div>
@@ -777,7 +782,7 @@ function Questions({
     </Box>
   )
 }
-function Section({ onResponse, value, type, prefillData, onComplete, closeDialog, ...props }) {
+function Section({ onResponse, value, type, prefillData, prefillTimestamp, onComplete, closeDialog,toolBarBack, ...props }) {
   const base = value.settings.map((x) => ({ item: x.text, value: null }))
   const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
@@ -816,7 +821,7 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton
+          {/* <IconButton
             color="default"
             className={classes.backbtn}
             aria-label="Menu"
@@ -826,7 +831,7 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
             onClick={closeDialog}
           >
             <Icon>arrow_back</Icon>
-          </IconButton>
+          </IconButton> */}
 
           <Typography
             variant="h5"
@@ -855,6 +860,9 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
                 handleBack={handleBack}
                 handleNext={handleNext}
                 onComplete={onComplete}
+                prefillData={prefillData}
+                prefillTimestamp={prefillTimestamp}
+                toolBarBack={toolBarBack}
               />
             </Box>
           ))
@@ -871,6 +879,9 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
                   handleBack={handleBack}
                   handleNext={handleNext}
                   onComplete={onComplete}
+                  prefillData={prefillData}
+                  prefillTimestamp={prefillTimestamp}
+                  toolBarBack={toolBarBack}
                 />
               </Box>
             </Slide>
@@ -879,58 +890,85 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
   )
 }
 
-export default function SurveyQuestions({
-  participant,
+function SurveyQuestions({
+  onResponse,
+  onValidationFailure,
+  validate,
+  partialValidationOnly,
+  content,
+  prefillData,
+  prefillTimestamp,
+  toolBarBack,
+  type,
   ...props
-}: {
-  participant: ParticipantObj
-  activities: any
-  type: string
-  onComplete: Function
-  closeDialog: Function
 }) {
-  const [survey, setSurvey] = useState<any>()
-  const [prefillData, setPrefillData] = useState(null)
-  const [prefillTimestamp, setPrefillTimestamp] = useState(null)
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
-
-  useEffect(() => {
-    if (props.activities.length === 0) return setSurvey(undefined)
-    getSplicedSurveys(props.activities).then((spliced) =>
-      setSurvey({
-        ...spliced,
-        prefillData: !_patientMode() ? props.activities[0].prefillData : undefined,
-        prefillTimestamp: !_patientMode() ? props.activities[0].prefillTimestamp : undefined,
-      })
-    )
-
-    let prefillData = !_patientMode() ? props.activities[0].prefillData : undefined
-    setPrefillData({ prefillData })
-    let prefillTimestamp = !_patientMode() ? props.activities[0].prefillTimestamp : undefined
-    setPrefillTimestamp({ prefillTimestamp })
-  }, [])
-
   const classes = useStyles()
+
 
   return (
     <div className={classes.root}>
-      {((survey || {}).sections || []).map((x, idx) => (
+      {((content || {}).sections || []).map((x, idx) => (
         <Section
           onResponse={(response) => (responses.current[idx] = response)}
           value={x}
-          prefillData={responses.current[idx]}
-          type={props.type}
+          prefillData={toolBarBack ? prefillData[idx] : {}}
+          prefillTimestamp={prefillTimestamp}
+          type={type}
           onComplete={() =>
-            props.onComplete(
+            onResponse(
               Array.from({
                 ...responses.current,
-                length: survey.sections.length,
+                length: content.sections.length,
               })
             )
           }
+          toolBarBack={toolBarBack}
           closeDialog={props.closeDialog}
         />
       ))}
     </div>
+  )
+}
+export default function SurveyInstrument({ id, group, onComplete, type,setVisibleActivities,fromPrevent, ...props }) {
+  const [survey, setSurvey] = useState<any>()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
+  // const [responses, setResponses] = useState({})
+console.log(type)
+  useEffect(() => {       
+    if (group.length === 0) return setSurvey(undefined)
+    getSplicedSurveys(group).then((spliced) => {
+      setSurvey({
+        ...spliced,
+        prefillData: !_patientMode() ? group[0].prefillData : undefined,
+        prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
+      }) 
+      // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
+      // setResponses(resp)
+    })
+   
+    console.log(group[0].prefillData)
+  }, [group])
+
+  return (
+        <SurveyQuestions
+            validate
+            partialValidationOnly
+            content={survey}
+            toolBarBack={fromPrevent}
+            prefillData={!!survey ? survey.prefillData : undefined}
+            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+            onValidationFailure={() =>
+              enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
+                variant: "error",
+              })
+            }
+            setVisibleActivities={setVisibleActivities}
+            onResponse={onComplete}
+            type={type}
+          />          
   )
 }
