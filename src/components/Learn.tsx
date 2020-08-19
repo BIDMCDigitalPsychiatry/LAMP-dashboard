@@ -115,6 +115,10 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       width: "100%",
       "& svg": {
+        [theme.breakpoints.down("md")]: {
+          width: 100,
+          height: 100,
+        },
         [theme.breakpoints.up("lg")]: {
           width: 150,
           height: 150,

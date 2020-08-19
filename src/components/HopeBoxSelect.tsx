@@ -40,15 +40,18 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "100%",
       padding: "0 10px",
     },
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: { 
+      // paddingLeft: 0, paddingRight: 0 
+    },
     toolbardashboard: {
       minHeight: 65,
+      padding: "0 10px",
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "center",
         fontWeight: "600",
         fontSize: 18,
-        width: "100%",
+        width: "calc(100% - 96px)",
       },
     },
 
@@ -241,13 +244,11 @@ export default function HopeBoxSelect({ ...props }) {
               Add to Hope Box
             </Button>
           </Box>
-          {imgSaved == true ? (
+          {imgSaved == true && (
             <Box className={classes.savedMsg}>
               <Saved onClick={closePreviewDialog} />
               <h4>Saved!</h4>
             </Box>
-          ) : (
-            ""
           )}
         </DialogContent>
       </Dialog>

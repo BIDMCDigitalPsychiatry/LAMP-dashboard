@@ -10,12 +10,13 @@ import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button,
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 15px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
   btnpeach: {
@@ -36,7 +37,9 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: { 
+    // paddingLeft: 0, paddingRight: 0
+   },
   background: {
     background: "#e0e0e0",
     minHeight: "calc(100vh - 65px)",

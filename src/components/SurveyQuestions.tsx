@@ -148,6 +148,9 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "600",
       fontSize: 18,
       width: "calc(100% - 96px)",
+      [theme.breakpoints.up("sm")]: {
+        textAlign: "left",
+      },
     },
   },
   backbtn: {
@@ -264,6 +267,14 @@ const useStyles = makeStyles((theme) => ({
     background: "#E7F8F2 !important",
   },
   surveyQuestionNav: { textAlign: "center", position: "absolute", width: "100%", bottom: 40 },
+  surveyQuestionAlign: {
+    textAlign: "center",
+    [theme.breakpoints.down("xs")]: {
+      textAlign: "left",
+      padding: "0 40px",
+    },
+  },
+  radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
 }))
 
 // Splice together all selected activities & their tags.
@@ -356,6 +367,7 @@ function RadioOption({ onChange, options, value, ...props }) {
               </Typography>
             }
             labelPlacement="end"
+            className={classes.radioLabel}
           />
         ))}
       </RadioGroup>
@@ -701,7 +713,7 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
   }
 
   return (
-    <Grid item xs={12} lg={6}>
+    <Grid>
       <Box className={classes.questionhead}>
         <Typography variant="h5">{text}</Typography>
         <Typography variant="caption" display="block" gutterBottom></Typography>
@@ -733,38 +745,40 @@ function Questions({
         </Typography>
       </Box>
 
-      <Container>
-        <Question
-          number={idx + 1}
-          text={x.text}
-          type={x.type}
-          options={x.options?.map((y) => ({ ...y, label: y.value }))}
-          value={responses.current[idx]}
-          onResponse={(response) => {
-            responses.current[idx] = response
+      <Grid container direction="row" justify="center" alignItems="flex-start">
+        <Grid item lg={4} sm={10} xs={12} className={classes.surveyQuestionAlign}>
+          <Question
+            number={idx + 1}
+            text={x.text}
+            type={x.type}
+            options={x.options?.map((y) => ({ ...y, label: y.value }))}
+            value={responses.current[idx]}
+            onResponse={(response) => {
+              responses.current[idx] = response
 
-            if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
+              if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
-            onResponse(
-              Array.from({
-                ...responses.current,
-                length: value.settings.length,
-              })
-            )
-          }}
-        />
-        <div className={classes.sliderActionsContainer}>
-          {supportsSidebar && idx === value.settings.length - 1 && (
-            <Button
-              variant="contained"
-              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-              className={classes.btngreen}
-            >
-              Submit
-            </Button>
-          )}
-        </div>
-      </Container>
+              onResponse(
+                Array.from({
+                  ...responses.current,
+                  length: value.settings.length,
+                })
+              )
+            }}
+          />
+          <div className={classes.sliderActionsContainer}>
+            {supportsSidebar && idx === value.settings.length - 1 && (
+              <Button
+                variant="contained"
+                onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
+                className={classes.btngreen}
+              >
+                Submit
+              </Button>
+            )}
+          </div>
+        </Grid>
+      </Grid>
     </Box>
   )
 }
