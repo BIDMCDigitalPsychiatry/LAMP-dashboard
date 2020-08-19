@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },        
+    },
     linkButton: {
       padding: "15px 25px 15px 25px",
     },
@@ -285,7 +285,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box textAlign="center">
+          <Box textAlign="center" pb={4}>
             <Typography variant="h5" gutterBottom>
               Nice work!
             </Typography>
@@ -295,9 +295,9 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <Box textAlign="center">
               <Ribbon width="170" height="226" />
             </Box>
-            <Button className={classes.gotit} onClick={handleClose}>
+            {/* <Button className={classes.gotit} onClick={handleClose}>
               Got it
-            </Button>
+            </Button> */}
           </Box>
         </DialogContent>
       </Dialog>
