@@ -21,7 +21,7 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
-import { ReactComponent as WaterBlue } from "../icons/water_blue.svg"
+import { ReactComponent as WaterBlue } from "../icons/WaterBlue.svg"
 import PreventData from "./PreventData"
 import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
@@ -37,6 +37,7 @@ import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
+import PreventGoalData from "./PreventGoalData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -56,15 +57,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbardashboard: {
       minHeight: 65,
+      padding: "0 10px",
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "center",
         fontWeight: "600",
         fontSize: 18,
-        width: "100%",
+        width: "calc(100% - 96px)",
       },
     },
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: { 
+      // paddingLeft: 0, paddingRight: 0
+     },
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
@@ -230,6 +234,7 @@ function getSocialContextGroups(gps_events?: SensorEventObj[]) {
 
 function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
+  console.log(gps_events)
   return [
     [
       {
@@ -391,32 +396,27 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-async function addHiddenEvent(
-  participant: ParticipantObj,
-  timestamp: number,
-  activityName: string
-): Promise<string[] | undefined> {
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.hidden_events")) as any
-  let _events = !!_hidden.error ? [] : _hidden.data
-  if (_events.includes(`${timestamp}/${activityName}`)) return _events
-  let new_events = [..._events, `${timestamp}/${activityName}`]
-  let _setEvents = (await LAMP.Type.setAttachment(
-    participant.id,
-    "me",
-    "lamp.dashboard.hidden_events",
-    new_events
-  )) as any
-  if (!!_setEvents.error) return undefined
-  return new_events
-}
-export default function Prevent({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Prevent({ participant, 
+  activeTab, 
+  hiddenEvents,
+  enableEditMode,
+  onEditAction,
+  onCopyAction,
+  onDeleteAction,...props }:
+   { participant: ParticipantObj
+    activeTab: Function 
+    hiddenEvents: string[]
+    enableEditMode: boolean
+    onEditAction: (activity: ActivityObj, data: any) => void
+    onCopyAction: (activity: ActivityObj, data: any) => void
+    onDeleteAction: (activity: ActivityObj, data: any) => void }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
-  const [hiddenEvents, setHiddenEvents] = React.useState([])
+  const [eventsData, setEventsData] = React.useState(null)
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -430,23 +430,28 @@ export default function Prevent({ participant, ...props }: { participant: Partic
   const openDetails = (activity: any, data: any, graphType?: number) => {
     setGraphType(graphType)
     setSelectedActivity(activity)
-    if (!graphType) setSelectedActivityName(activity.name)
+    if (!graphType) {
+      setSelectedActivityName(activity.name)
+    } else {
+      setSelectedActivityName("")
+    }
     setActivityData(data)
     setOpenData(true)
   }
 
-  const hideEvent = async (timestamp?: number, activity?: string) => {
-    if (timestamp === undefined && activity === undefined) {
-      setHiddenEvents(hiddenEvents) // trigger a reload for dependent components only
-      return
-    }
-    let result = await addHiddenEvent(participant, timestamp, activity)
-    if (!!result) {
-      setHiddenEvents(result)
+  const openRadialDetails = (activity: any, events: any, data: any, graphType?: number) => {
+    setGraphType(graphType)
+    setSelectedActivity(activity)
+    if (!graphType) {
+      setSelectedActivityName(activity.name)
     } else {
-      //   enqueueSnackbar("Failed to hide this event.", { variant: "error" })
+      setSelectedActivityName("")
     }
+    setEventsData(events)
+    setActivityData(data)
+    setOpenData(true)
   }
+
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
@@ -570,9 +575,10 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
-              // onClick={() =>
-              //   openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
-              // }
+              onClick={() => {
+                setSelectedActivityName("Goal: Water")
+                setOpenData(true)
+              }}
             >
               <Box display="flex">
                 <Box flexGrow={1}>
@@ -613,7 +619,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               <Card
                 className={classes.prevent}
                 onClick={() =>
-                  openDetails("Social Context", getSocialContextGroups(sensorEvents["lamp.gps.contextual"]), 1)
+                  openRadialDetails(
+                    "Social Context",
+                    sensorEvents["lamp.gps.contextual"],
+                    getSocialContextGroups(sensorEvents["lamp.gps.contextual"]),
+                    1
+                  )
                 }
               >
                 <Typography className={classes.preventlabel}>
@@ -637,8 +648,9 @@ export default function Prevent({ participant, ...props }: { participant: Partic
               <Card
                 className={classes.prevent}
                 onClick={() =>
-                  openDetails(
+                  openRadialDetails(
                     "Environmental Context",
+                    sensorEvents["lamp.gps.contextual"],
                     getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
                     1
                   )
@@ -786,10 +798,12 @@ export default function Prevent({ participant, ...props }: { participant: Partic
           </Toolbar>
           <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
-        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={3} />}
+        {supportsSidebar && <BottomMenu activeTab={activeTab} tabValue={3} />}
 
         {selectedActivityName === "Journal entries" ? (
           <Journal />
+        ) : selectedActivityName === "Goal: Water" ? (
+          <PreventGoalData />
         ) : (
           <PreventData
             participant={participant}
@@ -798,34 +812,9 @@ export default function Prevent({ participant, ...props }: { participant: Partic
             graphType={graphType}
             earliestDate={earliestDate}
             enableEditMode={!_patientMode()}
-            onEditAction={(activity, data) =>
-              setActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                  prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
-                },
-              ])
-            }
-            onCopyAction={(activity, data) =>
-              setActivities([
-                {
-                  ...activity,
-                  prefillData: [
-                    data.slice.map(({ item, value }) => ({
-                      item,
-                      value,
-                    })),
-                  ],
-                },
-              ])
-            }
-            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
+            onEditAction={onEditAction}
+            onCopyAction={onCopyAction}
+            onDeleteAction={onDeleteAction}
           />
         )}
       </ResponsiveDialog>

@@ -10,6 +10,8 @@ import {
   Grid,
   Box,
   Icon,
+  Fab,
+  Container
 } from "@material-ui/core"
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -19,14 +21,21 @@ import classnames from "classnames"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     topicon: {
-      minWidth: 200,
-      minHeight: 200,
-      marginLeft: "50px",
+      minWidth: 180,
+      minHeight: 180,
+      [theme.breakpoints.down("xs")]: {
+        minWidth: 180,
+      minHeight: 180,
+      },
     },
 
     header: {
       background: "#FFF9E5",
       padding: 20,
+      [theme.breakpoints.up("sm")]: {
+        textAlign: "center",
+      },
+     
 
       "& h2": {
         fontSize: 25,
@@ -35,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     tipscontentarea: {
-      padding: 20,
+      padding: "40px 20px 20px",
       "& h3": {
         fontWeight: "bold",
         fontSize: "16px",
@@ -84,13 +93,16 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
       lineHeight: "38px",
       marginTop: "15%",
-
+      cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
       "&:hover": { background: "#cea000" },
     },
-    backbtn: { paddingLeft: 0, paddingRight: 0, position: "absolute" },
+    backbtn: { 
+      // paddingLeft: 0, paddingRight: 0, 
+      position: "absolute", left: 10,
+    },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   })
 )
@@ -109,11 +121,19 @@ export default function TipNotification({ ...props }) {
         <IconButton onClick={props.onClose} color="default" className={classes.backbtn} aria-label="Menu">
           <Icon>arrow_back</Icon>
         </IconButton>
-        <SadHappy className={classes.topicon} />
+        <Box display="flex" justifyContent="center">
+          <Box><SadHappy className={classes.topicon} /></Box>
+        </Box>
         <Typography variant="body2">Tip</Typography>
-        <Typography variant="h2">Todays's Tip : Mood</Typography>
+        <Typography variant="h2">Todays's Tip: Mood</Typography>
       </div>
-
+      <Grid
+  container
+  direction="row"
+  justify="center"
+  alignItems="flex-start"
+>
+      <Grid item lg={4} sm={10} xs={12}>
       <CardContent className={classes.tipscontentarea}>
         <Typography variant="h3" gutterBottom>
           Focus on the good things
@@ -126,7 +146,7 @@ export default function TipNotification({ ...props }) {
         </Typography>
         <Box mt={4} mb={3}>
           <Grid container direction="row" justify="center" alignItems="center">
-            <Grid container spacing={0} xs={6} md={4} lg={2}>
+            <Grid container spacing={0} xs={4} md={4} lg={2}>
               <Grid item xs={3} className={classes.lineyellow}></Grid>
               <Grid item xs={3} className={classes.linegreen}></Grid>
               <Grid item xs={3} className={classes.linered}></Grid>
@@ -152,11 +172,13 @@ export default function TipNotification({ ...props }) {
           </IconButton>
         </Box>
         <Box textAlign="center">
-          <Button variant="contained" color="primary" className={classes.btnyellow}>
+          <Fab variant="extended" color="primary" className={classes.btnyellow}>
             Completed
-          </Button>
+          </Fab>
         </Box>
       </CardContent>
+      </Grid>
+      </Grid>
     </div>
   )
 }

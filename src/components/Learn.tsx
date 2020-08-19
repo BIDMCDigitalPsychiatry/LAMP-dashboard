@@ -72,12 +72,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbardashboard: {
       minHeight: 65,
+      [theme.breakpoints.down("xs")]: {
+        display: "block",
+      },
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "center",
+        textAlign: "left",
         fontWeight: "600",
         fontSize: 18,
-        width: "100%",
+        width: "calc(100% - 96px)",
+        [theme.breakpoints.down("xs")]: {
+          paddingLeft: 0,
+        },
       },
     },
     closeButton: {
@@ -93,7 +99,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     dialogtitle: { padding: 0 },
 
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: {
+      //  paddingLeft: 0, paddingRight: 0
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 0,
+      },
+    },
     learn: {
       background: "#FFF9E5",
       padding: "10px 0",
@@ -104,6 +115,10 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       width: "100%",
       "& svg": {
+        [theme.breakpoints.down("md")]: {
+          width: 100,
+          height: 100,
+        },
         [theme.breakpoints.up("lg")]: {
           width: 150,
           height: 150,
@@ -143,6 +158,7 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       "&:hover": { background: "#cea000" },
     },
+    dialogueCurve: { borderRadius: 10 },
   })
 )
 
@@ -780,7 +796,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
               <Box mt={2} mb={1}>
                 <MoodTips />
               </Box>
-              <Typography className={classes.cardlabel}>Mood Tips</Typography>
+              <Typography className={classes.cardlabel}>Mood</Typography>
             </Card>
           </ButtonBase>
         </Grid>
@@ -801,7 +817,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
               <Box mt={2} mb={1}>
                 <SleepTips />
               </Box>
-              <Typography className={classes.cardlabel}>Sleep Tips</Typography>
+              <Typography className={classes.cardlabel}>Sleep</Typography>
             </Card>
           </ButtonBase>
         </Grid>
@@ -822,7 +838,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
               <Box mt={2} mb={1}>
                 <Chat />
               </Box>
-              <Typography className={classes.cardlabel}>Social Tips</Typography>
+              <Typography className={classes.cardlabel}>Social</Typography>
             </Card>
           </ButtonBase>
         </Grid>
@@ -938,7 +954,10 @@ export default function Learn({ participant, ...props }: { participant: Particip
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
@@ -985,8 +1004,8 @@ export default function Learn({ participant, ...props }: { participant: Particip
             >
               <Icon>arrow_back</Icon>
             </IconButton>
+            <Typography variant="h5">{tip}</Typography>
           </Toolbar>
-          <Typography variant="h5">{tip}</Typography>
         </AppBar>
         {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={0} />}
         <LearnTips

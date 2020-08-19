@@ -89,7 +89,16 @@ export default function PreventData({
           <Typography variant="h5">
             {graphType == 0 ? activity.name : activity}: <Box component="span">fluctuating</Box>
           </Typography>
-          <Typography>Viewing charts for {graphType == 0 ? activity.name : activity}</Typography>
+          <Typography variant="h5">Summary</Typography>
+          <Typography variant="body2">
+            You have a good distribution of locations, which means you’re getting out of the house and doing things.
+            Studies show a change of scenery helps keep the mid engaged and positive.
+          </Typography>
+
+          <Typography variant="h5">Survey data : </Typography>
+          <Typography variant="h5" color="textSecondary">
+            Oct 10, 5:32pm
+          </Typography>
         </CardContent>
       </Grid>
       <Box
@@ -97,7 +106,7 @@ export default function PreventData({
         style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
       >
         {graphType === 1 ? (
-          <RadialDonutChart data={events} detailPage={true} width={300} height={300} />
+          <RadialDonutChart data={events} detailPage={true} width={370} height={350} />
         ) : graphType === 2 ? (
           <Sparkline
             minWidth={250}

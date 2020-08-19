@@ -5,17 +5,18 @@ import { ReactComponent as Background03 } from "../icons/scratch/Background-03.s
 import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
-import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link } from "@material-ui/core"
+import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 15px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
   btnpeach: {
@@ -36,7 +37,9 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: { 
+    // paddingLeft: 0, paddingRight: 0
+   },
   background: {
     background: "#e0e0e0",
     minHeight: "calc(100vh - 65px)",
@@ -186,9 +189,9 @@ export default function ScratchImage({ ...props }) {
         <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
           <Box width={1}>
             <Typography variant="h4">Well done!</Typography>
-            <Button className={classes.btnpeach} onClick={props.onComplete}>
+            <Fab className={classes.btnpeach} onClick={props.onComplete}>
               Close
-            </Button>
+            </Fab>
             <Box width={1} mt={3}>
               <Link
                 className={classes.linkpeach}

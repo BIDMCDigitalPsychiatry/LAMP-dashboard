@@ -14,7 +14,7 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
-import Messages from "./Messages"
+import Conversations from "./Conversations"
 
 import Root from "./Root"
 import Researcher from "./Researcher"
@@ -70,6 +70,7 @@ function AppRouter({ ...props }) {
     activeTab: null,
     surveyDone: false,
     welcome: true,
+    messageCount: 0,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -159,7 +160,30 @@ function AppRouter({ ...props }) {
         }
       )
     }
+    if (!!state.identity && state.authType === "participant") {
+      // console.log(messages(state.identity))
+      // setState((state) => ({
+      //   ...state,
+      //   messageCount:messages(state.identity)
+      // }))
+    }
   }, [state])
+
+  let messages = async (identity?: any) => {
+    let allMessages = Object.fromEntries(
+      (
+        await Promise.all(
+          [identity.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )
+    let x = (allMessages || {})[identity.id || ""] || []
+    allMessages = !Array.isArray(x) ? [] : x
+
+    return allMessages.filter((x) => x.type === "message" && x.from === "researcher").length
+  }
 
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity)
@@ -276,7 +300,7 @@ function AppRouter({ ...props }) {
               sameLineTitle={true}
             >
               {/* <Conversations goBack={props.history.goBack} /> */}
-              <Messages
+              <Conversations
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly

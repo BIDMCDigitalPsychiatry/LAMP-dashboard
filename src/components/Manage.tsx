@@ -21,7 +21,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-import { ReactComponent as Medication } from "../icons/Medication.svg"
+import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import { ReactComponent as InfoIcon } from "../icons/Info.svg"
 import Jewels from "./Jewels"
 import ScratchImage from "./ScratchImage"
@@ -34,7 +34,8 @@ import Link from "@material-ui/core/Link"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"
-import HopeBox from "./HopeBox"
+import HopeBoxSelect from "./HopeBoxSelect"
+import NewMedication from "./NewMedication"
 
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
@@ -112,7 +113,8 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     topicon: {
-      minWidth: 120,
+      minWidth: 150,
+      minHeight: 150,
       [theme.breakpoints.up("lg")]: {
         width: 150,
         height: 150,
@@ -146,6 +148,7 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
+    dialogueCurve: { borderRadius: 10 },
   })
 )
 
@@ -257,13 +260,13 @@ export default function Manage({ participant, ...props }: { participant: Partici
           sm={4}
           md={3}
           lg={3}
-          onClick={() => setLaunchedActivity("medicationtracker")}
+          onClick={() => handleClickOpen("Medication_tracker")}
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
-                <Medication />
+                <MedicationIcon />
               </Box>
               <Typography className={classes.cardlabel}>Medication tracker</Typography>
             </Card>
@@ -352,7 +355,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
               />
             ),
             HopeBox: (
-              <HopeBox
+              <HopeBoxSelect
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
@@ -361,7 +364,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             ),
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
+            Medication_tracker: <NewMedication onComplete={() => setLaunchedActivity(undefined)} />,
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -371,7 +374,10 @@ export default function Manage({ participant, ...props }: { participant: Partici
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
@@ -384,7 +390,11 @@ export default function Manage({ participant, ...props }: { participant: Partici
               {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
               {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
+              {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
+            <Typography variant="body2" align="left">
+              Games
+            </Typography>
             <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
           </div>
         </DialogTitle>

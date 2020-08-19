@@ -18,6 +18,7 @@ import {
   IconButton,
   Toolbar,
   Grid,
+  Fab,
 } from "@material-ui/core"
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
@@ -25,6 +26,9 @@ import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import Link from "@material-ui/core/Link"
 import classnames from "classnames"
+import CircularProgress, { CircularProgressProps } from "@material-ui/core/CircularProgress"
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
+import "react-circular-progressbar/dist/styles.css"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -61,15 +65,18 @@ const useStyles = makeStyles((theme) => ({
   active: { background: "#FE8470" },
   toolbardashboard: {
     minHeight: 65,
+    padding: "0 10px",
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "100%",
+      width: "calc(100% - 96px)",
     },
   },
-  backbtn: { paddingLeft: 0, paddingRight: 0 },
+  backbtn: {
+    //paddingLeft: 0, paddingRight: 0
+  },
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -83,52 +90,57 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
     "&:hover": {
+      background: "#FFAC98",
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
       textDecoration: "none",
     },
   },
-  "@keyframes Pulse": {
-    "0%": { transform: "scale(.15) rotate(180deg)" },
-    "100%": { transform: "scale(1)" },
-  },
-  "@keyframes Circle1": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-35px, -50px)" },
-  },
-  "@keyframes Circle2": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(35px, 50px)" },
-  },
-  "@keyframes Circle3": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-60px, 0)" },
-  },
-  "@keyframes Circle4": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(60px, 0)" },
-  },
-  "@keyframes Circle5": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(-35px, 50px)" },
-  },
-  "@keyframes Circle6": {
-    "0%": { transform: "translate(0, 0)" },
-    "100%": { transform: "translate(35px, -50px)" },
-  },
-  "@keyframes InhaleText": {
-    "0%": { opacity: 0 },
-    "10%": { opacity: 1, display: "inline" },
-    "30%": { opacity: 1 },
-    "50%": { opacity: 0, display: "none" },
-    "100%": { opacity: 0 },
-  },
+  // "@keyframes Pulse": {
+  //   "0%": { transform: "scale(.15) rotate(180deg)" },
+  //   "100%": { transform: "scale(1)" },
+  // },
+  // "@keyframes Circle1": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-35px, -50px)" },
+  // },
+  // "@keyframes Circle2": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(35px, 50px)" },
+  // },
+  // "@keyframes Circle3": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-60px, 0)" },
+  // },
+  // "@keyframes Circle4": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(60px, 0)" },
+  // },
+  // "@keyframes Circle5": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(-35px, 50px)" },
+  // },
+  // "@keyframes Circle6": {
+  //   "0%": { transform: "translate(0, 0)" },
+  //   "100%": { transform: "translate(35px, -50px)" },
+  // },
+
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
-    "50%": { opacity: 0 },
-    "60%": { opacity: 1, display: "inline" },
-    "90%": { opacity: 1 },
+    "15%": { opacity: 1 },
+    "40%": { opacity: 1 },
+    "50%": { opacity: 0, display: "inline" },
+    "75%": { opacity: 0 },
     "100%": { opacity: 0, display: "none" },
+  },
+
+  "@keyframes InhaleText": {
+    "0%": { opacity: 0 },
+    "25%": { opacity: 0, display: "none" },
+    "50%": { opacity: 0 },
+    "65%": { opacity: 1, display: "inline" },
+    "80%": { opacity: 1 },
+    "100%": { opacity: 0 },
   },
   Background: {
     background: "#000",
@@ -139,34 +151,34 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     height: "100vh",
   },
-  Face: {
-    height: "125px",
-    width: "125px",
-    animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
-    margin: "50px auto",
-  },
-  Circle: {
-    height: "125px",
-    width: "125px",
-    borderRadius: "50%",
-    position: "absolute",
-    mixBlendMode: "screen",
-    transform: "translate(0, 0)",
-    animation: "center 6s infinite",
+  // Face: {
+  //   height: "125px",
+  //   width: "125px",
+  //   animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
+  //   margin: "50px auto",
+  // },
+  // Circle: {
+  //   height: "125px",
+  //   width: "125px",
+  //   borderRadius: "50%",
+  //   position: "absolute",
+  //   mixBlendMode: "screen",
+  //   transform: "translate(0, 0)",
+  //   animation: "center 6s infinite",
 
-    "&:nth-child(odd)": { background: "#FFAC98" },
-    "&:nth-child(even)": { background: "#E56F61" },
-    "&:nth-child(1)": { animation: "$Circle1 4s ease alternate infinite" },
-    "&:nth-child(2)": { animation: "$Circle2 4s ease alternate infinite" },
-    "&:nth-child(3)": { animation: "$Circle3 4s ease alternate infinite" },
-    "&:nth-child(4)": { animation: "$Circle4 4s ease alternate infinite" },
-    "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
-    "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
-  },
-  inhale_exhale: { position: "relative", height: 100 },
+  //   "&:nth-child(odd)": { background: "#FFAC98" },
+  //   "&:nth-child(even)": { background: "#E56F61" },
+  //   "&:nth-child(1)": { animation: "$Circle1 4s ease alternate infinite" },
+  //   "&:nth-child(2)": { animation: "$Circle2 4s ease alternate infinite" },
+  //   "&:nth-child(3)": { animation: "$Circle3 4s ease alternate infinite" },
+  //   "&:nth-child(4)": { animation: "$Circle4 4s ease alternate infinite" },
+  //   "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
+  //   "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
+  // },
+  inhale_exhale: { position: "relative", height: 50 },
   InhaleContainer: {
     display: "block",
-    animation: "$InhaleText 8s ease infinite",
+    animation: "$InhaleText 6.135s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -178,7 +190,7 @@ const useStyles = makeStyles((theme) => ({
   ExhaleContainer: {
     display: "block",
     marginTop: "-2rem",
-    animation: "$ExhaleText 8s ease infinite",
+    animation: "$ExhaleText 6.135s ease infinite",
     fontSize: 30,
     fontWeight: "bold",
     textAlign: "center",
@@ -192,44 +204,52 @@ const useStyles = makeStyles((theme) => ({
     "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25 },
     "& p": { fontStyle: "italic", color: "rgba(0, 0, 0, 0.5)", margin: 15 },
   },
+  progress: {
+    color: "#E46759",
+  },
+  completed: {
+    color: "#FFAC98",
+  },
+  videoNav: {
+    "& video": {
+      [theme.breakpoints.down("xs")]: {
+        width: "100%",
+      },
+      [theme.breakpoints.up("sm")]: {
+        maxWidth: 400,
+      },
+    },
+  },
 }))
 
-// function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
-//   return (
-//     <Box position="relative" display="inline-flex">
-//       <CircularProgress variant="static" {...props} />
-//       <Box
-//         top={0}
-//         left={0}
-//         bottom={0}
-//         right={0}
-//         position="absolute"
-//         display="flex"
-//         alignItems="center"
-//         justifyContent="center"
-//       >
-//         <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
-//           props.value,
-//         )}%`}</Typography>
-//       </Box>
-//     </Box>
-//   );
-// }
-
-// function CircularStatic() {
-//   const [progress, setProgress] = React.useState(10);
-
-//   React.useEffect(() => {
-//     const timer = setInterval(() => {
-//       setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
-//     }, 800);
-//     return () => {
-//       clearInterval(timer);
-//     };
-//   }, []);
-
-//   return <CircularProgressWithLabel value={progress} />;
-// }
+function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
+  const classes = useStyles()
+  return (
+    <Box position="relative" display="inline-flex">
+      <CircularProgress
+        variant="determinate"
+        classes={{ colorPrimary: classes.progress, colorSecondary: classes.completed }}
+        {...props}
+        thickness={3}
+        value={props.value}
+      />
+      <Box
+        top={0}
+        left={0}
+        bottom={0}
+        right={0}
+        position="absolute"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
+          props.value + 20
+        )}`}</Typography>
+      </Box>
+    </Box>
+  )
+}
 
 export default function Breathe({ ...props }) {
   const classes = useStyles()
@@ -238,7 +258,8 @@ export default function Breathe({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tab, _setTab] = useState(0)
   const [status, setStatus] = useState("Yes")
-
+  const [progress, setProgress] = React.useState(100)
+  const [progressLabel, setProgressLabel] = React.useState(120)
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -246,31 +267,43 @@ export default function Breathe({ ...props }) {
     setStarted(!started)
     _setTab(tab + 1)
   }
-
-  const setValueUpdate = () => {
-    let val = progressValue + 15 //0.8
-    setProgressValue(val > 100 ? 100 : val)
+  const setProgressUpdate = () => {
+    let val = progressLabel - 1
+    setProgressLabel(val)
   }
-
   useEffect(() => {
     if (started) {
-      setValueUpdate()
+      setProgressUpdate()
     }
   }, [started])
 
   useEffect(() => {
+    let timer
     if (started) {
-      if (progressValue < 100) {
-        setTimeout(setValueUpdate, 1000)
+      if (progressLabel > 0) {
+        setTimeout(setProgressUpdate, 1000)
+        let val = progress - 0.83
+        setProgress(val < 0 ? 0 : val)
       } else {
         handleNext()
       }
     }
-  }, [progressValue])
+  }, [progressLabel])
+
+  useEffect(() => {
+    let timer
+    if (started) {
+      if (progressLabel > 0) {
+        let val = progressValue + 0.8
+        setProgressValue(val > 100 ? 100 : val)
+      }
+    }
+  }, [progress])
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
+  const percentage = 66
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
@@ -294,9 +327,9 @@ export default function Breathe({ ...props }) {
                 </Typography>
               </Box>
               <Box textAlign="center" mt={1}>
-                <Button className={classes.btnpeach} onClick={handleNext}>
+                <Fab className={classes.btnpeach} onClick={handleNext}>
                   Start
-                </Button>
+                </Fab>
               </Box>
             </Box>
           </Box>
@@ -310,24 +343,31 @@ export default function Breathe({ ...props }) {
             justify="center"
             style={{ minHeight: "80vh" }}
           >
-            <Grid item>
-              <Box className={classes.Face}>
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-                <Box className={classes.Circle} />
-              </Box>
-              <Box mt={5} className={classes.inhale_exhale}>
-                <Typography variant="overline" className={classes.InhaleContainer}>
-                  Inhale
-                </Typography>
+            <Grid item className={classes.videoNav}>
+              <video src="videos/Lotus.mp4" autoPlay={true} loop></video>
+              <Box className={classes.inhale_exhale}>
                 <Typography variant="overline" className={classes.ExhaleContainer}>
                   Exhale
                 </Typography>
+                <Typography variant="overline" className={classes.InhaleContainer}>
+                  Inhale
+                </Typography>
               </Box>
             </Grid>
+            <Box style={{ width: "100px", height: "100px" }}>
+              <CircularProgressbar
+                value={progress}
+                text={`${progressLabel}`}
+                strokeWidth={8}
+                styles={buildStyles({
+                  strokeLinecap: "butt",
+                  pathColor: "#E46759",
+                  textColor: "#BC453D",
+                  trailColor: "#FFAC98",
+                  textSize: "32px",
+                })}
+              />
+            </Box>
           </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>

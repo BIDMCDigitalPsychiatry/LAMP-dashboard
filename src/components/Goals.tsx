@@ -47,15 +47,18 @@ const demoActivities = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    backbtn: { paddingLeft: 0, paddingRight: 0 },
+    backbtn: {
+      // paddingLeft: 0, paddingRight: 0
+    },
     toolbardashboard: {
       minHeight: 65,
+      padding: "0 10px",
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "center",
         fontWeight: "600",
         fontSize: 18,
-        width: "100%",
+        width: "calc(100% - 96px)",
       },
     },
     linkButton: {
@@ -68,8 +71,8 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: 8,
       position: "absolute",
       width: "100%",
-      [theme.breakpoints.up("md")]: {
-        bottom: 15,
+      [theme.breakpoints.up("sm")]: {
+        bottom: 30,
       },
     },
 
@@ -146,14 +149,17 @@ const useStyles = makeStyles((theme: Theme) =>
         [theme.breakpoints.up("lg")]: {
           width: 150,
           height: 150,
+          marginTop: 20,
         },
         [theme.breakpoints.down("md")]: {
           width: 130,
           height: 130,
+          marginTop: 20,
         },
         [theme.breakpoints.down("xs")]: {
           width: 60,
           height: 60,
+          marginTop: 0,
         },
       },
 
@@ -186,8 +192,10 @@ export default function Goals({ ...props }) {
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
+  const [goalType, setGoalType] = useState("")
 
   const handleClickOpen = (type: string) => {
+    setGoalType(type)
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
     setClassType(classT)
@@ -232,7 +240,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={2} mb={1}>
+                <Box>
                   <Exercise />
                 </Box>
                 <Typography className={classes.cardlabel}>Exercise</Typography>
@@ -250,7 +258,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Weight />
                 </Box>
                 <Typography className={classes.cardlabel}>Weight</Typography>
@@ -268,7 +276,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Nutrition />
                 </Box>
                 <Typography className={classes.cardlabel}>Nutrition</Typography>
@@ -278,7 +286,7 @@ export default function Goals({ ...props }) {
           <Grid item xs={4} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Sleep")} className={classes.thumbMain}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Sleeping />
                 </Box>
                 <Typography className={classes.cardlabel}>Sleep</Typography>
@@ -296,7 +304,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <BreatheIcon />
                 </Box>
                 <Typography className={classes.cardlabel}>Medication</Typography>
@@ -309,12 +317,12 @@ export default function Goals({ ...props }) {
             sm={4}
             md={3}
             lg={3}
-            onClick={() => setLaunchedActivity("Reading")}
+            onClick={() => handleClickOpen("Reading")}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Reading />
                 </Box>
                 <Typography className={classes.cardlabel}>Reading</Typography>
@@ -332,7 +340,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Savings />
                 </Box>
                 <Typography className={classes.cardlabel}>Finances</Typography>
@@ -361,7 +369,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Meditation />
                 </Box>
                 <Typography className={classes.cardlabel}>Meditation</Typography>
@@ -379,7 +387,7 @@ export default function Goals({ ...props }) {
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
-                <Box mt={1}>
+                <Box>
                   <Custom />
                 </Box>
                 <Typography className={classes.cardlabel}>Custom</Typography>
@@ -396,7 +404,12 @@ export default function Goals({ ...props }) {
             setOpen(false)
           }}
         >
-          <NewGoals />
+          <NewGoals
+            goalType={goalType}
+            onComplete={() => {
+              setOpen(false)
+            }}
+          />
         </ResponsiveDialog>
 
         {/* <ResponsiveDialog

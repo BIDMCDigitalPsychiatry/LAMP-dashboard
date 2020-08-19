@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 
 import {
@@ -21,6 +21,16 @@ import { ReactComponent as Medication } from "../icons/Medicationsm.svg"
 import { ReactComponent as PencilPaper } from "../icons/PencilPaper.svg"
 import { ReactComponent as SadBoard } from "../icons/SadBoard.svg"
 import { ReactComponent as LineGraph } from "../icons/LineGraph.svg"
+import { ReactComponent as Exercise } from "../icons/Exercise.svg"
+import { ReactComponent as Reading } from "../icons/Reading.svg"
+import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
+import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
+import { ReactComponent as Meditation } from "../icons/Meditation.svg"
+import { ReactComponent as Emotions } from "../icons/Emotions.svg"
+import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
+import { ReactComponent as Savings } from "../icons/Savings.svg"
+import { ReactComponent as Weight } from "../icons/Weight.svg"
+import { ReactComponent as Custom } from "../icons/Custom.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import { Participant as ParticipantObj } from "lamp-core"
@@ -92,6 +102,21 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       "& svg": { opacity: 0.5 },
     },
+    goal: {
+      background: "#FFEFEC",
+      padding: "8px 10px",
+      borderRadius: 10,
+      border: "2px solid transparent",
+    },
+    goalCompleted: {
+      border: "2px solid #FFAC98",
+      padding: "8px 10px",
+      borderRadius: 10,
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.5) !important",
+      },
+      "& svg": { opacity: 0.5 },
+    },
     image: {
       width: 65,
       marginRight: "10px",
@@ -106,6 +131,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     smalltext: {
       fontSize: 12,
+      fontStyle: "normal",
     },
     stepIcon: {
       color: "white",
@@ -168,6 +194,17 @@ const useStyles = makeStyles((theme: Theme) =>
         fill: "#FFD645 !important",
       },
     },
+    goalIcon: {
+      border: "3px solid #FE8470",
+    },
+
+    goalCompletedIcon: {
+      color: "#FE8470 !important",
+      border: "0px solid #FE8470",
+      "& text": {
+        fill: "#FE8470 !important",
+      },
+    },
     customstepper: {
       position: "relative",
       maxWidth: 500,
@@ -201,6 +238,7 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
+    thumbContainer: { maxWidth: 1055, margin: "0 auto" },
   })
 )
 
@@ -214,9 +252,14 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const [date, changeDate] = useState(new Date())
   const [completed, setCompleted] = useState([])
   const [open, setOpen] = useState(false)
+  const [feedData, setFeedData] = useState([])
 
-  let feedData = [
-    { type: "learn", time: "8.30am", title: "Today's tip : Mood", icon: "sad-happy", description: "" },
+  const handleNext = (index: number) => {
+    setCompleted({ ...completed, [index]: true })
+  }
+
+  var feed = [
+    { type: "learn", time: "8.30am", title: "Today's tip: Mood", icon: "sad-happy", description: "" },
     {
       type: "manage",
       time: "8.30am",
@@ -228,15 +271,49 @@ export default function Feed({ participant, ...props }: { participant: Participa
     { type: "assess", time: "8.30am", title: "Anxiety survey", icon: "board", description: "10mins" },
     { type: "prevent", time: "8.30am", title: "Review today’s stats", icon: "linegraph", description: "" },
   ]
-  const handleNext = (index: number) => {
-    setCompleted({ ...completed, [index]: true })
-  }
+
+  useEffect(() => {
+    var feedList = []
+    var goals = JSON.parse(localStorage.getItem("goals"))
+    if (goals != undefined) {
+      //var goalsList = feedData
+      goals.map((goal) => {
+        var item = {
+          type: "goal",
+          time: goal.reminderTime,
+          title: goal.goalName,
+          icon: goal.goalType,
+          description: goal.goalValue + " " + goal.goalUnit,
+        }
+        feedList.push(item)
+      })
+    }
+    var medications = JSON.parse(localStorage.getItem("medications"))
+    if (medications != undefined) {
+      //var goalsList = feedData
+      medications.map((medication) => {
+        var item = {
+          type: "manage",
+          time: medication.reminderTime,
+          title: medication.medicationName,
+          icon: "medication",
+          description: "test description",
+        }
+        feedList.push(item)
+      })
+    }
+
+    feed.map((item) => {
+      feedList.push(item)
+    })
+    setFeedData(feedList)
+  }, [])
 
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" />}
 
-      <Grid container>
+      <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           <Stepper
             orientation="vertical"
@@ -277,6 +354,28 @@ export default function Feed({ participant, ...props }: { participant: Participa
                       </Grid>
 
                       <Grid container justify="center" direction="column" className={classes.image}>
+                        {label.type === "goal" &&
+                          (label.icon == "Exercise" ? (
+                            <Exercise />
+                          ) : label.icon == "Weight" ? (
+                            <Weight />
+                          ) : label.icon == "Nutrition" ? (
+                            <Nutrition />
+                          ) : label.icon == "Medication" ? (
+                            <BreatheIcon />
+                          ) : label.icon == "Sleep" ? (
+                            <Sleeping />
+                          ) : label.icon == "Reading" ? (
+                            <Reading />
+                          ) : label.icon == "Finances" ? (
+                            <Savings />
+                          ) : label.icon == "Mood" ? (
+                            <Emotions />
+                          ) : label.icon == "Meditation" ? (
+                            <Meditation />
+                          ) : (
+                            <Custom />
+                          ))}
                         {label.icon === "sad-happy" && <SadHappy />}
                         {label.icon === "medication" && <Medication />}
                         {label.icon === "pencil" && <PencilPaper />}
