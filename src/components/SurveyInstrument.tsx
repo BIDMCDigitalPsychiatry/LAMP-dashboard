@@ -859,18 +859,7 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          {/* <IconButton
-            color="default"
-            className={classes.backbtn}
-            aria-label="Menu"
-            style={{
-              marginLeft: supportsSidebar ? 64 : undefined,
-            }}
-            onClick={closeDialog}
-          >
-            <Icon>arrow_back</Icon>
-          </IconButton> */}
-
+          
           <Typography
             variant="h5"
             style={{
@@ -1016,7 +1005,7 @@ console.log(type)
               <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
                 <Box flexGrow={1} />
                 <Divider />
-                <Conversations refresh={!!survey} expandHeight privateOnly participant={id} />
+                <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
               </Drawer>
               <Tooltip title="Patient Notes" placement="left">
                 <Fab
