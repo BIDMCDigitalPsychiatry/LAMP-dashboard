@@ -104,6 +104,7 @@ export default function Conversations({
   participantOnly,
   privateOnly,
   expandHeight,
+  msgOpen,
   ...props
 }: {
   privateOnly?: boolean
@@ -112,15 +113,15 @@ export default function Conversations({
   participantOnly?: boolean
   refresh?: boolean
   style?: any
+  msgOpen?:boolean
 }) {
   const classes = useStyles()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(msgOpen ?? false)
   const [conversations, setConversations] = useState({})
   const [sender, setSender] = useState(null)
   const [lastDate, setLastDate] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
-
   useInterval(
     () => {
       refreshMessages()
@@ -178,6 +179,7 @@ export default function Conversations({
 
   return (
     <Container style={{ marginTop: "5%" }}>
+      {!msgOpen && 
       <Box>
         {
           getMessages()
@@ -218,6 +220,7 @@ export default function Conversations({
             ))[0]
         }
       </Box>
+      }
       <ResponsiveDialog
         transient={false}
         animate
@@ -269,6 +272,8 @@ export default function Conversations({
                 <Typography>{x.text}</Typography>
               </Box>
             ))}
+          
+
           <Box display="flex" className={classes.composeMsg}>
             <Box width="100%">
               <InputBase

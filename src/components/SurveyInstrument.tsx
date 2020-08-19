@@ -19,10 +19,10 @@ import {
   withStyles,
   Theme,
   AppBar,
-  Icon,
-  IconButton,
-  Toolbar,
+  Divider,
   Grid,
+  Drawer,
+  Toolbar,
   Slider,
   Menu,
   MenuItem,
@@ -31,10 +31,14 @@ import {
   List,
   TableFooter,
   Fab,
+  Tooltip,
+  Icon
 } from "@material-ui/core"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
+import { useSnackbar } from "notistack"
+import Conversations from "./Conversations"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -314,14 +318,15 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-
+console.log("xval", selectedValue)
   const classes = useStyles()
+
   return (
     <FormControl component="fieldset" className={classes.radioGroup}>
       <RadioGroup
         {...props}
         name="option"
-        value={selectedValue}
+        value={`${selectedValue}`}
         onChange={(event) => {
           setSelectedValue(event.target.value)
           onChange(event.target.value)
@@ -339,7 +344,7 @@ function RadioOption({ onChange, options, value, ...props }) {
                 color="default"
                 size="medium"
                 onClick={() => {
-                  if (selectedValue === `${x.value}`) {
+                  if (selectedValue == `${x.value}`) {
                     setSelectedValue("")
                     onChange(undefined)
                   }
@@ -690,7 +695,7 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-
+console.log("value" ,value)
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
@@ -732,6 +737,9 @@ function Questions({
   handleBack,
   handleNext,
   onComplete,
+  prefillData,
+  prefillTimestamp,
+  toolBarBack,
   ...props
 }) {
   const classes = useStyles()
@@ -745,44 +753,57 @@ function Questions({
         </Typography>
       </Box>
 
-      <Grid container direction="row" justify="center" alignItems="flex-start">
+<Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12} className={classes.surveyQuestionAlign}>
-          <Question
-            number={idx + 1}
-            text={x.text}
-            type={x.type}
-            options={x.options?.map((y) => ({ ...y, label: y.value }))}
-            value={responses.current[idx]}
-            onResponse={(response) => {
-              responses.current[idx] = response
+        <Question
+          number={idx + 1}
+          text={x.text}
+          type={x.type}
+          options={x.options?.map((y) => ({ ...y, label: y.value }))}
+          value={responses.current[idx]}
+          onResponse={(response) => {
+            responses.current[idx] = response
 
-              if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
+            if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
-              onResponse(
-                Array.from({
-                  ...responses.current,
-                  length: value.settings.length,
-                })
-              )
-            }}
-          />
-          <div className={classes.sliderActionsContainer}>
-            {supportsSidebar && idx === value.settings.length - 1 && (
-              <Button
-                variant="contained"
-                onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-                className={classes.btngreen}
-              >
-                Submit
-              </Button>
-            )}
-          </div>
+            onResponse(
+              Array.from({
+                ...responses.current,
+                length: value.settings.length,
+              })
+            )
+          }}
+        />
+        <div className={classes.sliderActionsContainer}>
+          {!supportsSidebar && idx > 0 && (
+            <Fab onClick={handleBack} className={classes.btnBack}>
+              Back
+            </Fab>
+          )}
+          {!supportsSidebar && (
+            <Fab
+              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
+              className={classes.btngreen}
+            >
+              {idx === value.settings.length - 1 ? (toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit") : "Next"}
+            </Fab>
+          )}
+
+          {supportsSidebar && idx === value.settings.length - 1 && (
+            <Fab
+              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
+              className={classes.btngreen}
+            >
+               { toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
+            </Fab>
+          )}
+        </div>
         </Grid>
       </Grid>
     </Box>
   )
 }
-function Section({ onResponse, value, type, prefillData, onComplete, closeDialog, ...props }) {
+function Section({ onResponse, value, type, prefillData, prefillTimestamp, onComplete, closeDialog,toolBarBack, ...props }) {
   const base = value.settings.map((x) => ({ item: x.text, value: null }))
   const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
@@ -809,6 +830,9 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
           handleBack={handleBack}
           handleNext={handleNext}
           onComplete={onComplete}
+          toolBarBack={toolBarBack}
+          prefillData={prefillData}
+          prefillTimestamp={prefillTimestamp}
         />
       )
     })
@@ -851,18 +875,7 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton
-            color="default"
-            className={classes.backbtn}
-            aria-label="Menu"
-            style={{
-              marginLeft: supportsSidebar ? 0 : undefined,
-            }}
-            onClick={closeDialog}
-          >
-            <Icon>arrow_back</Icon>
-          </IconButton>
-
+          
           <Typography
             variant="h5"
             style={{
@@ -874,97 +887,151 @@ function Section({ onResponse, value, type, prefillData, onComplete, closeDialog
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
-      {supportsSidebar ? (
-        value.settings.map((x, idx) => (
-          <Box my={4} onScroll={handleChange}>
-            <Questions
-              idx={idx}
-              x={x}
-              value={value}
-              responses={responses}
-              setActiveStep={setActiveStep}
-              onResponse={onResponse}
-              handleBack={handleBack}
-              handleNext={handleNext}
-              onComplete={onComplete}
-            />
-          </Box>
-        ))
-      ) : (
-        <Box>
-          <Slide in={elementIn} direction={tabDirection(index)} mountOnEnter unmountOnExit>
-            <Box>{slideElements ? slideElements[index] : null}</Box>
-          </Slide>
-          <Box className={classes.surveyQuestionNav}>
-            {!supportsSidebar && index > 0 && (
-              <Fab onClick={handleBack} className={classes.btnBack}>
-                Back
-              </Fab>
-            )}
-            {!supportsSidebar && (
-              <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
-                {index === value.settings.length - 1 ? "Submit" : "Next"}
-              </Fab>
-            )}
-          </Box>
-        </Box>
-      )}
+      {supportsSidebar
+        ? value.settings.map((x, idx) => (
+            <Box my={4} onScroll={handleChange}>
+              <Questions
+                idx={idx}
+                x={x}
+                value={value}
+                responses={responses}
+                setActiveStep={setActiveStep}
+                onResponse={onResponse}
+                handleBack={handleBack}
+                handleNext={handleNext}
+                onComplete={onComplete}
+                prefillData={prefillData}
+                prefillTimestamp={prefillTimestamp}
+                toolBarBack={toolBarBack}
+              />
+            </Box>
+          ))
+        : value.settings.map((x, idx) => (
+            <Slide in={tab === idx} direction={tabDirection(idx)} mountOnEnter unmountOnExit>
+              <Box>
+                <Questions
+                  idx={idx}
+                  x={x}
+                  value={value}
+                  responses={responses}
+                  setActiveStep={setActiveStep}
+                  onResponse={onResponse}
+                  handleBack={handleBack}
+                  handleNext={handleNext}
+                  onComplete={onComplete}
+                  prefillData={prefillData}
+                  prefillTimestamp={prefillTimestamp}
+                  toolBarBack={toolBarBack}
+                />
+              </Box>
+            </Slide>
+          ))}
     </Box>
   )
 }
 
-export default function SurveyQuestions({
-  participant,
+function SurveyQuestions({
+  onResponse,
+  onValidationFailure,
+  validate,
+  partialValidationOnly,
+  content,
+  prefillData,
+  prefillTimestamp,
+  toolBarBack,
+  type,
   ...props
-}: {
-  participant: ParticipantObj
-  activities: any
-  type: string
-  onComplete: Function
-  closeDialog: Function
 }) {
-  const [survey, setSurvey] = useState<any>()
-  const [prefillData, setPrefillData] = useState(null)
-  const [prefillTimestamp, setPrefillTimestamp] = useState(null)
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
-
-  useEffect(() => {
-    if (props.activities.length === 0) return setSurvey(undefined)
-    getSplicedSurveys(props.activities).then((spliced) =>
-      setSurvey({
-        ...spliced,
-        prefillData: !_patientMode() ? props.activities[0].prefillData : undefined,
-        prefillTimestamp: !_patientMode() ? props.activities[0].prefillTimestamp : undefined,
-      })
-    )
-
-    let prefillData = !_patientMode() ? props.activities[0].prefillData : undefined
-    setPrefillData({ prefillData })
-    let prefillTimestamp = !_patientMode() ? props.activities[0].prefillTimestamp : undefined
-    setPrefillTimestamp({ prefillTimestamp })
-  }, [])
-
   const classes = useStyles()
+
 
   return (
     <div className={classes.root}>
-      {((survey || {}).sections || []).map((x, idx) => (
+      {((content || {}).sections || []).map((x, idx) => (
         <Section
           onResponse={(response) => (responses.current[idx] = response)}
           value={x}
-          prefillData={responses.current[idx]}
-          type={props.type}
+          prefillData={toolBarBack ? prefillData[idx] : {}}
+          prefillTimestamp={prefillTimestamp}
+          type={type}
           onComplete={() =>
-            props.onComplete(
+            onResponse(
               Array.from({
                 ...responses.current,
-                length: survey.sections.length,
+                length: content.sections.length,
               })
             )
           }
+          toolBarBack={toolBarBack}
           closeDialog={props.closeDialog}
         />
       ))}
     </div>
+  )
+}
+export default function SurveyInstrument({ id, group, onComplete, type,setVisibleActivities,fromPrevent, ...props }) {
+  const [survey, setSurvey] = useState<any>()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
+  // const [responses, setResponses] = useState({})
+console.log(type)
+  useEffect(() => {       
+    if (group.length === 0) return setSurvey(undefined)
+    getSplicedSurveys(group).then((spliced) => {
+      setSurvey({
+        ...spliced,
+        prefillData: !_patientMode() ? group[0].prefillData : undefined,
+        prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
+      }) 
+      // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
+      // setResponses(resp)
+    })
+   
+    console.log(group[0].prefillData)
+  }, [group])
+
+  return (
+    <Grid container direction="row">
+        <Grid item style={{ width: "100%" }}>
+        <SurveyQuestions
+            validate
+            partialValidationOnly
+            content={survey}
+            toolBarBack={fromPrevent}
+            prefillData={!!survey ? survey.prefillData : undefined}
+            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+            onValidationFailure={() =>
+              enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
+                variant: "error",
+              })
+            }
+            setVisibleActivities={setVisibleActivities}
+            onResponse={onComplete}
+            type={type}
+          />   
+          </Grid>
+          {supportsSidebar && !_patientMode() && (
+            <Grid item>
+              <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
+                <Box flexGrow={1} />
+                <Divider />
+                <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
+              </Drawer>
+              <Tooltip title="Patient Notes" placement="left">
+                <Fab
+                  color="primary"
+                  aria-label="Patient Notes"
+                  style={{ position: "fixed", bottom: 85, right: 24 }}
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  <Icon>note_add</Icon>
+                </Fab>
+              </Tooltip>
+            </Grid>
+          )}  
+          </Grid>     
   )
 }

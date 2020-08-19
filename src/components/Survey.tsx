@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Container,
   Typography,
@@ -17,7 +17,7 @@ import {
   ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
-import SurveyQuestions from "./SurveyQuestions"
+import SurveyInstrument from "./SurveyInstrument"
 import BottomMenu from "./BottomMenu"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
@@ -31,6 +31,7 @@ import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -178,27 +179,27 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
-export default function Survey({
-  participant,
+
+
+export default function Survey({  
+  id,
+  activities,
+  visibleActivities,
+  setVisibleActivities,
+  onComplete,
   ...props
-}: {
-  participant: ParticipantObj
-  submitSurvey: Function
-  surveyDone: boolean
-  activeTab: Function
 }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
-  const [activities, setActivities] = useState([])
   const [openData, setOpenData] = React.useState(false)
   const [surveyType, setSurveyType] = useState(null)
-  const [visibleActivities, setVisibleActivities] = useState([])
   const [questionCount, setQuestionCount] = useState(0)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const handleClickOpen = (type: string) => {
+    console.log(type)
     setDialogueType(type)
     setOpen(true)
   }
@@ -208,32 +209,11 @@ export default function Survey({
     setOpenComplete(false)
   }
 
-  useEffect(() => {
-    LAMP.Activity.allByParticipant(participant.id).then(setActivities)
-  }, [])
 
-  const submitSurvey = (response) => {
-    let events = response.map((x, idx) => ({
-      timestamp: new Date().getTime(),
-      duration: 0,
-      activity: visibleActivities[idx].id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: 0,
-      })),
-    }))
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
-    ).then((x) => {
+  const submitSurveyType = (response) => {     
       setOpenData(false)
-      setOpenComplete(true)
-    })
+      setOpenComplete(true) 
+      onComplete(response) 
   }
 
   return (
@@ -249,10 +229,10 @@ export default function Survey({
                 sm={4}
                 md={3}
                 lg={3}
-                onClick={() => {
+                onClick={() => {                
                   setVisibleActivities([y])
                   setQuestionCount(y.settings.length)
-                  handleClickOpen(y.name)
+                  handleClickOpen(y.name)                
                 }}
                 className={classes.thumbMain}
               >
@@ -360,23 +340,16 @@ export default function Survey({
         </DialogContent>
       </Dialog>
       <ResponsiveDialog
-        transient={false}
+        transient
         animate
         fullScreen
         open={openData}
         onClose={() => {
           setOpenData(false)
         }}
-        //style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
-        {/* {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={1} />} */}
-        <SurveyQuestions
-          participant={participant}
-          type={surveyType}
-          onComplete={submitSurvey}
-          activities={visibleActivities}
-          closeDialog={() => setOpenData(false)}
-        />
+         <SurveyInstrument id={id} type={dialogueType} fromPrevent={false} group={visibleActivities} setVisibleActivities={setVisibleActivities} onComplete={submitSurveyType} />
+        
       </ResponsiveDialog>
     </Container>
   )
