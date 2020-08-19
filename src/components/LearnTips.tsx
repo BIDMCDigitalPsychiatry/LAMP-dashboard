@@ -86,10 +86,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
     },
-  },
-  backbtn: { 
-    // paddingLeft: 0, paddingRight: 0 
-  },
+  }, 
   rightArrow: { maxWidth: 50, padding: "15px 12px 11px 12px !important", "& svg": { color: "rgba(0, 0, 0, 0.5)" } },
   lineyellow: {
     background: "#FFD645",
@@ -143,7 +140,6 @@ export default function LearnTips({ ...props }) {
   const [details, setDetails] = useState(null)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   
-
   return (
     <Container>
       <Box>
@@ -211,7 +207,6 @@ export default function LearnTips({ ...props }) {
             <IconButton
               onClick={() => setOpenDialog(false)}
               color="default"
-              className={classes.backbtn}
               aria-label="Menu"
             >
               <Icon>arrow_back</Icon>
@@ -227,50 +222,50 @@ export default function LearnTips({ ...props }) {
           <Typography variant="h2">{title}</Typography>
         </Box>
         <Grid
-  container
-  direction="row"
-  justify="center"
-  alignItems="flex-start"
->
-      <Grid item lg={4} sm={10} xs={12}>
-        <CardContent className={classes.tipscontentarea}>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {details}
-          </Typography>
-          <Box mt={4} mb={3}>
-          <Grid container direction="row" justify="center" alignItems="center">
-            <Grid container spacing={0} xs={4} md={4} lg={2}>
-              <Grid item xs={3} className={classes.lineyellow}></Grid>
-              <Grid item xs={3} className={classes.linegreen}></Grid>
-              <Grid item xs={3} className={classes.linered}></Grid>
-              <Grid item xs={3} className={classes.lineblue}></Grid>
+          container
+          direction="row"
+          justify="center"
+          alignItems="flex-start"
+        >
+          <Grid item lg={4} sm={10} xs={12}>
+            <CardContent className={classes.tipscontentarea}>
+              <Typography variant="body2" color="textSecondary" component="p">
+                {details}
+              </Typography>
+              <Box mt={4} mb={3}>
+              <Grid container direction="row" justify="center" alignItems="center">
+                <Grid container spacing={0} xs={4} md={4} lg={2}>
+                  <Grid item xs={3} className={classes.lineyellow}></Grid>
+                  <Grid item xs={3} className={classes.linegreen}></Grid>
+                  <Grid item xs={3} className={classes.linered}></Grid>
+                  <Grid item xs={3} className={classes.lineblue}></Grid>
+                </Grid>
+              </Grid>
+            </Box>
+            <Box className={classes.howFeel}>Was this helpful today?</Box>
+            <Box textAlign="center">
+              <IconButton
+              
+                className={classes.likebtn}
+              >
+                <ThumbsUp />
+                <label>Yes</label>
+              </IconButton>
+              <IconButton
+              
+              className={classes.likebtn}
+              >
+                <ThumbsDown />
+                <label>No</label>
+              </IconButton>
+            </Box>
+            <Box textAlign="center">
+              <Fab variant="extended" color="primary" className={classes.btnyellow}>
+              Mark complete
+              </Fab>
+            </Box>
+            </CardContent>
             </Grid>
-          </Grid>
-        </Box>{" "}
-        <Box className={classes.howFeel}>Was this helpful today?</Box>
-        <Box textAlign="center">
-          <IconButton
-           
-            className={classes.likebtn}
-          >
-            <ThumbsUp />
-            <label>Yes</label>
-          </IconButton>
-          <IconButton
-           
-           className={classes.likebtn}
-          >
-            <ThumbsDown />
-            <label>No</label>
-          </IconButton>
-        </Box>
-        <Box textAlign="center">
-          <Fab variant="extended" color="primary" className={classes.btnyellow}>
-          Mark complete
-          </Fab>
-        </Box>
-        </CardContent>
-        </Grid>
         </Grid>
       </ResponsiveDialog>
     </Container>

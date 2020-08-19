@@ -43,12 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
+    },    
     inlineHeader: {
       background: "#FFFFFF",
       boxShadow: "none",
@@ -65,21 +60,13 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 18,
         width: "calc(100% - 96px)",
       },
-    },
-    backbtn: { 
-      // paddingLeft: 0, paddingRight: 0
-     },
+    },   
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
       paddingTop: theme.spacing(1),
       paddingBottom: theme.spacing(1),
     },
-    title: {
-      flexGrow: 1,
-      alignSelf: "flex-end",
-    },
-
     preventlabel: {
       fontSize: 16,
       minHeight: 48,
@@ -88,7 +75,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       textAlign: "left",
     },
-
     prevent: {
       background: "#ECF4FF",
       padding: "10px 0",
@@ -183,10 +169,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     activityContent: {
       maxHeight: "280px",
-    },
-    thumbMain: {
-      // maxWidth: 255
-    },
+    },    
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     preventGraph: {
@@ -503,7 +486,7 @@ export default function Prevent({ participant,
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
           .map((activity) => (
-            <Grid item xs={12} sm={6} md={6} lg={6} className={classes.thumbMain}>
+            <Grid item xs={12} sm={6} md={6} lg={6}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                   <Typography className={classes.preventlabelFull}>
@@ -546,7 +529,7 @@ export default function Prevent({ participant,
             </Grid>
           ))}
 
-        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
+        <Grid item xs={6} sm={3} md={3} lg={3}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
@@ -571,7 +554,7 @@ export default function Prevent({ participant,
           </ButtonBase>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
+        <Grid item xs={6} sm={3} md={3} lg={3}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
@@ -614,7 +597,7 @@ export default function Prevent({ participant,
       </Grid>
       <Grid container spacing={2}>
         {(selectedSensors || []).includes("Social Context") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -643,7 +626,7 @@ export default function Prevent({ participant,
           </Grid>
         )}
         {(selectedSensors || []).includes("Environmental Context") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -673,7 +656,7 @@ export default function Prevent({ participant,
         )}
 
         {(selectedSensors || []).includes("Step Count") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -790,7 +773,6 @@ export default function Prevent({ participant,
             <IconButton
               onClick={() => setOpenData(false)}
               color="default"
-              className={classes.backbtn}
               aria-label="Menu"
             >
               <Icon>arrow_back</Icon>

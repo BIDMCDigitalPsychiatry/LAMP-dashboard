@@ -196,35 +196,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     },
                   }}
                 />
-                {/* <TextField
-                required
-                name="ID"
-                label="ID"
-                
-                margin="normal"
-                variant="outlined"
-                style={{ width: "100%", height: 50, marginBottom: 10 }}
-                placeholder="Email address"
-                
-                value={state.id || ""}
-                onChange={handleChange}
-                InputProps={{
-                  classes: {
-                     root: classes.textfieldStyle,
-                    
-                  }
-               }}
-              /> */}
-
                 <TextField
                   required
                   name="id"
-                  // label="ID"
                   margin="normal"
                   variant="outlined"
                   style={{ width: "100%", height: 50 }}
                   placeholder="my.email@address.com"
-                  // helperText="Use your email address to login."
                   value={state.id || ""}
                   onChange={handleChange}
                   InputLabelProps={{ shrink: true }}
@@ -238,13 +216,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 <TextField
                   required
                   name="password"
-                  // label="Password"
                   type="password"
                   margin="normal"
                   variant="outlined"
                   style={{ width: "100%", height: 50, marginBottom: 40 }}
                   placeholder="•••••••••"
-                  // helperText="Use your password to login."
                   value={state.password || ""}
                   onChange={handleChange}
                   InputProps={{

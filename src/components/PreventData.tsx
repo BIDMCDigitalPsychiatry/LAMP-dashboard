@@ -9,28 +9,7 @@ import ActivityCard from "./ActivityCard"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
-  },
-  table: {
-    minWidth: "100%",
-    "& tr:nth-child(even)": {
-      backgroundColor: "rgba(236, 244, 255, 0.75)",
-    },
-    "& th": { border: 0, padding: "12px 0px 12px 20px" },
-    "& td": { border: 0, padding: "12px 0px 12px 20px" },
-    "& td:last-child": { paddingRight: 20 },
-  },
-  root2: {
-    maxWidth: 345,
-    margin: "16px",
-    maxLength: 500,
-  },
-  media: {
-    height: 200,
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
-  },
+  },  
   moodContent: {
     padding: 17,
 
@@ -42,11 +21,7 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: 20,
       "& span": { color: "#ff8f26" },
     },
-  },
-  recentstoreshd: {
-    padding: "0 20px",
-    "& h5": { fontSize: 18, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 10 },
-  },
+  }, 
   graphcontainer: { height: "auto" },
 }))
 

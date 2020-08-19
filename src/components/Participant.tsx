@@ -1,6 +1,5 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Box, useTheme, useMediaQuery, Slide } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
@@ -14,39 +13,6 @@ import Welcome from "./Welcome"
 import Learn from "./Learn"
 import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: "100%",
-    },
-    learn: {
-      background: "#FFF9E5",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
-    cardlabel: {
-      fontSize: 16,
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-    },
-    manage: {
-      background: "#FFEFEC",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-    },
-  })
-)
 
 function _hideCareTeam() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
@@ -105,7 +71,6 @@ export default function Participant({
 }) {
   const [activities, setActivities] = useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
 
   const getTab = () => {
     let tabNum
@@ -137,7 +102,6 @@ export default function Participant({
   const { enqueueSnackbar } = useSnackbar()
   const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
-  const classes = useStyles()
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
 
@@ -170,15 +134,11 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    //getShowWelcome(participant).then(setOpen)
+    getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
-
-  useEffect(() => {
-    console.log(visibleActivities)
-  }, [visibleActivities])
 
   const activeTab = (newTab) => {
     _setTab(newTab)

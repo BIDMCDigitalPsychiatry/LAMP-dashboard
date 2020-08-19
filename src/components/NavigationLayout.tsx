@@ -33,7 +33,7 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
 import { Link as RouterLink } from "react-router-dom"
 import ResponsiveDialog from "./ResponsiveDialog"
-import Conversations from "./Conversations"
+import Messages from "./Messages"
 import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -313,9 +313,9 @@ export default function NavigationLayout({
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
-          <Typography variant="h5">Conversations</Typography>
+          <Typography variant="h5">Messages</Typography>
         </AppBar>
-        <Conversations style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
+        <Messages style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
       </ResponsiveDialog>
     </Box>
   )
