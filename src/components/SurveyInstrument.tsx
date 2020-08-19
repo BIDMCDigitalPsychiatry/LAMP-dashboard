@@ -32,7 +32,7 @@ import {
   TableFooter,
   Fab,
   Tooltip,
-  Icon
+  Icon,
 } from "@material-ui/core"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
@@ -151,7 +151,7 @@ const useStyles = makeStyles((theme) => ({
       textAlign: "center",
       fontWeight: "600",
       fontSize: 18,
-      width: "calc(100% - 96px)",
+      width: "100%",
       [theme.breakpoints.up("sm")]: {
         textAlign: "left",
       },
@@ -318,7 +318,7 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-console.log("xval", selectedValue)
+  console.log("xval", selectedValue)
   const classes = useStyles()
 
   return (
@@ -695,7 +695,7 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-console.log("value" ,value)
+  console.log("value", value)
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
@@ -753,57 +753,67 @@ function Questions({
         </Typography>
       </Box>
 
-<Grid container direction="row" justify="center" alignItems="flex-start">
+      <Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12} className={classes.surveyQuestionAlign}>
-        <Question
-          number={idx + 1}
-          text={x.text}
-          type={x.type}
-          options={x.options?.map((y) => ({ ...y, label: y.value }))}
-          value={responses.current[idx]}
-          onResponse={(response) => {
-            responses.current[idx] = response
+          <Question
+            number={idx + 1}
+            text={x.text}
+            type={x.type}
+            options={x.options?.map((y) => ({ ...y, label: y.value }))}
+            value={responses.current[idx]}
+            onResponse={(response) => {
+              responses.current[idx] = response
 
-            if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
+              if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
-            onResponse(
-              Array.from({
-                ...responses.current,
-                length: value.settings.length,
-              })
-            )
-          }}
-        />
-        <div className={classes.sliderActionsContainer}>
-          {!supportsSidebar && idx > 0 && (
-            <Fab onClick={handleBack} className={classes.btnBack}>
-              Back
-            </Fab>
-          )}
-          {!supportsSidebar && (
-            <Fab
-              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-              className={classes.btngreen}
-            >
-              {idx === value.settings.length - 1 ? (toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit") : "Next"}
-            </Fab>
-          )}
+              onResponse(
+                Array.from({
+                  ...responses.current,
+                  length: value.settings.length,
+                })
+              )
+            }}
+          />
+          <div className={classes.sliderActionsContainer}>
+            {!supportsSidebar && idx > 0 && (
+              <Fab onClick={handleBack} className={classes.btnBack}>
+                Back
+              </Fab>
+            )}
+            {!supportsSidebar && (
+              <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {idx === value.settings.length - 1
+                  ? toolBarBack && !!prefillData
+                    ? !!prefillTimestamp
+                      ? "Overwrite"
+                      : "Duplicate"
+                    : "Submit"
+                  : "Next"}
+              </Fab>
+            )}
 
-          {supportsSidebar && idx === value.settings.length - 1 && (
-            <Fab
-              onClick={idx === value.settings.length - 1 ? onComplete : handleNext}
-              className={classes.btngreen}
-            >
-               { toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
-            </Fab>
-          )}
-        </div>
+            {supportsSidebar && idx === value.settings.length - 1 && (
+              <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
+              </Fab>
+            )}
+          </div>
         </Grid>
       </Grid>
     </Box>
   )
 }
-function Section({ onResponse, value, type, prefillData, prefillTimestamp, onComplete, closeDialog,toolBarBack, ...props }) {
+function Section({
+  onResponse,
+  value,
+  type,
+  prefillData,
+  prefillTimestamp,
+  onComplete,
+  closeDialog,
+  toolBarBack,
+  ...props
+}) {
   const base = value.settings.map((x) => ({ item: x.text, value: null }))
   const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
@@ -875,11 +885,10 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          
           <Typography
             variant="h5"
             style={{
-              marginLeft: supportsSidebar ? 0 : undefined,
+              marginLeft: supportsSidebar ? 65 : undefined,
             }}
           >
             {type.replace(/_/g, " ")}
@@ -945,7 +954,6 @@ function SurveyQuestions({
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
   const classes = useStyles()
 
-
   return (
     <div className={classes.root}>
       {((content || {}).sections || []).map((x, idx) => (
@@ -970,68 +978,68 @@ function SurveyQuestions({
     </div>
   )
 }
-export default function SurveyInstrument({ id, group, onComplete, type,setVisibleActivities,fromPrevent, ...props }) {
+export default function SurveyInstrument({ id, group, onComplete, type, setVisibleActivities, fromPrevent, ...props }) {
   const [survey, setSurvey] = useState<any>()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   // const [responses, setResponses] = useState({})
-console.log(type)
-  useEffect(() => {       
+  console.log(type)
+  useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
       setSurvey({
         ...spliced,
         prefillData: !_patientMode() ? group[0].prefillData : undefined,
         prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
-      }) 
+      })
       // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
       // setResponses(resp)
     })
-   
+
     console.log(group[0].prefillData)
   }, [group])
 
   return (
     <Grid container direction="row">
-        <Grid item style={{ width: "100%" }}>
+      <Grid item style={{ width: "100%" }}>
         <SurveyQuestions
-            validate
-            partialValidationOnly
-            content={survey}
-            toolBarBack={fromPrevent}
-            prefillData={!!survey ? survey.prefillData : undefined}
-            prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
-            onValidationFailure={() =>
-              enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
-                variant: "error",
-              })
-            }
-            setVisibleActivities={setVisibleActivities}
-            onResponse={onComplete}
-            type={type}
-          />   
-          </Grid>
-          {supportsSidebar && !_patientMode() && (
-            <Grid item>
-              <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
-                <Box flexGrow={1} />
-                <Divider />
-                <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
-              </Drawer>
-              <Tooltip title="Patient Notes" placement="left">
-                <Fab
-                  color="primary"
-                  aria-label="Patient Notes"
-                  style={{ position: "fixed", bottom: 85, right: 24 }}
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <Icon>note_add</Icon>
-                </Fab>
-              </Tooltip>
-            </Grid>
-          )}  
-          </Grid>     
+          validate
+          partialValidationOnly
+          content={survey}
+          toolBarBack={fromPrevent}
+          prefillData={!!survey ? survey.prefillData : undefined}
+          prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
+          onValidationFailure={() =>
+            enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
+              variant: "error",
+            })
+          }
+          setVisibleActivities={setVisibleActivities}
+          onResponse={onComplete}
+          type={type}
+        />
+      </Grid>
+      {supportsSidebar && !_patientMode() && (
+        <Grid item>
+          <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
+            <Box flexGrow={1} />
+            <Divider />
+            <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
+          </Drawer>
+          <Tooltip title="Patient Notes" placement="left">
+            <Fab
+              color="primary"
+              aria-label="Patient Notes"
+              style={{ position: "fixed", bottom: 85, right: 24 }}
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Icon>note_add</Icon>
+            </Fab>
+          </Tooltip>
+        </Grid>
+      )}
+    </Grid>
   )
 }
