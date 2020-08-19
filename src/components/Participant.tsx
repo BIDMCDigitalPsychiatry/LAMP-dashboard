@@ -177,6 +177,9 @@ export default function Participant({
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
+  useEffect(() => {
+   console.log(visibleActivities)
+  }, [visibleActivities])
   
   const activeTab = (newTab) => {
     _setTab(newTab)
@@ -216,14 +219,12 @@ export default function Participant({
         .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
       setVisibleActivities([])
-
-      // If a timestamp was provided to overwrite data, hide the original event too.
+       // If a timestamp was provided to overwrite data, hide the original event too.
       if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
       else hideEvent() // trigger a reload of dependent components anyway
     })    
   }
  
-console.log(visibleActivities);
   return (
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>

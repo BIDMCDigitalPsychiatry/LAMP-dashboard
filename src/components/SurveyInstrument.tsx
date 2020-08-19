@@ -318,7 +318,6 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-console.log("xval", selectedValue)
   const classes = useStyles()
 
   return (
@@ -624,7 +623,7 @@ function Rating({ onChange, options, value, ...props }) {
   )
 }
 function Question({ onResponse, number, text, type, options, value, ...props }) {
-  let onChange = (value) => onResponse({ item: text, value: value })
+  let onChange = (value) => onResponse({ item: text, value: parseInt(value) })
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
     { label: "No", value: "No" /* false */ },
@@ -695,7 +694,6 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-console.log("value" ,value)
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />

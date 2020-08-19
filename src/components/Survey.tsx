@@ -199,7 +199,6 @@ export default function Survey({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const handleClickOpen = (type: string) => {
-    console.log(type)
     setDialogueType(type)
     setOpen(true)
   }
