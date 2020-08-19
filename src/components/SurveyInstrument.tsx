@@ -279,6 +279,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
+  chatDrawer: {},
+  chatDrawerCustom: { minWidth: 411 },
 }))
 
 // Splice together all selected activities & their tags.
@@ -1009,9 +1011,17 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
       </Grid>
       {fromPrevent && (
         <Grid item>
-          <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
+          <Drawer
+            anchor="right"
+            variant="temporary"
+            classes={{
+              root: classes.chatDrawer, // class name, e.g. `classes-nesting-root-x`
+              paperAnchorRight: classes.chatDrawerCustom, // class name, e.g. `classes-nesting-label-x`
+            }}
+            open={!!sidebarOpen}
+            onClose={() => setSidebarOpen(undefined)}
+          >
             <Box flexGrow={1} />
-            <Divider />
             <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
           </Drawer>
           <Tooltip title="Patient Notes" placement="left">
