@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
   },
-  addicon: { float: "left", color: "#E46759" },
   likebtn: {
     fontStyle: "italic",
     padding: 6,
@@ -46,14 +45,6 @@ const useStyles = makeStyles((theme) => ({
   linkButton: {
     padding: "15px 25px 15px 25px",
   },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
   dialogueContent: {
     padding: "10px 20px 35px 20px",
     textAlign: "center",
@@ -67,14 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   closeButton: {
     color: theme.palette.grey[500],
-  },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
+  },    
   journalStyle: {
     background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
     borderRadius: "10px",
@@ -99,7 +83,6 @@ const useStyles = makeStyles((theme) => ({
     "& fieldset": { borderWidth: 0, outline: 0 },
     "& textarea": { lineHeight: "24px" },
   },
-  textfieldwrapper: {},
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -129,10 +112,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
     },
-  },
-  backbtn: {
-    // paddingLeft: 0, paddingRight: 0
-  },
+  }, 
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
@@ -253,14 +233,14 @@ export default function JournalEntries({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={() => setOpen(true)} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">New journal entry</Typography>
         </Toolbar>
       </AppBar>
       <Container>
-        <Box className={classes.textfieldwrapper} px={2}>
+        <Box px={2}>
           <FormControl
             component="fieldset"
             classes={{

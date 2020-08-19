@@ -38,7 +38,7 @@ import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
 import { useSnackbar } from "notistack"
-import Conversations from "./Conversations"
+import Messages from "./Messages"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -1022,7 +1022,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
             onClose={() => setSidebarOpen(undefined)}
           >
             <Box flexGrow={1} />
-            <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
+            <Messages refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
           </Drawer>
           <Tooltip title="Patient Notes" placement="left">
             <Fab

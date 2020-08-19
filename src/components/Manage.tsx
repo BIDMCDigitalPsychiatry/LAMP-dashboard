@@ -220,20 +220,13 @@ export default function Manage({ participant, ...props }: { participant: Partici
           </ButtonBase>
         </Grid>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            {/* <Link
-              component={RouterLink}
-              to={`/participant/${participant.id}/hopebox`}
-              underline="none"
-              className={classes.fullwidthBtn}
-            > */}
+          <ButtonBase focusRipple className={classes.fullwidthBtn}>           
             <Card className={classes.manage}>
               <Box mt={1}>
                 <HopeBoxIcon />
               </Box>
               <Typography className={classes.cardlabel}>Hope box</Typography>
-            </Card>
-            {/* </Link> */}
+            </Card>            
           </ButtonBase>
         </Grid>
         <Grid

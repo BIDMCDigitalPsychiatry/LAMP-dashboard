@@ -7,54 +7,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     marginTop: 20,
-  },
-  addicon: { float: "left", color: "#E46759" },
-  likebtn: {
-    fontStyle: "italic",
-    padding: 6,
-    margin: "0 5px",
-    "& label": {
-      position: "absolute",
-      bottom: -18,
-      fontSize: 12,
-    },
-  },
-  dialogtitle: { padding: 0 },
-  active: {
-    background: "#FFAC98",
-  },
-  linkButton: {
-    padding: "15px 25px 15px 25px",
-  },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
-  dialogueContent: {
-    padding: "10px 20px 35px 20px",
-    textAlign: "center",
-    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 15 },
-    "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
-  },
-  dialogueStyle: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  closeButton: {
-    color: theme.palette.grey[500],
-  },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
+  },      
   journalStyle: {
     background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
     borderRadius: "10px",
@@ -129,8 +82,7 @@ export default function JournalEntries({ ...props }) {
     return weekday[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
   }
 
-  const [jounalDate, setJounalDate] = useState(getDateString(new Date()))
-
+ 
   useEffect(() => {
     setJournals(getJournals())
   }, [])
@@ -138,7 +90,6 @@ export default function JournalEntries({ ...props }) {
   const handleOpen = (text: string, date?: string) => {
     if (text) setJounalValue(text)
     date = typeof date == "undefined" ? getDateString(new Date()) : date
-    setJounalDate(date)
     setOpen(true)
   }
 

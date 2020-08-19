@@ -14,7 +14,7 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
-import Conversations from "./Conversations"
+import Messages from "./Messages"
 
 import Root from "./Root"
 import Researcher from "./Researcher"
@@ -291,16 +291,16 @@ function AppRouter({ ...props }) {
         path="/participant/:id/messages"
         render={(props) => (
           <React.Fragment>
-            <PageTitle>mindLAMP | Conversations</PageTitle>
+            <PageTitle>mindLAMP | Messages</PageTitle>
             <NavigationLayout
               id={props.match.params.id}
               goBack={props.history.goBack}
               onLogout={() => reset()}
-              activeTab="Conversations"
+              activeTab="Messages"
               sameLineTitle={true}
             >
-              {/* <Conversations goBack={props.history.goBack} /> */}
-              <Conversations
+              {/* <Messages goBack={props.history.goBack} /> */}
+              <Messages
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly

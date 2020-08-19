@@ -7,7 +7,6 @@ import {
   Slide,
   useMediaQuery,
   useTheme,
-  Button,
   Container,
   LinearProgress,
   createStyles,
@@ -26,7 +25,6 @@ import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import Link from "@material-ui/core/Link"
 import classnames from "classnames"
-import CircularProgress, { CircularProgressProps } from "@material-ui/core/CircularProgress"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 
@@ -73,10 +71,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
     },
-  },
-  backbtn: {
-    //paddingLeft: 0, paddingRight: 0
-  },
+  },  
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -96,35 +91,7 @@ const useStyles = makeStyles((theme) => ({
       textDecoration: "none",
     },
   },
-  // "@keyframes Pulse": {
-  //   "0%": { transform: "scale(.15) rotate(180deg)" },
-  //   "100%": { transform: "scale(1)" },
-  // },
-  // "@keyframes Circle1": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(-35px, -50px)" },
-  // },
-  // "@keyframes Circle2": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(35px, 50px)" },
-  // },
-  // "@keyframes Circle3": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(-60px, 0)" },
-  // },
-  // "@keyframes Circle4": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(60px, 0)" },
-  // },
-  // "@keyframes Circle5": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(-35px, 50px)" },
-  // },
-  // "@keyframes Circle6": {
-  //   "0%": { transform: "translate(0, 0)" },
-  //   "100%": { transform: "translate(35px, -50px)" },
-  // },
-
+  
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
     "15%": { opacity: 1 },
@@ -141,40 +108,7 @@ const useStyles = makeStyles((theme) => ({
     "65%": { opacity: 1, display: "inline" },
     "80%": { opacity: 1 },
     "100%": { opacity: 0 },
-  },
-  Background: {
-    background: "#000",
-    color: "#fff",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    height: "100vh",
-  },
-  // Face: {
-  //   height: "125px",
-  //   width: "125px",
-  //   animation: "$Pulse 4s cubic-bezier(0.5, 0, 0.5, 1) alternate infinite",
-  //   margin: "50px auto",
-  // },
-  // Circle: {
-  //   height: "125px",
-  //   width: "125px",
-  //   borderRadius: "50%",
-  //   position: "absolute",
-  //   mixBlendMode: "screen",
-  //   transform: "translate(0, 0)",
-  //   animation: "center 6s infinite",
-
-  //   "&:nth-child(odd)": { background: "#FFAC98" },
-  //   "&:nth-child(even)": { background: "#E56F61" },
-  //   "&:nth-child(1)": { animation: "$Circle1 4s ease alternate infinite" },
-  //   "&:nth-child(2)": { animation: "$Circle2 4s ease alternate infinite" },
-  //   "&:nth-child(3)": { animation: "$Circle3 4s ease alternate infinite" },
-  //   "&:nth-child(4)": { animation: "$Circle4 4s ease alternate infinite" },
-  //   "&:nth-child(5)": { animation: "$Circle5 4s ease alternate infinite" },
-  //   "&:nth-child(6)": { animation: "$Circle6 4s ease alternate infinite" },
-  // },
+  },  
   inhale_exhale: { position: "relative", height: 50 },
   InhaleContainer: {
     display: "block",
@@ -221,35 +155,6 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }))
-
-function CircularProgressWithLabel(props: CircularProgressProps & { value: number }) {
-  const classes = useStyles()
-  return (
-    <Box position="relative" display="inline-flex">
-      <CircularProgress
-        variant="determinate"
-        classes={{ colorPrimary: classes.progress, colorSecondary: classes.completed }}
-        {...props}
-        thickness={3}
-        value={props.value}
-      />
-      <Box
-        top={0}
-        left={0}
-        bottom={0}
-        right={0}
-        position="absolute"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Typography variant="caption" component="div" color="textSecondary">{`${Math.round(
-          props.value + 20
-        )}`}</Typography>
-      </Box>
-    </Box>
-  )
-}
 
 export default function Breathe({ ...props }) {
   const classes = useStyles()
@@ -308,7 +213,7 @@ export default function Breathe({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Breathe</Typography>
