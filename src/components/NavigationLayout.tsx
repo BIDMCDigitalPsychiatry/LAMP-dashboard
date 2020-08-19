@@ -313,7 +313,7 @@ export default function NavigationLayout({
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
-          <Typography variant="h5">Messages</Typography>
+          <Typography variant="h5">Conversations</Typography>
         </AppBar>
         <Messages style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
       </ResponsiveDialog>
