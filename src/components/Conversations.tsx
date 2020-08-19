@@ -171,133 +171,147 @@ export default function Conversations({
     setConversations({ ...(conversations || {}), [participant]: all })
   }
 
+  const messageSection = () => {
+    return (
+      <Box px={3} style={{ marginTop: "5%" }}>
+      {        
+        getMessages()
+        .filter(
+          (x) => x.type === "message" //&&  x.from === sender - to be replaced with different senders
+        )
+        .map((x) => (
+          <Box
+            className={classes.innerMessage}
+            style={{
+              background:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "#F6F6F6"
+                  : "#5784EE",
+              marginLeft:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? ""
+                  : "10%",
+              marginRight:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "10%"
+                  : "",
+              borderRadius:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "0px 20px 20px 20px"
+                  : "20px 0px 20px 20px",
+              color:
+                (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
+                  ? "rgba(0, 0, 0, 0.75)"
+                  : "white",
+            }}
+          >
+            <Typography>{x.text}</Typography>
+          </Box>
+        ))}
+      
+
+      <Box display="flex" className={classes.composeMsg}>
+        <Box width="100%">
+          <InputBase
+            placeholder="text"
+            value={currentMessage || ""}
+            onChange={(event) => setCurrentMessage(event.target.value)}
+            style={{ display: addMsg ? "block" : "none" }}
+          />
+        </Box>
+        <Box flexShrink={1}>
+          <IconButton
+            style={{ display: addMsg ? "block" : "none" }}
+            edge="end"
+            aria-label="send"
+            onClick={sendMessage}
+            onMouseDown={(event) => event.preventDefault()}
+          >
+            <Icon>send</Icon>
+          </IconButton>
+        </Box>
+        <AddCircleOutlineIcon style={{ display: !addMsg ? "block" : "none" }} onClick={() => setAddMsg(true)} />
+      </Box>  
+    </Box>
+    )
+  }
+
   const getDateString = (date: Date) => {
     var weekday = new Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
     var monthname = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
     return weekday[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
   }
-
-  return (
-    <Container style={{ marginTop: "5%" }}>
-      {!msgOpen && 
-      <Box>
-        {
-          getMessages()
-            .filter(
-              (x) =>
-                (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-                (!participantOnly && x.from === "participant")
-            )
-            .map((x) => (
-              <Box
-                border={0}
-                className={classes.conversationStyle}
-                onClick={() => {
-                  refreshMessages()
-                  setSender(x.from)
-                  setLastDate(new Date(x.date || 0))
-                  setOpen(true)
-                }}
-                style={{
-                  background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
-                  border: x.status === 0 ? "0" : "1px solid #C6C6C6",
-                }}
-              >
-                <Grid container>
-                  <Grid item xs>
-                    <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
-                      {x.from}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs className={classes.conversationtime} justify="space-between">
-                    <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
-                  </Grid>
+  
+  if(msgOpen) {
+    return (
+        <Container>
+          {messageSection()}
+        </Container>
+      )
+  }
+  else {
+    return (
+      <Container style={{ marginTop: "5%" }}>
+      <Box>        
+        {getMessages()
+          .filter(
+            (x) =>
+              (x.type === "message" && !!participantOnly && x.from === "researcher") ||
+              (!participantOnly && x.from === "participant")
+          )
+          .map((x) => (
+            <Box
+              border={0}
+              className={classes.conversationStyle}
+              onClick={() => {
+                refreshMessages()
+                setSender(x.from)
+                setLastDate(new Date(x.date || 0))
+                setOpen(true)
+              }}
+              style={{
+                background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
+                border: x.status === 0 ? "0" : "1px solid #C6C6C6",
+              }}
+            >
+              <Grid container>
+                <Grid item xs>
+                  <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
+                    {x.from}
+                  </Typography>
                 </Grid>
-                <Box width={1}>
-                  <Typography>{x.text}</Typography>
-                </Box>
-              </Box>
-            ))[0]
-        }
-      </Box>
-      }
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={open}
-        onClose={() => {
-          setOpen(false)
-        }}
-      >
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-          </Toolbar>
-          <Typography variant="h5">{sender}</Typography>
-        </AppBar>
-        <Box px={3} style={{ marginTop: "5%" }}>
-          {getMessages()
-            .filter(
-              (x) => x.type === "message" //&&  x.from === sender - to be replaced with different senders
-            )
-            .map((x) => (
-              <Box
-                className={classes.innerMessage}
-                style={{
-                  background:
-                    (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                      ? "#F6F6F6"
-                      : "#5784EE",
-                  marginLeft:
-                    (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                      ? ""
-                      : "10%",
-                  marginRight:
-                    (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                      ? "10%"
-                      : "",
-                  borderRadius:
-                    (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                      ? "0px 20px 20px 20px"
-                      : "20px 0px 20px 20px",
-                  color:
-                    (!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant")
-                      ? "rgba(0, 0, 0, 0.75)"
-                      : "white",
-                }}
-              >
+                <Grid item xs className={classes.conversationtime} justify="space-between">
+                  <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
+                </Grid>
+              </Grid>
+              <Box width={1}>
                 <Typography>{x.text}</Typography>
               </Box>
-            ))}
-          
-
-          <Box display="flex" className={classes.composeMsg}>
-            <Box width="100%">
-              <InputBase
-                placeholder="text"
-                value={currentMessage || ""}
-                onChange={(event) => setCurrentMessage(event.target.value)}
-                style={{ display: addMsg ? "block" : "none" }}
-              />
             </Box>
-            <Box flexShrink={1}>
-              <IconButton
-                style={{ display: addMsg ? "block" : "none" }}
-                edge="end"
-                aria-label="send"
-                onClick={sendMessage}
-                onMouseDown={(event) => event.preventDefault()}
-              >
-                <Icon>send</Icon>
-              </IconButton>
-            </Box>
-            <AddCircleOutlineIcon style={{ display: !addMsg ? "block" : "none" }} onClick={() => setAddMsg(true)} />
-          </Box>
-        </Box>
-      </ResponsiveDialog>
+          ))[0]}
+      
+    </Box>
+  
+    <ResponsiveDialog
+      transient={false}
+      animate
+      fullScreen
+      open={open}
+      onClose={() => {
+        setOpen(false)
+      }}
+    >
+      <AppBar position="static" className={classes.inlineHeader}>
+        <Toolbar className={classes.toolbardashboard}>
+          <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
+            <Icon>arrow_back</Icon>
+          </IconButton>
+        </Toolbar>
+        <Typography variant="h5">{sender}</Typography>
+      </AppBar>
+      {messageSection()}
+    </ResponsiveDialog>
     </Container>
-  )
-}
+    ) 
+  }
+  }
