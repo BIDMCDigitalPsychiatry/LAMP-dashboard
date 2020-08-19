@@ -153,7 +153,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
       [theme.breakpoints.up("sm")]: {
-        textAlign: "left",
+        textAlign: "center",
       },
     },
   },
@@ -874,13 +874,9 @@ function Section({ onResponse, value, type, prefillData, prefillTimestamp, onCom
   return (
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
-        <Toolbar className={classes.toolbardashboard}>
-          
+        <Toolbar className={classes.toolbardashboard}>          
           <Typography
-            variant="h5"
-            style={{
-              marginLeft: supportsSidebar ? 0 : undefined,
-            }}
+            variant="h5"            
           >
             {type.replace(/_/g, " ")}
           </Typography>
@@ -976,8 +972,7 @@ export default function SurveyInstrument({ id, group, onComplete, type,setVisibl
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  // const [responses, setResponses] = useState({})
-console.log(type)
+  
   useEffect(() => {       
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
@@ -985,12 +980,8 @@ console.log(type)
         ...spliced,
         prefillData: !_patientMode() ? group[0].prefillData : undefined,
         prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
-      }) 
-      // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
-      // setResponses(resp)
+      })      
     })
-   
-    console.log(group[0].prefillData)
   }, [group])
 
   return (
@@ -1013,7 +1004,7 @@ console.log(type)
             type={type}
           />   
           </Grid>
-          {supportsSidebar && !_patientMode() && (
+          {fromPrevent && (
             <Grid item>
               <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
                 <Box flexGrow={1} />
