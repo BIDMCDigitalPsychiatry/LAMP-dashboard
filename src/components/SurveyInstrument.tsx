@@ -153,7 +153,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "100%",
       [theme.breakpoints.up("sm")]: {
-        textAlign: "left",
+        textAlign: "center",
       },
     },
   },
@@ -318,7 +318,6 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-  console.log("xval", selectedValue)
   const classes = useStyles()
 
   return (
@@ -624,7 +623,7 @@ function Rating({ onChange, options, value, ...props }) {
   )
 }
 function Question({ onResponse, number, text, type, options, value, ...props }) {
-  let onChange = (value) => onResponse({ item: text, value: value })
+  let onChange = (value) => onResponse({ item: text, value: parseInt(value) })
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
     { label: "No", value: "No" /* false */ },
@@ -695,7 +694,6 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-  console.log("value", value)
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
@@ -984,8 +982,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  // const [responses, setResponses] = useState({})
-  console.log(type)
+
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
@@ -994,11 +991,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
         prefillData: !_patientMode() ? group[0].prefillData : undefined,
         prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
       })
-      // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
-      // setResponses(resp)
     })
-
-    console.log(group[0].prefillData)
   }, [group])
 
   return (
@@ -1021,7 +1014,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
           type={type}
         />
       </Grid>
-      {supportsSidebar && !_patientMode() && (
+      {fromPrevent && (
         <Grid item>
           <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
             <Box flexGrow={1} />
