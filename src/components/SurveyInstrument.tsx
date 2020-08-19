@@ -153,7 +153,8 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "100%",
       [theme.breakpoints.up("sm")]: {
-        textAlign: "center",
+        textAlign: "left",
+        margin: "0 55px",
       },
     },
   },

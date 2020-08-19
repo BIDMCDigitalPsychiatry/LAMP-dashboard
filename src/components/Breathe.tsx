@@ -70,8 +70,11 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "600",
       fontSize: 18,
       width: "calc(100% - 96px)",
+      [theme.breakpoints.up("sm")]: {
+        textAlign: "left",
+      },
     },
-  },  
+  },
   btnpeach: {
     background: "#FFAC98",
     padding: "15px 25px 15px 25px",
@@ -91,7 +94,7 @@ const useStyles = makeStyles((theme) => ({
       textDecoration: "none",
     },
   },
-  
+
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
     "15%": { opacity: 1 },
@@ -108,7 +111,7 @@ const useStyles = makeStyles((theme) => ({
     "65%": { opacity: 1, display: "inline" },
     "80%": { opacity: 1 },
     "100%": { opacity: 0 },
-  },  
+  },
   inhale_exhale: { position: "relative", height: 50 },
   InhaleContainer: {
     display: "block",
@@ -135,7 +138,7 @@ const useStyles = makeStyles((theme) => ({
   },
   flower: { width: "100%", maxWidth: 375 },
   breatheReview: {
-    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25 },
+    "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25, marginTop: -50 },
     "& p": { fontStyle: "italic", color: "rgba(0, 0, 0, 0.5)", margin: 15 },
   },
   progress: {
@@ -153,6 +156,22 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: 400,
       },
     },
+  },
+  lineyellow: {
+    background: "#FFD645",
+    height: "3px",
+  },
+  linegreen: {
+    background: "#65CEBF",
+    height: "3px",
+  },
+  linered: {
+    background: "#FF775B",
+    height: "3px",
+  },
+  lineblue: {
+    background: "#86B6FF",
+    height: "3px",
   },
 }))
 
@@ -224,13 +243,28 @@ export default function Breathe({ ...props }) {
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
           <Box my={4}>
             <Box textAlign="center">
-              <Lotus className={classes.flower} />
-              <Typography variant="h6">Get ready</Typography>
-              <Box textAlign="center" px={4} pt={2} pb={5}>
-                <Typography variant="body2" component="p">
-                  Get yourself comfortable and when you’re ready tap the start button.
-                </Typography>
-              </Box>
+              {supportsSidebar && (
+                <Box pt={4}>
+                  <Typography variant="h6">Prepare yourself</Typography>
+                  <Box textAlign="center" px={4} pt={2}>
+                    <Typography variant="body2" component="p">
+                      Get yourself comfortable and when you’re ready tap the start button.
+                    </Typography>
+                    <Lotus className={classes.flower} />
+                  </Box>
+                </Box>
+              )}
+              {!supportsSidebar && (
+                <Box>
+                  <Lotus className={classes.flower} />
+                  <Typography variant="h6">Get ready</Typography>
+                  <Box textAlign="center" px={4} pt={2} pb={5}>
+                    <Typography variant="body2" component="p">
+                      Get yourself comfortable and when you’re ready tap the start button.
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
               <Box textAlign="center" mt={1}>
                 <Fab className={classes.btnpeach} onClick={handleNext}>
                   Start
@@ -280,14 +314,16 @@ export default function Breathe({ ...props }) {
             <Box textAlign="center" className={classes.breatheReview}>
               <Lotus className={classes.flower} />
               <Typography variant="h4">Nicely done!</Typography>
-              <div
-                style={{
-                  height: 3,
-                  margin: "0% 20%",
-                  background:
-                    "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
-                }}
-              />
+              <Box mt={4} mb={3}>
+                <Grid container direction="row" justify="center" alignItems="center">
+                  <Grid container spacing={0} xs={4} md={4} lg={2}>
+                    <Grid item xs={3} className={classes.lineyellow}></Grid>
+                    <Grid item xs={3} className={classes.linegreen}></Grid>
+                    <Grid item xs={3} className={classes.linered}></Grid>
+                    <Grid item xs={3} className={classes.lineblue}></Grid>
+                  </Grid>
+                </Grid>
+              </Box>
               <Typography variant="body2">Was this helpful today?</Typography>
               <Box textAlign="center" mb={5}>
                 <IconButton
@@ -305,7 +341,7 @@ export default function Breathe({ ...props }) {
                   <label>No</label>
                 </IconButton>
               </Box>
-              <Box textAlign="center">
+              <Box textAlign="center" pt={4}>
                 <Link href="#" className={classes.btnpeach} onClick={props.onComplete}>
                   Done
                 </Link>
