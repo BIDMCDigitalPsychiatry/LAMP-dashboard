@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },    
+    },
     inlineHeader: {
       background: "#FFFFFF",
       boxShadow: "none",
@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 18,
         width: "calc(100% - 96px)",
       },
-    },   
+    },
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
@@ -108,6 +108,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       [theme.breakpoints.down("xs")]: {
         minHeight: "auto",
+      },
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+        maxHeight: 240,
       },
 
       "& h6": {
@@ -169,7 +173,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     activityContent: {
       maxHeight: "280px",
-    },    
+    },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     preventGraph: {
@@ -379,20 +383,24 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-export default function Prevent({ participant, 
-  activeTab, 
+export default function Prevent({
+  participant,
+  activeTab,
   hiddenEvents,
   enableEditMode,
   onEditAction,
   onCopyAction,
-  onDeleteAction,...props }:
-   { participant: ParticipantObj
-    activeTab: Function 
-    hiddenEvents: string[]
-    enableEditMode: boolean
-    onEditAction: (activity: ActivityObj, data: any) => void
-    onCopyAction: (activity: ActivityObj, data: any) => void
-    onDeleteAction: (activity: ActivityObj, data: any) => void }) {
+  onDeleteAction,
+  ...props
+}: {
+  participant: ParticipantObj
+  activeTab: Function
+  hiddenEvents: string[]
+  enableEditMode: boolean
+  onEditAction: (activity: ActivityObj, data: any) => void
+  onCopyAction: (activity: ActivityObj, data: any) => void
+  onDeleteAction: (activity: ActivityObj, data: any) => void
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
@@ -770,11 +778,7 @@ export default function Prevent({ participant,
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => setOpenData(false)}
-              color="default"
-              aria-label="Menu"
-            >
+            <IconButton onClick={() => setOpenData(false)} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>

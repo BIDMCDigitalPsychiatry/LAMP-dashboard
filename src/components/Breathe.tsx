@@ -95,47 +95,6 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  "@keyframes ExhaleText": {
-    "0%": { opacity: 0 },
-    "15%": { opacity: 1 },
-    "40%": { opacity: 1 },
-    "50%": { opacity: 0, display: "inline" },
-    "75%": { opacity: 0 },
-    "100%": { opacity: 0, display: "none" },
-  },
-
-  "@keyframes InhaleText": {
-    "0%": { opacity: 0 },
-    "25%": { opacity: 0, display: "none" },
-    "50%": { opacity: 0 },
-    "65%": { opacity: 1, display: "inline" },
-    "80%": { opacity: 1 },
-    "100%": { opacity: 0 },
-  },
-  inhale_exhale: { position: "relative", height: 50 },
-  InhaleContainer: {
-    display: "block",
-    animation: "$InhaleText 6.135s ease infinite",
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    position: "absolute",
-    width: "100%",
-    bottom: 30,
-    textTransform: "capitalize",
-  },
-  ExhaleContainer: {
-    display: "block",
-    marginTop: "-2rem",
-    animation: "$ExhaleText 6.135s ease infinite",
-    fontSize: 30,
-    fontWeight: "bold",
-    textAlign: "center",
-    position: "absolute",
-    width: "100%",
-    bottom: 30,
-    textTransform: "capitalize",
-  },
   flower: { width: "100%", maxWidth: 375 },
   breatheReview: {
     "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 25, marginTop: -50 },
@@ -148,6 +107,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#FFAC98",
   },
   videoNav: {
+    marginBottom: 30,
     "& video": {
       [theme.breakpoints.down("xs")]: {
         width: "100%",
@@ -284,14 +244,6 @@ export default function Breathe({ ...props }) {
           >
             <Grid item className={classes.videoNav}>
               <video src="videos/Lotus.mp4" autoPlay={true} loop></video>
-              <Box className={classes.inhale_exhale}>
-                <Typography variant="overline" className={classes.ExhaleContainer}>
-                  Exhale
-                </Typography>
-                <Typography variant="overline" className={classes.InhaleContainer}>
-                  Inhale
-                </Typography>
-              </Box>
             </Grid>
             <Box style={{ width: "100px", height: "100px" }}>
               <CircularProgressbar
