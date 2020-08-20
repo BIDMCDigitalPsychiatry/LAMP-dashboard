@@ -66,9 +66,9 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-    backbtn: { 
+    backbtn: {
       // paddingLeft: 0, paddingRight: 0
-     },
+    },
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
@@ -396,20 +396,24 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
-export default function Prevent({ participant, 
-  activeTab, 
+export default function Prevent({
+  participant,
+  activeTab,
   hiddenEvents,
   enableEditMode,
   onEditAction,
   onCopyAction,
-  onDeleteAction,...props }:
-   { participant: ParticipantObj
-    activeTab: Function 
-    hiddenEvents: string[]
-    enableEditMode: boolean
-    onEditAction: (activity: ActivityObj, data: any) => void
-    onCopyAction: (activity: ActivityObj, data: any) => void
-    onDeleteAction: (activity: ActivityObj, data: any) => void }) {
+  onDeleteAction,
+  ...props
+}: {
+  participant: ParticipantObj
+  activeTab: Function
+  hiddenEvents: string[]
+  enableEditMode: boolean
+  onEditAction: (activity: ActivityObj, data: any) => void
+  onCopyAction: (activity: ActivityObj, data: any) => void
+  onDeleteAction: (activity: ActivityObj, data: any) => void
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)

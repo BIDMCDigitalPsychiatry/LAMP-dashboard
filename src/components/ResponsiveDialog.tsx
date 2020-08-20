@@ -22,7 +22,7 @@ export default function ResponsiveDialog({
     <Dialog {...props} fullScreen={!!fullScreen ? true : sm} TransitionComponent={!!animate ? SlideUp : undefined}>
       {!!transient && (
         <IconButton
-           style={{
+          style={{
             position: "fixed",
             left: 16,
             top: 16,
@@ -30,7 +30,7 @@ export default function ResponsiveDialog({
             WebkitBackdropFilter: "blur(5px)",
             zIndex: 99999,
           }}
-          color="default"          
+          color="default"
           onClick={props.onClose as any}
           aria-label="Close"
         >

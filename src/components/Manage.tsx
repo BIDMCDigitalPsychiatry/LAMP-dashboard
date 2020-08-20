@@ -364,7 +364,14 @@ export default function Manage({ participant, ...props }: { participant: Partici
             ),
             jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            Medication_tracker: <NewMedication onComplete={() => setLaunchedActivity(undefined)} />,
+            Medication_tracker: (
+              <NewMedication
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>

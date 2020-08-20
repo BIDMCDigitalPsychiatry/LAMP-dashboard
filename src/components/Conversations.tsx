@@ -113,7 +113,7 @@ export default function Conversations({
   participantOnly?: boolean
   refresh?: boolean
   style?: any
-  msgOpen?:boolean
+  msgOpen?: boolean
 }) {
   const classes = useStyles()
   const [open, setOpen] = useState(msgOpen ?? false)
@@ -179,48 +179,48 @@ export default function Conversations({
 
   return (
     <Container style={{ marginTop: "5%" }}>
-      {!msgOpen && 
-      <Box>
-        {
-          getMessages()
-            .filter(
-              (x) =>
-                (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-                (!participantOnly && x.from === "participant")
-            )
-            .map((x) => (
-              <Box
-                border={0}
-                className={classes.conversationStyle}
-                onClick={() => {
-                  refreshMessages()
-                  setSender(x.from)
-                  setLastDate(new Date(x.date || 0))
-                  setOpen(true)
-                }}
-                style={{
-                  background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
-                  border: x.status === 0 ? "0" : "1px solid #C6C6C6",
-                }}
-              >
-                <Grid container>
-                  <Grid item xs>
-                    <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
-                      {x.from}
-                    </Typography>
+      {!msgOpen && (
+        <Box>
+          {
+            getMessages()
+              .filter(
+                (x) =>
+                  (x.type === "message" && !!participantOnly && x.from === "researcher") ||
+                  (!participantOnly && x.from === "participant")
+              )
+              .map((x) => (
+                <Box
+                  border={0}
+                  className={classes.conversationStyle}
+                  onClick={() => {
+                    refreshMessages()
+                    setSender(x.from)
+                    setLastDate(new Date(x.date || 0))
+                    setOpen(true)
+                  }}
+                  style={{
+                    background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
+                    border: x.status === 0 ? "0" : "1px solid #C6C6C6",
+                  }}
+                >
+                  <Grid container>
+                    <Grid item xs>
+                      <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
+                        {x.from}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs className={classes.conversationtime} justify="space-between">
+                      <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs className={classes.conversationtime} justify="space-between">
-                    <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
-                  </Grid>
-                </Grid>
-                <Box width={1}>
-                  <Typography>{x.text}</Typography>
+                  <Box width={1}>
+                    <Typography>{x.text}</Typography>
+                  </Box>
                 </Box>
-              </Box>
-            ))[0]
-        }
-      </Box>
-      }
+              ))[0]
+          }
+        </Box>
+      )}
       <ResponsiveDialog
         transient={false}
         animate
@@ -272,7 +272,6 @@ export default function Conversations({
                 <Typography>{x.text}</Typography>
               </Box>
             ))}
-          
 
           <Box display="flex" className={classes.composeMsg}>
             <Box width="100%">

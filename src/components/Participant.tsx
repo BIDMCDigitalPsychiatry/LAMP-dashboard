@@ -69,7 +69,6 @@ async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
   return !!_hidden.error ? false : (_hidden.data as boolean)
 }
 
-
 async function addHiddenEvent(
   participant: ParticipantObj,
   timestamp: number,
@@ -177,14 +176,13 @@ export default function Participant({
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
 
-  
   const activeTab = (newTab) => {
     _setTab(newTab)
     const tabName = getTabName(newTab)
     props.activeTab(tabName)
     setVisibleActivities([])
   }
-  
+
   const hideEvent = async (timestamp?: number, activity?: string) => {
     if (timestamp === undefined && activity === undefined) {
       setHiddenEvents(hiddenEvents) // trigger a reload for dependent components only
@@ -193,7 +191,7 @@ export default function Participant({
     let result = await addHiddenEvent(participant, timestamp, activity)
     if (!!result) {
       setHiddenEvents(result)
-    } 
+    }
   }
 
   const submitSurvey = (response, overwritingTimestamp) => {
@@ -220,10 +218,10 @@ export default function Participant({
       // If a timestamp was provided to overwrite data, hide the original event too.
       if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
       else hideEvent() // trigger a reload of dependent components anyway
-    })    
+    })
   }
- 
-console.log(visibleActivities);
+
+  console.log(visibleActivities)
   return (
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
@@ -233,7 +231,13 @@ console.log(visibleActivities);
       </Slide>
       <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Survey id={participant.id} activities={activities} visibleActivities={visibleActivities} onComplete={submitSurvey} setVisibleActivities={setVisibleActivities}/>          
+          <Survey
+            id={participant.id}
+            activities={activities}
+            visibleActivities={visibleActivities}
+            onComplete={submitSurvey}
+            setVisibleActivities={setVisibleActivities}
+          />
         </Box>
       </Slide>
       <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
@@ -244,44 +248,41 @@ console.log(visibleActivities);
       <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
           <Prevent
-            participant={participant} 
-            activeTab={activeTab} 
+            participant={participant}
+            activeTab={activeTab}
             hiddenEvents={hiddenEvents}
             enableEditMode={!_patientMode()}
-            onEditAction={(activity, data) =>
-              {
-                setSurveyName(activity.name)
-                setVisibleActivities([
-                  {
-                    ...activity,
-                    prefillData: [
-                      data.slice.map(({ item, value }) => ({
-                        item,
-                        value,
-                      })),
-                    ],
-                    prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
-                  },
-                ])
-              }
-            }
-            onCopyAction={(activity, data) =>
-              {
-                setSurveyName(activity.name)
-                setVisibleActivities([
-                  {
-                    ...activity,
-                    prefillData: [
-                      data.slice.map(({ item, value }) => ({
-                        item,
-                        value,
-                      })),
-                    ],
-                  },
-                ])
-              }
-            }
-            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)} />
+            onEditAction={(activity, data) => {
+              setSurveyName(activity.name)
+              setVisibleActivities([
+                {
+                  ...activity,
+                  prefillData: [
+                    data.slice.map(({ item, value }) => ({
+                      item,
+                      value,
+                    })),
+                  ],
+                  prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
+                },
+              ])
+            }}
+            onCopyAction={(activity, data) => {
+              setSurveyName(activity.name)
+              setVisibleActivities([
+                {
+                  ...activity,
+                  prefillData: [
+                    data.slice.map(({ item, value }) => ({
+                      item,
+                      value,
+                    })),
+                  ],
+                },
+              ])
+            }}
+            onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
+          />
         </Box>
       </Slide>
       <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
@@ -308,7 +309,14 @@ console.log(visibleActivities);
           setVisibleActivities([])
         }}
       >
-          <SurveyInstrument id={participant.id} fromPrevent={true} type={surveyName} group={visibleActivities} setVisibleActivities={setVisibleActivities} onComplete={submitSurvey} />     
+        <SurveyInstrument
+          id={participant.id}
+          fromPrevent={true}
+          type={surveyName}
+          group={visibleActivities}
+          setVisibleActivities={setVisibleActivities}
+          onComplete={submitSurvey}
+        />
       </ResponsiveDialog>
     </React.Fragment>
   )

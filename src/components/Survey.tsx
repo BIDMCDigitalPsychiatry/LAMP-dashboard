@@ -32,7 +32,6 @@ import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -179,16 +178,7 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
-
-
-export default function Survey({  
-  id,
-  activities,
-  visibleActivities,
-  setVisibleActivities,
-  onComplete,
-  ...props
-}) {
+export default function Survey({ id, activities, visibleActivities, setVisibleActivities, onComplete, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
@@ -209,11 +199,10 @@ export default function Survey({
     setOpenComplete(false)
   }
 
-
-  const submitSurveyType = (response) => {     
-      setOpenData(false)
-      setOpenComplete(true) 
-      onComplete(response) 
+  const submitSurveyType = (response) => {
+    setOpenData(false)
+    setOpenComplete(true)
+    onComplete(response)
   }
 
   return (
@@ -229,10 +218,10 @@ export default function Survey({
                 sm={4}
                 md={3}
                 lg={3}
-                onClick={() => {                
+                onClick={() => {
                   setVisibleActivities([y])
                   setQuestionCount(y.settings.length)
-                  handleClickOpen(y.name)                
+                  handleClickOpen(y.name)
                 }}
                 className={classes.thumbMain}
               >
@@ -348,8 +337,14 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-         <SurveyInstrument id={id} type={dialogueType} fromPrevent={false} group={visibleActivities} setVisibleActivities={setVisibleActivities} onComplete={submitSurveyType} />
-        
+        <SurveyInstrument
+          id={id}
+          type={dialogueType}
+          fromPrevent={false}
+          group={visibleActivities}
+          setVisibleActivities={setVisibleActivities}
+          onComplete={submitSurveyType}
+        />
       </ResponsiveDialog>
     </Container>
   )

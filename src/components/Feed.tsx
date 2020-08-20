@@ -36,6 +36,14 @@ import WeekView from "./WeekView"
 import { Participant as ParticipantObj } from "lamp-core"
 import TipNotification from "./TipNotification"
 import LAMP from "lamp-core"
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import DateFnsUtils from "@date-io/date-fns"
+
+class LocalizedUtils extends DateFnsUtils {
+  getWeekdays() {
+    return ["S", "M", "T", "W", "T", "F", "S"]
+  }
+}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -234,11 +242,45 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     large_calendar: {
+      "& span": {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "rgba(0, 0, 0, 0.75)",
+      },
+      // "& p": {fontSize: 10,},
+
       [theme.breakpoints.down("sm")]: {
         display: "none",
       },
     },
     thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    calendarCustom: {},
+    highlight: {
+      // background: "#ccc"
+    },
+    day: {
+      "& p": { fontSize: 10 },
+    },
+    currentDay: {
+      "& button": {
+        width: 36,
+        height: 36,
+        background: "#ECF4FF",
+        border: "1px solid #7599FF",
+        display: "block",
+        "& p": { fontSize: 10, color: "#618EF7" },
+      },
+    },
+    selectedDay: {
+      "& button": {
+        width: 36,
+        height: 36,
+        background: "#7599FF",
+        display: "block",
+        boxShadow: "0px 10px 15px rgba(134, 182, 255, 0.25)",
+        "& p": { fontSize: 10, color: "white" },
+      },
+    },
   })
 )
 
@@ -253,6 +295,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const [completed, setCompleted] = useState([])
   const [open, setOpen] = useState(false)
   const [feedData, setFeedData] = useState([])
+  const [selectedDays, setSelectedDays] = useState([1, 2, 15])
 
   const handleNext = (index: number) => {
     setCompleted({ ...completed, [index]: true })
@@ -276,12 +319,11 @@ export default function Feed({ participant, ...props }: { participant: Participa
     var feedList = []
     var goals = JSON.parse(localStorage.getItem("goals"))
     if (goals != undefined) {
-      //var goalsList = feedData
       goals.map((goal) => {
         var item = {
           type: "goal",
           time: goal.reminderTime,
-          title: goal.goalName,
+          title: "Goal: " + goal.goalName,
           icon: goal.goalType,
           description: goal.goalValue + " " + goal.goalUnit,
         }
@@ -290,12 +332,11 @@ export default function Feed({ participant, ...props }: { participant: Participa
     }
     var medications = JSON.parse(localStorage.getItem("medications"))
     if (medications != undefined) {
-      //var goalsList = feedData
       medications.map((medication) => {
         var item = {
           type: "manage",
           time: medication.reminderTime,
-          title: medication.medicationName,
+          title: "Medication: " + medication.medicationName,
           icon: "medication",
           description: "test description",
         }
@@ -308,6 +349,12 @@ export default function Feed({ participant, ...props }: { participant: Participa
     })
     setFeedData(feedList)
   }, [])
+
+  const showFeedDetails = (type) => {
+    if (type == "learn") {
+      setOpen(true)
+    }
+  }
 
   return (
     <div className={classes.root}>
@@ -336,7 +383,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
                   <Card
                     className={completed[index] ? classes[label.type + "Completed"] : classes[label.type]}
                     variant="outlined"
-                    onClick={() => setOpen(true)}
+                    onClick={() => showFeedDetails(label.type)}
                   >
                     <Grid container spacing={0}>
                       <Grid xs container justify="center" direction="column" className={classes.feedtasks} spacing={0}>
@@ -393,15 +440,35 @@ export default function Feed({ participant, ...props }: { participant: Participa
           </Stepper>
         </Grid>
         <Grid item xs className={classes.large_calendar}>
-          <DatePicker
-            autoOk
-            orientation="landscape"
-            variant="static"
-            openTo="date"
-            value={date}
-            onChange={changeDate}
-            disableToolbar={true}
-          />
+          <MuiPickersUtilsProvider utils={LocalizedUtils}>
+            <DatePicker
+              autoOk
+              disableToolbar
+              orientation="landscape"
+              variant="static"
+              openTo="date"
+              value={date}
+              onChange={changeDate}
+              renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
+                const isSelected = isInCurrentMonth && selectedDays.includes(date.getDate())
+                console.log(selectedDate)
+                const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
+                const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
+                const view = isSelected ? (
+                  <div className={classes.highlight}>
+                    <span className={classes.day}> {dayComponent} </span>
+                  </div>
+                ) : isCurrentDay ? (
+                  <span className={isActiveDate ? classes.selectedDay : classes.currentDay}> {dayComponent} </span>
+                ) : isActiveDate ? (
+                  <span className={classes.selectedDay}> {dayComponent} </span>
+                ) : (
+                  <span className={classes.day}> {dayComponent} </span>
+                )
+                return view
+              }}
+            />
+          </MuiPickersUtilsProvider>
         </Grid>
       </Grid>
       <ResponsiveDialog
