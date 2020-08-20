@@ -36,6 +36,7 @@ export function spliceActivity({ raw, tag }) {
           text: question.text,
           type: tag?.questions?.[idx]?.multiselect === true ? "multiselect" : question.type,
           description: tag?.questions?.[idx]?.description,
+          popupText:tag?.questions?.[idx]?.popupText,
           options:
             question.options === null
               ? null
@@ -59,6 +60,7 @@ export function unspliceActivity(x) {
         text: y?.text,
         type: y?.type === "multiselect" ? "list" : y?.type,
         options: y?.options === null ? null : y?.options?.map((z) => z?.value),
+        popupText: y?.popupText === null ? null : y?.popupText
       })),
     },
     tag: {
@@ -67,6 +69,7 @@ export function unspliceActivity(x) {
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
         options: y?.options === null ? null : y?.options?.map((z) => z?.description),
+        popupText: y?.popupText === null ? null : y?.popupText
       })),
     },
   }
