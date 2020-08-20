@@ -28,14 +28,12 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: 180,
       },
     },
-
     header: {
       background: "#FFF9E5",
       padding: 20,
       [theme.breakpoints.up("sm")]: {
         textAlign: "center",
-      },
-     
+      },   
 
       "& h2": {
         fontSize: 25,
@@ -100,7 +98,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#cea000" },
     },
     backbtn: { 
-      // paddingLeft: 0, paddingRight: 0, 
       position: "absolute", left: 10,
     },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
@@ -128,56 +125,56 @@ export default function TipNotification({ ...props }) {
         <Typography variant="h2">Todays's Tip: Mood</Typography>
       </div>
       <Grid
-  container
-  direction="row"
-  justify="center"
-  alignItems="flex-start"
->
-      <Grid item lg={4} sm={10} xs={12}>
-      <CardContent className={classes.tipscontentarea}>
-        <Typography variant="h3" gutterBottom>
-          Focus on the good things
-        </Typography>
-        <Typography variant="body2" color="textSecondary" component="p">
-          Challenging situations and obstacles are a part of life. When you’re faced with one, focus on the good things
-          no matter how small or seemingly insignificant they seem. If you look for it, you can always find the
-          proverbial silver lining in every cloud — even if it’s not immediately obvious. For example, if someone
-          cancels plans, focus on how it frees up time for you to catch up on a TV show or other activity you enjoy
-        </Typography>
-        <Box mt={4} mb={3}>
-          <Grid container direction="row" justify="center" alignItems="center">
-            <Grid container spacing={0} xs={4} md={4} lg={2}>
-              <Grid item xs={3} className={classes.lineyellow}></Grid>
-              <Grid item xs={3} className={classes.linegreen}></Grid>
-              <Grid item xs={3} className={classes.linered}></Grid>
-              <Grid item xs={3} className={classes.lineblue}></Grid>
-            </Grid>
-          </Grid>
-        </Box>{" "}
-        <Box className={classes.howFeel}>Was this helpful today?</Box>
-        <Box textAlign="center">
-          <IconButton
-            onClick={() => handleClickStatus("Yes")}
-            className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-          >
-            <ThumbsUp />
-            <label>Yes</label>
-          </IconButton>
-          <IconButton
-            onClick={() => handleClickStatus("No")}
-            className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-          >
-            <ThumbsDown />
-            <label>No</label>
-          </IconButton>
-        </Box>
-        <Box textAlign="center">
-          <Fab variant="extended" color="primary" className={classes.btnyellow}>
-            Completed
-          </Fab>
-        </Box>
-      </CardContent>
-      </Grid>
+          container
+          direction="row"
+          justify="center"
+          alignItems="flex-start"
+        >
+        <Grid item lg={4} sm={10} xs={12}>
+          <CardContent className={classes.tipscontentarea}>
+            <Typography variant="h3" gutterBottom>
+              Focus on the good things
+            </Typography>
+            <Typography variant="body2" color="textSecondary" component="p">
+              Challenging situations and obstacles are a part of life. When you’re faced with one, focus on the good things
+              no matter how small or seemingly insignificant they seem. If you look for it, you can always find the
+              proverbial silver lining in every cloud — even if it’s not immediately obvious. For example, if someone
+              cancels plans, focus on how it frees up time for you to catch up on a TV show or other activity you enjoy
+            </Typography>
+            <Box mt={4} mb={3}>
+              <Grid container direction="row" justify="center" alignItems="center">
+                <Grid container spacing={0} xs={4} md={4} lg={2}>
+                  <Grid item xs={3} className={classes.lineyellow}></Grid>
+                  <Grid item xs={3} className={classes.linegreen}></Grid>
+                  <Grid item xs={3} className={classes.linered}></Grid>
+                  <Grid item xs={3} className={classes.lineblue}></Grid>
+                </Grid>
+              </Grid>
+            </Box>
+            <Box className={classes.howFeel}>Was this helpful today?</Box>
+            <Box textAlign="center">
+              <IconButton
+                onClick={() => handleClickStatus("Yes")}
+                className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+              >
+                <ThumbsUp />
+                <label>Yes</label>
+              </IconButton>
+              <IconButton
+                onClick={() => handleClickStatus("No")}
+                className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+              >
+                <ThumbsDown />
+                <label>No</label>
+              </IconButton>
+            </Box>
+            <Box textAlign="center">
+              <Fab variant="extended" color="primary" className={classes.btnyellow}>
+                Completed
+              </Fab>
+            </Box>
+          </CardContent>
+        </Grid>
       </Grid>
     </div>
   )

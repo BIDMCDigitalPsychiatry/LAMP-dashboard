@@ -18,6 +18,8 @@ import {
   useMediaQuery,
   useTheme,
   ButtonBase,
+  Fab,
+  Link,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
@@ -44,30 +46,25 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       width: "100%",
     },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
     inlineHeader: {
       background: "#FFFFFF",
       boxShadow: "none",
 
-      "& h5": { fontSize: 25, paddingLeft: 16, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
+      [theme.breakpoints.down("xs")]: {
+        display: "block",
+      },
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "center",
+        textAlign: "left",
         fontWeight: "600",
-        fontSize: 18,
+        fontSize: 25,
         width: "calc(100% - 96px)",
       },
-    },
-    backbtn: {
-      // paddingLeft: 0, paddingRight: 0
     },
     toolbar: {
       minHeight: 90,
@@ -75,11 +72,6 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingTop: theme.spacing(1),
       paddingBottom: theme.spacing(1),
     },
-    title: {
-      flexGrow: 1,
-      alignSelf: "flex-end",
-    },
-
     preventlabel: {
       fontSize: 16,
       minHeight: 48,
@@ -88,7 +80,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       textAlign: "left",
     },
-
     prevent: {
       background: "#ECF4FF",
       padding: "10px 0",
@@ -122,6 +113,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       [theme.breakpoints.down("xs")]: {
         minHeight: "auto",
+      },
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 240,
+        maxHeight: 240,
       },
 
       "& h6": {
@@ -175,7 +170,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "0 0 15px 0",
     },
     maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
-    maxw300: { maxWidth: 300, marginLeft: "auto", marginRight: "auto" },
+    maxw300: {
+      maxWidth: 300,
+      marginLeft: "auto",
+      marginRight: "auto",
+      [theme.breakpoints.up("lg")]: {
+        maxWidth: "90%",
+        marginTop: 40,
+      },
+    },
     activitydatapop: {
       display: "flex",
       alignItems: "center",
@@ -184,18 +187,35 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       maxHeight: "280px",
     },
-    thumbMain: {
-      // maxWidth: 255
-    },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     preventGraph: {
       marginTop: -35,
       maxHeight: 100,
-      "& h2": { fontWeight: 600, fontSize: 75, color: "#4C66D6", marginTop: 22 },
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          marginTop: 15,
+        },
+      },
+      "& h2": {
+        fontWeight: 600,
+        fontSize: 75,
+        color: "#4C66D6",
+        marginTop: 22,
+        [theme.breakpoints.up("lg")]: {
+          marginTop: 40,
+        },
+      },
     },
     preventRightSVG: {
       "& svg": { maxWidth: 40, maxHeight: 40 },
+    },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    backbtn: {
+      //  paddingLeft: 0, paddingRight: 0
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 0,
+      },
     },
   })
 )
@@ -507,7 +527,7 @@ export default function Prevent({
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
           .map((activity) => (
-            <Grid item xs={12} sm={6} md={6} lg={6} className={classes.thumbMain}>
+            <Grid item xs={12} sm={6} md={6} lg={6}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                   <Typography className={classes.preventlabelFull}>
@@ -550,7 +570,7 @@ export default function Prevent({
             </Grid>
           ))}
 
-        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
+        <Grid item xs={6} sm={3} md={3} lg={3}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
@@ -575,7 +595,7 @@ export default function Prevent({
           </ButtonBase>
         </Grid>
 
-        <Grid item xs={6} sm={3} md={3} lg={3} className={classes.thumbMain}>
+        <Grid item xs={6} sm={3} md={3} lg={3}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
@@ -618,7 +638,7 @@ export default function Prevent({
       </Grid>
       <Grid container spacing={2}>
         {(selectedSensors || []).includes("Social Context") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -647,7 +667,7 @@ export default function Prevent({
           </Grid>
         )}
         {(selectedSensors || []).includes("Environmental Context") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -677,7 +697,7 @@ export default function Prevent({
         )}
 
         {(selectedSensors || []).includes("Step Count") && (
-          <Grid item xs={6} sm={4} md={3} lg={3} className={classes.thumbMain}>
+          <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
                 className={classes.prevent}
@@ -740,7 +760,10 @@ export default function Prevent({
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.activitydatapop}
+        classes={{
+          root: classes.activitydatapop,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title">
           {dialogueType === 0 ? "Activity data" : "Sensor Data"}
@@ -771,10 +794,10 @@ export default function Prevent({
           )}
         </DialogContent>
         <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={1}>
-            <Button onClick={handleClose} color="primary">
+          <Box textAlign="center" width={1} mt={3} mb={3}>
+            <Link onClick={handleClose} color="primary">
               Done
-            </Button>
+            </Link>
           </Box>
         </DialogActions>
       </Dialog>
@@ -794,13 +817,13 @@ export default function Prevent({
             <IconButton
               onClick={() => setOpenData(false)}
               color="default"
-              className={classes.backbtn}
               aria-label="Menu"
+              className={classes.backbtn}
             >
               <Icon>arrow_back</Icon>
             </IconButton>
+            <Typography variant="h5">{selectedActivityName}</Typography>
           </Toolbar>
-          <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
         {supportsSidebar && <BottomMenu activeTab={activeTab} tabValue={3} />}
 

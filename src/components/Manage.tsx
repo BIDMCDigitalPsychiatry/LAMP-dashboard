@@ -73,7 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     header: {
       background: "#FFEFEC",
-      padding: "25px 20px 10px",
+      padding: "35px 40px 10px",
       textAlign: "center",
 
       "& h2": {
@@ -107,6 +107,7 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
       fontWeight: "bold",
+      marginBottom: 20,
       "&:hover": {
         boxShadow:
           "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
@@ -121,7 +122,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     dialogueContent: {
-      padding: 20,
+      padding: "20px 40px 40px",
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
     },
     dialogtitle: { padding: 0 },
@@ -148,7 +149,7 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
-    dialogueCurve: { borderRadius: 10 },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
   })
 )
 
@@ -184,7 +185,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
+              <Box mt={2}>
                 <BreatheIcon />
               </Box>
               <Typography className={classes.cardlabel}>Breathe</Typography>
@@ -221,19 +222,12 @@ export default function Manage({ participant, ...props }: { participant: Partici
         </Grid>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            {/* <Link
-              component={RouterLink}
-              to={`/participant/${participant.id}/hopebox`}
-              underline="none"
-              className={classes.fullwidthBtn}
-            > */}
             <Card className={classes.manage}>
               <Box mt={1}>
                 <HopeBoxIcon />
               </Box>
               <Typography className={classes.cardlabel}>Hope box</Typography>
             </Card>
-            {/* </Link> */}
           </ButtonBase>
         </Grid>
         <Grid
@@ -416,7 +410,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
           )}
           {dialogueType === "Breathe" && (
-            <Typography variant="body2" color="textSecondary" component="p">
+            <Typography variant="body2" component="p">
               Follow the motion of the lotus flower opening and closing to control your breaths in and out.
             </Typography>
           )}

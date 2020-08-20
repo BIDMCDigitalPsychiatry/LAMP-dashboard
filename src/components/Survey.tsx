@@ -18,7 +18,6 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
-import BottomMenu from "./BottomMenu"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
@@ -36,31 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },
-    customheader: {
-      backgroundColor: "white",
-      boxShadow: "none",
-      "& h5": { color: "#555555", fontSize: 25, fontWeight: "bold" },
-    },
-    inlineHeader: {
-      background: "#FFFFFF",
-      boxShadow: "none",
-
-      "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
-    },
-    toolbardashboard: {
-      minHeight: 65,
-      padding: "0 10px",
-      "& h5": {
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "center",
-        fontWeight: "600",
-        fontSize: 18,
-        width: "calc(100% - 96px)",
-      },
-    },
-    backbtn: {
-      // paddingLeft: 0, paddingRight: 0
     },
     linkButton: {
       padding: "15px 25px 15px 25px",
@@ -189,7 +163,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const handleClickOpen = (type: string) => {
-    console.log(type)
     setDialogueType(type)
     setOpen(true)
   }
@@ -312,7 +285,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box textAlign="center">
+          <Box textAlign="center" pb={4}>
             <Typography variant="h5" gutterBottom>
               Nice work!
             </Typography>
@@ -322,9 +295,9 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <Box textAlign="center">
               <Ribbon width="170" height="226" />
             </Box>
-            <Button className={classes.gotit} onClick={handleClose}>
+            {/* <Button className={classes.gotit} onClick={handleClose}>
               Got it
-            </Button>
+            </Button> */}
           </Box>
         </DialogContent>
       </Dialog>

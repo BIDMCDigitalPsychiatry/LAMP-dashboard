@@ -36,10 +36,7 @@ const useStyles = makeStyles((theme) => ({
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
-  },
-  backbtn: { 
-    // paddingLeft: 0, paddingRight: 0
-   },
+  }, 
   background: {
     background: "#e0e0e0",
     minHeight: "calc(100vh - 65px)",
@@ -175,7 +172,7 @@ export default function ScratchImage({ ...props }) {
     <div>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Scratch card</Typography>

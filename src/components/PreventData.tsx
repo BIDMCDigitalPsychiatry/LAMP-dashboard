@@ -10,27 +10,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
   },
-  table: {
-    minWidth: "100%",
-    "& tr:nth-child(even)": {
-      backgroundColor: "rgba(236, 244, 255, 0.75)",
-    },
-    "& th": { border: 0, padding: "12px 0px 12px 20px" },
-    "& td": { border: 0, padding: "12px 0px 12px 20px" },
-    "& td:last-child": { paddingRight: 20 },
-  },
-  root2: {
-    maxWidth: 345,
-    margin: "16px",
-    maxLength: 500,
-  },
-  media: {
-    height: 200,
-  },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightRegular,
-  },
   moodContent: {
     padding: 17,
 
@@ -42,10 +21,6 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: 20,
       "& span": { color: "#ff8f26" },
     },
-  },
-  recentstoreshd: {
-    padding: "0 20px",
-    "& h5": { fontSize: 18, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 10 },
   },
   graphcontainer: { height: "auto" },
 }))
@@ -83,8 +58,8 @@ export default function PreventData({
   const classes = useStyles()
 
   return (
-    <Box>
-      <Grid container>
+    <Grid container direction="row" justify="center" alignItems="flex-start">
+      <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
             {graphType == 0 ? activity.name : activity}: <Box component="span">fluctuating</Box>
@@ -95,45 +70,47 @@ export default function PreventData({
             Studies show a change of scenery helps keep the mid engaged and positive.
           </Typography>
 
-          <Typography variant="h5">Survey data : </Typography>
           <Typography variant="h5" color="textSecondary">
             Oct 10, 5:32pm
           </Typography>
         </CardContent>
+
+        <Box
+          className={classes.graphcontainer}
+          style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
+        >
+          {graphType === 1 ? (
+            <RadialDonutChart data={events} detailPage={true} width={370} height={350} />
+          ) : graphType === 2 ? (
+            <Sparkline
+              minWidth={250}
+              minHeight={220}
+              XAxisLabel="Time"
+              YAxisLabel="  "
+              color={colors.blue[500]}
+              data={events}
+            />
+          ) : (
+            <ActivityCard
+              activity={activity}
+              events={events}
+              startDate={earliestDate}
+              forceDefaultGrid={_hideExperimental()}
+              onEditAction={
+                activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onEditAction(activity, data)
+              }
+              onCopyAction={
+                activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onCopyAction(activity, data)
+              }
+              onDeleteAction={
+                activity.spec !== "lamp.survey" || !enableEditMode
+                  ? undefined
+                  : (data) => onDeleteAction(activity, data)
+              }
+            />
+          )}
+        </Box>
       </Grid>
-      <Box
-        className={classes.graphcontainer}
-        style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
-      >
-        {graphType === 1 ? (
-          <RadialDonutChart data={events} detailPage={true} width={370} height={350} />
-        ) : graphType === 2 ? (
-          <Sparkline
-            minWidth={250}
-            minHeight={220}
-            XAxisLabel="Time"
-            YAxisLabel="  "
-            color={colors.blue[500]}
-            data={events}
-          />
-        ) : (
-          <ActivityCard
-            activity={activity}
-            events={events}
-            startDate={earliestDate}
-            forceDefaultGrid={_hideExperimental()}
-            onEditAction={
-              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onEditAction(activity, data)
-            }
-            onCopyAction={
-              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onCopyAction(activity, data)
-            }
-            onDeleteAction={
-              activity.spec !== "lamp.survey" || !enableEditMode ? undefined : (data) => onDeleteAction(activity, data)
-            }
-          />
-        )}
-      </Box>
-    </Box>
+    </Grid>
   )
 }
