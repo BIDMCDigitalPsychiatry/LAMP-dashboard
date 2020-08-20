@@ -184,10 +184,6 @@ export default function Participant({
     })
   }
 
-<<<<<<< HEAD
-=======
-  console.log(visibleActivities)
->>>>>>> dashboard-design
   return (
     <React.Fragment>
       <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>

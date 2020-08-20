@@ -321,10 +321,6 @@ function _useTernaryBool() {
 
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
-<<<<<<< HEAD
-=======
-  console.log("xval", selectedValue)
->>>>>>> dashboard-design
   const classes = useStyles()
 
   return (
@@ -701,10 +697,7 @@ function Question({ onResponse, number, text, type, options, value, ...props }) 
       label: "Exellent",
     },
   ]
-<<<<<<< HEAD
-=======
-  console.log("value", value)
->>>>>>> dashboard-design
+
   switch (type) {
     case "rating":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
@@ -894,18 +887,7 @@ function Section({
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-<<<<<<< HEAD
           <Typography variant="h5">{type.replace(/_/g, " ")}</Typography>
-=======
-          <Typography
-            variant="h5"
-            style={{
-              marginLeft: supportsSidebar ? 0 : undefined,
-            }}
-          >
-            {type.replace(/_/g, " ")}
-          </Typography>
->>>>>>> dashboard-design
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
@@ -997,12 +979,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-<<<<<<< HEAD
 
-=======
-  // const [responses, setResponses] = useState({})
-  console.log(type)
->>>>>>> dashboard-design
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
@@ -1011,15 +988,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
         prefillData: !_patientMode() ? group[0].prefillData : undefined,
         prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
       })
-<<<<<<< HEAD
     })
-=======
-      // const resp = useRef(!!group[0].prefillData ? Object.assign({}, group[0].prefillData) : {})
-      // setResponses(resp)
-    })
-
-    console.log(group[0].prefillData)
->>>>>>> dashboard-design
   }, [group])
 
   return (
@@ -1042,7 +1011,6 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
           type={type}
         />
       </Grid>
-<<<<<<< HEAD
       {fromPrevent && (
         <Grid item>
           <Drawer
@@ -1057,14 +1025,6 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
           >
             <Box flexGrow={1} />
             <Messages refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
-=======
-      {supportsSidebar && !_patientMode() && (
-        <Grid item>
-          <Drawer anchor="right" variant="temporary" open={!!sidebarOpen} onClose={() => setSidebarOpen(undefined)}>
-            <Box flexGrow={1} />
-            <Divider />
-            <Conversations refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
->>>>>>> dashboard-design
           </Drawer>
           <Tooltip title="Patient Notes" placement="left">
             <Fab

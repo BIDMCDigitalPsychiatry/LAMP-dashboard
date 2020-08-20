@@ -66,12 +66,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-<<<<<<< HEAD
-=======
-    backbtn: {
-      // paddingLeft: 0, paddingRight: 0
-    },
->>>>>>> dashboard-design
     toolbar: {
       minHeight: 90,
       alignItems: "flex-start",
