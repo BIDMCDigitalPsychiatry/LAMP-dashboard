@@ -23,6 +23,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
+import classnames from "classnames"
 
 const useStyles = makeStyles((theme) => ({
   topicon: {
@@ -139,7 +140,12 @@ export default function LearnTips({ ...props }) {
   const [title, setTitle] = useState(null)
   const [details, setDetails] = useState(null)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  
+  const [status, setStatus] = useState("Yes")
+
+  const handleClickStatus = (statusVal: string) => {
+    setStatus(statusVal)
+  }
+
   return (
     <Container>
       <Box>
@@ -245,15 +251,15 @@ export default function LearnTips({ ...props }) {
             <Box className={classes.howFeel}>Was this helpful today?</Box>
             <Box textAlign="center">
               <IconButton
-              
-                className={classes.likebtn}
+                onClick={() => handleClickStatus("Yes")}
+                className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
                 <ThumbsUp />
                 <label>Yes</label>
               </IconButton>
               <IconButton
-              
-              className={classes.likebtn}
+                onClick={() => handleClickStatus("No")}
+                className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
                 <ThumbsDown />
                 <label>No</label>
