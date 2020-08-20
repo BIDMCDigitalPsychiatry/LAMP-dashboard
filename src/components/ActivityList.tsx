@@ -35,15 +35,16 @@ export function spliceActivity({ raw, tag }) {
       : raw.settings.map((question, idx) => ({
           text: question.text,
           type: tag?.questions?.[idx]?.multiselect === true ? "multiselect" : question.type,
-          description: tag?.questions?.[idx]?.description,
-          popupText:tag?.questions?.[idx]?.popupText,
+          description: tag?.questions?.[idx]?.description,          
           options:
             question.options === null
               ? null
               : question.options?.map((z, idx2) => ({
-                  value: z,
-                  description: tag?.questions?.[idx]?.options?.[idx2],
-                })),
+                  value: z.value,
+                  description: z.description,
+                  popupOption: typeof z.popupText != "undefined" && z.popupText.trim().length > 0 ? true : false,
+                  popupText:z.popupText,
+              })),
         })),
   }
 }
@@ -59,8 +60,7 @@ export function unspliceActivity(x) {
       settings: x.settings?.map((y) => ({
         text: y?.text,
         type: y?.type === "multiselect" ? "list" : y?.type,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.value),
-        popupText: y?.popupText === null ? null : y?.popupText
+        options: y?.options === null ? null : y?.options,      
       })),
     },
     tag: {
@@ -68,8 +68,7 @@ export function unspliceActivity(x) {
       questions: x.settings?.map((y) => ({
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
-        popupText: y?.popupText === null ? null : y?.popupText
+        options: y?.options === null ? null : y?.options,       
       })),
     },
   }

@@ -28,7 +28,10 @@ import {
 
 function SelectList({ checkbox, value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])
+console.log(value)
   useEffect(() => {
+    console.log(options)
+
     onChange(options)
   }, [options])
 
@@ -68,6 +71,8 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                         [idx]: {
                           value: event.target.value,
                           description: options[idx].description,
+                          popupText:options[idx].popupText,
+                          popupOption:options[idx].popupOption,
                         },
                       })
                     )
@@ -104,16 +109,68 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                         [idx]: {
                           value: options[idx].value,
                           description: event.target.value,
+                          popupText:options[idx].popupText,
+                          popupOption:options[idx].popupOption,
                         },
                       })
                     )
                   }
                 />
+                <Box borderColor="grey.400" border={1} borderRadius={4} p={2} style={{marginBottom:"10px"}}>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={x.popupOption || false}
+                            onChange={() => 
+                              setOptions((options) =>
+                                  Object.assign([...options], {
+                                    [idx]: {
+                                      value: options[idx].value,
+                                      description: options[idx].description,
+                                      popupText:options[idx].popupText,
+                                      popupOption:!x.popupOption,
+                                    },
+                                  })
+                                )}
+                            color="primary"
+                          />
+                        }
+                        label="Show popup message"
+                      />  
+                      <Box style={{display : x.popupOption ? "block" : "none"}}>                 
+                        <Grow
+                            in={x.popupOption}
+                            style={{ transformOrigin: '0 0 0' }}
+                            {...(x.popupOption ? { timeout: 1000 } : {})}
+                          >
+                            <TextField fullWidth
+                              id="popup-message"
+                              value={x.popupText || ""} 
+                              label="Message"
+                              variant="outlined" 
+                              margin="dense"
+                              onChange={(event) => setOptions((options) =>
+                                                          Object.assign([...options], {
+                                                            [idx]: {
+                                                              value: options[idx].value,
+                                                              description: options[idx].description,
+                                                              popupText:event.target.value,
+                                                              popupOption:options[idx].popupOption,
+                                                            },
+                                                          })
+                            )} />                          
+                        </Grow>
+                      </Box>  
+                   </Grid>
+                  </Box>
               </React.Fragment>
             }
             labelPlacement="end"
           />
         ))}
+        
+                  
         <FormControlLabel
           control={
             <TypeComponent
@@ -136,18 +193,14 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
-  const [popupOption, setPopupOption] = useState(question.popupText !== "" ? true : false)
-  const [popupText, setPopupText] = useState(question.popupText)
-
   useEffect(() => {
     onChange({
       text,
       type,
       description,
       options: ["list", "select", "multiselect"].includes(type) ? options : null,
-      popupText: ["likert", "boolean"].includes(type) && popupText.trim().length > 0? popupText : "",
     })
-  }, [text, description, type, options, popupText])
+  }, [text, description, type, options])
 
   return (
     <Step {...props}>
@@ -219,34 +272,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <SelectList checkbox={type === "multiselect"} value={options} onChange={setOptions} />
               </Box>
-            </Grid>
-          )}
-          {["likert", "boolean"].includes(type) && (
-            <Grid item>
-              <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
-                <FormGroup> 
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={popupOption}
-                        onChange={() => {
-                          setPopupOption(!popupOption)
-                        }}
-                        color="primary"
-                      />
-                    }
-                    label="Show popup message"
-                  />
-                  <Grow
-                      in={popupOption}
-                      style={{ transformOrigin: '0 0 0' }}
-                      {...(popupOption ? { timeout: 1000 } : {})}
-                    >
-                    <TextField id="popup-message" value={popupText} label="Message" variant="outlined" onChange={(e) => setPopupText(e.target.value)} />
-                  </Grow>
-                </FormGroup>
-              </Box>
-            </Grid>
+            </Grid>   
           )}
         </Grid>
       </StepContent>
