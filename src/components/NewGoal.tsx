@@ -40,7 +40,6 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
 import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
-import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 
 export default function NewGoal({ ...props }) {
   const classes = useStyles()
@@ -71,12 +70,7 @@ export default function NewGoal({ ...props }) {
   const frequency = ["hourly", "daily", "weekly", "monthly"]
 
   useEffect(() => {
-    if (
-      props.goalType == "Exercise" ||
-      props.goalType == "Medication" ||
-      props.goalType == "Meditation" ||
-      props.goalType == "Mood"
-    ) {
+    if (props.goalType == "Exercise" || props.goalType == "Meditation" || props.goalType == "Mood") {
       setUnits(["hours", "minutes"])
       setGoalUnit("minutes")
     } else if (props.goalType == "Weight") {
@@ -91,6 +85,9 @@ export default function NewGoal({ ...props }) {
     } else if (props.goalType == "Finances") {
       setUnits(["$"])
       setGoalUnit("$")
+    } else if (props.goalType == "Medication") {
+      setUnits(["mg", "g", "Ounces"])
+      setGoalUnit("mg")
     } else {
       setUnits(["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"])
       setGoalUnit("Ounces")
