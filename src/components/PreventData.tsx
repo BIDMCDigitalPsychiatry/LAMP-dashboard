@@ -70,7 +70,6 @@ export default function PreventData({
             Studies show a change of scenery helps keep the mid engaged and positive.
           </Typography>
 
-          <Typography variant="h5">Survey data : </Typography>
           <Typography variant="h5" color="textSecondary">
             Oct 10, 5:32pm
           </Typography>
