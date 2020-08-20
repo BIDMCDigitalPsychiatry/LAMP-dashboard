@@ -28,10 +28,8 @@ import {
 
 function SelectList({ checkbox, value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])
-console.log(value)
+  
   useEffect(() => {
-    console.log(options)
-
     onChange(options)
   }, [options])
 
