@@ -41,7 +41,23 @@ export default function ResponsiveDialog({
   return (
     <Dialog {...props} fullScreen={!!fullScreen ? true : sm} TransitionComponent={!!animate ? SlideUp : undefined}>
       {!!transient && (
+<<<<<<< HEAD
         <IconButton className={classes.customBackbtn} color="default" onClick={props.onClose as any} aria-label="Close">
+=======
+        <IconButton
+          style={{
+            position: "fixed",
+            left: 16,
+            top: 16,
+            background: "#ffffff66",
+            WebkitBackdropFilter: "blur(5px)",
+            zIndex: 99999,
+          }}
+          color="default"
+          onClick={props.onClose as any}
+          aria-label="Close"
+        >
+>>>>>>> dashboard-design
           <Icon>arrow_back</Icon>
         </IconButton>
       )}
