@@ -18,6 +18,8 @@ import {
   useMediaQuery,
   useTheme,
   ButtonBase,
+  Fab,
+  Link,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
@@ -48,16 +50,19 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#FFFFFF",
       boxShadow: "none",
 
-      "& h5": { fontSize: 25, paddingLeft: 16, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
+      [theme.breakpoints.down("xs")]: {
+        display: "block",
+      },
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "center",
+        textAlign: "left",
         fontWeight: "600",
-        fontSize: 18,
+        fontSize: 25,
         width: "calc(100% - 96px)",
       },
     },
@@ -165,7 +170,15 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "0 0 15px 0",
     },
     maxw150: { maxWidth: 150, marginLeft: "auto", marginRight: "auto" },
-    maxw300: { maxWidth: 300, marginLeft: "auto", marginRight: "auto" },
+    maxw300: {
+      maxWidth: 300,
+      marginLeft: "auto",
+      marginRight: "auto",
+      [theme.breakpoints.up("lg")]: {
+        maxWidth: "90%",
+        marginTop: 40,
+      },
+    },
     activitydatapop: {
       display: "flex",
       alignItems: "center",
@@ -179,10 +192,30 @@ const useStyles = makeStyles((theme: Theme) =>
     preventGraph: {
       marginTop: -35,
       maxHeight: 100,
-      "& h2": { fontWeight: 600, fontSize: 75, color: "#4C66D6", marginTop: 22 },
+      "& svg": {
+        [theme.breakpoints.up("lg")]: {
+          marginTop: 15,
+        },
+      },
+      "& h2": {
+        fontWeight: 600,
+        fontSize: 75,
+        color: "#4C66D6",
+        marginTop: 22,
+        [theme.breakpoints.up("lg")]: {
+          marginTop: 40,
+        },
+      },
     },
     preventRightSVG: {
       "& svg": { maxWidth: 40, maxHeight: 40 },
+    },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    backbtn: {
+      //  paddingLeft: 0, paddingRight: 0
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 0,
+      },
     },
   })
 )
@@ -727,7 +760,10 @@ export default function Prevent({
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.activitydatapop}
+        classes={{
+          root: classes.activitydatapop,
+          paper: classes.dialogueCurve,
+        }}
       >
         <DialogTitle id="alert-dialog-slide-title">
           {dialogueType === 0 ? "Activity data" : "Sensor Data"}
@@ -758,10 +794,10 @@ export default function Prevent({
           )}
         </DialogContent>
         <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={1}>
-            <Button onClick={handleClose} color="primary">
+          <Box textAlign="center" width={1} mt={3} mb={3}>
+            <Link onClick={handleClose} color="primary">
               Done
-            </Button>
+            </Link>
           </Box>
         </DialogActions>
       </Dialog>
@@ -778,11 +814,16 @@ export default function Prevent({
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setOpenData(false)} color="default" aria-label="Menu">
+            <IconButton
+              onClick={() => setOpenData(false)}
+              color="default"
+              aria-label="Menu"
+              className={classes.backbtn}
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
+            <Typography variant="h5">{selectedActivityName}</Typography>
           </Toolbar>
-          <Typography variant="h5">{selectedActivityName}</Typography>
         </AppBar>
         {supportsSidebar && <BottomMenu activeTab={activeTab} tabValue={3} />}
 
