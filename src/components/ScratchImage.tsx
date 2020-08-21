@@ -135,8 +135,8 @@ export default function ScratchImage({ ...props }) {
   }
 
   useEffect(() => {
-    setImage(background())
     if (canvas != null) {
+      setImage(background())
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
       context = canvas.getContext("2d")
