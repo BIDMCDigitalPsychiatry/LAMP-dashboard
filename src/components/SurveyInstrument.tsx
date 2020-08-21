@@ -782,23 +782,6 @@ function Questions({
             startTime={idx === 0 ? startTime : new Date().getTime()}
           />
           <div className={classes.sliderActionsContainer}>
-            {!supportsSidebar && idx > 0 && (
-              <Fab onClick={handleBack} className={classes.btnBack}>
-                Back
-              </Fab>
-            )}
-            {!supportsSidebar && (
-              <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
-                {idx === value.settings.length - 1
-                  ? toolBarBack && !!prefillData
-                    ? !!prefillTimestamp
-                      ? "Overwrite"
-                      : "Duplicate"
-                    : "Submit"
-                  : "Next"}
-              </Fab>
-            )}
-
             {supportsSidebar && idx === value.settings.length - 1 && (
               <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
                 {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
@@ -856,7 +839,6 @@ function Section({
         )
       })
       setSlideElements(slideElements)
-      // onResponse(Array.from({ ...responses.current, length: value.settings.length }))
     }
     window.addEventListener("scroll", handleChange, true)
   }, [])
