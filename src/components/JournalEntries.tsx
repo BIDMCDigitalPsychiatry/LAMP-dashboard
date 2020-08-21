@@ -32,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "italic",
     padding: 6,
     margin: "0 5px",
+    "&:hover": { background: "#FFAC98" },
     "& label": {
       position: "absolute",
       bottom: -18,
@@ -49,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "10px 20px 35px 20px",
     textAlign: "center",
     "& h4": { fontSize: 25, fontWeight: 600, marginBottom: 15 },
-    "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
+    "& p": { fontSize: 16, fontWeight: 300, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
   },
   dialogueStyle: {
     display: "flex",
@@ -95,6 +96,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
+    marginTop: "50px",
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
@@ -116,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
-  btnNav: { marginBottom: 45 },
+  btnNav: { marginBottom: 0 },
 }))
 
 const getJournals = () => {
@@ -278,7 +280,7 @@ export default function JournalEntries({ ...props }) {
                 </IconButton>
               </Box>
             </Grid>
-            <Box textAlign="center" mt={4}>
+            <Box textAlign="center">
               <Fab className={classes.btnpeach} onClick={props.onComplete}>
                 Submit
               </Fab>

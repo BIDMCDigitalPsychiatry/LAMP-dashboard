@@ -133,6 +133,7 @@ const useStyles = makeStyles((theme) => ({
     color: "rgba(0, 0, 0, 0.75)",
     "&:hover": { background: "#cea000" },
   },
+  colorLine: { maxWidth: 115 },
 }))
 
 export default function LearnTips({ ...props }) {
@@ -232,7 +233,7 @@ export default function LearnTips({ ...props }) {
               </Typography>
               <Box mt={4} mb={2}>
                 <Grid container direction="row" justify="center" alignItems="center">
-                  <Grid container spacing={0} xs={4} md={4} lg={3}>
+                  <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>
                     <Grid item xs={3} className={classes.lineyellow}></Grid>
                     <Grid item xs={3} className={classes.linegreen}></Grid>
                     <Grid item xs={3} className={classes.linered}></Grid>
