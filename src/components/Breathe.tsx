@@ -54,6 +54,7 @@ const useStyles = makeStyles((theme) => ({
     height: 36,
     padding: 9,
     margin: "0 5px",
+    "&:hover": { background: "#FE8470" },
     "& label": {
       position: "absolute",
       bottom: -18,
@@ -133,6 +134,7 @@ const useStyles = makeStyles((theme) => ({
     background: "#86B6FF",
     height: "3px",
   },
+  colorLine: { maxWidth: 115 },
 }))
 
 export default function Breathe({ ...props }) {
@@ -266,9 +268,9 @@ export default function Breathe({ ...props }) {
             <Box textAlign="center" className={classes.breatheReview}>
               <Lotus className={classes.flower} />
               <Typography variant="h4">Nicely done!</Typography>
-              <Box mt={4} mb={3}>
+              <Box mt={4} mb={2}>
                 <Grid container direction="row" justify="center" alignItems="center">
-                  <Grid container spacing={0} xs={4} md={4} lg={2}>
+                  <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={2}>
                     <Grid item xs={3} className={classes.lineyellow}></Grid>
                     <Grid item xs={3} className={classes.linegreen}></Grid>
                     <Grid item xs={3} className={classes.linered}></Grid>
