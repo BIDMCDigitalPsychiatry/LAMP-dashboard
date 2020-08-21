@@ -247,17 +247,13 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "bold",
         color: "rgba(0, 0, 0, 0.75)",
       },
-      // "& p": {fontSize: 10,},
-
+     
       [theme.breakpoints.down("sm")]: {
         display: "none",
       },
     },
     thumbContainer: { maxWidth: 1055, margin: "0 auto" },
-    calendarCustom: {},
-    highlight: {
-      // background: "#ccc"
-    },
+    calendarCustom: {},   
     day: {
       "& p": { fontSize: 10 },
     },
@@ -432,9 +428,11 @@ export default function Feed({ participant, ...props }: { participant: Participa
                     </Grid>
                   </Card>
                 </StepLabel>
-                <StepContent classes={{ root: classes.customsteppercontent }}>
-                  <div></div>
-                </StepContent>
+                { index !== feedData.length - 1 && (
+                  <StepContent classes={{ root: classes.customsteppercontent }}>
+                    <div></div>
+                  </StepContent> 
+                )}
               </Step>
             ))}
           </Stepper>
@@ -455,7 +453,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
-                  <div className={classes.highlight}>
+                  <div>
                     <span className={classes.day}> {dayComponent} </span>
                   </div>
                 ) : isCurrentDay ? (
