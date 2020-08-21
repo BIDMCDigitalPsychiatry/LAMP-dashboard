@@ -100,7 +100,7 @@ export default function Participant({
   const [tab, _setTab] = useState(getTab())
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
-  const [openDialog, setOpen] = useState(true)
+  const [openDialog, setOpen] = useState(false)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
@@ -134,7 +134,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-    getShowWelcome(participant).then(setOpen)
+  //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)

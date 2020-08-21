@@ -907,11 +907,11 @@ function Section({
             <Box>{slideElements ? slideElements[index] : null}</Box>
           </Slide>
           <Box className={classes.surveyQuestionNav}>
-            {!supportsSidebar && index > 0 && (
+            {/* {!supportsSidebar && index > 0 && (
               <Fab onClick={handleBack} className={classes.btnBack}>
                 Back
               </Fab>
-            )}
+            )} */}
             {!supportsSidebar && (
               <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
                 {index === value.settings.length - 1
