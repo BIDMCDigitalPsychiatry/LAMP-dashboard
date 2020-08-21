@@ -241,92 +241,94 @@ export default function JournalEntries({ ...props }) {
           <Typography variant="h5">New journal entry</Typography>
         </Toolbar>
       </AppBar>
-      <Container>
-        <Box px={2}>
-          <FormControl
-            component="fieldset"
-            classes={{
-              root: classes.textAreaControl,
-            }}
-          >
-            <Typography variant="caption" className={classes.todaydate}>
-              {jounalDate}
-            </Typography>
-            <TextField
-              id="standard-multiline-flexible"
-              multiline
-              rows={10}
-              variant="outlined"
-              value={journalValue}
-              onChange={(event) => setJounalValue(event.target.value)}
-              classes={{ root: classes.textArea }}
-            />
-            <Box className={classes.howFeel}>How do you feel today?</Box>
-            <Grid className={classes.btnNav}>
+      <Grid container direction="row" justify="center" alignItems="flex-start">
+        <Grid item lg={4} sm={10} xs={12}>
+          <Box px={2}>
+            <FormControl
+              component="fieldset"
+              classes={{
+                root: classes.textAreaControl,
+              }}
+            >
+              <Typography variant="caption" className={classes.todaydate}>
+                {jounalDate}
+              </Typography>
+              <TextField
+                id="standard-multiline-flexible"
+                multiline
+                rows={10}
+                variant="outlined"
+                value={journalValue}
+                onChange={(event) => setJounalValue(event.target.value)}
+                classes={{ root: classes.textArea }}
+              />
+              <Box className={classes.howFeel}>How do you feel today?</Box>
+              <Grid className={classes.btnNav}>
+                <Box textAlign="center">
+                  <IconButton
+                    onClick={() => handleClickStatus("Yes")}
+                    className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                  >
+                    <ThumbsUp />
+                    <label>Good</label>
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleClickStatus("No")}
+                    className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                  >
+                    <ThumbsDown />
+                    <label>Bad</label>
+                  </IconButton>
+                </Box>
+              </Grid>
               <Box textAlign="center">
-                <IconButton
-                  onClick={() => handleClickStatus("Yes")}
-                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsUp />
-                  <label>Good</label>
-                </IconButton>
-                <IconButton
-                  onClick={() => handleClickStatus("No")}
-                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsDown />
-                  <label>Bad</label>
-                </IconButton>
+                <Fab className={classes.btnpeach} onClick={props.onComplete}>
+                  Submit
+                </Fab>
               </Box>
-            </Grid>
-            <Box textAlign="center">
-              <Fab className={classes.btnpeach} onClick={props.onComplete}>
-                Submit
-              </Fab>
-            </Box>
-          </FormControl>
-        </Box>
-
-        <Dialog
-          open={open}
-          onClose={() => setOpen(false)}
-          scroll="paper"
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-          className={classes.dialogueStyle}
-        >
-          <Box display="flex" justifyContent="flex-end">
-            <Box>
-              <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
+            </FormControl>
           </Box>
 
-          <DialogContent className={classes.dialogueContent}>
-            <Typography variant="h4">Leaving so soon?</Typography>
-            <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
-          </DialogContent>
-          <Grid>
-            <Box textAlign="center" width={1} mt={1} mb={3}>
-              <Link
-                underline="none"
-                onClick={() => setOpen(false)}
-                className={classnames(classes.btnpeach, classes.linkButton)}
-              >
-                No, don’t leave yet
-              </Link>
+          <Dialog
+            open={open}
+            onClose={() => setOpen(false)}
+            scroll="paper"
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+            className={classes.dialogueStyle}
+          >
+            <Box display="flex" justifyContent="flex-end">
+              <Box>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                  <CloseIcon />
+                </IconButton>
+              </Box>
             </Box>
-            <Box textAlign="center" width={1} mb={4}>
-              <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
-                {" "}
-                Yes, leave
-              </Link>
-            </Box>
-          </Grid>
-        </Dialog>
-      </Container>
+
+            <DialogContent className={classes.dialogueContent}>
+              <Typography variant="h4">Leaving so soon?</Typography>
+              <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+            </DialogContent>
+            <Grid>
+              <Box textAlign="center" width={1} mt={1} mb={3}>
+                <Link
+                  underline="none"
+                  onClick={() => setOpen(false)}
+                  className={classnames(classes.btnpeach, classes.linkButton)}
+                >
+                  No, don’t leave yet
+                </Link>
+              </Box>
+              <Box textAlign="center" width={1} mb={4}>
+                <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
+                  {" "}
+                  Yes, leave
+                </Link>
+              </Box>
+            </Grid>
+          </Dialog>
+        </Grid>
+      </Grid>
     </div>
   )
 }
