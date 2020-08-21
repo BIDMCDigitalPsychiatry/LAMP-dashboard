@@ -280,6 +280,7 @@ export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
+
   const [openTabs, setOpenTabs] = useState([
     props.tabValue === 0 ? true : false,
     props.tabValue === 1 ? true : false,
@@ -313,10 +314,6 @@ export default function BottomMenu({ ...props }) {
             },
           }}
         >
-          {/* <IconButton aria-label="logo" className={classes.leftbarLogo}>
-            <Logo />
-          </IconButton> */}
-
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 4: false })}>
             <FeedTooltip
               open={openTabs[4]}
@@ -398,7 +395,7 @@ export default function BottomMenu({ ...props }) {
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 1: false })}>
             <AssesTooltip
-              open={openTabs[1]}
+              open={!props.showWelcome && openTabs[1]}
               interactive={true}
               title={
                 <React.Fragment>
@@ -472,7 +469,7 @@ export default function BottomMenu({ ...props }) {
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 3: false })}>
             <PreventTooltip
-              open={openTabs[3]}
+              open={!props.showWelcome && openTabs[3]}
               interactive={true}
               title={
                 <React.Fragment>
