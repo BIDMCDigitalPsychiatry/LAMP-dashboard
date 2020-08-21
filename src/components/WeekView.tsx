@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme: Theme) =>
       borderRadius: "50%",
       color: "rgba(255, 255, 255, 0.5)",
       "& span": { color: "white" },
+      "& p": { color: "rgba(255, 255, 255, 0.75)" },
     },
     feedDateview: { color: "#00765C", background: "#BCEFDD", fontWeight: "bold" },
     journalDateview: { color: "#4C66D6", background: "#ECF4FF", fontWeight: "bold" },

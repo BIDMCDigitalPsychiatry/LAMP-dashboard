@@ -109,6 +109,7 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "italic",
     padding: 6,
     margin: "0 5px",
+    "&:hover": { background: "#FFD645" },
     "& label": {
       position: "absolute",
       bottom: -18,
@@ -125,7 +126,7 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "200px",
     boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
     lineHeight: "38px",
-    marginTop: "15%",
+    marginTop: "12%",
     cursor: "pointer",
     textTransform: "capitalize",
     fontSize: "16px",
@@ -148,7 +149,7 @@ export default function LearnTips({ ...props }) {
 
   return (
     <Container>
-      <Box>
+      <Box pb={4}>
         <Grid container direction="row" alignItems="stretch">
           {props.details.map((detail) =>
             props.type === 2 ? (
@@ -229,9 +230,9 @@ export default function LearnTips({ ...props }) {
               <Typography variant="body2" color="textSecondary" component="p">
                 {details}
               </Typography>
-              <Box mt={4} mb={3}>
+              <Box mt={4} mb={2}>
                 <Grid container direction="row" justify="center" alignItems="center">
-                  <Grid container spacing={0} xs={4} md={4} lg={2}>
+                  <Grid container spacing={0} xs={4} md={4} lg={3}>
                     <Grid item xs={3} className={classes.lineyellow}></Grid>
                     <Grid item xs={3} className={classes.linegreen}></Grid>
                     <Grid item xs={3} className={classes.linered}></Grid>
