@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     float: "right",
     "& input": { padding: 0, color: "#4C66D6" },
     "& svg": { color: "#4C66D6" },
-    "& button": { padding: "0px 15px", color: "#4C66D6", "&:hover": { backgroundColor: "transparent" } },
+    "& button": { padding: 0, color: "#4C66D6", marginRight: 0, "&:hover": { backgroundColor: "transparent" } },
   },
   toolbardashboard: {
     minHeight: 65,

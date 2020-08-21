@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
-    linkBlue: { color: "#6083E7", fontWeight: "bold", "&:hover": { textDecoration: "underline" } },
+    linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh" },
     loginInner: { maxWidth: 280 },
   })
