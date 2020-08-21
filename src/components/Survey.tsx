@@ -132,13 +132,17 @@ const useStyles = makeStyles((theme: Theme) =>
     ribbonText: {
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
+      fontWeight: 600,
       marginBottom: "30px",
+      padding: "0 42px",
     },
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    niceWork: {
+      "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+    },
   })
 )
 
@@ -247,7 +251,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           <Typography variant="h4" gutterBottom>
             {questionCount} questions (10 mins)
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography variant="body2" component="p">
             The following survey will assess your sleep and social behavior. For each of the statements, rate which is
             true for you.
           </Typography>
@@ -285,7 +289,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box textAlign="center" pb={4}>
+          <Box textAlign="center" pb={4} className={classes.niceWork}>
             <Typography variant="h5" gutterBottom>
               Nice work!
             </Typography>
