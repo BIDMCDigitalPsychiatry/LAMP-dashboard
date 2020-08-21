@@ -64,8 +64,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backbtn: {
-    paddingLeft: 0,
-    paddingRight: 0,
+    // paddingLeft: 0,
+    // paddingRight: 0,
   },
   conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
   inlineHeader: {
@@ -229,7 +229,7 @@ export default function Messages({
         </Box>
       </Box>
     )
-  }  
+  }
 
   if (msgOpen) {
     return (

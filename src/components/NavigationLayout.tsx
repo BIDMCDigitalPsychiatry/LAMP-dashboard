@@ -60,16 +60,33 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#FFFFFF",
       boxShadow: "none",
 
-      "& h5": { fontSize: 25, paddingLeft: 16, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
-    toolbardashboard: { minHeight: 75 },
+    toolbardashboard: {
+      minHeight: 75,
+      padding: "0 10px",
+      [theme.breakpoints.down("xs")]: {
+        display: "block",
+        width: "100%",
+      },
+    },
+    headerRight: {
+      [theme.breakpoints.down("xs")]: {
+        display: "block",
+        float: "right",
+        paddingTop: 10,
+      },
+    },
     toolbarinner: { minHeight: 95 },
     backbtn: {
-      paddingLeft: 0,
-      paddingRight: 0,
-      position: "absolute",
+      // paddingLeft: 0,
+      // paddingRight: 0,
+      //position: "absolute",
       [theme.breakpoints.up("md")]: {
-        marginTop: 8,
+        // marginTop: 8,
+      },
+      [theme.breakpoints.down("xs")]: {
+        paddingLeft: 0,
       },
     },
     notification: {
@@ -178,7 +195,7 @@ export default function NavigationLayout({
             )}
             <Box flexGrow={1} />
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
-              <Box>
+              <Box className={classes.headerRight}>
                 <Tooltip title="Notifications">
                   <Badge badgeContent={undefined} color="primary" onClick={() => setOpenMessages(true)}>
                     <Message />
@@ -312,8 +329,8 @@ export default function NavigationLayout({
             >
               <Icon>arrow_back</Icon>
             </IconButton>
+            <Typography variant="h5">Conversations</Typography>
           </Toolbar>
-          <Typography variant="h5">Conversations</Typography>
         </AppBar>
         <Messages style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
       </ResponsiveDialog>
