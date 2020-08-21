@@ -280,8 +280,11 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
-        classes={{ paperScrollPaper: classes.MuiDialogPaperScrollPaper }}
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+        }}
       >
         <DialogTitle>
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>

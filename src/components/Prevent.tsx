@@ -25,7 +25,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import { ReactComponent as WaterBlue } from "../icons/WaterBlue.svg"
 import PreventData from "./PreventData"
-import BottomMenu from "./BottomMenu"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
@@ -217,7 +216,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     backbtn: {
-      //  paddingLeft: 0, paddingRight: 0
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
@@ -818,7 +816,6 @@ export default function Prevent({
         onClose={() => {
           setOpenData(false)
         }}
-        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
@@ -833,7 +830,6 @@ export default function Prevent({
             <Typography variant="h5">{selectedActivityName}</Typography>
           </Toolbar>
         </AppBar>
-        {supportsSidebar && <BottomMenu activeTab={activeTab} tabValue={3} />}
 
         {selectedActivityName === "Journal entries" ? (
           <Journal />

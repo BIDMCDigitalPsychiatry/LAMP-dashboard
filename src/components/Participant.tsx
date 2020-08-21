@@ -249,10 +249,10 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Feed participant={participant} activeTab={activeTab}/>
+          <Feed participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
-      <BottomMenu activeTab={activeTab} tabValue={tab} showWelcome={openDialog}/>
+      <BottomMenu activeTab={activeTab} tabValue={tab} showWelcome={openDialog} />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

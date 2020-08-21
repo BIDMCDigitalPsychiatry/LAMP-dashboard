@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
-  }, 
+  },
   background: {
     background: "#e0e0e0",
     minHeight: "calc(100vh - 65px)",
@@ -135,8 +135,8 @@ export default function ScratchImage({ ...props }) {
   }
 
   useEffect(() => {
-    setImage(background())
     if (canvas != null) {
+      setImage(background())
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
       context = canvas.getContext("2d")

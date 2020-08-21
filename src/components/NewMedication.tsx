@@ -77,11 +77,11 @@ export default function NewMedication({ ...props }) {
   function getTimeValue(date: Date) {
     var hours = date.getHours()
     var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "PM" : "AM"
+    var ampm = hours >= 12 ? "pm" : "am"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
     var minutes = minute < 10 ? "0" + minute : minute
-    var strTime = hours + ":" + minutes + " " + ampm
+    var strTime = hours + ":" + minutes + ampm
     return strTime
   }
 
@@ -115,27 +115,29 @@ export default function NewMedication({ ...props }) {
   }
 
   const saveNewMedication = () => {
-    var medications = []
-    medications = JSON.parse(localStorage.getItem("medications"))
-    let medicationDetails = {
-      medicationName: medicationName,
-      frequency: selectedFrequency,
-      weekdays: selectedDays,
-      startDate: startDate,
-      duration: duration,
-      reminderTime: getTimeValue(reminderTime),
-      dosageList: dosageList,
-    }
-    if (medications != null) {
-      medications.push(medicationDetails)
-      localStorage.setItem("medications", JSON.stringify(medications))
-    } else {
-      var newMedication = []
-      newMedication.push(medicationDetails)
-      localStorage.setItem("medications", JSON.stringify(newMedication))
-    }
+    if (medicationName != null && medicationName != "") {
+      var medications = []
+      medications = JSON.parse(localStorage.getItem("medications"))
+      let medicationDetails = {
+        medicationName: medicationName,
+        frequency: selectedFrequency,
+        weekdays: selectedDays,
+        startDate: startDate,
+        duration: duration,
+        reminderTime: getTimeValue(reminderTime),
+        dosageList: dosageList,
+      }
+      if (medications != null) {
+        medications.push(medicationDetails)
+        localStorage.setItem("medications", JSON.stringify(medications))
+      } else {
+        var newMedication = []
+        newMedication.push(medicationDetails)
+        localStorage.setItem("medications", JSON.stringify(newMedication))
+      }
 
-    props.onComplete()
+      props.onComplete()
+    }
   }
 
   const medicationList = [
@@ -612,8 +614,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   backbtn: {
-    //  paddingLeft: 0, paddingRight: 0 
-    },
+    //  paddingLeft: 0, paddingRight: 0
+  },
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },

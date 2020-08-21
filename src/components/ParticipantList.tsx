@@ -246,7 +246,9 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
             ),
           },
         ]}
-        detailPanel={(rowData) => <Messages refresh participant={participants[rowData.tableData.id].id} msgOpen={true}/>}
+        detailPanel={(rowData) => (
+          <Messages refresh participant={participants[rowData.tableData.id].id} msgOpen={true} />
+        )}
         onRowClick={(event, rowData, togglePanel) => onParticipantSelect(participants[rowData.tableData.id].id)}
         actions={[
           {

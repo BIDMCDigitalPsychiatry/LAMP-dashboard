@@ -17,7 +17,7 @@ import {
   CardActionArea,
   Card,
   Link,
-  Fab
+  Fab,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 180,
     [theme.breakpoints.down("xs")]: {
       minWidth: 180,
-    minHeight: 180,
+      minHeight: 180,
     },
   },
   root2: {
@@ -87,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
     },
-  }, 
+  },
   rightArrow: { maxWidth: 50, padding: "15px 12px 11px 12px !important", "& svg": { color: "rgba(0, 0, 0, 0.5)" } },
   lineyellow: {
     background: "#FFD645",
@@ -109,6 +109,7 @@ const useStyles = makeStyles((theme) => ({
     fontStyle: "italic",
     padding: 6,
     margin: "0 5px",
+    "&:hover": { background: "#FFD645" },
     "& label": {
       position: "absolute",
       bottom: -18,
@@ -125,13 +126,14 @@ const useStyles = makeStyles((theme) => ({
     minWidth: "200px",
     boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
     lineHeight: "38px",
-    marginTop: "15%",
+    marginTop: "12%",
     cursor: "pointer",
     textTransform: "capitalize",
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     "&:hover": { background: "#cea000" },
   },
+  colorLine: { maxWidth: 115 },
 }))
 
 export default function LearnTips({ ...props }) {
@@ -148,7 +150,7 @@ export default function LearnTips({ ...props }) {
 
   return (
     <Container>
-      <Box>
+      <Box pb={4}>
         <Grid container direction="row" alignItems="stretch">
           {props.details.map((detail) =>
             props.type === 2 ? (
@@ -210,11 +212,7 @@ export default function LearnTips({ ...props }) {
       >
         <AppBar position="static" style={{ background: "#FFF9E5", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => setOpenDialog(false)}
-              color="default"
-              aria-label="Menu"
-            >
+            <IconButton onClick={() => setOpenDialog(false)} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
           </Toolbar>
@@ -227,51 +225,46 @@ export default function LearnTips({ ...props }) {
           <Typography variant="caption">Tip</Typography>
           <Typography variant="h2">{title}</Typography>
         </Box>
-        <Grid
-          container
-          direction="row"
-          justify="center"
-          alignItems="flex-start"
-        >
+        <Grid container direction="row" justify="center" alignItems="flex-start">
           <Grid item lg={4} sm={10} xs={12}>
             <CardContent className={classes.tipscontentarea}>
               <Typography variant="body2" color="textSecondary" component="p">
                 {details}
               </Typography>
-              <Box mt={4} mb={3}>
-              <Grid container direction="row" justify="center" alignItems="center">
-                <Grid container spacing={0} xs={4} md={4} lg={2}>
-                  <Grid item xs={3} className={classes.lineyellow}></Grid>
-                  <Grid item xs={3} className={classes.linegreen}></Grid>
-                  <Grid item xs={3} className={classes.linered}></Grid>
-                  <Grid item xs={3} className={classes.lineblue}></Grid>
+              <Box mt={4} mb={2}>
+                <Grid container direction="row" justify="center" alignItems="center">
+                  <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>
+                    <Grid item xs={3} className={classes.lineyellow}></Grid>
+                    <Grid item xs={3} className={classes.linegreen}></Grid>
+                    <Grid item xs={3} className={classes.linered}></Grid>
+                    <Grid item xs={3} className={classes.lineblue}></Grid>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Box>
-            <Box className={classes.howFeel}>Was this helpful today?</Box>
-            <Box textAlign="center">
-              <IconButton
-                onClick={() => handleClickStatus("Yes")}
-                className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-              >
-                <ThumbsUp />
-                <label>Yes</label>
-              </IconButton>
-              <IconButton
-                onClick={() => handleClickStatus("No")}
-                className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-              >
-                <ThumbsDown />
-                <label>No</label>
-              </IconButton>
-            </Box>
-            <Box textAlign="center">
-              <Fab variant="extended" color="primary" className={classes.btnyellow}>
-              Mark complete
-              </Fab>
-            </Box>
+              </Box>
+              <Box className={classes.howFeel}>Was this helpful today?</Box>
+              <Box textAlign="center">
+                <IconButton
+                  onClick={() => handleClickStatus("Yes")}
+                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
+                  <ThumbsUp />
+                  <label>Yes</label>
+                </IconButton>
+                <IconButton
+                  onClick={() => handleClickStatus("No")}
+                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                >
+                  <ThumbsDown />
+                  <label>No</label>
+                </IconButton>
+              </Box>
+              <Box textAlign="center">
+                <Fab variant="extended" color="primary" className={classes.btnyellow}>
+                  Mark complete
+                </Fab>
+              </Box>
             </CardContent>
-            </Grid>
+          </Grid>
         </Grid>
       </ResponsiveDialog>
     </Container>

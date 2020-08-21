@@ -247,7 +247,6 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "bold",
         color: "rgba(0, 0, 0, 0.75)",
       },
-      // "& p": {fontSize: 10,},
 
       [theme.breakpoints.down("sm")]: {
         display: "none",
@@ -255,9 +254,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     thumbContainer: { maxWidth: 1055, margin: "0 auto" },
     calendarCustom: {},
-    highlight: {
-      // background: "#ccc"
-    },
     day: {
       "& p": { fontSize: 10 },
     },
@@ -320,27 +316,31 @@ export default function Feed({ participant, ...props }: { participant: Participa
     var goals = JSON.parse(localStorage.getItem("goals"))
     if (goals != undefined) {
       goals.map((goal) => {
-        var item = {
-          type: "goal",
-          time: goal.reminderTime,
-          title: "Goal: " + goal.goalName,
-          icon: goal.goalType,
-          description: goal.goalValue + " " + goal.goalUnit,
+        if (goal.goalName != null && goal.goalName != "" && goal.goalValue != null && goal.goalValue != "") {
+          var item = {
+            type: "goal",
+            time: goal.reminderTime,
+            title: "Goal: " + goal.goalName,
+            icon: goal.goalType,
+            description: goal.goalValue + " " + goal.goalUnit,
+          }
+          feedList.push(item)
         }
-        feedList.push(item)
       })
     }
     var medications = JSON.parse(localStorage.getItem("medications"))
     if (medications != undefined) {
       medications.map((medication) => {
-        var item = {
-          type: "manage",
-          time: medication.reminderTime,
-          title: "Medication: " + medication.medicationName,
-          icon: "medication",
-          description: "test description",
+        if (medication.medicationName != null && medication.medicationName != "") {
+          var item = {
+            type: "manage",
+            time: medication.reminderTime,
+            title: "Medication: " + medication.medicationName,
+            icon: "medication",
+            description: "test description",
+          }
+          feedList.push(item)
         }
-        feedList.push(item)
       })
     }
 
@@ -432,9 +432,11 @@ export default function Feed({ participant, ...props }: { participant: Participa
                     </Grid>
                   </Card>
                 </StepLabel>
-                <StepContent classes={{ root: classes.customsteppercontent }}>
-                  <div></div>
-                </StepContent>
+                {index !== feedData.length - 1 && (
+                  <StepContent classes={{ root: classes.customsteppercontent }}>
+                    <div></div>
+                  </StepContent>
+                )}
               </Step>
             ))}
           </Stepper>
@@ -455,7 +457,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
-                  <div className={classes.highlight}>
+                  <div>
                     <span className={classes.day}> {dayComponent} </span>
                   </div>
                 ) : isCurrentDay ? (

@@ -992,7 +992,6 @@ export default function Learn({ participant, ...props }: { participant: Particip
         onClose={() => {
           setOpenData(false)
         }}
-        style={{ paddingLeft: supportsSidebar ? "100px" : "" }}
       >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
@@ -1007,7 +1006,6 @@ export default function Learn({ participant, ...props }: { participant: Particip
             <Typography variant="h5">{tip}</Typography>
           </Toolbar>
         </AppBar>
-        {supportsSidebar && <BottomMenu activeTab={props.activeTab} tabValue={0} />}
         <LearnTips
           tip={tip}
           icon={icon}

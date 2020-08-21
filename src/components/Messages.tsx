@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     float: "right",
     "& input": { padding: 0, color: "#4C66D6" },
     "& svg": { color: "#4C66D6" },
-    "& button": { padding: "0px 15px", color: "#4C66D6" },
+    "& button": { padding: 0, color: "#4C66D6", marginRight: 0, "&:hover": { backgroundColor: "transparent" } },
   },
   toolbardashboard: {
     minHeight: 65,
@@ -62,10 +62,6 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "100%",
     },
-  },
-  backbtn: {
-    // paddingLeft: 0,
-    // paddingRight: 0,
   },
   conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
   inlineHeader: {
@@ -241,13 +237,11 @@ export default function Messages({
     return (
       <Container style={{ marginTop: "5%" }}>
         <Box>
-          {
-             getMessages()
-             .filter(
-               (x) =>
-                 (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-                 (!participantOnly && x.from === "participant")
-             ).length > 0 ? (
+          {getMessages().filter(
+            (x) =>
+              (x.type === "message" && !!participantOnly && x.from === "researcher") ||
+              (!participantOnly && x.from === "participant")
+          ).length > 0 ? (
             getMessages()
               .filter(
                 (x) =>
@@ -282,10 +276,10 @@ export default function Messages({
                     <Typography>{x.text}</Typography>
                   </Box>
                 </Box>
-              ))[0]  )
-              :
-              (<Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box> )          
-          }          
+              ))[0]
+          ) : (
+            <Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box>
+          )}
         </Box>
 
         <ResponsiveDialog
@@ -299,7 +293,7 @@ export default function Messages({
         >
           <AppBar position="static" className={classes.inlineHeader}>
             <Toolbar className={classes.toolbardashboard}>
-              <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
+              <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
                 <Icon>arrow_back</Icon>
               </IconButton>
             </Toolbar>

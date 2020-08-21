@@ -71,6 +71,11 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
+    centerHeader: {
+      "& h2": {
+        textAlign: "center !important",
+      },
+    },
     header: {
       background: "#FFEFEC",
       padding: "35px 40px 10px",
@@ -393,10 +398,22 @@ export default function Manage({ participant, ...props }: { participant: Partici
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
-            <Typography variant="body2" align="left">
-              Games
-            </Typography>
-            <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
+            {dialogueType === "Scratch_card" && (
+              <Box textAlign="center" width={1} mt={1} className={classes.centerHeader}>
+                <Typography variant="body2" align="center">
+                  Meditation exercises
+                </Typography>
+                <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
+              </Box>
+            )}
+            {dialogueType !== "Scratch_card" && (
+              <Box>
+                <Typography variant="body2" align="left">
+                  Games
+                </Typography>
+                <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
+              </Box>
+            )}
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
@@ -412,6 +429,11 @@ export default function Manage({ participant, ...props }: { participant: Partici
           {dialogueType === "Breathe" && (
             <Typography variant="body2" component="p">
               Follow the motion of the lotus flower opening and closing to control your breaths in and out.
+            </Typography>
+          )}
+          {dialogueType !== "Breathe" && dialogueType !== "Scratch_card" && (
+            <Typography variant="body2" component="p">
+              Test description for the manage section.
             </Typography>
           )}
         </DialogContent>

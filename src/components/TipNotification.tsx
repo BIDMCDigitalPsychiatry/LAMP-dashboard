@@ -103,6 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 10,
     },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
+    colorLine: { maxWidth: 115 },
   })
 )
 
@@ -143,7 +144,7 @@ export default function TipNotification({ ...props }) {
             </Typography>
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
-                <Grid container spacing={0} xs={4} md={4} lg={3}>
+                <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={3}>
                   <Grid item xs={3} className={classes.lineyellow}></Grid>
                   <Grid item xs={3} className={classes.linegreen}></Grid>
                   <Grid item xs={3} className={classes.linered}></Grid>

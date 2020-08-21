@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     marginTop: 20,
-  },      
+  },
   journalStyle: {
     background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
     borderRadius: "10px",
@@ -82,7 +82,6 @@ export default function JournalEntries({ ...props }) {
     return weekday[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
   }
 
- 
   useEffect(() => {
     setJournals(getJournals())
   }, [])
