@@ -100,7 +100,7 @@ export default function Participant({
   const [tab, _setTab] = useState(getTab())
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
-  const [openDialog, setOpen] = useState(false)
+  const [openDialog, setOpen] = useState(true)
   const [hideCareTeam, setHideCareTeam] = useState(_hideCareTeam())
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
@@ -169,7 +169,7 @@ export default function Participant({
         value: y !== undefined ? y.value : null,
         type: null,
         level: null,
-        duration: 0,
+        duration: y.duration,
       })),
     }))
     Promise.all(
@@ -249,10 +249,10 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Feed participant={participant} activeTab={activeTab} />
+          <Feed participant={participant} activeTab={activeTab}/>
         </Box>
       </Slide>
-      <BottomMenu activeTab={activeTab} tabValue={tab} />
+      <BottomMenu activeTab={activeTab} tabValue={tab} showWelcome={openDialog}/>
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

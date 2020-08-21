@@ -75,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   radioroot: {
-    padding: "23px",
+    padding: "20px",
   },
   icon: {
     borderRadius: "50%",
@@ -116,8 +116,9 @@ const useStyles = makeStyles((theme) => ({
   },
   btngreen: {
     background: "#92E7CA",
-    borderRadius: "40px",
-    minWidth: "150px",
+    borderRadius: "40px",	
+    fontWeight: 600,
+    minWidth: "200px",
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
     lineHeight: "38px",
     margin: "5% 5px 0 5px",
@@ -157,9 +158,6 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 55px",
       },
     },
-  },
-  backbtn: {
-    // paddingLeft: 0, paddingRight: 0
   },
   slider: { width: "80%", color: "#2F9D7E" },
   sliderRail: {
@@ -356,7 +354,10 @@ function RadioOption({ onChange, options, value, ...props }) {
               />
             }
             label={
-              <Typography component="span" variant="body2">
+              <Typography 
+                component="span" 
+                variant="body2" 
+                style={{color:(selectedValue == `${x.value}`)  ? "black" : "rgba(0, 0, 0, 0.5)"}}>
                 {x.label}
                 {!!x.description && (
                   <Box
@@ -625,8 +626,10 @@ function Rating({ onChange, options, value, ...props }) {
     </Box>
   )
 }
-function Question({ onResponse, number, text, type, options, value, ...props }) {
-  let onChange = (value) => onResponse({ item: text, value: parseInt(value) })
+function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
+  let onChange = (value) => {
+   onResponse({ item: text, value: parseInt(value), duration : ((new Date().getTime() - startTime) /1000).toFixed(1) })
+  }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
     { label: "No", value: "No" /* false */ },
@@ -742,6 +745,7 @@ function Questions({
   prefillData,
   prefillTimestamp,
   toolBarBack,
+  startTime,
   ...props
 }) {
   const classes = useStyles()
@@ -763,9 +767,8 @@ function Questions({
             type={x.type}
             options={x.options?.map((y) => ({ ...y, label: y.value }))}
             value={responses.current[idx]}
-            onResponse={(response) => {
+            onResponse={(response) => {              
               responses.current[idx] = response
-
               if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
               onResponse(
@@ -775,25 +778,9 @@ function Questions({
                 })
               )
             }}
+            startTime={idx === 0 ? startTime : new Date().getTime()}
           />
-          <div className={classes.sliderActionsContainer}>
-            {!supportsSidebar && idx > 0 && (
-              <Fab onClick={handleBack} className={classes.btnBack}>
-                Back
-              </Fab>
-            )}
-            {!supportsSidebar && (
-              <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
-                {idx === value.settings.length - 1
-                  ? toolBarBack && !!prefillData
-                    ? !!prefillTimestamp
-                      ? "Overwrite"
-                      : "Duplicate"
-                    : "Submit"
-                  : "Next"}
-              </Fab>
-            )}
-
+          <div className={classes.sliderActionsContainer}>   
             {supportsSidebar && idx === value.settings.length - 1 && (
               <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
                 {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
@@ -816,7 +803,7 @@ function Section({
   toolBarBack,
   ...props
 }) {
-  const base = value.settings.map((x) => ({ item: x.text, value: null }))
+  const base = value.settings.map((x) => ({ item: x.text, value: null, duration: 0 }))
   const responses = useRef(!!prefillData ? Object.assign(base, prefillData) : base)
   const [activeStep, setActiveStep] = useState(0)
   const classes = useStyles()
@@ -829,46 +816,50 @@ function Section({
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
-    const slideElements = value.settings.map((x, idx) => {
-      setElementIn(true)
-      return (
-        <Questions
-          idx={idx}
-          x={x}
-          value={value}
-          responses={responses}
-          setActiveStep={setActiveStep}
-          onResponse={onResponse}
-          handleBack={handleBack}
-          handleNext={handleNext}
-          onComplete={onComplete}
-          toolBarBack={toolBarBack}
-          prefillData={prefillData}
-          prefillTimestamp={prefillTimestamp}
-        />
-      )
-    })
-    setSlideElements(slideElements)
+    if(slideElements == null) {
+      const slideElements = value.settings.map((x, idx) => {
+        setElementIn(true)
+        return (
+          <Questions
+            idx={idx}
+            x={x}
+            value={value}
+            responses={responses}
+            setActiveStep={setActiveStep}
+            onResponse={onResponse}
+            handleBack={handleBack}
+            handleNext={handleNext}
+            onComplete={onComplete}
+            toolBarBack={toolBarBack}
+            prefillData={prefillData}
+            prefillTimestamp={prefillTimestamp}
+            startTime={new Date().getTime()}
+          />
+        )
+      })
+      setSlideElements(slideElements)
+      // onResponse(Array.from({ ...responses.current, length: value.settings.length }))
+    }
     window.addEventListener("scroll", handleChange, true)
-    onResponse(Array.from({ ...responses.current, length: value.settings.length }))
+    
   }, [])
   const isComplete = (idx) => !!responses.current[idx]?.value
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
     setElementIn(false)
-    setTimeout(() => {
-      setElementIn(true)
+    setTimeout(() => {      
       setIndex((index - 1) % slideElements.length)
+      setElementIn(true)
     }, 500)
     _setTab(tab - 1)
     setProgressValue(progressValue - 100 / value.settings.length)
   }
   const handleNext = () => {
     setElementIn(false)
-    setTimeout(() => {
-      setElementIn(true)
+    setTimeout(() => {      
       setIndex((index + 1) % slideElements.length)
+      setElementIn(true)
     }, 500)
     _setTab(tab + 1)
     setProgressValue(progressValue + 100 / value.settings.length)
@@ -891,45 +882,51 @@ function Section({
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
-      {supportsSidebar
-        ? value.settings.map((x, idx) => (
-            <Box my={4} onScroll={handleChange}>
-              <Questions
-                idx={idx}
-                x={x}
-                value={value}
-                responses={responses}
-                setActiveStep={setActiveStep}
-                onResponse={onResponse}
-                handleBack={handleBack}
-                handleNext={handleNext}
-                onComplete={onComplete}
-                prefillData={prefillData}
-                prefillTimestamp={prefillTimestamp}
-                toolBarBack={toolBarBack}
-              />
-            </Box>
-          ))
-        : value.settings.map((x, idx) => (
-            <Slide in={tab === idx} direction={tabDirection(idx)} mountOnEnter unmountOnExit>
-              <Box>
-                <Questions
-                  idx={idx}
-                  x={x}
-                  value={value}
-                  responses={responses}
-                  setActiveStep={setActiveStep}
-                  onResponse={onResponse}
-                  handleBack={handleBack}
-                  handleNext={handleNext}
-                  onComplete={onComplete}
-                  prefillData={prefillData}
-                  prefillTimestamp={prefillTimestamp}
-                  toolBarBack={toolBarBack}
-                />
-              </Box>
-            </Slide>
-          ))}
+      {supportsSidebar ? (
+        value.settings.map((x, idx) => (
+          <Box my={4} onScroll={handleChange}>
+            <Questions
+              idx={idx}
+              x={x}
+              value={value}
+              responses={responses}
+              setActiveStep={setActiveStep}
+              onResponse={onResponse}
+              handleBack={handleBack}
+              handleNext={handleNext}
+              onComplete={onComplete}
+              toolBarBack={toolBarBack}
+              prefillData={prefillData}
+              prefillTimestamp={prefillTimestamp}
+              startTime={new Date().getTime()}
+            />
+          </Box>
+        ))
+      ) : (
+        <Box>
+          <Slide in={elementIn} direction={tabDirection(index)} mountOnEnter unmountOnExit>
+            <Box>{slideElements ? slideElements[index] : null}</Box>
+          </Slide>
+          <Box className={classes.surveyQuestionNav}>
+            {!supportsSidebar && index  > 0 && (
+              <Fab onClick={handleBack} className={classes.btnBack}>
+                Back
+              </Fab>
+            )}
+            {!supportsSidebar && (
+              <Fab onClick={index  === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {index  === value.settings.length - 1
+                  ? toolBarBack && !!prefillData
+                    ? !!prefillTimestamp
+                      ? "Overwrite"
+                      : "Duplicate"
+                    : "Submit"
+                  : "Next"}
+              </Fab>
+            )}
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }
