@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
   highlight: {
     background: "#CFE3FF",
     borderRadius: "50%",
-  }, 
+  },
   journalHistory: {
     marginTop: 10,
   },
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   streakDetails: {
     "& h6": { fontSize: 16, fontWeight: 600, whiteSpace: "nowrap", color: "rgba(0, 0, 0, 0.75)" },
     "& h5": { fontSize: 16, fontWeight: 600, color: "#618EF7", lineHeight: 1.6 },
-  }
+  },
 }))
 
 export default function JournalEntries({ ...props }) {

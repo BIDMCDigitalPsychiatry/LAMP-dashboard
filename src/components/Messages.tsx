@@ -63,10 +63,6 @@ const useStyles = makeStyles((theme) => ({
       width: "100%",
     },
   },
-  backbtn: {
-    // paddingLeft: 0,
-    // paddingRight: 0,
-  },
   conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
   inlineHeader: {
     background: "#FFFFFF",
@@ -297,7 +293,7 @@ export default function Messages({
         >
           <AppBar position="static" className={classes.inlineHeader}>
             <Toolbar className={classes.toolbardashboard}>
-              <IconButton onClick={() => setOpen(false)} color="default" className={classes.backbtn} aria-label="Menu">
+              <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
                 <Icon>arrow_back</Icon>
               </IconButton>
             </Toolbar>

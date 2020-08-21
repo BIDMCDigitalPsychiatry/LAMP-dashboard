@@ -131,37 +131,39 @@ export default function NewGoal({ ...props }) {
   function getTimeValue(date: Date) {
     var hours = date.getHours()
     var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "PM" : "AM"
+    var ampm = hours >= 12 ? "pm" : "am"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
     var minutes = minute < 10 ? "0" + minute : minute
-    var strTime = hours + ":" + minutes + " " + ampm
+    var strTime = hours + ":" + minutes + ampm
     return strTime
   }
 
   const saveNewGoal = () => {
-    var goals = []
-    goals = JSON.parse(localStorage.getItem("goals"))
-    let goalDetails = {
-      goalName: goalName,
-      goalType: props.goalType,
-      goalUnit: goalUnit,
-      goalValue: goalValue,
-      frequency: selectedFrequency,
-      weekdays: selectedDays,
-      startDate: startDate,
-      duration: duration,
-      reminderTime: getTimeValue(reminderTime),
+    if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
+      var goals = []
+      goals = JSON.parse(localStorage.getItem("goals"))
+      let goalDetails = {
+        goalName: goalName,
+        goalType: props.goalType,
+        goalUnit: goalUnit,
+        goalValue: goalValue,
+        frequency: selectedFrequency,
+        weekdays: selectedDays,
+        startDate: startDate,
+        duration: duration,
+        reminderTime: getTimeValue(reminderTime),
+      }
+      if (goals != null) {
+        goals.push(goalDetails)
+        localStorage.setItem("goals", JSON.stringify(goals))
+      } else {
+        var newGoal = []
+        newGoal.push(goalDetails)
+        localStorage.setItem("goals", JSON.stringify(newGoal))
+      }
+      props.onComplete()
     }
-    if (goals != null) {
-      goals.push(goalDetails)
-      localStorage.setItem("goals", JSON.stringify(goals))
-    } else {
-      var newGoal = []
-      newGoal.push(goalDetails)
-      localStorage.setItem("goals", JSON.stringify(newGoal))
-    }
-    props.onComplete()
   }
   var goalIcon =
     props.goalType == "Exercise" ? (
