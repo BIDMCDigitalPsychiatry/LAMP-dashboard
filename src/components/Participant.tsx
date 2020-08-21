@@ -169,7 +169,7 @@ export default function Participant({
         value: y !== undefined ? y.value : null,
         type: null,
         level: null,
-        duration: 0,
+        duration: y.duration,
       })),
     }))
     Promise.all(
