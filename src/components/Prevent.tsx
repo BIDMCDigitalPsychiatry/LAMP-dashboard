@@ -79,6 +79,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: 8,
       width: "100%",
       textAlign: "left",
+      "& span": { color: "#618EF7" },
     },
     prevent: {
       background: "#ECF4FF",
@@ -139,6 +140,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: 8,
       width: "100%",
       textAlign: "left",
+      "& span": { color: "#618EF7" },
     },
 
     addicon: { float: "right", color: "#6083E7" },
@@ -164,7 +166,10 @@ const useStyles = makeStyles((theme: Theme) =>
       "& button": { padding: 0 },
     },
     sensorhd: {
-      margin: "25px 0 15px 0",
+      margin: "80px 0 15px 0",
+      [theme.breakpoints.down("xs")]: {
+        marginTop: 50,
+      },
     },
     activityhd: {
       margin: "0 0 15px 0",
@@ -217,6 +222,7 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 0,
       },
     },
+    linkBlue: { color: "#6083E7" },
   })
 )
 
@@ -531,7 +537,7 @@ export default function Prevent({
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                   <Typography className={classes.preventlabelFull}>
-                    {activity.name} ({activityCounts[activity.name]})
+                    {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
                   </Typography>
                   <Box className={classes.maxw300}>
                     <Sparkline
@@ -652,7 +658,7 @@ export default function Prevent({
                 }
               >
                 <Typography className={classes.preventlabel}>
-                  Social Context ({sensorCounts["Social Context"]})
+                  Social Context <Box component="span">({sensorCounts["Social Context"]})</Box>
                 </Typography>
                 <Box>
                   <RadialDonutChart
@@ -681,7 +687,7 @@ export default function Prevent({
                 }
               >
                 <Typography className={classes.preventlabel}>
-                  Environmental Context ({sensorCounts["Environmental Context"]})
+                  Environmental Context <Box component="span">({sensorCounts["Environmental Context"]})</Box>
                 </Typography>
                 <Box>
                   <RadialDonutChart
@@ -712,7 +718,9 @@ export default function Prevent({
                   )
                 }
               >
-                <Typography className={classes.preventlabel}>Step Count({sensorCounts["Step Count"]})</Typography>
+                <Typography className={classes.preventlabel}>
+                  Step Count <Box component="span">({sensorCounts["Step Count"]})</Box>
+                </Typography>
                 <Box mt={3} mb={1} className={classes.maxw150}>
                   <Sparkline
                     ariaLabel="Step count"
@@ -795,7 +803,7 @@ export default function Prevent({
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={3} mb={3}>
-            <Link onClick={handleClose} color="primary">
+            <Link onClick={handleClose} className={classes.linkBlue}>
               Done
             </Link>
           </Box>
