@@ -242,6 +242,12 @@ export default function Messages({
       <Container style={{ marginTop: "5%" }}>
         <Box>
           {
+             getMessages()
+             .filter(
+               (x) =>
+                 (x.type === "message" && !!participantOnly && x.from === "researcher") ||
+                 (!participantOnly && x.from === "participant")
+             ).length > 0 ? (
             getMessages()
               .filter(
                 (x) =>
@@ -276,8 +282,10 @@ export default function Messages({
                     <Typography>{x.text}</Typography>
                   </Box>
                 </Box>
-              ))[0]
-          }
+              ))[0]  )
+              :
+              (<Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box> )          
+          }          
         </Box>
 
         <ResponsiveDialog
