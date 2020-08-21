@@ -1,4 +1,4 @@
-// Core Imports
+﻿// Core Imports
 import React, { useEffect, useState } from "react"
 import {
   Typography,
@@ -198,161 +198,162 @@ export default function NewGoal({ ...props }) {
           <Typography variant="h5">New Goal</Typography>
         </Toolbar>
       </AppBar>
-      <Grid container direction="row" justify="center" alignItems="flex-start">
-        <Grid item lg={4} sm={10} xs={12}>
-          <Grid container direction="row" justify="flex-start" alignItems="center" className={classes.goalHeader}>
-            <Grid item>{goalIcon}</Grid>
-            <Grid item>
-              <Box pl={2}>
-                <InputBase placeholder="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} />
-              </Box>
-              {/* <Typography variant="h4">Goal name</Typography> */}
+      <Box px={2}>
+        <Grid container direction="row" justify="center" alignItems="flex-start">
+          <Grid item lg={4} sm={10} xs={12}>
+            <Grid container direction="row" justify="flex-start" alignItems="center" className={classes.goalHeader}>
+              <Grid item>{goalIcon}</Grid>
+              <Grid item>
+                <Box pl={2}>
+                  <InputBase placeholder="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} />
+                </Box>
+                {/* <Typography variant="h4">Goal name</Typography> */}
+              </Grid>
             </Grid>
-          </Grid>
-          <Box className={classes.textfieldwrapper}>
-            <Typography variant="h5">Goal details</Typography>
-            <FormControl
-              component="fieldset"
-              classes={{
-                root: classes.textAreaControl,
-              }}
-            >
-              <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
-                <Grid item xs={2}>
-                  <InputBase
-                    className={classes.inputText}
-                    value={goalValue}
-                    placeholder="0"
-                    onChange={(e) => setGoalValue(e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={5} className={classes.goalUnit}>
-                  <List component="nav" className={classes.timeHours}>
-                    <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClick}>
-                      <ListItemText secondary={goalUnit} />
-                    </ListItem>
-                  </List>
-                  <Menu
-                    id="lock-menu"
-                    anchorEl={anchorEl}
-                    keepMounted
-                    open={Boolean(anchorEl)}
-                    onClose={handleClose}
-                    classes={{ paper: classes.menuPaper }}
-                  >
-                    {units.map((option, index) => (
-                      <MenuItem
-                        key={option}
-                        selected={option === goalUnit}
-                        onClick={(event) => handleMenuItemClick(event, option)}
-                      >
-                        {option}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Grid
-                    container
-                    direction="row"
-                    justify="space-between"
-                    alignItems="center"
-                    className={classes.durationOuter}
-                  >
-                    {frequency.map((value) => (
-                      <Grid key={value} item>
-                        <ButtonBase
-                          focusRipple
-                          className={
-                            value == selectedFrequency
-                              ? classes.duration + " " + classes.durationActive
-                              : classes.duration
-                          }
-                          onClick={() => setSelectedFrequency(value)}
+            <Box className={classes.textfieldwrapper}>
+              <Typography variant="h5">Goal details</Typography>
+              <FormControl
+                component="fieldset"
+                classes={{
+                  root: classes.textAreaControl,
+                }}
+              >
+                <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
+                  <Grid item xs={2}>
+                    <InputBase
+                      className={classes.inputText}
+                      value={goalValue}
+                      placeholder="0"
+                      onChange={(e) => setGoalValue(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={5} className={classes.goalUnit}>
+                    <List component="nav" className={classes.timeHours}>
+                      <ListItem button aria-haspopup="true" aria-controls="lock-menu" onClick={handleClick}>
+                        <ListItemText secondary={goalUnit} />
+                      </ListItem>
+                    </List>
+                    <Menu
+                      id="lock-menu"
+                      anchorEl={anchorEl}
+                      keepMounted
+                      open={Boolean(anchorEl)}
+                      onClose={handleClose}
+                      classes={{ paper: classes.menuPaper }}
+                    >
+                      {units.map((option, index) => (
+                        <MenuItem
+                          key={option}
+                          selected={option === goalUnit}
+                          onClick={(event) => handleMenuItemClick(event, option)}
                         >
-                          {value}
-                        </ButtonBase>
-                      </Grid>
-                    ))}
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Menu>
                   </Grid>
-                </Grid>
 
-                <Grid item xs={12}>
-                  <Grid
-                    container
-                    direction="row"
-                    justify="space-between"
-                    alignItems="center"
-                    className={classes.weekdaysOuter}
-                  >
-                    {weekdays.map((value) => (
-                      <Grid key={value} item>
-                        <ButtonBase
-                          focusRipple
-                          className={
-                            selectedDays.includes(value) == true
-                              ? classes.weekdays + " " + classes.weekdaysActive
-                              : classes.weekdays
-                          }
-                          onClick={() => setSelectedDaysValue(value)}
-                        >
-                          {value.substr(0, 1)}
-                        </ButtonBase>
+                  <Grid item xs={12}>
+                    <Grid
+                      container
+                      direction="row"
+                      justify="space-between"
+                      alignItems="center"
+                      className={classes.durationOuter}
+                    >
+                      {frequency.map((value) => (
+                        <Grid key={value} item>
+                          <ButtonBase
+                            focusRipple
+                            className={
+                              value == selectedFrequency
+                                ? classes.duration + " " + classes.durationActive
+                                : classes.duration
+                            }
+                            onClick={() => setSelectedFrequency(value)}
+                          >
+                            {value}
+                          </ButtonBase>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <Grid
+                      container
+                      direction="row"
+                      justify="space-between"
+                      alignItems="center"
+                      className={classes.weekdaysOuter}
+                    >
+                      {weekdays.map((value) => (
+                        <Grid key={value} item>
+                          <ButtonBase
+                            focusRipple
+                            className={
+                              selectedDays.includes(value) == true
+                                ? classes.weekdays + " " + classes.weekdaysActive
+                                : classes.weekdays
+                            }
+                            onClick={() => setSelectedDaysValue(value)}
+                          >
+                            {value.substr(0, 1)}
+                          </ButtonBase>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Grid>
+                  <Box width={1} mb={5}>
+                    <Grid container direction="row" justify="space-between" alignItems="center">
+                      <Grid item xs={6}>
+                        <Typography variant="body2">Start date</Typography>
                       </Grid>
-                    ))}
-                  </Grid>
-                </Grid>
-                <Box width={1} mb={5}>
-                  <Grid container direction="row" justify="space-between" alignItems="center">
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Start date</Typography>
+                      <Grid item xs={6} className={classes.goalDetails}>
+                        <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
+                          {startDate != null ? getDateString(startDate) : getDateString(new Date())}
+                        </Typography>
+                        <DatePicker
+                          autoOk
+                          open={startDateOpen}
+                          onOpen={() => setStartDateOpen(true)}
+                          onClose={() => setStartDateOpen(false)}
+                          value={startDate}
+                          onChange={(e) => changeStartDate(e)}
+                          TextFieldComponent={() => null}
+                          disableToolbar={true}
+                          okLabel=""
+                          cancelLabel=""
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6} className={classes.goalDetails}>
-                      <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
-                        {startDate != null ? getDateString(startDate) : getDateString(new Date())}
-                      </Typography>
-                      <DatePicker
-                        autoOk
-                        open={startDateOpen}
-                        onOpen={() => setStartDateOpen(true)}
-                        onClose={() => setStartDateOpen(false)}
-                        value={startDate}
-                        onChange={(e) => changeStartDate(e)}
-                        TextFieldComponent={() => null}
-                        disableToolbar={true}
-                        okLabel=""
-                        cancelLabel=""
-                      />
+                  </Box>
+                  <Box width={1} mb={5}>
+                    <Grid container direction="row" justify="space-between" alignItems="center">
+                      <Grid item xs={6}>
+                        <Typography variant="body2">Duration</Typography>
+                      </Grid>
+                      <Grid item xs={6} className={classes.goalDetails}>
+                        <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
+                          {duration} days
+                        </Typography>
+                        <DatePicker
+                          autoOk
+                          open={endDateOpen}
+                          onOpen={() => setEndDateOpen(true)}
+                          onClose={() => setEndDateOpen(false)}
+                          value={date}
+                          onChange={(e) => changeEndDate(e)}
+                          TextFieldComponent={() => null}
+                          disableToolbar={true}
+                          okLabel=""
+                          cancelLabel=""
+                          minDate={startDate}
+                        />
+                      </Grid>
                     </Grid>
-                  </Grid>
-                </Box>
-                <Box width={1} mb={5}>
-                  <Grid container direction="row" justify="space-between" alignItems="center">
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Duration</Typography>
-                    </Grid>
-                    <Grid item xs={6} className={classes.goalDetails}>
-                      <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
-                        {duration} days
-                      </Typography>
-                      <DatePicker
-                        autoOk
-                        open={endDateOpen}
-                        onOpen={() => setEndDateOpen(true)}
-                        onClose={() => setEndDateOpen(false)}
-                        value={date}
-                        onChange={(e) => changeEndDate(e)}
-                        TextFieldComponent={() => null}
-                        disableToolbar={true}
-                        okLabel=""
-                        cancelLabel=""
-                        minDate={startDate}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-                {/* <Box width={1} mb={5}>
+                  </Box>
+                  {/* <Box width={1} mb={5}>
                 <Grid container direction="row" justify="space-between" alignItems="center">
                   <Grid item xs={6}>
                     <Typography variant="body2">Reminders</Typography>
@@ -371,79 +372,80 @@ export default function NewGoal({ ...props }) {
                   </Grid>
                 </Grid>
               </Box> */}
-                <Box width={1} mb={5}>
-                  <Grid container direction="row" justify="space-between" alignItems="center">
-                    <Grid item xs={6}>
-                      <Typography variant="body2">Reminders</Typography>
+                  <Box width={1} mb={5}>
+                    <Grid container direction="row" justify="space-between" alignItems="center">
+                      <Grid item xs={6}>
+                        <Typography variant="body2">Reminders</Typography>
+                      </Grid>
+                      <Grid item xs={6} className={classes.goalDetails}>
+                        <TimePicker
+                          value={reminderTime}
+                          onChange={(e) => changeReminderTime(e)}
+                          disableToolbar={false}
+                          className={classes.reminderTime}
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={6} className={classes.goalDetails}>
-                      <TimePicker
-                        value={reminderTime}
-                        onChange={(e) => changeReminderTime(e)}
-                        disableToolbar={false}
-                        className={classes.reminderTime}
-                      />
-                    </Grid>
-                  </Grid>
+                  </Box>
+                </Grid>
+
+                <Box textAlign="center" mt={4}>
+                  <Button className={classes.btnpeach} onClick={() => saveNewGoal()}>
+                    Save
+                  </Button>
                 </Box>
-              </Grid>
-
-              <Box textAlign="center" mt={4}>
-                <Button className={classes.btnpeach} onClick={() => saveNewGoal()}>
-                  Save
-                </Button>
-              </Box>
-              <Box textAlign="center" width={1} mt={3}>
-                <Link className={classes.linkpeach} onClick={props.onComplete}>
-                  Cancel
-                </Link>
-              </Box>
-            </FormControl>
-          </Box>
-
-          <Dialog
-            open={open}
-            onClose={() => setOpen(false)}
-            scroll="paper"
-            aria-labelledby="alert-dialog-slide-title"
-            aria-describedby="alert-dialog-slide-description"
-            classes={{
-              root: classes.dialogueStyle,
-              paper: classes.dialogueCurve,
-            }}
-          >
-            <Box display="flex" justifyContent="flex-end">
-              <Box>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                  <CloseIcon />
-                </IconButton>
-              </Box>
+                <Box textAlign="center" width={1} mt={3}>
+                  <Link className={classes.linkpeach} onClick={props.onComplete}>
+                    Cancel
+                  </Link>
+                </Box>
+              </FormControl>
             </Box>
 
-            <DialogContent className={classes.dialogueContent}>
-              <Typography variant="h4">Leaving so soon?</Typography>
-              <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
-            </DialogContent>
-            <Grid>
-              <Box textAlign="center" width={1} mt={1} mb={3}>
-                <Link
-                  underline="none"
-                  onClick={() => setOpen(false)}
-                  className={classnames(classes.btnpeach, classes.linkButton)}
-                >
-                  No, don’t leave yet
-                </Link>
+            <Dialog
+              open={open}
+              onClose={() => setOpen(false)}
+              scroll="paper"
+              aria-labelledby="alert-dialog-slide-title"
+              aria-describedby="alert-dialog-slide-description"
+              classes={{
+                root: classes.dialogueStyle,
+                paper: classes.dialogueCurve,
+              }}
+            >
+              <Box display="flex" justifyContent="flex-end">
+                <Box>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
               </Box>
-              <Box textAlign="center" width={1} mb={4}>
-                <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
-                  {" "}
-                  Yes, leave
-                </Link>
-              </Box>
-            </Grid>
-          </Dialog>
+
+              <DialogContent className={classes.dialogueContent}>
+                <Typography variant="h4">Leaving so soon?</Typography>
+                <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+              </DialogContent>
+              <Grid>
+                <Box textAlign="center" width={1} mt={1} mb={3}>
+                  <Link
+                    underline="none"
+                    onClick={() => setOpen(false)}
+                    className={classnames(classes.btnpeach, classes.linkButton)}
+                  >
+                    No, don’t leave yet
+                  </Link>
+                </Box>
+                <Box textAlign="center" width={1} mb={4}>
+                  <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
+                    {" "}
+                    Yes, leave
+                  </Link>
+                </Box>
+              </Grid>
+            </Dialog>
+          </Grid>
         </Grid>
-      </Grid>
+      </Box>
     </div>
   )
 }
