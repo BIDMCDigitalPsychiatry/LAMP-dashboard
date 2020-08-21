@@ -71,10 +71,10 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
-    centerHeader : {
-      "& h2" : {
-        textAlign:"center !important"
-      }
+    centerHeader: {
+      "& h2": {
+        textAlign: "center !important",
+      },
     },
     header: {
       background: "#FFEFEC",
@@ -399,7 +399,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
             {dialogueType === "Scratch_card" && (
-              <Box textAlign="center" width={1} mt={1} mb={4} className={classes.centerHeader}>
+              <Box textAlign="center" width={1} mt={1} className={classes.centerHeader}>
                 <Typography variant="body2" align="center">
                   Meditation exercises
                 </Typography>
