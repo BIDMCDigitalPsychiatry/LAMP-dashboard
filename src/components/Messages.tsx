@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
     float: "right",
     "& input": { padding: 0, color: "#4C66D6" },
     "& svg": { color: "#4C66D6" },
-    "& button": { padding: "0px 15px", color: "#4C66D6" },
+    "& button": { padding: "0px 15px", color: "#4C66D6", "&:hover": { backgroundColor: "transparent" } },
   },
   toolbardashboard: {
     minHeight: 65,
@@ -241,13 +241,11 @@ export default function Messages({
     return (
       <Container style={{ marginTop: "5%" }}>
         <Box>
-          {
-             getMessages()
-             .filter(
-               (x) =>
-                 (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-                 (!participantOnly && x.from === "participant")
-             ).length > 0 ? (
+          {getMessages().filter(
+            (x) =>
+              (x.type === "message" && !!participantOnly && x.from === "researcher") ||
+              (!participantOnly && x.from === "participant")
+          ).length > 0 ? (
             getMessages()
               .filter(
                 (x) =>
@@ -282,10 +280,10 @@ export default function Messages({
                     <Typography>{x.text}</Typography>
                   </Box>
                 </Box>
-              ))[0]  )
-              :
-              (<Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box> )          
-          }          
+              ))[0]
+          ) : (
+            <Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box>
+          )}
         </Box>
 
         <ResponsiveDialog
