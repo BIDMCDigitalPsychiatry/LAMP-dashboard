@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme) => ({
   },
   dialogtitle: { padding: 0 },
   active: {
-    background: "#FFAC98",
+    background: "#FFAC98 !important",
   },
   linkButton: {
     padding: "15px 25px 15px 25px",
