@@ -118,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
     background: "#92E7CA",
     borderRadius: "40px",
     fontWeight: 600,
-    minWidth: "200px",
+    minWidth: "160px",
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
     lineHeight: "38px",
     margin: "5% 5px 0 5px",
@@ -166,7 +166,7 @@ const useStyles = makeStyles((theme) => ({
   },
   btnBack: {
     borderRadius: "40px",
-    minWidth: "150px",
+    minWidth: "160px",
     boxShadow: "0px 10px 15px rgba(0, 0, 0, 0.05)",
     lineHeight: "38px",
     fontFamily: "inter",
