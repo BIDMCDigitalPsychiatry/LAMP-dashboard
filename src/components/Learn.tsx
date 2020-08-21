@@ -992,7 +992,7 @@ export default function Learn({ participant, ...props }: { participant: Particip
         onClose={() => {
           setOpenData(false)
         }}
-       >
+      >
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton

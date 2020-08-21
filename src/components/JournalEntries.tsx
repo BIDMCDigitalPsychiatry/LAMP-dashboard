@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
   },
   closeButton: {
     color: theme.palette.grey[500],
-  },    
+  },
   journalStyle: {
     background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
     borderRadius: "10px",
@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 18,
       width: "calc(100% - 96px)",
     },
-  }, 
+  },
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },

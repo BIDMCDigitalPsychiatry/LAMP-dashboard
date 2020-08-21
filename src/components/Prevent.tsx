@@ -216,7 +216,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     backbtn: {
-      //  paddingLeft: 0, paddingRight: 0
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
@@ -831,7 +830,7 @@ export default function Prevent({
             <Typography variant="h5">{selectedActivityName}</Typography>
           </Toolbar>
         </AppBar>
-       
+
         {selectedActivityName === "Journal entries" ? (
           <Journal />
         ) : selectedActivityName === "Goal: Water" ? (

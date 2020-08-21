@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
   },
   btngreen: {
     background: "#92E7CA",
-    borderRadius: "40px",	
+    borderRadius: "40px",
     fontWeight: 600,
     minWidth: "200px",
     boxShadow: "0px 10px 15px rgba(146, 231, 202, 0.25)",
@@ -354,10 +354,11 @@ function RadioOption({ onChange, options, value, ...props }) {
               />
             }
             label={
-              <Typography 
-                component="span" 
-                variant="body2" 
-                style={{color:(selectedValue == `${x.value}`)  ? "black" : "rgba(0, 0, 0, 0.5)"}}>
+              <Typography
+                component="span"
+                variant="body2"
+                style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
+              >
                 {x.label}
                 {!!x.description && (
                   <Box
@@ -628,7 +629,7 @@ function Rating({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-   onResponse({ item: text, value: parseInt(value), duration : ((new Date().getTime() - startTime) /1000).toFixed(1) })
+    onResponse({ item: text, value: parseInt(value), duration: ((new Date().getTime() - startTime) / 1000).toFixed(1) })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -767,7 +768,7 @@ function Questions({
             type={x.type}
             options={x.options?.map((y) => ({ ...y, label: y.value }))}
             value={responses.current[idx]}
-            onResponse={(response) => {              
+            onResponse={(response) => {
               responses.current[idx] = response
               if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
 
@@ -780,7 +781,24 @@ function Questions({
             }}
             startTime={idx === 0 ? startTime : new Date().getTime()}
           />
-          <div className={classes.sliderActionsContainer}>   
+          <div className={classes.sliderActionsContainer}>
+            {!supportsSidebar && idx > 0 && (
+              <Fab onClick={handleBack} className={classes.btnBack}>
+                Back
+              </Fab>
+            )}
+            {!supportsSidebar && (
+              <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {idx === value.settings.length - 1
+                  ? toolBarBack && !!prefillData
+                    ? !!prefillTimestamp
+                      ? "Overwrite"
+                      : "Duplicate"
+                    : "Submit"
+                  : "Next"}
+              </Fab>
+            )}
+
             {supportsSidebar && idx === value.settings.length - 1 && (
               <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
                 {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
@@ -816,7 +834,7 @@ function Section({
 
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
-    if(slideElements == null) {
+    if (slideElements == null) {
       const slideElements = value.settings.map((x, idx) => {
         setElementIn(true)
         return (
@@ -841,14 +859,13 @@ function Section({
       // onResponse(Array.from({ ...responses.current, length: value.settings.length }))
     }
     window.addEventListener("scroll", handleChange, true)
-    
   }, [])
   const isComplete = (idx) => !!responses.current[idx]?.value
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
     setElementIn(false)
-    setTimeout(() => {      
+    setTimeout(() => {
       setIndex((index - 1) % slideElements.length)
       setElementIn(true)
     }, 500)
@@ -857,7 +874,7 @@ function Section({
   }
   const handleNext = () => {
     setElementIn(false)
-    setTimeout(() => {      
+    setTimeout(() => {
       setIndex((index + 1) % slideElements.length)
       setElementIn(true)
     }, 500)
@@ -908,14 +925,14 @@ function Section({
             <Box>{slideElements ? slideElements[index] : null}</Box>
           </Slide>
           <Box className={classes.surveyQuestionNav}>
-            {!supportsSidebar && index  > 0 && (
+            {!supportsSidebar && index > 0 && (
               <Fab onClick={handleBack} className={classes.btnBack}>
                 Back
               </Fab>
             )}
             {!supportsSidebar && (
-              <Fab onClick={index  === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
-                {index  === value.settings.length - 1
+              <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+                {index === value.settings.length - 1
                   ? toolBarBack && !!prefillData
                     ? !!prefillTimestamp
                       ? "Overwrite"
