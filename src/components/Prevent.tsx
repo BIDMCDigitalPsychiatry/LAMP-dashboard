@@ -401,12 +401,76 @@ async function getActivities(participant: ParticipantObj) {
   return [...original, ...custom]
 }
 
+async function getSelectedActivities(participant: ParticipantObj) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.selectedActivities").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""] ?? []
+  )
+}
+async function getSelectedSensors(participant: ParticipantObj) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.selectedSensors").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""] ?? []
+  )
+}
+
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
   return Object.assign(
     {},
     ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
       [k]: v.length,
     }))
+  )
+}
+
+async function getJournalCount(participant: ParticipantObj) {
+  console.log(
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )
+  )
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""]?.length ?? 0
   )
 }
 
@@ -490,9 +554,15 @@ export default function Prevent({
   const [selectedActivity, setSelectedActivity] = React.useState({})
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
-
+  const [journalCount, setJournalCount] = React.useState(0)
   React.useEffect(() => {
     ;(async () => {
+      let selActivities = await getSelectedActivities(participant)
+      setSelectedActivities(selActivities)
+      let selSensors = await getSelectedSensors(participant)
+      setSelectedSensors(selSensors)
+      let journalCount = await getJournalCount(participant)
+      setJournalCount(journalCount)
       let activities = await getActivities(participant)
       setActivities(activities)
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
@@ -546,7 +616,7 @@ export default function Prevent({
                       startDate={earliestDate()}
                       data={activityEvents?.[activity.name]?.map((d) => ({
                         x: new Date(d.timestamp),
-                        y: d.duration / 1000,
+                        y: d.duration,
                       }))}
                     >
                       <LinearGradient
@@ -592,7 +662,7 @@ export default function Prevent({
                 </Box>
               </Box>
               <Box className={classes.preventGraph}>
-                <Typography variant="h2">14</Typography>
+                <Typography variant="h2">{journalCount}</Typography>
               </Box>
               <Typography variant="h6">entries this month</Typography>
             </Card>
@@ -787,7 +857,10 @@ export default function Prevent({
               items={(activities || []).map((x) => `${x.name}`)}
               showZeroBadges={false}
               badges={activityCounts}
-              onChange={(x) => setSelectedActivities(x)}
+              onChange={(x) => {
+                LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedActivities", x)
+                setSelectedActivities(x)
+              }}
             />
           ) : (
             <MultipleSelect
@@ -795,7 +868,10 @@ export default function Prevent({
               items={[`Environmental Context`, `Step Count`, `Social Context`]}
               showZeroBadges={false}
               badges={sensorCounts}
-              onChange={(x) => setSelectedSensors(x)}
+              onChange={(x) => {
+                LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
+                setSelectedSensors(x)
+              }}
             />
           )}
         </DialogContent>

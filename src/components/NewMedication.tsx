@@ -33,10 +33,11 @@ import classnames from "classnames"
 import { ReactComponent as SearchIcon } from "../icons/Search.svg"
 import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
+import LAMP from "lamp-core"
 
 import Autocomplete from "@material-ui/lab/Autocomplete"
 
-export default function NewMedication({ ...props }) {
+export default function NewMedication({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
@@ -56,6 +57,8 @@ export default function NewMedication({ ...props }) {
   const [dosageName, setDosageName] = useState(null)
   const [dosageValue, setDosageValue] = useState(null)
   const [dosageTime, setDosageTime] = useState(new Date())
+  const [medications, setMedications] = useState({})
+  const [feeds, setFeeds] = useState({})
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -113,11 +116,47 @@ export default function NewMedication({ ...props }) {
     var date = new Date(e)
     setDosageTime(date)
   }
-
-  const saveNewMedication = () => {
+  const getMedications = async () => {
+    setMedications(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.medications").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+  const getDetails = (data) => {
+    let x = (data || {})[participant.id || ""] || []
+    console.log(x)
+    return !Array.isArray(x) ? [] : x
+  }
+  const getFeeds = async () => {
+    setFeeds(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+  const saveNewMedication = async () => {
     if (medicationName != null && medicationName != "") {
-      var medications = []
-      medications = JSON.parse(localStorage.getItem("medications"))
+      await getMedications()
+      let all = getDetails(medications)
       let medicationDetails = {
         medicationName: medicationName,
         frequency: selectedFrequency,
@@ -127,15 +166,20 @@ export default function NewMedication({ ...props }) {
         reminderTime: getTimeValue(reminderTime),
         dosageList: dosageList,
       }
-      if (medications != null) {
-        medications.push(medicationDetails)
-        localStorage.setItem("medications", JSON.stringify(medications))
-      } else {
-        var newMedication = []
-        newMedication.push(medicationDetails)
-        localStorage.setItem("medications", JSON.stringify(newMedication))
+      all.push(medicationDetails)
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.medications", all)
+      setMedications({ ...(medications || {}), [participant]: all })
+      await getFeeds()
+      all = getDetails(feeds)
+      var item = {
+        type: "manage",
+        time: getTimeValue(reminderTime),
+        title: "Medication: " + medicationName,
+        icon: "medication",
+        description: "test description",
       }
-
+      all.push(item)
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
     }
   }

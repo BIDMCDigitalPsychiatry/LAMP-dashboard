@@ -332,7 +332,12 @@ export default function NavigationLayout({
             <Typography variant="h5">Conversations</Typography>
           </Toolbar>
         </AppBar>
-        <Messages style={{ margin: "0px -16px -16px -16px" }} refresh={true} participantOnly participant={id} />
+        <Messages
+          style={{ margin: "0px -16px -16px -16px" }}
+          refresh={true}
+          participantOnly={typeof title != "undefined" && title.startsWith("Patient") ? true : false}
+          participant={id}
+        />
       </ResponsiveDialog>
     </Box>
   )

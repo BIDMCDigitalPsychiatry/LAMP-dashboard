@@ -61,6 +61,47 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 12,
     },
   },
+  "@keyframes InhaleText": {
+    "0%": { opacity: 0 },
+    "15%": { opacity: 1 },
+    "40%": { opacity: 1 },
+    "50%": { opacity: 0, display: "inline" },
+    "75%": { opacity: 0 },
+    "100%": { opacity: 0, display: "none" },
+  },
+
+  "@keyframes ExhaleText": {
+    "0%": { opacity: 0 },
+    "25%": { opacity: 0, display: "none" },
+    "50%": { opacity: 0 },
+    "65%": { opacity: 1, display: "inline" },
+    "80%": { opacity: 1 },
+    "100%": { opacity: 0 },
+  },
+  inhale_exhale: { position: "relative", height: 50 },
+  InhaleContainer: {
+    display: "block",
+    animation: "$InhaleText 10s ease infinite",
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    position: "absolute",
+    width: "100%",
+    bottom: 30,
+    textTransform: "capitalize",
+  },
+  ExhaleContainer: {
+    display: "block",
+    marginTop: "-2rem",
+    animation: "$ExhaleText 10s ease infinite",
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+    position: "absolute",
+    width: "100%",
+    bottom: 30,
+    textTransform: "capitalize",
+  },
   active: { background: "#FE8470" },
   toolbardashboard: {
     minHeight: 65,
@@ -145,7 +186,10 @@ export default function Breathe({ ...props }) {
   const [tab, _setTab] = useState(0)
   const [status, setStatus] = useState("Yes")
   const [progress, setProgress] = React.useState(100)
-  const [progressLabel, setProgressLabel] = React.useState(120)
+  const [progressLabel, setProgressLabel] = React.useState(4)
+  // const [isLoading, setIsLoading] = useState(false)
+  const [inhale, setInhale] = useState(true)
+
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -155,7 +199,13 @@ export default function Breathe({ ...props }) {
   }
   const setProgressUpdate = () => {
     let val = progressLabel - 1
-    setProgressLabel(val)
+    if (val == -1) {
+      setProgressLabel(4)
+      setProgress(100)
+      setInhale(!inhale)
+    } else {
+      setProgressLabel(val)
+    }
   }
   useEffect(() => {
     if (started) {
@@ -166,22 +216,21 @@ export default function Breathe({ ...props }) {
   useEffect(() => {
     let timer
     if (started) {
-      if (progressLabel > 0) {
-        setTimeout(setProgressUpdate, 1000)
-        let val = progress - 0.83
-        setProgress(val < 0 ? 0 : val)
-      } else {
-        handleNext()
-      }
+      setTimeout(setProgressUpdate, 1000)
+      let val = progress - 25 >= 0 ? progress - 25 : 100
+      setProgress(val < 0 ? 0 : val)
     }
   }, [progressLabel])
 
   useEffect(() => {
     let timer
     if (started) {
-      if (progressLabel > 0) {
+      console.log(progressValue)
+      if (progressValue < 100) {
         let val = progressValue + 0.8
         setProgressValue(val > 100 ? 100 : val)
+      } else {
+        handleNext()
       }
     }
   }, [progress])
@@ -244,22 +293,55 @@ export default function Breathe({ ...props }) {
             justify="center"
             style={{ minHeight: "80vh" }}
           >
+            {/* //   {isLoading && ( */}
             <Grid item className={classes.videoNav}>
-              <video src="videos/Lotus.mp4" autoPlay={true} loop></video>
+              <video
+                src="videos/Lotus.mp4"
+                autoPlay={true}
+                loop
+                preload={"auto"}
+                //   onLoadEnd={() =>setIsLoading(false)}
+              ></video>
+
+              <Box className={classes.inhale_exhale}>
+                <Typography variant="overline" className={classes.ExhaleContainer}>
+                  Exhale
+                </Typography>
+                <Typography variant="overline" className={classes.InhaleContainer}>
+                  Inhale
+                </Typography>
+              </Box>
             </Grid>
+            {/* //   )} */}
             <Box style={{ width: "100px", height: "100px" }}>
-              <CircularProgressbar
-                value={progress}
-                text={`${progressLabel}`}
-                strokeWidth={8}
-                styles={buildStyles({
-                  strokeLinecap: "butt",
-                  pathColor: "#E46759",
-                  textColor: "#BC453D",
-                  trailColor: "#FFAC98",
-                  textSize: "32px",
-                })}
-              />
+              {inhale && (
+                <CircularProgressbar
+                  value={progress}
+                  text={`${progressLabel}`}
+                  strokeWidth={8}
+                  styles={buildStyles({
+                    strokeLinecap: "butt",
+                    pathColor: "#E46759",
+                    textColor: "#BC453D",
+                    trailColor: "#FFAC98",
+                    textSize: "32px",
+                  })}
+                />
+              )}
+              {!inhale && (
+                <CircularProgressbar
+                  value={progress}
+                  text={`${progressLabel}`}
+                  strokeWidth={8}
+                  styles={buildStyles({
+                    strokeLinecap: "butt",
+                    pathColor: "#E46759",
+                    textColor: "#BC453D",
+                    trailColor: "#FFAC98",
+                    textSize: "32px",
+                  })}
+                />
+              )}
             </Box>
           </Grid>
         </Slide>

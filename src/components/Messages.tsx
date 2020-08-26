@@ -145,7 +145,7 @@ export default function Messages({
     return !Array.isArray(x) ? [] : x
   }
 
-  const sendMessage = async () => {
+  const sendMessage = async (msgOpen: boolean) => {
     let msg = (currentMessage || "").trim()
     if (msg.length === 0 || !participant) return
 
@@ -153,10 +153,11 @@ export default function Messages({
     let all = getMessages()
     all.push({
       from: !!participantOnly ? "participant" : "researcher",
-      type: "message",
+      type: msgOpen ? "note" : "message",
       date: new Date(),
       text: msg,
     })
+    console.log(msgOpen)
     LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
     setAddMsg(false)
@@ -164,11 +165,12 @@ export default function Messages({
   }
 
   const messageSection = (type: number) => {
+    console.log(getMessages().filter((x) => x.type === "message"))
     return (
       <Box>
         {getMessages()
           .filter(
-            (x) => x.type === "message" //&&  x.from === sender - to be replaced with different senders
+            (x) => (type === 0 && x.type === "note") || (type === 1 && x.type === "message") //&&  x.from === sender - to be replaced with different senders
           )
           .map((x) => (
             <Box
@@ -215,7 +217,7 @@ export default function Messages({
               style={{ display: addMsg ? "block" : "none" }}
               edge="end"
               aria-label="send"
-              onClick={sendMessage}
+              onClick={() => sendMessage(msgOpen)}
               onMouseDown={(event) => event.preventDefault()}
             >
               <Icon>send</Icon>
@@ -239,14 +241,14 @@ export default function Messages({
         <Box>
           {getMessages().filter(
             (x) =>
-              (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-              (!participantOnly && x.from === "participant")
+              x.type === "message" &&
+              ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
           ).length > 0 ? (
             getMessages()
               .filter(
                 (x) =>
-                  (x.type === "message" && !!participantOnly && x.from === "researcher") ||
-                  (!participantOnly && x.from === "participant")
+                  x.type === "message" &&
+                  ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
               )
               .map((x) => (
                 <Box
@@ -278,7 +280,7 @@ export default function Messages({
                 </Box>
               ))[0]
           ) : (
-            <Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box>
+            <Box style={{ marginTop: "5%" }}>{messageSection(1)}</Box>
           )}
         </Box>
 

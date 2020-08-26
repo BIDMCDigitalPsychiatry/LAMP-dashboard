@@ -68,6 +68,7 @@ export default function Participant({
   tabValue: string
   surveyDone: boolean
   submitSurvey: Function
+  setShowDemoMessage: Function
 }) {
   const [activities, setActivities] = useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
@@ -134,7 +135,7 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-  //  getShowWelcome(participant).then(setOpen)
+    //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
@@ -159,6 +160,7 @@ export default function Participant({
   }
 
   const submitSurvey = (response, overwritingTimestamp) => {
+    console.log(response)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: 0,
@@ -252,7 +254,12 @@ export default function Participant({
           <Feed participant={participant} activeTab={activeTab} />
         </Box>
       </Slide>
-      <BottomMenu activeTab={activeTab} tabValue={tab} showWelcome={openDialog} />
+      <BottomMenu
+        activeTab={activeTab}
+        tabValue={tab}
+        showWelcome={openDialog}
+        setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
+      />
       <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
         <Welcome
           activities={activities}

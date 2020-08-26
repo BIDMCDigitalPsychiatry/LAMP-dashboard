@@ -247,7 +247,12 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
           },
         ]}
         detailPanel={(rowData) => (
-          <Messages refresh participant={participants[rowData.tableData.id].id} msgOpen={true} />
+          <Messages
+            refresh
+            participant={participants[rowData.tableData.id].id}
+            msgOpen={false}
+            participantOnly={false}
+          />
         )}
         onRowClick={(event, rowData, togglePanel) => onParticipantSelect(participants[rowData.tableData.id].id)}
         actions={[
@@ -374,7 +379,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         )}
       </Popover>
       <ResponsiveDialog transient animate open={!!openMessaging} onClose={() => setOpenMessaging(undefined)}>
-        <Messages participant={openMessaging} />
+        <Messages participant={openMessaging} participantOnly={false} msgOpen={false} />
       </ResponsiveDialog>
       <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
         <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />

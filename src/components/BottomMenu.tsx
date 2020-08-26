@@ -280,6 +280,7 @@ export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
+  const [viewedTabs, setViewedTabs] = useState([1])
 
   const [openTabs, setOpenTabs] = useState([
     props.tabValue === 0 ? true : false,
@@ -291,7 +292,13 @@ export default function BottomMenu({ ...props }) {
 
   const setTab = (newTab) => {
     _setTab(newTab)
-    setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
+    //setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
+    props.setShowDemoMessage(false)
+    if (viewedTabs.length == 0) setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
+    if (!viewedTabs.includes(newTab)) {
+      setViewedTabs(viewedTabs.concat(newTab))
+      setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
+    }
     props.activeTab(newTab)
   }
 
