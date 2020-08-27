@@ -123,6 +123,18 @@ const useStyles = makeStyles((theme) => ({
   btnNav: { marginBottom: 0 },
 }))
 
+async function getJournals(participantId) {
+  return Object.fromEntries(
+    (
+      await Promise.all(
+        [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => [])])
+      )
+    )
+      .filter((x: any) => x[1].message !== "404.object-not-found")
+      .map((x: any) => [x[0], x[1].data])
+  )
+}
+
 export default function JournalEntries({ participant, ...props }) {
   const classes = useStyles()
   const [journals, setJournals] = useState({})
@@ -134,37 +146,19 @@ export default function JournalEntries({ participant, ...props }) {
     setStatus(statusVal)
   }
 
-  const handleOpen = (text: string, date?: string) => {
-    if (text) setJounalValue(text)
-    setOpen(true)
-  }
-
-  const getJournals = async () => {
-    setJournals(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )
-    )
-  }
+  useEffect(() => {
+    ;(async () => {
+      let journals = await getJournals(participant.id)
+      setJournals(journals)
+    })()
+  }, [])
 
   const getData = () => {
-    console.log(journals)
     let x = (journals || {})[participant.id || ""] || []
-    console.log(x)
     return !Array.isArray(x) ? [] : x
   }
 
   const saveJournal = async () => {
-    await getJournals()
     let all = getData()
     let journal = {
       journalText: journalValue,
@@ -172,7 +166,6 @@ export default function JournalEntries({ participant, ...props }) {
       datetime: new Date(),
     }
     all.push(journal)
-    console.log(all)
     LAMP.Type.setAttachment(participant.id, "me", "lamp.journals", all)
     setJournals({ ...(journals || {}), [participant]: all })
     props.onComplete()

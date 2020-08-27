@@ -23,7 +23,6 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
-import { ReactComponent as WaterBlue } from "../icons/WaterBlue.svg"
 import PreventData from "./PreventData"
 import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
@@ -39,6 +38,16 @@ import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
+import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
+import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
+import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
+import { ReactComponent as PreventNutrition } from "../icons/PreventNutrition.svg"
+import { ReactComponent as PreventMeditation } from "../icons/PreventMeditation.svg"
+import { ReactComponent as PreventEmotions } from "../icons/PreventEmotions.svg"
+import { ReactComponent as PreventBreatheIcon } from "../icons/PreventBreathe.svg"
+import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
+import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
+import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -442,22 +451,19 @@ function getActivityEventCount(activity_events: { [groupName: string]: ActivityE
     }))
   )
 }
+async function getGoals(participant: ParticipantObj) {
+  return Object.fromEntries(
+    (
+      await Promise.all(
+        [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.goals").catch((e) => [])])
+      )
+    )
+      .filter((x: any) => x[1].message !== "404.object-not-found")
+      .map((x: any) => [x[0], x[1].data])
+  )[participant.id || ""]
+}
 
 async function getJournalCount(participant: ParticipantObj) {
-  console.log(
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )
-  )
   return (
     Object.fromEntries(
       (
@@ -508,7 +514,7 @@ export default function Prevent({
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
-  const [eventsData, setEventsData] = React.useState(null)
+  const [goals, setGoals] = React.useState({})
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -539,7 +545,6 @@ export default function Prevent({
     } else {
       setSelectedActivityName("")
     }
-    setEventsData(events)
     setActivityData(data)
     setOpenData(true)
   }
@@ -552,9 +557,33 @@ export default function Prevent({
   const [sensorCounts, setSensorCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
   const [selectedActivity, setSelectedActivity] = React.useState({})
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
+
+  const goalIcon = (goalType: string) => {
+    return goalType == "Exercise" ? (
+      <PreventExercise width="40px" height="40px" />
+    ) : goalType == "Weight" ? (
+      <PreventWeight width="40px" height="40px" />
+    ) : goalType == "Nutrition" ? (
+      <PreventNutrition width="40px" height="40px" />
+    ) : goalType == "Medication" ? (
+      <PreventBreatheIcon width="40px" height="40px" />
+    ) : goalType == "Sleep" ? (
+      <PreventSleeping width="40px" height="40px" />
+    ) : goalType == "Reading" ? (
+      <PreventReading width="40px" height="40px" />
+    ) : goalType == "Finances" ? (
+      <PreventSavings />
+    ) : goalType == "Mood" ? (
+      <PreventEmotions width="40px" height="40px" />
+    ) : goalType == "Meditation" ? (
+      <PreventMeditation width="40px" height="40px" />
+    ) : (
+      <PreventCustom width="40px" height="40px" />
+    )
+  }
+
   React.useEffect(() => {
     ;(async () => {
       let selActivities = await getSelectedActivities(participant)
@@ -564,10 +593,18 @@ export default function Prevent({
       let journalCount = await getJournalCount(participant)
       setJournalCount(journalCount)
       let activities = await getActivities(participant)
+      let goals = await getGoals(participant)
+      if (typeof goals !== "undefined") {
+        goals.map((goal) => {
+          activities.push({ name: goal.goalType, type: "goals" })
+        })
+      }
+      if (journalCount > 0) activities.push({ name: "Journals" })
       setActivities(activities)
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
+      if (journalCount > 0) activityEventCount["Journals"] = journalCount
       setActivityCounts(activityEventCount)
       let sensorEvents = await getSensorEvents(participant)
       setSensorEvents(sensorEvents)
@@ -600,106 +637,107 @@ export default function Prevent({
       <Grid container spacing={2}>
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
-          .map((activity) => (
-            <Grid item xs={12} sm={6} md={6} lg={6}>
-              <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
-                  <Typography className={classes.preventlabelFull}>
-                    {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
-                  </Typography>
-                  <Box className={classes.maxw300}>
-                    <Sparkline
-                      ariaLabel={activity.name}
-                      margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
-                      width={300}
-                      height={70}
-                      startDate={earliestDate()}
-                      data={activityEvents?.[activity.name]?.map((d) => ({
-                        x: new Date(d.timestamp),
-                        y: d.duration,
-                      }))}
-                    >
-                      <LinearGradient
-                        id="gredient"
-                        from="#ECF4FF"
-                        to="#FFFFFF"
-                        fromOffset="30%"
-                        fromOpacity="1"
-                        toOpacity="1"
-                        toOffset="100%"
-                        rotate={90}
+          .map((activity) =>
+            activity.name === "Journals" ? (
+              <Grid item xs={6} sm={3} md={3} lg={3}>
+                <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                  <Card
+                    className={classes.prevent}
+                    onClick={() => {
+                      setSelectedActivityName("Journal entries")
+                      setOpenData(true)
+                    }}
+                  >
+                    <Box display="flex">
+                      <Box flexGrow={1}>
+                        <Typography className={classes.preventlabel}>Journal</Typography>
+                      </Box>
+                      <Box mr={1} className={classes.preventRightSVG}>
+                        <JournalBlue />
+                      </Box>
+                    </Box>
+                    <Box className={classes.preventGraph}>
+                      <Typography variant="h2">{journalCount}</Typography>
+                    </Box>
+                    <Typography variant="h6">entries this month</Typography>
+                  </Card>
+                </ButtonBase>
+              </Grid>
+            ) : activity.type === "goals" ? (
+              <Grid item xs={6} sm={3} md={3} lg={3}>
+                <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                  <Card
+                    className={classes.prevent}
+                    onClick={() => {
+                      setSelectedActivityName(`Goal: ${activity.name}`)
+                      setOpenData(true)
+                    }}
+                  >
+                    <Box display="flex">
+                      <Box flexGrow={1}>
+                        <Typography className={classes.preventlabel}>{activity.name}</Typography>
+                      </Box>
+                      <Box mr={1} className={classes.preventRightSVG}>
+                        {goalIcon(activity.name)}
+                      </Box>
+                    </Box>
+                    <Box className={classes.preventGraph}>
+                      <RadialDonutChart
+                        data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
+                        detailPage={false}
+                        width={135}
+                        height={135}
                       />
-                      <LineSeries
-                        showArea={true}
-                        fill={`url(#gradient)`}
-                        stroke="#3C5DDD"
-                        strokeWidth={2}
-                        strokeLinecap="butt"
-                      />
-                    </Sparkline>
-                  </Box>
-                  <Typography variant="h6">this month</Typography>
-                </Card>
-              </ButtonBase>
-            </Grid>
-          ))}
-
-        <Grid item xs={6} sm={3} md={3} lg={3}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card
-              className={classes.prevent}
-              onClick={() => {
-                setSelectedActivityName("Journal entries")
-                setOpenData(true)
-              }}
-            >
-              <Box display="flex">
-                <Box flexGrow={1}>
-                  <Typography className={classes.preventlabel}>Journal</Typography>
-                </Box>
-                <Box mr={1} className={classes.preventRightSVG}>
-                  <JournalBlue />
-                </Box>
-              </Box>
-              <Box className={classes.preventGraph}>
-                <Typography variant="h2">{journalCount}</Typography>
-              </Box>
-              <Typography variant="h6">entries this month</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-
-        <Grid item xs={6} sm={3} md={3} lg={3}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card
-              className={classes.prevent}
-              onClick={() => {
-                setSelectedActivityName("Goal: Water")
-                setOpenData(true)
-              }}
-            >
-              <Box display="flex">
-                <Box flexGrow={1}>
-                  <Typography className={classes.preventlabel}>Water</Typography>
-                </Box>
-                <Box mr={1} className={classes.preventRightSVG}>
-                  <WaterBlue />
-                </Box>
-              </Box>
-              <Box className={classes.preventGraph}>
-                <RadialDonutChart
-                  data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
-                  detailPage={false}
-                  width={135}
-                  height={135}
-                />
-              </Box>
-              <Typography variant="h6">12/16 this month</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
+                    </Box>
+                    <Typography variant="h6">12/16 this month</Typography>
+                  </Card>
+                </ButtonBase>
+              </Grid>
+            ) : (
+              <Grid item xs={12} sm={6} md={6} lg={6}>
+                <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                  <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
+                    <Typography className={classes.preventlabelFull}>
+                      {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
+                    </Typography>
+                    <Box className={classes.maxw300}>
+                      <Sparkline
+                        ariaLabel={activity.name}
+                        margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
+                        width={300}
+                        height={70}
+                        startDate={earliestDate()}
+                        data={activityEvents?.[activity.name]?.map((d) => ({
+                          x: new Date(d.timestamp),
+                          y: d.duration,
+                        }))}
+                      >
+                        <LinearGradient
+                          id="gredient"
+                          from="#ECF4FF"
+                          to="#FFFFFF"
+                          fromOffset="30%"
+                          fromOpacity="1"
+                          toOpacity="1"
+                          toOffset="100%"
+                          rotate={90}
+                        />
+                        <LineSeries
+                          showArea={true}
+                          fill={`url(#gradient)`}
+                          stroke="#3C5DDD"
+                          strokeWidth={2}
+                          strokeLinecap="butt"
+                        />
+                      </Sparkline>
+                    </Box>
+                    <Typography variant="h6">this month</Typography>
+                  </Card>
+                </ButtonBase>
+              </Grid>
+            )
+          )}
       </Grid>
-
       <Grid container xs={12} spacing={0} className={classes.sensorhd}>
         <Grid item xs className={classes.preventHeader}>
           <Typography variant="h5">Sensors</Typography>
@@ -908,7 +946,7 @@ export default function Prevent({
         </AppBar>
 
         {selectedActivityName === "Journal entries" ? (
-          <Journal />
+          <Journal participant={participant} />
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
         ) : (
