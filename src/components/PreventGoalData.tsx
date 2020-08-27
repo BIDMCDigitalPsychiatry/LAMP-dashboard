@@ -1,7 +1,7 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
 import { Typography, makeStyles, Box, Grid, Container, Link, Badge, Icon } from "@material-ui/core"
-import { ReactComponent as WaterBlue } from "../icons/WaterBlue.svg"
+import { ReactComponent as WaterBlue } from "../icons/PreventNutrition.svg"
 import { DatePicker } from "@material-ui/pickers"
 
 const useStyles = makeStyles((theme) => ({

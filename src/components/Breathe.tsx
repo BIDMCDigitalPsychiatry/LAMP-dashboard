@@ -209,7 +209,8 @@ export default function Breathe({ ...props }) {
   }
   useEffect(() => {
     if (started) {
-      setProgressUpdate()
+      setTimeout(setProgressUpdate, 1000)
+      //setProgressUpdate()
     }
   }, [started])
 
@@ -325,6 +326,7 @@ export default function Breathe({ ...props }) {
                     textColor: "#BC453D",
                     trailColor: "#FFAC98",
                     textSize: "32px",
+                    pathTransitionDuration: 1,
                   })}
                 />
               )}
@@ -339,6 +341,7 @@ export default function Breathe({ ...props }) {
                     textColor: "#BC453D",
                     trailColor: "#FFAC98",
                     textSize: "32px",
+                    pathTransitionDuration: 1,
                   })}
                 />
               )}

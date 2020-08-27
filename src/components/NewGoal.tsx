@@ -42,6 +42,29 @@ import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import LAMP from "lamp-core"
 
+async function getAttachmentData(participantId, type: string) {
+  console.log(
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )
+  )
+  return Object.fromEntries(
+    (
+      await Promise.all(
+        [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
+      )
+    )
+      .filter((x: any) => x[1].message !== "404.object-not-found")
+      .map((x: any) => [x[0], x[1].data])
+  )
+}
+
 export default function NewGoal({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
@@ -71,50 +94,15 @@ export default function NewGoal({ participant, ...props }) {
   }
   //var units = ["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"]
   const frequency = ["hourly", "daily", "weekly", "monthly"]
-  const getGoals = async () => {
-    setGoals(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.goals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )
-    )
-  }
-  const getFeeds = async () => {
-    console.log(
-      Object.fromEntries(
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-          ])
-        )
-      )
-    )
-    setFeeds(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )
-    )
-  }
 
   useEffect(() => {
+    ;(async () => {
+      let goals = await getAttachmentData(participant.id, "lamp.goals")
+      console.log(goals)
+      setGoals(goals)
+      let feeds = await getAttachmentData(participant.id, "lamp.feed.goals")
+      setFeeds(feeds)
+    })()
     if (props.goalType == "Exercise" || props.goalType == "Meditation" || props.goalType == "Mood") {
       setUnits(["hours", "minutes"])
       setGoalUnit("minutes")
@@ -186,7 +174,7 @@ export default function NewGoal({ participant, ...props }) {
 
   const saveNewGoal = async () => {
     if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
-      await getGoals()
+      console.log(goals)
       let all = getData(goals)
       let goalDetails = {
         goalName: goalName,
@@ -203,7 +191,6 @@ export default function NewGoal({ participant, ...props }) {
       all.push(goalDetails)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.goals", all)
       setGoals({ ...(goals || {}), [participant]: all })
-      await getFeeds()
       all = getData(feeds)
       var item = {
         type: "goal",

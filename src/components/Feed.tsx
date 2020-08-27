@@ -36,9 +36,13 @@ import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
 import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
-import { Participant as ParticipantObj } from "lamp-core"
 import TipNotification from "./TipNotification"
-import LAMP from "lamp-core"
+import LAMP, {
+  Participant as ParticipantObj,
+  Activity as ActivityObj,
+  ActivityEvent as ActivityEventObj,
+  SensorEvent as SensorEventObj,
+} from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 
@@ -299,6 +303,67 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+// Perform event coalescing/grouping by sensor or activity type.
+async function getActivityEvents(
+  participant: ParticipantObj,
+  _activities: ActivityObj[]
+): Promise<{ [groupName: string]: ActivityEventObj[] }> {
+  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
+    .map((x) => ({
+      ...x,
+      activity: _activities.find((y) => x.activity === y.id),
+    }))
+
+    .sort((x, y) => x.timestamp - y.timestamp)
+    .map((x) => ({
+      ...x,
+      activity: (x.activity || { name: "" }).name,
+    }))
+    .groupBy("activity") as any
+  let customEvents = _activities
+    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
+    .map((x) =>
+      x?.settings?.map((y, idx) =>
+        original?.[y.activity]
+          ?.map((z) => ({
+            idx: idx,
+            timestamp: z.timestamp,
+            duration: z.duration,
+            activity: x.name,
+            slices: z.temporal_slices.find((a) => a.item === y.question),
+          }))
+          .filter((y) => y.slices !== undefined)
+      )
+    )
+    .filter((x) => x !== undefined)
+    .flat(2)
+    .groupBy("activity")
+  let customGroups = Object.entries(customEvents).map(([k, x]) => [
+    k,
+    Object.values(x.groupBy("timestamp")).map((z: any) => ({
+      timestamp: z?.[0].timestamp,
+      duration: z?.[0].duration,
+      activity: z?.[0].activity,
+      static_data: {},
+      temporal_slices: Array.from(
+        z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
+          length:
+            z
+              .map((a) => a.idx)
+              .sort()
+              .slice(-1)[0] + 1,
+        })
+      ).map((a) => (a === undefined ? {} : a)),
+    })),
+  ])
+  return Object.fromEntries([...Object.entries(original), ...customGroups])
+}
+
+async function getActivities(participant: ParticipantObj) {
+  let original = await LAMP.Activity.allByParticipant(participant.id)
+  return [...original]
+}
+
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
@@ -309,62 +374,23 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const [date, changeDate] = useState(new Date())
   const [completed, setCompleted] = useState([])
   const [open, setOpen] = useState(false)
-  const [feeds, setFeeds] = useState({})
+  const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
   const [data, setData] = useState({})
   const [medications, setMedications] = useState({})
   const [feedData, setFeedData] = useState([])
   const [schedules, setSchedules] = useState({})
-  const [activities, setActivities] = useState([])
+  const [activities, setActivities] = React.useState([])
+  const [activityEvents, setActivityEvents] = React.useState({})
+  const [currentFeed, setCurrentFeed] = React.useState([])
+  const triweekly = [1, 3, 5]
+  const biweekly = [2, 4]
 
   const markCompleted = (event: any, index: number) => {
     if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
       setCompleted({ ...completed, [index]: true })
     }
   }
-
-  var feed = [
-    {
-      type: "learn",
-      time: new Date("2020-08-25T08:30:00"),
-      title: "Today's tip: Mood",
-      icon: "sad-happy",
-      description: "",
-      completed: false,
-    },
-    {
-      type: "manage",
-      time: new Date("2020-08-25T12:30:00"),
-      title: "Medication: Caplyta",
-      icon: "medication",
-      description: "Take one capsule (42mg)",
-      completed: false,
-    },
-    {
-      type: "manage",
-      time: new Date("2020-08-27T06:00:00"),
-      title: "Daily journal entry",
-      icon: "pencil",
-      description: "",
-      completed: false,
-    },
-    {
-      type: "assess",
-      time: new Date("2020-08-26T04:30:00"),
-      title: "Anxiety survey",
-      icon: "board",
-      description: "10mins",
-      completed: false,
-    },
-    {
-      type: "prevent",
-      time: new Date("2020-08-25T03:45:00"),
-      title: "Review today’s stats",
-      icon: "linegraph",
-      description: "",
-      completed: false,
-    },
-  ]
 
   const getFeedData = async (type: string) => {
     setData(
@@ -385,17 +411,6 @@ export default function Feed({ participant, ...props }: { participant: Participa
   }
 
   const getFeeds = async () => {
-    console.log(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.feed").catch((e) => [])])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )
-    )
     setFeeds(
       Object.fromEntries(
         (
@@ -416,10 +431,36 @@ export default function Feed({ participant, ...props }: { participant: Participa
 
   useEffect(() => {
     setInitialData()
-    LAMP.Activity.allByParticipant(participant.id).then(setActivities)
-    console.log(LAMP.Activity.allByParticipant(participant.id))
-    console.log(feeds)
+    ;(async () => {
+      let activities = await getActivities(participant)
+      setActivities(activities)
+      let feeds = []
+      let schedule
+      activities.map((activity) => {
+        schedule = activity?.schedule ?? []
+        if (schedule.length > 0) feeds.push(activity)
+      })
+      setFeeds(feeds)
+    })()
   }, [])
+
+  function currentDay() {
+    let date = new Date()
+    return date.getDay()
+  }
+
+  const getFeedByDate = (date: Date) => {
+    let currentFeed = []
+    // feeds.map((feed) => {
+    //   //currentFeed.
+    //   feed.schedule.map((s) => {
+
+    //   }
+    //   // schedule = activity?.schedule ?? []
+    //   // if(schedule.length > 0)
+    //   //   feeds.push(activity)
+    // })
+  }
 
   const showFeedDetails = (type) => {
     if (type == "learn") {
@@ -429,7 +470,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
 
   return (
     <div className={classes.root}>
-      {!supportsSidebar && <WeekView type="feed" />}
+      {!supportsSidebar && <WeekView type="feed" onselect={getFeedByDate} />}
 
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>

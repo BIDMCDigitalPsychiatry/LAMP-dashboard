@@ -21,6 +21,7 @@ import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
+import TipNotification from "./TipNotification"
 
 // import VegaGraph from "./VegaGraph"
 
@@ -321,6 +322,16 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | Hope Box</PageTitle>
             <HopeBox goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/tip"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <TipNotification goBack={props.history.goBack} />
           </React.Fragment>
         )}
       />

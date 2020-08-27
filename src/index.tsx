@@ -20,7 +20,6 @@ document.head.appendChild(css)
 document.body.appendChild(root)
 css.type = "text/css"
 css.innerHTML = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;

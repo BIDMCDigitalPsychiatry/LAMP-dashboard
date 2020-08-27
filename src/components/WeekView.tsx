@@ -65,7 +65,7 @@ function getDates() {
   return week
 }
 
-export default function WeekView({ type, ...props }) {
+export default function WeekView({ type, onselect, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
@@ -81,7 +81,7 @@ export default function WeekView({ type, ...props }) {
         i !== currentDay() && i != 3 ? (type === "feed" ? classes.feedDateview : classes.journalDateview) : ""
       let classNameVal = classnames(selectedClass, classes.paper)
       grids.push(
-        <Grid item xs>
+        <Grid item xs onClick={() => props.onselect(dates[i])}>
           <Paper className={classNameVal}>
             <Box component="span">{day}</Box>
             <Box component="p" className={selectedDayClass}>
