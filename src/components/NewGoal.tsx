@@ -40,8 +40,9 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
 import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
+import LAMP from "lamp-core"
 
-export default function NewGoal({ ...props }) {
+export default function NewGoal({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
@@ -59,6 +60,8 @@ export default function NewGoal({ ...props }) {
   const [selectedFrequency, setSelectedFrequency] = useState("daily")
   const [selectedDays, setSelectedDays] = useState([])
   const [units, setUnits] = useState([])
+  const [goals, setGoals] = useState({})
+  const [feeds, setFeeds] = useState({})
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -68,6 +71,48 @@ export default function NewGoal({ ...props }) {
   }
   //var units = ["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"]
   const frequency = ["hourly", "daily", "weekly", "monthly"]
+  const getGoals = async () => {
+    setGoals(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.goals").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+  const getFeeds = async () => {
+    console.log(
+      Object.fromEntries(
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
+          ])
+        )
+      )
+    )
+    setFeeds(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
 
   useEffect(() => {
     if (props.goalType == "Exercise" || props.goalType == "Meditation" || props.goalType == "Mood") {
@@ -139,10 +184,10 @@ export default function NewGoal({ ...props }) {
     return strTime
   }
 
-  const saveNewGoal = () => {
+  const saveNewGoal = async () => {
     if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
-      var goals = []
-      goals = JSON.parse(localStorage.getItem("goals"))
+      await getGoals()
+      let all = getData(goals)
       let goalDetails = {
         goalName: goalName,
         goalType: props.goalType,
@@ -153,18 +198,31 @@ export default function NewGoal({ ...props }) {
         startDate: startDate,
         duration: duration,
         reminderTime: getTimeValue(reminderTime),
+        completed: false,
       }
-      if (goals != null) {
-        goals.push(goalDetails)
-        localStorage.setItem("goals", JSON.stringify(goals))
-      } else {
-        var newGoal = []
-        newGoal.push(goalDetails)
-        localStorage.setItem("goals", JSON.stringify(newGoal))
+      all.push(goalDetails)
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.goals", all)
+      setGoals({ ...(goals || {}), [participant]: all })
+      await getFeeds()
+      all = getData(feeds)
+      var item = {
+        type: "goal",
+        time: getTimeValue(reminderTime),
+        title: "Goal: " + goalName,
+        icon: props.goalType,
+        description: goalValue + " " + goalUnit,
       }
+      all.push(item)
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
     }
   }
+  const getData = (data) => {
+    let x = (data || {})[participant.id || ""] || []
+    console.log(x)
+    return !Array.isArray(x) ? [] : x
+  }
+
   var goalIcon =
     props.goalType == "Exercise" ? (
       <Exercise />

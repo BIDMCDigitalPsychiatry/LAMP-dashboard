@@ -629,7 +629,7 @@ function Rating({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    onResponse({ item: text, value: parseInt(value), duration: ((new Date().getTime() - startTime) / 1000).toFixed(1) })
+    onResponse({ item: text, value: parseInt(value), duration: new Date().getTime() - startTime })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },

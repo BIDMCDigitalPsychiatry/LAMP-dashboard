@@ -75,6 +75,8 @@ function AppRouter({ ...props }) {
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
+  const [showDemoMessage, setShowDemoMessage] = useState(true)
+
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -131,7 +133,7 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     closeSnackbar("admin")
-    closeSnackbar("demo")
+    if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar("Proceed with caution: you are logged in as the administrator.", {
         key: "admin",
@@ -144,7 +146,7 @@ function AppRouter({ ...props }) {
           </Button>
         ),
       })
-    } else if (state.auth?.serverAddress === "demo.lamp.digital") {
+    } else if (showDemoMessage && state.auth?.serverAddress === "demo.lamp.digital") {
       enqueueSnackbar(
         "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
         {
@@ -201,6 +203,7 @@ function AppRouter({ ...props }) {
         identity: null,
         auth: null,
         authType: null,
+        activeTab: null,
         lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
           ? undefined
           : state.auth.serverAddress,
@@ -447,6 +450,9 @@ function AppRouter({ ...props }) {
                   tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
                   surveyDone={state.surveyDone}
                   submitSurvey={submitSurvey}
+                  setShowDemoMessage={(val) => {
+                    setShowDemoMessage(val)
+                  }}
                 />
               </NavigationLayout>
             </React.Fragment>

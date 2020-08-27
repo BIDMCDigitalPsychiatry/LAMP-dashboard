@@ -130,7 +130,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
           <div></div>
           <TextField autoFocus margin="normal" variant="outlined" label="Dose" />
           <Typography>Set reminder? </Typography>
-          <Switch color="primary"> </Switch>
+          {/* <Switch color="primary"> fsdfg</Switch> */}
           <div></div>
           <DatePicker label="Start Date" value={selectedDate} onChange={handleDateChange} animateYearScrolling />
           <div></div>

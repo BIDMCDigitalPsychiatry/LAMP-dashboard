@@ -13,6 +13,7 @@ import {
   useMediaQuery,
   useTheme,
   StepConnector,
+  StepIcon,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
@@ -31,6 +32,8 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
 import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
+import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
+import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import { Participant as ParticipantObj } from "lamp-core"
@@ -242,10 +245,26 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     large_calendar: {
+      padding: "5px 0 0 50px",
       "& span": {
         fontSize: 14,
         fontWeight: "bold",
         color: "rgba(0, 0, 0, 0.75)",
+        width: 50,
+        height: 45,
+        display: "block",
+        margin: 0,
+      },
+      "& div.MuiPickersCalendarHeader-switchHeader": { marginBottom: 35, padding: "0 5px" },
+      "& div.MuiPickersCalendar-transitionContainer": { minHeight: 300 },
+      "& div": { maxWidth: "inherit !important" },
+      "& button": {
+        width: 40,
+        height: 40,
+        margin: "0 auto",
+        display: "flex",
+        padding: 0,
+        "& span": { width: "auto", height: "auto" },
       },
 
       [theme.breakpoints.down("sm")]: {
@@ -290,64 +309,116 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const [date, changeDate] = useState(new Date())
   const [completed, setCompleted] = useState([])
   const [open, setOpen] = useState(false)
-  const [feedData, setFeedData] = useState([])
+  const [feeds, setFeeds] = useState({})
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
+  const [data, setData] = useState({})
+  const [medications, setMedications] = useState({})
+  const [feedData, setFeedData] = useState([])
+  const [schedules, setSchedules] = useState({})
+  const [activities, setActivities] = useState([])
 
-  const handleNext = (index: number) => {
-    setCompleted({ ...completed, [index]: true })
+  const markCompleted = (event: any, index: number) => {
+    if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
+      setCompleted({ ...completed, [index]: true })
+    }
   }
 
   var feed = [
-    { type: "learn", time: "8.30am", title: "Today's tip: Mood", icon: "sad-happy", description: "" },
+    {
+      type: "learn",
+      time: new Date("2020-08-25T08:30:00"),
+      title: "Today's tip: Mood",
+      icon: "sad-happy",
+      description: "",
+      completed: false,
+    },
     {
       type: "manage",
-      time: "8.30am",
+      time: new Date("2020-08-25T12:30:00"),
       title: "Medication: Caplyta",
       icon: "medication",
       description: "Take one capsule (42mg)",
+      completed: false,
     },
-    { type: "manage", time: "8.30am", title: "Daily journal entry", icon: "pencil", description: "" },
-    { type: "assess", time: "8.30am", title: "Anxiety survey", icon: "board", description: "10mins" },
-    { type: "prevent", time: "8.30am", title: "Review today’s stats", icon: "linegraph", description: "" },
+    {
+      type: "manage",
+      time: new Date("2020-08-27T06:00:00"),
+      title: "Daily journal entry",
+      icon: "pencil",
+      description: "",
+      completed: false,
+    },
+    {
+      type: "assess",
+      time: new Date("2020-08-26T04:30:00"),
+      title: "Anxiety survey",
+      icon: "board",
+      description: "10mins",
+      completed: false,
+    },
+    {
+      type: "prevent",
+      time: new Date("2020-08-25T03:45:00"),
+      title: "Review today’s stats",
+      icon: "linegraph",
+      description: "",
+      completed: false,
+    },
   ]
 
-  useEffect(() => {
-    var feedList = []
-    var goals = JSON.parse(localStorage.getItem("goals"))
-    if (goals != undefined) {
-      goals.map((goal) => {
-        if (goal.goalName != null && goal.goalName != "" && goal.goalValue != null && goal.goalValue != "") {
-          var item = {
-            type: "goal",
-            time: goal.reminderTime,
-            title: "Goal: " + goal.goalName,
-            icon: goal.goalType,
-            description: goal.goalValue + " " + goal.goalUnit,
-          }
-          feedList.push(item)
-        }
-      })
-    }
-    var medications = JSON.parse(localStorage.getItem("medications"))
-    if (medications != undefined) {
-      medications.map((medication) => {
-        if (medication.medicationName != null && medication.medicationName != "") {
-          var item = {
-            type: "manage",
-            time: medication.reminderTime,
-            title: "Medication: " + medication.medicationName,
-            icon: "medication",
-            description: "test description",
-          }
-          feedList.push(item)
-        }
-      })
-    }
+  const getFeedData = async (type: string) => {
+    setData(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
+              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
 
-    feed.map((item) => {
-      feedList.push(item)
-    })
-    setFeedData(feedList)
+  const getFeeds = async () => {
+    console.log(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.feed").catch((e) => [])])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+    setFeeds(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.feed").catch((e) => [])])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+
+  const setInitialData = async () => {
+    await getFeedData("lamp.feed.goals")
+    await getFeeds()
+  }
+
+  useEffect(() => {
+    setInitialData()
+    LAMP.Activity.allByParticipant(participant.id).then(setActivities)
+    console.log(LAMP.Activity.allByParticipant(participant.id))
+    console.log(feeds)
   }, [])
 
   const showFeedDetails = (type) => {
@@ -378,7 +449,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
                       completed: classes[label.type + "CompletedIcon"],
                     },
                   }}
-                  onClick={() => handleNext(index)}
+                  onClick={(e) => markCompleted(e, index)}
                 >
                   <Card
                     className={completed[index] ? classes[label.type + "Completed"] : classes[label.type]}
@@ -390,7 +461,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
                         <Box m={1}>
                           <Typography variant="body2" color="textSecondary">
                             <Box fontStyle="italic" className={classes.smalltext}>
-                              {label.time}
+                              {label.time.getTime()}
                             </Box>
                           </Typography>
                           <Typography variant="h5">{label.title}</Typography>
@@ -453,7 +524,6 @@ export default function Feed({ participant, ...props }: { participant: Participa
               onChange={changeDate}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
                 const isSelected = isInCurrentMonth && selectedDays.includes(date.getDate())
-                console.log(selectedDate)
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
@@ -469,6 +539,8 @@ export default function Feed({ participant, ...props }: { participant: Participa
                 )
                 return view
               }}
+              leftArrowIcon={<LeftArrow />}
+              rightArrowIcon={<RightArrow />}
             />
           </MuiPickersUtilsProvider>
         </Grid>

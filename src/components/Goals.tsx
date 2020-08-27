@@ -185,7 +185,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Goals({ ...props }) {
+export default function Goals({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -405,6 +405,7 @@ export default function Goals({ ...props }) {
           }}
         >
           <NewGoals
+            participant={participant}
             goalType={goalType}
             onComplete={() => {
               setOpen(false)

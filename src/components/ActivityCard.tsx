@@ -105,7 +105,7 @@ export default function ActivityCard({
             hiddenKeys={["x"]}
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
-              value: x.value,
+              value: `${x.value}`.replace("NaN", "-").replace("null", "-"),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />

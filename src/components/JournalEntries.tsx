@@ -24,6 +24,8 @@ import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
+import LAMP from "lamp-core"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -121,53 +123,9 @@ const useStyles = makeStyles((theme) => ({
   btnNav: { marginBottom: 0 },
 }))
 
-const getJournals = () => {
-  let data = [
-    {
-      "This Week": [
-        {
-          date: "Fri Jul 04, 08:34am",
-          text:
-            "Feeling generally good; slept well and had a good breakfast. I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Wed Jul 05, 10:50am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Mon Jul 06, 05:30pm",
-          text:
-            "Feeling generally good; slept well and had a good breakfast. Woke up thinking about.I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-      ],
-    },
-    {
-      "This Month": [
-        {
-          date: "Fri Jul 04, 08:34am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Wed Jul 05, 10:50am",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-        {
-          date: "Mon Jul 06, 05:30pm",
-          text:
-            "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-        },
-      ],
-    },
-  ]
-  return data
-}
-
-export default function JournalEntries({ ...props }) {
+export default function JournalEntries({ participant, ...props }) {
   const classes = useStyles()
-  const [journals, setJournals] = useState([])
+  const [journals, setJournals] = useState({})
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
@@ -175,60 +133,55 @@ export default function JournalEntries({ ...props }) {
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
+
+  const handleOpen = (text: string, date?: string) => {
+    if (text) setJounalValue(text)
+    setOpen(true)
+  }
+
+  const getJournals = async () => {
+    setJournals(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+
+  const getData = () => {
+    console.log(journals)
+    let x = (journals || {})[participant.id || ""] || []
+    console.log(x)
+    return !Array.isArray(x) ? [] : x
+  }
+
+  const saveJournal = async () => {
+    await getJournals()
+    let all = getData()
+    let journal = {
+      journalText: journalValue,
+      feedback: status,
+      datetime: new Date(),
+    }
+    all.push(journal)
+    console.log(all)
+    LAMP.Type.setAttachment(participant.id, "me", "lamp.journals", all)
+    setJournals({ ...(journals || {}), [participant]: all })
+    props.onComplete()
+  }
+
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return weekday[date.getDay()] + " " + monthname[date.getMonth()] + ", " + date.getDate()
-  }
-
-  const [jounalDate, setJounalDate] = useState(getDateString(new Date()))
-
-  useEffect(() => {
-    setJournals(getJournals())
-  }, [])
-
-  const handleOpen = (text: string, date?: string) => {
-    if (text) setJounalValue(text)
-    date = typeof date == "undefined" ? getDateString(new Date()) : date
-    setJounalDate(date)
-    setOpen(true)
-  }
-
-  const getContent = () => {
-    let content = []
-
-    Object.keys(journals).forEach((index) => {
-      let eachData = []
-      Object.keys(journals[index]).forEach((key) => {
-        eachData.push(
-          <Box fontWeight="fontWeightBold" className={classes.journalday}>
-            {key}
-          </Box>
-        )
-        Object.keys(journals[index][key]).forEach((keyIndex) => {
-          let fullText = journals[index][key][keyIndex].text
-          let text = fullText.substring(0, 80)
-          text = text.substr(0, Math.min(text.length, text.lastIndexOf(" ")))
-          eachData.push(
-            <Grid item>
-              <Box
-                className={classes.journalStyle}
-                onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
-              >
-                <Typography variant="caption" gutterBottom>
-                  {journals[index][key][keyIndex].date}
-                </Typography>
-                <Typography variant="body2" component="p">
-                  {text}...
-                </Typography>
-              </Box>
-            </Grid>
-          )
-        })
-      })
-      content.push(<Box boxShadow={0}>{eachData}</Box>)
-    })
-    return content
   }
 
   return (
@@ -252,7 +205,7 @@ export default function JournalEntries({ ...props }) {
                 }}
               >
                 <Typography variant="caption" className={classes.todaydate}>
-                  {jounalDate}
+                  {getDateString(new Date())}
                 </Typography>
                 <TextField
                   id="standard-multiline-flexible"
@@ -283,7 +236,7 @@ export default function JournalEntries({ ...props }) {
                   </Box>
                 </Grid>
                 <Box textAlign="center">
-                  <Fab className={classes.btnpeach} onClick={props.onComplete}>
+                  <Fab className={classes.btnpeach} onClick={() => saveJournal()}>
                     Submit
                   </Fab>
                 </Box>
@@ -322,7 +275,6 @@ export default function JournalEntries({ ...props }) {
                 </Box>
                 <Box textAlign="center" width={1} mb={4}>
                   <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
-                    {" "}
                     Yes, leave
                   </Link>
                 </Box>

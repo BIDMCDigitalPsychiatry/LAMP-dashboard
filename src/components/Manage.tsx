@@ -323,6 +323,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
           {
             Goals: (
               <Goals
+                participant={participant}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
@@ -331,6 +332,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             ),
             Journals: (
               <JournalEntries
+                participant={participant}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
@@ -365,6 +367,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             Medication_tracker: (
               <NewMedication
+                participant={participant}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
