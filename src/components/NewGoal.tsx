@@ -101,6 +101,7 @@ export default function NewGoal({ participant, ...props }) {
       console.log(goals)
       setGoals(goals)
       let feeds = await getAttachmentData(participant.id, "lamp.feed.goals")
+      console.log(feeds)
       setFeeds(feeds)
     })()
     if (props.goalType == "Exercise" || props.goalType == "Meditation" || props.goalType == "Mood") {
@@ -194,12 +195,13 @@ export default function NewGoal({ participant, ...props }) {
       all = getData(feeds)
       var item = {
         type: "goal",
-        time: getTimeValue(reminderTime),
+        timeValue: getTimeValue(reminderTime),
         title: "Goal: " + goalName,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
       }
       all.push(item)
+      console.log(all)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
     }

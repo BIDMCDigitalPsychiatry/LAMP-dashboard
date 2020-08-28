@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Paper, Grid, Box, useMediaQuery, useTheme } from "@material-ui/core"
 import classnames from "classnames"
@@ -45,55 +45,39 @@ function getDays() {
   return ["M", "T", "W", "T", "F", "S", "S"]
 }
 
-function currentDay() {
-  let date = new Date()
-  return date.getDay()
-}
-
 function getDates() {
-  let curr = new Date()
   let week = []
-  let first = curr.getDate() - curr.getDay() + 7
-  let day = new Date(curr.setDate(first))
-  week.push(day.getDate())
-  curr = new Date()
+  let first
+  let curr = new Date()
   for (let i = 1; i < 7; i++) {
     first = curr.getDate() - curr.getDay() + i
     let day = new Date(curr.setDate(first))
     week.push(day.getDate())
   }
+  curr = new Date()
+  first = curr.getDate() - curr.getDay() + 7
+  let day = new Date(curr.setDate(first))
+  week.push(day.getDate())
   return week
 }
 
-export default function WeekView({ type, onselect, ...props }) {
+export default function WeekView({
+  type,
+  onSelect,
+  daysWithdata,
+  ...props
+}: {
+  type: string
+  onSelect?: Function
+  daysWithdata?: any
+}) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-
-  const dateView = () => {
-    const days = getDays()
-    const dates = getDates()
-    let grids = []
-    let i = 1
-    for (let day of days) {
-      i = i === 7 ? 0 : i
-      const selectedClass = i === currentDay() ? classes.selected : ""
-      const selectedDayClass =
-        i !== currentDay() && i != 3 ? (type === "feed" ? classes.feedDateview : classes.journalDateview) : ""
-      let classNameVal = classnames(selectedClass, classes.paper)
-      grids.push(
-        <Grid item xs onClick={() => props.onselect(dates[i])}>
-          <Paper className={classNameVal}>
-            <Box component="span">{day}</Box>
-            <Box component="p" className={selectedDayClass}>
-              {dates[i]}
-            </Box>
-          </Paper>
-        </Grid>
-      )
-      i++
-    }
-    return grids
-  }
+  const days = getDays()
+  const dates = getDates()
+  let currentMonth = new Date().getMonth() + 1
+  let currentYear = new Date().getFullYear()
+  const [selectedDate, setSelectedDate] = useState(null)
 
   return (
     <Box
@@ -102,7 +86,37 @@ export default function WeekView({ type, onselect, ...props }) {
       }}
     >
       <Grid container spacing={0}>
-        {dateView()}
+        {days.map((day, index) => (
+          <Grid item xs>
+            <Paper
+              className={classnames(
+                selectedDate !== null && index == selectedDate ? classes.selected : "",
+                classes.paper
+              )}
+              onClick={() => {
+                setSelectedDate(index)
+                onSelect(new Date(currentMonth + "/" + dates[index] + "/" + currentYear))
+              }}
+            >
+              <Box component="span">{day}</Box>
+              <Box
+                component="p"
+                className={
+                  daysWithdata &&
+                  daysWithdata.indexOf(
+                    new Date(currentMonth + "/" + dates[index] + "/" + currentYear).toLocaleDateString()
+                  ) > -1
+                    ? type === "feed"
+                      ? classes.feedDateview
+                      : classes.journalDateview
+                    : ""
+                }
+              >
+                {dates[index]}
+              </Box>
+            </Paper>
+          </Grid>
+        ))}
       </Grid>
     </Box>
   )

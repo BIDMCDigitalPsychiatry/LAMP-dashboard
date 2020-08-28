@@ -50,64 +50,39 @@ const getJournals = async (participantId) => {
   )
     .filter((x: any) => x[1].message !== "404.object-not-found")
     .map((x: any) => x[1].data)[0]
-  return journals
-  // TODO - Week/month wise data
-  // let weekdays = getWeekDates()
-  // console.log(journals)
-  // let weekData = journals.filter((journal:any) => weekdays.indexOf(journal.datetime) > -1).map((journal) => journal)
 
-  // console.log(data)
+  let weekdays = getWeekDates()
+  let weekData = journals
+    .filter(
+      (journal: any) =>
+        new Date(journal.datetime).getMonth() === new Date().getMonth() &&
+        weekdays.indexOf(new Date(journal.datetime).getDate()) > -1
+    )
+    .map((journal) => journal)
+  let monthData = journals
+    .filter((journal: any) => new Date(journal.datetime).getMonth() === new Date().getMonth())
+    .map((journal) => journal)
+  let others = journals
+    .filter((journal: any) => new Date(journal.datetime).getMonth() !== new Date().getMonth())
+    .map((journal) => journal)
+  let data = [
+    {
+      "This week": weekData,
+      "This month": monthData,
+      Others: others,
+      All: journals,
+    },
+  ]
+
+  return data
 }
-
-// const getJournals = () => {
-//   let data = [
-//     {
-//       "This Week": [
-//         {
-//           date: "Fri Jul 04, 08:34am",
-//           text:
-//             "Feeling generally good; slept well and had a good breakfast. I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//         {
-//           date: "Wed Jul 05, 10:50am",
-//           text:
-//             "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//         {
-//           date: "Mon Jul 06, 05:30pm",
-//           text:
-//             "Feeling generally good; slept well and had a good breakfast. Woke up thinking about.I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//       ],
-//     },
-//     {
-//       "This Month": [
-//         {
-//           date: "Fri Jul 04, 08:34am",
-//           text:
-//             "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//         {
-//           date: "Wed Jul 05, 10:50am",
-//           text:
-//             "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//         {
-//           date: "Mon Jul 06, 05:30pm",
-//           text:
-//             "I’m at my full-time job and writing to my Talkspace therapist about not going to the grocery store because I have no idea how to feed myself and the whole thing is overwhelming. I’ve already checked on my cats via security camera twice — no catastrophes yet. I check on them at least every hour, making sure they’re safe, that my apartment didn’t burn down.",
-//         },
-//       ],
-//     },
-//   ]
-//   return data
-// }
 
 export default function Journals({ participant, ...props }) {
   const classes = useStyles()
   const [journals, setJournals] = useState([])
-  const [journal, setJournal] = useState(null)
+  const [allJournals, setAllJournals] = useState(null)
   const [open, setOpen] = useState(true)
+  const [selectedDates, setSelectedDates] = useState()
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -126,49 +101,61 @@ export default function Journals({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       let journals = await getJournals(participant.id)
-      setJournal(
-        journals
-          .filter((journal: any) => new Date(journal.datetime).toLocaleDateString() === new Date().toLocaleDateString())
-          .map((journal) => journal)
-      )
       setJournals(journals)
+      setAllJournals(journals[0]["All"])
+      setSelectedDates(journals[0]["All"].map((journal) => new Date(journal.datetime).toLocaleDateString()))
     })()
   }, [])
 
   const getContent = (date: Date) => {
-    setJournal(
-      journals
-        .filter(
-          (journal: any) => new Date(journal.datetime).toLocaleDateString() === new Date(date).toLocaleDateString()
-        )
-        .map((journal) => journal)
-    )
+    let data = allJournals
+      .filter((journal: any) => new Date(journal.datetime).toLocaleDateString() == new Date(date).toLocaleDateString())
+      .map((journal) => journal)
+    setJournals([{ "This date": data }])
   }
-
+  const getData = () => {
+    let content = []
+    Object.keys(journals).forEach((index) => {
+      let eachData = []
+      Object.keys(journals[index]).forEach((key) => {
+        if (journals[index][key].length > 0 && key !== "All") {
+          eachData.push(
+            <Box fontWeight="fontWeightBold" className={classes.journalday}>
+              {key}
+            </Box>
+          )
+          Object.keys(journals[index][key]).forEach((keyIndex) => {
+            let fullText = journals[index][key][keyIndex].journalText
+            let text = fullText.substring(0, 80)
+            if (text.length != fullText.length) {
+              text = text.substr(0, Math.min(text.length, text.lastIndexOf(" ")))
+            }
+            eachData.push(
+              <Grid item>
+                <Box
+                  className={classes.journalStyle}
+                  // onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
+                >
+                  <Typography variant="caption" gutterBottom>
+                    {getDateString(journals[index][key][keyIndex].datetime)}
+                  </Typography>
+                  <Typography variant="body2" component="p">
+                    {text}...
+                  </Typography>
+                </Box>
+              </Grid>
+            )
+          })
+        }
+      })
+      content.push(<Box boxShadow={0}>{eachData}</Box>)
+    })
+    return content
+  }
   return (
     <div className={classes.root}>
-      <WeekView type="journal" onselect={getContent} />
-      <Container className={classes.journalHistory}>
-        {journal !== null
-          ? journal.map((j) => (
-              <Box boxShadow={0}>
-                <Grid item>
-                  <Box
-                    className={classes.journalStyle}
-                    // onClick={() => handleOpen(fullText, j.datetime)}
-                  >
-                    <Typography variant="caption" gutterBottom>
-                      {getDateString(j.datetime)}
-                    </Typography>
-                    <Typography variant="body2" component="p">
-                      {j.journalText}...
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Box>
-            ))
-          : null}
-      </Container>
+      <WeekView type="journal" onSelect={getContent} daysWithdata={selectedDates} />
+      <Container className={classes.journalHistory}>{getData()}</Container>
     </div>
   )
 }

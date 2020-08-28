@@ -303,60 +303,19 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-// Perform event coalescing/grouping by sensor or activity type.
-async function getActivityEvents(
-  participant: ParticipantObj,
-  _activities: ActivityObj[]
-): Promise<{ [groupName: string]: ActivityEventObj[] }> {
-  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
-    .map((x) => ({
-      ...x,
-      activity: _activities.find((y) => x.activity === y.id),
-    }))
-
-    .sort((x, y) => x.timestamp - y.timestamp)
-    .map((x) => ({
-      ...x,
-      activity: (x.activity || { name: "" }).name,
-    }))
-    .groupBy("activity") as any
-  let customEvents = _activities
-    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
-    .map((x) =>
-      x?.settings?.map((y, idx) =>
-        original?.[y.activity]
-          ?.map((z) => ({
-            idx: idx,
-            timestamp: z.timestamp,
-            duration: z.duration,
-            activity: x.name,
-            slices: z.temporal_slices.find((a) => a.item === y.question),
-          }))
-          .filter((y) => y.slices !== undefined)
+async function getCurrentFeeds(participant: ParticipantObj) {
+  return Object.fromEntries(
+    (
+      await Promise.all(
+        [participant.id || ""].map(async (x) => [
+          x,
+          await LAMP.Type.getAttachment(x, "lamp.current_feeds").catch((e) => []),
+        ])
       )
     )
-    .filter((x) => x !== undefined)
-    .flat(2)
-    .groupBy("activity")
-  let customGroups = Object.entries(customEvents).map(([k, x]) => [
-    k,
-    Object.values(x.groupBy("timestamp")).map((z: any) => ({
-      timestamp: z?.[0].timestamp,
-      duration: z?.[0].duration,
-      activity: z?.[0].activity,
-      static_data: {},
-      temporal_slices: Array.from(
-        z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
-          length:
-            z
-              .map((a) => a.idx)
-              .sort()
-              .slice(-1)[0] + 1,
-        })
-      ).map((a) => (a === undefined ? {} : a)),
-    })),
-  ])
-  return Object.fromEntries([...Object.entries(original), ...customGroups])
+      .filter((x: any) => x[1].message !== "404.object-not-found")
+      .map((x: any) => [x[0], x[1].data])
+  )[participant.id || ""]
 }
 
 async function getActivities(participant: ParticipantObj) {
@@ -372,28 +331,28 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
-  const [completed, setCompleted] = useState([])
+  const [completed, setCompleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
   const [data, setData] = useState({})
   const [medications, setMedications] = useState({})
-  const [feedData, setFeedData] = useState([])
-  const [schedules, setSchedules] = useState({})
-  const [activities, setActivities] = React.useState([])
-  const [activityEvents, setActivityEvents] = React.useState({})
-  const [currentFeed, setCurrentFeed] = React.useState([])
+  const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
 
   const markCompleted = (event: any, index: number) => {
+    let feed = currentFeed
     if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
-      setCompleted({ ...completed, [index]: true })
+      feed[index].completed = true
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", feed)
+      setCurrentFeed(feed)
+      setCompleted(!completed)
     }
   }
 
-  const getFeedData = async (type: string) => {
-    setData(
+  const getFeedData = async () => {
+    console.log(
       Object.fromEntries(
         (
           await Promise.all(
@@ -406,60 +365,159 @@ export default function Feed({ participant, ...props }: { participant: Participa
         )
           .filter((x: any) => x[1].message !== "404.object-not-found")
           .map((x: any) => [x[0], x[1].data])
-      )
+      )[participant.id || ""] ?? []
     )
-  }
-
-  const getFeeds = async () => {
-    setFeeds(
+    return (
       Object.fromEntries(
         (
           await Promise.all(
-            [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.feed").catch((e) => [])])
+            [participant.id || ""].map(async (x) => [
+              x,
+              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
+              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
+            ])
           )
         )
           .filter((x: any) => x[1].message !== "404.object-not-found")
           .map((x: any) => [x[0], x[1].data])
-      )
+      )[participant.id || ""] ?? []
     )
   }
 
-  const setInitialData = async () => {
-    await getFeedData("lamp.feed.goals")
-    await getFeeds()
-  }
-
   useEffect(() => {
-    setInitialData()
     ;(async () => {
+      let feedData = await getFeedData()
+      setData(feedData)
       let activities = await getActivities(participant)
-      setActivities(activities)
       let feeds = []
       let schedule
       activities.map((activity) => {
         schedule = activity?.schedule ?? []
-        if (schedule.length > 0) feeds.push(activity)
+        if (schedule.length > 0) {
+          feeds.push(activity)
+        }
       })
       setFeeds(feeds)
     })()
   }, [])
 
-  function currentDay() {
-    let date = new Date()
+  useEffect(() => {
+    let currentFeed = getFeedByDate(feeds, new Date())
+    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
+    setCurrentFeed(currentFeed)
+  }, [feeds])
+
+  function getDayNumber(date: Date) {
+    date = new Date(date)
     return date.getDay()
   }
+  function getTimeValue(date: Date) {
+    var hours = date.getHours()
+    var minute = date.getMinutes()
+    var ampm = hours >= 12 ? "pm" : "am"
+    hours = hours % 12
+    hours = hours ? hours : 12 // the hour '0' should be '12'
+    var minutes = minute < 10 ? "0" + minute : minute
+    var strTime = hours + ":" + minutes + ampm
+    return strTime
+  }
 
-  const getFeedByDate = (date: Date) => {
+  const getFeedByDate = (feeds: any, date: Date) => {
     let currentFeed = []
-    // feeds.map((feed) => {
-    //   //currentFeed.
-    //   feed.schedule.map((s) => {
-
-    //   }
-    //   // schedule = activity?.schedule ?? []
-    //   // if(schedule.length > 0)
-    //   //   feeds.push(activity)
-    // })
+    let dayNumber = getDayNumber(date)
+    feeds.map((feed) => {
+      feed.schedule.map((schedule) => {
+        schedule.icon = feed.spec === "lamp.survey" ? "board" : ""
+        schedule.type = feed.spec === "lamp.survey" ? "assess" : "manage"
+        schedule.title = feed.name
+        schedule.timeValue = getTimeValue(new Date(schedule.time))
+        switch (schedule.repeat_interval) {
+          case "triweekly":
+            if (triweekly.indexOf(dayNumber) > -1) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "biweekly":
+            if (biweekly.indexOf(dayNumber) > -1) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "daily":
+            schedule.completed = schedule.completed ?? false
+            currentFeed.push(schedule)
+            break
+          case "custom":
+            schedule.custom_time.map((time) => {
+              if (new Date().toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+            })
+            break
+          case "hourly":
+            if (
+              new Date().toLocaleTimeString() ===
+              new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
+            ) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "every3h":
+            if (
+              new Date().toLocaleTimeString() ===
+              new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
+            ) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "every6h":
+            if (
+              new Date().toLocaleTimeString() ===
+              new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
+            ) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "every12h":
+            if (
+              new Date().toLocaleTimeString() ===
+              new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
+            ) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "monthly":
+            if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "bimonthly":
+            if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+          case "none":
+            if (new Date(date) === new Date(schedule.start_date)) {
+              schedule.completed = schedule.completed ?? false
+              currentFeed.push(schedule)
+            }
+            break
+        }
+      })
+    })
+    Object.keys(data).forEach((key) => {
+      currentFeed.push(data[key])
+    })
+    console.log(currentFeed)
+    return currentFeed
   }
 
   const showFeedDetails = (type) => {
@@ -470,7 +528,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
 
   return (
     <div className={classes.root}>
-      {!supportsSidebar && <WeekView type="feed" onselect={getFeedByDate} />}
+      {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} />}
 
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
@@ -479,78 +537,86 @@ export default function Feed({ participant, ...props }: { participant: Participa
             classes={{ root: classes.customstepper }}
             connector={<StepConnector classes={{ root: classes.customstepperconnecter }} />}
           >
-            {feedData.map((label, index) => (
-              <Step>
-                <StepLabel
-                  StepIconProps={{
-                    completed: completed[index],
-                    classes: {
-                      root: classnames(classes.stepIcon, classes[label.type + "Icon"]),
-                      active: classes.stepActiveIcon,
-                      completed: classes[label.type + "CompletedIcon"],
-                    },
-                  }}
-                  onClick={(e) => markCompleted(e, index)}
-                >
-                  <Card
-                    className={completed[index] ? classes[label.type + "Completed"] : classes[label.type]}
-                    variant="outlined"
-                    onClick={() => showFeedDetails(label.type)}
+            {typeof currentFeed !== "undefined" &&
+              currentFeed.map((feed, index) => (
+                <Step>
+                  <StepLabel
+                    StepIconProps={{
+                      completed: feed.completed,
+                      classes: {
+                        root: classnames(classes.stepIcon, classes[feed.type + "Icon"]),
+                        active: classes.stepActiveIcon,
+                        completed: classes[feed.type + "CompletedIcon"],
+                      },
+                    }}
+                    onClick={(e) => markCompleted(e, index)}
                   >
-                    <Grid container spacing={0}>
-                      <Grid xs container justify="center" direction="column" className={classes.feedtasks} spacing={0}>
-                        <Box m={1}>
-                          <Typography variant="body2" color="textSecondary">
-                            <Box fontStyle="italic" className={classes.smalltext}>
-                              {label.time.getTime()}
-                            </Box>
-                          </Typography>
-                          <Typography variant="h5">{label.title}</Typography>
-                          <Typography className={classes.smalltext} color="textSecondary">
-                            {label.description}
-                          </Typography>
-                        </Box>
-                      </Grid>
+                    <Card
+                      className={feed.completed ? classes[feed.type + "Completed"] : classes[feed.type]}
+                      variant="outlined"
+                      onClick={() => showFeedDetails(feed.type)}
+                    >
+                      <Grid container spacing={0}>
+                        <Grid
+                          xs
+                          container
+                          justify="center"
+                          direction="column"
+                          className={classes.feedtasks}
+                          spacing={0}
+                        >
+                          <Box m={1}>
+                            <Typography variant="body2" color="textSecondary">
+                              <Box fontStyle="italic" className={classes.smalltext}>
+                                {feed.timeValue}
+                              </Box>
+                            </Typography>
+                            <Typography variant="h5">{feed.title}</Typography>
+                            <Typography className={classes.smalltext} color="textSecondary">
+                              {feed.spec}
+                            </Typography>
+                          </Box>
+                        </Grid>
 
-                      <Grid container justify="center" direction="column" className={classes.image}>
-                        {label.type === "goal" &&
-                          (label.icon == "Exercise" ? (
-                            <Exercise />
-                          ) : label.icon == "Weight" ? (
-                            <Weight />
-                          ) : label.icon == "Nutrition" ? (
-                            <Nutrition />
-                          ) : label.icon == "Medication" ? (
-                            <BreatheIcon />
-                          ) : label.icon == "Sleep" ? (
-                            <Sleeping />
-                          ) : label.icon == "Reading" ? (
-                            <Reading />
-                          ) : label.icon == "Finances" ? (
-                            <Savings />
-                          ) : label.icon == "Mood" ? (
-                            <Emotions />
-                          ) : label.icon == "Meditation" ? (
-                            <Meditation />
-                          ) : (
-                            <Custom />
-                          ))}
-                        {label.icon === "sad-happy" && <SadHappy />}
-                        {label.icon === "medication" && <Medication />}
-                        {label.icon === "pencil" && <PencilPaper />}
-                        {label.icon === "board" && <SadBoard />}
-                        {label.icon === "linegraph" && <LineGraph />}
+                        <Grid container justify="center" direction="column" className={classes.image}>
+                          {feed.type === "goal" &&
+                            (feed.icon == "Exercise" ? (
+                              <Exercise />
+                            ) : feed.icon == "Weight" ? (
+                              <Weight />
+                            ) : feed.icon == "Nutrition" ? (
+                              <Nutrition />
+                            ) : feed.icon == "Medication" ? (
+                              <BreatheIcon />
+                            ) : feed.icon == "Sleep" ? (
+                              <Sleeping />
+                            ) : feed.icon == "Reading" ? (
+                              <Reading />
+                            ) : feed.icon == "Finances" ? (
+                              <Savings />
+                            ) : feed.icon == "Mood" ? (
+                              <Emotions />
+                            ) : feed.icon == "Meditation" ? (
+                              <Meditation />
+                            ) : (
+                              <Custom />
+                            ))}
+                          {feed.icon === "sad-happy" && <SadHappy />}
+                          {feed.icon === "medication" && <Medication />}
+                          {feed.icon === "pencil" && <PencilPaper />}
+                          {feed.icon === "board" && <SadBoard />}
+                          {feed.icon === "linegraph" && <LineGraph />}
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  </Card>
-                </StepLabel>
-                {index !== feedData.length - 1 && (
-                  <StepContent classes={{ root: classes.customsteppercontent }}>
-                    <div></div>
-                  </StepContent>
-                )}
-              </Step>
-            ))}
+                    </Card>
+                  </StepLabel>
+                  {index !== currentFeed.length - 1 && (
+                    <StepContent classes={{ root: classes.customsteppercontent }}>
+                      <div></div>
+                    </StepContent>
+                  )}
+                </Step>
+              ))}
           </Stepper>
         </Grid>
         <Grid item xs className={classes.large_calendar}>
