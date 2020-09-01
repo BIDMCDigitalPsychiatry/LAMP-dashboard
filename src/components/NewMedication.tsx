@@ -60,6 +60,7 @@ export default function NewMedication({ participant, ...props }) {
   const [endDateOpen, setEndDateOpen] = useState(false)
   const [duration, setDuration] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
   const [reminderTime, setReminderTime] = useState(new Date())
   const [selectedFrequency, setSelectedFrequency] = useState("daily")
   const [selectedDays, setSelectedDays] = useState([])
@@ -114,6 +115,7 @@ export default function NewMedication({ participant, ...props }) {
   }
   const changeEndDate = (e: any) => {
     let msDiff = new Date(e).getTime() - startDate.getTime()
+    setEndDate(new Date(e))
     let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
     setDuration(daysDiff)
   }
@@ -156,6 +158,11 @@ export default function NewMedication({ participant, ...props }) {
         icon: "Medication",
         description: "test description",
         group: "manage",
+        frequency: selectedFrequency,
+        weekdays: selectedDays,
+        startDate: startDate,
+        endDate: endDate,
+        completed: false,
       }
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
