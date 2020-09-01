@@ -12,6 +12,8 @@ import {
   Icon,
   Fab,
   Container,
+  AppBar,
+  Toolbar,
 } from "@material-ui/core"
 import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -104,6 +106,26 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
     colorLine: { maxWidth: 115 },
+    tipStyle: {
+      background: "#FFF9E5",
+      borderRadius: "10px",
+      padding: "20px 20px 20px 20px",
+      textAlign: "justify",
+      margin: "20px auto 0px",
+      "& h6": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+    },
+    toolbardashboard: {
+      minHeight: 65,
+      padding: "0 10px",
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "center",
+        fontWeight: "600",
+        fontSize: 18,
+        width: "calc(100% - 96px)",
+      },
+    },
+    headerIcon: { textAlign: "center" },
   })
 )
 
@@ -116,35 +138,23 @@ export default function TipNotification({ ...props }) {
   }
 
   return (
-    <div>
-      <div className={classes.header}>
-        <IconButton onClick={props.onClose} color="default" className={classes.backbtn} aria-label="Menu">
-          <Icon>arrow_back</Icon>
-        </IconButton>
-        <Box display="flex" justifyContent="center">
-          <Box>
-            <SadHappy className={classes.topicon} />
-          </Box>
+    <Container>
+      <Box className={classes.header}>
+        <Box width={1} className={classes.headerIcon}>
+          {props.icon}
         </Box>
-        <Typography variant="body2">Tip</Typography>
-        <Typography variant="h2">Todays's Tip: Mood</Typography>
-      </div>
+        <Typography variant="caption">Tip</Typography>
+        <Typography variant="h2">{props.title}</Typography>
+      </Box>
       <Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12}>
           <CardContent className={classes.tipscontentarea}>
-            <Typography variant="h3" gutterBottom>
-              Focus on the good things
-            </Typography>
             <Typography variant="body2" color="textSecondary" component="p">
-              Challenging situations and obstacles are a part of life. When you’re faced with one, focus on the good
-              things no matter how small or seemingly insignificant they seem. If you look for it, you can always find
-              the proverbial silver lining in every cloud — even if it’s not immediately obvious. For example, if
-              someone cancels plans, focus on how it frees up time for you to catch up on a TV show or other activity
-              you enjoy
+              {props.details}
             </Typography>
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
-                <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={3}>
+                <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>
                   <Grid item xs={3} className={classes.lineyellow}></Grid>
                   <Grid item xs={3} className={classes.linegreen}></Grid>
                   <Grid item xs={3} className={classes.linered}></Grid>
@@ -170,13 +180,13 @@ export default function TipNotification({ ...props }) {
               </IconButton>
             </Box>
             <Box textAlign="center">
-              <Fab variant="extended" color="primary" className={classes.btnyellow}>
+              <Fab variant="extended" color="primary" className={classes.btnyellow} onClick={props.onComplete}>
                 Mark complete
               </Fab>
             </Box>
           </CardContent>
         </Grid>
       </Grid>
-    </div>
+    </Container>
   )
 }

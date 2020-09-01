@@ -284,6 +284,7 @@ const useStyles = makeStyles((theme) => ({
 
 // Splice together all selected activities & their tags.
 async function getSplicedSurveys(activities) {
+  console.log(activities)
   let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
   let spliced = res.map((y: any, idx) =>
     spliceActivity({

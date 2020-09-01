@@ -59,6 +59,32 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
+function saveTodaysTip(id) {
+  let todayTip = {
+    type: "tip",
+    title: "Today's tip : Sleep",
+    timeValue: "08:30am",
+    icon: "sleep_tip",
+    description: "Sleep Tips",
+    group: "learn",
+    completed: false,
+    data: [
+      {
+        title: "Weekends",
+        text:
+          "Dr. Epstein explains that psychiatric and psychological problems can be related to sleep. To improve " +
+          "your sleep, try sticking to a sleep schedule even on the weekends. If you sleep in on the weekends, it " +
+          "will be difficult to get back to your routine during the week. Waking up within the same hour everyday " +
+          "can help both your physical and mental health over time. For the next seven days, try waking up at the " +
+          "same time every day.",
+        link:
+          "https://www.insider.com/things-that-are-not-helping-your-mental-health-2018-9#those-retail-therapy-sessions-might-make-you-feel-poor-in-more-ways-than-one-5",
+      },
+    ],
+  }
+  LAMP.Type.setAttachment(id, "me", "lamp.feed.todays_tip", todayTip)
+}
+
 export default function Participant({
   participant,
   ...props
@@ -139,6 +165,8 @@ export default function Participant({
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
+
+    saveTodaysTip(participant.id)
   }, [])
 
   const activeTab = (newTab) => {
@@ -160,7 +188,6 @@ export default function Participant({
   }
 
   const submitSurvey = (response, overwritingTimestamp) => {
-    console.log(response)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: 0,
@@ -251,7 +278,14 @@ export default function Participant({
       </Slide>
       <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
         <Box my={4}>
-          <Feed participant={participant} activeTab={activeTab} />
+          <Feed
+            participant={participant}
+            activeTab={activeTab}
+            activities={activities}
+            visibleActivities={visibleActivities}
+            onComplete={submitSurvey}
+            setVisibleActivities={setVisibleActivities}
+          />
         </Box>
       </Slide>
       <BottomMenu

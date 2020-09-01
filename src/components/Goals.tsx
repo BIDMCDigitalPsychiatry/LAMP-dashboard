@@ -24,7 +24,7 @@ import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
 import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
-import { ReactComponent as Meditation } from "../icons/Meditation.svg"
+import { ReactComponent as Medication } from "../icons/Medication.svg"
 import { ReactComponent as Emotions } from "../icons/Emotions.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
@@ -299,7 +299,7 @@ export default function Goals({ participant, ...props }) {
             sm={4}
             md={3}
             lg={3}
-            onClick={() => handleClickOpen("Medication")}
+            onClick={() => handleClickOpen("Meditation")}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -307,7 +307,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <BreatheIcon />
                 </Box>
-                <Typography className={classes.cardlabel}>Medication</Typography>
+                <Typography className={classes.cardlabel}>Meditation</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -364,15 +364,15 @@ export default function Goals({ participant, ...props }) {
             sm={4}
             md={3}
             lg={3}
-            onClick={() => handleClickOpen("Meditation")}
+            onClick={() => handleClickOpen("Medication")}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card className={classes.manage}>
                 <Box>
-                  <Meditation />
+                  <Medication />
                 </Box>
-                <Typography className={classes.cardlabel}>Meditation</Typography>
+                <Typography className={classes.cardlabel}>Medication</Typography>
               </Card>
             </ButtonBase>
           </Grid>

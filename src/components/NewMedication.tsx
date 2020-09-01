@@ -150,11 +150,12 @@ export default function NewMedication({ participant, ...props }) {
       setMedications({ ...(medications || {}), [participant]: all })
       all = getDetails(feeds)
       var item = {
-        type: "manage",
+        type: "medication",
         timeValue: getTimeValue(reminderTime),
         title: "Medication: " + medicationName,
-        icon: "medication",
+        icon: "Medication",
         description: "test description",
+        group: "manage",
       }
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
