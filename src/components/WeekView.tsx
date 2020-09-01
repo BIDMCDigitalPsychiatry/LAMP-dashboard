@@ -46,18 +46,19 @@ function getDays() {
 }
 
 function getDates() {
-  let week = []
+  let dates = []
+  let months = []
+  let years = []
   let first
   let curr = new Date()
-  for (let i = 1; i < 7; i++) {
+  for (let i = 1; i < 8; i++) {
     first = curr.getDate() - curr.getDay() + i
     let day = new Date(curr.setDate(first))
-    week.push(day.getDate())
+    dates.push(day.getDate())
+    months.push(day.getMonth() + 1)
+    years.push(day.getFullYear())
   }
-  curr = new Date()
-  first = curr.getDate() - curr.getDay() + 7
-  let day = new Date(curr.setDate(first))
-  week.push(day.getDate())
+  let week = { dates: dates, months: months, years: years }
   return week
 }
 
@@ -74,7 +75,10 @@ export default function WeekView({
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const days = getDays()
-  const dates = getDates()
+  const dates = getDates().dates
+  const months = getDates().months
+  const years = getDates().years
+
   let currentMonth = new Date().getMonth() + 1
   let currentYear = new Date().getFullYear()
   const [selectedDate, setSelectedDate] = useState(type === "feed" ? dates.indexOf(new Date().getDate()) : null)
@@ -95,7 +99,7 @@ export default function WeekView({
               )}
               onClick={() => {
                 setSelectedDate(index)
-                onSelect(new Date(currentMonth + "/" + dates[index] + "/" + currentYear))
+                onSelect(new Date(months[index] + "/" + dates[index] + "/" + years[index]))
               }}
             >
               <Box component="span">{day}</Box>
@@ -104,7 +108,7 @@ export default function WeekView({
                 className={
                   daysWithdata &&
                   daysWithdata.indexOf(
-                    new Date(currentMonth + "/" + dates[index] + "/" + currentYear).toLocaleDateString()
+                    new Date(months[index] + "/" + dates[index] + "/" + years[index]).toLocaleDateString()
                   ) > -1
                     ? type === "feed"
                       ? classes.feedDateview
