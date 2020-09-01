@@ -24,6 +24,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
+import TipNotification from "./TipNotification"
 
 const useStyles = makeStyles((theme) => ({
   topicon: {
@@ -198,7 +199,7 @@ export default function LearnTips({ ...props }) {
                 </Grid>
               </Grid>
             )
-          )}{" "}
+          )}
         </Grid>
       </Box>
       <ResponsiveDialog
@@ -217,55 +218,14 @@ export default function LearnTips({ ...props }) {
             </IconButton>
           </Toolbar>
         </AppBar>
-
-        <Box className={classes.header}>
-          <Box width={1} className={classes.headerIcon}>
-            {props.icon}
-          </Box>
-          <Typography variant="caption">Tip</Typography>
-          <Typography variant="h2">{title}</Typography>
-        </Box>
-        <Grid container direction="row" justify="center" alignItems="flex-start">
-          <Grid item lg={4} sm={10} xs={12}>
-            <CardContent className={classes.tipscontentarea}>
-              <Typography variant="body2" color="textSecondary" component="p">
-                {details}
-              </Typography>
-              <Box mt={4} mb={2}>
-                <Grid container direction="row" justify="center" alignItems="center">
-                  <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>
-                    <Grid item xs={3} className={classes.lineyellow}></Grid>
-                    <Grid item xs={3} className={classes.linegreen}></Grid>
-                    <Grid item xs={3} className={classes.linered}></Grid>
-                    <Grid item xs={3} className={classes.lineblue}></Grid>
-                  </Grid>
-                </Grid>
-              </Box>
-              <Box className={classes.howFeel}>Was this helpful today?</Box>
-              <Box textAlign="center">
-                <IconButton
-                  onClick={() => handleClickStatus("Yes")}
-                  className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsUp />
-                  <label>Yes</label>
-                </IconButton>
-                <IconButton
-                  onClick={() => handleClickStatus("No")}
-                  className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
-                >
-                  <ThumbsDown />
-                  <label>No</label>
-                </IconButton>
-              </Box>
-              <Box textAlign="center">
-                <Fab variant="extended" color="primary" className={classes.btnyellow}>
-                  Mark complete
-                </Fab>
-              </Box>
-            </CardContent>
-          </Grid>
-        </Grid>
+        <TipNotification
+          title={title}
+          details={details}
+          icon={props.icon}
+          onComplete={() => {
+            setOpenDialog(false)
+          }}
+        />
       </ResponsiveDialog>
     </Container>
   )

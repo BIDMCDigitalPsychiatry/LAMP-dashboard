@@ -34,7 +34,7 @@ import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
 import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
-import { ReactComponent as Meditation } from "../icons/Meditation.svg"
+import { ReactComponent as Medication } from "../icons/Medication.svg"
 import { ReactComponent as Emotions } from "../icons/Emotions.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
@@ -43,17 +43,6 @@ import { ReactComponent as Custom } from "../icons/Custom.svg"
 import LAMP from "lamp-core"
 
 async function getAttachmentData(participantId, type: string) {
-  console.log(
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )
-  )
   return Object.fromEntries(
     (
       await Promise.all(
@@ -199,6 +188,7 @@ export default function NewGoal({ participant, ...props }) {
         title: "Goal: " + goalName,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
+        group: "manage",
       }
       all.push(item)
       console.log(all)
@@ -219,7 +209,7 @@ export default function NewGoal({ participant, ...props }) {
       <Weight />
     ) : props.goalType == "Nutrition" ? (
       <Nutrition />
-    ) : props.goalType == "Medication" ? (
+    ) : props.goalType == "Meditation" ? (
       <BreatheIcon />
     ) : props.goalType == "Sleep" ? (
       <Sleeping />
@@ -229,8 +219,8 @@ export default function NewGoal({ participant, ...props }) {
       <Savings />
     ) : props.goalType == "Mood" ? (
       <Emotions />
-    ) : props.goalType == "Meditation" ? (
-      <Meditation />
+    ) : props.goalType == "Medication" ? (
+      <Medication />
     ) : (
       <Custom />
     )

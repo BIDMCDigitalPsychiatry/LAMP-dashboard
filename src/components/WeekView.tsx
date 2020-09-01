@@ -36,8 +36,8 @@ const useStyles = makeStyles((theme: Theme) =>
       "& span": { color: "white" },
       "& p": { color: "rgba(255, 255, 255, 0.75)" },
     },
-    feedDateview: { color: "#00765C", background: "#BCEFDD", fontWeight: "bold" },
-    journalDateview: { color: "#4C66D6", background: "#ECF4FF", fontWeight: "bold" },
+    feedDateview: { color: "#00765C !important", background: "#BCEFDD", fontWeight: "bold" },
+    journalDateview: { color: "#4C66D6 !important", background: "#ECF4FF", fontWeight: "bold" },
   })
 )
 
@@ -77,7 +77,7 @@ export default function WeekView({
   const dates = getDates()
   let currentMonth = new Date().getMonth() + 1
   let currentYear = new Date().getFullYear()
-  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedDate, setSelectedDate] = useState(type === "feed" ? dates.indexOf(new Date().getDate()) : null)
 
   return (
     <Box

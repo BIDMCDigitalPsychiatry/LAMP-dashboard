@@ -26,7 +26,6 @@ import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
 import { ReactComponent as Nutrition } from "../icons/Nutrition.svg"
-import { ReactComponent as Meditation } from "../icons/Meditation.svg"
 import { ReactComponent as Emotions } from "../icons/Emotions.svg"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as Savings } from "../icons/Savings.svg"
@@ -34,9 +33,13 @@ import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
 import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
+import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
+
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
+import SurveyInstrument from "./SurveyInstrument"
+
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -327,7 +330,14 @@ function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
 
-export default function Feed({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Feed({
+  participant,
+  onComplete,
+  activities,
+  visibleActivities,
+  setVisibleActivities,
+  ...props
+}) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
@@ -337,29 +347,40 @@ export default function Feed({ participant, ...props }: { participant: Participa
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
   const [data, setData] = useState({})
   const [medications, setMedications] = useState({})
+  const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [tip, setTip] = useState({})
+  const [goals, setGoals] = useState({})
+  const [surveyName, setSurveyName] = useState<string>()
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
+  const [details, setDetails] = useState(null)
+  const [title, setTitle] = useState(null)
+  const [icon, setIcon] = useState(null)
+  const [index, setIndex] = useState(null)
 
   const markCompleted = (event: any, index: number) => {
-    let feed = currentFeed
     if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
-      feed[index].completed = true
-      LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", feed)
-      setCurrentFeed(feed)
-      setCompleted(!completed)
+      completeFeed(index)
     }
   }
 
+  const completeFeed = (index: number) => {
+    let feed = currentFeed
+    feed[index].completed = true
+    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", feed)
+    setCurrentFeed(feed)
+    setCompleted(!completed)
+  }
+
   const getFeedData = async () => {
-    console.log(
+    setGoals(
       Object.fromEntries(
         (
           await Promise.all(
             [participant.id || ""].map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
             ])
           )
         )
@@ -367,13 +388,28 @@ export default function Feed({ participant, ...props }: { participant: Participa
           .map((x: any) => [x[0], x[1].data])
       )[participant.id || ""] ?? []
     )
-    return (
+
+    setTip(
       Object.fromEntries(
         (
           await Promise.all(
             [participant.id || ""].map(async (x) => [
               x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
+              await LAMP.Type.getAttachment(x, "lamp.feed.todays_tip").catch((e) => []),
+            ])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )[participant.id || ""] ?? []
+    )
+
+    setMedications(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [participant.id || ""].map(async (x) => [
+              x,
               await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
             ])
           )
@@ -386,9 +422,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
 
   useEffect(() => {
     ;(async () => {
-      let feedData = await getFeedData()
-      setData(feedData)
-      let activities = await getActivities(participant)
+      await getFeedData()
       let feeds = []
       let schedule
       activities.map((activity) => {
@@ -402,9 +436,7 @@ export default function Feed({ participant, ...props }: { participant: Participa
   }, [])
 
   useEffect(() => {
-    let currentFeed = getFeedByDate(feeds, new Date())
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
-    setCurrentFeed(currentFeed)
+    getFeedByDate(new Date())
   }, [feeds])
 
   function getDayNumber(date: Date) {
@@ -422,108 +454,118 @@ export default function Feed({ participant, ...props }: { participant: Participa
     return strTime
   }
 
-  const getFeedByDate = (feeds: any, date: Date) => {
+  const getFeedByDate = (date: Date) => {
     let currentFeed = []
-    let dayNumber = getDayNumber(date)
-    feeds.map((feed) => {
-      feed.schedule.map((schedule) => {
-        schedule.icon = feed.spec === "lamp.survey" ? "board" : ""
-        schedule.type = feed.spec === "lamp.survey" ? "assess" : "manage"
-        schedule.title = feed.name
-        schedule.timeValue = getTimeValue(new Date(schedule.time))
-        switch (schedule.repeat_interval) {
-          case "triweekly":
-            if (triweekly.indexOf(dayNumber) > -1) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "biweekly":
-            if (biweekly.indexOf(dayNumber) > -1) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "daily":
-            schedule.completed = schedule.completed ?? false
-            currentFeed.push(schedule)
-            break
-          case "custom":
-            schedule.custom_time.map((time) => {
-              if (new Date().toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
+    if (feeds.length > 0) {
+      let dayNumber = getDayNumber(date)
+      feeds.map((feed) => {
+        feed.schedule.map((schedule) => {
+          schedule.icon = feed.spec === "lamp.survey" ? "board" : ""
+          schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
+          schedule.type = feed.name
+          schedule.title = feed.name
+          schedule.timeValue = getTimeValue(new Date(schedule.time))
+          schedule.activityData = [feed]
+          switch (schedule.repeat_interval) {
+            case "triweekly":
+              if (triweekly.indexOf(dayNumber) > -1) {
                 schedule.completed = schedule.completed ?? false
                 currentFeed.push(schedule)
               }
-            })
-            break
-          case "hourly":
-            if (
-              new Date().toLocaleTimeString() ===
-              new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
-            ) {
+              break
+            case "biweekly":
+              if (biweekly.indexOf(dayNumber) > -1) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "daily":
               schedule.completed = schedule.completed ?? false
               currentFeed.push(schedule)
-            }
-            break
-          case "every3h":
-            if (
-              new Date().toLocaleTimeString() ===
-              new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
-            ) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "every6h":
-            if (
-              new Date().toLocaleTimeString() ===
-              new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
-            ) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "every12h":
-            if (
-              new Date().toLocaleTimeString() ===
-              new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
-            ) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "monthly":
-            if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "bimonthly":
-            if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-          case "none":
-            if (new Date(date) === new Date(schedule.start_date)) {
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-            }
-            break
-        }
+              break
+            case "custom":
+              schedule.custom_time.map((time) => {
+                if (new Date().toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+              })
+              break
+            case "hourly":
+              if (
+                new Date().toLocaleTimeString() ===
+                new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
+              ) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "every3h":
+              if (
+                new Date().toLocaleTimeString() ===
+                new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
+              ) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "every6h":
+              if (
+                new Date().toLocaleTimeString() ===
+                new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
+              ) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "every12h":
+              if (
+                new Date().toLocaleTimeString() ===
+                new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
+              ) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "monthly":
+              if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "bimonthly":
+              if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+            case "none":
+              if (new Date(date) === new Date(schedule.start_date)) {
+                schedule.completed = schedule.completed ?? false
+                currentFeed.push(schedule)
+              }
+              break
+          }
+        })
       })
-    })
-    Object.keys(data).forEach((key) => {
-      currentFeed.push(data[key])
-    })
-    console.log(currentFeed)
-    return currentFeed
+      currentFeed.push(tip)
+      Object.keys(medications).forEach((key) => {
+        currentFeed.push(medications[key])
+      })
+      Object.keys(goals).forEach((key) => {
+        currentFeed.push(goals[key])
+      })
+      LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
+      setCurrentFeed(currentFeed)
+    }
   }
 
   const showFeedDetails = (type) => {
-    if (type == "learn") {
-      setOpen(true)
-    }
+    setLaunchedActivity(type)
+  }
+  const submitSurvey = (response) => {
+    onComplete(response)
+    setLaunchedActivity(undefined)
   }
 
   return (
@@ -544,17 +586,29 @@ export default function Feed({ participant, ...props }: { participant: Participa
                     StepIconProps={{
                       completed: feed.completed,
                       classes: {
-                        root: classnames(classes.stepIcon, classes[feed.type + "Icon"]),
+                        root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
                         active: classes.stepActiveIcon,
-                        completed: classes[feed.type + "CompletedIcon"],
+                        completed: classes[feed.group + "CompletedIcon"],
                       },
                     }}
                     onClick={(e) => markCompleted(e, index)}
                   >
                     <Card
-                      className={feed.completed ? classes[feed.type + "Completed"] : classes[feed.type]}
+                      className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
-                      onClick={() => showFeedDetails(feed.type)}
+                      onClick={() => {
+                        if (feed.group == "assess") {
+                          setSurveyName(feed.title)
+                          setVisibleActivities(feed.activityData)
+                        }
+                        if (feed.group == "learn") {
+                          setTitle(feed.data[0].title)
+                          setDetails(feed.data[0].text)
+                          setIndex(index)
+                          setIcon(<SleepTips />)
+                        }
+                        showFeedDetails(feed.type)
+                      }}
                     >
                       <Grid container spacing={0}>
                         <Grid
@@ -579,28 +633,29 @@ export default function Feed({ participant, ...props }: { participant: Participa
                         </Grid>
 
                         <Grid container justify="center" direction="column" className={classes.image}>
-                          {feed.type === "goal" &&
-                            (feed.icon == "Exercise" ? (
-                              <Exercise />
-                            ) : feed.icon == "Weight" ? (
-                              <Weight />
-                            ) : feed.icon == "Nutrition" ? (
-                              <Nutrition />
-                            ) : feed.icon == "Medication" ? (
-                              <BreatheIcon />
-                            ) : feed.icon == "Sleep" ? (
-                              <Sleeping />
-                            ) : feed.icon == "Reading" ? (
-                              <Reading />
-                            ) : feed.icon == "Finances" ? (
-                              <Savings />
-                            ) : feed.icon == "Mood" ? (
-                              <Emotions />
-                            ) : feed.icon == "Meditation" ? (
-                              <Meditation />
-                            ) : (
-                              <Custom />
-                            ))}
+                          {feed.icon == "Exercise" ? (
+                            <Exercise />
+                          ) : feed.icon == "Weight" ? (
+                            <Weight />
+                          ) : feed.icon == "Nutrition" ? (
+                            <Nutrition />
+                          ) : feed.icon == "Meditation" ? (
+                            <BreatheIcon />
+                          ) : feed.icon == "Sleep" ? (
+                            <Sleeping />
+                          ) : feed.icon == "Reading" ? (
+                            <Reading />
+                          ) : feed.icon == "Finances" ? (
+                            <Savings />
+                          ) : feed.icon == "Mood" ? (
+                            <Emotions />
+                          ) : feed.icon == "Medication" ? (
+                            <Medication />
+                          ) : feed.icon == "sleep_tip" ? (
+                            <SleepTips width="80" height="80" />
+                          ) : feed.icon == "Custom" ? (
+                            <Custom />
+                          ) : null}
                           {feed.icon === "sad-happy" && <SadHappy />}
                           {feed.icon === "medication" && <Medication />}
                           {feed.icon === "pencil" && <PencilPaper />}
@@ -653,15 +708,41 @@ export default function Feed({ participant, ...props }: { participant: Participa
         </Grid>
       </Grid>
       <ResponsiveDialog
-        transient={false}
+        transient
         animate
         fullScreen
-        open={open}
+        open={!!launchedActivity}
         onClose={() => {
-          setOpen(false)
+          setLaunchedActivity(undefined)
         }}
       >
-        <TipNotification onClose={() => setOpen(false)} />
+        {
+          {
+            assess: (
+              <SurveyInstrument
+                id={participant.id}
+                type={surveyName}
+                fromPrevent={false}
+                group={visibleActivities}
+                setVisibleActivities={setVisibleActivities}
+                onComplete={submitSurvey}
+              />
+            ),
+            tip: (
+              <TipNotification
+                participant={participant}
+                title={title}
+                details={details}
+                icon={icon}
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                  completeFeed(index)
+                }}
+              />
+            ),
+          }[launchedActivity ?? ""]
+        }
       </ResponsiveDialog>
     </div>
   )
