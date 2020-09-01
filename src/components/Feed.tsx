@@ -288,7 +288,7 @@ const useStyles = makeStyles((theme: Theme) =>
     day: {
       "& p": { fontSize: 10 },
     },
-    currentDay: {
+    selectedDay: {
       "& button": {
         width: 36,
         height: 36,
@@ -298,14 +298,14 @@ const useStyles = makeStyles((theme: Theme) =>
         "& p": { fontSize: 10, color: "#618EF7" },
       },
     },
-    selectedDay: {
+    currentDay: {
       "& button": {
         width: 36,
         height: 36,
         background: "#7599FF",
         display: "block",
         boxShadow: "0px 10px 15px rgba(134, 182, 255, 0.25)",
-        "& p": { fontSize: 10, color: "white" },
+        "& p": { fontSize: 10, color: "white  !important" },
       },
     },
   })
@@ -349,7 +349,7 @@ export default function Feed({
   const [completed, setCompleted] = useState(false)
   const [open, setOpen] = useState(false)
   const [feeds, setFeeds] = useState([])
-  const [selectedDays, setSelectedDays] = useState([1, 2, 15])
+  const [selectedDays, setSelectedDays] = useState([])
   const [medications, setMedications] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [tip, setTip] = useState({})
@@ -358,6 +358,7 @@ export default function Feed({
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
+  const daily = [0, 1, 2, 3, 4, 5, 6]
   const [details, setDetails] = useState(null)
   const [title, setTitle] = useState(null)
   const [icon, setIcon] = useState(null)
@@ -459,10 +460,20 @@ export default function Feed({
     return strTime
   }
 
+  const getDates = (type: any) => {
+    var curr = new Date()
+    let days = []
+    type.map((day) => {
+      let each = curr.getDate() - curr.getDay() + day
+      days.push(new Date(curr.setDate(each)).toLocaleDateString())
+    })
+    return days
+  }
+
   const getFeedByDate = (date: Date) => {
     let currentFeed = []
     let currentDate = new Date(date)
-    let selectedDays = []
+    let selectedWeekViewDays = []
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
@@ -480,17 +491,19 @@ export default function Feed({
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
-                selectedDays.push()
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(triweekly))
                 break
               case "biweekly":
                 if (biweekly.indexOf(dayNumber) > -1) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(biweekly))
                 break
               case "daily":
                 schedule.completed = schedule.completed ?? false
                 currentFeed.push(schedule)
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily))
                 break
               case "custom":
                 schedule.custom_time.map((time) => {
@@ -498,6 +511,7 @@ export default function Feed({
                     schedule.completed = schedule.completed ?? false
                     currentFeed.push(schedule)
                   }
+                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(time).toLocaleDateString())
                 })
                 break
               case "hourly":
@@ -508,6 +522,7 @@ export default function Feed({
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily))
                 break
               case "every3h":
                 if (
@@ -517,6 +532,7 @@ export default function Feed({
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily))
                 break
               case "every6h":
                 if (
@@ -526,6 +542,7 @@ export default function Feed({
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily))
                 break
               case "every12h":
                 if (
@@ -535,41 +552,63 @@ export default function Feed({
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily))
                 break
               case "monthly":
                 if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
+                  selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleTimeString())
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleTimeString())
                 break
               case "bimonthly":
                 if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(
+                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleTimeString()
+                )
+                selectedWeekViewDays = selectedWeekViewDays.concat(
+                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 20).toLocaleTimeString()
+                )
                 break
               case "none":
                 if (new Date(date) === new Date(schedule.start_date)) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleTimeString())
                 break
             }
           }
         })
       })
+
       currentFeed.push(tip)
-      currentFeed = checkDataForFeed(date, goals, currentFeed)
-      currentFeed = checkDataForFeed(date, medications, currentFeed)
+      let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
+      currentFeed = goalsFeedData.feed
+      selectedWeekViewDays = goalsFeedData.weekDays
+      let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
+      currentFeed = medicationsData.feed
+      selectedWeekViewDays = medicationsData.weekDays
       LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
+      let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
+      setSelectedDays(selectedDays)
     }
   }
 
-  const checkDataForFeed = (date: any, data: any, currentFeed: any) => {
+  const checkDataForFeed = (date: any, data: any, currentFeed: any, selectedWeekViewDays: any) => {
     let currentDate = new Date(date)
+    let dates = []
     Object.keys(data).forEach((key) => {
       if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
+        data[key].weekdays.map((day) => {
+          dates.push(weekdays.indexOf(day))
+        })
+        selectedWeekViewDays = selectedWeekViewDays.concat(getDates(dates))
         if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
           currentFeed.push(data[key])
         }
@@ -587,7 +626,8 @@ export default function Feed({
       //       break
       // }
     })
-    return currentFeed
+    let result = { weekDays: selectedWeekViewDays, feed: currentFeed }
+    return result
   }
 
   const showFeedDetails = (type) => {
@@ -600,7 +640,7 @@ export default function Feed({
 
   return (
     <div className={classes.root}>
-      {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} />}
+      {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
 
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
@@ -677,7 +717,7 @@ export default function Feed({
                             <Reading />
                           ) : feed.icon == "Finances" ? (
                             <Savings />
-                          ) : feed.icon == "Mood" ? (
+                          ) : feed.group == "goals" && feed.icon == "Mood" ? (
                             <Emotions />
                           ) : feed.icon == "Medication" ? (
                             <Medication />
@@ -721,12 +761,12 @@ export default function Feed({
               value={date}
               onChange={changeDate}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
-                const isSelected = isInCurrentMonth && selectedDays.includes(date.getDate())
+                const isSelected = isInCurrentMonth && selectedDays.indexOf(date.toLocaleDateString()) > -1
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
-                  <div>
-                    <span className={classes.day}> {dayComponent} </span>
+                  <div onClick={() => getFeedByDate(date)}>
+                    <span className={classes.selectedDay}> {dayComponent} </span>
                   </div>
                 ) : isCurrentDay ? (
                   <span className={isActiveDate ? classes.selectedDay : classes.currentDay}> {dayComponent} </span>
