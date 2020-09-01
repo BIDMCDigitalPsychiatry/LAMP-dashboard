@@ -34,7 +34,12 @@ import { ReactComponent as Custom } from "../icons/Custom.svg"
 import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
 import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
 import { ReactComponent as SleepTips } from "../icons/SleepTips.svg"
-
+import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
+import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
+import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
+import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
+import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
+import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
@@ -345,7 +350,6 @@ export default function Feed({
   const [open, setOpen] = useState(false)
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
-  const [data, setData] = useState({})
   const [medications, setMedications] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [tip, setTip] = useState({})
@@ -358,6 +362,7 @@ export default function Feed({
   const [title, setTitle] = useState(null)
   const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const markCompleted = (event: any, index: number) => {
     if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
@@ -456,108 +461,133 @@ export default function Feed({
 
   const getFeedByDate = (date: Date) => {
     let currentFeed = []
+    let currentDate = new Date(date)
+    let selectedDays = []
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
         feed.schedule.map((schedule) => {
-          schedule.icon = feed.spec === "lamp.survey" ? "board" : ""
-          schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
-          schedule.type = feed.name
-          schedule.title = feed.name
-          schedule.timeValue = getTimeValue(new Date(schedule.time))
-          schedule.activityData = [feed]
-          switch (schedule.repeat_interval) {
-            case "triweekly":
-              if (triweekly.indexOf(dayNumber) > -1) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "biweekly":
-              if (biweekly.indexOf(dayNumber) > -1) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "daily":
-              schedule.completed = schedule.completed ?? false
-              currentFeed.push(schedule)
-              break
-            case "custom":
-              schedule.custom_time.map((time) => {
-                if (new Date().toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
+          if (currentDate >= new Date(schedule.start_date)) {
+            schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
+            schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
+            schedule.type = feed.name
+            schedule.title = feed.name
+            schedule.timeValue = getTimeValue(new Date(schedule.time))
+            schedule.activityData = [feed]
+            switch (schedule.repeat_interval) {
+              case "triweekly":
+                if (triweekly.indexOf(dayNumber) > -1) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
-              })
-              break
-            case "hourly":
-              if (
-                new Date().toLocaleTimeString() ===
-                new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
-              ) {
+                selectedDays.push()
+                break
+              case "biweekly":
+                if (biweekly.indexOf(dayNumber) > -1) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "daily":
                 schedule.completed = schedule.completed ?? false
                 currentFeed.push(schedule)
-              }
-              break
-            case "every3h":
-              if (
-                new Date().toLocaleTimeString() ===
-                new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
-              ) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "every6h":
-              if (
-                new Date().toLocaleTimeString() ===
-                new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
-              ) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "every12h":
-              if (
-                new Date().toLocaleTimeString() ===
-                new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
-              ) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "monthly":
-              if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "bimonthly":
-              if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
-            case "none":
-              if (new Date(date) === new Date(schedule.start_date)) {
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-              }
-              break
+                break
+              case "custom":
+                schedule.custom_time.map((time) => {
+                  if (new Date().toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
+                    schedule.completed = schedule.completed ?? false
+                    currentFeed.push(schedule)
+                  }
+                })
+                break
+              case "hourly":
+                if (
+                  new Date().toLocaleTimeString() ===
+                  new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
+                ) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "every3h":
+                if (
+                  new Date().toLocaleTimeString() ===
+                  new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
+                ) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "every6h":
+                if (
+                  new Date().toLocaleTimeString() ===
+                  new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
+                ) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "every12h":
+                if (
+                  new Date().toLocaleTimeString() ===
+                  new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
+                ) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "monthly":
+                if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "bimonthly":
+                if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+              case "none":
+                if (new Date(date) === new Date(schedule.start_date)) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                break
+            }
           }
         })
       })
       currentFeed.push(tip)
-      Object.keys(medications).forEach((key) => {
-        currentFeed.push(medications[key])
-      })
-      Object.keys(goals).forEach((key) => {
-        currentFeed.push(goals[key])
-      })
+      currentFeed = checkDataForFeed(date, goals, currentFeed)
+      currentFeed = checkDataForFeed(date, medications, currentFeed)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
     }
+  }
+
+  const checkDataForFeed = (date: any, data: any, currentFeed: any) => {
+    let currentDate = new Date(date)
+    Object.keys(data).forEach((key) => {
+      if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
+        if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
+          currentFeed.push(data[key])
+        }
+      }
+      //   switch(data[key].frequency) {
+      //     case "hourly":
+      //     case "daily":
+      //       currentFeed.push(data[key])
+      //     case "weekly":
+      //       if(data[key].weekdays.indexOf(weekdays[new Date().getDay()]) > -1){
+      //         currentFeed.push(data[key])
+      //       }
+      //       break
+      //     case "monthly":
+      //       break
+      // }
+    })
+    return currentFeed
   }
 
   const showFeedDetails = (type) => {
@@ -656,11 +686,17 @@ export default function Feed({
                           ) : feed.icon == "Custom" ? (
                             <Custom />
                           ) : null}
-                          {feed.icon === "sad-happy" && <SadHappy />}
-                          {feed.icon === "medication" && <Medication />}
-                          {feed.icon === "pencil" && <PencilPaper />}
-                          {feed.icon === "board" && <SadBoard />}
-                          {feed.icon === "linegraph" && <LineGraph />}
+                          {feed.icon === "sad-happy" && <SadHappy width="80" height="80" />}
+                          {feed.icon === "medication" && <Medication width="80" height="80" />}
+                          {feed.icon === "pencil" && <PencilPaper width="80" height="80" />}
+                          {feed.icon === "board" && <SadBoard width="80" height="80" />}
+                          {feed.icon === "linegraph" && <LineGraph width="80" height="80" />}
+                          {feed.icon === "Mood" && <AssessMood width="80" height="80" />}
+                          {feed.icon === "Sleep and Social" && <AssessSleep width="80" height="80" />}
+                          {feed.icon === "Anxiety" && <AssessAnxiety width="80" height="80" />}
+                          {feed.icon === "App Usability" && <AssessUsability width="80" height="80" />}
+                          {feed.icon === "Water and Nutrition" && <AssessNutrition width="80" height="80" />}
+                          {feed.icon === "Psychosis and Social" && <AssessSocial width="80" height="80" />}
                         </Grid>
                       </Grid>
                     </Card>

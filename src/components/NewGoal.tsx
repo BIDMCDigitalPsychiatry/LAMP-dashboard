@@ -68,6 +68,7 @@ export default function NewGoal({ participant, ...props }) {
   const [endDateOpen, setEndDateOpen] = useState(false)
   const [duration, setDuration] = useState(0)
   const [startDate, setStartDate] = useState(new Date())
+  const [endDate, setEndDate] = useState(new Date())
   const [reminderTime, setReminderTime] = useState(new Date())
   const [selectedFrequency, setSelectedFrequency] = useState("daily")
   const [selectedDays, setSelectedDays] = useState([])
@@ -142,6 +143,7 @@ export default function NewGoal({ participant, ...props }) {
   }
   const changeEndDate = (e: any) => {
     let msDiff = new Date(e).getTime() - startDate.getTime()
+    setEndDate(new Date(e))
     let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
     setDuration(daysDiff)
   }
@@ -188,7 +190,12 @@ export default function NewGoal({ participant, ...props }) {
         title: "Goal: " + goalName,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
+        frequency: selectedFrequency,
+        weekdays: selectedDays,
         group: "manage",
+        startDate: startDate,
+        endDate: endDate,
+        completed: false,
       }
       all.push(item)
       console.log(all)
