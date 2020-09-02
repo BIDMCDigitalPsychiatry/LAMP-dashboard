@@ -62,8 +62,8 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
 function saveTodaysTip(id) {
   let todayTip = {
     type: "tip",
-    title: "Today's tip : Sleep",
-    timeValue: "08:30am",
+    title: "Today's tip: Sleep",
+    timeValue: "08:30 am",
     icon: "sleep_tip",
     description: "Sleep Tips",
     group: "learn",

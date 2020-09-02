@@ -153,17 +153,6 @@ export default function NewGoal({ participant, ...props }) {
     setReminderTime(date)
   }
 
-  function getTimeValue(date: Date) {
-    var hours = date.getHours()
-    var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "pm" : "am"
-    hours = hours % 12
-    hours = hours ? hours : 12 // the hour '0' should be '12'
-    var minutes = minute < 10 ? "0" + minute : minute
-    var strTime = hours + ":" + minutes + ampm
-    return strTime
-  }
-
   const saveNewGoal = async () => {
     if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
       console.log(goals)
@@ -177,7 +166,7 @@ export default function NewGoal({ participant, ...props }) {
         weekdays: selectedDays,
         startDate: startDate,
         duration: duration,
-        reminderTime: getTimeValue(reminderTime),
+        reminderTime: reminderTime,
         completed: false,
       }
       all.push(goalDetails)
@@ -186,7 +175,7 @@ export default function NewGoal({ participant, ...props }) {
       all = getData(feeds)
       var item = {
         type: "goal",
-        timeValue: getTimeValue(reminderTime),
+        timeValue: reminderTime,
         title: "Goal: " + goalName,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,

@@ -40,6 +40,9 @@ import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
 import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
+import { ReactComponent as Jewels } from "../icons/Jewels.svg"
+import { ReactComponent as InfoIcon } from "../icons/Info.svg"
+
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
@@ -452,7 +455,7 @@ export default function Feed({
   function getTimeValue(date: Date) {
     var hours = date.getHours()
     var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "pm" : "am"
+    var ampm = hours >= 12 ? " pm" : " am"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
     var minutes = minute < 10 ? "0" + minute : minute
@@ -585,6 +588,7 @@ export default function Feed({
           }
         })
       })
+      console.log(currentFeed)
 
       currentFeed.push(tip)
       let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
@@ -610,6 +614,7 @@ export default function Feed({
         })
         selectedWeekViewDays = selectedWeekViewDays.concat(getDates(dates))
         if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
+          data[key].timeValue = getTimeValue(new Date(data[key].timeValue))
           currentFeed.push(data[key])
         }
       }
@@ -670,14 +675,15 @@ export default function Feed({
                         if (feed.group == "assess") {
                           setSurveyName(feed.title)
                           setVisibleActivities(feed.activityData)
+                          showFeedDetails(feed.group)
                         }
                         if (feed.group == "learn") {
                           setTitle(feed.data[0].title)
                           setDetails(feed.data[0].text)
                           setIndex(index)
                           setIcon(<SleepTips />)
+                          showFeedDetails(feed.type)
                         }
-                        showFeedDetails(feed.type)
                       }}
                     >
                       <Grid container spacing={0}>
@@ -717,26 +723,41 @@ export default function Feed({
                             <Reading />
                           ) : feed.icon == "Finances" ? (
                             <Savings />
-                          ) : feed.group == "goals" && feed.icon == "Mood" ? (
+                          ) : feed.group === "goals" && feed.icon == "Mood" ? (
                             <Emotions />
                           ) : feed.icon == "Medication" ? (
                             <Medication />
-                          ) : feed.icon == "sleep_tip" ? (
-                            <SleepTips width="80" height="80" />
                           ) : feed.icon == "Custom" ? (
                             <Custom />
-                          ) : null}
-                          {feed.icon === "sad-happy" && <SadHappy width="80" height="80" />}
-                          {feed.icon === "medication" && <Medication width="80" height="80" />}
-                          {feed.icon === "pencil" && <PencilPaper width="80" height="80" />}
-                          {feed.icon === "board" && <SadBoard width="80" height="80" />}
-                          {feed.icon === "linegraph" && <LineGraph width="80" height="80" />}
-                          {feed.icon === "Mood" && <AssessMood width="80" height="80" />}
-                          {feed.icon === "Sleep and Social" && <AssessSleep width="80" height="80" />}
-                          {feed.icon === "Anxiety" && <AssessAnxiety width="80" height="80" />}
-                          {feed.icon === "App Usability" && <AssessUsability width="80" height="80" />}
-                          {feed.icon === "Water and Nutrition" && <AssessNutrition width="80" height="80" />}
-                          {feed.icon === "Psychosis and Social" && <AssessSocial width="80" height="80" />}
+                          ) : feed.icon === "sad-happy" ? (
+                            <SadHappy width="80" height="80" />
+                          ) : feed.icon === "medication" ? (
+                            <Medication width="80" height="80" />
+                          ) : feed.icon === "pencil" ? (
+                            <PencilPaper width="80" height="80" />
+                          ) : feed.icon === "board" ? (
+                            <SadBoard width="80" height="80" />
+                          ) : feed.icon === "linegraph" ? (
+                            <LineGraph width="80" height="80" />
+                          ) : feed.icon === "Mood" ? (
+                            <AssessMood width="80" height="80" />
+                          ) : feed.icon === "Sleep and Social" ? (
+                            <AssessSleep width="80" height="80" />
+                          ) : feed.icon === "Anxiety" ? (
+                            <AssessAnxiety width="80" height="80" />
+                          ) : feed.icon === "App Usability" ? (
+                            <AssessUsability width="80" height="80" />
+                          ) : feed.icon === "Water and Nutrition" ? (
+                            <AssessNutrition width="80" height="80" />
+                          ) : feed.icon === "sleep_tip" ? (
+                            <SleepTips width="80" height="80" />
+                          ) : feed.icon === "Psychosis and Social" ? (
+                            <AssessSocial width="80" height="80" />
+                          ) : feed.type === "Jewels Trails A" || feed.type === "Jewels Trails B" ? (
+                            <Jewels width="80" height="80" />
+                          ) : (
+                            <InfoIcon width="80" height="80" />
+                          )}
                         </Grid>
                       </Grid>
                     </Card>

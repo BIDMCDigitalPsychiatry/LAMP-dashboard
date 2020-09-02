@@ -89,17 +89,6 @@ export default function NewMedication({ participant, ...props }) {
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
-  function getTimeValue(date: Date) {
-    var hours = date.getHours()
-    var minute = date.getMinutes()
-    var ampm = hours >= 12 ? "pm" : "am"
-    hours = hours % 12
-    hours = hours ? hours : 12 // the hour '0' should be '12'
-    var minutes = minute < 10 ? "0" + minute : minute
-    var strTime = hours + ":" + minutes + ampm
-    return strTime
-  }
-
   const setSelectedDaysValue = (val: any) => {
     var days = selectedDays
     if (days.indexOf(val) !== -1) {
@@ -135,6 +124,17 @@ export default function NewMedication({ participant, ...props }) {
     return !Array.isArray(x) ? [] : x
   }
 
+  function getTimeValue(date: Date) {
+    var hours = date.getHours()
+    var minute = date.getMinutes()
+    var ampm = hours >= 12 ? " pm" : " am"
+    hours = hours % 12
+    hours = hours ? hours : 12 // the hour '0' should be '12'
+    var minutes = minute < 10 ? "0" + minute : minute
+    var strTime = hours + ":" + minutes + ampm
+    return strTime
+  }
+
   const saveNewMedication = async () => {
     if (medicationName != null && medicationName != "") {
       let all = getDetails(medications)
@@ -144,7 +144,7 @@ export default function NewMedication({ participant, ...props }) {
         weekdays: selectedDays,
         startDate: startDate,
         duration: duration,
-        reminderTime: getTimeValue(reminderTime),
+        reminderTime: reminderTime,
         dosageList: dosageList,
       }
       all.push(medicationDetails)
@@ -153,7 +153,7 @@ export default function NewMedication({ participant, ...props }) {
       all = getDetails(feeds)
       var item = {
         type: "medication",
-        timeValue: getTimeValue(reminderTime),
+        timeValue: reminderTime,
         title: "Medication: " + medicationName,
         icon: "Medication",
         description: "test description",
