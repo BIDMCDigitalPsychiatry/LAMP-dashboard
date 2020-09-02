@@ -165,7 +165,11 @@ export default function LearnTips({ ...props }) {
                         <br />
                         {detail.author}
                       </Typography>
-                      {detail.link && <Link href={detail.link}>{detail.text}</Link>}
+                      {detail.link && (
+                        <Link target="_blank" href={detail.link}>
+                          {detail.text}
+                        </Link>
+                      )}
                     </CardContent>
                   </CardActionArea>
                 </Card>
