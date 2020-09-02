@@ -187,15 +187,21 @@ export default function Breathe({ ...props }) {
   const [status, setStatus] = useState("Yes")
   const [progress, setProgress] = React.useState(100)
   const [progressLabel, setProgressLabel] = React.useState(4)
-  // const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [inhale, setInhale] = useState(true)
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
   const handleNext = () => {
-    setStarted(!started)
+    // if (started) setStarted(!started)
     _setTab(tab + 1)
+  }
+
+  const videoLoaded = () => {
+    setStarted(!started)
+    setProgressUpdate()
+    //setTimeout(setProgressUpdate, 1000)
   }
   const setProgressUpdate = () => {
     let val = progressLabel - 1
@@ -207,12 +213,6 @@ export default function Breathe({ ...props }) {
       setProgressLabel(val)
     }
   }
-  useEffect(() => {
-    if (started) {
-      setTimeout(setProgressUpdate, 1000)
-      //setProgressUpdate()
-    }
-  }, [started])
 
   useEffect(() => {
     let timer
@@ -226,11 +226,11 @@ export default function Breathe({ ...props }) {
   useEffect(() => {
     let timer
     if (started) {
-      console.log(progressValue)
       if (progressValue < 100) {
         let val = progressValue + 0.8
         setProgressValue(val > 100 ? 100 : val)
       } else {
+        setStarted(!started)
         handleNext()
       }
     }
@@ -299,53 +299,58 @@ export default function Breathe({ ...props }) {
               <video
                 src="videos/Lotus.mp4"
                 autoPlay={true}
+                onLoadedData={() => {
+                  videoLoaded()
+                }}
                 loop
-                preload={"auto"}
+                preload={"metadata"}
                 //   onLoadEnd={() =>setIsLoading(false)}
               ></video>
-
-              <Box className={classes.inhale_exhale}>
-                <Typography variant="overline" className={classes.ExhaleContainer}>
-                  Exhale
-                </Typography>
-                <Typography variant="overline" className={classes.InhaleContainer}>
-                  Inhale
-                </Typography>
-              </Box>
+              {started && (
+                <Box className={classes.inhale_exhale}>
+                  <Typography variant="overline" className={classes.ExhaleContainer}>
+                    Exhale
+                  </Typography>
+                  <Typography variant="overline" className={classes.InhaleContainer}>
+                    Inhale
+                  </Typography>
+                </Box>
+              )}
             </Grid>
-            {/* //   )} */}
-            <Box style={{ width: "100px", height: "100px" }}>
-              {inhale && (
-                <CircularProgressbar
-                  value={progress}
-                  text={`${progressLabel}`}
-                  strokeWidth={8}
-                  styles={buildStyles({
-                    strokeLinecap: "butt",
-                    pathColor: "#E46759",
-                    textColor: "#BC453D",
-                    trailColor: "#FFAC98",
-                    textSize: "32px",
-                    pathTransitionDuration: 1,
-                  })}
-                />
-              )}
-              {!inhale && (
-                <CircularProgressbar
-                  value={progress}
-                  text={`${progressLabel}`}
-                  strokeWidth={8}
-                  styles={buildStyles({
-                    strokeLinecap: "butt",
-                    pathColor: "#E46759",
-                    textColor: "#BC453D",
-                    trailColor: "#FFAC98",
-                    textSize: "32px",
-                    pathTransitionDuration: 1,
-                  })}
-                />
-              )}
-            </Box>
+            {started && (
+              <Box style={{ width: "100px", height: "100px" }}>
+                {inhale && (
+                  <CircularProgressbar
+                    value={progress}
+                    text={`${progressLabel}`}
+                    strokeWidth={8}
+                    styles={buildStyles({
+                      strokeLinecap: "butt",
+                      pathColor: "#E46759",
+                      textColor: "#BC453D",
+                      trailColor: "#FFAC98",
+                      textSize: "32px",
+                      pathTransitionDuration: 1,
+                    })}
+                  />
+                )}
+                {!inhale && (
+                  <CircularProgressbar
+                    value={progress}
+                    text={`${progressLabel}`}
+                    strokeWidth={8}
+                    styles={buildStyles({
+                      strokeLinecap: "butt",
+                      pathColor: "#E46759",
+                      textColor: "#BC453D",
+                      trailColor: "#FFAC98",
+                      textSize: "32px",
+                      pathTransitionDuration: 1,
+                    })}
+                  />
+                )}
+              </Box>
+            )}
           </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>

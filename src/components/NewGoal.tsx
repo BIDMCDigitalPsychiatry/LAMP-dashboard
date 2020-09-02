@@ -41,6 +41,7 @@ import { ReactComponent as Savings } from "../icons/Savings.svg"
 import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -75,6 +76,7 @@ export default function NewGoal({ participant, ...props }) {
   const [units, setUnits] = useState([])
   const [goals, setGoals] = useState({})
   const [feeds, setFeeds] = useState({})
+  const { enqueueSnackbar } = useSnackbar()
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -154,8 +156,7 @@ export default function NewGoal({ participant, ...props }) {
   }
 
   const saveNewGoal = async () => {
-    if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
-      console.log(goals)
+    if (validateNewGoal()) {
       let all = getData(goals)
       let goalDetails = {
         goalName: goalName,
@@ -190,6 +191,23 @@ export default function NewGoal({ participant, ...props }) {
       console.log(all)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
+      enqueueSnackbar(`The goal has been saved successfully.`, { variant: "success" })
+    }
+  }
+
+  const validateNewGoal = () => {
+    if (goalName != null && goalName != "") {
+      if (goalValue != null && goalValue != "") {
+        if (duration != null && duration != 0) {
+          return true
+        } else {
+          enqueueSnackbar(`Please select duration.`, { variant: "error" })
+        }
+      } else {
+        enqueueSnackbar(`Please enter goal value.`, { variant: "error" })
+      }
+    } else {
+      enqueueSnackbar(`Please enter goal name.`, { variant: "error" })
     }
   }
   const getData = (data) => {
@@ -257,6 +275,7 @@ export default function NewGoal({ participant, ...props }) {
                       className={classes.inputText}
                       value={goalValue}
                       placeholder="0"
+                      type="number"
                       onChange={(e) => setGoalValue(e.target.value)}
                     />
                   </Grid>

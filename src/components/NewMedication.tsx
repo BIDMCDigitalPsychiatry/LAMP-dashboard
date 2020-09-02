@@ -35,6 +35,7 @@ import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP from "lamp-core"
 import Autocomplete from "@material-ui/lab/Autocomplete"
+import { useSnackbar } from "notistack"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -71,6 +72,7 @@ export default function NewMedication({ participant, ...props }) {
   const [dosageTime, setDosageTime] = useState(new Date())
   const [medications, setMedications] = useState({})
   const [feeds, setFeeds] = useState({})
+  const { enqueueSnackbar } = useSnackbar()
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -136,7 +138,7 @@ export default function NewMedication({ participant, ...props }) {
   }
 
   const saveNewMedication = async () => {
-    if (medicationName != null && medicationName != "") {
+    if (validateNewMedication()) {
       let all = getDetails(medications)
       let medicationDetails = {
         medicationName: medicationName,
@@ -167,6 +169,19 @@ export default function NewMedication({ participant, ...props }) {
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
+      enqueueSnackbar(`The medication has been saved successfully.`, { variant: "success" })
+    }
+  }
+
+  const validateNewMedication = () => {
+    if (medicationName != null && medicationName != "") {
+      if (duration != null && duration != 0) {
+        return true
+      } else {
+        enqueueSnackbar(`Please select duration.`, { variant: "error" })
+      }
+    } else {
+      enqueueSnackbar(`Please select medication name.`, { variant: "error" })
     }
   }
 
@@ -479,6 +494,7 @@ export default function NewMedication({ participant, ...props }) {
                 className={classes.inputText}
                 value={dosageValue}
                 placeholder="Dose"
+                type="number"
                 onChange={(e) => setDosageValue(e.target.value)}
                 fullWidth={true}
               />
