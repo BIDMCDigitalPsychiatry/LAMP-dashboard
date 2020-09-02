@@ -594,9 +594,12 @@ export default function Prevent({
       setJournalCount(journalCount)
       let activities = await getActivities(participant)
       let goals = await getGoals(participant)
+      let groupByType
       if (typeof goals !== "undefined") {
         goals.map((goal) => {
-          activities.push({ name: goal.goalType, type: "goals" })
+          if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
+            activities.push({ name: goal.goalType, type: "goals" })
+          }
         })
       }
       if (journalCount > 0) activities.push({ name: "Journals" })
@@ -605,6 +608,13 @@ export default function Prevent({
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
       if (journalCount > 0) activityEventCount["Journals"] = journalCount
+      if (typeof goals !== "undefined") {
+        groupByType = goals.reduce((goal, it) => {
+          goal[it.goalType] = goal[it.goalType] + 1 || 1
+          activityEventCount[it.goalType] = goal[it.goalType]
+          return goal
+        }, {})
+      }
       setActivityCounts(activityEventCount)
       let sensorEvents = await getSensorEvents(participant)
       setSensorEvents(sensorEvents)
@@ -668,10 +678,10 @@ export default function Prevent({
                 <ButtonBase focusRipple className={classes.fullwidthBtn}>
                   <Card
                     className={classes.prevent}
-                    onClick={() => {
-                      setSelectedActivityName(`Goal: ${activity.name}`)
-                      setOpenData(true)
-                    }}
+                    // onClick={() => {
+                    //   setSelectedActivityName(`Goal: ${activity.name}`)
+                    //   setOpenData(true)
+                    // }}
                   >
                     <Box display="flex">
                       <Box flexGrow={1}>
@@ -682,14 +692,9 @@ export default function Prevent({
                       </Box>
                     </Box>
                     <Box className={classes.preventGraph}>
-                      <RadialDonutChart
-                        data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
-                        detailPage={false}
-                        width={135}
-                        height={135}
-                      />
+                      <Typography variant="h2">{activityCounts[activity.name]}</Typography>
                     </Box>
-                    <Typography variant="h6">12/16 this month</Typography>
+                    <Typography variant="h6">entries this month</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>

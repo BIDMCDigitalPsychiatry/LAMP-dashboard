@@ -294,6 +294,8 @@ const useStyles = makeStyles((theme: Theme) =>
         border: "1px solid #7599FF",
         display: "block",
         "& p": { fontSize: 10, color: "#618EF7" },
+        "&:hover": { background: "#2196f3" },
+        "&:hover p": { color: "#fff" },
       },
     },
     currentDay: {
