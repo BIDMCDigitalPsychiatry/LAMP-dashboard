@@ -761,7 +761,10 @@ export default function Feed({
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
                   <div onClick={() => getFeedByDate(date)}>
-                    <span className={classes.selectedDay}> {dayComponent} </span>
+                    <span className={isCurrentDay || isActiveDate ? classes.currentDay : classes.selectedDay}>
+                      {" "}
+                      {dayComponent}{" "}
+                    </span>
                   </div>
                 ) : isCurrentDay || isActiveDate ? (
                   <span onClick={() => getFeedByDate(date)} className={classes.currentDay}>

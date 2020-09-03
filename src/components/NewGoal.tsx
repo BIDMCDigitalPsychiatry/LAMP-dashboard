@@ -121,6 +121,12 @@ export default function NewGoal({ participant, ...props }) {
     }
   }, [])
 
+  const setGoalVal = (val) => {
+    if (val.length < 5) setGoalValue(val)
+    else return false
+    if (Number(val) < 0) setGoalValue(0)
+  }
+
   const handleClose = () => {
     setAnchorEl(null)
   }
@@ -260,6 +266,9 @@ export default function NewGoal({ participant, ...props }) {
               <Grid item>
                 <Box pl={2}>
                   <InputBase
+                    inputProps={{
+                      maxLength: 50,
+                    }}
                     placeholder="Goal Name"
                     value={goalName}
                     onChange={(e) => setGoalName(e.target.value)}
@@ -278,13 +287,13 @@ export default function NewGoal({ participant, ...props }) {
                 }}
               >
                 <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
-                  <Grid item xs={2}>
+                  <Grid item xs={3}>
                     <InputBase
                       className={classes.inputText}
                       value={goalValue}
                       placeholder="0"
                       type="number"
-                      onChange={(e) => setGoalValue(e.target.value)}
+                      onChange={(e) => setGoalVal(e.target.value)}
                       inputRef={valueInput}
                     />
                   </Grid>

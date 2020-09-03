@@ -241,6 +241,7 @@ export default function Participant({
           <Prevent
             participant={participant}
             activeTab={activeTab}
+            activities={activities}
             hiddenEvents={hiddenEvents}
             enableEditMode={!_patientMode()}
             onEditAction={(activity, data) => {

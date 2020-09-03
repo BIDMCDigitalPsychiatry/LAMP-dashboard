@@ -356,6 +356,7 @@ async function getActivityEvents(
       activity: (x.activity || { name: "" }).name,
     }))
     .groupBy("activity") as any
+
   let customEvents = _activities
     .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
     .map((x) =>
@@ -393,21 +394,6 @@ async function getActivityEvents(
     })),
   ])
   return Object.fromEntries([...Object.entries(original), ...customGroups])
-}
-
-async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id)
-  let custom =
-    ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
-      ...x,
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: x.settings.map((y) => ({
-        ...y,
-        ...original.find((z) => z.name === y.activity)?.settings.find((a) => a.text === y.question),
-      })),
-    })) ?? [] // original.filter((x) => x.spec !== "lamp.survey")
-  return [...original, ...custom]
 }
 
 async function getSelectedActivities(participant: ParticipantObj) {
@@ -493,6 +479,7 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
 export default function Prevent({
   participant,
   activeTab,
+  activities,
   hiddenEvents,
   enableEditMode,
   onEditAction,
@@ -502,6 +489,7 @@ export default function Prevent({
 }: {
   participant: ParticipantObj
   activeTab: Function
+  activities: any[]
   hiddenEvents: string[]
   enableEditMode: boolean
   onEditAction: (activity: ActivityObj, data: any) => void
@@ -551,7 +539,7 @@ export default function Prevent({
 
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [activityCounts, setActivityCounts] = React.useState({})
-  const [activities, setActivities] = React.useState([])
+  const [preventactivities, setActivities] = React.useState(activities)
   const [sensorEvents, setSensorEvents] = React.useState({})
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [sensorCounts, setSensorCounts] = React.useState({})
@@ -592,7 +580,7 @@ export default function Prevent({
       setSelectedSensors(selSensors)
       let journalCount = await getJournalCount(participant)
       setJournalCount(journalCount)
-      let activities = await getActivities(participant)
+      let activities = preventactivities
       let goals = await getGoals(participant)
       let groupByType
       if (typeof goals !== "undefined") {
