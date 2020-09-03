@@ -603,7 +603,7 @@ export default function Prevent({
         })
       }
       if (journalCount > 0) activities.push({ name: "Journals" })
-      setActivities(activities)
+      
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
@@ -616,6 +616,8 @@ export default function Prevent({
         }, {})
       }
       setActivityCounts(activityEventCount)
+      activities = activities.filter(activity => activityEventCount[activity.name] > 0)
+      setActivities(activities)
       let sensorEvents = await getSensorEvents(participant)
       setSensorEvents(sensorEvents)
       let sensorEventCount = getSensorEventCount(sensorEvents)

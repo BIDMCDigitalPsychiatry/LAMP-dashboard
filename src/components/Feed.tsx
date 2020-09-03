@@ -461,6 +461,7 @@ export default function Feed({
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
         feed.schedule.map((schedule) => {
+          console.log(schedule)
           if (currentDate >= new Date(schedule.start_date)) {
             schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
             schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
@@ -498,21 +499,21 @@ export default function Feed({
                 })
                 break
               case "hourly":
-                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (60 * 60 * 1000) === 0) {
+                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "every3h":
-                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (3 * 60 * 60 * 1000) === 0) {
+                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (3 * 60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "every6h":
-                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (6 * 60 * 60 * 1000) === 0) {
+                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (6 * 60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
@@ -520,7 +521,7 @@ export default function Feed({
                 break
               case "every12h":
                 if (
-                  (new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (12 * 60 * 60 * 1000) ===
+                  (new Date(date).getTime() - new Date(schedule.time).getTime()) % (12 * 60 * 60 * 1000) ===
                   0
                 ) {
                   schedule.completed = schedule.completed ?? false
@@ -542,7 +543,7 @@ export default function Feed({
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(
-                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleTimeString()
+                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleDateString()
                 )
                 selectedWeekViewDays = selectedWeekViewDays.concat(
                   new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 20).toLocaleDateString()
