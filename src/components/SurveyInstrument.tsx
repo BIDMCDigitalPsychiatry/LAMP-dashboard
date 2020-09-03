@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   sliderActionsContainer: {
-    position: "absolute",
+    // position: "absolute",
     textAlign: "center",
     width: "100%",
     left: 0,
@@ -728,7 +728,9 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
     <Grid>
       <Box className={classes.questionhead}>
         <Typography variant="h5">{text}</Typography>
-        <Typography variant="caption" display="block" gutterBottom></Typography>
+        <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
+          {type === "likert" ? "(Select one)" : type === "rating" ? "(0 being terrible, 10 being excellent)" : ""}
+        </Typography>
       </Box>
       {component}
     </Grid>

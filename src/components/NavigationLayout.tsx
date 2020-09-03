@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbardashboard: {
       minHeight: 75,
-      padding: "0 10px",
+      padding: "15px 10px 0",
       [theme.breakpoints.down("xs")]: {
         display: "block",
         width: "100%",
@@ -109,6 +109,7 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 24,
       },
     },
+    scroll: { position: "absolute", width: "100%", height: "100%", overflowY: "scroll" },
   })
 )
 
@@ -147,7 +148,7 @@ export default function NavigationLayout({
       : classnames(classes.toolbar, classes.toolbardashboard)
 
   return (
-    <Box>
+    <Box className={classes.scroll}>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
@@ -263,6 +264,7 @@ export default function NavigationLayout({
           paddingBottom: 56,
           width: "100%",
           overflowY: "auto",
+          overflow: "hidden",
         }}
       >
         <ResponsiveMargin

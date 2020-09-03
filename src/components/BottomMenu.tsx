@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 125,
       },
       width: "100%",
-      minWidth: 75,
+      minWidth: 64,
     },
     closeButton: {
       position: "absolute",

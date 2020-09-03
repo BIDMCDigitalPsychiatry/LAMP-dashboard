@@ -98,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
-    marginTop: "50px",
+    // marginTop: "50px",
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
@@ -121,6 +121,7 @@ const useStyles = makeStyles((theme) => ({
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   btnNav: { marginBottom: 0 },
+  dialogueCurve: { borderRadius: 10, maxWidth: 400 },
 }))
 
 async function getJournals(participantId) {
@@ -228,7 +229,7 @@ export default function JournalEntries({ participant, ...props }) {
                     </IconButton>
                   </Box>
                 </Grid>
-                <Box textAlign="center">
+                <Box textAlign="center" pt={4} mt={2}>
                   <Fab className={classes.btnpeach} onClick={() => saveJournal()}>
                     Submit
                   </Fab>
@@ -242,7 +243,10 @@ export default function JournalEntries({ participant, ...props }) {
               scroll="paper"
               aria-labelledby="alert-dialog-slide-title"
               aria-describedby="alert-dialog-slide-description"
-              className={classes.dialogueStyle}
+              classes={{
+                root: classes.dialogueStyle,
+                paper: classes.dialogueCurve,
+              }}
             >
               <Box display="flex" justifyContent="flex-end">
                 <Box>

@@ -521,6 +521,9 @@ export default function NewMedication({ participant, ...props }) {
                     fullWidth={true}
                     autoFocus
                     inputRef={doseNameInput}
+                    inputProps={{
+                      maxLength: 30,
+                    }}
                   />
                 </Box>
 
@@ -533,6 +536,9 @@ export default function NewMedication({ participant, ...props }) {
                     onChange={(e) => setDosageValue(e.target.value)}
                     fullWidth={true}
                     inputRef={doseValueInput}
+                    inputProps={{
+                      maxLength: 15,
+                    }}
                   />
                 </Box>
 

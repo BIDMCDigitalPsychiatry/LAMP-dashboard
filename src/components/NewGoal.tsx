@@ -101,22 +101,22 @@ export default function NewGoal({ participant, ...props }) {
       setUnits(["hours", "minutes"])
       setGoalUnit("minutes")
     } else if (props.goalType == "Weight") {
-      setUnits(["mg", "g", "Kg"])
+      setUnits(["g", "Kg"])
       setGoalUnit("Kg")
     } else if (props.goalType == "Nutrition") {
-      setUnits(["mg", "g", "Ounces"])
+      setUnits(["mg", "g", "Ounces", "Pound", "Kg"])
       setGoalUnit("Ounces")
     } else if (props.goalType == "Sleep" || props.goalType == "Reading") {
       setUnits(["hours", "minutes"])
       setGoalUnit("hours")
     } else if (props.goalType == "Finances") {
-      setUnits(["$"])
+      setUnits(["$", "€"])
       setGoalUnit("$")
     } else if (props.goalType == "Medication") {
       setUnits(["mg", "g", "Ounces"])
       setGoalUnit("mg")
     } else {
-      setUnits(["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"])
+      setUnits(["Ounces", "mg", "g", "Pound", "Kg", "hours", "minutes", "$", "€"])
       setGoalUnit("Ounces")
     }
   }, [])
@@ -153,7 +153,7 @@ export default function NewGoal({ participant, ...props }) {
   const changeEndDate = (e: any) => {
     let msDiff = new Date(e).getTime() - startDate.getTime()
     setEndDate(new Date(e))
-    let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
+    let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24) + 1)
     setDuration(daysDiff)
   }
 
@@ -560,8 +560,9 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "#FFCEC2 solid 2px",
     fontSize: 30,
     fontWeight: 600,
+
     color: "rgba(0, 0, 0, 0.75)",
-    "& input": { textAlign: "right" },
+    "& input": { textAlign: "right", appearance: "textfield" },
   },
   durationOuter: { margin: "30px 0" },
   weekdaysOuter: { marginBottom: 50 },

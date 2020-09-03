@@ -520,10 +520,7 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "every12h":
-                if (
-                  (new Date(date).getTime() - new Date(schedule.time).getTime()) % (12 * 60 * 60 * 1000) ===
-                  0
-                ) {
+                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (12 * 60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
@@ -643,18 +640,20 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        setIndex(index)
-                        if (feed.group == "assess") {
-                          setSurveyName(feed.title)
-                          setVisibleActivities(feed.activityData)
-                          showFeedDetails(feed.group)
-                        }
-                        if (feed.group == "learn") {
-                          setTitle(feed.data[0].title)
-                          setDetails(feed.data[0].text)
+                        if (!feed.completed) {
                           setIndex(index)
-                          setIcon(<SleepTips />)
-                          showFeedDetails(feed.type)
+                          if (feed.group == "assess") {
+                            setSurveyName(feed.title)
+                            setVisibleActivities(feed.activityData)
+                            showFeedDetails(feed.group)
+                          }
+                          if (feed.group == "learn") {
+                            setTitle(feed.data[0].title)
+                            setDetails(feed.data[0].text)
+                            setIndex(index)
+                            setIcon(<SleepTips />)
+                            showFeedDetails(feed.type)
+                          }
                         }
                       }}
                     >
