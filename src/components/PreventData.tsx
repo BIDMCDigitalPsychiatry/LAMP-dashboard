@@ -80,7 +80,7 @@ export default function PreventData({
           ) : graphType === 2 ? (
             <Sparkline
               minWidth={250}
-              minHeight={220}
+              minHeight={450}
               XAxisLabel="Time"
               YAxisLabel="  "
               color={colors.blue[500]}

@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Paper, List, ListItem, ListItemText, Box, useMediaQuery } from "@material-ui/core"
+import { Paper, List, ListItem, ListItemText, Box, useMediaQuery, useTheme } from "@material-ui/core"
 import {
   XYChart,
   theme,
@@ -84,9 +84,8 @@ const styles = {
       bottom: {
         pointerEvents: "none",
         textAnchor: "middle",
-        fontWeight: 400,
         fill: "#757575",
-        fontSize: 10,
+        fontSize: "0.9em !important",
         letterSpacing: 0.4,
         dy: "0.25em",
       },
@@ -126,6 +125,7 @@ const styles = {
 export default withParentSize(function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const renderTooltip = ({ datum, series }) => (
     <List dense>
@@ -213,7 +213,20 @@ export default withParentSize(function Sparkline({ ...props }) {
             tickStyles={styles.tick}
             orientation="left"
           />
-          <XAxis label={null} numTicks={7} rangePadding={4} axisStyles={styles.axis} tickStyles={styles.tick} />
+          <XAxis
+            label={null}
+            tickLabelProps={(d, i) => ({
+              scaleToFit: supportsSidebar ? true : false,
+              dy: 0,
+              fontSize: 9,
+              angle: supportsSidebar ? 0 : 90,
+            })}
+            numTicks={7}
+            rangePadding={4}
+            axisStyles={styles.axis}
+            tickStyles={styles.tick}
+            orientation="bottom"
+          />
           <LineSeries
             data={props.data}
             seriesKey={props.YAxisLabel ?? "Data"}
