@@ -1,5 +1,5 @@
 ﻿// Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
   Typography,
   makeStyles,
@@ -77,7 +77,8 @@ export default function NewGoal({ participant, ...props }) {
   const [goals, setGoals] = useState({})
   const [feeds, setFeeds] = useState({})
   const { enqueueSnackbar } = useSnackbar()
-
+  const nameInput = useRef(null)
+  const valueInput = useRef(null)
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {
@@ -204,9 +205,11 @@ export default function NewGoal({ participant, ...props }) {
           enqueueSnackbar(`Please select duration.`, { variant: "error" })
         }
       } else {
+        valueInput.current.focus()
         enqueueSnackbar(`Please enter goal value.`, { variant: "error" })
       }
     } else {
+      nameInput.current.focus()
       enqueueSnackbar(`Please enter goal name.`, { variant: "error" })
     }
   }
@@ -256,7 +259,12 @@ export default function NewGoal({ participant, ...props }) {
               <Grid item>{goalIcon}</Grid>
               <Grid item>
                 <Box pl={2}>
-                  <InputBase placeholder="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} />
+                  <InputBase
+                    placeholder="Goal Name"
+                    value={goalName}
+                    onChange={(e) => setGoalName(e.target.value)}
+                    inputRef={nameInput}
+                  />
                 </Box>
                 {/* <Typography variant="h4">Goal name</Typography> */}
               </Grid>
@@ -277,6 +285,7 @@ export default function NewGoal({ participant, ...props }) {
                       placeholder="0"
                       type="number"
                       onChange={(e) => setGoalValue(e.target.value)}
+                      inputRef={valueInput}
                     />
                   </Grid>
                   <Grid item xs={5} className={classes.goalUnit}>

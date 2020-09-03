@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
   Typography,
   makeStyles,
@@ -73,6 +73,9 @@ export default function NewMedication({ participant, ...props }) {
   const [medications, setMedications] = useState({})
   const [feeds, setFeeds] = useState({})
   const { enqueueSnackbar } = useSnackbar()
+  const nameInput = useRef(null)
+  const doseNameInput = useRef(null)
+  const doseValueInput = useRef(null)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -181,7 +184,22 @@ export default function NewMedication({ participant, ...props }) {
         enqueueSnackbar(`Please select duration.`, { variant: "error" })
       }
     } else {
+      nameInput.current.focus()
       enqueueSnackbar(`Please select medication name.`, { variant: "error" })
+    }
+  }
+
+  const validateDosage = () => {
+    if (dosageName != null && dosageName != "") {
+      if (dosageValue != null && dosageValue != "") {
+        return true
+      } else {
+        doseValueInput.current.focus()
+        enqueueSnackbar(`Please enter dose.`, { variant: "error" })
+      }
+    } else {
+      doseNameInput.current.focus()
+      enqueueSnackbar(`Please enter name.`, { variant: "error" })
     }
   }
 
@@ -203,11 +221,13 @@ export default function NewMedication({ participant, ...props }) {
   ]
 
   const addDosage = () => {
-    var dosage = { Name: dosageName, Value: dosageValue, Time: getTimeValue(dosageTime) }
-    var list = dosageList
-    list = list.concat(dosage)
-    setDosageList(list)
-    setOpenAddDosage(false)
+    if (validateDosage()) {
+      var dosage = { Name: dosageName, Value: dosageValue, Time: getTimeValue(dosageTime) }
+      var list = dosageList
+      list = list.concat(dosage)
+      setDosageList(list)
+      setOpenAddDosage(false)
+    }
   }
 
   const openAddDosageDialog = () => {
@@ -243,6 +263,7 @@ export default function NewMedication({ participant, ...props }) {
                   onChange={(event: any, newValue: any) => {
                     setMedicationName(newValue)
                   }}
+                  ref={nameInput}
                   options={medicationList.map((option) => option.title)}
                   renderInput={(params) => (
                     <TextField
@@ -499,6 +520,7 @@ export default function NewMedication({ participant, ...props }) {
                     onChange={(e) => setDosageName(e.target.value)}
                     fullWidth={true}
                     autoFocus
+                    inputRef={doseNameInput}
                   />
                 </Box>
 
@@ -510,6 +532,7 @@ export default function NewMedication({ participant, ...props }) {
                     type="number"
                     onChange={(e) => setDosageValue(e.target.value)}
                     fullWidth={true}
+                    inputRef={doseValueInput}
                   />
                 </Box>
 

@@ -18,6 +18,7 @@ import {
 } from "@data-ui/xy-chart"
 
 function PaperTooltip({ top, left, ...props }) {
+  left = window.innerWidth < left + 196 ? left - 196 : left
   return (
     <Box clone displayPrint="none">
       <Paper

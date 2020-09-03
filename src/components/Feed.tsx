@@ -498,30 +498,21 @@ export default function Feed({
                 })
                 break
               case "hourly":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
-                ) {
+                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "every3h":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
-                ) {
+                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (3 * 60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "every6h":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
-                ) {
+                if ((new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (6 * 60 * 60 * 1000) === 0) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
@@ -529,8 +520,8 @@ export default function Feed({
                 break
               case "every12h":
                 if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
+                  (new Date(date).getTime() - new Date(schedule.start_date).getTime()) % (12 * 60 * 60 * 1000) ===
+                  0
                 ) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
@@ -617,6 +608,7 @@ export default function Feed({
     setLaunchedActivity(type)
   }
   const submitSurvey = (response) => {
+    completeFeed(index)
     onComplete(response)
     setLaunchedActivity(undefined)
   }
@@ -650,6 +642,7 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
+                        setIndex(index)
                         if (feed.group == "assess") {
                           setSurveyName(feed.title)
                           setVisibleActivities(feed.activityData)
@@ -770,22 +763,12 @@ export default function Feed({
                   <div onClick={() => getFeedByDate(date)}>
                     <span className={classes.selectedDay}> {dayComponent} </span>
                   </div>
-                ) : isCurrentDay ? (
-                  <span
-                    onClick={() => getFeedByDate(date)}
-                    className={isActiveDate ? classes.selectedDay : classes.currentDay}
-                  >
-                    {" "}
-                    {dayComponent}{" "}
-                  </span>
-                ) : isActiveDate ? (
-                  <span onClick={() => getFeedByDate(date)} className={classes.selectedDay}>
-                    {" "}
-                    {dayComponent}{" "}
+                ) : isCurrentDay || isActiveDate ? (
+                  <span onClick={() => getFeedByDate(date)} className={classes.currentDay}>
+                    {dayComponent}
                   </span>
                 ) : (
                   <span onClick={() => getFeedByDate(date)} className={classes.day}>
-                    {" "}
                     {dayComponent}{" "}
                   </span>
                 )

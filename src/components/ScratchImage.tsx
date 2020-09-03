@@ -83,6 +83,8 @@ export default function ScratchImage({ ...props }) {
 
   let brush = new Image()
   let cover = new Image()
+  brush.width = 150
+  brush.height = 150
   const classes = useStyles()
   let area = 0
   let val = 0
