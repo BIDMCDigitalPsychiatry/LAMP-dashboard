@@ -213,20 +213,37 @@ export default withParentSize(function Sparkline({ ...props }) {
             tickStyles={styles.tick}
             orientation="left"
           />
-          <XAxis
-            label={null}
-            tickLabelProps={(d, i) => ({
-              scaleToFit: supportsSidebar ? true : false,
-              dy: 0,
-              fontSize: 9,
-              angle: supportsSidebar ? 0 : 90,
-            })}
-            numTicks={7}
-            rangePadding={4}
-            axisStyles={styles.axis}
-            tickStyles={styles.tick}
-            orientation="bottom"
-          />
+          {supportsSidebar ? (
+            <XAxis
+              label={null}
+              numTicks={7}
+              rangePadding={4}
+              axisStyles={styles.axis}
+              tickStyles={styles.tick}
+              orientation="bottom"
+              tickLabelProps={(d, i) => ({
+                dy: 0,
+                dx: "-1.25em",
+                fontSize: 9,
+                angle: 0,
+              })}
+            />
+          ) : (
+            <XAxis
+              label={null}
+              tickLabelProps={(d, i) => ({
+                scaleToFit: supportsSidebar ? true : false,
+                dy: 0,
+                fontSize: 9,
+                angle: supportsSidebar ? 0 : 90,
+              })}
+              numTicks={7}
+              rangePadding={4}
+              axisStyles={styles.axis}
+              tickStyles={styles.tick}
+              orientation="bottom"
+            />
+          )}
           <LineSeries
             data={props.data}
             seriesKey={props.YAxisLabel ?? "Data"}

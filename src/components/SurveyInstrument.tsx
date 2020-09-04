@@ -284,7 +284,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 30,
     paddingLeft: 10,
     [theme.breakpoints.down("xs")]: {
-      maxHeight: 300,
+      height: "calc(100vh - 380px)",
       overflow: "auto",
     },
   },
