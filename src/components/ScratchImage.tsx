@@ -80,6 +80,7 @@ export default function ScratchImage({ ...props }) {
   const [done, setDone] = useState(false)
   const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
   const [image, setImage] = useState(null)
+  const [isSVGLoaded, setSVGLoaded] = useState(false)
 
   let brush = new Image()
   let cover = new Image()
@@ -151,6 +152,7 @@ export default function ScratchImage({ ...props }) {
       brush.src = require("../icons/scratch/circle.svg")
       cover.src = require("../icons/scratch/ScratchCover.svg")
       cover.onload = () => {
+        setSVGLoaded(true)
         context.drawImage(cover, 0, 0, canvas.width, canvas.height)
         context.textAlign = "center"
         context.font = "bold 30px inter"
@@ -181,6 +183,11 @@ export default function ScratchImage({ ...props }) {
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
+        <Box display={isSVGLoaded ? "none" : "flex"} alignItems="center" className={classes.scratchCompleteMsg}>
+          <Box width={1}>
+            <Typography variant="h4">Loading</Typography>
+          </Box>
+        </Box>
         {canvasComponent}
         <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
           {image}

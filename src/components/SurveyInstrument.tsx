@@ -729,7 +729,11 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
       <Box className={classes.questionhead}>
         <Typography variant="h5">{text}</Typography>
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
-          {type === "likert" ? "(Select one)" : type === "rating" ? "(0 being terrible, 10 being excellent)" : ""}
+          {type === "likert" || type === "boolean" || type === "list" || type === "select"
+            ? "(Select one)"
+            : type === "rating"
+            ? "(0 being terrible, 10 being excellent)"
+            : ""}
         </Typography>
       </Box>
       {component}
@@ -812,7 +816,7 @@ function Section({
   const [activeStep, setActiveStep] = useState(0)
   const classes = useStyles()
   const [tab, _setTab] = useState(0)
-  const [progressValue, setProgressValue] = useState(10)
+  const [progressValue, setProgressValue] = useState(100 / value.settings.length)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [index, setIndex] = useState(0)
   const [slideElements, setSlideElements] = useState(null)
@@ -849,22 +853,22 @@ function Section({
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
-    setElementIn(false)
-    setTimeout(() => {
-      setIndex((index - 1) % slideElements.length)
-      setElementIn(true)
-    }, 500)
-    _setTab(tab - 1)
-    setProgressValue(progressValue - 100 / value.settings.length)
+    slideElementChange(0)
   }
-  const handleNext = () => {
+
+  const slideElementChange = (type: number) => {
     setElementIn(false)
     setTimeout(() => {
-      setIndex((index + 1) % slideElements.length)
+      type == 0 ? setIndex((index - 1) % slideElements.length) : setIndex((index + 1) % slideElements.length)
       setElementIn(true)
     }, 500)
-    _setTab(tab + 1)
-    setProgressValue(progressValue + 100 / value.settings.length)
+    type == 0 ? _setTab(tab - 1) : _setTab(tab + 1)
+    let val = type == 0 ? progressValue - 100 / value.settings.length : progressValue + 100 / value.settings.length
+    type == 0 ? setProgressValue(val > 0 ? val : 100 / value.settings.length) : setProgressValue(val > 100 ? 100 : val)
+  }
+
+  const handleNext = () => {
+    slideElementChange(1)
   }
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -910,13 +914,16 @@ function Section({
             <Box>{slideElements ? slideElements[index] : null}</Box>
           </Slide>
           <Box className={classes.surveyQuestionNav}>
-            {/* {!supportsSidebar && index > 0 && (
+            {!supportsSidebar && index > 0 && (
               <Fab onClick={handleBack} className={classes.btnBack}>
                 Back
               </Fab>
-            )} */}
+            )}
             {!supportsSidebar && (
-              <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+              <Fab
+                onClick={elementIn && (index === value.settings.length - 1 ? onComplete : handleNext)}
+                className={classes.btngreen}
+              >
                 {index === value.settings.length - 1
                   ? toolBarBack && !!prefillData
                     ? !!prefillTimestamp
@@ -948,6 +955,22 @@ function SurveyQuestions({
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
   const classes = useStyles()
 
+  const validator = (response) => {
+    for (let section of response) {
+      if (section === undefined)
+        if (!!partialValidationOnly) continue
+        else return false
+      for (let question of section) if (question === undefined) return false
+    }
+    return true
+  }
+  const postSubmit = (response) => {
+    console.log(validator(response))
+    if (!validate) onResponse(response, prefillTimestamp)
+    else if (validate && validator(response)) onResponse(response, prefillTimestamp)
+    else if (validate && !validator(response)) onValidationFailure()
+  }
+
   return (
     <div className={classes.root}>
       {((content || {}).sections || []).map((x, idx) => (
@@ -957,13 +980,20 @@ function SurveyQuestions({
           prefillData={toolBarBack ? prefillData[idx] : {}}
           prefillTimestamp={prefillTimestamp}
           type={type}
-          onComplete={() =>
-            onResponse(
-              Array.from({
-                ...responses.current,
-                length: content.sections.length,
-              })
-            )
+          onComplete={
+            () =>
+              postSubmit(
+                Array.from({
+                  ...responses.current,
+                  length: content.sections.length,
+                })
+              )
+            // onResponse(
+            //   Array.from({
+            //     ...responses.current,
+            //     length: content.sections.length,
+            //   })
+            // )
           }
           toolBarBack={toolBarBack}
           closeDialog={props.closeDialog}
@@ -994,8 +1024,8 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
     <Grid container direction="row">
       <Grid item style={{ width: "100%" }}>
         <SurveyQuestions
-          validate
-          partialValidationOnly
+          validate={true}
+          partialValidationOnly={false}
           content={survey}
           toolBarBack={fromPrevent}
           prefillData={!!survey ? survey.prefillData : undefined}
