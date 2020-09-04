@@ -156,10 +156,14 @@ export default function NewMedication({ participant, ...props }) {
       LAMP.Type.setAttachment(participant.id, "me", "lamp.medications", all)
       setMedications({ ...(medications || {}), [participant]: all })
       all = getDetails(feeds)
+      let text = medicationName || "".substring(0, 20)
+      if (text.length != medicationName || "".length) {
+        text = text.substr(0, Math.min(text.length, text.lastIndexOf(" "))) + "..."
+      }
       var item = {
         type: "medication",
         timeValue: reminderTime,
-        title: "Medication: " + medicationName,
+        title: "Medication: " + text,
         icon: "Medication",
         description: "test description",
         group: "manage",
@@ -169,6 +173,7 @@ export default function NewMedication({ participant, ...props }) {
         endDate: endDate,
         completed: false,
       }
+      console.log(reminderTime)
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()

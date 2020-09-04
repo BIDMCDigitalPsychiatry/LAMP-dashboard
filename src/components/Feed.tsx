@@ -576,6 +576,7 @@ export default function Feed({
     let currentDate = new Date(date)
     let dates = []
     Object.keys(data).forEach((key) => {
+      console.log(data[key])
       if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
         data[key].weekdays.map((day) => {
           dates.push(weekdays.indexOf(day))
@@ -682,25 +683,25 @@ export default function Feed({
 
                         <Grid container justify="center" direction="column" className={classes.image}>
                           {feed.icon == "Exercise" ? (
-                            <Exercise />
+                            <Exercise width="80" height="80" />
                           ) : feed.icon == "Weight" ? (
-                            <Weight />
+                            <Weight width="80" height="80" />
                           ) : feed.icon == "Nutrition" ? (
-                            <Nutrition />
+                            <Nutrition width="80" height="80" />
                           ) : feed.icon == "Meditation" ? (
-                            <BreatheIcon />
+                            <BreatheIcon width="80" height="80" />
                           ) : feed.icon == "Sleep" ? (
-                            <Sleeping />
+                            <Sleeping width="80" height="80" />
                           ) : feed.icon == "Reading" ? (
-                            <Reading />
+                            <Reading width="80" height="80" />
                           ) : feed.icon == "Finances" ? (
-                            <Savings />
+                            <Savings width="80" height="80" />
                           ) : feed.group === "goals" && feed.icon == "Mood" ? (
-                            <Emotions />
+                            <Emotions width="80" height="80" />
                           ) : feed.icon == "Medication" ? (
-                            <Medication />
+                            <Medication width="80" height="80" />
                           ) : feed.icon == "Custom" ? (
-                            <Custom />
+                            <Custom width="80" height="80" />
                           ) : feed.icon === "sad-happy" ? (
                             <SadHappy width="80" height="80" />
                           ) : feed.icon === "medication" ? (

@@ -181,10 +181,14 @@ export default function NewGoal({ participant, ...props }) {
       LAMP.Type.setAttachment(participant.id, "me", "lamp.goals", all)
       setGoals({ ...(goals || {}), [participant]: all })
       all = getData(feeds)
+      let text = goalName.substring(0, 20)
+      if (text.length != goalName.length) {
+        text = text.substr(0, Math.min(text.length, text.lastIndexOf(" ")))
+      }
       var item = {
         type: "goal",
         timeValue: reminderTime,
-        title: "Goal: " + goalName,
+        title: "Goal: " + text,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
         frequency: selectedFrequency,
