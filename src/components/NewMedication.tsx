@@ -172,7 +172,14 @@ export default function NewMedication({ participant, ...props }) {
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
-      enqueueSnackbar(`The medication has been saved successfully.`, { variant: "success" })
+      enqueueSnackbar(`The medication has been saved successfully.`, {
+        variant: "success",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
     }
   }
 
@@ -181,11 +188,25 @@ export default function NewMedication({ participant, ...props }) {
       if (duration != null && duration != 0) {
         return true
       } else {
-        enqueueSnackbar(`Please select duration.`, { variant: "error" })
+        enqueueSnackbar(`Please select duration.`, {
+          variant: "error",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+          preventDuplicate: true,
+        })
       }
     } else {
       nameInput.current.focus()
-      enqueueSnackbar(`Please select medication name.`, { variant: "error" })
+      enqueueSnackbar(`Please select medication name.`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
     }
   }
 
@@ -195,11 +216,25 @@ export default function NewMedication({ participant, ...props }) {
         return true
       } else {
         doseValueInput.current.focus()
-        enqueueSnackbar(`Please enter dose.`, { variant: "error" })
+        enqueueSnackbar(`Please enter dose.`, {
+          variant: "error",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+          preventDuplicate: true,
+        })
       }
     } else {
       doseNameInput.current.focus()
-      enqueueSnackbar(`Please enter name.`, { variant: "error" })
+      enqueueSnackbar(`Please enter name.`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
     }
   }
 
