@@ -275,6 +275,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
+      height: "calc(100vh - 270px)",
+      overflow: "auto",
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
@@ -857,14 +859,18 @@ function Section({
   }
 
   const slideElementChange = (type: number) => {
-    setElementIn(false)
-    setTimeout(() => {
-      type == 0 ? setIndex((index - 1) % slideElements.length) : setIndex((index + 1) % slideElements.length)
-      setElementIn(true)
-    }, 500)
-    type == 0 ? _setTab(tab - 1) : _setTab(tab + 1)
-    let val = type == 0 ? progressValue - 100 / value.settings.length : progressValue + 100 / value.settings.length
-    type == 0 ? setProgressValue(val > 0 ? val : 100 / value.settings.length) : setProgressValue(val > 100 ? 100 : val)
+    if (!supportsSidebar) {
+      setElementIn(false)
+      setTimeout(() => {
+        type == 0 ? setIndex((index - 1) % slideElements.length) : setIndex((index + 1) % slideElements.length)
+        setElementIn(true)
+      }, 500)
+      type == 0 ? _setTab(tab - 1) : _setTab(tab + 1)
+      let val = type == 0 ? progressValue - 100 / value.settings.length : progressValue + 100 / value.settings.length
+      type == 0
+        ? setProgressValue(val > 0 ? val : 100 / value.settings.length)
+        : setProgressValue(val > 100 ? 100 : val)
+    }
   }
 
   const handleNext = () => {
@@ -875,9 +881,11 @@ function Section({
   }
 
   const handleChange = (event) => {
-    const target = event.target
-    const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
-    setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    if (supportsSidebar) {
+      const target = event.target
+      const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
+      setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    }
   }
 
   return (
@@ -980,20 +988,13 @@ function SurveyQuestions({
           prefillData={toolBarBack ? prefillData[idx] : {}}
           prefillTimestamp={prefillTimestamp}
           type={type}
-          onComplete={
-            () =>
-              postSubmit(
-                Array.from({
-                  ...responses.current,
-                  length: content.sections.length,
-                })
-              )
-            // onResponse(
-            //   Array.from({
-            //     ...responses.current,
-            //     length: content.sections.length,
-            //   })
-            // )
+          onComplete={() =>
+            postSubmit(
+              Array.from({
+                ...responses.current,
+                length: content.sections.length,
+              })
+            )
           }
           toolBarBack={toolBarBack}
           closeDialog={props.closeDialog}

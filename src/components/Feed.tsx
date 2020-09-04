@@ -461,7 +461,6 @@ export default function Feed({
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
         feed.schedule.map((schedule) => {
-          console.log(schedule)
           if (currentDate >= new Date(schedule.start_date)) {
             schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
             schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
@@ -485,46 +484,48 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(biweekly, date))
                 break
               case "daily":
+              case "hourly":
+              case "every3h":
+              case "every6h":
+              case "every12h":
                 schedule.completed = schedule.completed ?? false
                 currentFeed.push(schedule)
+                const hourVal =
+                  schedule.repeat_interval === "hourly"
+                    ? 1 * 60 * 60 * 1000
+                    : schedule.repeat_interval === "every3h"
+                    ? 3 * 60 * 60 * 1000
+                    : schedule.repeat_interval === "every6h"
+                    ? 6 * 60 * 60 * 1000
+                    : 12 * 60 * 60 * 1000
+                let checkDate = date
+                if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
+                  checkDate.setHours(new Date().getHours())
+                  checkDate.setMinutes(new Date().getMinutes())
+                }
+                let scheduledDate = new Date(schedule.start_date)
+                scheduledDate.setHours(new Date(schedule.time).getHours())
+                scheduledDate.setMinutes(new Date(schedule.time).getMinutes())
+                schedule.timeValue =
+                  schedule.repeat_interval === "daily"
+                    ? getTimeValue(new Date(scheduledDate))
+                    : getTimeValue(
+                        new Date(
+                          new Date(checkDate).getTime() +
+                            ((new Date(checkDate).getTime() - new Date(scheduledDate).getTime()) % hourVal)
+                        )
+                      )
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "custom":
                 schedule.custom_time.map((time) => {
                   if (new Date(date).toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
                     schedule.completed = schedule.completed ?? false
+                    schedule.timeValue = getTimeValue(new Date(time))
                     currentFeed.push(schedule)
                   }
                   selectedWeekViewDays = selectedWeekViewDays.concat(new Date(time).toLocaleDateString())
                 })
-                break
-              case "hourly":
-                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (60 * 60 * 1000) === 0) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every3h":
-                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (3 * 60 * 60 * 1000) === 0) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every6h":
-                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (6 * 60 * 60 * 1000) === 0) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every12h":
-                if ((new Date(date).getTime() - new Date(schedule.time).getTime()) % (12 * 60 * 60 * 1000) === 0) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "monthly":
                 if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {

@@ -196,12 +196,13 @@ export default function Breathe({ ...props }) {
   const handleNext = () => {
     // if (started) setStarted(!started)
     _setTab(tab + 1)
+    setIsLoading(true)
   }
 
   const videoLoaded = () => {
+    setIsLoading(false)
     setStarted(!started)
     setProgressUpdate()
-    //setTimeout(setProgressUpdate, 1000)
   }
   const setProgressUpdate = () => {
     let val = progressLabel - 1
@@ -294,6 +295,13 @@ export default function Breathe({ ...props }) {
             justify="center"
             style={{ minHeight: "80vh" }}
           >
+            {isLoading && (
+              <Box alignItems="center">
+                <Box width={1}>
+                  <Typography variant="h4">Loading</Typography>
+                </Box>
+              </Box>
+            )}
             {/* //   {isLoading && ( */}
             <Grid item className={classes.videoNav}>
               <video
@@ -329,7 +337,7 @@ export default function Breathe({ ...props }) {
                       pathColor: "#E46759",
                       textColor: "#BC453D",
                       trailColor: "#FFAC98",
-                      textSize: "32px",
+                      textSize: "45px",
                       pathTransitionDuration: 1,
                     })}
                   />
@@ -344,7 +352,7 @@ export default function Breathe({ ...props }) {
                       pathColor: "#E46759",
                       textColor: "#BC453D",
                       trailColor: "#FFAC98",
-                      textSize: "32px",
+                      textSize: "45px",
                       pathTransitionDuration: 1,
                     })}
                   />
