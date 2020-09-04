@@ -225,12 +225,12 @@ export default function Participant({
     <React.Fragment>
       <Box className={classes.scroll}>
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
-          <Box my={1}>
+          <Box mt={1} mb={4}>
             <Learn participant={participant} activeTab={activeTab} />
           </Box>
         </Slide>
         <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
-          <Box my={1}>
+          <Box mt={1} mb={4}>
             <Survey
               id={participant.id}
               activities={activities}
@@ -241,12 +241,12 @@ export default function Participant({
           </Box>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
-          <Box my={1}>
+          <Box mt={1} mb={4}>
             <Manage participant={participant} activeTab={activeTab} />
           </Box>
         </Slide>
         <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-          <Box my={1}>
+          <Box mt={1} mb={4}>
             <Prevent
               participant={participant}
               activeTab={activeTab}
@@ -286,7 +286,7 @@ export default function Participant({
           </Box>
         </Slide>
         <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-          <Box my={1}>
+          <Box mt={1} mb={4}>
             <Feed
               participant={participant}
               activeTab={activeTab}
