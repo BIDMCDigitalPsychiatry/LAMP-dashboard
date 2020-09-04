@@ -205,7 +205,7 @@ export default function JournalEntries({ participant, ...props }) {
                   id="standard-multiline-flexible"
                   multiline
                   rows={10}
-                  variant="outlined"
+                  autoFocus={true}
                   value={journalValue}
                   onChange={(event) => setJounalValue(event.target.value)}
                   classes={{ root: classes.textArea }}

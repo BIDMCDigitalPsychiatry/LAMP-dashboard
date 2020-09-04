@@ -6,6 +6,7 @@ import { ReactComponent as Background04 } from "../icons/scratch/Background-04.s
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
 import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
+import CircularProgress from "@material-ui/core/CircularProgress"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -185,7 +186,7 @@ export default function ScratchImage({ ...props }) {
       <div id="canvasDiv" className={classes.background}>
         <Box display={isSVGLoaded ? "none" : "flex"} alignItems="center" className={classes.scratchCompleteMsg}>
           <Box width={1}>
-            <Typography variant="h4">Loading</Typography>
+            <CircularProgress />
           </Box>
         </Box>
         {canvasComponent}

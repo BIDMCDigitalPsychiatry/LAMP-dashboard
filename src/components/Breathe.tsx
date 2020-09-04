@@ -27,6 +27,7 @@ import Link from "@material-ui/core/Link"
 import classnames from "classnames"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
+import CircularProgress from "@material-ui/core/CircularProgress"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -298,7 +299,7 @@ export default function Breathe({ ...props }) {
             {isLoading && (
               <Box alignItems="center">
                 <Box width={1}>
-                  <Typography variant="h4">Loading</Typography>
+                  <CircularProgress />
                 </Box>
               </Box>
             )}
