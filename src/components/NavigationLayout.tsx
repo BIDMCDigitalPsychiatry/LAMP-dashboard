@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         display: "block",
         width: "100%",
+        padding: "0px 10px 0",
       },
     },
     headerRight: {
