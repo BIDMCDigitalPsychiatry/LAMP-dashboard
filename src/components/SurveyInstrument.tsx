@@ -196,7 +196,7 @@ const useStyles = makeStyles((theme) => ({
     margin: "-10px 0 50px 0",
   },
   radioGroup: {
-    marginTop: "30px",
+    // marginTop: "30px",
     marginLeft: -15,
     [theme.breakpoints.up("md")]: {
       marginTop: 0,
@@ -275,13 +275,19 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
-      height: "calc(100vh - 270px)",
-      overflow: "auto",
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
   chatDrawer: {},
   chatDrawerCustom: { minWidth: 411 },
+  questionScroll: {
+    marginTop: 30,
+    paddingLeft: 10,
+    [theme.breakpoints.down("xs")]: {
+      maxHeight: 300,
+      overflow: "auto",
+    },
+  },
 }))
 
 // Splice together all selected activities & their tags.
@@ -738,7 +744,7 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
             : ""}
         </Typography>
       </Box>
-      {component}
+      <Box className={classes.questionScroll}>{component}</Box>
     </Grid>
   )
 }
