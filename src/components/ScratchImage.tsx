@@ -6,7 +6,6 @@ import { ReactComponent as Background04 } from "../icons/scratch/Background-04.s
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
 import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
-import CircularProgress from "@material-ui/core/CircularProgress"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -81,7 +80,6 @@ export default function ScratchImage({ ...props }) {
   const [done, setDone] = useState(false)
   const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
   const [image, setImage] = useState(null)
-  const [isSVGLoaded, setSVGLoaded] = useState(false)
 
   let brush = new Image()
   let cover = new Image()
@@ -153,7 +151,6 @@ export default function ScratchImage({ ...props }) {
       brush.src = require("../icons/scratch/circle.svg")
       cover.src = require("../icons/scratch/ScratchCover.svg")
       cover.onload = () => {
-        setSVGLoaded(true)
         context.drawImage(cover, 0, 0, canvas.width, canvas.height)
         context.textAlign = "center"
         context.font = "bold 30px inter"
@@ -184,11 +181,6 @@ export default function ScratchImage({ ...props }) {
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
-        <Box display={isSVGLoaded ? "none" : "flex"} alignItems="center" className={classes.scratchCompleteMsg}>
-          <Box width={1}>
-            <CircularProgress />
-          </Box>
-        </Box>
         {canvasComponent}
         <Box className={classes.svgouter} style={{ display: visibility ? "block" : "none" }}>
           {image}

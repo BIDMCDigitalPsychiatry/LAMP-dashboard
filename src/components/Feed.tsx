@@ -426,7 +426,7 @@ export default function Feed({
   }
   function getTimeValue(date: Date) {
     var hours = date.getHours()
-    var minute = date.getMinutes()
+    var minute = isNaN(date.getMinutes()) ? 0 : date.getMinutes()
     var ampm = hours >= 12 ? " pm" : " am"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
