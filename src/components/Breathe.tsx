@@ -18,7 +18,11 @@ import {
   Toolbar,
   Grid,
   Fab,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core"
+import { CheckboxProps } from "@material-ui/core/Checkbox"
+
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -179,6 +183,16 @@ const useStyles = makeStyles((theme) => ({
   colorLine: { maxWidth: 115 },
 }))
 
+const PeachCheckbox = withStyles({
+  root: {
+    color: "#FEAC98",
+    "&$checked": {
+      color: "#FEAC98",
+    },
+  },
+  checked: {},
+})((props: CheckboxProps) => <Checkbox color="default" {...props} />)
+
 export default function Breathe({ ...props }) {
   const classes = useStyles()
   const [started, setStarted] = useState(false)
@@ -190,14 +204,16 @@ export default function Breathe({ ...props }) {
   const [progressLabel, setProgressLabel] = React.useState(4)
   const [isLoading, setIsLoading] = useState(false)
   const [inhale, setInhale] = useState(true)
+  const [playMusic, setPlayMusic] = useState(true)
+  const [audio, setAudio] = useState(new Audio("https://liquidmindmusic.com/mp3/breatheinme.mp3"))
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
   const handleNext = () => {
-    // if (started) setStarted(!started)
     _setTab(tab + 1)
     setIsLoading(true)
+    playMusic && tab < 1 ? audio.play() : audio.pause()
   }
 
   const videoLoaded = () => {
@@ -233,6 +249,7 @@ export default function Breathe({ ...props }) {
         setProgressValue(val > 100 ? 100 : val)
       } else {
         setStarted(!started)
+        setPlayMusic(false)
         handleNext()
       }
     }
@@ -283,6 +300,12 @@ export default function Breathe({ ...props }) {
                 <Fab className={classes.btnpeach} onClick={handleNext}>
                   Start
                 </Fab>
+              </Box>
+              <Box textAlign="center" mt={1}>
+                <FormControlLabel
+                  control={<PeachCheckbox checked={playMusic} onChange={() => setPlayMusic(!playMusic)} />}
+                  label="Play music with exercise"
+                />
               </Box>
             </Box>
           </Box>
