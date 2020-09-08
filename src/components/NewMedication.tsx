@@ -173,7 +173,6 @@ export default function NewMedication({ participant, ...props }) {
         endDate: endDate,
         completed: false,
       }
-      console.log(reminderTime)
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
@@ -283,7 +282,7 @@ export default function NewMedication({ participant, ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={() => setOpen(true)} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Add medication</Typography>
@@ -397,9 +396,9 @@ export default function NewMedication({ participant, ...props }) {
 
                 <Box display="flex" justifyContent="center" mb={5}>
                   <Box>
-                    <Button className={classes.iconButton} onClick={() => openAddDosageDialog()}>
+                    <ButtonBase className={classes.iconButton} onClick={() => openAddDosageDialog()}>
                       <AddCircleOutlineIcon /> Add dosage
-                    </Button>
+                    </ButtonBase>
                   </Box>
                 </Box>
 
@@ -488,9 +487,9 @@ export default function NewMedication({ participant, ...props }) {
                 </Box>
 
                 <Box textAlign="center" mt={5}>
-                  <Button className={classes.btnpeach} onClick={() => saveNewMedication()}>
+                  <ButtonBase className={classes.btnpeach} onClick={() => saveNewMedication()}>
                     Save
-                  </Button>
+                  </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={props.onComplete}>
@@ -591,9 +590,9 @@ export default function NewMedication({ participant, ...props }) {
                   />
                 </Box>
                 <Box textAlign="center" mt={5}>
-                  <Button className={classes.btnpeach} onClick={() => addDosage()}>
+                  <ButtonBase className={classes.btnpeach} onClick={() => addDosage()}>
                     Save
-                  </Button>
+                  </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={closeAddDosageDialog}>
@@ -619,17 +618,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: "rgba(0, 0, 0, 0.75)",
   },
-  addicon: { float: "left", color: "#E46759" },
-  likebtn: {
-    fontStyle: "italic",
-    padding: 6,
-    margin: "0 5px",
-    "& label": {
-      position: "absolute",
-      bottom: -18,
-      fontSize: 12,
-    },
-  },
   dialogtitle: { padding: 0 },
   active: {
     background: "#FFAC98",
@@ -637,13 +625,7 @@ const useStyles = makeStyles((theme) => ({
   linkButton: {
     padding: "15px 25px 15px 25px",
   },
-  timeHours: {
-    padding: "3px 10px 5px 0",
-    borderBottom: "#FFCEC2 solid 2px",
-    minWidth: 57,
-    "& div": { padding: 0, margin: 0 },
-    "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
-  },
+
   inputText: {
     borderBottom: "#FFCEC2 solid 1px",
     fontSize: 16,
@@ -653,28 +635,7 @@ const useStyles = makeStyles((theme) => ({
   },
   durationOuter: { margin: "30px 0" },
   weekdaysOuter: { marginBottom: 30 },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
-  menuPaper: {
-    background: "#F5F5F5",
-    boxShadow: "none",
-    marginTop: 54,
-    maxHeight: 336,
 
-    borderRadius: 0,
-    "& ul": { padding: 0 },
-    "& li": {
-      fontSize: 25,
-
-      padding: "0 12px",
-    },
-  },
   dialogueContent: {
     padding: "10px 20px 35px 20px",
     textAlign: "center",
@@ -689,13 +650,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     color: theme.palette.grey[500],
   },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
+
   journalStyle: {
     background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
     borderRadius: "10px",
@@ -740,7 +695,7 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
+
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -752,13 +707,8 @@ const useStyles = makeStyles((theme) => ({
       width: "calc(100% - 96px)",
     },
   },
-  backbtn: {
-    //  paddingLeft: 0, paddingRight: 0
-  },
-  todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
+
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
-  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
-  btnNav: { marginBottom: 45 },
   weekdays: {
     width: 32,
     height: 32,

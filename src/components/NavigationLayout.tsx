@@ -20,7 +20,6 @@ import {
   DialogActions,
   Typography,
   colors,
-  Link,
   Container,
 } from "@material-ui/core"
 
@@ -31,10 +30,8 @@ import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
-import { Link as RouterLink } from "react-router-dom"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
-import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -80,12 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbarinner: { minHeight: 95 },
     backbtn: {
-      // paddingLeft: 0,
-      // paddingRight: 0,
-      //position: "absolute",
-      [theme.breakpoints.up("md")]: {
-        // marginTop: 8,
-      },
+      [theme.breakpoints.up("md")]: {},
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
@@ -102,7 +94,7 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       position: "absolute",
       height: 50,
-      // zIndex: -1,
+
       [theme.breakpoints.up("md")]: {
         paddingLeft: 125,
       },

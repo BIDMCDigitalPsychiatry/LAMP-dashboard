@@ -92,6 +92,10 @@ function saveTodaysTip(id) {
   }
   LAMP.Type.setAttachment(id, "me", "lamp.feed.todays_tip", todayTip)
 }
+function saveBreatheMusicURL(id) {
+  let backgroundMusicURL = { URL: "https://liquidmindmusic.com/mp3/breatheinme.mp3" }
+  LAMP.Type.setAttachment(id, "me", "lamp.breathe.music_url", backgroundMusicURL)
+}
 
 export default function Participant({
   participant,
@@ -173,8 +177,8 @@ export default function Participant({
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
-
     saveTodaysTip(participant.id)
+    saveBreatheMusicURL(participant.id)
   }, [])
 
   const activeTab = (newTab) => {

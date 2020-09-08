@@ -112,26 +112,6 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    leftbarLogo: {
-      textAlign: "center",
-      paddingTop: 0,
-      "&:hover": { backgroundColor: "transparent !important" },
-      "& svg": {
-        maxWidth: 30,
-      },
-      [theme.breakpoints.down("sm")]: {
-        display: "none",
-      },
-      width: "100%",
-    },
-    paper: {
-      padding: "25px 20px",
-      boxShadow: "none",
-      background: "rgba(228, 103, 89, 0.95)",
-      borderRadius: 10,
-      "& h6": { color: "white", fontWeight: 300, fontSize: 16, "& span": { fontWeight: 500 } },
-      "& p": { color: "white", fontWeight: 300, marginTop: 10 },
-    },
   })
 )
 

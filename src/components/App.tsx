@@ -110,24 +110,7 @@ function AppRouter({ ...props }) {
         }))
       })
     }
-    let todayTip = {
-      Sleep_Tips: {
-        description: "Sleep Tips",
-        data: [
-          {
-            title: "Weekends",
-            text:
-              "Dr. Epstein explains that psychiatric and psychological problems can be related to sleep. To improve " +
-              "your sleep, try sticking to a sleep schedule even on the weekends. If you sleep in on the weekends, it " +
-              "will be difficult to get back to your routine during the week. Waking up within the same hour everyday " +
-              "can help both your physical and mental health over time. For the next seven days, try waking up at the " +
-              "same time every day.",
-            link:
-              "https://www.insider.com/things-that-are-not-helping-your-mental-health-2018-9#those-retail-therapy-sessions-might-make-you-feel-poor-in-more-ways-than-one-5",
-          },
-        ],
-      },
-    }
+
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 

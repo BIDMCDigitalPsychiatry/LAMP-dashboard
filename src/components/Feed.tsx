@@ -282,7 +282,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     thumbContainer: { maxWidth: 1055, margin: "0 auto" },
-    calendarCustom: {},
     day: {
       "& p": { fontSize: 10 },
     },

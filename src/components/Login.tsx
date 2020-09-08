@@ -4,7 +4,6 @@ import {
   Fab,
   Box,
   TextField,
-  Button,
   Slide,
   Menu,
   MenuItem,
@@ -49,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
       "& fieldset": { border: 0 },
     },
-    inputText: {},
+
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },

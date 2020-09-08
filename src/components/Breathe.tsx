@@ -22,6 +22,7 @@ import {
   Checkbox,
 } from "@material-ui/core"
 import { CheckboxProps } from "@material-ui/core/Checkbox"
+import LAMP from "lamp-core"
 
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
@@ -193,7 +194,24 @@ const PeachCheckbox = withStyles({
   checked: {},
 })((props: CheckboxProps) => <Checkbox color="default" {...props} />)
 
-export default function Breathe({ ...props }) {
+async function getBreatheMP3URL(participantId) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participantId || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.breathe.music_url").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participantId || ""] || []
+  )
+}
+
+export default function Breathe({ participant, ...props }) {
   const classes = useStyles()
   const [started, setStarted] = useState(false)
   const [progressValue, setProgressValue] = useState(0)
@@ -205,7 +223,7 @@ export default function Breathe({ ...props }) {
   const [isLoading, setIsLoading] = useState(false)
   const [inhale, setInhale] = useState(true)
   const [playMusic, setPlayMusic] = useState(true)
-  const [audio, setAudio] = useState(new Audio("https://liquidmindmusic.com/mp3/breatheinme.mp3"))
+  const [audio, setAudio] = useState(null)
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -233,6 +251,12 @@ export default function Breathe({ ...props }) {
   }
 
   useEffect(() => {
+    ;(async () => {
+      let breatheData = await getBreatheMP3URL(participant.id)
+      if (breatheData.URL) {
+        setAudio(new Audio(breatheData.URL))
+      }
+    })()
     let timer
     if (started) {
       setTimeout(setProgressUpdate, 1000)
@@ -258,7 +282,7 @@ export default function Breathe({ ...props }) {
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
-  const percentage = 66
+
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
