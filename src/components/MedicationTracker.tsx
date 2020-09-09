@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
-  Switch,
   Typography,
   Card,
   CardContent,
@@ -30,7 +29,6 @@ export default function MedicationTracker({ onComplete, ...props }) {
   const [open, setOpen] = React.useState(false)
   const [open2, setOpen2] = React.useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const [medications, setMedications] = useState<MedicationItem[]>([])
 
   useEffect(() => {
     enqueueSnackbar(`This is a demo only. Entries will not be saved.`, {
@@ -53,7 +51,6 @@ export default function MedicationTracker({ onComplete, ...props }) {
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
   const [selectedDate, handleDateChange] = useState(new Date())
   const [selectedDateEnd, handleDateChangeEnd] = useState(new Date())
-  const [medication, setmedication] = useState(null)
 
   return (
     <Container maxWidth="sm">
@@ -132,7 +129,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
           <div></div>
           <TextField autoFocus margin="normal" variant="outlined" label="Dose" />
           <Typography>Set reminder? </Typography>
-          <Switch color="primary"> </Switch>
+          {/* <Switch color="primary"> fsdfg</Switch> */}
           <div></div>
           <DatePicker label="Start Date" value={selectedDate} onChange={handleDateChange} animateYearScrolling />
           <div></div>

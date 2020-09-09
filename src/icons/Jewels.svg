@@ -1,45 +1,7 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-<polygon style="fill:#82D2FF;" points="256,0 34.297,128 34.297,384 256,512 477.703,384 477.703,128 "/>
-<polygon style="fill:#08B7FC;" points="256,256 256,0 34.297,128 "/>
-<path style="fill:#82D2FF;" d="M256,256L256,256L256,256z"/>
-<polygon style="fill:#006DFF;" points="34.297,128 34.297,384 256,256 "/>
-<polygon style="fill:#08B7FC;" points="477.703,128 477.703,128 256,256 256,256 477.703,384 477.703,384 "/>
-<polygon style="fill:#0050C0;" points="256,256 34.297,384 256,512 "/>
-<polygon style="fill:#006DFF;" points="256,512 477.703,384 256,256 "/>
-<polygon style="fill:#82D2FF;" points="381.121,328.238 381.121,183.762 256,111.523 130.879,183.762 130.879,328.238 256,400.477 
-	"/>
-<polygon style="fill:#55CBFF;" points="381.121,328.238 381.121,183.762 256,111.523 256,400.477 "/>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M69.4699 20.24H30.5299C30.1099 20.24 29.6999 20.41 29.3999 20.7L12.4399 37.49C11.8899 38.03 11.8499 38.91 12.3399 39.5L48.8499 83.24C49.4399 83.95 50.5399 83.95 51.1299 83.24L87.6499 39.5C88.1399 38.91 88.0999 38.03 87.5499 37.49L70.5999 20.7C70.2999 20.4 69.8999 20.24 69.4699 20.24Z" fill="#F9907B"/>
+<path d="M88.53 38.45H11.47L29.87 20.24H70.13L88.53 38.45Z" fill="#F9907B"/>
+<path d="M88.53 38.45H11.47L50 84.6L88.53 38.45Z" fill="#C75E5A"/>
+<path d="M67.3 38.45H32.7L50 84.6L67.3 38.45Z" fill="#F9907B"/>
+<path d="M67.3 38.45H32.7L50 20.24L67.3 38.45Z" fill="#FAC1B5"/>
 </svg>

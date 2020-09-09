@@ -1,11 +1,10 @@
 // Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, makeStyles } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
-import "typeface-roboto"
 
 // External Imports
 import DateFnsUtils from "@date-io/date-fns"
@@ -15,14 +14,27 @@ import "swagger-ui-react/swagger-ui.css"
 // Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
+import Messages from "./Messages"
+
 import Root from "./Root"
 import Researcher from "./Researcher"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
+import HopeBox from "./HopeBox"
+import TipNotification from "./TipNotification"
+
+// import VegaGraph from "./VegaGraph"
 
 /* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
 /* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
 /* TODO: /participant/:participant_id/messaging -> messaging */
+
+/*
+// colors as a gradient:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(101,206,191,1) 33%, rgba(255,119,91,1) 66%, rgba(134,182,255,1) 100%);
+// colors as a bar:
+background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%);
+*/
 
 //
 /*const srcLock = () => {
@@ -37,18 +49,34 @@ function PageTitle({ children, ...props }) {
   })
   return <React.Fragment />
 }
-
+function _patientMode() {
+  return LAMP.Auth._type === "participant"
+}
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+
+  // To set page titile for active tab for menu
+  let activeTab = (newTab?: any) => {
+    setState((state) => ({
+      ...state,
+      activeTab: newTab,
+    }))
+  }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
     authType: LAMP.Auth._type,
     lastDomain: undefined,
+    activeTab: null,
+    surveyDone: false,
+    welcome: true,
+    messageCount: 0,
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
+  const [showDemoMessage, setShowDemoMessage] = useState(true)
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -106,7 +134,7 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     closeSnackbar("admin")
-    closeSnackbar("demo")
+    if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
       enqueueSnackbar("Proceed with caution: you are logged in as the administrator.", {
         key: "admin",
@@ -119,7 +147,7 @@ function AppRouter({ ...props }) {
           </Button>
         ),
       })
-    } else if (state.auth?.serverAddress === "demo.lamp.digital") {
+    } else if (showDemoMessage && state.auth?.serverAddress === "demo.lamp.digital") {
       enqueueSnackbar(
         "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
         {
@@ -135,7 +163,30 @@ function AppRouter({ ...props }) {
         }
       )
     }
+    if (!!state.identity && state.authType === "participant") {
+      // console.log(messages(state.identity))
+      // setState((state) => ({
+      //   ...state,
+      //   messageCount:messages(state.identity)
+      // }))
+    }
   }, [state])
+
+  let messages = async (identity?: any) => {
+    let allMessages = Object.fromEntries(
+      (
+        await Promise.all(
+          [identity.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )
+    let x = (allMessages || {})[identity.id || ""] || []
+    allMessages = !Array.isArray(x) ? [] : x
+
+    return allMessages.filter((x) => x.type === "message" && x.from === "researcher").length
+  }
 
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity)
@@ -153,6 +204,7 @@ function AppRouter({ ...props }) {
         identity: null,
         auth: null,
         authType: null,
+        activeTab: null,
         lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
           ? undefined
           : state.auth.serverAddress,
@@ -203,6 +255,22 @@ function AppRouter({ ...props }) {
     return null
   }
 
+  const titlecase = (str) => {
+    return str
+      .toLowerCase()
+      .split("_")
+      .map(function (word) {
+        return word.replace(word[0], word[0].toUpperCase())
+      })
+      .join(" ")
+  }
+  const submitSurvey = () => {
+    setState((state) => ({
+      ...state,
+      surveyDone: true,
+    }))
+  }
+
   const promptInstall = () => {
     if (deferredPrompt === null) return
     deferredPrompt.prompt()
@@ -222,6 +290,51 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
+      <Route
+        exact
+        path="/participant/:id/messages"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Messages</PageTitle>
+            <NavigationLayout
+              id={props.match.params.id}
+              goBack={props.history.goBack}
+              onLogout={() => reset()}
+              activeTab="Messages"
+              sameLineTitle={true}
+            >
+              {/* <Messages goBack={props.history.goBack} /> */}
+              <Messages
+                style={{ margin: "0px -16px -16px -16px" }}
+                refresh={true}
+                participantOnly
+                participant={getParticipant(props.match.params.id).id}
+              />
+            </NavigationLayout>
+          </React.Fragment>
+        )}
+      />
+
+      <Route
+        exact
+        path="/participant/:id/hopebox"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <HopeBox goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/tip"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <TipNotification goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route
         exact
@@ -339,8 +452,18 @@ function AppRouter({ ...props }) {
                 title={`Patient ${getParticipant(props.match.params.id).id}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab={state.activeTab}
               >
-                <Participant participant={getParticipant(props.match.params.id)} />
+                <Participant
+                  participant={getParticipant(props.match.params.id)}
+                  activeTab={activeTab}
+                  tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
+                  surveyDone={state.surveyDone}
+                  submitSurvey={submitSurvey}
+                  setShowDemoMessage={(val) => {
+                    setShowDemoMessage(val)
+                  }}
+                />
               </NavigationLayout>
             </React.Fragment>
           )
@@ -372,6 +495,9 @@ export default function App({ ...props }) {
   return (
     <ThemeProvider
       theme={createMuiTheme({
+        typography: {
+          fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
+        },
         palette: {
           primary: blue,
           secondary: red,

@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Paper, List, ListItem, ListItemText, Box, useMediaQuery } from "@material-ui/core"
+import { Paper, List, ListItem, ListItemText, Box, useMediaQuery, useTheme } from "@material-ui/core"
 import {
   XYChart,
   theme,
@@ -17,9 +17,8 @@ import {
   PatternLines,
 } from "@data-ui/xy-chart"
 
-// TODO: ***IntervalSeries, (future) BarSeries/Histogram, ViolinPlot
-
 function PaperTooltip({ top, left, ...props }) {
+  left = window.innerWidth < left + 196 ? left - 196 : left
   return (
     <Box clone displayPrint="none">
       <Paper
@@ -80,14 +79,13 @@ const styles = {
   },
   tick: {
     stroke: "#bdbdbd",
-    length: 8,
+    length: 18,
     label: {
       bottom: {
         pointerEvents: "none",
         textAnchor: "middle",
-        fontWeight: 400,
         fill: "#757575",
-        fontSize: 10,
+        fontSize: "0.9em !important",
         letterSpacing: 0.4,
         dy: "0.25em",
       },
@@ -127,6 +125,7 @@ const styles = {
 export default withParentSize(function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const renderTooltip = ({ datum, series }) => (
     <List dense>
@@ -178,8 +177,8 @@ export default withParentSize(function Sparkline({ ...props }) {
           eventTriggerRefs={props.eventTriggerRefs}
           margin={{
             top: 8,
-            left: 8,
-            right: !!props.YAxisLabel ? 46 : 0,
+            left: 45,
+            right: 20,
             bottom: !!props.XAxisLabel ? 50 : 0,
           }}
           onClick={({ datum }) => !!props.onClick && props.onClick(datum)}
@@ -190,10 +189,10 @@ export default withParentSize(function Sparkline({ ...props }) {
           tooltipData={tooltipData}
           xScale={{
             type: "time",
-            domain:
-              props.data.length <= 0
-                ? undefined
-                : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
+            // domain:
+            //   props.data.length <= 0
+            //     ? undefined
+            //     : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
           }}
           yScale={{ type: "linear" }}
         >
@@ -206,22 +205,43 @@ export default withParentSize(function Sparkline({ ...props }) {
             orientation={["diagonal"]}
           />
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
-          {props.XAxisLabel && (
+          <YAxis
+            label={null}
+            numTicks={7}
+            rangePadding={4}
+            axisStyles={styles.axis}
+            tickStyles={styles.tick}
+            orientation="left"
+          />
+          {supportsSidebar ? (
             <XAxis
-              label={props.XAxisLabel}
-              numTicks={5}
+              label={null}
+              numTicks={7}
               rangePadding={4}
               axisStyles={styles.axis}
               tickStyles={styles.tick}
+              orientation="bottom"
+              tickLabelProps={(d, i) => ({
+                dy: 0,
+                dx: "-1.25em",
+                fontSize: 9,
+                angle: 0,
+              })}
             />
-          )}
-          {props.YAxisLabel && (
-            <YAxis
-              label={props.YAxisLabel}
-              numTicks={4}
+          ) : (
+            <XAxis
+              label={null}
+              tickLabelProps={(d, i) => ({
+                scaleToFit: supportsSidebar ? true : false,
+                dy: 0,
+                fontSize: 9,
+                angle: supportsSidebar ? 0 : 90,
+              })}
+              numTicks={7}
               rangePadding={4}
               axisStyles={styles.axis}
               tickStyles={styles.tick}
+              orientation="bottom"
             />
           )}
           <LineSeries
