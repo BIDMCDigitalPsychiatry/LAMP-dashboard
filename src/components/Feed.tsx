@@ -564,7 +564,7 @@ export default function Feed({
       let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
-      LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
+      //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedDays)
