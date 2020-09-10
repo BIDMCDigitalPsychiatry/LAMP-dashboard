@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Container,
   Typography,
@@ -13,9 +13,8 @@ import {
   IconButton,
   ButtonBase,
 } from "@material-ui/core"
-import { Link as RouterLink } from "react-router-dom"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
@@ -25,7 +24,6 @@ import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import { ReactComponent as InfoIcon } from "../icons/Info.svg"
 import Jewels from "./Jewels"
 import ScratchImage from "./ScratchImage"
-import MedicationTracker from "./MedicationTracker"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
@@ -166,6 +164,20 @@ export default function Manage({ participant, ...props }: { participant: Partici
   const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
 
+  useEffect(() => {
+    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
+    var eventer = window[eventMethod]
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
+    // Listen to message from child window
+    eventer(
+      messageEvent,
+      function (e) {
+        console.log("parent received message!:  ", e.data)
+        LAMP.ActivityEvent.create(participant.id, e.data).catch((e) => console.dir(e))
+      },
+      false
+    )
+  })
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
@@ -349,6 +361,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             ),
             Breathe: (
               <Breathe
+                participant={participant}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)

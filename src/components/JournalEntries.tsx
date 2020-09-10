@@ -7,16 +7,12 @@ import {
   Grid,
   IconButton,
   TextField,
-  Button,
   FormControl,
-  Container,
   AppBar,
   Toolbar,
   Icon,
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
   Link,
   Fab,
 } from "@material-ui/core"
@@ -41,7 +37,6 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 12,
     },
   },
-  dialogtitle: { padding: 0 },
   active: {
     background: "#FFAC98 !important",
   },
@@ -62,18 +57,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     color: theme.palette.grey[500],
   },
-  journalStyle: {
-    background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
-    borderRadius: "10px",
-    padding: "0px 20px 20px 20px",
-    textAlign: "justify",
-    marginBottom: 20,
-    "& span": {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: "12px",
-      lineHeight: "40px",
-    },
-  },
+
   textAreaControl: {
     width: "100%",
     marginTop: 35,
@@ -98,14 +82,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
-    marginTop: "50px",
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
+
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -121,6 +104,7 @@ const useStyles = makeStyles((theme) => ({
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   btnNav: { marginBottom: 0 },
+  dialogueCurve: { borderRadius: 10, maxWidth: 400 },
 }))
 
 async function getJournals(participantId) {
@@ -204,7 +188,7 @@ export default function JournalEntries({ participant, ...props }) {
                   id="standard-multiline-flexible"
                   multiline
                   rows={10}
-                  variant="outlined"
+                  autoFocus={true}
                   value={journalValue}
                   onChange={(event) => setJounalValue(event.target.value)}
                   classes={{ root: classes.textArea }}
@@ -228,7 +212,7 @@ export default function JournalEntries({ participant, ...props }) {
                     </IconButton>
                   </Box>
                 </Grid>
-                <Box textAlign="center">
+                <Box textAlign="center" pt={4} mt={2}>
                   <Fab className={classes.btnpeach} onClick={() => saveJournal()}>
                     Submit
                   </Fab>
@@ -242,7 +226,10 @@ export default function JournalEntries({ participant, ...props }) {
               scroll="paper"
               aria-labelledby="alert-dialog-slide-title"
               aria-describedby="alert-dialog-slide-description"
-              className={classes.dialogueStyle}
+              classes={{
+                root: classes.dialogueStyle,
+                paper: classes.dialogueCurve,
+              }}
             >
               <Box display="flex" justifyContent="flex-end">
                 <Box>

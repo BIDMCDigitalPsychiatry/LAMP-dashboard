@@ -1,22 +1,17 @@
 ﻿// Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
   Typography,
   makeStyles,
   Box,
   Grid,
   IconButton,
-  TextField,
-  Button,
   FormControl,
-  Container,
   AppBar,
   Toolbar,
   Icon,
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
   Link,
   List,
   ListItem,
@@ -41,6 +36,7 @@ import { ReactComponent as Savings } from "../icons/Savings.svg"
 import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -75,7 +71,9 @@ export default function NewGoal({ participant, ...props }) {
   const [units, setUnits] = useState([])
   const [goals, setGoals] = useState({})
   const [feeds, setFeeds] = useState({})
-
+  const { enqueueSnackbar } = useSnackbar()
+  const nameInput = useRef(null)
+  const valueInput = useRef(null)
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {
@@ -98,25 +96,31 @@ export default function NewGoal({ participant, ...props }) {
       setUnits(["hours", "minutes"])
       setGoalUnit("minutes")
     } else if (props.goalType == "Weight") {
-      setUnits(["mg", "g", "Kg"])
+      setUnits(["g", "Kg"])
       setGoalUnit("Kg")
     } else if (props.goalType == "Nutrition") {
-      setUnits(["mg", "g", "Ounces"])
+      setUnits(["mg", "g", "Ounces", "Pound", "Kg"])
       setGoalUnit("Ounces")
     } else if (props.goalType == "Sleep" || props.goalType == "Reading") {
       setUnits(["hours", "minutes"])
       setGoalUnit("hours")
     } else if (props.goalType == "Finances") {
-      setUnits(["$"])
+      setUnits(["$", "€"])
       setGoalUnit("$")
     } else if (props.goalType == "Medication") {
       setUnits(["mg", "g", "Ounces"])
       setGoalUnit("mg")
     } else {
-      setUnits(["Ounces", "mg", "g", "Kg", "hours", "minutes", "$"])
+      setUnits(["Ounces", "mg", "g", "Pound", "Kg", "hours", "minutes", "$", "€"])
       setGoalUnit("Ounces")
     }
   }, [])
+
+  const setGoalVal = (val) => {
+    if (val.length < 5) setGoalValue(val)
+    else return false
+    if (Number(val) < 0) setGoalValue(0)
+  }
 
   const handleClose = () => {
     setAnchorEl(null)
@@ -144,7 +148,7 @@ export default function NewGoal({ participant, ...props }) {
   const changeEndDate = (e: any) => {
     let msDiff = new Date(e).getTime() - startDate.getTime()
     setEndDate(new Date(e))
-    let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24))
+    let daysDiff = Math.floor(msDiff / (1000 * 60 * 60 * 24) + 1)
     setDuration(daysDiff)
   }
 
@@ -154,8 +158,7 @@ export default function NewGoal({ participant, ...props }) {
   }
 
   const saveNewGoal = async () => {
-    if (goalName != null && goalName != "" && goalValue != null && goalValue != "") {
-      console.log(goals)
+    if (validateNewGoal()) {
       let all = getData(goals)
       let goalDetails = {
         goalName: goalName,
@@ -173,10 +176,14 @@ export default function NewGoal({ participant, ...props }) {
       LAMP.Type.setAttachment(participant.id, "me", "lamp.goals", all)
       setGoals({ ...(goals || {}), [participant]: all })
       all = getData(feeds)
+      let text = goalName.substring(0, 20)
+      if (text.length != goalName.length) {
+        text = text.substr(0, Math.min(text.length, text.lastIndexOf(" "))) + "..."
+      }
       var item = {
         type: "goal",
         timeValue: reminderTime,
-        title: "Goal: " + goalName,
+        title: "Goal: " + text,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
         frequency: selectedFrequency,
@@ -190,6 +197,53 @@ export default function NewGoal({ participant, ...props }) {
       console.log(all)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
+      enqueueSnackbar(`The goal has been saved successfully.`, {
+        variant: "success",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
+    }
+  }
+
+  const validateNewGoal = () => {
+    if (goalName != null && goalName != "") {
+      if (goalValue != null && goalValue != "") {
+        if (duration != null && duration != 0) {
+          return true
+        } else {
+          enqueueSnackbar(`Please select duration.`, {
+            variant: "error",
+            anchorOrigin: {
+              vertical: "top",
+              horizontal: "right",
+            },
+            preventDuplicate: true,
+          })
+        }
+      } else {
+        valueInput.current.focus()
+        enqueueSnackbar(`Please enter goal value.`, {
+          variant: "error",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+          preventDuplicate: true,
+        })
+      }
+    } else {
+      nameInput.current.focus()
+      enqueueSnackbar(`Please enter goal name.`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
     }
   }
   const getData = (data) => {
@@ -225,7 +279,7 @@ export default function NewGoal({ participant, ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={() => setOpen(true)} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">New Goal</Typography>
@@ -238,9 +292,16 @@ export default function NewGoal({ participant, ...props }) {
               <Grid item>{goalIcon}</Grid>
               <Grid item>
                 <Box pl={2}>
-                  <InputBase placeholder="Goal Name" value={goalName} onChange={(e) => setGoalName(e.target.value)} />
+                  <InputBase
+                    inputProps={{
+                      maxLength: 50,
+                    }}
+                    placeholder="Goal Name"
+                    value={goalName}
+                    onChange={(e) => setGoalName(e.target.value)}
+                    inputRef={nameInput}
+                  />
                 </Box>
-                {/* <Typography variant="h4">Goal name</Typography> */}
               </Grid>
             </Grid>
             <Box className={classes.textfieldwrapper}>
@@ -252,12 +313,14 @@ export default function NewGoal({ participant, ...props }) {
                 }}
               >
                 <Grid container direction="row" justify="center" alignItems="center" className={classes.root}>
-                  <Grid item xs={2}>
+                  <Grid item xs={3}>
                     <InputBase
                       className={classes.inputText}
                       value={goalValue}
                       placeholder="0"
-                      onChange={(e) => setGoalValue(e.target.value)}
+                      type="number"
+                      onChange={(e) => setGoalVal(e.target.value)}
+                      inputRef={valueInput}
                     />
                   </Grid>
                   <Grid item xs={5} className={classes.goalUnit}>
@@ -386,25 +449,7 @@ export default function NewGoal({ participant, ...props }) {
                       </Grid>
                     </Grid>
                   </Box>
-                  {/* <Box width={1} mb={5}>
-                <Grid container direction="row" justify="space-between" alignItems="center">
-                  <Grid item xs={6}>
-                    <Typography variant="body2">Reminders</Typography>
-                  </Grid>
-                  <Grid item xs={6} className={classes.goalDetails}>
-                    <InputBase
-                      id="time"
-                      // label="Alarm clock"
-                      type="time"
-                      defaultValue="07:30"
-                      className={classes.reminderTime}
-                      inputProps={{
-                        step: 300, // 5 min
-                      }}
-                    />
-                  </Grid>
-                </Grid>
-              </Box> */}
+
                   <Box width={1} mb={5}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                       <Grid item xs={6}>
@@ -423,9 +468,9 @@ export default function NewGoal({ participant, ...props }) {
                 </Grid>
 
                 <Box textAlign="center" mt={4}>
-                  <Button className={classes.btnpeach} onClick={() => saveNewGoal()}>
+                  <ButtonBase className={classes.btnpeach} onClick={() => saveNewGoal()}>
                     Save
-                  </Button>
+                  </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={props.onComplete}>
@@ -493,18 +538,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: "rgba(0, 0, 0, 0.75)",
   },
-  addicon: { float: "left", color: "#E46759" },
-  likebtn: {
-    fontStyle: "italic",
-    padding: 6,
-    margin: "0 5px",
-    "& label": {
-      position: "absolute",
-      bottom: -18,
-      fontSize: 12,
-    },
-  },
-  dialogtitle: { padding: 0 },
+
   active: {
     background: "#FFAC98",
   },
@@ -523,19 +557,13 @@ const useStyles = makeStyles((theme) => ({
     borderBottom: "#FFCEC2 solid 2px",
     fontSize: 30,
     fontWeight: 600,
+
     color: "rgba(0, 0, 0, 0.75)",
-    "& input": { textAlign: "right" },
+    "& input": { textAlign: "right", appearance: "textfield" },
   },
   durationOuter: { margin: "30px 0" },
   weekdaysOuter: { marginBottom: 50 },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
+
   menuPaper: {
     background: "#F5F5F5",
     boxShadow: "none",
@@ -564,30 +592,11 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     color: theme.palette.grey[500],
   },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
-  journalStyle: {
-    background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
-    borderRadius: "10px",
-    padding: "0px 20px 20px 20px",
-    textAlign: "justify",
-    marginBottom: 20,
-    "& span": {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: "12px",
-      lineHeight: "40px",
-    },
-  },
+
   textAreaControl: {
     width: "100%",
     marginTop: 25,
     borderRadius: 10,
-    // "& p": { position: "absolute", bottom: 15, right: 0 },
   },
   textArea: {
     borderRadius: "10px",
@@ -615,7 +624,7 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
+
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -627,13 +636,9 @@ const useStyles = makeStyles((theme) => ({
       width: "calc(100% - 96px)",
     },
   },
-  backbtn: {
-    // paddingLeft: 0, paddingRight: 0
-  },
-  todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
+
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
-  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
-  btnNav: { marginBottom: 45 },
+
   weekdays: {
     width: 32,
     height: 32,

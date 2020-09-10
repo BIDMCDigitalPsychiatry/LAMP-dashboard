@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   sliderActionsContainer: {
-    position: "absolute",
+    // position: "absolute",
     textAlign: "center",
     width: "100%",
     left: 0,
@@ -196,7 +196,7 @@ const useStyles = makeStyles((theme) => ({
     margin: "-10px 0 50px 0",
   },
   radioGroup: {
-    marginTop: "30px",
+    // marginTop: "30px",
     marginLeft: -15,
     [theme.breakpoints.up("md")]: {
       marginTop: 0,
@@ -280,6 +280,14 @@ const useStyles = makeStyles((theme) => ({
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
   chatDrawer: {},
   chatDrawerCustom: { minWidth: 411 },
+  questionScroll: {
+    marginTop: 30,
+    paddingLeft: 10,
+    [theme.breakpoints.down("xs")]: {
+      height: "calc(100vh - 380px)",
+      overflow: "auto",
+    },
+  },
 }))
 
 // Splice together all selected activities & their tags.
@@ -728,9 +736,15 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
     <Grid>
       <Box className={classes.questionhead}>
         <Typography variant="h5">{text}</Typography>
-        <Typography variant="caption" display="block" gutterBottom></Typography>
+        <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
+          {type === "likert" || type === "boolean" || type === "list" || type === "select"
+            ? "(Select one)"
+            : type === "rating"
+            ? "(0 being terrible, 10 being excellent)"
+            : ""}
+        </Typography>
       </Box>
-      {component}
+      <Box className={classes.questionScroll}>{component}</Box>
     </Grid>
   )
 }
@@ -810,7 +824,7 @@ function Section({
   const [activeStep, setActiveStep] = useState(0)
   const classes = useStyles()
   const [tab, _setTab] = useState(0)
-  const [progressValue, setProgressValue] = useState(10)
+  const [progressValue, setProgressValue] = useState(100 / value.settings.length)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [index, setIndex] = useState(0)
   const [slideElements, setSlideElements] = useState(null)
@@ -847,22 +861,24 @@ function Section({
   const isError = (idx) => !isComplete(idx) && idx < activeStep
 
   const handleBack = () => {
-    setElementIn(false)
-    setTimeout(() => {
-      setIndex((index - 1) % slideElements.length)
-      setElementIn(true)
-    }, 500)
-    _setTab(tab - 1)
-    setProgressValue(progressValue - 100 / value.settings.length)
+    slideElementChange(0)
   }
+
+  const slideElementChange = (type: number) => {
+    if (!supportsSidebar) {
+      setElementIn(false)
+      setTimeout(() => {
+        type == 0 ? setIndex((index - 1) % slideElements.length) : setIndex((index + 1) % slideElements.length)
+        setElementIn(true)
+      }, 500)
+    }
+    type == 0 ? _setTab(tab - 1) : _setTab(tab + 1)
+    let val = type == 0 ? progressValue - 100 / value.settings.length : progressValue + 100 / value.settings.length
+    type == 0 ? setProgressValue(val > 0 ? val : 100 / value.settings.length) : setProgressValue(val > 100 ? 100 : val)
+  }
+
   const handleNext = () => {
-    setElementIn(false)
-    setTimeout(() => {
-      setIndex((index + 1) % slideElements.length)
-      setElementIn(true)
-    }, 500)
-    _setTab(tab + 1)
-    setProgressValue(progressValue + 100 / value.settings.length)
+    slideElementChange(1)
   }
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -908,13 +924,16 @@ function Section({
             <Box>{slideElements ? slideElements[index] : null}</Box>
           </Slide>
           <Box className={classes.surveyQuestionNav}>
-            {/* {!supportsSidebar && index > 0 && (
+            {!supportsSidebar && index > 0 && (
               <Fab onClick={handleBack} className={classes.btnBack}>
                 Back
               </Fab>
-            )} */}
+            )}
             {!supportsSidebar && (
-              <Fab onClick={index === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
+              <Fab
+                onClick={elementIn && (index === value.settings.length - 1 ? onComplete : handleNext)}
+                className={classes.btngreen}
+              >
                 {index === value.settings.length - 1
                   ? toolBarBack && !!prefillData
                     ? !!prefillTimestamp
@@ -946,6 +965,22 @@ function SurveyQuestions({
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
   const classes = useStyles()
 
+  const validator = (response) => {
+    for (let section of response) {
+      if (section === undefined)
+        if (!!partialValidationOnly) continue
+        else return false
+      for (let question of section) if (question === undefined) return false
+    }
+    return true
+  }
+  const postSubmit = (response) => {
+    console.log(validator(response))
+    if (!validate) onResponse(response, prefillTimestamp)
+    else if (validate && validator(response)) onResponse(response, prefillTimestamp)
+    else if (validate && !validator(response)) onValidationFailure()
+  }
+
   return (
     <div className={classes.root}>
       {((content || {}).sections || []).map((x, idx) => (
@@ -956,7 +991,7 @@ function SurveyQuestions({
           prefillTimestamp={prefillTimestamp}
           type={type}
           onComplete={() =>
-            onResponse(
+            postSubmit(
               Array.from({
                 ...responses.current,
                 length: content.sections.length,
@@ -992,8 +1027,8 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
     <Grid container direction="row">
       <Grid item style={{ width: "100%" }}>
         <SurveyQuestions
-          validate
-          partialValidationOnly
+          validate={true}
+          partialValidationOnly={false}
           content={survey}
           toolBarBack={fromPrevent}
           prefillData={!!survey ? survey.prefillData : undefined}

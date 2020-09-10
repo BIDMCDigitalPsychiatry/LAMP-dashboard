@@ -20,7 +20,6 @@ import {
   DialogActions,
   Typography,
   colors,
-  Link,
   Container,
 } from "@material-ui/core"
 
@@ -31,10 +30,8 @@ import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
-import { Link as RouterLink } from "react-router-dom"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
-import BottomMenu from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -64,10 +61,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbardashboard: {
       minHeight: 75,
-      padding: "0 10px",
+      padding: "15px 10px 0",
       [theme.breakpoints.down("xs")]: {
         display: "block",
         width: "100%",
+        padding: "0px 10px 0",
       },
     },
     headerRight: {
@@ -79,12 +77,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     toolbarinner: { minHeight: 95 },
     backbtn: {
-      // paddingLeft: 0,
-      // paddingRight: 0,
-      //position: "absolute",
-      [theme.breakpoints.up("md")]: {
-        // marginTop: 8,
-      },
+      [theme.breakpoints.up("md")]: {},
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
@@ -101,7 +94,7 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       position: "absolute",
       height: 50,
-      // zIndex: -1,
+
       [theme.breakpoints.up("md")]: {
         paddingLeft: 125,
       },
@@ -109,6 +102,7 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 24,
       },
     },
+    scroll: { position: "absolute", width: "100%", height: "100%", overflowY: "scroll" },
   })
 )
 
@@ -147,7 +141,7 @@ export default function NavigationLayout({
       : classnames(classes.toolbar, classes.toolbardashboard)
 
   return (
-    <Box>
+    <Box className={classes.scroll}>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
@@ -263,6 +257,7 @@ export default function NavigationLayout({
           paddingBottom: 56,
           width: "100%",
           overflowY: "auto",
+          overflow: "hidden",
         }}
       >
         <ResponsiveMargin

@@ -30,6 +30,7 @@ import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -164,7 +165,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const [openData, setOpenData] = React.useState(false)
   const [surveyType, setSurveyType] = useState(null)
   const [questionCount, setQuestionCount] = useState(0)
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)

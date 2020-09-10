@@ -17,13 +17,9 @@ import {
   CardActionArea,
   Card,
   Link,
-  Fab,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
-import classnames from "classnames"
 import TipNotification from "./TipNotification"
 
 const useStyles = makeStyles((theme) => ({

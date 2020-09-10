@@ -2,12 +2,9 @@ import React, { useState } from "react"
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
 import GridList from "@material-ui/core/GridList"
 import GridListTile from "@material-ui/core/GridListTile"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
-import { ReactComponent as Camera } from "../icons/Camera.svg"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
 import { ReactComponent as Saved } from "../icons/Saved.svg"
 import {
-  Input,
   Typography,
   AppBar,
   Toolbar,
@@ -40,9 +37,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "100%",
       padding: "0 10px",
     },
-    backbtn: { 
-      // paddingLeft: 0, paddingRight: 0 
-    },
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
@@ -55,23 +49,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
 
-    addbtnmain: {
-      textAlign: "center",
-      "& button": { padding: 0 },
-      "& h5": {
-        fontWeight: 600,
-        fontSize: 16,
-        color: "rgba(0, 0, 0, 0.75)",
-        marginLeft: 10,
-        display: "inline-block",
-      },
-    },
-    journalhd: {
-      margin: "20px 0 15px 0",
-    },
-
-    addicon: { float: "left", color: "#E46759" },
-    sample: {},
     hopeHEader: { background: "#FBF1EF", boxShadow: "none", borderBottom: "#fff solid 65px" },
     HopeHeadImage: { marginBottom: -80, marginLeft: "auto", marginRight: "auto" },
     hopeBoxContent: {
@@ -120,11 +97,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& p": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", lineHeight: "19px" },
       "& img": { width: "100%" },
     },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+
     savedMsg: {
       position: "absolute",
       top: 0,
@@ -169,7 +142,7 @@ export default function HopeBoxSelect({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" className={classes.hopeHEader}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton color="default" className={classes.backbtn} onClick={props.onComplete} aria-label="Menu">
+          <IconButton color="default" onClick={props.onComplete} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Hope Box</Typography>
@@ -182,9 +155,7 @@ export default function HopeBoxSelect({ ...props }) {
           {" "}
           Hope Box content will show up in your feed from time to time to inspire and uplift you.
         </Typography>
-        {/* <Box textAlign="center" mt={5} pt={2}>
-          <ButtonBase className={classes.btnpeach}>Add an image</ButtonBase>
-        </Box>*/}
+
         <Box textAlign="center" mt={5} pt={2}>
           <ImageUploader
             {...props}
@@ -205,20 +176,6 @@ export default function HopeBoxSelect({ ...props }) {
           <Link className={classes.linkpeach}>View my Hope Box</Link>
         </Box>
       </Box>
-      {/* <Grid container xs={12} spacing={0} className={classes.journalhd} alignItems="center" justify="center">
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton>
-            <AddCircleOutlineIcon className={classes.addicon} />
-          </IconButton>
-          <Typography variant="h5">Add a quote </Typography>
-        </Grid>
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton>
-            <Camera className={classes.addicon} />
-          </IconButton>
-          <Typography variant="h5">Add an image</Typography>
-        </Grid>
-      </Grid> */}
 
       <GridList cellHeight={180} spacing={2} className={classes.gridList} cols={3}>
         {tileData.map((tile) => (

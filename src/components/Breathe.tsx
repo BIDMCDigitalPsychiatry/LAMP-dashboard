@@ -18,7 +18,12 @@ import {
   Toolbar,
   Grid,
   Fab,
+  FormControlLabel,
+  Checkbox,
 } from "@material-ui/core"
+import { CheckboxProps } from "@material-ui/core/Checkbox"
+import LAMP from "lamp-core"
+
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -27,6 +32,7 @@ import Link from "@material-ui/core/Link"
 import classnames from "classnames"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
+import CircularProgress from "@material-ui/core/CircularProgress"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -178,7 +184,34 @@ const useStyles = makeStyles((theme) => ({
   colorLine: { maxWidth: 115 },
 }))
 
-export default function Breathe({ ...props }) {
+const PeachCheckbox = withStyles({
+  root: {
+    color: "#FEAC98",
+    "&$checked": {
+      color: "#FEAC98",
+    },
+  },
+  checked: {},
+})((props: CheckboxProps) => <Checkbox color="default" {...props} />)
+
+async function getBreatheMP3URL(participantId) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participantId || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.breathe.music_url").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participantId || ""] || []
+  )
+}
+
+export default function Breathe({ participant, ...props }) {
   const classes = useStyles()
   const [started, setStarted] = useState(false)
   const [progressValue, setProgressValue] = useState(0)
@@ -187,15 +220,24 @@ export default function Breathe({ ...props }) {
   const [status, setStatus] = useState("Yes")
   const [progress, setProgress] = React.useState(100)
   const [progressLabel, setProgressLabel] = React.useState(4)
-  // const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [inhale, setInhale] = useState(true)
+  const [playMusic, setPlayMusic] = useState(true)
+  const [audio, setAudio] = useState(null)
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
   const handleNext = () => {
-    setStarted(!started)
     _setTab(tab + 1)
+    setIsLoading(true)
+    playMusic && tab < 1 ? audio.play() : audio.pause()
+  }
+
+  const videoLoaded = () => {
+    setIsLoading(false)
+    setStarted(!started)
+    setProgressUpdate()
   }
   const setProgressUpdate = () => {
     let val = progressLabel - 1
@@ -207,14 +249,14 @@ export default function Breathe({ ...props }) {
       setProgressLabel(val)
     }
   }
-  useEffect(() => {
-    if (started) {
-      setTimeout(setProgressUpdate, 1000)
-      //setProgressUpdate()
-    }
-  }, [started])
 
   useEffect(() => {
+    ;(async () => {
+      let breatheData = await getBreatheMP3URL(participant.id)
+      if (breatheData.URL) {
+        setAudio(new Audio(breatheData.URL))
+      }
+    })()
     let timer
     if (started) {
       setTimeout(setProgressUpdate, 1000)
@@ -226,11 +268,12 @@ export default function Breathe({ ...props }) {
   useEffect(() => {
     let timer
     if (started) {
-      console.log(progressValue)
       if (progressValue < 100) {
         let val = progressValue + 0.8
         setProgressValue(val > 100 ? 100 : val)
       } else {
+        setStarted(!started)
+        setPlayMusic(false)
         handleNext()
       }
     }
@@ -239,7 +282,7 @@ export default function Breathe({ ...props }) {
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
-  const percentage = 66
+
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
@@ -282,6 +325,12 @@ export default function Breathe({ ...props }) {
                   Start
                 </Fab>
               </Box>
+              <Box textAlign="center" mt={1}>
+                <FormControlLabel
+                  control={<PeachCheckbox checked={playMusic} onChange={() => setPlayMusic(!playMusic)} />}
+                  label="Play music with exercise"
+                />
+              </Box>
             </Box>
           </Box>
         </Slide>
@@ -294,58 +343,70 @@ export default function Breathe({ ...props }) {
             justify="center"
             style={{ minHeight: "80vh" }}
           >
+            {isLoading && (
+              <Box alignItems="center">
+                <Box width={1}>
+                  <CircularProgress />
+                </Box>
+              </Box>
+            )}
             {/* //   {isLoading && ( */}
             <Grid item className={classes.videoNav}>
               <video
                 src="videos/Lotus.mp4"
                 autoPlay={true}
+                onLoadedData={() => {
+                  videoLoaded()
+                }}
                 loop
-                preload={"auto"}
+                preload={"metadata"}
                 //   onLoadEnd={() =>setIsLoading(false)}
               ></video>
-
-              <Box className={classes.inhale_exhale}>
-                <Typography variant="overline" className={classes.ExhaleContainer}>
-                  Exhale
-                </Typography>
-                <Typography variant="overline" className={classes.InhaleContainer}>
-                  Inhale
-                </Typography>
-              </Box>
+              {started && (
+                <Box className={classes.inhale_exhale}>
+                  <Typography variant="overline" className={classes.ExhaleContainer}>
+                    Exhale
+                  </Typography>
+                  <Typography variant="overline" className={classes.InhaleContainer}>
+                    Inhale
+                  </Typography>
+                </Box>
+              )}
             </Grid>
-            {/* //   )} */}
-            <Box style={{ width: "100px", height: "100px" }}>
-              {inhale && (
-                <CircularProgressbar
-                  value={progress}
-                  text={`${progressLabel}`}
-                  strokeWidth={8}
-                  styles={buildStyles({
-                    strokeLinecap: "butt",
-                    pathColor: "#E46759",
-                    textColor: "#BC453D",
-                    trailColor: "#FFAC98",
-                    textSize: "32px",
-                    pathTransitionDuration: 1,
-                  })}
-                />
-              )}
-              {!inhale && (
-                <CircularProgressbar
-                  value={progress}
-                  text={`${progressLabel}`}
-                  strokeWidth={8}
-                  styles={buildStyles({
-                    strokeLinecap: "butt",
-                    pathColor: "#E46759",
-                    textColor: "#BC453D",
-                    trailColor: "#FFAC98",
-                    textSize: "32px",
-                    pathTransitionDuration: 1,
-                  })}
-                />
-              )}
-            </Box>
+            {started && (
+              <Box style={{ width: "100px", height: "100px" }}>
+                {inhale && (
+                  <CircularProgressbar
+                    value={progress}
+                    text={`${progressLabel}`}
+                    strokeWidth={8}
+                    styles={buildStyles({
+                      strokeLinecap: "butt",
+                      pathColor: "#E46759",
+                      textColor: "#BC453D",
+                      trailColor: "#FFAC98",
+                      textSize: "45px",
+                      pathTransitionDuration: 1,
+                    })}
+                  />
+                )}
+                {!inhale && (
+                  <CircularProgressbar
+                    value={progress}
+                    text={`${progressLabel}`}
+                    strokeWidth={8}
+                    styles={buildStyles({
+                      strokeLinecap: "butt",
+                      pathColor: "#E46759",
+                      textColor: "#BC453D",
+                      trailColor: "#FFAC98",
+                      textSize: "45px",
+                      pathTransitionDuration: 1,
+                    })}
+                  />
+                )}
+              </Box>
+            )}
           </Grid>
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>

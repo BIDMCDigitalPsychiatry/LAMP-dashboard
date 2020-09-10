@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import {
   Typography,
   makeStyles,
@@ -35,6 +35,7 @@ import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP from "lamp-core"
 import Autocomplete from "@material-ui/lab/Autocomplete"
+import { useSnackbar } from "notistack"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -71,6 +72,10 @@ export default function NewMedication({ participant, ...props }) {
   const [dosageTime, setDosageTime] = useState(new Date())
   const [medications, setMedications] = useState({})
   const [feeds, setFeeds] = useState({})
+  const { enqueueSnackbar } = useSnackbar()
+  const nameInput = useRef(null)
+  const doseNameInput = useRef(null)
+  const doseValueInput = useRef(null)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -136,7 +141,7 @@ export default function NewMedication({ participant, ...props }) {
   }
 
   const saveNewMedication = async () => {
-    if (medicationName != null && medicationName != "") {
+    if (validateNewMedication()) {
       let all = getDetails(medications)
       let medicationDetails = {
         medicationName: medicationName,
@@ -151,10 +156,14 @@ export default function NewMedication({ participant, ...props }) {
       LAMP.Type.setAttachment(participant.id, "me", "lamp.medications", all)
       setMedications({ ...(medications || {}), [participant]: all })
       all = getDetails(feeds)
+      let text = medicationName || "".substring(0, 20)
+      if (text.length != medicationName || "".length) {
+        text = text.substr(0, Math.min(text.length, text.lastIndexOf(" "))) + "..."
+      }
       var item = {
         type: "medication",
         timeValue: reminderTime,
-        title: "Medication: " + medicationName,
+        title: "Medication: " + text,
         icon: "Medication",
         description: "test description",
         group: "manage",
@@ -167,6 +176,69 @@ export default function NewMedication({ participant, ...props }) {
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
+      enqueueSnackbar(`The medication has been saved successfully.`, {
+        variant: "success",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
+    }
+  }
+
+  const validateNewMedication = () => {
+    if (medicationName != null && medicationName != "") {
+      if (duration != null && duration != 0) {
+        return true
+      } else {
+        enqueueSnackbar(`Please select duration.`, {
+          variant: "error",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+          preventDuplicate: true,
+        })
+      }
+    } else {
+      nameInput.current.focus()
+      enqueueSnackbar(`Please select medication name.`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
+    }
+  }
+
+  const validateDosage = () => {
+    if (dosageName != null && dosageName != "") {
+      if (dosageValue != null && dosageValue != "") {
+        return true
+      } else {
+        doseValueInput.current.focus()
+        enqueueSnackbar(`Please enter dose.`, {
+          variant: "error",
+          anchorOrigin: {
+            vertical: "top",
+            horizontal: "right",
+          },
+          preventDuplicate: true,
+        })
+      }
+    } else {
+      doseNameInput.current.focus()
+      enqueueSnackbar(`Please enter name.`, {
+        variant: "error",
+        anchorOrigin: {
+          vertical: "top",
+          horizontal: "right",
+        },
+        preventDuplicate: true,
+      })
     }
   }
 
@@ -188,11 +260,13 @@ export default function NewMedication({ participant, ...props }) {
   ]
 
   const addDosage = () => {
-    var dosage = { Name: dosageName, Value: dosageValue, Time: getTimeValue(dosageTime) }
-    var list = dosageList
-    list = list.concat(dosage)
-    setDosageList(list)
-    setOpenAddDosage(false)
+    if (validateDosage()) {
+      var dosage = { Name: dosageName, Value: dosageValue, Time: getTimeValue(dosageTime) }
+      var list = dosageList
+      list = list.concat(dosage)
+      setDosageList(list)
+      setOpenAddDosage(false)
+    }
   }
 
   const openAddDosageDialog = () => {
@@ -208,166 +282,176 @@ export default function NewMedication({ participant, ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={() => setOpen(true)} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Add medication</Typography>
         </Toolbar>
       </AppBar>
-      <Container>
-        <Box display="flex" className={classes.medicationHeader}>
-          <Box flexShrink={1}>{<SearchIcon />}</Box>
-          <Box width="100%" pl={2}>
-            <Autocomplete
-              id="free-solo-demo"
-              classes={{ popper: classes.autofillpopper, paper: classes.autofillpaper }}
-              freeSolo
-              value={medicationName}
-              onChange={(event: any, newValue: any) => {
-                setMedicationName(newValue)
-              }}
-              options={medicationList.map((option) => option.title)}
-              renderInput={(params) => (
-                <TextField {...params} className={classes.autofill} placeholder="Medication name" variant="outlined" />
-              )}
-            />
-          </Box>
-        </Box>
-        <Box className={classes.textfieldwrapper}>
-          <FormControl
-            component="fieldset"
-            classes={{
-              root: classes.textAreaControl,
-            }}
-          >
-            <Grid item xs={12}>
-              <Grid
-                container
-                direction="row"
-                justify="space-between"
-                alignItems="center"
-                className={classes.durationOuter}
-              >
-                {frequency.map((value) => (
-                  <Grid key={value} item>
-                    <ButtonBase
-                      focusRipple
-                      className={
-                        value == selectedFrequency ? classes.duration + " " + classes.durationActive : classes.duration
-                      }
-                      onClick={() => setSelectedFrequency(value)}
-                    >
-                      {value}
-                    </ButtonBase>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Grid
-                container
-                direction="row"
-                justify="space-between"
-                alignItems="center"
-                className={classes.weekdaysOuter}
-              >
-                {weekdays.map((value) => (
-                  <Grid key={value} item>
-                    <ButtonBase
-                      focusRipple
-                      className={
-                        selectedDays.includes(value) == true
-                          ? classes.weekdays + " " + classes.weekdaysActive
-                          : classes.weekdays
-                      }
-                      onClick={() => setSelectedDaysValue(value)}
-                    >
-                      {value.substr(0, 1)}
-                    </ButtonBase>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-
-            {dosageList.map((dosage) => (
-              <Box width={1} mb={2}>
-                <Grid container direction="row" justify="space-between" alignItems="center">
-                  <Grid item xs={4}>
-                    <Typography variant="body2">{dosage.Name}</Typography>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography variant="body2" align="right">
-                      {dosage.Value}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={4} className={classes.medicationDetails}>
-                    <Typography variant="body2" align="right">
-                      {dosage.Time}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-            ))}
-
-            <Box display="flex" justifyContent="center" mb={5}>
-              <Box>
-                <Button className={classes.iconButton} onClick={() => openAddDosageDialog()}>
-                  <AddCircleOutlineIcon /> Add dosage
-                </Button>
+      <Box px={2}>
+        <Grid container direction="row" justify="center" alignItems="flex-start">
+          <Grid item lg={4} sm={10} xs={12}>
+            <Box display="flex" className={classes.medicationHeader}>
+              <Box flexShrink={1}>{<SearchIcon />}</Box>
+              <Box width="100%" pl={2}>
+                <Autocomplete
+                  id="free-solo-demo"
+                  classes={{ popper: classes.autofillpopper, paper: classes.autofillpaper }}
+                  freeSolo
+                  value={medicationName}
+                  onChange={(event: any, newValue: any) => {
+                    setMedicationName(newValue)
+                  }}
+                  ref={nameInput}
+                  options={medicationList.map((option) => option.title)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      className={classes.autofill}
+                      placeholder="Medication name"
+                      variant="outlined"
+                    />
+                  )}
+                />
               </Box>
             </Box>
+            <Box className={classes.textfieldwrapper}>
+              <FormControl
+                component="fieldset"
+                classes={{
+                  root: classes.textAreaControl,
+                }}
+              >
+                <Grid item xs={12}>
+                  <Grid
+                    container
+                    direction="row"
+                    justify="space-between"
+                    alignItems="center"
+                    className={classes.durationOuter}
+                  >
+                    {frequency.map((value) => (
+                      <Grid key={value} item>
+                        <ButtonBase
+                          focusRipple
+                          className={
+                            value == selectedFrequency
+                              ? classes.duration + " " + classes.durationActive
+                              : classes.duration
+                          }
+                          onClick={() => setSelectedFrequency(value)}
+                        >
+                          {value}
+                        </ButtonBase>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Grid>
 
-            <Box width={1} mb={5}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
-                <Grid item xs={6}>
-                  <Typography variant="body2">Start date</Typography>
+                <Grid item xs={12}>
+                  <Grid
+                    container
+                    direction="row"
+                    justify="space-between"
+                    alignItems="center"
+                    className={classes.weekdaysOuter}
+                  >
+                    {weekdays.map((value) => (
+                      <Grid key={value} item>
+                        <ButtonBase
+                          focusRipple
+                          className={
+                            selectedDays.includes(value) == true
+                              ? classes.weekdays + " " + classes.weekdaysActive
+                              : classes.weekdays
+                          }
+                          onClick={() => setSelectedDaysValue(value)}
+                        >
+                          {value.substr(0, 1)}
+                        </ButtonBase>
+                      </Grid>
+                    ))}
+                  </Grid>
                 </Grid>
-                <Grid item xs={6} className={classes.medicationDetails}>
-                  <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
-                    {startDate != null ? getDateString(startDate) : getDateString(new Date())}
-                  </Typography>
-                  <DatePicker
-                    autoOk
-                    open={startDateOpen}
-                    onOpen={() => setStartDateOpen(true)}
-                    onClose={() => setStartDateOpen(false)}
-                    value={startDate}
-                    onChange={(e) => changeStartDate(e)}
-                    TextFieldComponent={() => null}
-                    disableToolbar={true}
-                    okLabel=""
-                    cancelLabel=""
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-            <Box width={1} mb={5}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
-                <Grid item xs={6}>
-                  <Typography variant="body2">Duration</Typography>
-                </Grid>
-                <Grid item xs={6} className={classes.medicationDetails}>
-                  <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
-                    {duration} days
-                  </Typography>
-                  <DatePicker
-                    autoOk
-                    open={endDateOpen}
-                    onOpen={() => setEndDateOpen(true)}
-                    onClose={() => setEndDateOpen(false)}
-                    value={date}
-                    onChange={(e) => changeEndDate(e)}
-                    TextFieldComponent={() => null}
-                    disableToolbar={true}
-                    okLabel=""
-                    cancelLabel=""
-                    minDate={startDate}
-                  />
-                </Grid>
-              </Grid>
-            </Box>
-            {/* <Box width={1} mb={5}>
+
+                {dosageList.map((dosage) => (
+                  <Box width={1} mb={2}>
+                    <Grid container direction="row" justify="space-between" alignItems="center">
+                      <Grid item xs={4}>
+                        <Typography variant="body2">{dosage.Name}</Typography>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography variant="body2" align="right">
+                          {dosage.Value}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4} className={classes.medicationDetails}>
+                        <Typography variant="body2" align="right">
+                          {dosage.Time}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                ))}
+
+                <Box display="flex" justifyContent="center" mb={5}>
+                  <Box>
+                    <ButtonBase className={classes.iconButton} onClick={() => openAddDosageDialog()}>
+                      <AddCircleOutlineIcon /> Add dosage
+                    </ButtonBase>
+                  </Box>
+                </Box>
+
+                <Box width={1} mb={5}>
+                  <Grid container direction="row" justify="space-between" alignItems="center">
+                    <Grid item xs={6}>
+                      <Typography variant="body2">Start date</Typography>
+                    </Grid>
+                    <Grid item xs={6} className={classes.medicationDetails}>
+                      <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
+                        {startDate != null ? getDateString(startDate) : getDateString(new Date())}
+                      </Typography>
+                      <DatePicker
+                        autoOk
+                        open={startDateOpen}
+                        onOpen={() => setStartDateOpen(true)}
+                        onClose={() => setStartDateOpen(false)}
+                        value={startDate}
+                        onChange={(e) => changeStartDate(e)}
+                        TextFieldComponent={() => null}
+                        disableToolbar={true}
+                        okLabel=""
+                        cancelLabel=""
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+                <Box width={1} mb={5}>
+                  <Grid container direction="row" justify="space-between" alignItems="center">
+                    <Grid item xs={6}>
+                      <Typography variant="body2">Duration</Typography>
+                    </Grid>
+                    <Grid item xs={6} className={classes.medicationDetails}>
+                      <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
+                        {duration} days
+                      </Typography>
+                      <DatePicker
+                        autoOk
+                        open={endDateOpen}
+                        onOpen={() => setEndDateOpen(true)}
+                        onClose={() => setEndDateOpen(false)}
+                        value={date}
+                        onChange={(e) => changeEndDate(e)}
+                        TextFieldComponent={() => null}
+                        disableToolbar={true}
+                        okLabel=""
+                        cancelLabel=""
+                        minDate={startDate}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+                {/* <Box width={1} mb={5}>
                 <Grid container direction="row" justify="space-between" alignItems="center">
                   <Grid item xs={6}>
                     <Typography variant="body2">Reminders</Typography>
@@ -386,125 +470,140 @@ export default function NewMedication({ participant, ...props }) {
                   </Grid>
                 </Grid>
               </Box> */}
-            <Box width={1} mb={5}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
-                <Grid item xs={6}>
-                  <Typography variant="body2">Reminders</Typography>
-                </Grid>
-                <Grid item xs={6} className={classes.medicationDetails}>
-                  <TimePicker
-                    value={reminderTime}
-                    onChange={(e) => changeReminderTime(e)}
-                    disableToolbar={false}
-                    className={classes.reminderTime}
-                  />
-                </Grid>
+                <Box width={1} mb={5}>
+                  <Grid container direction="row" justify="space-between" alignItems="center">
+                    <Grid item xs={6}>
+                      <Typography variant="body2">Reminders</Typography>
+                    </Grid>
+                    <Grid item xs={6} className={classes.medicationDetails}>
+                      <TimePicker
+                        value={reminderTime}
+                        onChange={(e) => changeReminderTime(e)}
+                        disableToolbar={false}
+                        className={classes.reminderTime}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <Box textAlign="center" mt={5}>
+                  <ButtonBase className={classes.btnpeach} onClick={() => saveNewMedication()}>
+                    Save
+                  </ButtonBase>
+                </Box>
+                <Box textAlign="center" width={1} mt={3}>
+                  <Link className={classes.linkpeach} onClick={props.onComplete}>
+                    Cancel
+                  </Link>
+                </Box>
+              </FormControl>
+            </Box>
+            <Dialog
+              open={open}
+              onClose={() => setOpen(false)}
+              scroll="paper"
+              aria-labelledby="alert-dialog-slide-title"
+              aria-describedby="alert-dialog-slide-description"
+              className={classes.dialogueStyle}
+            >
+              <Box display="flex" justifyContent="flex-end">
+                <Box>
+                  <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+              </Box>
+
+              <DialogContent className={classes.dialogueContent}>
+                <Typography variant="h4">Leaving so soon?</Typography>
+                <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+              </DialogContent>
+              <Grid>
+                <Box textAlign="center" width={1} mt={1} mb={3}>
+                  <Link
+                    underline="none"
+                    onClick={() => setOpen(false)}
+                    className={classnames(classes.btnpeach, classes.linkButton)}
+                  >
+                    No, don’t leave yet
+                  </Link>
+                </Box>
+                <Box textAlign="center" width={1} mb={4}>
+                  <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
+                    {" "}
+                    Yes, leave
+                  </Link>
+                </Box>
               </Grid>
-            </Box>
+            </Dialog>
+            <Dialog fullWidth={true} open={openAddDosage} onClose={closeAddDosageDialog}>
+              <Box display="flex" justifyContent="flex-end">
+                <Box>
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeButton}
+                    onClick={() => setOpenAddDosage(false)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Box>
+              </Box>
 
-            <Box textAlign="center" mt={5}>
-              <Button className={classes.btnpeach} onClick={() => saveNewMedication()}>
-                Save
-              </Button>
-            </Box>
-            <Box textAlign="center" width={1} mt={3}>
-              <Link className={classes.linkpeach} onClick={props.onComplete}>
-                Cancel
-              </Link>
-            </Box>
-          </FormControl>
-        </Box>
-        <Dialog
-          open={open}
-          onClose={() => setOpen(false)}
-          scroll="paper"
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-          className={classes.dialogueStyle}
-        >
-          <Box display="flex" justifyContent="flex-end">
-            <Box>
-              <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
+              <DialogContent className={classes.dialogueContent}>
+                <Typography variant="h4">Add Dosage</Typography>
+                <Box mt={3} mb={4}>
+                  <InputBase
+                    className={classes.inputText}
+                    value={dosageName}
+                    placeholder="Name"
+                    onChange={(e) => setDosageName(e.target.value)}
+                    fullWidth={true}
+                    autoFocus
+                    inputRef={doseNameInput}
+                    inputProps={{
+                      maxLength: 30,
+                    }}
+                  />
+                </Box>
 
-          <DialogContent className={classes.dialogueContent}>
-            <Typography variant="h4">Leaving so soon?</Typography>
-            <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
-          </DialogContent>
-          <Grid>
-            <Box textAlign="center" width={1} mt={1} mb={3}>
-              <Link
-                underline="none"
-                onClick={() => setOpen(false)}
-                className={classnames(classes.btnpeach, classes.linkButton)}
-              >
-                No, don’t leave yet
-              </Link>
-            </Box>
-            <Box textAlign="center" width={1} mb={4}>
-              <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
-                {" "}
-                Yes, leave
-              </Link>
-            </Box>
+                <Box mb={4}>
+                  <InputBase
+                    className={classes.inputText}
+                    value={dosageValue}
+                    placeholder="Dose"
+                    type="number"
+                    onChange={(e) => setDosageValue(e.target.value)}
+                    fullWidth={true}
+                    inputRef={doseValueInput}
+                    inputProps={{
+                      maxLength: 15,
+                    }}
+                  />
+                </Box>
+
+                <Box>
+                  <TimePicker
+                    value={dosageTime}
+                    onChange={(e) => changeDosageTime(e)}
+                    disableToolbar={false}
+                    className={classes.reminderTimepopup}
+                  />
+                </Box>
+                <Box textAlign="center" mt={5}>
+                  <ButtonBase className={classes.btnpeach} onClick={() => addDosage()}>
+                    Save
+                  </ButtonBase>
+                </Box>
+                <Box textAlign="center" width={1} mt={3}>
+                  <Link className={classes.linkpeach} onClick={closeAddDosageDialog}>
+                    Cancel
+                  </Link>
+                </Box>
+              </DialogContent>
+            </Dialog>
           </Grid>
-        </Dialog>
-        <Dialog fullWidth={true} open={openAddDosage} onClose={closeAddDosageDialog}>
-          <Box display="flex" justifyContent="flex-end">
-            <Box>
-              <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenAddDosage(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
-
-          <DialogContent className={classes.dialogueContent}>
-            <Typography variant="h4">Add Dosage</Typography>
-            <Box mt={3} mb={4}>
-              <InputBase
-                className={classes.inputText}
-                value={dosageName}
-                placeholder="Name"
-                onChange={(e) => setDosageName(e.target.value)}
-                fullWidth={true}
-                autoFocus
-              />
-            </Box>
-
-            <Box mb={4}>
-              <InputBase
-                className={classes.inputText}
-                value={dosageValue}
-                placeholder="Dose"
-                onChange={(e) => setDosageValue(e.target.value)}
-                fullWidth={true}
-              />
-            </Box>
-
-            <Box>
-              <TimePicker
-                value={dosageTime}
-                onChange={(e) => changeDosageTime(e)}
-                disableToolbar={false}
-                className={classes.reminderTimepopup}
-              />
-            </Box>
-            <Box textAlign="center" mt={5}>
-              <Button className={classes.btnpeach} onClick={() => addDosage()}>
-                Save
-              </Button>
-            </Box>
-            <Box textAlign="center" width={1} mt={3}>
-              <Link className={classes.linkpeach} onClick={closeAddDosageDialog}>
-                Cancel
-              </Link>
-            </Box>
-          </DialogContent>
-        </Dialog>
-      </Container>
+        </Grid>
+      </Box>
     </div>
   )
 }
@@ -519,17 +618,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 600,
     color: "rgba(0, 0, 0, 0.75)",
   },
-  addicon: { float: "left", color: "#E46759" },
-  likebtn: {
-    fontStyle: "italic",
-    padding: 6,
-    margin: "0 5px",
-    "& label": {
-      position: "absolute",
-      bottom: -18,
-      fontSize: 12,
-    },
-  },
   dialogtitle: { padding: 0 },
   active: {
     background: "#FFAC98",
@@ -537,13 +625,7 @@ const useStyles = makeStyles((theme) => ({
   linkButton: {
     padding: "15px 25px 15px 25px",
   },
-  timeHours: {
-    padding: "3px 10px 5px 0",
-    borderBottom: "#FFCEC2 solid 2px",
-    minWidth: 57,
-    "& div": { padding: 0, margin: 0 },
-    "& p": { fontSize: 30, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)", textAlign: "left" },
-  },
+
   inputText: {
     borderBottom: "#FFCEC2 solid 1px",
     fontSize: 16,
@@ -553,28 +635,7 @@ const useStyles = makeStyles((theme) => ({
   },
   durationOuter: { margin: "30px 0" },
   weekdaysOuter: { marginBottom: 30 },
-  journalHeader: {
-    "& h5": {
-      fontWeight: 600,
-      fontSize: 16,
-      color: "rgba(0, 0, 0, 0.75)",
-      marginLeft: 15,
-    },
-  },
-  menuPaper: {
-    background: "#F5F5F5",
-    boxShadow: "none",
-    marginTop: 54,
-    maxHeight: 336,
 
-    borderRadius: 0,
-    "& ul": { padding: 0 },
-    "& li": {
-      fontSize: 25,
-
-      padding: "0 12px",
-    },
-  },
   dialogueContent: {
     padding: "10px 20px 35px 20px",
     textAlign: "center",
@@ -589,13 +650,7 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     color: theme.palette.grey[500],
   },
-  addbtnmain: {
-    maxWidth: 24,
-    "& button": { padding: 0 },
-  },
-  journalhd: {
-    margin: "40px 0 15px 0",
-  },
+
   journalStyle: {
     background: "linear-gradient(0deg, #FBF1EF, #FBF1EF)",
     borderRadius: "10px",
@@ -640,7 +695,7 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-  journalday: { color: "rgba(0, 0, 0, 0.4)", marginBottom: 15, marginTop: 25 },
+
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -652,13 +707,8 @@ const useStyles = makeStyles((theme) => ({
       width: "calc(100% - 96px)",
     },
   },
-  backbtn: {
-    //  paddingLeft: 0, paddingRight: 0
-  },
-  todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
+
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
-  howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
-  btnNav: { marginBottom: 45 },
   weekdays: {
     width: 32,
     height: 32,

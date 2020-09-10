@@ -282,7 +282,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     thumbContainer: { maxWidth: 1055, margin: "0 auto" },
-    calendarCustom: {},
     day: {
       "& p": { fontSize: 10 },
     },
@@ -294,6 +293,8 @@ const useStyles = makeStyles((theme: Theme) =>
         border: "1px solid #7599FF",
         display: "block",
         "& p": { fontSize: 10, color: "#618EF7" },
+        "&:hover": { background: "#2196f3" },
+        "&:hover p": { color: "#fff" },
       },
     },
     currentDay: {
@@ -424,7 +425,7 @@ export default function Feed({
   }
   function getTimeValue(date: Date) {
     var hours = date.getHours()
-    var minute = date.getMinutes()
+    var minute = isNaN(date.getMinutes()) ? 0 : date.getMinutes()
     var ampm = hours >= 12 ? " pm" : " am"
     hours = hours % 12
     hours = hours ? hours : 12 // the hour '0' should be '12'
@@ -482,58 +483,48 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(biweekly, date))
                 break
               case "daily":
+              case "hourly":
+              case "every3h":
+              case "every6h":
+              case "every12h":
                 schedule.completed = schedule.completed ?? false
                 currentFeed.push(schedule)
+                const hourVal =
+                  schedule.repeat_interval === "hourly"
+                    ? 1 * 60 * 60 * 1000
+                    : schedule.repeat_interval === "every3h"
+                    ? 3 * 60 * 60 * 1000
+                    : schedule.repeat_interval === "every6h"
+                    ? 6 * 60 * 60 * 1000
+                    : 12 * 60 * 60 * 1000
+                let checkDate = date
+                if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
+                  checkDate.setHours(new Date().getHours())
+                  checkDate.setMinutes(new Date().getMinutes())
+                }
+                let scheduledDate = new Date(schedule.start_date)
+                scheduledDate.setHours(new Date(schedule.time).getHours())
+                scheduledDate.setMinutes(new Date(schedule.time).getMinutes())
+                schedule.timeValue =
+                  schedule.repeat_interval === "daily"
+                    ? getTimeValue(new Date(scheduledDate))
+                    : getTimeValue(
+                        new Date(
+                          new Date(checkDate).getTime() +
+                            ((new Date(checkDate).getTime() - new Date(scheduledDate).getTime()) % hourVal)
+                        )
+                      )
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "custom":
                 schedule.custom_time.map((time) => {
                   if (new Date(date).toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
                     schedule.completed = schedule.completed ?? false
+                    schedule.timeValue = getTimeValue(new Date(time))
                     currentFeed.push(schedule)
                   }
                   selectedWeekViewDays = selectedWeekViewDays.concat(new Date(time).toLocaleDateString())
                 })
-                break
-              case "hourly":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 60 * 60 * 1000).toLocaleTimeString()
-                ) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every3h":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 3 * 60 * 60 * 1000).toLocaleTimeString()
-                ) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every6h":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 6 * 60 * 60 * 1000).toLocaleTimeString()
-                ) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
-                break
-              case "every12h":
-                if (
-                  new Date(date).toLocaleTimeString() ===
-                  new Date(new Date(schedule.start_date).getTime() + 12 * 60 * 60 * 1000).toLocaleTimeString()
-                ) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "monthly":
                 if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
@@ -549,7 +540,7 @@ export default function Feed({
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(
-                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleTimeString()
+                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleDateString()
                 )
                 selectedWeekViewDays = selectedWeekViewDays.concat(
                   new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 20).toLocaleDateString()
@@ -573,7 +564,7 @@ export default function Feed({
       let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
-      LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
+      //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedDays)
@@ -584,6 +575,7 @@ export default function Feed({
     let currentDate = new Date(date)
     let dates = []
     Object.keys(data).forEach((key) => {
+      console.log(data[key])
       if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
         data[key].weekdays.map((day) => {
           dates.push(weekdays.indexOf(day))
@@ -615,6 +607,7 @@ export default function Feed({
     setLaunchedActivity(type)
   }
   const submitSurvey = (response) => {
+    completeFeed(index)
     onComplete(response)
     setLaunchedActivity(undefined)
   }
@@ -648,17 +641,20 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        if (feed.group == "assess") {
-                          setSurveyName(feed.title)
-                          setVisibleActivities(feed.activityData)
-                          showFeedDetails(feed.group)
-                        }
-                        if (feed.group == "learn") {
-                          setTitle(feed.data[0].title)
-                          setDetails(feed.data[0].text)
+                        if (!feed.completed) {
                           setIndex(index)
-                          setIcon(<SleepTips />)
-                          showFeedDetails(feed.type)
+                          if (feed.group == "assess") {
+                            setSurveyName(feed.title)
+                            setVisibleActivities(feed.activityData)
+                            showFeedDetails(feed.group)
+                          }
+                          if (feed.group == "learn") {
+                            setTitle(feed.data[0].title)
+                            setDetails(feed.data[0].text)
+                            setIndex(index)
+                            setIcon(<SleepTips />)
+                            showFeedDetails(feed.type)
+                          }
                         }
                       }}
                     >
@@ -686,25 +682,25 @@ export default function Feed({
 
                         <Grid container justify="center" direction="column" className={classes.image}>
                           {feed.icon == "Exercise" ? (
-                            <Exercise />
+                            <Exercise width="80" height="80" />
                           ) : feed.icon == "Weight" ? (
-                            <Weight />
+                            <Weight width="80" height="80" />
                           ) : feed.icon == "Nutrition" ? (
-                            <Nutrition />
+                            <Nutrition width="80" height="80" />
                           ) : feed.icon == "Meditation" ? (
-                            <BreatheIcon />
+                            <BreatheIcon width="80" height="80" />
                           ) : feed.icon == "Sleep" ? (
-                            <Sleeping />
+                            <Sleeping width="80" height="80" />
                           ) : feed.icon == "Reading" ? (
-                            <Reading />
+                            <Reading width="80" height="80" />
                           ) : feed.icon == "Finances" ? (
-                            <Savings />
+                            <Savings width="80" height="80" />
                           ) : feed.group === "goals" && feed.icon == "Mood" ? (
-                            <Emotions />
+                            <Emotions width="80" height="80" />
                           ) : feed.icon == "Medication" ? (
-                            <Medication />
+                            <Medication width="80" height="80" />
                           ) : feed.icon == "Custom" ? (
-                            <Custom />
+                            <Custom width="80" height="80" />
                           ) : feed.icon === "sad-happy" ? (
                             <SadHappy width="80" height="80" />
                           ) : feed.icon === "medication" ? (
@@ -766,24 +762,17 @@ export default function Feed({
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (
                   <div onClick={() => getFeedByDate(date)}>
-                    <span className={classes.selectedDay}> {dayComponent} </span>
+                    <span className={isCurrentDay || isActiveDate ? classes.currentDay : classes.selectedDay}>
+                      {" "}
+                      {dayComponent}{" "}
+                    </span>
                   </div>
-                ) : isCurrentDay ? (
-                  <span
-                    onClick={() => getFeedByDate(date)}
-                    className={isActiveDate ? classes.selectedDay : classes.currentDay}
-                  >
-                    {" "}
-                    {dayComponent}{" "}
-                  </span>
-                ) : isActiveDate ? (
-                  <span onClick={() => getFeedByDate(date)} className={classes.selectedDay}>
-                    {" "}
-                    {dayComponent}{" "}
+                ) : isCurrentDay || isActiveDate ? (
+                  <span onClick={() => getFeedByDate(date)} className={classes.currentDay}>
+                    {dayComponent}
                   </span>
                 ) : (
                   <span onClick={() => getFeedByDate(date)} className={classes.day}>
-                    {" "}
                     {dayComponent}{" "}
                   </span>
                 )

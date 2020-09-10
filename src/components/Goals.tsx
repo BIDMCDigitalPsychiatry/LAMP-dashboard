@@ -6,20 +6,14 @@ import {
   Grid,
   Card,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton,
   ButtonBase,
   AppBar,
   Toolbar,
   Icon,
 } from "@material-ui/core"
-import { Link as RouterLink } from "react-router-dom"
+
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Participant as ParticipantObj } from "lamp-core"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
@@ -34,7 +28,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import NewGoals from "./NewGoal"
 
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
@@ -47,9 +40,7 @@ const demoActivities = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    backbtn: {
-      // paddingLeft: 0, paddingRight: 0
-    },
+    backbtn: {},
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
@@ -61,9 +52,7 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-    linkButton: {
-      padding: "15px 25px 15px 25px",
-    },
+
     cardlabel: {
       fontSize: 14,
 
@@ -76,17 +65,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
 
-    closeButton: {
-      position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
     header: {
       background: "#FFEFEC",
       padding: "25px 20px 10px",
@@ -112,22 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
         textAlign: "center !important",
       },
     },
-    btnpeach: {
-      background: "#FFAC98",
-      borderRadius: "40px",
-      minWidth: "200px",
-      boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
-      lineHeight: "22px",
-      display: "inline-block",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
-      "&:hover": {
-        boxShadow:
-          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
-      },
-    },
+
     topicon: {
       minWidth: 120,
     },
@@ -412,120 +375,6 @@ export default function Goals({ participant, ...props }) {
             }}
           />
         </ResponsiveDialog>
-
-        {/* <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!embeddedActivity}
-        onClose={() => {
-          setEmbeddedActivity(undefined)
-        }}
-      >
-        <div style={{ display: "flex", width: "100%", height: "100%", flexDirection: "column", overflow: "hidden" }}>
-          <iframe
-            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-            sandbox="allow-scripts"
-            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
-            srcDoc={embeddedActivity}
-          />
-        </div>
-      </ResponsiveDialog>
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={!!launchedActivity}
-        onClose={() => {
-          setLaunchedActivity(undefined)
-        }}
-      >
-        {
-          {
-            Journals: (
-              <JournalEntries
-                onComplete={() => {
-                  setOpen(false)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            Scratch_card: (
-              <ScratchImage
-                onComplete={() => {
-                  setOpen(false)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            Breathe: (
-              <Breathe
-                onComplete={() => {
-                  setOpen(false)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
-            resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            medicationtracker: <MedicationTracker onComplete={() => setLaunchedActivity(undefined)} />,
-          }[launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        className={classes.dialogueStyle}
-      >
-        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-          <div className={classType}>
-            {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
-            {dialogueType === "Scratch_card" && (
-              <Box>
-                <ScratchCard className={classes.topicon} />
-                <Typography variant="h6">Meditation exercises</Typography>
-              </Box>
-            )}
-            {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
-            <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
-          </div>
-        </DialogTitle>
-        <DialogContent className={classes.dialogueContent}>
-          {dialogueType === "Breathe" && (
-            <Typography variant="h4" gutterBottom>
-              Breathing exercise (2 mins)
-            </Typography>
-          )}
-
-          {dialogueType === "Scratch_card" && (
-            <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
-          )}
-          {dialogueType === "Breathe" && (
-            <Typography variant="body2" color="textSecondary" component="p">
-              Follow the motion of the lotus flower opening and closing to control your breaths in and out.
-            </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={4}>
-            <Link
-              onClick={() => {
-                setLaunchedActivity(dialogueType)
-              }}
-              underline="none"
-              className={classnames(classes.btnpeach, classes.linkButton)}
-            >
-              Begin
-            </Link>
-          </Box>
-        </DialogActions>
-      </Dialog> */}
       </Container>
     </div>
   )

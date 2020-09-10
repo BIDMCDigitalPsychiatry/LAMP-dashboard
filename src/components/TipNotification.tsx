@@ -126,6 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     headerIcon: { textAlign: "center" },
+    mainContainer: { padding: 0 },
   })
 )
 
@@ -138,7 +139,7 @@ export default function TipNotification({ ...props }) {
   }
 
   return (
-    <Container>
+    <Container maxWidth={false} className={classes.mainContainer}>
       <Box className={classes.header}>
         <Box width={1} className={classes.headerIcon}>
           {props.icon}

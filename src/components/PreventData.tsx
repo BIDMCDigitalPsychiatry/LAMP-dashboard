@@ -62,12 +62,12 @@ export default function PreventData({
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {graphType == 0 ? activity.name : activity}: <Box component="span">fluctuating</Box>
+            {graphType == 0 ? activity.name : activity}: <Box component="span">{/*fluctuating*/}</Box>
           </Typography>
           <Typography variant="h5">Summary</Typography>
           <Typography variant="body2">
-            You have a good distribution of locations, which means you’re getting out of the house and doing things.
-            Studies show a change of scenery helps keep the mid engaged and positive.
+            {/*You have a good distribution of locations, which means you’re getting out of the house and doing things.
+            Studies show a change of scenery helps keep the mid engaged and positive.*/}
           </Typography>
         </CardContent>
 
@@ -80,7 +80,7 @@ export default function PreventData({
           ) : graphType === 2 ? (
             <Sparkline
               minWidth={250}
-              minHeight={220}
+              minHeight={450}
               XAxisLabel="Time"
               YAxisLabel="  "
               color={colors.blue[500]}

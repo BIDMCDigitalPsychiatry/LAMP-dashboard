@@ -2,8 +2,6 @@ import React from "react"
 import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
 import GridList from "@material-ui/core/GridList"
 import GridListTile from "@material-ui/core/GridListTile"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
-import { ReactComponent as Camera } from "../icons/Camera.svg"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
 
 import { Typography, AppBar, Toolbar, IconButton, Icon, Grid } from "@material-ui/core"
@@ -24,9 +22,7 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "100%",
       padding: "0 10px",
     },
-    backbtn: {
-      // paddingLeft: 0, paddingRight: 0
-    },
+
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
@@ -39,24 +35,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-
-    addbtnmain: {
-      textAlign: "center",
-      "& button": { padding: 0 },
-      "& h5": {
-        fontWeight: 600,
-        fontSize: 16,
-        color: "rgba(0, 0, 0, 0.75)",
-        marginLeft: 10,
-        display: "inline-block",
-      },
-    },
-    journalhd: {
-      margin: "20px 0 15px 0",
-    },
-
-    addicon: { float: "left", color: "#E46759" },
-    sample: {},
   })
 )
 
@@ -135,29 +113,13 @@ export default function HopeBox({ ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton color="default" className={classes.backbtn} onClick={props.onComplete} aria-label="Menu">
+          <IconButton color="default" onClick={props.onComplete} aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Hope Box</Typography>
         </Toolbar>
         <HopeBoxHeader />
       </AppBar>
-
-      {/* <Grid container xs={12} spacing={0} className={classes.journalhd} alignItems="center" justify="center">
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton>
-            <AddCircleOutlineIcon className={classes.addicon} />
-          </IconButton>
-          <Typography variant="h5">Add a quote </Typography>
-        </Grid>
-        <Grid item xs className={classes.addbtnmain}>
-          <IconButton>
-            <Camera className={classes.addicon} />
-          </IconButton>
-          <Typography variant="h5">Add an image</Typography>
-        </Grid>
-      </Grid> */}
-
       <GridList cellHeight={180} spacing={2} className={classes.gridList} cols={3}>
         {tileData.map((tile) => (
           <GridListTile key={tile.img} cols={1} className={classes.singletile}>
