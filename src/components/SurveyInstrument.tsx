@@ -246,7 +246,7 @@ const useStyles = makeStyles((theme) => ({
       padding: "0 40px",
     },
   },
-  radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important" },
+  radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important", textAlign: "left" },
 
   chatDrawerCustom: { minWidth: 411 },
   questionScroll: {
