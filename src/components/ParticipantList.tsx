@@ -307,32 +307,7 @@ export default function ParticipantList({ studyID, title, onParticipantSelect, s
         }}
         components={{ Container: (props) => <Box {...props} /> }}
       />
-      {/*detailPanel={rowData => 
-          <Box style={{ margin: 8 }}>
-            <Typography style={{ width: '100%', textAlign: 'center' }}>
-              <b>Patient Health</b>
-            </Typography>
-            <Divider style={{ margin: 8 }} />
-            <Sparkchips items={
-              [ ...(activities || []), { name: 'Environmental Context' }, { name: 'Step Count' }]
-                .filter(x => (x.spec !== 'lamp.survey' && !!showUnscheduled) || (x.spec === 'lamp.survey'))
-                .map(x => ({ 
-                  name: x.name, 
-                  color: (x.spec !== 'lamp.survey' ? 
-                    grey[700] : (x.name.length % 3 === 0 ? 
-                      red[500] : (x.name.length % 3 === 1 ? 
-                        yellow[500] : 
-                          green[500]))), 
-                  textColor: (x.name.length % 3 === 1 && x.spec === 'lamp.survey') ? '#000' : '#fff',
-                  tooltip: (x.spec !== 'lamp.survey' ? 
-                    'Activity not scheduled or monitored (optional).' : (x.name.length % 3 === 0 ? 
-                      'Requires clinical attention.' : (x.name.length % 3 === 1 ? 
-                        'Monitor health status for changes.' : 
-                          'Health status is okay.')))
-                }))
-            } />
-          </Box>
-        }*/}
+
       <Popover
         open={Boolean(state.popoverAttachElement)}
         anchorPosition={!!state.popoverAttachElement && state.popoverAttachElement.getBoundingClientRect()}

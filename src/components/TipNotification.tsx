@@ -6,30 +6,20 @@ import {
   Theme,
   IconButton,
   CardContent,
-  Button,
   Grid,
   Box,
-  Icon,
   Fab,
   Container,
   AppBar,
   Toolbar,
 } from "@material-ui/core"
-import { ReactComponent as SadHappy } from "../icons/SadHappy.svg"
+
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    topicon: {
-      minWidth: 180,
-      minHeight: 180,
-      [theme.breakpoints.down("xs")]: {
-        minWidth: 180,
-        minHeight: 180,
-      },
-    },
     header: {
       background: "#FFF9E5",
       padding: 20,
@@ -100,31 +90,9 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       "&:hover": { background: "#cea000" },
     },
-    backbtn: {
-      position: "absolute",
-      left: 10,
-    },
+
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
     colorLine: { maxWidth: 115 },
-    tipStyle: {
-      background: "#FFF9E5",
-      borderRadius: "10px",
-      padding: "20px 20px 20px 20px",
-      textAlign: "justify",
-      margin: "20px auto 0px",
-      "& h6": { fontSize: 16, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-    },
-    toolbardashboard: {
-      minHeight: 65,
-      padding: "0 10px",
-      "& h5": {
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "center",
-        fontWeight: "600",
-        fontSize: 18,
-        width: "calc(100% - 96px)",
-      },
-    },
     headerIcon: { textAlign: "center" },
     mainContainer: { padding: 0 },
   })

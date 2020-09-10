@@ -11,15 +11,12 @@ import {
   FormControlLabel,
   useMediaQuery,
   useTheme,
-  Button,
-  Container,
   TextField,
   LinearProgress,
   createStyles,
   withStyles,
   Theme,
   AppBar,
-  Divider,
   Grid,
   Drawer,
   Toolbar,
@@ -29,7 +26,6 @@ import {
   ListItemText,
   ListItem,
   List,
-  TableFooter,
   Fab,
   Tooltip,
   Icon,
@@ -65,7 +61,6 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1),
   },
   sliderActionsContainer: {
-    // position: "absolute",
     textAlign: "center",
     width: "100%",
     left: 0,
@@ -130,20 +125,7 @@ const useStyles = makeStyles((theme) => ({
     },
     "&:hover": { background: "#92E7CA" },
   },
-  toolbar: {
-    paddingLeft: 20,
-    paddingRight: 20,
-    alignItems: "flex-start",
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    "& h5": {
-      color: "#555555",
-      fontSize: 25,
-      fontWeight: "bold",
-      position: "absolute",
-      bottom: 0,
-    },
-  },
+
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -160,10 +142,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   slider: { width: "80%", color: "#2F9D7E" },
-  sliderRail: {
-    background: "#BCEFDD",
-    borderRadius: "2px",
-  },
+
   btnBack: {
     borderRadius: "40px",
     minWidth: "160px",
@@ -178,17 +157,11 @@ const useStyles = makeStyles((theme) => ({
       marginTop: 30,
     },
   },
-  minutes: {
-    padding: "10px",
-  },
-  hours: {
-    padding: "10px",
-  },
+
   ampm: {
     padding: "10px",
   },
-  timeSelect: { minWidth: 55, margin: "0 10px", "& svg": { display: "none" } },
-  timeselectInput: { margin: 0, padding: "10px 0 !important", fontSize: 40 },
+
   questionTrack: {
     fontSize: "14px",
     color: "#2F9D7E",
@@ -196,7 +169,6 @@ const useStyles = makeStyles((theme) => ({
     margin: "-10px 0 50px 0",
   },
   radioGroup: {
-    // marginTop: "30px",
     marginLeft: -15,
     [theme.breakpoints.up("md")]: {
       marginTop: 0,
@@ -221,10 +193,7 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 600,
     },
   },
-  surveyquestions: {
-    padding: 10,
-    "& h5": { fontSize: 18 },
-  },
+
   questionhead: {
     "& h5": { fontSize: 18, fontWeight: 600 },
     "& span": {
@@ -277,8 +246,8 @@ const useStyles = makeStyles((theme) => ({
       padding: "0 40px",
     },
   },
-  radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)" },
-  chatDrawer: {},
+  radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important", textAlign: "left" },
+
   chatDrawerCustom: { minWidth: 411 },
   questionScroll: {
     marginTop: 30,
@@ -369,19 +338,7 @@ function RadioOption({ onChange, options, value, ...props }) {
                 style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
               >
                 {x.label}
-                {!!x.description && (
-                  <Box
-                    my={0.5}
-                    p={0.5}
-                    borderRadius={4}
-                    borderColor="text.secondary"
-                    border={1}
-                    color="text.secondary"
-                    style={{ whiteSpace: "pre-wrap" }}
-                  >
-                    {x.description}
-                  </Box>
-                )}
+                {!!x.description && ` (${x.description})`}
               </Typography>
             }
             labelPlacement="end"
@@ -560,7 +517,7 @@ function TextSection({ onChange, charLimit, value, ...props }) {
           variant="outlined"
           onChange={onChange}
           value={!!value ? value.value : undefined}
-          helperText={`${value.value.length}/${charLimit} max characters`}
+          helperText={!!value ? `${value.value.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
           }}
@@ -1049,7 +1006,6 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
             anchor="right"
             variant="temporary"
             classes={{
-              root: classes.chatDrawer, // class name, e.g. `classes-nesting-root-x`
               paperAnchorRight: classes.chatDrawerCustom, // class name, e.g. `classes-nesting-label-x`
             }}
             open={!!sidebarOpen}

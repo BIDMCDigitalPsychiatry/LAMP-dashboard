@@ -456,16 +456,19 @@ export default function Feed({
     let currentFeed = []
     let currentDate = new Date(date)
     let selectedWeekViewDays = []
+    let scheduleTime, scheduleStartDate
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
         feed.schedule.map((schedule) => {
-          if (currentDate >= new Date(schedule.start_date)) {
+          scheduleTime = new Date(new Date(schedule.time).toLocaleString())
+          scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
+          if (currentDate >= scheduleStartDate) {
             schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
             schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
             schedule.type = feed.name
             schedule.title = feed.name
-            schedule.timeValue = getTimeValue(new Date(schedule.time))
+            schedule.timeValue = getTimeValue(scheduleTime)
             schedule.activityData = [feed]
             switch (schedule.repeat_interval) {
               case "triweekly":
@@ -502,9 +505,9 @@ export default function Feed({
                   checkDate.setHours(new Date().getHours())
                   checkDate.setMinutes(new Date().getMinutes())
                 }
-                let scheduledDate = new Date(schedule.start_date)
-                scheduledDate.setHours(new Date(schedule.time).getHours())
-                scheduledDate.setMinutes(new Date(schedule.time).getMinutes())
+                let scheduledDate = new Date(scheduleStartDate)
+                scheduledDate.setHours(new Date(scheduleTime).getHours())
+                scheduledDate.setMinutes(new Date(scheduleTime).getMinutes())
                 schedule.timeValue =
                   schedule.repeat_interval === "daily"
                     ? getTimeValue(new Date(scheduledDate))
@@ -527,12 +530,12 @@ export default function Feed({
                 })
                 break
               case "monthly":
-                if (new Date(date).getDate() === new Date(schedule.start_date).getDate()) {
+                if (new Date(date).getDate() === new Date(scheduleStartDate).getDate()) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
-                  selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleTimeString())
+                  selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleTimeString())
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleDateString())
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
                 break
               case "bimonthly":
                 if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
@@ -547,11 +550,11 @@ export default function Feed({
                 )
                 break
               case "none":
-                if (new Date(date) === new Date(schedule.start_date)) {
+                if (new Date(date) === new Date(scheduleStartDate)) {
                   schedule.completed = schedule.completed ?? false
                   currentFeed.push(schedule)
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(schedule.start_date).toLocaleDateString())
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
                 break
             }
           }

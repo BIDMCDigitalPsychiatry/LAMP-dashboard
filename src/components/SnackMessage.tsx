@@ -32,15 +32,6 @@ const useStyles = makeStyles((theme) => ({
   collapse: {
     padding: 16,
   },
-  checkIcon: {
-    fontSize: 20,
-    color: "#b3b3b3",
-    paddingRight: 4,
-  },
-  button: {
-    padding: 0,
-    textTransform: "none",
-  },
 }))
 
 const SnackMessage = React.forwardRef((props: { id?: string; message?: string; children: any }, ref) => {
