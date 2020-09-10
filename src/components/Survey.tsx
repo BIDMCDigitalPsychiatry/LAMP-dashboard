@@ -9,11 +9,8 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  Button,
   DialogActions,
   IconButton,
-  useMediaQuery,
-  useTheme,
   ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -42,7 +39,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cardlabel: {
       fontSize: 16,
-
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
@@ -124,12 +120,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
     },
     dialogtitle: { padding: 0 },
-    gotit: {
-      color: "#6083E7",
-      fontSize: "16px",
-      marginTop: "20px",
-      padding: "25px",
-    },
+
     ribbonText: {
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
@@ -303,9 +294,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <Box textAlign="center">
               <Ribbon width="170" height="226" />
             </Box>
-            {/* <Button className={classes.gotit} onClick={handleClose}>
-              Got it
-            </Button> */}
           </Box>
         </DialogContent>
       </Dialog>

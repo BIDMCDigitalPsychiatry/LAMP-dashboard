@@ -156,7 +156,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Manage({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Manage({ participant, activities, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")

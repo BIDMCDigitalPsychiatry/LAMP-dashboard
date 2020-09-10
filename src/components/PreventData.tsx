@@ -12,7 +12,6 @@ const useStyles = makeStyles((theme) => ({
   },
   moodContent: {
     padding: 17,
-
     "& h4": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 40 },
     "& h5": {
       fontSize: 18,

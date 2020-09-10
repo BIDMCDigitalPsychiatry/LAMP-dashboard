@@ -189,10 +189,6 @@ export default withParentSize(function Sparkline({ ...props }) {
           tooltipData={tooltipData}
           xScale={{
             type: "time",
-            // domain:
-            //   props.data.length <= 0
-            //     ? undefined
-            //     : [props.startDate ?? props.data.slice(0, 1)[0].x, props.data.slice(-1)[0].x],
           }}
           yScale={{ type: "linear" }}
         >

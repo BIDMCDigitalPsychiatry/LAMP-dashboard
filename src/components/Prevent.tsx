@@ -10,15 +10,11 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
-  Button,
   DialogActions,
   AppBar,
   Toolbar,
   Icon,
-  useMediaQuery,
-  useTheme,
   ButtonBase,
-  Fab,
   Link,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
