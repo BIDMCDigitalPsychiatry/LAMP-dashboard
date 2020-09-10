@@ -40,7 +40,7 @@ const demoActivities = {
   "Box Game": "boxgame",
   "Cats n Dogs": "catsndogs",
   "Dot Touch": "dottouch",
-  Jewels: "jewels",
+  "Jewels Trails A": "jewels",
   "Pop The Bubbles": "popthebubbles",
 }
 
@@ -156,13 +156,26 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Manage({ participant, ...props }: { participant: ParticipantObj; activeTab: Function }) {
+export default function Manage({ participant, activities, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
+  const [iFrame, setIframe] = useState(null)
+  const [gameSettings, setGameSettings] = useState(null)
+  const [activityId, setActivityId] = useState(null)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    if (iFrame != null) {
+      iFrame.onload = function () {
+        console.log("test parent")
+        iFrame.contentWindow.postMessage(gameSettings, "*")
+      }
+    }
+  }, [iFrame])
 
   useEffect(() => {
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
@@ -172,12 +185,18 @@ export default function Manage({ participant, ...props }: { participant: Partici
     eventer(
       messageEvent,
       function (e) {
-        console.log("parent received message!:  ", e.data)
-        LAMP.ActivityEvent.create(participant.id, e.data).catch((e) => console.dir(e))
+        if (!saved && activityId !== null) {
+          let data = JSON.parse(e.data)
+          data["activity"] = activityId
+          LAMP.ActivityEvent.create(participant.id, data).catch((e) => console.dir(e))
+          setSaved(true)
+          setEmbeddedActivity(undefined)
+        }
       },
       false
     )
-  })
+  }, [activityId])
+
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
@@ -189,7 +208,11 @@ export default function Manage({ participant, ...props }: { participant: Partici
     setOpen(false)
   }
 
-  const activateEmbeddedActivity = async (id) => {
+  const activateEmbeddedActivity = async (name, id) => {
+    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0]
+    setActivityId(details[0])
+    setGameSettings(details[1])
+    setSaved(false)
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
     )
@@ -290,7 +313,7 @@ export default function Manage({ participant, ...props }: { participant: Partici
             sm={4}
             md={3}
             lg={3}
-            onClick={() => activateEmbeddedActivity(entry[1])}
+            onClick={() => activateEmbeddedActivity(entry[0], entry[1])}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -315,6 +338,9 @@ export default function Manage({ participant, ...props }: { participant: Partici
       >
         <div style={{ display: "flex", width: "100%", height: "100%", flexDirection: "column", overflow: "hidden" }}>
           <iframe
+            ref={(e) => {
+              setIframe(e)
+            }}
             style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
             sandbox="allow-scripts"
             allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"

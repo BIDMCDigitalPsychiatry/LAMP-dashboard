@@ -6,7 +6,7 @@ import LAMP, {
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
-import { useSnackbar } from "notistack"
+
 import ActivityCard from "./ActivityCard"
 import MultipleSelect from "./MultipleSelect"
 import Sparkline from "./Sparkline"

@@ -174,6 +174,7 @@ export default function Participant({
     const tabName = getTabName(tab)
     props.activeTab(tabName)
     //  getShowWelcome(participant).then(setOpen)
+    console.log(LAMP.Activity.allByParticipant(participant.id))
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
@@ -246,7 +247,7 @@ export default function Participant({
         </Slide>
         <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>
-            <Manage participant={participant} activeTab={activeTab} />
+            <Manage participant={participant} activities={activities} activeTab={activeTab} />
           </Box>
         </Slide>
         <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>

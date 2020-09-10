@@ -40,7 +40,6 @@ const demoActivities = {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    backbtn: {},
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",
@@ -180,7 +179,7 @@ export default function Goals({ participant, ...props }) {
     <div>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.onComplete} color="default" className={classes.backbtn} aria-label="Menu">
+          <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Create goal</Typography>
