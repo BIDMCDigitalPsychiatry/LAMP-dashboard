@@ -578,7 +578,6 @@ export default function Feed({
     let currentDate = new Date(date)
     let dates = []
     Object.keys(data).forEach((key) => {
-      console.log(data[key])
       if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
         data[key].weekdays.map((day) => {
           dates.push(weekdays.indexOf(day))

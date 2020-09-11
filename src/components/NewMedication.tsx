@@ -125,7 +125,6 @@ export default function NewMedication({ participant, ...props }) {
   }
   const getDetails = (data) => {
     let x = (data || {})[participant.id || ""] || []
-    console.log(x)
     return !Array.isArray(x) ? [] : x
   }
 

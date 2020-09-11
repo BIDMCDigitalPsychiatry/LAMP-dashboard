@@ -263,7 +263,6 @@ const useStyles = makeStyles((theme) => ({
 
 // Splice together all selected activities & their tags.
 async function getSplicedSurveys(activities) {
-  console.log(activities)
   let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
   let spliced = res.map((y: any, idx) =>
     spliceActivity({
@@ -656,8 +655,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    console.log(value)
-    onResponse({ item: text, value: value, duration: new Date().getTime() - startTime })
+    onResponse({ item: text, value: value.replace(/\"/g, ""), duration: new Date().getTime() - startTime })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -1000,9 +998,7 @@ function SurveyQuestions({
     return true
   }
   const postSubmit = (response) => {
-    console.log(response)
     response.duration = new Date().getTime() - startTime
-    console.log(response)
     if (!validate) onResponse(response, prefillTimestamp)
     else if (validate && validator(response)) onResponse(response, prefillTimestamp)
     else if (validate && !validator(response)) onValidationFailure()

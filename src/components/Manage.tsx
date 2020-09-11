@@ -171,7 +171,6 @@ export default function Manage({ participant, activities, ...props }) {
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
-        console.log("test parent")
         iFrame.contentWindow.postMessage(gameSettings, "*")
       }
     }

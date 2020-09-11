@@ -174,7 +174,6 @@ export default function Participant({
     const tabName = getTabName(tab)
     props.activeTab(tabName)
     //  getShowWelcome(participant).then(setOpen)
-    console.log(LAMP.Activity.allByParticipant(participant.id))
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)

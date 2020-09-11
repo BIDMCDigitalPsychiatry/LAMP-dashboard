@@ -86,10 +86,8 @@ export default function NewGoal({ participant, ...props }) {
   useEffect(() => {
     ;(async () => {
       let goals = await getAttachmentData(participant.id, "lamp.goals")
-      console.log(goals)
       setGoals(goals)
       let feeds = await getAttachmentData(participant.id, "lamp.feed.goals")
-      console.log(feeds)
       setFeeds(feeds)
     })()
     if (props.goalType == "Exercise" || props.goalType == "Meditation" || props.goalType == "Mood") {
@@ -194,7 +192,6 @@ export default function NewGoal({ participant, ...props }) {
         completed: false,
       }
       all.push(item)
-      console.log(all)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
       enqueueSnackbar(`The goal has been saved successfully.`, {
@@ -248,7 +245,6 @@ export default function NewGoal({ participant, ...props }) {
   }
   const getData = (data) => {
     let x = (data || {})[participant.id || ""] || []
-    console.log(x)
     return !Array.isArray(x) ? [] : x
   }
 
