@@ -29,6 +29,8 @@ import {
   Fab,
   Tooltip,
   Icon,
+  Checkbox,
+  FormGroup,
 } from "@material-ui/core"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
@@ -501,6 +503,7 @@ function TimeSelection({ onChange, value, ...props }) {
 
 function TextSection({ onChange, charLimit, value, ...props }) {
   const classes = useStyles()
+  const [text, setText] = useState(!!value ? value.value : undefined)
 
   return (
     <Box className={classes.textfieldwrapper}>
@@ -515,9 +518,12 @@ function TextSection({ onChange, charLimit, value, ...props }) {
           multiline
           rows={10}
           variant="outlined"
-          onChange={onChange}
+          onChange={(e) => {
+            setText(e.target.value)
+            onChange(e.target.value)
+          }}
           value={!!value ? value.value : undefined}
-          helperText={!!value ? `${value.value.length}/${charLimit} max characters` : `${charLimit} max characters`}
+          helperText={text ? `${text.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
           }}
@@ -593,9 +599,65 @@ function Rating({ onChange, options, value, ...props }) {
     </Box>
   )
 }
+
+// // eslint-disable-next-line
+// function CheckboxResponse({ onChange, value, ...props }) {
+//   return <Checkbox {...props} value={value || false} onChange={(event) => onChange(event.target.value)} />
+// }
+
+// // eslint-disable-next-line
+// function SwitchResponse({ onChange, value, ...props }) {
+//   return <Switch {...props} value={value || false} onChange={(event) => onChange(event.target.value)} />
+// }
+const CSV_parse = (x) => (Array.isArray(JSON.parse(`[${x}]`)) ? JSON.parse(`[${x}]`) : [])
+const CSV_stringify = (x) => (Array.isArray(x) ? JSON.stringify(x).slice(1, -1) : "")
+
+function MultiSelectResponse({ onChange, options, value, ...props }) {
+  const [selectedValue, setSelectedValue] = useState(value || "")
+  const _selection = CSV_parse(selectedValue)
+  return (
+    <FormGroup {...props}>
+      {options.map((x) => (
+        <FormControlLabel
+          key={x.label}
+          value={`${x.value}`}
+          style={{ alignItems: !!x.description ? "flex-start" : undefined }}
+          control={
+            <Checkbox
+              checked={_selection.includes(`${x.value}`)}
+              color={_selection.includes(`${x.value}`) ? "secondary" : "default"}
+              onClick={() => {
+                let targetValue = !_selection.includes(`${x.value}`)
+                  ? [..._selection, `${x.value}`]
+                  : _selection.filter((y) => y !== `${x.value}`)
+                let _target = CSV_stringify(targetValue)
+                setSelectedValue(_target)
+                onChange(_target)
+              }}
+              icon={<Icon fontSize="small">check_box_outline_blank</Icon>}
+              checkedIcon={<Icon fontSize="small">check_box</Icon>}
+            />
+          }
+          label={
+            <Typography
+              component="span"
+              variant="body2"
+              style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
+            >
+              {x.label}
+              {!!x.description && ` (${x.description})`}
+            </Typography>
+          }
+          labelPlacement="end"
+        />
+      ))}
+    </FormGroup>
+  )
+}
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    onResponse({ item: text, value: parseInt(value), duration: new Date().getTime() - startTime })
+    console.log(value)
+    onResponse({ item: text, value: value, duration: new Date().getTime() - startTime })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -686,6 +748,11 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
       break
     case "time":
       component = <TimeSelection onChange={onChange} value={!!value ? value.value : undefined} />
+      break
+    case "multiselect":
+      component = (
+        <MultiSelectResponse options={options} onChange={onChange} value={!!value ? value.value : undefined} />
+      )
       break
   }
 
@@ -917,6 +984,7 @@ function SurveyQuestions({
   prefillTimestamp,
   toolBarBack,
   type,
+  startTime,
   ...props
 }) {
   const responses = useRef(!!prefillData ? Object.assign({}, prefillData) : {})
@@ -932,7 +1000,9 @@ function SurveyQuestions({
     return true
   }
   const postSubmit = (response) => {
-    console.log(validator(response))
+    console.log(response)
+    response.duration = new Date().getTime() - startTime
+    console.log(response)
     if (!validate) onResponse(response, prefillTimestamp)
     else if (validate && validator(response)) onResponse(response, prefillTimestamp)
     else if (validate && !validator(response)) onValidationFailure()
@@ -968,6 +1038,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
+  const startTime = new Date().getTime()
 
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
@@ -997,6 +1068,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
           }
           setVisibleActivities={setVisibleActivities}
           onResponse={onComplete}
+          startTime={startTime}
           type={type}
         />
       </Grid>

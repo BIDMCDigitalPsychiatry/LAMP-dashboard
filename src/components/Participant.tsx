@@ -203,7 +203,7 @@ export default function Participant({
   const submitSurvey = (response, overwritingTimestamp) => {
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
-      duration: 0,
+      duration: response.duration,
       activity: visibleActivities[idx].id,
       static_data: {},
       temporal_slices: (x || []).map((y) => ({
