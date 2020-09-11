@@ -257,7 +257,7 @@ export default function Breathe({ participant, ...props }) {
       }
     })()
   }, [])
-  useEffect(() => {   
+  useEffect(() => {
     if (started) {
       setTimeout(setProgressUpdate, 1000)
       let val = progress - 25 >= 0 ? progress - 25 : 100
@@ -268,7 +268,7 @@ export default function Breathe({ participant, ...props }) {
   useEffect(() => {
     if (started) {
       if (progressValue < 100) {
-        let val = progressValue +15// 0.8
+        let val = progressValue + 0.8
         setProgressValue(val > 100 ? 100 : val)
       } else {
         setStarted(!started)
@@ -286,13 +286,16 @@ export default function Breathe({ participant, ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={() => {
+          <IconButton
+            onClick={() => {
               setPlayMusic(false)
               audio.pause()
               setAudio(null)
               props.onComplete()
-            }
-          } color="default" aria-label="Menu">
+            }}
+            color="default"
+            aria-label="Menu"
+          >
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Breathe</Typography>
