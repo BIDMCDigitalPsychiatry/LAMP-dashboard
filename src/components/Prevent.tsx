@@ -263,7 +263,6 @@ function getSocialContextGroups(gps_events?: SensorEventObj[]) {
 
 function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
-  console.log(gps_events)
   return [
     [
       {
