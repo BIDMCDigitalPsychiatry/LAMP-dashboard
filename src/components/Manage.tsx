@@ -40,7 +40,8 @@ const demoActivities = {
   "Box Game": "boxgame",
   "Cats n Dogs": "catsndogs",
   "Dot Touch": "dottouch",
-  "Jewels Trails A": "jewels",
+  Jewels: "jewels",
+  "Jewels Pro": "jewelspro",
   "Pop The Bubbles": "popthebubbles",
 }
 
@@ -171,7 +172,6 @@ export default function Manage({ participant, activities, ...props }) {
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
-        console.log("test parent")
         iFrame.contentWindow.postMessage(gameSettings, "*")
       }
     }
@@ -209,13 +209,24 @@ export default function Manage({ participant, activities, ...props }) {
   }
 
   const activateEmbeddedActivity = async (name, id) => {
-    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0]
-    setActivityId(details[0])
-    setGameSettings(details[1])
+    name =
+      name === "Jewels"
+        ? "Jewels Trails A"
+        : name === "Jewels Pro"
+        ? "Jewels Trails B"
+        : name === "Box Game"
+        ? "Spatial Span"
+        : name
+    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []
+    setActivityId(details[0] ?? [])
+    setGameSettings(details[1] ?? [])
     setSaved(false)
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
     )
+    // let response = await fetch(
+    //   `${id}.html.b64`
+    // )
     setEmbeddedActivity(atob(await response.text()))
   }
 
