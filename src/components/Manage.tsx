@@ -208,13 +208,16 @@ export default function Manage({ participant, activities, ...props }) {
   }
 
   const activateEmbeddedActivity = async (name, id) => {
-    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0]
-    setActivityId(details[0])
-    setGameSettings(details[1])
+    const details = (activities || []).filter((x) => x.name === (name === "Box Game" ? "Spatial Span" : name)).map((y) => [y.id, y.settings])[0] ?? []
+    setActivityId(details[0] ?? [])
+    setGameSettings(details[1] ?? [])
     setSaved(false)
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
     )
+    // response = await fetch(
+    //   `${id}.html.b64`
+    // )
     setEmbeddedActivity(atob(await response.text()))
   }
 
