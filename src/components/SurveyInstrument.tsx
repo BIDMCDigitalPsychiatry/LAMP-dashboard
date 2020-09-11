@@ -29,14 +29,27 @@ import {
   Fab,
   Tooltip,
   Icon,
-  Checkbox,
   FormGroup,
 } from "@material-ui/core"
+import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
+import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
+import CheckBoxIcon from "@material-ui/icons/CheckBox"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
 import { useSnackbar } from "notistack"
 import Messages from "./Messages"
+import classes from "*.module.css"
+
+const GreenCheckbox = withStyles({
+  root: {
+    color: "#2F9D7E",
+    "&$checked": {
+      color: "#2F9D7E",
+    },
+    "& svg": { fontSize: "32px !important" },
+  },
+})((props: CheckboxProps) => <Checkbox color="default" {...props} />)
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -259,6 +272,12 @@ const useStyles = makeStyles((theme) => ({
       overflow: "auto",
     },
   },
+  fieldGroup: {
+    display: "inline-flex",
+    textAlign: "left",
+    "& span.MuiCheckbox-root": { color: "#C6C6C6 !important" },
+    "& span.Mui-checked": { color: "#2F9D7E !important" },
+  },
 }))
 
 // Splice together all selected activities & their tags.
@@ -315,7 +334,7 @@ function RadioOption({ onChange, options, value, ...props }) {
           <FormControlLabel
             key={x.label}
             value={`${x.value}`}
-            style={{ alignItems: !!x.description ? "flex-start" : undefined }}
+            style={{ alignItems: x.value.length > 25 && !!x.description ? "flex-start" : undefined }}
             control={
               <Radio
                 className={classes.radioroot}
@@ -614,17 +633,23 @@ const CSV_stringify = (x) => (Array.isArray(x) ? JSON.stringify(x).slice(1, -1) 
 function MultiSelectResponse({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
   const _selection = CSV_parse(selectedValue)
+  const classes = useStyles()
   return (
-    <FormGroup {...props}>
+    <FormGroup
+      {...props}
+      classes={{
+        root: classes.fieldGroup,
+      }}
+    >
       {options.map((x) => (
         <FormControlLabel
           key={x.label}
           value={`${x.value}`}
-          style={{ alignItems: !!x.description ? "flex-start" : undefined }}
+          style={{ alignItems: x.value.length > 20 && !!x.description ? "flex-start" : undefined }}
           control={
-            <Checkbox
+            <GreenCheckbox
               checked={_selection.includes(`${x.value}`)}
-              color={_selection.includes(`${x.value}`) ? "secondary" : "default"}
+              // color={_selection.includes(`${x.value}`) ? "secondary" : "default"}
               onClick={() => {
                 let targetValue = !_selection.includes(`${x.value}`)
                   ? [..._selection, `${x.value}`]
@@ -633,8 +658,10 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
                 setSelectedValue(_target)
                 onChange(_target)
               }}
-              icon={<Icon fontSize="small">check_box_outline_blank</Icon>}
-              checkedIcon={<Icon fontSize="small">check_box</Icon>}
+              // icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
+              // checkedIcon={<Icon fontSize="large">check_box</Icon>}
+              icon={<CheckBoxOutlineBlankIcon fontSize="large" />}
+              checkedIcon={<CheckBoxIcon fontSize="large" />}
             />
           }
           label={
