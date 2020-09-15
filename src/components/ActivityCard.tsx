@@ -18,8 +18,9 @@ export const strategies = {
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) =>
-    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
+  "lamp.jewels_a": (slices, activity, scopedItem) => slices.score.toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) => slices.score.toFixed(1) || 0,
+  "lamp.spatial_span":  (slices, activity, scopedItem) => slices.score.toFixed(1) || 0
 }
 
 export default function ActivityCard({
@@ -39,7 +40,7 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
-
+console.log(events)
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
@@ -124,8 +125,8 @@ export default function ActivityCard({
               color={blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
-                y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
-                  d.temporal_slices,
+                y: strategies[activity.spec](
+                  activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
                   activity,
                   idx
                 ),
@@ -159,8 +160,8 @@ export default function ActivityCard({
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),
-            y: strategies[activity.spec === "lamp.survey" ? "lamp.survey" : "lamp.jewels_a"](
-              d.temporal_slices,
+            y: strategies[activity.spec](
+              activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
               activity,
               undefined
             ),

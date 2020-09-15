@@ -168,12 +168,13 @@ export default function Manage({ participant, activities, ...props }) {
   const [gameSettings, setGameSettings] = useState(null)
   const [activityId, setActivityId] = useState(null)
   const [saved, setSaved] = useState(false)
+  const [data, setData] = useState(null)
 
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(gameSettings, "*")
-      }
+      }      
     }
   }, [iFrame])
 
@@ -188,15 +189,24 @@ export default function Manage({ participant, activities, ...props }) {
         if (!saved && activityId !== null) {
           let data = JSON.parse(e.data)
           data["activity"] = activityId
-          LAMP.ActivityEvent.create(participant.id, data).catch((e) => console.dir(e))
-          setSaved(true)
-          setEmbeddedActivity(undefined)
+          setData(data)  
+          setEmbeddedActivity(undefined) 
+          setGameSettings(null)
+          setActivityId(null)           
         }
       },
       false
     )
   }, [activityId])
 
+  useEffect(() => {
+    if(embeddedActivity === undefined && data !== null && !saved) {
+      LAMP.ActivityEvent.create(participant.id, data).catch((e) => console.dir(e)).then((x) =>
+      {               
+          setSaved(true) 
+      }) 
+    }
+  }, [embeddedActivity])
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
@@ -216,8 +226,8 @@ export default function Manage({ participant, activities, ...props }) {
         ? "Jewels Trails B"
         : name === "Box Game"
         ? "Spatial Span"
-        : name
-    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []
+        : name  
+    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []      
     setActivityId(details[0] ?? [])
     setGameSettings(details[1] ?? [])
     setSaved(false)
@@ -227,7 +237,7 @@ export default function Manage({ participant, activities, ...props }) {
     // let response = await fetch(
     //   `${id}.html.b64`
     // )
-    setEmbeddedActivity(atob(await response.text()))
+    setEmbeddedActivity(atob(await response.text()))    
   }
 
   return (
