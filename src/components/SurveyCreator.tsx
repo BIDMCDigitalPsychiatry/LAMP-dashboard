@@ -207,6 +207,9 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Button color={type === "multiselect" ? "primary" : "default"} onClick={() => setType("multiselect")}>
                 multi-select
               </Button>
+              <Button color={type === "slider" ? "primary" : "default"} onClick={() => setType("slider")}>
+                Slider
+              </Button>
             </ButtonGroup>
           </Grid>
           {["list", "select", "multiselect"].includes(type) && (

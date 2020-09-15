@@ -249,7 +249,6 @@ export default function Breathe({ participant, ...props }) {
       setProgressLabel(val)
     }
   }
-
   useEffect(() => {
     ;(async () => {
       let breatheData = await getBreatheMP3URL(participant.id)
@@ -257,7 +256,8 @@ export default function Breathe({ participant, ...props }) {
         setAudio(new Audio(breatheData.URL))
       }
     })()
-    let timer
+  }, [])
+  useEffect(() => {
     if (started) {
       setTimeout(setProgressUpdate, 1000)
       let val = progress - 25 >= 0 ? progress - 25 : 100
@@ -266,7 +266,6 @@ export default function Breathe({ participant, ...props }) {
   }, [progressLabel])
 
   useEffect(() => {
-    let timer
     if (started) {
       if (progressValue < 100) {
         let val = progressValue + 0.8
@@ -287,7 +286,16 @@ export default function Breathe({ participant, ...props }) {
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
+          <IconButton
+            onClick={() => {
+              setPlayMusic(false)
+              audio.pause()
+              setAudio(null)
+              props.onComplete()
+            }}
+            color="default"
+            aria-label="Menu"
+          >
             <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h5">Breathe</Typography>

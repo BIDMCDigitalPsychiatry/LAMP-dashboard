@@ -174,7 +174,6 @@ export default function Participant({
     const tabName = getTabName(tab)
     props.activeTab(tabName)
     //  getShowWelcome(participant).then(setOpen)
-    console.log(LAMP.Activity.allByParticipant(participant.id))
     LAMP.Activity.allByParticipant(participant.id).then(setActivities)
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
@@ -203,7 +202,7 @@ export default function Participant({
   const submitSurvey = (response, overwritingTimestamp) => {
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
-      duration: 0,
+      duration: response.duration,
       activity: visibleActivities[idx].id,
       static_data: {},
       temporal_slices: (x || []).map((y) => ({
