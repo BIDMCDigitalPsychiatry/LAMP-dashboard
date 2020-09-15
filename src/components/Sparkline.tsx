@@ -164,7 +164,6 @@ export default withParentSize(function Sparkline({ ...props }) {
       )}
     </List>
   )
-
   return (
     <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
       {({ onMouseLeave, onMouseMove, tooltipData }) => (

@@ -40,7 +40,7 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
-console.log(events)
+
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
@@ -130,8 +130,8 @@ console.log(events)
                   activity,
                   idx
                 ),
-                slice: d.temporal_slices,
-                missing: [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null), // sometimes the slice itself is missing, not set to null
+                slice: d.temporal_slices ,
+                missing: activity.spec === "lamp.survey" ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null) :d.static_data.score, // sometimes the slice itself is missing, not set to null
               }))}
               onClick={(datum) => setVisibleSlice(datum)}
             />
@@ -139,10 +139,10 @@ console.log(events)
           value={Object.values(
             events
               .map((d) =>
-                d.temporal_slices.map((t) => ({
+                  d.temporal_slices.map((t) => ({
                   item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value,
-                }))
+                })) 
               )
               .reduce((x, y) => x.concat(y), [])
               .groupBy("item")
@@ -166,7 +166,7 @@ console.log(events)
               undefined
             ),
             slice: d.temporal_slices,
-            missing: d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0,
+            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0 : false,
           }))}
           onClick={(datum) => setVisibleSlice(datum)}
         />
