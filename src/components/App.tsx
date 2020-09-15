@@ -133,6 +133,7 @@ function AppRouter({ ...props }) {
   }, [deferredPrompt])
 
   useEffect(() => {
+    console.log('test blank')
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
