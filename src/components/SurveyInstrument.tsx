@@ -589,7 +589,7 @@ function Rating({ onChange, options, value, ...props }) {
           mark: classes.customTrack,
           thumb: classes.customThumb,
         }}
-        onChange={onChange}
+        onChange={() => onChange(getSliderValue())}
       />
       <Grid container spacing={10} style={{ marginTop: "-50px" }} direction="row" justify="center" alignItems="center">
         <Grid item xs={4}>
@@ -682,7 +682,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    onResponse({ item: text, value: value.replace(/\"/g, ""), duration: new Date().getTime() - startTime })
+    onResponse({ item: text, value: value.replace(/\"/g, "") })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -756,7 +756,7 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
   ]
 
   switch (type) {
-    case "rating":
+    case "slider":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "likert":
@@ -833,9 +833,21 @@ function Questions({
             options={x.options?.map((y) => ({ ...y, label: y.value }))}
             value={responses.current[idx]}
             onResponse={(response) => {
+              let lastEndTime =
+                responses.current
+                  .filter((item) => item.value != null)
+                  .sort(function (a, b) {
+                    return a.endTime - b.endTime
+                  })
+                  .pop()?.endTime ?? startTime
+              let currentItem = responses.current.filter((item) => item.item == x.text).pop()
+
               responses.current[idx] = response
               if (x.type !== "multiselect") setActiveStep((prev) => prev + 1)
-
+              response.duration =
+                (x.type !== "text" ? new Date().getTime() - startTime : new Date().getTime() - lastEndTime) +
+                  currentItem?.duration ?? 0
+              response.endTime = new Date().getTime()
               onResponse(
                 Array.from({
                   ...responses.current,
@@ -843,7 +855,7 @@ function Questions({
                 })
               )
             }}
-            startTime={idx === 0 ? startTime : new Date().getTime()}
+            startTime={new Date().getTime()}
           />
           <div className={classes.sliderActionsContainer}>
             {supportsSidebar && idx === value.settings.length - 1 && (
