@@ -98,7 +98,7 @@ function AppRouter({ ...props }) {
         password: x[1],
         serverAddress: x[2],
       }).then((x) => {
-        //props.history.replace('/')
+        props.history.replace('/')
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
