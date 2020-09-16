@@ -485,6 +485,14 @@ export default function Feed({
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(biweekly, date))
                 break
+              case "weekly":
+                let dayNo = getDayNumber(new Date(date))
+                if (dayNo === dayNumber) {
+                  schedule.completed = schedule.completed ?? false
+                  currentFeed.push(schedule)
+                }
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
+                break
               case "daily":
               case "hourly":
               case "every3h":
@@ -535,7 +543,7 @@ export default function Feed({
                   currentFeed.push(schedule)
                   selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleTimeString())
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
                 break
               case "bimonthly":
                 if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
