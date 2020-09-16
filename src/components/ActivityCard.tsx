@@ -18,9 +18,9 @@ export const strategies = {
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) => slices.score.toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) => slices.score.toFixed(1) || 0,
-  "lamp.spatial_span":  (slices, activity, scopedItem) => slices.score.toFixed(1) || 0
+  "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
+  "lamp.spatial_span":  (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0
 }
 
 export default function ActivityCard({
