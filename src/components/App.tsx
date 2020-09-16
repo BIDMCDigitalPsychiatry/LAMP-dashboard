@@ -89,7 +89,8 @@ function AppRouter({ ...props }) {
 
       //
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      if (a === undefined) return
+      console.log(a)
+      if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
 
       //
@@ -98,7 +99,7 @@ function AppRouter({ ...props }) {
         password: x[1],
         serverAddress: x[2],
       }).then((x) => {
-        props.history.replace('/')
+        window.location.href = "/#/"
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
