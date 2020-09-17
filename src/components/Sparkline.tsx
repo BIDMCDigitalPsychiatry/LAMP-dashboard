@@ -202,7 +202,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
           <YAxis
             label={null}
-            numTicks={7}
+            numTicks={20}
             rangePadding={4}
             axisStyles={styles.axis}
             tickStyles={styles.tick}

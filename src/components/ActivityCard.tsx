@@ -153,7 +153,7 @@ export default function ActivityCard({
       ) : (
         <Sparkline
           minWidth={250}
-          minHeight={250}
+          minHeight={350}
           XAxisLabel="Time"
           YAxisLabel="Score"
           color={blue[500]}
@@ -166,7 +166,7 @@ export default function ActivityCard({
               undefined
             ),
             slice: d.temporal_slices,
-            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0 : false,
+            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0:d.static_data.score,
           }))}
           onClick={(datum) => setVisibleSlice(datum)}
         />
