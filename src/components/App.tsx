@@ -22,6 +22,7 @@ import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
 import TipNotification from "./TipNotification"
+import NotificationPage from "./NotificationPage"
 
 // import VegaGraph from "./VegaGraph"
 
@@ -89,7 +90,6 @@ function AppRouter({ ...props }) {
 
       //
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      console.log(a)
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
 
@@ -134,7 +134,6 @@ function AppRouter({ ...props }) {
   }, [deferredPrompt])
 
   useEffect(() => {
-    console.log('test blank')
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
@@ -324,6 +323,18 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | Hope Box</PageTitle>
             <HopeBox goBack={props.history.goBack} />
+          </React.Fragment>
+        )}
+      />
+      <Route
+        exact
+        path="/participant/:id/survey/:surveyId"
+        render={(props) => (
+          <React.Fragment>
+            <NotificationPage
+              participant={props.match.params.id}
+              surveyId={props.match.params.surveyId}              
+            />
           </React.Fragment>
         )}
       />

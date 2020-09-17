@@ -1074,7 +1074,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const startTime = new Date().getTime()
-
+console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
