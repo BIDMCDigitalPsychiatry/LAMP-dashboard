@@ -131,7 +131,7 @@ export default function ActivityCard({
                   idx
                 ),
                 slice: d.temporal_slices ,
-                missing: activity.spec === "lamp.survey" ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null) :d.static_data.score, // sometimes the slice itself is missing, not set to null
+                missing: activity.spec === "lamp.survey" ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null) :false, // sometimes the slice itself is missing, not set to null
               }))}
               onClick={(datum) => setVisibleSlice(datum)}
             />
@@ -166,7 +166,7 @@ export default function ActivityCard({
               undefined
             ),
             slice: d.temporal_slices,
-            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0:d.static_data.score,
+            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0:false,
           }))}
           onClick={(datum) => setVisibleSlice(datum)}
         />

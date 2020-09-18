@@ -127,14 +127,14 @@ export default withParentSize(function Sparkline({ ...props }) {
   const print = useMediaQuery("print")
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
-  const renderTooltip = ({ datum, series }) => (
+  const renderTooltip = ({ datum, series }) => (   
     <List dense>
       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
         <ListItemText
           primaryTypographyProps={{ variant: "overline", style: { lineHeight: "1.4" } }}
           secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
         >
-          {datum.x.toLocaleString("en-US", Date.formatStyle("full"))}
+          {datum ? datum?.x?.toLocaleString("en-US", Date.formatStyle("full")) : null}
         </ListItemText>
       </ListItem>
       {series && series[props.YAxisLabel ?? "Data"] && (
@@ -202,7 +202,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
           <YAxis
             label={null}
-            numTicks={20}
+            numTicks={10}
             rangePadding={4}
             axisStyles={styles.axis}
             tickStyles={styles.tick}

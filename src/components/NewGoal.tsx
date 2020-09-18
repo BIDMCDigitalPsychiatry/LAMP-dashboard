@@ -53,8 +53,6 @@ async function getAttachmentData(participantId, type: string) {
 export default function NewGoal({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
-  const [journalValue, setJounalValue] = useState("")
-  const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [goalName, setGoalName] = useState(null)
   const [goalValue, setGoalValue] = useState(null)

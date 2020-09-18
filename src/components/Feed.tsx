@@ -349,7 +349,7 @@ export default function Feed({
   const completeFeed = (index: number) => {
     let feed = currentFeed
     feed[index].completed = true
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(feed))
+   //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(feed))
     setCurrentFeed(feed)
     setCompleted(!completed)
   }
@@ -582,7 +582,7 @@ export default function Feed({
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
       console.log(currentFeed)
-    //  LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(currentFeed))
+     /// LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedDays)
