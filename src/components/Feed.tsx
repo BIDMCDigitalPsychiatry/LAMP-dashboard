@@ -472,7 +472,6 @@ export default function Feed({
             schedule.title = feed.name
             schedule.timeValue = getTimeValue(scheduleTime)
             schedule.activityData = feed
-            console.log(new Date().toLocaleDateString(), new Date(date).toLocaleDateString())
             if(new Date().toLocaleDateString() !== new Date(date).toLocaleDateString()){
               schedule.completed = false
             }
@@ -581,7 +580,6 @@ export default function Feed({
       let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
-      console.log(currentFeed)
      /// LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
       setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
