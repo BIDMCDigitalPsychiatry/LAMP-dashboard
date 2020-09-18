@@ -13,16 +13,13 @@ const useStyles = makeStyles((theme) => ({
   
 }))
 
-export default function NotificationPage({ participant,surveyId,  ...props }) {
+export default function NotificationPage({ participant,activityId,  ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState([])
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
-    console.log(participant, surveyId)
     ;(async () => {
-      console.log(participant, LAMP.Activity.allByParticipant(participant))
-      console.log(participant, LAMP.Activity.allByStudy(surveyId))
-      LAMP.Activity.allByStudy(surveyId).then(setActivity)     
+     LAMP.Activity.allByStudy(activityId).then(setActivity)     
     })()
   }, [])
   useEffect(() => {

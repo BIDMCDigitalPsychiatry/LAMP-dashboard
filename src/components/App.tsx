@@ -328,12 +328,12 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
-        path="/participant/:id/survey/:surveyId"
+        path="/participant/:id/activity/:activityId"
         render={(props) => (
           <React.Fragment>
             <NotificationPage
               participant={props.match.params.id}
-              surveyId={props.match.params.surveyId}              
+              activityId={props.match.params.activityId}              
             />
           </React.Fragment>
         )}
@@ -432,7 +432,13 @@ function AppRouter({ ...props }) {
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
-                  onParticipantSelect={(id) => props.history.push(`/participant/${id}`)}
+                  onParticipantSelect={(id) => {
+                    setState((state) => ({
+                      ...state,
+                      activeTab: 3,
+                    }))
+                    props.history.push(`/participant/${id}`)
+                  }}
                 />
               </NavigationLayout>
             </React.Fragment>

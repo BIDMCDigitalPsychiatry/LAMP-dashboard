@@ -337,6 +337,7 @@ export default function Feed({
   const [title, setTitle] = useState(null)
   const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
+
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const markCompleted = (event: any, index: number) => {
@@ -348,7 +349,7 @@ export default function Feed({
   const completeFeed = (index: number) => {
     let feed = currentFeed
     feed[index].completed = true
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", feed)
+    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(feed))
     setCurrentFeed(feed)
     setCompleted(!completed)
   }
@@ -457,6 +458,7 @@ export default function Feed({
     let currentDate = new Date(date)
     let selectedWeekViewDays = []
     let scheduleTime, scheduleStartDate
+    changeDate(new Date(date))
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
@@ -469,7 +471,11 @@ export default function Feed({
             schedule.type = feed.name
             schedule.title = feed.name
             schedule.timeValue = getTimeValue(scheduleTime)
-            schedule.activityData = [feed]
+            schedule.activityData = feed
+            console.log(new Date().toLocaleDateString(), new Date(date).toLocaleDateString())
+            if(new Date().toLocaleDateString() !== new Date(date).toLocaleDateString()){
+              schedule.completed = false
+            }
             switch (schedule.repeat_interval) {
               case "triweekly":
                 if (triweekly.indexOf(dayNumber) > -1) {
@@ -564,7 +570,7 @@ export default function Feed({
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
                 break
-            }
+            }           
           }
         })
       })
@@ -575,7 +581,8 @@ export default function Feed({
       let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
-      //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
+      console.log(currentFeed)
+    //  LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(currentFeed))
       setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedDays)
@@ -638,24 +645,29 @@ export default function Feed({
                 <Step>
                   <StepLabel
                     StepIconProps={{
-                      completed: feed.completed,
+                      completed: date.toLocaleDateString() === new Date().toLocaleDateString() ? feed.completed : false,
                       classes: {
                         root: classnames(classes.stepIcon, classes[feed.group + "Icon"]),
                         active: classes.stepActiveIcon,
                         completed: classes[feed.group + "CompletedIcon"],
                       },
                     }}
-                    onClick={(e) => markCompleted(e, index)}
+                    onClick={(e) => 
+                      {
+                        if(new Date().toLocaleDateString() === new Date(date).toLocaleDateString()) { 
+                          markCompleted(e, index) 
+                        }
+                      }}
                   >
                     <Card
-                      className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
+                      className={date.toLocaleDateString() === new Date().toLocaleDateString() && feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        if (!feed.completed) {
+                        if (!feed.completed && new Date().toLocaleDateString() === new Date(date).toLocaleDateString()) {
                           setIndex(index)
                           if (feed.group == "assess") {
                             setSurveyName(feed.title)
-                            setVisibleActivities(feed.activityData)
+                            setVisibleActivities([feed.activityData])
                             showFeedDetails(feed.group)
                           }
                           if (feed.group == "learn") {
