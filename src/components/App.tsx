@@ -330,11 +330,20 @@ function AppRouter({ ...props }) {
         exact
         path="/participant/:id/activity/:activityId"
         render={(props) => (
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) :
           <React.Fragment>
-            <NotificationPage
-              participant={props.match.params.id}
-              activityId={props.match.params.activityId}              
-            />
+            <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
           </React.Fragment>
         )}
       />

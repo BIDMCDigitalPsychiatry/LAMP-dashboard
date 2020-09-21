@@ -135,10 +135,16 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "capitalize",
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
+    cursor: "pointer !important",
     [theme.breakpoints.up("md")]: {
       marginTop: 30,
     },
-    "&:hover": { background: "#92E7CA" },
+    "& span": { cursor: "pointer" },
+    "&:hover": {
+      background: "#92E7CA",
+      boxShadow:
+        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    },
   },
 
   toolbardashboard: {
@@ -682,7 +688,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    onResponse({ item: text, value: value.replace(/\"/g, "") })
+    onResponse({ item: text, value: value?.replace(/\"/g, "") })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },
@@ -1074,7 +1080,6 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const startTime = new Date().getTime()
-console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
