@@ -225,7 +225,7 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingLeft: 0,
       },
     },
-    linkBlue: { color: "#6083E7" },
+    linkBlue: { color: "#6083E7", cursor: "pointer" },
   })
 )
 
@@ -348,7 +348,7 @@ async function getActivityEvents(
     .sort((x, y) => x.timestamp - y.timestamp)
     .map((x) => ({
       ...x,
-      activity: (x.activity || { name: "" }).name,
+      activity: (x.activity || { name: "" }).name || x.static_data?.survey_name,
     }))
     .groupBy("activity") as any
   let customEvents = _activities
@@ -598,7 +598,6 @@ export default function Prevent({
         })
       }
       if (journalCount > 0) activities.push({ name: "Journals" })
-
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)

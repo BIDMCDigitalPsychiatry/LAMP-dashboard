@@ -20,7 +20,7 @@ export const strategies = {
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
   "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
-  "lamp.spatial_span":  (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0
+  "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
 }
 
 export default function ActivityCard({
@@ -130,8 +130,11 @@ export default function ActivityCard({
                   activity,
                   idx
                 ),
-                slice: d.temporal_slices ,
-                missing: activity.spec === "lamp.survey" ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null) :false, // sometimes the slice itself is missing, not set to null
+                slice: d.temporal_slices,
+                missing:
+                  activity.spec === "lamp.survey"
+                    ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null)
+                    : false, // sometimes the slice itself is missing, not set to null
               }))}
               onClick={(datum) => setVisibleSlice(datum)}
             />
@@ -139,10 +142,10 @@ export default function ActivityCard({
           value={Object.values(
             events
               .map((d) =>
-                  d.temporal_slices.map((t) => ({
+                d.temporal_slices.map((t) => ({
                   item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value,
-                })) 
+                }))
               )
               .reduce((x, y) => x.concat(y), [])
               .groupBy("item")
@@ -166,7 +169,10 @@ export default function ActivityCard({
               undefined
             ),
             slice: d.temporal_slices,
-            missing: activity.spec === "lamp.survey" ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0:false,
+            missing:
+              activity.spec === "lamp.survey"
+                ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
+                : false,
           }))}
           onClick={(datum) => setVisibleSlice(datum)}
         />

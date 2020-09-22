@@ -238,7 +238,6 @@ export default function ActivityList({ studyID, title, ...props }) {
         },
       ],
     })) as any
-    //console.dir(newItem)
     if (!!newItem.error)
       enqueueSnackbar("Failed to create a new group Activity.", {
         variant: "error",
@@ -253,8 +252,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     let newItem = (await LAMP.Activity.create(studyID, { spec: x.name })) as any
-    //console.dir(newItem)
-    if (!!newItem.data) {
+   if (!!newItem.data) {
       onChange()
       enqueueSnackbar("Successfully created a new cognitive test Activity.", {
         variant: "success",

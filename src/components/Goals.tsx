@@ -28,7 +28,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import NewGoals from "./NewGoal"
 import classnames from "classnames"
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {

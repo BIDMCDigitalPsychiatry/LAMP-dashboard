@@ -10,26 +10,24 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: 20,
   },
-  
 }))
 
-export default function NotificationPage({ participant,activityId,  ...props }) {
+export default function NotificationPage({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState([])
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     ;(async () => {
-     LAMP.Activity.allByStudy(activityId).then(setActivity)     
+      LAMP.Activity.allByStudy(activityId).then(setActivity)
     })()
   }, [])
   useEffect(() => {
-    if(activity.length > 0) {
+    if (activity.length > 0) {
       setLoaded(true)
     }
   }, [activity])
-  
+
   const submitSurvey = (response, overwritingTimestamp) => {
-    console.log(response)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: response.duration,
@@ -48,19 +46,21 @@ export default function NotificationPage({ participant,activityId,  ...props }) 
         .filter((x) => x.temporal_slices.length > 0)
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
-      window.location.href="/#/"
+      window.location.href = "/#/"
     })
   }
   return (
     <div className={classes.root}>
-      {loaded && activity[0]?.spec === "lamp.survey" && <SurveyInstrument
-        id={participant}
-        type={activity[0]?.name ?? ""}
-        fromPrevent={false}
-        group={activity}
-        setVisibleActivities={setActivity}
-        onComplete={submitSurvey}
-      />}
+      {loaded && activity[0]?.spec === "lamp.survey" && (
+        <SurveyInstrument
+          id={participant}
+          type={activity[0]?.name ?? ""}
+          fromPrevent={false}
+          group={activity}
+          setVisibleActivities={setActivity}
+          onComplete={submitSurvey}
+        />
+      )}
     </div>
   )
 }

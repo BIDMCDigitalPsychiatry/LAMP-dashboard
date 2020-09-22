@@ -112,6 +112,8 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       fontWeight: "bold",
       marginBottom: 20,
+      cursor: "pointer",
+      "& span": { cursor: "pointer" },
       "&:hover": {
         boxShadow:
           "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
@@ -174,7 +176,7 @@ export default function Manage({ participant, activities, ...props }) {
     if (iFrame != null) {
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(gameSettings, "*")
-      }      
+      }
     }
   }, [iFrame])
 
@@ -189,10 +191,10 @@ export default function Manage({ participant, activities, ...props }) {
         if (!saved && activityId !== null) {
           let data = JSON.parse(e.data)
           data["activity"] = activityId
-          setData(data)  
-          setEmbeddedActivity(undefined) 
+          setData(data)
+          setEmbeddedActivity(undefined)
           setGameSettings(null)
-          setActivityId(null)           
+          setActivityId(null)
         }
       },
       false
@@ -200,11 +202,12 @@ export default function Manage({ participant, activities, ...props }) {
   }, [activityId])
 
   useEffect(() => {
-    if(embeddedActivity === undefined && data !== null && !saved) {
-      LAMP.ActivityEvent.create(participant.id, data).catch((e) => console.dir(e)).then((x) =>
-      {               
-          setSaved(true) 
-      }) 
+    if (embeddedActivity === undefined && data !== null && !saved) {
+      LAMP.ActivityEvent.create(participant.id, data)
+        .catch((e) => console.dir(e))
+        .then((x) => {
+          setSaved(true)
+        })
     }
   }, [embeddedActivity])
   const handleClickOpen = (type: string) => {
@@ -226,8 +229,8 @@ export default function Manage({ participant, activities, ...props }) {
         ? "Jewels Trails B"
         : name === "Box Game"
         ? "Spatial Span"
-        : name  
-    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []      
+        : name
+    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []
     setActivityId(details[0] ?? [])
     setGameSettings(details[1] ?? [])
     setSaved(false)
@@ -237,7 +240,7 @@ export default function Manage({ participant, activities, ...props }) {
     // let response = await fetch(
     //   `${id}.html.b64`
     // )
-    setEmbeddedActivity(atob(await response.text()))    
+    setEmbeddedActivity(atob(await response.text()))
   }
 
   return (

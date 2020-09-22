@@ -612,6 +612,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
+    cursor: "pointer",
+    "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
@@ -631,7 +633,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600, cursor: "pointer" },
 
   weekdays: {
     width: 32,

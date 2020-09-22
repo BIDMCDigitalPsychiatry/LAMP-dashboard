@@ -135,6 +135,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
+    cursor: "pointer",
+    "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#FFAC98",
       boxShadow:

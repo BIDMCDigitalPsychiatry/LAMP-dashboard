@@ -127,7 +127,7 @@ export default withParentSize(function Sparkline({ ...props }) {
   const print = useMediaQuery("print")
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
-  const renderTooltip = ({ datum, series }) => (   
+  const renderTooltip = ({ datum, series }) => (
     <List dense>
       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
         <ListItemText
