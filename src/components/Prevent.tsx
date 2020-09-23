@@ -439,6 +439,7 @@ async function getSelectedSensors(participant: ParticipantObj) {
 }
 
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
+  console.log(activity_events)
   return Object.assign(
     {},
     ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
