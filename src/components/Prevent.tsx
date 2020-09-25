@@ -439,7 +439,6 @@ async function getSelectedSensors(participant: ParticipantObj) {
 }
 
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
-  console.log(activity_events)
   return Object.assign(
     {},
     ...Object.entries(activity_events || {}).map(([k, v]: [string, any[]]) => ({
@@ -484,6 +483,22 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
     "Social Context": sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.social)?.length ?? 0,
     "Step Count": sensor_events?.["lamp.steps"]?.length ?? 0,
   }
+}
+
+export const strategies = {
+  "lamp.survey": (slices, activity, scopedItem) =>
+    (slices ?? [])
+      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      .map((x, idx) => {
+        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
+        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else return parseInt(x.value) || 0
+      })
+      .reduce((prev, curr) => prev + curr, 0),
+  "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
+  "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
 }
 
 export default function Prevent({
@@ -711,7 +726,11 @@ export default function Prevent({
                         startDate={earliestDate()}
                         data={activityEvents?.[activity.name]?.map((d) => ({
                           x: new Date(d.timestamp),
-                          y: d.duration,
+                          y: strategies[activity.spec](
+                            activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                            activity,
+                            undefined
+                          ),
                         }))}
                       >
                         <LinearGradient

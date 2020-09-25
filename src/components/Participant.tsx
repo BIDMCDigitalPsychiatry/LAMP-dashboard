@@ -75,6 +75,7 @@ function saveTodaysTip(id) {
     icon: "sleep_tip",
     description: "Sleep Tips",
     group: "learn",
+    time: new Date().getTime(),
     completed: false,
     data: [
       {
