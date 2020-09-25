@@ -252,7 +252,7 @@ export default function ActivityList({ studyID, title, ...props }) {
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     let newItem = (await LAMP.Activity.create(studyID, { spec: x.name })) as any
-   if (!!newItem.data) {
+    if (!!newItem.data) {
       onChange()
       enqueueSnackbar("Successfully created a new cognitive test Activity.", {
         variant: "success",

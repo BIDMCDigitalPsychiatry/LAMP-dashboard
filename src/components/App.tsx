@@ -329,7 +329,7 @@ function AppRouter({ ...props }) {
       <Route
         exact
         path="/participant/:id/activity/:activityId"
-        render={(props) => (
+        render={(props) =>
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | Login</PageTitle>
@@ -341,11 +341,12 @@ function AppRouter({ ...props }) {
                 />
               </NavigationLayout>
             </React.Fragment>
-          ) :
-          <React.Fragment>
-            <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
-          </React.Fragment>
-        )}
+          ) : (
+            <React.Fragment>
+              <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
+            </React.Fragment>
+          )
+        }
       />
       <Route
         exact

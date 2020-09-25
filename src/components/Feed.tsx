@@ -508,6 +508,14 @@ export default function Feed({
     return activityEvents
   }
 
+  // const getDates = () => {
+  //   if (feeds.length > 0) {
+  //     feed.schedule.map((schedule) => {
+
+  //     })
+  //   }
+  // }
+
   const getDetails = () => {
     let currentFeed = []
     let currentDate = new Date(date)
@@ -587,19 +595,22 @@ export default function Feed({
 
                   let endTime = currentDate.getTime() + 86400000
 
+                  startTime =
+                    currentDate.toLocaleDateString() === new Date(startTime).toLocaleDateString()
+                      ? startTime
+                      : endTime - ((currentDate.getTime() - startTime) % hourVal) - 86400000
+
                   let intervalStart, intervalEnd
                   let time
                   let completedVal
                   let clickableVal
                   for (let start = startTime; start <= endTime; start = start + hourVal) {
-                    let newDateVal = new Date(start + ((start - new Date(scheduledDate).getTime()) % hourVal))
+                    let newDateVal = new Date(start)
                     if (newDateVal.getDate() === date.getDate()) {
                       time = getTimeValue(newDateVal)
 
-                      intervalStart = new Date(
-                        start + ((start - new Date(scheduledDate).getTime()) % hourVal) - hourVal
-                      ).getTime()
-                      intervalEnd = new Date(start + ((start - new Date(scheduledDate).getTime()) % hourVal)).getTime()
+                      intervalStart = start
+                      intervalEnd = start + hourVal
                       let filteredData = savedData.filter(
                         (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
                       )
@@ -881,7 +892,7 @@ export default function Feed({
               value={date}
               onChange={changeDate}
               onMonthChange={(e) => {
-                getFeedByDate(new Date(e))
+                // getFeedByDate(new Date(e))
               }}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
                 const isSelected = isInCurrentMonth && selectedDays.indexOf(date.toLocaleDateString()) > -1
