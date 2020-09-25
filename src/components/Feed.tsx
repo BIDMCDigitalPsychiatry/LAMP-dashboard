@@ -618,7 +618,7 @@ export default function Feed({
                       completedVal = filteredData.length > 0 ? true : false
                       clickableVal =
                         new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                        new Date().getTime() <= intervalEnd
+                        new Date().getTime() <= intervalStart
                           ? true
                           : false
                       let each = {
