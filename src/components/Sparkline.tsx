@@ -164,6 +164,7 @@ export default withParentSize(function Sparkline({ ...props }) {
       )}
     </List>
   )
+
   return (
     <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
       {({ onMouseLeave, onMouseMove, tooltipData }) => (
@@ -267,9 +268,9 @@ export default withParentSize(function Sparkline({ ...props }) {
             showHorizontalLine={true}
             stroke={props.color}
             strokeDasharray="3 1"
-            circleSize={(d) => (d.y === tooltipData.datum.y ? 8 : 4)}
+            circleSize={(d) => (d.y === tooltipData?.datum?.y ? 8 : 4)}
             circleStyles={{ strokeWidth: 0.0 }}
-            circleFill={(d) => (d.y === tooltipData.datum.y ? (d.missing ? "#f00" : props.color) : "#fff")}
+            circleFill={(d) => (d.y === tooltipData?.datum?.y ? (d.missing ? "#f00" : props.color) : "#fff")}
             showCircle
           />
           <Brush
