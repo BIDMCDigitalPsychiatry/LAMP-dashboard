@@ -36,6 +36,7 @@ export default function PreventData({
   participant,
   activity,
   events,
+  type,
   graphType,
   earliestDate,
   enableEditMode,
@@ -47,6 +48,7 @@ export default function PreventData({
   participant: ParticipantObj
   activity: any
   events: any
+  type: any
   graphType: number
   earliestDate: any
   enableEditMode: boolean
@@ -55,7 +57,6 @@ export default function PreventData({
   onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
-
   return (
     <Grid container direction="row" justify="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>
@@ -75,7 +76,7 @@ export default function PreventData({
           style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
         >
           {graphType === 1 ? (
-            <RadialDonutChart data={events} detailPage={true} width={370} height={350} />
+            <RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />
           ) : graphType === 2 ? (
             <Sparkline
               minWidth={250}

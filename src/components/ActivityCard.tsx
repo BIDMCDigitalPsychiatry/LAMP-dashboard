@@ -125,11 +125,13 @@ export default function ActivityCard({
               color={blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
-                y: strategies[activity.spec](
-                  activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
-                  activity,
-                  idx
-                ),
+                y: strategies[activity.spec]
+                  ? strategies[activity.spec](
+                      activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                      activity,
+                      idx
+                    )
+                  : 0,
                 slice: d.temporal_slices,
                 missing:
                   activity.spec === "lamp.survey"
@@ -163,11 +165,13 @@ export default function ActivityCard({
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),
-            y: strategies[activity.spec](
-              activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
-              activity,
-              undefined
-            ),
+            y: strategies[activity.spec]
+              ? strategies[activity.spec](
+                  activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                  activity,
+                  undefined
+                )
+              : 0,
             slice: d.temporal_slices,
             missing:
               activity.spec === "lamp.survey"

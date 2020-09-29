@@ -34,16 +34,7 @@ import Breathe from "./Breathe"
 import Goals from "./Goals"
 import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
-
-const demoActivities = {
-  "Balloon Risk": "balloonrisk",
-  "Box Game": "boxgame",
-  "Cats n Dogs": "catsndogs",
-  "Dot Touch": "dottouch",
-  Jewels: "jewels",
-  "Jewels Pro": "jewelspro",
-  "Pop The Bubbles": "popthebubbles",
-}
+import EmbeddedActivity from "./EmbeddedActivity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -159,57 +150,25 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+const demoActivities = [
+  "Balloon Risk",
+  "Spatial Span",
+  "Cats and Dogs",
+  "Dot Touch",
+  "Jewels Trails A",
+  "Jewels Trails B",
+  "Pop The Bubbles",
+]
+
 export default function Manage({ participant, activities, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
-  const [iFrame, setIframe] = useState(null)
-  const [gameSettings, setGameSettings] = useState(null)
   const [activityId, setActivityId] = useState(null)
-  const [saved, setSaved] = useState(false)
-  const [data, setData] = useState(null)
+  const [activityName, setActivityName] = useState(null)
 
-  useEffect(() => {
-    if (iFrame != null) {
-      iFrame.onload = function () {
-        iFrame.contentWindow.postMessage(gameSettings, "*")
-      }
-    }
-  }, [iFrame])
-
-  useEffect(() => {
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
-    var eventer = window[eventMethod]
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
-    // Listen to message from child window
-    eventer(
-      messageEvent,
-      function (e) {
-        if (!saved && activityId !== null) {
-          let data = JSON.parse(e.data)
-          data["activity"] = activityId
-          setData(data)
-          setEmbeddedActivity(undefined)
-          setGameSettings(null)
-          setActivityId(null)
-        }
-      },
-      false
-    )
-  }, [activityId])
-
-  useEffect(() => {
-    if (embeddedActivity === undefined && data !== null && !saved) {
-      LAMP.ActivityEvent.create(participant.id, data)
-        .catch((e) => console.dir(e))
-        .then((x) => {
-          setSaved(true)
-        })
-    }
-  }, [embeddedActivity])
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
@@ -219,28 +178,6 @@ export default function Manage({ participant, activities, ...props }) {
 
   const handleClose = () => {
     setOpen(false)
-  }
-
-  const activateEmbeddedActivity = async (name, id) => {
-    name =
-      name === "Jewels"
-        ? "Jewels Trails A"
-        : name === "Jewels Pro"
-        ? "Jewels Trails B"
-        : name === "Box Game"
-        ? "Spatial Span"
-        : name
-    const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []
-    setActivityId(details[0] ?? [])
-    setGameSettings(details[1] ?? [])
-    setSaved(false)
-    let response = await fetch(
-      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
-    )
-    // let response = await fetch(
-    //   `${id}.html.b64`
-    // )
-    setEmbeddedActivity(atob(await response.text()))
   }
 
   return (
@@ -330,14 +267,17 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        {Object.entries(demoActivities).map((entry) => (
+        {demoActivities.map((entry) => (
           <Grid
             item
             xs={6}
             sm={4}
             md={3}
             lg={3}
-            onClick={() => activateEmbeddedActivity(entry[0], entry[1])}
+            onClick={() => {
+              setActivityName(entry)
+              handleClickOpen("Game")
+            }}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -345,39 +285,19 @@ export default function Manage({ participant, activities, ...props }) {
                 <Box mt={2} mb={1}>
                   <InfoIcon />
                 </Box>
-                <Typography className={classes.cardlabel}>{entry[0]}</Typography>
+                <Typography className={classes.cardlabel}>{entry}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
         ))}
       </Grid>
       <ResponsiveDialog
-        transient
-        animate
-        fullScreen
-        open={!!embeddedActivity}
-        onClose={() => {
-          setEmbeddedActivity(undefined)
-        }}
-      >
-        <div style={{ display: "flex", width: "100%", height: "100%", flexDirection: "column", overflow: "hidden" }}>
-          <iframe
-            ref={(e) => {
-              setIframe(e)
-            }}
-            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-            sandbox="allow-scripts"
-            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
-            srcDoc={embeddedActivity}
-          />
-        </div>
-      </ResponsiveDialog>
-      <ResponsiveDialog
-        transient={false}
+        transient={launchedActivity === "Game" ? true : false}
         animate
         fullScreen
         open={!!launchedActivity}
         onClose={() => {
+          setOpen(false)
           setLaunchedActivity(undefined)
         }}
       >
@@ -426,10 +346,21 @@ export default function Manage({ participant, activities, ...props }) {
                 }}
               />
             ),
-            jewels: <Jewels onComplete={() => setLaunchedActivity(undefined)} />,
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             Medication_tracker: (
               <NewMedication
+                participant={participant}
+                onComplete={() => {
+                  setOpen(false)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            Game: (
+              <EmbeddedActivity
+                name={activityName}
+                id={activityId}
+                activities={activities}
                 participant={participant}
                 onComplete={() => {
                   setOpen(false)

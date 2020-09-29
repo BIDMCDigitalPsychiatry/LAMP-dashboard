@@ -322,7 +322,7 @@ function _useTernaryBool() {
 }
 
 function RadioOption({ onChange, options, value, ...props }) {
-  const [selectedValue, setSelectedValue] = useState(value || "")
+  const [selectedValue, setSelectedValue] = useState(value >= 0 ? value : "")
   const classes = useStyles()
 
   return (

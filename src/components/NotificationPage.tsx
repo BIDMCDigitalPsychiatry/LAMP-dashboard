@@ -1,9 +1,9 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { Typography, makeStyles, Box, Grid, Container } from "@material-ui/core"
-
+import { Typography, makeStyles, Box } from "@material-ui/core"
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
+import EmbeddedActivity from "./EmbeddedActivity"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -14,15 +14,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NotificationPage({ participant, activityId, ...props }) {
   const classes = useStyles()
-  const [activity, setActivity] = useState([])
+  const [activity, setActivity] = useState(null)
   const [loaded, setLoaded] = useState(false)
   useEffect(() => {
     ;(async () => {
-      LAMP.Activity.allByStudy(activityId).then(setActivity)
+      LAMP.Activity.view(activityId).then(setActivity)
     })()
   }, [])
   useEffect(() => {
-    if (activity.length > 0) {
+    console.log(activity)
+    if (activity !== null) {
+      console.log(activity)
       setLoaded(true)
     }
   }, [activity])
@@ -31,7 +33,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: response.duration,
-      activity: activity[idx].id,
+      activity: activity.id,
       static_data: {},
       temporal_slices: (x || []).map((y) => ({
         item: y !== undefined ? y.item : null,
@@ -50,17 +52,32 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     })
   }
   return (
-    <div className={classes.root}>
-      {loaded && activity[0]?.spec === "lamp.survey" && (
-        <SurveyInstrument
-          id={participant}
-          type={activity[0]?.name ?? ""}
-          fromPrevent={false}
-          group={activity}
-          setVisibleActivities={setActivity}
-          onComplete={submitSurvey}
-        />
-      )}
+    <div style={{ height: "100%" }}>
+      {loaded &&
+        (activity?.spec === "lamp.survey" ? (
+          <SurveyInstrument
+            id={participant}
+            type={activity?.name ?? ""}
+            fromPrevent={false}
+            group={[activity]}
+            setVisibleActivities={setActivity}
+            onComplete={submitSurvey}
+          />
+        ) : activity?.spec === "lamp.cats_and_dogs" ||
+          activity?.spec === "lamp.jewels_a" ||
+          activity?.spec === "lamp.jewels_b" ||
+          activity?.spec === "lamp.spatial_span" ? (
+          <EmbeddedActivity
+            name={activity?.name}
+            activities={[activity]}
+            participant={participant}
+            onComplete={() => {}}
+          />
+        ) : (
+          <Box textAlign="center">
+            <Typography variant="h5">Coming Soon !!</Typography>
+          </Box>
+        ))}
     </div>
   )
 }

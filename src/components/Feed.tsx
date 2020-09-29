@@ -47,7 +47,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
 import SurveyInstrument from "./SurveyInstrument"
-
+import EmbeddedActivity from "./EmbeddedActivity"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -400,6 +400,8 @@ export default function Feed({
   const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
   const [events, setEvents] = useState(null)
+  const [activityId, setActivityId] = useState(null)
+  const [activityName, setActivityName] = useState(null)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -459,10 +461,10 @@ export default function Feed({
   }
 
   useEffect(() => {
+    getFeedByDate(new Date())
     ;(async () => {
       await getFeedData()
     })()
-    getFeedByDate(new Date())
   }, [])
 
   function getDayNumber(date: Date) {
@@ -529,13 +531,15 @@ export default function Feed({
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
+        console.log(feed)
+
         savedData = events[feed.name] ?? []
         feed.schedule.map((schedule) => {
           scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
-
+          // console.log(new Date(date) === new Date(scheduleStartDate)
           if (currentDate.getTime() >= scheduleStartDate.getTime()) {
             scheduleTime = new Date(new Date(schedule.time).toLocaleString())
             let timeVal = getTimeValue(scheduleTime)
@@ -546,8 +550,8 @@ export default function Feed({
             let scheduledDate = new Date(scheduleStartDate)
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
-            schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
-            schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
+            schedule.icon = feed.name
+            schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
             schedule.type = feed.name
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
@@ -670,7 +674,7 @@ export default function Feed({
                 }
                 break
               case "none":
-                if (new Date(date) === new Date(scheduleStartDate)) {
+                if (new Date(currentDate).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
                   schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
                 }
@@ -702,6 +706,7 @@ export default function Feed({
     }
   }, [events])
   const getFeedByDate = (date: Date) => {
+    console.log(activities)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
     setFeeds(feeds)
     changeDate(new Date(date))
@@ -792,6 +797,13 @@ export default function Feed({
                             setIndex(index)
                             setIcon(<SleepTips />)
                             showFeedDetails(feed.type)
+                          }
+                          if (feed.group == "manage") {
+                            console.log(feed)
+                            setActivityName(feed.title)
+                            setActivityId(feed.activityData.id)
+                            setVisibleActivities([feed.activityData])
+                            showFeedDetails("game")
                           }
                         }
                       }}
@@ -952,6 +964,17 @@ export default function Feed({
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                   completeFeed(index)
+                }}
+              />
+            ),
+            game: (
+              <EmbeddedActivity
+                name={activityName}
+                activities={activities}
+                participant={participant}
+                onComplete={() => {
+                  completeFeed(index)
+                  setLaunchedActivity(undefined)
                 }}
               />
             ),

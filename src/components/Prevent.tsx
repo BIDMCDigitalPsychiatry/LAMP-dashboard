@@ -234,68 +234,67 @@ function _patientMode() {
 }
 
 function getSocialContextGroups(gps_events?: SensorEventObj[]) {
-  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
-  return [
-    [
-      {
-        label: "Alone",
-        value: gps_events.filter((x) => x.data.context.social === "alone").length,
-      },
-      {
-        label: "Friends",
-        value: gps_events.filter((x) => x.data.context.social === "friends").length,
-      },
-      {
-        label: "Family",
-        value: gps_events.filter((x) => x.data.context.social === "family").length,
-      },
-      {
-        label: "Peers",
-        value: gps_events.filter((x) => x.data.context.social === "peers").length,
-      },
-      {
-        label: "Crowd",
-        value: gps_events.filter((x) => x.data.context.social === "crowd").length,
-      },
-    ],
+  gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
+  let events = [
+    {
+      label: "Alone",
+      value: gps_events.filter((x) => x.data.context.social === "alone").length,
+    },
+    {
+      label: "Friends",
+      value: gps_events.filter((x) => x.data.context.social === "friends").length,
+    },
+    {
+      label: "Family",
+      value: gps_events.filter((x) => x.data.context.social === "family").length,
+    },
+    {
+      label: "Peers",
+      value: gps_events.filter((x) => x.data.context.social === "peers").length,
+    },
+    {
+      label: "Crowd",
+      value: gps_events.filter((x) => x.data.context.social === "crowd").length,
+    },
   ]
+  return events
 }
 
 function getEnvironmentalContextGroups(gps_events?: SensorEventObj[]) {
-  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment || !!x.data?.context?.social) ?? [] // Catch missing data.
-  return [
-    [
-      {
-        label: "Home",
-        value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
-          .length,
-      },
-      {
-        label: "School",
-        value: gps_events.filter((x) => x.data.context.environment === "school").length,
-      },
-      {
-        label: "Work",
-        value: gps_events.filter((x) => x.data.context.environment === "work").length,
-      },
-      {
-        label: "Hospital",
-        value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
-      },
-      {
-        label: "Outside",
-        value: gps_events.filter((x) => x.data.context.environment === "outside").length,
-      },
-      {
-        label: "Shopping",
-        value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
-      },
-      {
-        label: "Transit",
-        value: gps_events.filter((x) => x.data.context.environment === "transit").length,
-      },
-    ],
+  gps_events = gps_events?.filter((x) => !!x.data?.context?.environment) ?? [] // Catch missing data.
+  let events = [
+    {
+      label: "Home",
+      value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
+        .length,
+    },
+    {
+      label: "School",
+      value: gps_events.filter((x) => x.data.context.environment === "school").length,
+    },
+    {
+      label: "Work",
+      value: gps_events.filter((x) => x.data.context.environment === "work").length,
+    },
+    {
+      label: "Hospital",
+      value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
+    },
+    {
+      label: "Outside",
+      value: gps_events.filter((x) => x.data.context.environment === "outside").length,
+    },
+    {
+      label: "Shopping",
+      value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
+    },
+    {
+      label: "Transit",
+      value: gps_events.filter((x) => x.data.context.environment === "transit").length,
+    },
   ]
+
+  return events
 }
 
 // Perform event coalescing/grouping by sensor or activity type.
@@ -501,6 +500,28 @@ export const strategies = {
   "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score).toFixed(1) || 0,
 }
 
+function getTimeSpan(timestamp: number): String {
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  if (year === new Date().getFullYear()) {
+    if (date.getMonth() === new Date().getMonth()) {
+      const curr = new Date(date)
+      const first = date.getDate() - date.getDay()
+      const firstDate = new Date(curr.setDate(first))
+      const lastDate = new Date(curr.setDate(first + 7))
+      if (date.getTime() <= lastDate.getTime() && date.getTime() >= firstDate.getTime()) {
+        return "this week"
+      } else {
+        return "this month"
+      }
+    } else {
+      return "last " + (new Date().getMonth() - date.getMonth()) + " months"
+    }
+  } else {
+    return "last " + (new Date().getFullYear() - date.getFullYear()) + " years"
+  }
+}
+
 export default function Prevent({
   participant,
   activeTab,
@@ -525,7 +546,6 @@ export default function Prevent({
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
-  const [goals, setGoals] = React.useState({})
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -570,6 +590,9 @@ export default function Prevent({
   const [selectedActivity, setSelectedActivity] = React.useState({})
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
+  const [timeSpans, setTimeSpans] = React.useState({})
+  let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
+  let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
   const goalIcon = (goalType: string) => {
     return goalType == "Exercise" ? (
@@ -600,7 +623,6 @@ export default function Prevent({
       let selActivities = await getSelectedActivities(participant)
       setSelectedActivities(selActivities)
       let selSensors = await getSelectedSensors(participant)
-      setSelectedSensors(selSensors)
       let journalCount = await getJournalCount(participant)
       setJournalCount(journalCount)
       let activities = await getActivities(participant)
@@ -615,22 +637,34 @@ export default function Prevent({
       }
       if (journalCount > 0) activities.push({ name: "Journals" })
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
+
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
+
       setActivityEvents(activityEvents)
+
       let activityEventCount = getActivityEventCount(activityEvents)
-      if (journalCount > 0) activityEventCount["Journals"] = journalCount
+      if (journalCount > 0) {
+        activityEventCount["Journals"] = journalCount
+        timeSpans["Journals"] = { timestamp: new Date().getTime() }
+      }
       if (typeof goals !== "undefined") {
         groupByType = goals.reduce((goal, it) => {
           goal[it.goalType] = goal[it.goalType] + 1 || 1
           activityEventCount[it.goalType] = goal[it.goalType]
+          timeSpans[it.goalType] = { timestamp: new Date().getTime() }
           return goal
         }, {})
       }
+      setTimeSpans(timeSpans)
       setActivityCounts(activityEventCount)
       activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
       setActivities(activities)
       let sensorEvents = await getSensorEvents(participant)
-      setSensorEvents(sensorEvents)
       let sensorEventCount = getSensorEventCount(sensorEvents)
+      setSelectedSensors(selSensors)
+
+      setSensorEvents(sensorEvents)
+
       setSensorCounts(sensorEventCount)
     })()
   }, [])
@@ -681,7 +715,7 @@ export default function Prevent({
                     <Box className={classes.preventGraph}>
                       <Typography variant="h2">{journalCount}</Typography>
                     </Box>
-                    <Typography variant="h6">entries this month</Typography>
+                    <Typography variant="h6">entries {getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -706,7 +740,7 @@ export default function Prevent({
                     <Box className={classes.preventGraph}>
                       <Typography variant="h2">{activityCounts[activity.name]}</Typography>
                     </Box>
-                    <Typography variant="h6">entries this month</Typography>
+                    <Typography variant="h6">entries {getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -726,11 +760,13 @@ export default function Prevent({
                         startDate={earliestDate()}
                         data={activityEvents?.[activity.name]?.map((d) => ({
                           x: new Date(d.timestamp),
-                          y: strategies[activity.spec](
-                            activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
-                            activity,
-                            undefined
-                          ),
+                          y: strategies[activity.spec]
+                            ? strategies[activity.spec](
+                                activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                                activity,
+                                undefined
+                              )
+                            : 0,
                         }))}
                       >
                         <LinearGradient
@@ -752,7 +788,7 @@ export default function Prevent({
                         />
                       </Sparkline>
                     </Box>
-                    <Typography variant="h6">this month</Typography>
+                    <Typography variant="h6">{getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -770,7 +806,7 @@ export default function Prevent({
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        {(selectedSensors || []).includes("Social Context") && (
+        {(selectedSensors || []).includes("Social Context") && sensorCounts["Social Context"] > 0 && (
           <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
@@ -778,7 +814,9 @@ export default function Prevent({
                 onClick={() =>
                   openRadialDetails(
                     "Social Context",
-                    sensorEvents["lamp.gps.contextual"],
+                    sensorEvents["lamp.gps.contextual"].filter(
+                      (x) => socialContexts.indexOf(x.data.context.environment) >= 0
+                    ),
                     getSocialContextGroups(sensorEvents["lamp.gps.contextual"]),
                     1
                   )
@@ -789,6 +827,7 @@ export default function Prevent({
                 </Typography>
                 <Box>
                   <RadialDonutChart
+                    type={socialContexts}
                     data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                     detailPage={false}
                     width={150}
@@ -799,7 +838,7 @@ export default function Prevent({
             </ButtonBase>
           </Grid>
         )}
-        {(selectedSensors || []).includes("Environmental Context") && (
+        {(selectedSensors || []).includes("Environmental Context") && sensorCounts["Environmental Context"] > 0 && (
           <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
@@ -807,7 +846,9 @@ export default function Prevent({
                 onClick={() =>
                   openRadialDetails(
                     "Environmental Context",
-                    sensorEvents["lamp.gps.contextual"],
+                    sensorEvents["lamp.gps.contextual"].filter(
+                      (x) => envContexts.indexOf(x.data.context.environment) >= 0
+                    ),
                     getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
                     1
                   )
@@ -818,6 +859,7 @@ export default function Prevent({
                 </Typography>
                 <Box>
                   <RadialDonutChart
+                    type={envContexts}
                     data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                     detailPage={false}
                     width={150}
@@ -829,7 +871,7 @@ export default function Prevent({
           </Grid>
         )}
 
-        {(selectedSensors || []).includes("Step Count") && (
+        {(selectedSensors || []).includes("Step Count") && sensorCounts["Step Count"] > 0 && (
           <Grid item xs={6} sm={4} md={3} lg={3}>
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
               <Card
@@ -924,7 +966,9 @@ export default function Prevent({
           ) : (
             <MultipleSelect
               selected={selectedSensors || []}
-              items={[`Environmental Context`, `Step Count`, `Social Context`]}
+              items={[`Environmental Context`, `Step Count`, `Social Context`].filter(
+                (sensor) => sensorCounts[sensor] > 0
+              )}
               showZeroBadges={false}
               badges={sensorCounts}
               onChange={(x) => {
@@ -974,6 +1018,7 @@ export default function Prevent({
           <PreventData
             participant={participant}
             activity={selectedActivity}
+            type={graphType === 2 ? (selectedActivity === "Environmental Context" ? envContexts : socialContexts) : []}
             events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
             graphType={graphType}
             earliestDate={earliestDate}
