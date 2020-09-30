@@ -313,64 +313,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-async function getActivityEvents(
-  participant: ParticipantObj,
-  _activities: ActivityObj[],
-  startTime: number,
-  endTime: number
-): Promise<{ [groupName: string]: ActivityEventObj[] }> {
-  let original = (await LAMP.ActivityEvent.allByParticipant(participant.id))
-    .map((x) => ({
-      ...x,
-      activity: _activities.find((y) => x.activity === y.id),
-    }))
-    .filter((item) => item.timestamp >= startTime && item.timestamp <= endTime)
-    .sort((x, y) => x.timestamp - y.timestamp)
-    .map((x) => ({
-      ...x,
-      activity: x.activity?.name ?? x.static_data?.survey_name ?? "",
-    }))
-    .groupBy("activity") as any
-  let customEvents = _activities
-    .filter((x) => x.spec === "lamp.dashboard.custom_survey_group")
-    .map((x) =>
-      x?.settings?.map((y, idx) =>
-        original?.[y.activity]
-          ?.map((z) => ({
-            idx: idx,
-            timestamp: z.timestamp,
-            duration: z.duration,
-            activity: x.name,
-            slices: z.temporal_slices.find((a) => a.item === y.question),
-          }))
-          .filter((y) => y.slices !== undefined)
-      )
-    )
-    .filter((x) => x !== undefined)
-    .flat(2)
-    .groupBy("activity")
-  let customGroups = Object.entries(customEvents).map(([k, x]) => [
-    k,
-    Object.values(x.groupBy("timestamp"))
-      .map((z: any) => ({
-        timestamp: z?.[0].timestamp,
-        duration: z?.[0].duration,
-        activity: z?.[0].activity,
-        static_data: {},
-        temporal_slices: Array.from(
-          z?.reduce((prev, curr) => ({ ...prev, [curr.idx]: curr.slices }), {
-            length:
-              z
-                .map((a) => a.idx)
-                .sort()
-                .slice(-1)[0] + 1,
-          })
-        ).map((a) => (a === undefined ? {} : a)),
-      }))
-      .filter((item) => item.timestamp >= startTime && item.timestamp <= endTime),
-  ])
-  return Object.fromEntries([...Object.entries(original), ...customGroups])
-}
 
 export default function Feed({
   participant,
@@ -500,23 +442,15 @@ export default function Feed({
     return days
   }
 
-  const getEvents = async (date: Date, feeds: ActivityObj[], from?: number, to?: number) => {
+  const getEvents = async (date: Date) => {
     date.setHours(0)
     date.setMinutes(0)
     date.setSeconds(0)
-    let startHour = from ?? date.getTime()
-    let endHour = to ?? startHour + 86400000
-    let activityEvents = await getActivityEvents(participant, feeds, startHour, endHour)
+    let startTime =date.getTime()
+    let endTime = startTime + 86400000
+    let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime)
     return activityEvents
   }
-
-  // const getDates = () => {
-  //   if (feeds.length > 0) {
-  //     feed.schedule.map((schedule) => {
-
-  //     })
-  //   }
-  // }
 
   const getDetails = () => {
     let currentFeed = []
@@ -531,15 +465,12 @@ export default function Feed({
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
-        console.log(feed)
-
-        savedData = events[feed.name] ?? []
+        savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
           scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
-          // console.log(new Date(date) === new Date(scheduleStartDate)
           if (currentDate.getTime() >= scheduleStartDate.getTime()) {
             scheduleTime = new Date(new Date(schedule.time).toLocaleString())
             let timeVal = getTimeValue(scheduleTime)
@@ -555,7 +486,7 @@ export default function Feed({
             schedule.type = feed.name
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
-            schedule.completed = savedData.length > 0 ? true : false
+           
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() >= currentDate.getTime()
@@ -566,6 +497,7 @@ export default function Feed({
             switch (schedule.repeat_interval) {
               case "triweekly":
               case "biweekly":
+                schedule.completed = savedData.length > 0 ? true : false
                 let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
                 if (type.indexOf(dayNumber) > -1) {
                   currentFeed.push(schedule)
@@ -573,6 +505,7 @@ export default function Feed({
                 }
                 break
               case "weekly":
+                schedule.completed = savedData.length > 0 ? true : false
                 let dayNo = getDayNumber(new Date(scheduleStartDate))
                 if (dayNo === dayNumber) {
                   currentFeed.push(schedule)
@@ -585,6 +518,7 @@ export default function Feed({
               case "every6h":
               case "every12h":
                 if (schedule.repeat_interval === "daily") {
+                  schedule.completed = savedData.length > 0 ? true : false
                   currentFeed.push(schedule)
                 } else {
                   let startTime = scheduledDate.getTime()
@@ -613,8 +547,8 @@ export default function Feed({
                     if (newDateVal.getDate() === date.getDate()) {
                       time = getTimeValue(newDateVal)
 
-                      intervalStart = start
-                      intervalEnd = start + hourVal
+                      intervalStart = new Date(start).getTime() - hourVal
+                      intervalEnd = new Date(start).getTime() 
                       let filteredData = savedData.filter(
                         (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
                       )
@@ -622,7 +556,7 @@ export default function Feed({
                       completedVal = filteredData.length > 0 ? true : false
                       clickableVal =
                         new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                        new Date().getTime() <= intervalStart
+                        new Date().getTime() >= intervalStart &&  new Date().getTime() <= intervalEnd                         
                           ? true
                           : false
                       let each = {
@@ -639,6 +573,7 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "custom":
+                schedule.completed = savedData.length > 0 ? true : false
                 schedule.custom_time.map((time) => {
                   let scheduledDate = new Date(currentDate)
                   scheduledDate.setHours(new Date(time).getHours())
@@ -655,6 +590,7 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
                 break
               case "monthly":
+                schedule.completed = savedData.length > 0 ? true : false
                 if (new Date(date).getDate() === new Date(scheduleStartDate).getDate()) {
                   schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
@@ -662,6 +598,7 @@ export default function Feed({
                 selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleTimeString())
                 break
               case "bimonthly":
+                schedule.completed = savedData.length > 0 ? true : false
                 if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
                   schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
@@ -674,6 +611,7 @@ export default function Feed({
                 }
                 break
               case "none":
+                schedule.completed = savedData.length > 0 ? true : false
                 if (new Date(currentDate).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
                   schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
@@ -706,12 +644,11 @@ export default function Feed({
     }
   }, [events])
   const getFeedByDate = (date: Date) => {
-    console.log(activities)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
     setFeeds(feeds)
     changeDate(new Date(date))
     ;(async () => {
-      await getEvents(date, feeds).then(setEvents)
+      await getEvents(date).then(setEvents)
     })()
   }
 
@@ -799,7 +736,6 @@ export default function Feed({
                             showFeedDetails(feed.type)
                           }
                           if (feed.group == "manage") {
-                            console.log(feed)
                             setActivityName(feed.title)
                             setActivityId(feed.activityData.id)
                             setVisibleActivities([feed.activityData])

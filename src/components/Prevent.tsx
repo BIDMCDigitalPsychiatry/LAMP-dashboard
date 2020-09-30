@@ -44,6 +44,10 @@ import { ReactComponent as PreventBreatheIcon } from "../icons/PreventBreathe.sv
 import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
 import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
+import en from "javascript-time-ago/locale/en"
+import TimeAgo from "javascript-time-ago"
+TimeAgo.addLocale(en)
+const timeAgo = new TimeAgo("en-US")
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -500,30 +504,6 @@ export const strategies = {
   "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
 }
 
-function getTimeSpan(timestamp: number): String {
-  const date = new Date(timestamp)
-  const year = date.getFullYear()
-  if (year === new Date().getFullYear()) {
-    if (date.getMonth() === new Date().getMonth()) {
-      const curr = new Date(date)
-      const first = date.getDate() - date.getDay()
-      const firstDate = new Date(curr.setDate(first))
-      const lastDate = new Date(curr.setDate(first + 7))
-      if (date.getTime() <= lastDate.getTime() && date.getTime() >= firstDate.getTime()) {
-        return "this week"
-      } else {
-        return "this month"
-      }
-    } else {
-      let diff = new Date().getMonth() - date.getMonth()
-      return "last " + diff + (diff > 1 ? " months" : " month")
-    }
-  } else {
-    let diff = new Date().getFullYear() - date.getFullYear()
-    return "last " + diff + (diff > 1 ? " years" : " year")
-  }
-}
-
 export default function Prevent({
   participant,
   activeTab,
@@ -640,7 +620,7 @@ export default function Prevent({
       if (journalCount > 0) activities.push({ name: "Journals" })
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
 
-      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][0]]))
 
       setActivityEvents(activityEvents)
 
@@ -653,7 +633,7 @@ export default function Prevent({
         groupByType = goals.reduce((goal, it) => {
           goal[it.goalType] = goal[it.goalType] + 1 || 1
           activityEventCount[it.goalType] = goal[it.goalType]
-          timeSpans[it.goalType] = { timestamp: new Date().getTime() }
+          timeSpans[it.goalType+"-goal"] = { timestamp: new Date().getTime() }
           return goal
         }, {})
       }
@@ -717,7 +697,7 @@ export default function Prevent({
                     <Box className={classes.preventGraph}>
                       <Typography variant="h2">{journalCount}</Typography>
                     </Box>
-                    <Typography variant="h6">entries {getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
+                    <Typography variant="h6">entries {timeAgo.format(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -742,7 +722,7 @@ export default function Prevent({
                     <Box className={classes.preventGraph}>
                       <Typography variant="h2">{activityCounts[activity.name]}</Typography>
                     </Box>
-                    <Typography variant="h6">entries {getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
+                    <Typography variant="h6">entries {timeAgo.format(timeSpans[activity.name+"-goal"].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -790,7 +770,7 @@ export default function Prevent({
                         />
                       </Sparkline>
                     </Box>
-                    <Typography variant="h6">{getTimeSpan(timeSpans[activity.name].timestamp)}</Typography>
+                    <Typography variant="h6">{timeAgo.format(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
