@@ -15,7 +15,7 @@ function percentageCal(l, target) {
   })
 }
 
-export default function RadialDonutChart(props) {
+export default function RadialDonutChart(props) { 
   let data = props.data.sort((x, y) => (x.value > y.value ? -1 : 1))
   let total = data
     .map((val) => val.value)
@@ -41,7 +41,7 @@ export default function RadialDonutChart(props) {
         })
   return (
     <Box>
-      <Box style={{ float: supportsSidebar ? "left" : "none" }}>
+      <Box style={{ float: supportsSidebar && props.detailPage ? "left" : "none" }}>
         <RadialChart
           ariaLabel="This is a radial-chart chart of..."
           width={props.width}
