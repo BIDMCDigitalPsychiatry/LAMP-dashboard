@@ -22,7 +22,6 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     })()
   }, [])
   useEffect(() => {
-    console.log(activity)
     if (activity !== null) {
       console.log(activity)
       setLoaded(true)
@@ -75,7 +74,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           />
         ) : (
           <Box textAlign="center">
-            <Typography variant="h5">Coming Soon !!</Typography>
+            <Typography variant="h5" style={{ paddingTop: "20%" }}>
+              Coming Soon !!
+            </Typography>
           </Box>
         ))}
     </div>

@@ -212,8 +212,10 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
           srcDoc={embeddedActivity}
         />
       ) : (
-        <Box textAlign="center">
-          <Typography variant="h5">Coming Soon !!</Typography>
+        <Box textAlign="center" alignItems="center">
+          <Typography variant="h5" style={{ paddingTop: "20%" }}>
+            Coming Soon !!
+          </Typography>
         </Box>
       )}
     </div>

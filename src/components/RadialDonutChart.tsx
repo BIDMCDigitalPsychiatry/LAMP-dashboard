@@ -49,12 +49,12 @@ export default function RadialDonutChart(props) {
           margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
           renderTooltip={({ datum, fraction }) => {
             const { label } = datum
-            const style = { color: colorScale(label) }
+            const style = { color: "#3C5DDD" }
 
             return (
-              <div>
+              <div style={style}>
                 <div>
-                  <strong style={style}>{label}</strong>
+                  <strong>{label}</strong>
                 </div>
                 <div>{datum.value}%</div>
               </div>
