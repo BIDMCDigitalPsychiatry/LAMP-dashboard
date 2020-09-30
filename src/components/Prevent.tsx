@@ -520,7 +520,7 @@ function getTimeSpan(timestamp: number): String {
     }
   } else {
     let diff = new Date().getFullYear() - date.getFullYear()
-    return "last " + (diff > 1 ? " years" : " year")
+    return "last " + diff + (diff > 1 ? " years" : " year")
   }
 }
 
