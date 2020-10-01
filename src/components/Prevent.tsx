@@ -321,7 +321,8 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
             ? {
                 ...a,
                 data: {
-                  value: a.data.value + b.data.value,
+                  value: ((typeof a.data.value) == 'string' ? 0 : a.data.value) +
+                     ((typeof b.data.value) == 'string' ? 0 : b.data.value),
                   units: "steps",
                 },
               }
