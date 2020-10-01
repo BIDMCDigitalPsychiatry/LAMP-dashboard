@@ -99,7 +99,7 @@ function AppRouter({ ...props }) {
         password: x[1],
         serverAddress: x[2],
       }).then((x) => {
-        window.location.href = "/#/"
+        window.location.href = query[0]
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
