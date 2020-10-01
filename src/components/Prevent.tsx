@@ -620,7 +620,7 @@ export default function Prevent({
       if (journalCount > 0) activities.push({ name: "Journals" })
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
 
-      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length-1]]))
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
 
       setActivityEvents(activityEvents)
 
@@ -633,7 +633,7 @@ export default function Prevent({
         groupByType = goals.reduce((goal, it) => {
           goal[it.goalType] = goal[it.goalType] + 1 || 1
           activityEventCount[it.goalType] = goal[it.goalType]
-          timeSpans[it.goalType+"-goal"] = { timestamp: new Date().getTime() }
+          timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
           return goal
         }, {})
       }
@@ -720,7 +720,9 @@ export default function Prevent({
                     <Box className={classes.preventGraph}>
                       <Typography variant="h2">{activityCounts[activity.name]}</Typography>
                     </Box>
-                    <Typography variant="h6">entries {timeAgo.format(timeSpans[activity.name+"-goal"].timestamp)}</Typography>
+                    <Typography variant="h6">
+                      entries {timeAgo.format(timeSpans[activity.name + "-goal"].timestamp)}
+                    </Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -861,7 +863,7 @@ export default function Prevent({
                     "Step Count",
                     sensorEvents?.["lamp.steps"]?.map((d) => ({
                       x: new Date(parseInt(d.timestamp)),
-                      y: (typeof d.data.value) == 'string' ? 0 :  d.data.value  || 0,
+                      y: typeof d.data.value == "string" ? 0 : d.data.value || 0,
                     })) ?? [],
                     2
                   )
@@ -882,7 +884,7 @@ export default function Prevent({
                     data={
                       sensorEvents?.["lamp.steps"]?.map((d) => ({
                         x: new Date(parseInt(d.timestamp)),
-                        y: (typeof d.data.value) == 'string' ? 0 :  d.data.value  || 0,
+                        y: typeof d.data.value == "string" ? 0 : d.data.value || 0,
                       })) ?? []
                     }
                   >

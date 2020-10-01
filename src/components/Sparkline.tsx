@@ -164,8 +164,8 @@ export default withParentSize(function Sparkline({ ...props }) {
       )}
     </List>
   )
-  
-  if(props.data.length === 1  ) {
+
+  if (props.data.length === 1) {
     props.data[0].x = new Date(props.data[0].x).toLocaleString()
   }
   return (
@@ -191,7 +191,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           snapTooltipToData={false}
           tooltipData={tooltipData}
           xScale={{
-            type:  props.data.length === 1 ? "ordinal" :"time",
+            type: props.data.length === 1 ? "ordinal" : "time",
           }}
           yScale={{ type: "linear" }}
         >

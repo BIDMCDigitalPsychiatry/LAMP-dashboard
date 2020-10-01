@@ -446,7 +446,7 @@ export default function Feed({
     date.setHours(0)
     date.setMinutes(0)
     date.setSeconds(0)
-    let startTime =date.getTime()
+    let startTime = date.getTime()
     let endTime = startTime + 86400000
     let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime)
     return activityEvents
@@ -486,7 +486,7 @@ export default function Feed({
             schedule.type = feed.name
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
-           
+
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() >= currentDate.getTime()
@@ -548,7 +548,7 @@ export default function Feed({
                       time = getTimeValue(newDateVal)
 
                       intervalStart = new Date(start).getTime() - hourVal
-                      intervalEnd = new Date(start).getTime() 
+                      intervalEnd = new Date(start).getTime()
                       let filteredData = savedData.filter(
                         (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
                       )
@@ -556,7 +556,8 @@ export default function Feed({
                       completedVal = filteredData.length > 0 ? true : false
                       clickableVal =
                         new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                        new Date().getTime() >= intervalStart &&  new Date().getTime() <= intervalEnd                         
+                        new Date().getTime() >= intervalStart &&
+                        new Date().getTime() <= intervalEnd
                           ? true
                           : false
                       let each = {
