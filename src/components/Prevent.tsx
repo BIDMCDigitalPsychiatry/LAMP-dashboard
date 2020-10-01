@@ -322,8 +322,8 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
                 ...a,
                 data: {
                   value:
-                    (typeof a.data.value == "string" ? 0 : a.data.value) +
-                    (typeof b.data.value == "string" ? 0 : b.data.value),
+                    (typeof a.data.value !== "number" ? 0 : a.data.value) +
+                    (typeof b.data.value !== "number" ? 0 : b.data.value),
                   units: "steps",
                 },
               }
@@ -868,7 +868,7 @@ export default function Prevent({
                     "Step Count",
                     sensorEvents?.["lamp.steps"]?.map((d) => ({
                       x: new Date(parseInt(d.timestamp)),
-                      y: typeof d.data.value == "string" ? 0 : d.data.value || 0,
+                      y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
                     })) ?? [],
                     2
                   )
@@ -889,7 +889,7 @@ export default function Prevent({
                     data={
                       sensorEvents?.["lamp.steps"]?.map((d) => ({
                         x: new Date(parseInt(d.timestamp)),
-                        y: typeof d.data.value == "string" ? 0 : d.data.value || 0,
+                        y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
                       })) ?? []
                     }
                   >
