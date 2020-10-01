@@ -722,7 +722,7 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        if (!feed.completed && feed.clickable) {
+                        if (!feed.completed && feed.clickable && feed.time >= new Date().getTime()) {
                           setIndex(index)
                           if (feed.group == "assess") {
                             setSurveyName(feed.title)
@@ -742,6 +742,8 @@ export default function Feed({
                             setVisibleActivities([feed.activityData])
                             showFeedDetails("game")
                           }
+                        } else if (!feed.completed && feed.clickable) {
+                          getFeedByDate(date)
                         }
                       }}
                     >
