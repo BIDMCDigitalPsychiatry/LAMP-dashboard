@@ -321,8 +321,9 @@ async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupNam
             ? {
                 ...a,
                 data: {
-                  value: ((typeof a.data.value) == 'string' ? 0 : a.data.value) +
-                     ((typeof b.data.value) == 'string' ? 0 : b.data.value),
+                  value:
+                    (typeof a.data.value == "string" ? 0 : a.data.value) +
+                    (typeof b.data.value == "string" ? 0 : b.data.value),
                   units: "steps",
                 },
               }
@@ -737,7 +738,7 @@ export default function Prevent({
                     <Box className={classes.maxw300}>
                       <Sparkline
                         ariaLabel={activity.name}
-                        margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
+                        margin={{ top: 50, right: 0, bottom: 1, left: 0 }}
                         width={300}
                         height={70}
                         startDate={earliestDate()}
@@ -745,12 +746,15 @@ export default function Prevent({
                           x: new Date(d.timestamp),
                           y: strategies[activity.spec]
                             ? strategies[activity.spec](
-                                activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                                activity.spec === "lamp.survey"
+                                  ? d?.temporal_slices ?? d["temporal_slices"]
+                                  : d.static_data,
                                 activity,
                                 undefined
                               )
                             : 0,
                         }))}
+                        valueAccessor={(datum) => datum}
                       >
                         <LinearGradient
                           id="gredient"
@@ -766,8 +770,8 @@ export default function Prevent({
                           showArea={true}
                           fill={`url(#gradient)`}
                           stroke="#3C5DDD"
-                          strokeWidth={2}
-                          strokeLinecap="butt"
+                          strokeWidth={activityEvents?.[activity.name]?.length === 1 ? 4 : 2}
+                          strokeLinecap="round"
                         />
                       </Sparkline>
                     </Box>
