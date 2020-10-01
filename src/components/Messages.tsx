@@ -156,7 +156,6 @@ export default function Messages({
       date: new Date(),
       text: msg,
     })
-    console.log(msgOpen)
     LAMP.Type.setAttachment(participant, "me", "lamp.messaging", all)
     setCurrentMessage(undefined)
     setAddMsg(false)
@@ -164,7 +163,6 @@ export default function Messages({
   }
 
   const messageSection = (type: number) => {
-    console.log(getMessages().filter((x) => x.type === "message"))
     return (
       <Box>
         {getMessages()

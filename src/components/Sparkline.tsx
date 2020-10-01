@@ -134,7 +134,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           primaryTypographyProps={{ variant: "overline", style: { lineHeight: "1.4" } }}
           secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
         >
-          {datum.x.toLocaleString("en-US", Date.formatStyle("full"))}
+          {datum ? datum?.x?.toLocaleString("en-US", Date.formatStyle("full")) : null}
         </ListItemText>
       </ListItem>
       {series && series[props.YAxisLabel ?? "Data"] && (
@@ -165,6 +165,9 @@ export default withParentSize(function Sparkline({ ...props }) {
     </List>
   )
 
+  if (props.data.length === 1) {
+    props.data[0].x = new Date(props.data[0].x).toLocaleString()
+  }
   return (
     <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
       {({ onMouseLeave, onMouseMove, tooltipData }) => (
@@ -188,7 +191,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           snapTooltipToData={false}
           tooltipData={tooltipData}
           xScale={{
-            type: "time",
+            type: props.data.length === 1 ? "ordinal" : "time",
           }}
           yScale={{ type: "linear" }}
         >
@@ -203,7 +206,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
           <YAxis
             label={null}
-            numTicks={7}
+            numTicks={10}
             rangePadding={4}
             axisStyles={styles.axis}
             tickStyles={styles.tick}
@@ -268,9 +271,9 @@ export default withParentSize(function Sparkline({ ...props }) {
             showHorizontalLine={true}
             stroke={props.color}
             strokeDasharray="3 1"
-            circleSize={(d) => (d.y === tooltipData.datum.y ? 8 : 4)}
+            circleSize={(d) => (d.y === tooltipData?.datum?.y ? 8 : 4)}
             circleStyles={{ strokeWidth: 0.0 }}
-            circleFill={(d) => (d.y === tooltipData.datum.y ? (d.missing ? "#f00" : props.color) : "#fff")}
+            circleFill={(d) => (d.y === tooltipData?.datum?.y ? (d.missing ? "#f00" : props.color) : "#fff")}
             showCircle
           />
           <Brush

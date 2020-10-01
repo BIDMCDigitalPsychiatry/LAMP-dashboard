@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     linkButton: {
-      padding: "15px 25px 15px 25px",
+      padding: "15px 40px 15px 40px",
     },
     dialogueContent: {
       padding: 20,
@@ -152,11 +152,15 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
       lineHeight: "38px",
       marginTop: "15%",
-
+      cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
       color: "rgba(0, 0, 0, 0.75)",
-      "&:hover": { background: "#cea000" },
+
+      "&:hover": {
+        boxShadow:
+          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+      },
     },
     dialogueCurve: { borderRadius: 10 },
   })

@@ -82,6 +82,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
+    cursor: "pointer",
+    "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
@@ -101,7 +103,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   todaydate: { paddingLeft: 13, color: "rgba(0, 0, 0, 0.4)" },
-  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600, cursor: "pointer" },
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   btnNav: { marginBottom: 0 },
   dialogueCurve: { borderRadius: 10, maxWidth: 400 },

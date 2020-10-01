@@ -47,8 +47,12 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
 import SurveyInstrument from "./SurveyInstrument"
-
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+import EmbeddedActivity from "./EmbeddedActivity"
+import LAMP, {
+  Participant as ParticipantObj,
+  Activity as ActivityObj,
+  ActivityEvent as ActivityEventObj,
+} from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 
@@ -321,7 +325,7 @@ export default function Feed({
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
-  const [completed, setCompleted] = useState(false)
+  const [show, setShow] = useState(false)
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
   const [medications, setMedications] = useState({})
@@ -337,20 +341,18 @@ export default function Feed({
   const [title, setTitle] = useState(null)
   const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  const [events, setEvents] = useState(null)
+  const [activityId, setActivityId] = useState(null)
+  const [activityName, setActivityName] = useState(null)
 
-  const markCompleted = (event: any, index: number) => {
-    if (event.target.closest("div").className.indexOf("MuiStep-root") > -1) {
-      completeFeed(index)
-    }
-  }
+  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const completeFeed = (index: number) => {
     let feed = currentFeed
     feed[index].completed = true
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", feed)
+    //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(feed))
     setCurrentFeed(feed)
-    setCompleted(!completed)
+    //setCompleted(!completed)
   }
 
   const getFeedData = async () => {
@@ -401,23 +403,11 @@ export default function Feed({
   }
 
   useEffect(() => {
+    getFeedByDate(new Date())
     ;(async () => {
       await getFeedData()
-      let feeds = []
-      let schedule
-      activities.map((activity) => {
-        schedule = activity?.schedule ?? []
-        if (schedule.length > 0) {
-          feeds.push(activity)
-        }
-      })
-      setFeeds(feeds)
     })()
   }, [])
-
-  useEffect(() => {
-    getFeedByDate(new Date())
-  }, [feeds])
 
   function getDayNumber(date: Date) {
     date = new Date(date)
@@ -452,106 +442,179 @@ export default function Feed({
     return days
   }
 
-  const getFeedByDate = (date: Date) => {
+  const getEvents = async (date: Date) => {
+    date.setHours(0)
+    date.setMinutes(0)
+    date.setSeconds(0)
+    let startTime = date.getTime()
+    let endTime = startTime + 86400000
+    let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, null, startTime, endTime)
+    return activityEvents
+  }
+
+  const getDetails = () => {
     let currentFeed = []
     let currentDate = new Date(date)
+    let startD = new Date(date)
+    currentDate.setHours(0)
+    currentDate.setMinutes(0)
+    currentDate.setSeconds(0)
     let selectedWeekViewDays = []
     let scheduleTime, scheduleStartDate
+    let savedData = []
     if (feeds.length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
+        savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
-          scheduleTime = new Date(new Date(schedule.time).toLocaleString())
           scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
-          if (currentDate >= scheduleStartDate) {
-            schedule.icon = feed.spec === "lamp.survey" ? feed.name : ""
-            schedule.group = feed.spec === "lamp.survey" ? "assess" : "manage"
+          scheduleStartDate.setHours(0)
+          scheduleStartDate.setMinutes(0)
+          scheduleStartDate.setSeconds(0)
+          if (currentDate.getTime() >= scheduleStartDate.getTime()) {
+            scheduleTime = new Date(new Date(schedule.time).toLocaleString())
+            let timeVal = getTimeValue(scheduleTime)
+            startD.setHours(scheduleTime.getHours())
+            startD.setMinutes(scheduleTime.getMinutes())
+            startD.setSeconds(0)
+            scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
+            let scheduledDate = new Date(scheduleStartDate)
+            scheduledDate.setHours(scheduleTime.getHours())
+            scheduledDate.setMinutes(scheduleTime.getMinutes())
+            schedule.icon = feed.name
+            schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
             schedule.type = feed.name
             schedule.title = feed.name
-            schedule.timeValue = getTimeValue(scheduleTime)
-            schedule.activityData = [feed]
+            schedule.activityData = JSON.parse(JSON.stringify(feed))
+
+            schedule.clickable =
+              new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+              startD.getTime() >= new Date().getTime()
+                ? true
+                : false
+            schedule.timeValue = timeVal
+            schedule.time = startD.getTime()
             switch (schedule.repeat_interval) {
               case "triweekly":
-                if (triweekly.indexOf(dayNumber) > -1) {
-                  schedule.completed = schedule.completed ?? false
-                  currentFeed.push(schedule)
-                }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(triweekly, date))
-                break
               case "biweekly":
-                if (biweekly.indexOf(dayNumber) > -1) {
-                  schedule.completed = schedule.completed ?? false
+                schedule.completed = savedData.length > 0 ? true : false
+                let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
+                if (type.indexOf(dayNumber) > -1) {
                   currentFeed.push(schedule)
+                  selectedWeekViewDays = selectedWeekViewDays.concat(getDates(type, date))
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(getDates(biweekly, date))
+                break
+              case "weekly":
+                schedule.completed = savedData.length > 0 ? true : false
+                let dayNo = getDayNumber(new Date(scheduleStartDate))
+                if (dayNo === dayNumber) {
+                  currentFeed.push(schedule)
+                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
+                }
                 break
               case "daily":
               case "hourly":
               case "every3h":
               case "every6h":
               case "every12h":
-                schedule.completed = schedule.completed ?? false
-                currentFeed.push(schedule)
-                const hourVal =
-                  schedule.repeat_interval === "hourly"
-                    ? 1 * 60 * 60 * 1000
-                    : schedule.repeat_interval === "every3h"
-                    ? 3 * 60 * 60 * 1000
-                    : schedule.repeat_interval === "every6h"
-                    ? 6 * 60 * 60 * 1000
-                    : 12 * 60 * 60 * 1000
-                let checkDate = date
-                if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
-                  checkDate.setHours(new Date().getHours())
-                  checkDate.setMinutes(new Date().getMinutes())
-                }
-                let scheduledDate = new Date(scheduleStartDate)
-                scheduledDate.setHours(new Date(scheduleTime).getHours())
-                scheduledDate.setMinutes(new Date(scheduleTime).getMinutes())
-                schedule.timeValue =
-                  schedule.repeat_interval === "daily"
-                    ? getTimeValue(new Date(scheduledDate))
-                    : getTimeValue(
-                        new Date(
-                          new Date(checkDate).getTime() +
-                            ((new Date(checkDate).getTime() - new Date(scheduledDate).getTime()) % hourVal)
-                        )
+                if (schedule.repeat_interval === "daily") {
+                  schedule.completed = savedData.length > 0 ? true : false
+                  currentFeed.push(schedule)
+                } else {
+                  let startTime = scheduledDate.getTime()
+                  const hourVal =
+                    schedule.repeat_interval === "hourly"
+                      ? 1 * 60 * 60 * 1000
+                      : schedule.repeat_interval === "every3h"
+                      ? 3 * 60 * 60 * 1000
+                      : schedule.repeat_interval === "every6h"
+                      ? 6 * 60 * 60 * 1000
+                      : 12 * 60 * 60 * 1000
+
+                  let endTime = currentDate.getTime() + 86400000
+
+                  startTime =
+                    currentDate.toLocaleDateString() === new Date(startTime).toLocaleDateString()
+                      ? startTime
+                      : endTime - ((currentDate.getTime() - startTime) % hourVal) - 86400000
+
+                  let intervalStart, intervalEnd
+                  let time
+                  let completedVal
+                  let clickableVal
+                  for (let start = startTime; start <= endTime; start = start + hourVal) {
+                    let newDateVal = new Date(start)
+                    if (newDateVal.getDate() === date.getDate()) {
+                      time = getTimeValue(newDateVal)
+
+                      intervalStart = new Date(start).getTime() - hourVal
+                      intervalEnd = new Date(start).getTime()
+                      let filteredData = savedData.filter(
+                        (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
                       )
+
+                      completedVal = filteredData.length > 0 ? true : false
+                      clickableVal =
+                        new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+                        new Date().getTime() >= intervalStart &&
+                        new Date().getTime() <= intervalEnd
+                          ? true
+                          : false
+                      let each = {
+                        ...schedule,
+                        clickable: clickableVal,
+                        completed: completedVal,
+                        timeValue: time,
+                        time: newDateVal.getTime(),
+                      }
+                      currentFeed.push(each)
+                    }
+                  }
+                }
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "custom":
+                schedule.completed = savedData.length > 0 ? true : false
                 schedule.custom_time.map((time) => {
-                  if (new Date(date).toLocaleTimeString() === new Date(time).toLocaleTimeString()) {
-                    schedule.completed = schedule.completed ?? false
-                    schedule.timeValue = getTimeValue(new Date(time))
-                    currentFeed.push(schedule)
-                  }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(time).toLocaleDateString())
+                  let scheduledDate = new Date(currentDate)
+                  scheduledDate.setHours(new Date(time).getHours())
+                  scheduledDate.setMinutes(new Date(time).getMinutes())
+                  schedule.timeValue = getTimeValue(new Date(time))
+                  schedule.time = scheduledDate.getTime()
+                  schedule.clickable =
+                    new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+                    scheduledDate.getTime() >= new Date().getTime()
+                      ? true
+                      : false
+                  currentFeed.push(schedule)
                 })
+                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
                 break
               case "monthly":
+                schedule.completed = savedData.length > 0 ? true : false
                 if (new Date(date).getDate() === new Date(scheduleStartDate).getDate()) {
-                  schedule.completed = schedule.completed ?? false
+                  schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
-                  selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleTimeString())
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
+                selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleTimeString())
                 break
               case "bimonthly":
+                schedule.completed = savedData.length > 0 ? true : false
                 if ([10, 20].indexOf(new Date(date).getDate()) > -1) {
-                  schedule.completed = schedule.completed ?? false
+                  schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
+                  selectedWeekViewDays = selectedWeekViewDays.concat(
+                    new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleDateString()
+                  )
+                  selectedWeekViewDays = selectedWeekViewDays.concat(
+                    new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 20).toLocaleDateString()
+                  )
                 }
-                selectedWeekViewDays = selectedWeekViewDays.concat(
-                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 10).toLocaleDateString()
-                )
-                selectedWeekViewDays = selectedWeekViewDays.concat(
-                  new Date(new Date().getFullYear + "-" + new Date().getMonth + 1 + "-" + 20).toLocaleDateString()
-                )
                 break
               case "none":
-                if (new Date(date) === new Date(scheduleStartDate)) {
-                  schedule.completed = schedule.completed ?? false
+                schedule.completed = savedData.length > 0 ? true : false
+                if (new Date(currentDate).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
+                  schedule.timeValue = getTimeValue(scheduleTime)
                   currentFeed.push(schedule)
                 }
                 selectedWeekViewDays = selectedWeekViewDays.concat(new Date(scheduleStartDate).toLocaleDateString())
@@ -560,18 +623,34 @@ export default function Feed({
           }
         })
       })
-      currentFeed.push(tip)
+      //   console.log(tip)
+      //  currentFeed.push(tip)
       let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
       currentFeed = goalsFeedData.feed
       selectedWeekViewDays = goalsFeedData.weekDays
       let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
       currentFeed = medicationsData.feed
       selectedWeekViewDays = medicationsData.weekDays
-      //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", currentFeed)
-      setCurrentFeed(currentFeed)
       let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedDays)
+      currentFeed = currentFeed.sort((x, y) => x.time - y.time)
+      return currentFeed
     }
+  }
+
+  useEffect(() => {
+    if (events !== null) {
+      let currentFeeds = getDetails()
+      setCurrentFeed(currentFeeds)
+    }
+  }, [events])
+  const getFeedByDate = (date: Date) => {
+    let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
+    setFeeds(feeds)
+    changeDate(new Date(date))
+    ;(async () => {
+      await getEvents(date).then(setEvents)
+    })()
   }
 
   const checkDataForFeed = (date: any, data: any, currentFeed: any, selectedWeekViewDays: any) => {
@@ -585,6 +664,7 @@ export default function Feed({
         selectedWeekViewDays = selectedWeekViewDays.concat(getDates(dates, date))
         if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
           data[key].timeValue = getTimeValue(new Date(data[key].timeValue))
+          data[key].time = new Date(data[key].timeValue).getTime()
           currentFeed.push(data[key])
         }
       }
@@ -637,17 +717,16 @@ export default function Feed({
                         completed: classes[feed.group + "CompletedIcon"],
                       },
                     }}
-                    onClick={(e) => markCompleted(e, index)}
                   >
                     <Card
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        if (!feed.completed) {
+                        if (!feed.completed && feed.clickable && feed.time >= new Date().getTime()) {
                           setIndex(index)
                           if (feed.group == "assess") {
                             setSurveyName(feed.title)
-                            setVisibleActivities(feed.activityData)
+                            setVisibleActivities([feed.activityData])
                             showFeedDetails(feed.group)
                           }
                           if (feed.group == "learn") {
@@ -657,6 +736,14 @@ export default function Feed({
                             setIcon(<SleepTips />)
                             showFeedDetails(feed.type)
                           }
+                          if (feed.group == "manage") {
+                            setActivityName(feed.title)
+                            setActivityId(feed.activityData.id)
+                            setVisibleActivities([feed.activityData])
+                            showFeedDetails("game")
+                          }
+                        } else if (!feed.completed && feed.clickable) {
+                          getFeedByDate(date)
                         }
                       }}
                     >
@@ -683,25 +770,25 @@ export default function Feed({
                         </Grid>
 
                         <Grid container justify="center" direction="column" className={classes.image}>
-                          {feed.icon == "Exercise" ? (
+                          {feed.icon == "Exercise" && feed.group === "goals" ? (
                             <Exercise width="80" height="80" />
-                          ) : feed.icon == "Weight" ? (
+                          ) : feed.icon == "Weight" && feed.group === "goals" ? (
                             <Weight width="80" height="80" />
-                          ) : feed.icon == "Nutrition" ? (
+                          ) : feed.icon == "Nutrition" && feed.group === "goals" ? (
                             <Nutrition width="80" height="80" />
-                          ) : feed.icon == "Meditation" ? (
+                          ) : feed.icon == "Meditation" && feed.group === "goals" ? (
                             <BreatheIcon width="80" height="80" />
-                          ) : feed.icon == "Sleep" ? (
+                          ) : feed.icon == "Sleep" && feed.group === "goals" ? (
                             <Sleeping width="80" height="80" />
-                          ) : feed.icon == "Reading" ? (
+                          ) : feed.icon == "Reading" && feed.group === "goals" ? (
                             <Reading width="80" height="80" />
-                          ) : feed.icon == "Finances" ? (
+                          ) : feed.icon == "Finances" && feed.group === "goals" ? (
                             <Savings width="80" height="80" />
                           ) : feed.group === "goals" && feed.icon == "Mood" ? (
                             <Emotions width="80" height="80" />
-                          ) : feed.icon == "Medication" ? (
+                          ) : feed.icon == "Medication" && feed.group === "goals" ? (
                             <Medication width="80" height="80" />
-                          ) : feed.icon == "Custom" ? (
+                          ) : feed.icon == "Custom" && feed.group === "goals" ? (
                             <Custom width="80" height="80" />
                           ) : feed.icon === "sad-happy" ? (
                             <SadHappy width="80" height="80" />
@@ -713,19 +800,19 @@ export default function Feed({
                             <SadBoard width="80" height="80" />
                           ) : feed.icon === "linegraph" ? (
                             <LineGraph width="80" height="80" />
-                          ) : feed.icon === "Mood" ? (
+                          ) : feed.icon === "Mood" && feed.group === "assess" ? (
                             <AssessMood width="80" height="80" />
-                          ) : feed.icon === "Sleep and Social" ? (
+                          ) : feed.icon === "Sleep and Social" && feed.group === "assess" ? (
                             <AssessSleep width="80" height="80" />
-                          ) : feed.icon === "Anxiety" ? (
+                          ) : feed.icon === "Anxiety" && feed.group === "assess" ? (
                             <AssessAnxiety width="80" height="80" />
-                          ) : feed.icon === "App Usability" ? (
+                          ) : feed.icon === "App Usability" && feed.group === "assess" ? (
                             <AssessUsability width="80" height="80" />
-                          ) : feed.icon === "Water and Nutrition" ? (
+                          ) : feed.icon === "Water and Nutrition" && feed.group === "assess" ? (
                             <AssessNutrition width="80" height="80" />
                           ) : feed.icon === "sleep_tip" ? (
                             <SleepTips width="80" height="80" />
-                          ) : feed.icon === "Psychosis and Social" ? (
+                          ) : feed.icon === "Psychosis and Social" && feed.group === "assess" ? (
                             <AssessSocial width="80" height="80" />
                           ) : feed.type === "Jewels Trails A" || feed.type === "Jewels Trails B" ? (
                             <Jewels width="80" height="80" />
@@ -756,7 +843,7 @@ export default function Feed({
               value={date}
               onChange={changeDate}
               onMonthChange={(e) => {
-                getFeedByDate(new Date(e))
+                // getFeedByDate(new Date(e))
               }}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
                 const isSelected = isInCurrentMonth && selectedDays.indexOf(date.toLocaleDateString()) > -1
@@ -816,6 +903,17 @@ export default function Feed({
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                   completeFeed(index)
+                }}
+              />
+            ),
+            game: (
+              <EmbeddedActivity
+                name={activityName}
+                activities={activities}
+                participant={participant}
+                onComplete={() => {
+                  completeFeed(index)
+                  setLaunchedActivity(undefined)
                 }}
               />
             ),

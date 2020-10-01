@@ -26,17 +26,7 @@ import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import NewGoals from "./NewGoal"
-
 import classnames from "classnames"
-
-const demoActivities = {
-  "Balloon Risk": "balloonrisk",
-  "Box Game": "boxgame",
-  "Cats n Dogs": "catsndogs",
-  "Dot Touch": "dottouch",
-  Jewels: "jewels",
-  "Pop The Bubbles": "popthebubbles",
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -151,8 +141,6 @@ export default function Goals({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [embeddedActivity, setEmbeddedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
   const [goalType, setGoalType] = useState("")
 
@@ -162,17 +150,6 @@ export default function Goals({ participant, ...props }) {
     let classT = type === "Scratch card" ? classnames(classes.header, classes.scratch) : classes.header
     setClassType(classT)
     setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const activateEmbeddedActivity = async (id) => {
-    let response = await fetch(
-      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${id}.html.b64`
-    )
-    setEmbeddedActivity(atob(await response.text()))
   }
 
   return (

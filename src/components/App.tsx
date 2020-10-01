@@ -22,6 +22,7 @@ import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
 import TipNotification from "./TipNotification"
+import NotificationPage from "./NotificationPage"
 
 // import VegaGraph from "./VegaGraph"
 
@@ -89,7 +90,7 @@ function AppRouter({ ...props }) {
 
       //
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
-      if (a === undefined) return
+      if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
 
       //
@@ -98,7 +99,7 @@ function AppRouter({ ...props }) {
         password: x[1],
         serverAddress: x[2],
       }).then((x) => {
-        //props.history.replace('/')
+        window.location.href = query[0]
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
@@ -133,7 +134,6 @@ function AppRouter({ ...props }) {
   }, [deferredPrompt])
 
   useEffect(() => {
-    console.log('test blank')
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
@@ -328,6 +328,28 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
+        path="/participant/:id/activity/:activityId"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | Login</PageTitle>
+              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
+              </NavigationLayout>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
+            </React.Fragment>
+          )
+        }
+      />
+      <Route
+        exact
         path="/participant/:id/tip"
         render={(props) => (
           <React.Fragment>
@@ -420,7 +442,13 @@ function AppRouter({ ...props }) {
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
-                  onParticipantSelect={(id) => props.history.push(`/participant/${id}`)}
+                  onParticipantSelect={(id) => {
+                    setState((state) => ({
+                      ...state,
+                      activeTab: 3,
+                    }))
+                    props.history.push(`/participant/${id}`)
+                  }}
                 />
               </NavigationLayout>
             </React.Fragment>

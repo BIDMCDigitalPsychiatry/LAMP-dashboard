@@ -53,8 +53,6 @@ async function getAttachmentData(participantId, type: string) {
 export default function NewGoal({ participant, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
-  const [journalValue, setJounalValue] = useState("")
-  const [status, setStatus] = useState("Yes")
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [goalName, setGoalName] = useState(null)
   const [goalValue, setGoalValue] = useState(null)
@@ -614,6 +612,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
     fontWeight: "bold",
+    cursor: "pointer",
+    "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#FFAC98",
       boxShadow:
@@ -633,7 +633,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 
-  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600, cursor: "pointer" },
 
   weekdays: {
     width: 32,

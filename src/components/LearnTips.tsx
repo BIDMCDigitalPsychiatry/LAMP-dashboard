@@ -128,7 +128,12 @@ const useStyles = makeStyles((theme) => ({
     textTransform: "capitalize",
     fontSize: "16px",
     color: "rgba(0, 0, 0, 0.75)",
-    "&:hover": { background: "#cea000" },
+    "& span": { cursor: "pointer" },
+    "&:hover": {
+      background: "#FFD645",
+      boxShadow:
+        "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+    },
   },
   colorLine: { maxWidth: 115 },
 }))
