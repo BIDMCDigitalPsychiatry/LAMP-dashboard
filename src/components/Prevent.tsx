@@ -738,7 +738,7 @@ export default function Prevent({
                     <Box className={classes.maxw300}>
                       <Sparkline
                         ariaLabel={activity.name}
-                        margin={{ top: 50, right: 0, bottom: 1, left: 0 }}
+                        margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
                         width={300}
                         height={70}
                         startDate={earliestDate()}
