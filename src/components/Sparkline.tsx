@@ -164,7 +164,10 @@ export default withParentSize(function Sparkline({ ...props }) {
       )}
     </List>
   )
-
+  
+  if(props.data.length === 1  ) {
+    props.data[0].x = new Date(props.data[0].x).toLocaleString()
+  }
   return (
     <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
       {({ onMouseLeave, onMouseMove, tooltipData }) => (
@@ -188,7 +191,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           snapTooltipToData={false}
           tooltipData={tooltipData}
           xScale={{
-            type: "time",
+            type:  props.data.length === 1 ? "ordinal" :"time",
           }}
           yScale={{ type: "linear" }}
         >

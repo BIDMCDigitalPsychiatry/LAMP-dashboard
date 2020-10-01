@@ -620,7 +620,7 @@ export default function Prevent({
       if (journalCount > 0) activities.push({ name: "Journals" })
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
 
-      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][0]]))
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length-1]]))
 
       setActivityEvents(activityEvents)
 
@@ -644,9 +644,7 @@ export default function Prevent({
       let sensorEvents = await getSensorEvents(participant)
       let sensorEventCount = getSensorEventCount(sensorEvents)
       setSelectedSensors(selSensors)
-
       setSensorEvents(sensorEvents)
-
       setSensorCounts(sensorEventCount)
     })()
   }, [])
@@ -863,7 +861,7 @@ export default function Prevent({
                     "Step Count",
                     sensorEvents?.["lamp.steps"]?.map((d) => ({
                       x: new Date(parseInt(d.timestamp)),
-                      y: d.data.value || 0,
+                      y: (typeof d.data.value) == 'string' ? 0 :  d.data.value  || 0,
                     })) ?? [],
                     2
                   )
@@ -884,7 +882,7 @@ export default function Prevent({
                     data={
                       sensorEvents?.["lamp.steps"]?.map((d) => ({
                         x: new Date(parseInt(d.timestamp)),
-                        y: d.data.value || 0,
+                        y: (typeof d.data.value) == 'string' ? 0 :  d.data.value  || 0,
                       })) ?? []
                     }
                   >
