@@ -489,7 +489,7 @@ export default function Feed({
 
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-              startD.getTime() >= currentDate.getTime()
+              startD.getTime() >= new Date().getTime()
                 ? true
                 : false
             schedule.timeValue = timeVal
