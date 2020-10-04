@@ -144,7 +144,6 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
 
   useEffect(() => {
     if (iFrame != null) {
-      console.log(gameSettings)
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(gameSettings, "*")
       }

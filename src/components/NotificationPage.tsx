@@ -23,7 +23,6 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   }, [])
   useEffect(() => {
     if (activity !== null) {
-      console.log(activity)
       setLoaded(true)
     }
   }, [activity])

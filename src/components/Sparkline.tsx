@@ -179,7 +179,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           eventTrigger={"container"}
           eventTriggerRefs={props.eventTriggerRefs}
           margin={{
-            top: 8,
+            top: 5,
             left: 45,
             right: 20,
             bottom: !!props.XAxisLabel ? 50 : 0,
@@ -206,7 +206,7 @@ export default withParentSize(function Sparkline({ ...props }) {
           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
           <YAxis
             label={null}
-            numTicks={10}
+            numTicks={12}
             rangePadding={4}
             axisStyles={styles.axis}
             tickStyles={styles.tick}

@@ -501,9 +501,9 @@ export const strategies = {
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.jewels_a": (slices, activity, scopedItem) => (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) => (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.spatial_span": (slices, activity, scopedItem) => (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
 }
 
 export default function Prevent({
@@ -738,7 +738,7 @@ export default function Prevent({
                     <Box className={classes.maxw300}>
                       <Sparkline
                         ariaLabel={activity.name}
-                        margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
+                        margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
                         width={300}
                         height={70}
                         startDate={earliestDate()}
@@ -880,7 +880,7 @@ export default function Prevent({
                 <Box mt={3} mb={1} className={classes.maxw150}>
                   <Sparkline
                     ariaLabel="Step count"
-                    margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                    margin={{ top: 5, right: 0, bottom: 4, left: 0 }}
                     width={126}
                     height={70}
                     XAxisLabel="Time"
