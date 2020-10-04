@@ -134,7 +134,8 @@ export default function NavigationLayout({
   const print = useMediaQuery("print")
   const classes = useStyles()
   //sameLineTitle
-  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed"]
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
+  const hideNotifications = ["Researcher"]
   const selectedClass =
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
@@ -190,11 +191,13 @@ export default function NavigationLayout({
             <Box flexGrow={1} />
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
               <Box className={classes.headerRight}>
+                {hideNotifications.indexOf(activeTab) < 0 ?
                 <Tooltip title="Notifications">
                   <Badge badgeContent={undefined} color="primary" onClick={() => setOpenMessages(true)}>
                     <Message />
                   </Badge>
                 </Tooltip>
+                :""}
                 <Tooltip title="Profile & Settings">
                   <IconButton
                     aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
