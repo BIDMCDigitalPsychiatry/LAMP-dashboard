@@ -1,6 +1,14 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { Typography, makeStyles, Box } from "@material-ui/core"
+import {
+  Typography,
+  makeStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Button,
+} from "@material-ui/core"
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
@@ -16,6 +24,8 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [loaded, setLoaded] = useState(false)
+  const [openNotImplemented, setOpenNotImplemented] = useState(false)
+
   useEffect(() => {
     ;(async () => {
       LAMP.Activity.view(activityId).then(setActivity)
@@ -72,11 +82,19 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             onComplete={() => {}}
           />
         ) : (
-          <Box textAlign="center">
-            <Typography variant="h5" style={{ paddingTop: "20%" }}>
-              Coming Soon !!
-            </Typography>
-          </Box>
+          <Dialog
+            open={openNotImplemented}
+            onClose={() => setOpenNotImplemented(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogContent>This activity is not yet available in mindLAMP 2.</DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenNotImplemented(false)} color="primary">
+                Ok
+              </Button>
+            </DialogActions>
+          </Dialog>
         ))}
     </div>
   )
