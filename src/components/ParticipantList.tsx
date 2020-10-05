@@ -15,6 +15,8 @@ import {
   Fab,
   Container,
   Typography,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
@@ -238,6 +240,11 @@ export default function ParticipantList({
         "&:hover": { backgroundColor: "#f3f3f3" },
       },
       deleteBtn: { background: "#7599FF", color: "#fff", "&:hover": { background: "#5680f9" } },
+      backdrop: {
+        zIndex: theme.zIndex.drawer + 1,
+        color: "#fff",
+      },
+      
     })
   )
   const classes = useStyles()
@@ -256,10 +263,23 @@ export default function ParticipantList({
   const [studiesCount, setStudiesCount] = useState({})
   const [nameArray, setNameArray] = useState([])
   const { enqueueSnackbar } = useSnackbar()
+  const [loading, setLoading] = React.useState(true)  
   useEffect(() => {
-    ;(async () => {
+    ;(async () => { 
+      let participantCount = (await LAMP.Participant.allByStudy(studyID)).length
+      let studies: any = await LAMP.Study.allByResearcher(researcher.id).then((res) => {
+        return res.map((x) => ({
+          id: x.id,
+          name: x.name,
+          count: participantCount,
+        }))
+      })
+      setTagData(studies)
+      let studiesData = filterStudyData(studies)
+      setStudiesCount(studiesData)
       let participantData = await LAMP.Participant.allByResearcher(researcher.id).then(async (res: any) => {
         setParticipants(res)
+        setLoading(false)
         return await Promise.all(
           res.map(async (x) => ({
             id: x.id,
@@ -272,20 +292,9 @@ export default function ParticipantList({
         obj[res["id"]] = res["name"]
       })
       setNameArray(obj)
-      let participantCount = (await LAMP.Participant.allByStudy(studyID)).length
-      let studies: any = await LAMP.Study.allByResearcher(researcher.id).then((res) => {
-        return res.map((x) => ({
-          id: x.id,
-          name: x.name,
-          count: participantCount,
-        }))
-      })
-      setTagData(studies)
-      let studiesData = filterStudyData(studies)
-      setStudiesCount(studiesData)
     })()
   }, [])
-
+  
   const onChange = () => LAMP.Participant.allByResearcher(researcher.id).then(setParticipants)
 
   const onStudyChange = (study) => {
@@ -450,6 +459,10 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
+    
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <MuiThemeProvider theme={theme}>
         <Box className={classes.tableContainer}>
           <MaterialTable
