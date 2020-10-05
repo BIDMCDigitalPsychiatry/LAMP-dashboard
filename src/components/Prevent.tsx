@@ -16,6 +16,8 @@ import {
   Icon,
   ButtonBase,
   Link,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
@@ -230,6 +232,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     linkBlue: { color: "#6083E7", cursor: "pointer" },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -578,6 +584,8 @@ export default function Prevent({
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
+  const [loading, setLoading] = React.useState(true)
+
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
@@ -651,6 +659,7 @@ export default function Prevent({
       setSelectedSensors(selSensors)
       setSensorEvents(sensorEvents)
       setSensorCounts(sensorEventCount)
+      setLoading(false)
     })()
   }, [])
 
@@ -665,6 +674,9 @@ export default function Prevent({
 
   return (
     <Container className={classes.thumbContainer}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container xs={12} spacing={0} className={classes.activityhd}>
         <Grid item xs className={classes.preventHeader}>
           <Typography variant="h5">Activity</Typography>

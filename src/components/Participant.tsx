@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, useTheme, useMediaQuery, Slide } from "@material-ui/core"
+import { Box, useTheme, useMediaQuery, Slide, Backdrop, CircularProgress } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 // Local Imports
@@ -19,6 +19,10 @@ import classes from "*.module.css"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     scroll: { overflowY: "hidden" },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -145,6 +149,7 @@ export default function Participant({
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
+  const [loading, setLoading] = useState(![3, 4].includes(getTab()))
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -175,7 +180,10 @@ export default function Participant({
     const tabName = getTabName(tab)
     props.activeTab(tabName)
     //  getShowWelcome(participant).then(setOpen)
-    LAMP.Activity.allByParticipant(participant.id).then(setActivities)
+    LAMP.Activity.allByParticipant(participant.id).then((e) => {
+      setActivities(e)
+      setLoading(false)
+    })
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
     saveTodaysTip(participant.id)
@@ -228,6 +236,9 @@ export default function Participant({
 
   return (
     <React.Fragment>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box className={classes.scroll}>
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>

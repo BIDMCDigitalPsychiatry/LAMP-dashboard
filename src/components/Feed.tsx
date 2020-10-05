@@ -13,7 +13,8 @@ import {
   useMediaQuery,
   useTheme,
   StepConnector,
-  StepIcon,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
@@ -311,6 +312,10 @@ const useStyles = makeStyles((theme: Theme) =>
         "& p": { fontSize: 10, color: "white  !important" },
       },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -344,6 +349,7 @@ export default function Feed({
   const [events, setEvents] = useState(null)
   const [activityId, setActivityId] = useState(null)
   const [activityName, setActivityName] = useState(null)
+  const [loading, setLoading] = React.useState(true)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -489,7 +495,7 @@ export default function Feed({
 
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-              startD.getTime() >= new Date().getTime()
+              startD.getTime() >= currentDate.getTime()
                 ? true
                 : false
             schedule.timeValue = timeVal
@@ -642,6 +648,7 @@ export default function Feed({
     if (events !== null) {
       let currentFeeds = getDetails()
       setCurrentFeed(currentFeeds)
+      setLoading(false)
     }
   }, [events])
   const getFeedByDate = (date: Date) => {
@@ -697,7 +704,9 @@ export default function Feed({
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
-
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           <Stepper
@@ -722,7 +731,7 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
-                        if (!feed.completed && feed.clickable && feed.time >= new Date().getTime()) {
+                        if (!feed.completed && feed.clickable) {
                           setIndex(index)
                           if (feed.group == "assess") {
                             setSurveyName(feed.title)
@@ -742,8 +751,6 @@ export default function Feed({
                             setVisibleActivities([feed.activityData])
                             showFeedDetails("game")
                           }
-                        } else if (!feed.completed && feed.clickable) {
-                          getFeedByDate(date)
                         }
                       }}
                     >
