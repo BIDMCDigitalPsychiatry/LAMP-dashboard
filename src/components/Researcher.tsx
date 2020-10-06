@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {  
+import {
   Drawer,
   List,
   ListItem,
@@ -11,7 +11,7 @@ import {
   Tooltip,
   Chip,
   useMediaQuery,
-  useTheme
+  useTheme,
 } from "@material-ui/core"
 
 // Local Imports
@@ -22,7 +22,7 @@ import { ResponsivePaper } from "./Utils"
 import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
 import { fade, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-  
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     search: {
@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
     researcherHeaderInner: { display: "flex", justifyContent: "space-between" },
     researcherMenu: {
       background: "#F8F8F8",
-     maxWidth: 100,
+      maxWidth: 100,
       border: 0,
       [theme.breakpoints.down("sm")]: {
         maxWidth: "100%",
@@ -120,17 +120,19 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         paddingTop: 16,
         paddingBottom: 9,
-},
+      },
       [theme.breakpoints.down("xs")]: {
-               padding: 6,
+        padding: 6,
       },
     },
-    menuIcon: { minWidth: "auto", 
-    [theme.breakpoints.down("xs")]: {
-     top: 5,
-     position: "relative",
-},
-    "& path": { fill: "rgba(0, 0, 0, 0.4)", fillOpacity: 0.7 } },
+    menuIcon: {
+      minWidth: "auto",
+      [theme.breakpoints.down("xs")]: {
+        top: 5,
+        position: "relative",
+      },
+      "& path": { fill: "rgba(0, 0, 0, 0.4)", fillOpacity: 0.7 },
+    },
 
     // Developer
     tagChip: {
@@ -177,7 +179,7 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "flex",
         padding: 0,
       },
-    }
+    },
   })
 )
 
