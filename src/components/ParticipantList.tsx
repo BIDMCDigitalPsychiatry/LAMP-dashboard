@@ -246,7 +246,6 @@ export default function ParticipantList({
         zIndex: theme.zIndex.drawer + 1,
         color: "#fff",
       },
-      
     })
   )
   const classes = useStyles()
@@ -266,9 +265,9 @@ export default function ParticipantList({
   const [studiesCount, setStudiesCount] = useState({})
   const [nameArray, setNameArray] = useState([])
   const { enqueueSnackbar } = useSnackbar()
-  const [loading, setLoading] = React.useState(true)  
+  const [loading, setLoading] = React.useState(true)
   useEffect(() => {
-    ;(async () => { 
+    ;(async () => {
       let participantCount = (await LAMP.Participant.allByStudy(studyID)).length
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then((res) => {
         return res.map((x) => ({
@@ -297,7 +296,7 @@ export default function ParticipantList({
       setNameArray(obj)
     })()
   }, [])
-  
+
   const onChange = () => LAMP.Participant.allByResearcher(researcher.id).then(setParticipants)
 
   const onStudyChange = (study) => {
@@ -329,7 +328,7 @@ export default function ParticipantList({
           },
         }))
       )
-     let filteredSensors = data.filter((y) => y.res.length > 0)
+      let filteredSensors = data.filter((y) => y.res.length > 0)
       setLogins((logins) => filteredSensors.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
       setPassive((passive) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.passive }), setPassive))
     })()
@@ -428,8 +427,10 @@ export default function ParticipantList({
   }
 
   const daysSinceLast = (id) => ({
-    gpsString:passive[id]?.gps.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)) :"Never",
-    accelString: passive[id]?.accel.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)) :"Never",
+    gpsString:
+      passive[id]?.gps.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)) : "Never",
+    accelString:
+      passive[id]?.accel.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)) : "Never",
     gps:
       (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
       (1000 * 3600 * 24),
@@ -500,7 +501,6 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-    
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -562,8 +562,11 @@ export default function ParticipantList({
                 render: (rowData) => (
                   <Box>
                     <Tooltip title={dataQuality(rowData.id).title}>
-                      <Chip label="Data Quality" className={classes.dataQuality} 
-                        style={{backgroundColor: dataQuality(rowData.id).color}} />
+                      <Chip
+                        label="Data Quality"
+                        className={classes.dataQuality}
+                        style={{ backgroundColor: dataQuality(rowData.id).color }}
+                      />
                     </Tooltip>
                   </Box>
                 ),

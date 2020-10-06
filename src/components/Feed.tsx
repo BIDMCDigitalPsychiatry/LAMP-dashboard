@@ -18,7 +18,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   Button,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
@@ -363,8 +362,11 @@ export default function Feed({
   const [events, setEvents] = useState(null)
   const [activityId, setActivityId] = useState(null)
   const [activityName, setActivityName] = useState(null)
+<<<<<<< HEAD
   const [loading, setLoading] = React.useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
+=======
+>>>>>>> master
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -510,7 +512,11 @@ export default function Feed({
 
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
+<<<<<<< HEAD
               startD.getTime() >= currentDate.getTime()
+=======
+              startD.getTime() >= new Date().getTime()
+>>>>>>> master
                 ? true
                 : false
             schedule.timeValue = timeVal
@@ -656,6 +662,7 @@ export default function Feed({
       setSelectedDays(selectedDays)
       currentFeed = currentFeed.sort((x, y) => x.time - y.time)
       return currentFeed
+<<<<<<< HEAD
     }
   }
 
@@ -664,6 +671,23 @@ export default function Feed({
       let currentFeeds = getDetails()
       setCurrentFeed(currentFeeds)
       setLoading(false)
+=======
+>>>>>>> master
+    }
+  }, [events])
+  const getFeedByDate = (date: Date) => {
+    let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
+    setFeeds(feeds)
+    changeDate(new Date(date))
+    ;(async () => {
+      await getEvents(date).then(setEvents)
+    })()
+  }
+
+  useEffect(() => {
+    if (events !== null) {
+      let currentFeeds = getDetails()
+      setCurrentFeed(currentFeeds)
     }
   }, [events])
   const getFeedByDate = (date: Date) => {
@@ -746,7 +770,11 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
+<<<<<<< HEAD
                         if (!feed.completed && feed.clickable) {
+=======
+                        if (!feed.completed && feed.clickable && feed.time >= new Date().getTime()) {
+>>>>>>> master
                           setIndex(index)
                           if (feed.group == "assess") {
                             setSurveyName(feed.title)
@@ -761,6 +789,7 @@ export default function Feed({
                             showFeedDetails(feed.type)
                           }
                           if (feed.group == "manage") {
+<<<<<<< HEAD
                             if (games.includes(feed.title)) {
                               setActivityName(feed.title)
                               setActivityId(feed.activityData.id)
@@ -770,6 +799,15 @@ export default function Feed({
                               setOpenNotImplemented(true)
                             }
                           }
+=======
+                            setActivityName(feed.title)
+                            setActivityId(feed.activityData.id)
+                            setVisibleActivities([feed.activityData])
+                            showFeedDetails("game")
+                          }
+                        } else if (!feed.completed && feed.clickable) {
+                          getFeedByDate(date)
+>>>>>>> master
                         }
                       }}
                     >
