@@ -16,6 +16,8 @@ import {
   Icon,
   ButtonBase,
   Link,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
@@ -230,6 +232,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     linkBlue: { color: "#6083E7", cursor: "pointer" },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -501,9 +507,12 @@ export const strategies = {
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.jewels_a": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.spatial_span": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
 }
 
 export default function Prevent({
@@ -575,6 +584,8 @@ export default function Prevent({
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
+  const [loading, setLoading] = React.useState(true)
+
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
@@ -648,6 +659,7 @@ export default function Prevent({
       setSelectedSensors(selSensors)
       setSensorEvents(sensorEvents)
       setSensorCounts(sensorEventCount)
+      setLoading(false)
     })()
   }, [])
 
@@ -662,6 +674,9 @@ export default function Prevent({
 
   return (
     <Container className={classes.thumbContainer}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container xs={12} spacing={0} className={classes.activityhd}>
         <Grid item xs className={classes.preventHeader}>
           <Typography variant="h5">Activity</Typography>
@@ -738,7 +753,7 @@ export default function Prevent({
                     <Box className={classes.maxw300}>
                       <Sparkline
                         ariaLabel={activity.name}
-                        margin={{ top: 5, right: 0, bottom: 1, left: 0 }}
+                        margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
                         width={300}
                         height={70}
                         startDate={earliestDate()}
@@ -880,7 +895,7 @@ export default function Prevent({
                 <Box mt={3} mb={1} className={classes.maxw150}>
                   <Sparkline
                     ariaLabel="Step count"
-                    margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
+                    margin={{ top: 5, right: 0, bottom: 4, left: 0 }}
                     width={126}
                     height={70}
                     XAxisLabel="Time"

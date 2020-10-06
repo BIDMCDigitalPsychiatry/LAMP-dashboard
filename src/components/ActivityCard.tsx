@@ -18,9 +18,24 @@ export const strategies = {
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spatial_span": (slices, activity, scopedItem) => parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.dashboard.custom_survey_group": (slices, activity, scopedItem) =>
+    (slices ?? [])
+      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
+      .map((x, idx) => {
+        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
+        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
+        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else return parseInt(x.value) || 0
+      })
+      .reduce((prev, curr) => prev + curr, 0),
+  "lamp.jewels_a": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.jewels_b": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.spatial_span": (slices, activity, scopedItem) =>
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  __default__: (slices, activity, scopedItem) =>
+    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
 export default function ActivityCard({
@@ -106,7 +121,7 @@ export default function ActivityCard({
             hiddenKeys={["x"]}
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
-              value: `${x.value}`.replace("NaN", "-").replace("null", "-"),
+              value: `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />

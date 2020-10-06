@@ -57,7 +57,6 @@ export default function PreventData({
   onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
-  console.log(events)
   return (
     <Grid container direction="row" justify="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>

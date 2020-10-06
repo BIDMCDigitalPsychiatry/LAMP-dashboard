@@ -688,7 +688,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    onResponse({ item: text, value: value?.replace(/\"/g, "") })
+    onResponse({ item: text, value: value })
   }
   const _binaryOpts = [
     { label: "Yes", value: "Yes" /* true */ },

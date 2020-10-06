@@ -13,7 +13,12 @@ import {
   useMediaQuery,
   useTheme,
   StepConnector,
-  StepIcon,
+  Backdrop,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
@@ -311,9 +316,22 @@ const useStyles = makeStyles((theme: Theme) =>
         "& p": { fontSize: 10, color: "white  !important" },
       },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
+const games = [
+  "Balloon Risk",
+  "Spatial Span",
+  "Cats and Dogs",
+  "Dot Touch",
+  "Jewels Trails A",
+  "Jewels Trails B",
+  "Pop The Bubbles",
+]
 export default function Feed({
   participant,
   onComplete,
@@ -344,6 +362,8 @@ export default function Feed({
   const [events, setEvents] = useState(null)
   const [activityId, setActivityId] = useState(null)
   const [activityName, setActivityName] = useState(null)
+  const [loading, setLoading] = React.useState(true)
+  const [openNotImplemented, setOpenNotImplemented] = useState(false)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -642,8 +662,10 @@ export default function Feed({
     if (events !== null) {
       let currentFeeds = getDetails()
       setCurrentFeed(currentFeeds)
+      setLoading(false)
     }
   }, [events])
+
   const getFeedByDate = (date: Date) => {
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
     setFeeds(feeds)
@@ -697,7 +719,9 @@ export default function Feed({
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
-
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           <Stepper
@@ -737,10 +761,14 @@ export default function Feed({
                             showFeedDetails(feed.type)
                           }
                           if (feed.group == "manage") {
-                            setActivityName(feed.title)
-                            setActivityId(feed.activityData.id)
-                            setVisibleActivities([feed.activityData])
-                            showFeedDetails("game")
+                            if (games.includes(feed.title)) {
+                              setActivityName(feed.title)
+                              setActivityId(feed.activityData.id)
+                              setVisibleActivities([feed.activityData])
+                              showFeedDetails("game")
+                            } else {
+                              setOpenNotImplemented(true)
+                            }
                           }
                         } else if (!feed.completed && feed.clickable) {
                           getFeedByDate(date)
@@ -920,6 +948,19 @@ export default function Feed({
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>
+      <Dialog
+        open={openNotImplemented}
+        onClose={() => setOpenNotImplemented(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>This activity is not yet available in mindLAMP 2.</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenNotImplemented(false)} color="primary">
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }

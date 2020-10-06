@@ -97,7 +97,10 @@ function AppRouter({ ...props }) {
       reset({
         id: x[0],
         password: x[1],
-        serverAddress: x[2],
+        serverAddress:
+          x.length > 2 && typeof x[2] !== "undefined"
+            ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
+            : "",
       }).then((x) => {
         window.location.href = query[0]
       })
@@ -439,6 +442,8 @@ function AppRouter({ ...props }) {
                 title={`${getResearcher(props.match.params.id).name}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab="Researcher"
+                sameLineTitle={true}
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}

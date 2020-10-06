@@ -1,121 +1,16 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Typography, Box } from "@material-ui/core"
+import { Backdrop, CircularProgress } from "@material-ui/core"
 
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    linkButton: {
-      padding: "15px 25px 15px 25px",
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
     },
-    cardlabel: {
-      fontSize: 16,
-
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-    },
-
-    closeButton: {
-      position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    centerHeader: {
-      "& h2": {
-        textAlign: "center !important",
-      },
-    },
-    header: {
-      background: "#FFEFEC",
-      padding: "35px 40px 10px",
-      textAlign: "center",
-
-      "& h2": {
-        fontSize: 25,
-        fontWeight: 600,
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "left",
-      },
-      "& h6": {
-        fontSize: "14px",
-        fontWeight: "normal",
-        textAlign: "left",
-      },
-    },
-    scratch: {
-      "& h2": {
-        textAlign: "center !important",
-      },
-      "& h6": {
-        textAlign: "center !important",
-      },
-    },
-    btnpeach: {
-      background: "#FFAC98",
-      borderRadius: "40px",
-      minWidth: "200px",
-      boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
-      lineHeight: "22px",
-      display: "inline-block",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
-      marginBottom: 20,
-      cursor: "pointer",
-      "& span": { cursor: "pointer" },
-      "&:hover": {
-        boxShadow:
-          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
-      },
-    },
-    topicon: {
-      minWidth: 150,
-      minHeight: 150,
-      [theme.breakpoints.up("lg")]: {
-        width: 150,
-        height: 150,
-      },
-    },
-    dialogueContent: {
-      padding: "20px 40px 40px",
-      "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
-    },
-    dialogtitle: { padding: 0 },
-    manage: {
-      background: "#FFEFEC",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-      width: "100%",
-      "& svg": {
-        [theme.breakpoints.up("lg")]: {
-          width: 150,
-          height: 150,
-        },
-      },
-
-      [theme.breakpoints.up("lg")]: {
-        minHeight: 240,
-      },
-    },
-    thumbMain: { maxWidth: 255 },
-    thumbContainer: { maxWidth: 1055 },
-    fullwidthBtn: { width: "100%" },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
   })
 )
 
@@ -137,6 +32,7 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
   const [activityId, setActivityId] = useState(null)
   const [saved, setSaved] = useState(false)
   const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     activateEmbeddedActivity(name)
@@ -144,7 +40,6 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
 
   useEffect(() => {
     if (iFrame != null) {
-      console.log(gameSettings)
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(gameSettings, "*")
       }
@@ -196,12 +91,13 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
       //   `${id}.html.b64`
       // )
       setEmbeddedActivity(atob(await response.text()))
+      setLoading(false)
     }
   }
 
   return (
     <div style={{ display: "flex", width: "100%", height: "100vh", flexDirection: "column", overflow: "hidden" }}>
-      {embeddedActivity !== "" ? (
+      {embeddedActivity !== "" && (
         <iframe
           ref={(e) => {
             setIframe(e)
@@ -211,13 +107,10 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
           srcDoc={embeddedActivity}
         />
-      ) : (
-        <Box textAlign="center" alignItems="center">
-          <Typography variant="h5" style={{ paddingTop: "20%" }}>
-            Coming Soon !!
-          </Typography>
-        </Box>
       )}
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   )
 }
