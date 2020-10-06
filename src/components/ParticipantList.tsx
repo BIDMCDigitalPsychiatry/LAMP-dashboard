@@ -26,6 +26,8 @@ import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
 import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
 import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
+import { green, yellow, red, grey } from "@material-ui/core/colors"
+
 // External Imports
 import { saveAs } from "file-saver"
 import JSZip from "jszip"
@@ -153,7 +155,7 @@ export default function ParticipantList({
       dataQuality: {
         margin: "4px 0",
         backgroundColor: "#E9F8E7",
-        color: "#00761A",
+        color: "#FFF",
       },
       tableOptions: {
         background: "#ECF4FF",
@@ -260,6 +262,7 @@ export default function ParticipantList({
   const [tagIds, setTagIds] = useState([])
   const [studyArray, setStudyArray] = useState([])
   const [logins, setLogins] = useState({})
+  const [passive, setPassive] = useState({})
   const [studiesCount, setStudiesCount] = useState({})
   const [nameArray, setNameArray] = useState([])
   const { enqueueSnackbar } = useSnackbar()
@@ -310,10 +313,25 @@ export default function ParticipantList({
         participants.map(async (x) => ({
           id: x.id,
           res: (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.analytics", undefined, undefined, 1)) ?? [],
+          passive: {
+            gps:
+              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.gps", undefined, undefined, 5)).slice(-1)[0] ??
+              (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.gps", undefined, undefined, 5)).slice(-1)[0] ??
+              [],
+            accel:
+              (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.accelerometer", undefined, undefined, 5)).slice(
+                -1
+              )[0] ??
+              (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.accelerometer", undefined, undefined, 5)).slice(
+                -1
+              )[0] ??
+              [],
+          },
         }))
       )
-      let filteredSensors = data.filter((y) => y.res.length > 0)
+     let filteredSensors = data.filter((y) => y.res.length > 0)
       setLogins((logins) => filteredSensors.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
+      setPassive((passive) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.passive }), setPassive))
     })()
   }, [participants])
 
@@ -408,6 +426,29 @@ export default function ParticipantList({
       selectedRows: [],
     }))
   }
+
+  const daysSinceLast = (id) => ({
+    gpsString:passive[id]?.gps.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)) :"Never",
+    accelString: passive[id]?.accel.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)) :"Never",
+    gps:
+      (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
+      (1000 * 3600 * 24),
+    accel:
+      (new Date().getTime() - new Date(parseInt(((passive[id] || {}).accel || {}).timestamp)).getTime()) /
+      (1000 * 3600 * 24),
+  })
+
+  const dataQuality = (id) => ({
+    title: `GPS: ${daysSinceLast(id).gpsString}, Accelerometer: ${daysSinceLast(id).accelString}`,
+    color:
+      daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
+        ? green[500]
+        : daysSinceLast(id).gps <= 7 || daysSinceLast(id).accel <= 7
+        ? yellow[500]
+        : daysSinceLast(id).gps <= 30 || daysSinceLast(id).accel <= 30
+        ? red[500]
+        : grey[800],
+  })
 
   const dateInfo = (id) => ({
     relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
@@ -520,8 +561,9 @@ export default function ParticipantList({
                 searchable: false,
                 render: (rowData) => (
                   <Box>
-                    <Tooltip title={"Data is optimal."}>
-                      <Chip label="Data Quality" className={classes.dataQuality} />
+                    <Tooltip title={dataQuality(rowData.id).title}>
+                      <Chip label="Data Quality" className={classes.dataQuality} 
+                        style={{backgroundColor: dataQuality(rowData.id).color}} />
                     </Tooltip>
                   </Box>
                 ),

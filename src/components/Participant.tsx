@@ -269,6 +269,7 @@ export default function Participant({
               hiddenEvents={hiddenEvents}
               enableEditMode={!_patientMode()}
               onEditAction={(activity, data) => {
+                console.log(data)
                 setSurveyName(activity.name)
                 setVisibleActivities([
                   {
@@ -279,7 +280,7 @@ export default function Participant({
                         value,
                       })),
                     ],
-                    prefillTimestamp: data.x.getTime() /* post-increment later to avoid double-reporting events! */,
+                    prefillTimestamp: new Date(data.x).getTime() /* post-increment later to avoid double-reporting events! */,
                   },
                 ])
               }}
@@ -297,7 +298,7 @@ export default function Participant({
                   },
                 ])
               }}
-              onDeleteAction={(activity, data) => hideEvent(data.x.getTime(), activity.id)}
+              onDeleteAction={(activity, data) => hideEvent(new Date(data.x).getTime(), activity.id)}
             />
           </Box>
         </Slide>
