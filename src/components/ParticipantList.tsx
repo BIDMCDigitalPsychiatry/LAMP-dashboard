@@ -427,10 +427,12 @@ export default function ParticipantList({
   }
 
   const daysSinceLast = (id) => ({
-    gpsString:
-      passive[id]?.gps.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)) : "Never",
-    accelString:
-      passive[id]?.accel.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)) : "Never",
+    gpsString: passive[id]?.gps?.timestamp
+      ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp))
+      : "Never",
+    accelString: passive[id]?.accel?.timestamp
+      ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp))
+      : "Never",
     gps:
       (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
       (1000 * 3600 * 24),
@@ -561,6 +563,7 @@ export default function ParticipantList({
                 searchable: false,
                 render: (rowData) => (
                   <Box>
+                    {console.log(dataQuality(rowData.id))}
                     <Tooltip title={dataQuality(rowData.id).title}>
                       <Chip
                         label="Data Quality"
