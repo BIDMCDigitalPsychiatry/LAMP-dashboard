@@ -771,8 +771,8 @@ export default function Feed({
                             }
                           }
                         } else if (!feed.completed && feed.clickable) {
-                          getFeedByDate(date) 
-                        }                        
+                          getFeedByDate(date)
+                        }
                       }}
                     >
                       <Grid container spacing={0}>

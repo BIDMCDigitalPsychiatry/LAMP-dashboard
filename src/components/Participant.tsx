@@ -269,7 +269,6 @@ export default function Participant({
               hiddenEvents={hiddenEvents}
               enableEditMode={!_patientMode()}
               onEditAction={(activity, data) => {
-                console.log(data)
                 setSurveyName(activity.name)
                 setVisibleActivities([
                   {
