@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
+import {  
   Drawer,
   List,
   ListItem,
@@ -11,7 +11,7 @@ import {
   Tooltip,
   Chip,
   useMediaQuery,
-  useTheme,
+  useTheme
 } from "@material-ui/core"
 
 // Local Imports
@@ -22,7 +22,7 @@ import { ResponsivePaper } from "./Utils"
 import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
 import { fade, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-
+  
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     search: {
@@ -103,7 +103,7 @@ const useStyles = makeStyles((theme: Theme) =>
     researcherHeaderInner: { display: "flex", justifyContent: "space-between" },
     researcherMenu: {
       background: "#F8F8F8",
-      maxWidth: 100,
+     maxWidth: 100,
       border: 0,
       [theme.breakpoints.down("sm")]: {
         maxWidth: "100%",
@@ -120,19 +120,17 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         paddingTop: 16,
         paddingBottom: 9,
-      },
+},
       [theme.breakpoints.down("xs")]: {
-        padding: 6,
+               padding: 6,
       },
     },
-    menuIcon: {
-      minWidth: "auto",
-      [theme.breakpoints.down("xs")]: {
-        top: 5,
-        position: "relative",
-      },
-      "& path": { fill: "rgba(0, 0, 0, 0.4)", fillOpacity: 0.7 },
-    },
+    menuIcon: { minWidth: "auto", 
+    [theme.breakpoints.down("xs")]: {
+     top: 5,
+     position: "relative",
+},
+    "& path": { fill: "rgba(0, 0, 0, 0.4)", fillOpacity: 0.7 } },
 
     // Developer
     tagChip: {
@@ -163,12 +161,23 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 500,
       "&:focus": { background: "#ECF4FF !important" },
     },
+    tableContainerWidth: {
+      maxWidth: 1055,
+      [theme.breakpoints.down("md")]: {
+        padding: 0,
+      },
+    },
+    tableContainerWidthPad: {
+      maxWidth: 1055,
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
     menuOuter: {
       [theme.breakpoints.down("sm")]: {
         display: "flex",
         padding: 0,
       },
-    },
+    }
   })
 )
 
@@ -180,48 +189,58 @@ function Study({ study, onParticipantSelect, researcher, ...props }) {
 
   return (
     <Container maxWidth={false}>
-      <Drawer
-        anchor={supportsSidebar ? "left" : "bottom"}
-        variant="permanent"
-        classes={{
-          paper: classes.researcherMenu,
-        }}
+      <Container
+        className={
+          window.innerWidth >= 1280 && window.innerWidth <= 1350
+            ? classes.tableContainerWidthPad
+            : classes.tableContainerWidth
+        }
       >
-        <List component="nav" className={classes.menuOuter}>
-          <ListItem
-            className={classes.menuItems}
-            button
-            selected={currentTab === 0}
-            onClick={(event) => setCurrentTab(0)}
+        <ResponsivePaper elevation={0}>
+          <Drawer
+            anchor={supportsSidebar ? "left" : "bottom"}
+            variant="permanent"
+            classes={{
+              paper: classes.researcherMenu,
+            }}
           >
-            <ListItemIcon className={classes.menuIcon}>
-              <Patients />
-            </ListItemIcon>
-            <ListItemText primary="Patients" />
-          </ListItem>
-          <ListItem
-            className={classes.menuItems}
-            button
-            selected={currentTab === 1}
-            onClick={(event) => setCurrentTab(1)}
-          >
-            <ListItemIcon className={classes.menuIcon}>
-              <Activities />
-            </ListItemIcon>
-            <ListItemText primary="Activities" />
-          </ListItem>
-        </List>
-      </Drawer>
-      {currentTab === 0 && (
-        <ParticipantList
-          title={study.name}
-          studyID={study.id}
-          showUnscheduled={showUnscheduled}
-          onParticipantSelect={onParticipantSelect}
-          researcher={researcher}
-        />
-      )}
-      {currentTab === 1 && <ActivityList title={study.name} studyID={study.id} />}
+            <List component="nav" className={classes.menuOuter}>
+              <ListItem
+                className={classes.menuItems}
+                button
+                selected={currentTab === 0}
+                onClick={(event) => setCurrentTab(0)}
+              >
+                <ListItemIcon className={classes.menuIcon}>
+                  <Patients />
+                </ListItemIcon>
+                <ListItemText primary="Patients" />
+              </ListItem>
+              <ListItem
+                className={classes.menuItems}
+                button
+                selected={currentTab === 1}
+                onClick={(event) => setCurrentTab(1)}
+              >
+                <ListItemIcon className={classes.menuIcon}>
+                  <Activities />
+                </ListItemIcon>
+                <ListItemText primary="Activities" />
+              </ListItem>
+            </List>
+          </Drawer>
+          {currentTab === 0 && (
+            <ParticipantList
+              title={study.name}
+              studyID={study.id}
+              showUnscheduled={showUnscheduled}
+              onParticipantSelect={onParticipantSelect}
+              researcher={researcher}
+            />
+          )}
+          {currentTab === 1 && <ActivityList title={study.name} studyID={study.id} />}
+        </ResponsivePaper>
+      </Container>
     </Container>
   )
 }

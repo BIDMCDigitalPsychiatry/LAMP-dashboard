@@ -246,6 +246,10 @@ export default function ParticipantList({
         zIndex: theme.zIndex.drawer + 1,
         color: "#fff",
       },
+      dataGreen: {backgroundColor: "#e0ffe1 !important", color: "#4caf50",},
+      dataYellow: {backgroundColor: "#fff8bc !important", color: "#a99700",},
+      dataRed: {backgroundColor: "#ffcfcc !important", color: "#f44336",},
+      dataGrey: {backgroundColor: "#d4d4d4 !important", color: "#424242",},
     })
   )
   const classes = useStyles()
@@ -427,12 +431,10 @@ export default function ParticipantList({
   }
 
   const daysSinceLast = (id) => ({
-    gpsString: passive[id]?.gps?.timestamp
-      ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp))
-      : "Never",
-    accelString: passive[id]?.accel?.timestamp
-      ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp))
-      : "Never",
+    gpsString:
+      passive[id]?.gps.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp)) : "Never",
+    accelString:
+      passive[id]?.accel.length > 0 ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp)) : "Never",
     gps:
       (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
       (1000 * 3600 * 24),
@@ -443,14 +445,14 @@ export default function ParticipantList({
 
   const dataQuality = (id) => ({
     title: `GPS: ${daysSinceLast(id).gpsString}, Accelerometer: ${daysSinceLast(id).accelString}`,
-    color:
+    class:
       daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
-        ? green[500]
+        ? classes.dataGreen
         : daysSinceLast(id).gps <= 7 || daysSinceLast(id).accel <= 7
-        ? yellow[500]
+        ? classes.dataYellow
         : daysSinceLast(id).gps <= 30 || daysSinceLast(id).accel <= 30
-        ? red[500]
-        : grey[800],
+        ? classes.dataRed
+        : classes.dataGrey,
   })
 
   const dateInfo = (id) => ({
@@ -563,12 +565,10 @@ export default function ParticipantList({
                 searchable: false,
                 render: (rowData) => (
                   <Box>
-                    {console.log(dataQuality(rowData.id))}
                     <Tooltip title={dataQuality(rowData.id).title}>
                       <Chip
                         label="Data Quality"
-                        className={classes.dataQuality}
-                        style={{ backgroundColor: dataQuality(rowData.id).color }}
+                        className={classes.dataQuality + " " + dataQuality(rowData.id).class}
                       />
                     </Tooltip>
                   </Box>
