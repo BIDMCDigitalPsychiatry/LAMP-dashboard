@@ -12,16 +12,19 @@ import {
   DialogActions,
   IconButton,
   ButtonBase,
+  Tooltip,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
-import { ReactComponent as InfoIcon } from "../icons/Info.svg"
+import InfoIcon from "../icons/Info.svg"
 import Jewels from "./Jewels"
 import ScratchImage from "./ScratchImage"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
@@ -147,18 +150,30 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
-const demoActivities = [
-  "Balloon Risk",
-  "Spatial Span",
-  "Cats and Dogs",
-  "Dot Touch",
-  "Jewels Trails A",
-  "Jewels Trails B",
-  "Pop The Bubbles",
-]
+const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+
+function getGameImageAct(activities: ActivityObj[]) {
+  let images = []
+  activities.map((activity) => {
+    ;(async () => {
+      images[activity.id] = await getGameImage(activity.id)
+    })()
+  })
+  return images
+}
+
+async function getGameImage(activityId: string) {
+  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
+    !!y.error ? undefined : y.data
+  )[0]
+}
 
 export default function Manage({ participant, activities, ...props }) {
   const classes = useStyles()
@@ -166,8 +181,37 @@ export default function Manage({ participant, activities, ...props }) {
   const [dialogueType, setDialogueType] = React.useState("")
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [classType, setClassType] = useState("")
-  const [activityId, setActivityId] = useState(null)
   const [activityName, setActivityName] = useState(null)
+  const [activity, setActivity] = useState(null)
+  const [tag, setTag] = useState([])
+  const [gamesActivities, setGameActivities] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [spec, setSpec] = useState(null)
+
+  useEffect(() => {
+    setLoading(true)
+    let gActivities = activities.filter((x: any) => games.includes(x.spec))
+    setGameActivities(gActivities)
+  }, [])
+
+  useEffect(() => {
+    setLoading(true)
+    ;(async () => {
+      let tags = []
+      let images = await gamesActivities.map((activity, index) => {
+        ;(async () => {
+          tags[activity.id] = await getGameImage(activity.id)
+          setTag(tags)
+          if (index === gamesActivities.length - 1) {
+            setLoading(false)
+            setTag(tags)
+            return tags
+          }
+        })()
+      })
+      setTag(images)
+    })()
+  }, [gamesActivities])
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -182,6 +226,9 @@ export default function Manage({ participant, activities, ...props }) {
 
   return (
     <Container className={classes.thumbContainer}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container spacing={2}>
         <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -267,7 +314,7 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        {demoActivities.map((entry) => (
+        {gamesActivities.map((entry) => (
           <Grid
             item
             xs={6}
@@ -275,18 +322,31 @@ export default function Manage({ participant, activities, ...props }) {
             md={3}
             lg={3}
             onClick={() => {
-              setActivityName(entry)
+              setActivityName(entry.name)
               handleClickOpen("Game")
+              setSpec(entry?.spec?.replace("lamp.", ""))
+              setActivity(entry)
             }}
             className={classes.thumbMain}
           >
             <ButtonBase focusRipple className={classes.fullwidthBtn}>
-              <Card className={classes.manage}>
-                <Box mt={2} mb={1}>
-                  <InfoIcon />
-                </Box>
-                <Typography className={classes.cardlabel}>{entry}</Typography>
-              </Card>
+              <Tooltip title={entry?.spec?.replace("lamp.", "")} placement="bottom">
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      style={{
+                        margin: "auto",
+                        height: "100px",
+                        width: "100px",
+                        background: tag[entry.id]?.photo
+                          ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{entry.name}</Typography>
+                </Card>
+              </Tooltip>
             </ButtonBase>
           </Grid>
         ))}
@@ -359,8 +419,7 @@ export default function Manage({ participant, activities, ...props }) {
             Game: (
               <EmbeddedActivity
                 name={activityName}
-                id={activityId}
-                activities={activities}
+                activity={activity}
                 participant={participant}
                 onComplete={() => {
                   setOpen(false)
@@ -408,7 +467,7 @@ export default function Manage({ participant, activities, ...props }) {
                 <Typography variant="body2" align="left">
                   Games
                 </Typography>
-                <Typography variant="h2">{dialogueType.replace(/_/g, " ")}</Typography>
+                <Typography variant="h2">{dialogueType.replace(/_/g, " ") + " (" + spec + ")"}</Typography>
               </Box>
             )}
           </div>

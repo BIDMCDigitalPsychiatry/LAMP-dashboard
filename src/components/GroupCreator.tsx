@@ -25,10 +25,10 @@ const reorder = (list, startIndex, endIndex) => {
 }
 
 function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
-  const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x.id === selected)[0] : null)
+  const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x?.id === selected)[0] ?? null : null)
   const [anchorEl, setAnchorEl] = useState<Element>()
   useEffect(() => {
-    if (_selected !== selected) onSave && onSave(_selected.id)
+    if (_selected !== selected && _selected !== null) onSave && onSave(_selected.id)
   }, [_selected])
   return (
     <Draggable draggableId={`${index}`} index={index} {...props}>
@@ -80,14 +80,17 @@ export default function GroupCreator({
   activities,
   value,
   onSave,
+  studies,
   ...props
 }: {
   activities?: any[]
   value?: any
   onSave?: any
+  studies: any
 }) {
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
 
   const onDragEnd = (result) => {
     if (!result.destination || result.destination.index === result.source.index) return
@@ -99,6 +102,29 @@ export default function GroupCreator({
       <Grid item>
         <Typography variant="h4">{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
         <Divider />
+      </Grid>
+      <Grid item>
+        <TextField
+          error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+          id="filled-select-currency"
+          select
+          label="Select"
+          value={studyId}
+          onChange={(e) => {
+            setStudyId(e.target.value)
+          }}
+          helperText={
+            typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+          }
+          variant="filled"
+          disabled={!!value ? true : false}
+        >
+          {studies.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
       <Grid item>
         <TextField
@@ -180,11 +206,14 @@ export default function GroupCreator({
                     spec: "lamp.group",
                     schedule: [],
                     settings: items.filter((i) => i !== null),
+                    studyID: studyId,
                   },
                   false /* overwrite */
                 )
               }
-              disabled={!onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text}
+              disabled={
+                !onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text || !studyId
+              }
             >
               Save
               <span style={{ width: 8 }} />

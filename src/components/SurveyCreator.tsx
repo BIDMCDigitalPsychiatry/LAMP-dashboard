@@ -23,6 +23,7 @@ import {
   FormControlLabel,
   FormGroup,
   Checkbox,
+  MenuItem,
 } from "@material-ui/core"
 
 function SelectList({ checkbox, value, onChange, ...props }) {
@@ -229,24 +230,44 @@ export default function SurveyCreator({
   value,
   onSave,
   onCancel,
+  studies,
   ...props
 }: {
   value?: any
   onSave?: any
   onCancel?: any
+  studies?: any
 }) {
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Grid item>
-        <Typography variant="h4">
-          {!!value ? "Modify an existing survey instrument." : "Create a new survey instrument."}
-        </Typography>
-        <Divider />
+        <TextField
+          error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+          id="filled-select-currency"
+          select
+          label="Select"
+          value={studyId}
+          onChange={(e) => {
+            setStudyId(e.target.value)
+          }}
+          helperText={
+            typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+          }
+          variant="filled"
+          disabled={!!value ? true : false}
+        >
+          {studies.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.name}
+            </MenuItem>
+          ))}
+        </TextField>
       </Grid>
       <Grid item>
         <TextField
@@ -333,11 +354,17 @@ export default function SurveyCreator({
                       schedule: [],
                       settings: questions,
                       description,
+                      studyID: studyId,
                     },
                     true /* duplicate */
                   )
                 }
-                disabled={!onSave || questions.length === 0 || !text || value.name.trim() === text.trim()}
+                disabled={
+                  !onSave ||
+                  questions.length === 0 ||
+                  !text ||
+                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                }
               >
                 Duplicate
                 <span style={{ width: 8 }} />
@@ -361,11 +388,12 @@ export default function SurveyCreator({
                     schedule: [],
                     settings: questions,
                     description,
+                    studyID: studyId,
                   },
                   false /* overwrite */
                 )
               }
-              disabled={!onSave || questions.length === 0 || !text}
+              disabled={!onSave || questions.length === 0 || !text || !studyId}
             >
               Save
               <span style={{ width: 8 }} />

@@ -1,14 +1,6 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import {
-  Typography,
-  makeStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Button,
-} from "@material-ui/core"
+import { makeStyles, Dialog, DialogActions, DialogContent, Button } from "@material-ui/core"
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
@@ -75,12 +67,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.jewels_a" ||
           activity?.spec === "lamp.jewels_b" ||
           activity?.spec === "lamp.spatial_span" ? (
-          <EmbeddedActivity
-            name={activity?.name}
-            activities={[activity]}
-            participant={participant}
-            onComplete={() => {}}
-          />
+          <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
         ) : (
           <Dialog
             open={openNotImplemented}

@@ -764,7 +764,7 @@ export default function Feed({
                             if (games.includes(feed.title)) {
                               setActivityName(feed.title)
                               setActivityId(feed.activityData.id)
-                              setVisibleActivities([feed.activityData])
+                              setVisibleActivities(feed.activityData)
                               showFeedDetails("game")
                             } else {
                               setOpenNotImplemented(true)
@@ -937,7 +937,7 @@ export default function Feed({
             game: (
               <EmbeddedActivity
                 name={activityName}
-                activities={activities}
+                activity={visibleActivities}
                 participant={participant}
                 onComplete={() => {
                   completeFeed(index)

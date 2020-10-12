@@ -183,7 +183,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Study({ study, onParticipantSelect, researcher, ...props }) {
+function Study({ onParticipantSelect, researcher, selectedStudies, ...props }) {
   const [showUnscheduled, setShowUnscheduled] = useState(false)
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -233,30 +233,49 @@ function Study({ study, onParticipantSelect, researcher, ...props }) {
           </Drawer>
           {currentTab === 0 && (
             <ParticipantList
-              title={study.name}
-              studyID={study.id}
+              title={null}
+              studyID={null}
               showUnscheduled={showUnscheduled}
               onParticipantSelect={onParticipantSelect}
               researcher={researcher}
+              selectedStudies={selectedStudies}
             />
           )}
-          {currentTab === 1 && <ActivityList title={study.name} studyID={study.id} />}
+          {currentTab === 1 && <ActivityList title={null} researcher={researcher} selectedStudies={selectedStudies} />}
         </ResponsivePaper>
       </Container>
     </Container>
   )
 }
 
+async function getSelectedStudies(researcher) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [researcher.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.selectedStudies").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[researcher.id || ""] ?? []
+  )
+}
+
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
-  const [studies, setStudies] = useState([])
+  const [selectedStudies, setSelectedStudies] = useState([])
   useEffect(() => {
-    LAMP.Study.allByResearcher(researcher.id).then(setStudies)
+    ;(async () => {
+      await getSelectedStudies(researcher).then(setSelectedStudies)
+    })()
   }, [])
+
   return (
     <React.Fragment>
-      {studies.map((study, index) => (
-        <Study study={study} onParticipantSelect={onParticipantSelect} key={index} researcher={researcher} />
-      ))}
+      <Study onParticipantSelect={onParticipantSelect} researcher={researcher} selectedStudies={selectedStudies} />
     </React.Fragment>
   )
 }
