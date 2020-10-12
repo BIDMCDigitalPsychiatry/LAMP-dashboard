@@ -585,6 +585,7 @@ export default function ActivityList({ researcher, title, selectedStudies, ...pr
     enqueueSnackbar("Successfully created a new survey Activity.", {
       variant: "success",
     })
+    setCreate(false)
     setShowCreate(false)
   }
 
