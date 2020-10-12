@@ -287,6 +287,7 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
 
   useEffect(() => {
+    setLoading(true)
     ;(async () => {
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
         return await Promise.all(
@@ -629,11 +630,11 @@ export default function ParticipantList({
     return Object.assign({}, ...dataArray.map((item) => ({ [item.name]: item.count })))
   }
 
-  const updateStudyData = (x) => {
-    setLoading(true)
-    setTagArray(x)
-    onChangeParticipantStudy(x)
-  }
+  // const updateStudyData = (x) => {
+  //   setLoading(true)
+  //   setTagArray(x)
+  //   onChangeParticipantStudy(x)
+  // }
 
   const userAgentConcat = (userAgent) => {
     let appVersion = userAgent.hasOwnProperty("app_version") ? userAgent.app_version : ""
@@ -824,7 +825,8 @@ export default function ParticipantList({
                           badges={studiesCount}
                           onChange={(x) => {
                             LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
-                            updateStudyData(x)
+                            setTagArray(x)
+                            // updateStudyData(x)
                           }}
                         />
                       }
