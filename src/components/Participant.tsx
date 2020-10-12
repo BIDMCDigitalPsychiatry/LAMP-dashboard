@@ -256,7 +256,6 @@ export default function Participant({
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {
       setActivities(e)
-      console.log(e)
       setLoading(false)
     })
     getHiddenEvents(participant).then(setHiddenEvents)
