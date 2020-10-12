@@ -323,49 +323,40 @@ export default function ParticipantList({
   }, [tagData])
 
   useEffect(() => {
-    onLoadParticipantStudy(tagData)
+    setLoading(true)
+    ;(async () => {
+      await onLoadParticipantStudy(tagData)
+    })()
   }, [tagArray])
 
   const onLoadParticipantStudy = async (study) => {
-    let filteredStudy
-    if (tagArray.length > 0) {
-      filteredStudy = study.filter(function (e) {
-        return this.indexOf(e.name) >= 0
-      }, tagArray)
+    let filteredStudy = study.filter(function (e) {
+      return this.indexOf(e.name) >= 0
+    }, tagArray)
+    if (filteredStudy.length == 0) {
+      setParticipants([])
     } else {
-      if (tagData.length > 0) {
-        filteredStudy = tagData.filter(function (e) {
-          return this.indexOf(e.name) >= 0
-        }, study)
-      } else {
-        filteredStudy = study
-      }
+      let participantFormat = await getParticipantsData(filteredStudy)
+      let participantArray = participantFormat
+      let participantNameArray = await Promise.all(
+        participantArray.map(async (x) => ({
+          id: x.id,
+          name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
+        }))
+      )
+      let obj = []
+      participantNameArray.forEach(function (res) {
+        obj[res["id"]] = res["name"]
+      })
+      setNameArray(obj)
     }
-    let participantFormat = await getParticipantsData(filteredStudy)
-    let participantArray = participantFormat
-    let participantNameArray = await Promise.all(
-      participantArray.map(async (x) => ({
-        id: x.id,
-        name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
-      }))
-    )
-    let obj = []
-    participantNameArray.forEach(function (res) {
-      obj[res["id"]] = res["name"]
-    })
-    setNameArray(obj)
     setLoading(false)
   }
 
   const onChangeParticipantStudy = async (study, type = "") => {
-    let filteredStudy
-    if (tagData.length > 0) {
-      filteredStudy = tagData.filter(function (e) {
-        return this.indexOf(e.name) >= 0
-      }, study)
-    } else {
-      filteredStudy = study
-    }
+    let filteredStudy = tagData.filter(function (e) {
+      return this.indexOf(e.name) >= 0
+    }, tagArray)
     if (filteredStudy.length > 0) {
       let participantFormat = await getParticipantsData(filteredStudy, true)
       if (participantFormat.length === 0) {
@@ -408,6 +399,7 @@ export default function ParticipantList({
   }
 
   const getParticipantsData = async (filteredStudy, noData = false) => {
+    console.log(filteredStudy)
     let participantFormat = await Promise.all(
       filteredStudy.map(async (x) => ({
         id_0: x.id,
@@ -630,12 +622,6 @@ export default function ParticipantList({
     return Object.assign({}, ...dataArray.map((item) => ({ [item.name]: item.count })))
   }
 
-  // const updateStudyData = (x) => {
-  //   setLoading(true)
-  //   setTagArray(x)
-  //   onChangeParticipantStudy(x)
-  // }
-
   const userAgentConcat = (userAgent) => {
     let appVersion = userAgent.hasOwnProperty("app_version") ? userAgent.app_version : ""
     let osVersion = userAgent.hasOwnProperty("os_version") ? userAgent.os_version : ""
@@ -826,7 +812,6 @@ export default function ParticipantList({
                           onChange={(x) => {
                             LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
                             setTagArray(x)
-                            // updateStudyData(x)
                           }}
                         />
                       }
