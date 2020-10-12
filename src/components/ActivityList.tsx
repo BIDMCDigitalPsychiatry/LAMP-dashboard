@@ -377,9 +377,8 @@ export default function ActivityList({ researcher, title, ...props }) {
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
-    
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
-   
+
     LAMP.ActivitySpec.all().then((res) =>
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
@@ -390,8 +389,17 @@ export default function ActivityList({ researcher, title, ...props }) {
   useEffect(() => {
     setLoading(true)
     ;(async () => {
-      let selectedStudies = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? studies.map((study) => {return study.name})
-      let selStudies = selectedStudies.length > 0 ? selectedStudies : studies.map((study) => {return study.name})
+      let selectedStudies =
+        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
+        studies.map((study) => {
+          return study.name
+        })
+      let selStudies =
+        selectedStudies.length > 0
+          ? selectedStudies
+          : studies.map((study) => {
+              return study.name
+            })
       setSelected(selStudies)
     })()
   }, [studies])

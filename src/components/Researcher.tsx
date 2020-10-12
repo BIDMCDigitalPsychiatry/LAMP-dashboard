@@ -237,7 +237,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
               studyID={null}
               showUnscheduled={showUnscheduled}
               onParticipantSelect={onParticipantSelect}
-              researcher={researcher}             
+              researcher={researcher}
             />
           )}
           {currentTab === 1 && <ActivityList title={null} researcher={researcher} />}
@@ -247,9 +247,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
   )
 }
 
-
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
- 
   return (
     <React.Fragment>
       <Study onParticipantSelect={onParticipantSelect} researcher={researcher} />

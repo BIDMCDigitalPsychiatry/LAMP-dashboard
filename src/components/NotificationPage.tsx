@@ -11,7 +11,7 @@ import {
   IconButton,
   Typography,
   Backdrop,
-  CircularProgress
+  CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
@@ -128,7 +128,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
       getEvents(participant, activity.id).then((steak) => {
-        setSteak(steak)        
+        setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })

@@ -303,7 +303,7 @@ export default function Participant({
         .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
       getEvents(participant, visibleActivities[0].id).then((steak) => {
-        setSteak(steak)        
+        setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })

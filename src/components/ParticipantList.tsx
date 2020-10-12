@@ -255,7 +255,7 @@ export default function ParticipantList({
   onParticipantSelect,
   showUnscheduled,
   researcher,
- ...props
+  ...props
 }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
@@ -297,18 +297,27 @@ export default function ParticipantList({
           }))
         )
       })
-      setTagData(studies)  
+      setTagData(studies)
       let studiesData = filterStudyData(studies)
-      setStudiesCount(studiesData)   
+      setStudiesCount(studiesData)
     })()
   }, [])
 
   useEffect(() => {
     setLoading(true)
     ;(async () => {
-      let selectedStudies = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? tagData.map((study) => {return study.name})
-      let selStudies = selectedStudies.length > 0 ? selectedStudies : tagData.map((study) => {return study.name})
-      setTagArray(selStudies)     
+      let selectedStudies =
+        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
+        tagData.map((study) => {
+          return study.name
+        })
+      let selStudies =
+        selectedStudies.length > 0
+          ? selectedStudies
+          : tagData.map((study) => {
+              return study.name
+            })
+      setTagArray(selStudies)
     })()
   }, [tagData])
 
@@ -316,36 +325,35 @@ export default function ParticipantList({
     onLoadParticipantStudy(tagData)
   }, [tagArray])
 
-  const onLoadParticipantStudy = async (study) => {    
+  const onLoadParticipantStudy = async (study) => {
     let filteredStudy
-       if (tagArray.length > 0) {
-        filteredStudy = study.filter(function (e) {
+    if (tagArray.length > 0) {
+      filteredStudy = study.filter(function (e) {
+        return this.indexOf(e.name) >= 0
+      }, tagArray)
+    } else {
+      if (tagData.length > 0) {
+        filteredStudy = tagData.filter(function (e) {
           return this.indexOf(e.name) >= 0
-        }, tagArray)
+        }, study)
       } else {
-        if (tagData.length > 0) {
-          filteredStudy = tagData.filter(function (e) {
-            return this.indexOf(e.name) >= 0
-          }, study)
-        } else {
-          filteredStudy = study
-        }
+        filteredStudy = study
       }
-      let participantFormat = await getParticipantsData(filteredStudy)
-      let participantArray = participantFormat
-      let participantNameArray = await Promise.all(
-        participantArray.map(async (x) => ({
-          id: x.id,
-          name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
-        }))
-      )
-      let obj = []
-      participantNameArray.forEach(function (res) {
-        obj[res["id"]] = res["name"]
-      })
-      setNameArray(obj)    
-      setLoading(false)
-    
+    }
+    let participantFormat = await getParticipantsData(filteredStudy)
+    let participantArray = participantFormat
+    let participantNameArray = await Promise.all(
+      participantArray.map(async (x) => ({
+        id: x.id,
+        name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
+      }))
+    )
+    let obj = []
+    participantNameArray.forEach(function (res) {
+      obj[res["id"]] = res["name"]
+    })
+    setNameArray(obj)
+    setLoading(false)
   }
 
   const onChangeParticipantStudy = async (study, type = "") => {
