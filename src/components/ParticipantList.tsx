@@ -255,8 +255,7 @@ export default function ParticipantList({
   onParticipantSelect,
   showUnscheduled,
   researcher,
-  selectedStudies,
-  ...props
+ ...props
 }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
@@ -283,7 +282,7 @@ export default function ParticipantList({
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = useState(true)
   const [openDialog, setOpenDialog] = useState(false)
-  const [selectedStudy, setSelectedStudy] = useState(selectedStudies)
+  const [selectedStudy, setSelectedStudy] = useState("")
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
 
@@ -298,23 +297,31 @@ export default function ParticipantList({
           }))
         )
       })
-      setTagData(studies)
+      setTagData(studies)  
       let studiesData = filterStudyData(studies)
-      setStudiesCount(studiesData)
-      onLoadParticipantStudy(studies)
+      setStudiesCount(studiesData)   
     })()
   }, [])
 
-  const onLoadParticipantStudy = async (study) => {
-    let selectedPropsStudies =
-      ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? []
-    setTagArray(selectedPropsStudies)
+  useEffect(() => {
+    setLoading(true)
+    ;(async () => {
+      let selectedStudies = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? tagData.map((study) => {return study.name})
+      let selStudies = selectedStudies.length > 0 ? selectedStudies : tagData.map((study) => {return study.name})
+      setTagArray(selStudies)     
+    })()
+  }, [tagData])
+
+  useEffect(() => {
+    onLoadParticipantStudy(tagData)
+  }, [tagArray])
+
+  const onLoadParticipantStudy = async (study) => {    
     let filteredStudy
-    if (selectedPropsStudies.length > 0) {
-      if (selectedPropsStudies.length > 0) {
+       if (tagArray.length > 0) {
         filteredStudy = study.filter(function (e) {
           return this.indexOf(e.name) >= 0
-        }, selectedPropsStudies)
+        }, tagArray)
       } else {
         if (tagData.length > 0) {
           filteredStudy = tagData.filter(function (e) {
@@ -326,7 +333,6 @@ export default function ParticipantList({
       }
       let participantFormat = await getParticipantsData(filteredStudy)
       let participantArray = participantFormat
-      setLoading(false)
       let participantNameArray = await Promise.all(
         participantArray.map(async (x) => ({
           id: x.id,
@@ -337,10 +343,9 @@ export default function ParticipantList({
       participantNameArray.forEach(function (res) {
         obj[res["id"]] = res["name"]
       })
-      setNameArray(obj)
-    } else {
+      setNameArray(obj)    
       setLoading(false)
-    }
+    
   }
 
   const onChangeParticipantStudy = async (study, type = "") => {
@@ -448,7 +453,7 @@ export default function ParticipantList({
   }, [participants])
 
   let addParticipant = async () => {
-    if (selectedStudy.length === 0) {
+    if (selectedStudy && selectedStudy === "") {
       setShowErrorMsg(true)
       return false
     } else {

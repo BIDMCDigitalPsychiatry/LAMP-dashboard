@@ -183,7 +183,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Study({ onParticipantSelect, researcher, selectedStudies, ...props }) {
+function Study({ onParticipantSelect, researcher, ...props }) {
   const [showUnscheduled, setShowUnscheduled] = useState(false)
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -237,45 +237,22 @@ function Study({ onParticipantSelect, researcher, selectedStudies, ...props }) {
               studyID={null}
               showUnscheduled={showUnscheduled}
               onParticipantSelect={onParticipantSelect}
-              researcher={researcher}
-              selectedStudies={selectedStudies}
+              researcher={researcher}             
             />
           )}
-          {currentTab === 1 && <ActivityList title={null} researcher={researcher} selectedStudies={selectedStudies} />}
+          {currentTab === 1 && <ActivityList title={null} researcher={researcher} />}
         </ResponsivePaper>
       </Container>
     </Container>
   )
 }
 
-async function getSelectedStudies(researcher) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [researcher.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedStudies").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[researcher.id || ""] ?? []
-  )
-}
 
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
-  const [selectedStudies, setSelectedStudies] = useState([])
-  useEffect(() => {
-    ;(async () => {
-      await getSelectedStudies(researcher).then(setSelectedStudies)
-    })()
-  }, [])
-
+ 
   return (
     <React.Fragment>
-      <Study onParticipantSelect={onParticipantSelect} researcher={researcher} selectedStudies={selectedStudies} />
+      <Study onParticipantSelect={onParticipantSelect} researcher={researcher} />
     </React.Fragment>
   )
 }

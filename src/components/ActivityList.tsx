@@ -344,7 +344,7 @@ const availableAtiveSpecs = [
   "lamp.scratch_image",
 ]
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
-export default function ActivityList({ researcher, title, selectedStudies, ...props }) {
+export default function ActivityList({ researcher, title, ...props }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
     selectedIcon: null,
@@ -377,20 +377,9 @@ export default function ActivityList({ researcher, title, selectedStudies, ...pr
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
+    
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
-    ;(async () => {
-      let selectedStudies = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? []
-      let studiesData = studies.sort((a, b) => (a.name > b.name ? -1 : 1))
-      let selStudies = selectedStudies
-
-      if (selStudies.length === 0) {
-        studiesData.map((study) => {
-          selStudies.push(study.name)
-        })
-      }
-      setSelected(selStudies)
-      refreshData()
-    })()
+   
     LAMP.ActivitySpec.all().then((res) =>
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
@@ -399,7 +388,17 @@ export default function ActivityList({ researcher, title, selectedStudies, ...pr
   }, [])
 
   useEffect(() => {
+    setLoading(true)
+    ;(async () => {
+      let selectedStudies = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? studies.map((study) => {return study.name})
+      let selStudies = selectedStudies.length > 0 ? selectedStudies : studies.map((study) => {return study.name})
+      setSelected(selStudies)
+    })()
+  }, [studies])
+
+  useEffect(() => {
     if (selected !== null) {
+      setLoading(true)
       refreshData()
     }
   }, [selected])
@@ -412,7 +411,7 @@ export default function ActivityList({ researcher, title, selectedStudies, ...pr
       ;(async () => {
         await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
           counts[study.name] = resActivities.length
-          if (selected.includes(study.name)) {
+          if (selected !== null && selected.includes(study.name)) {
             resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
             activityData = activityData.concat(resActivities)
           }
