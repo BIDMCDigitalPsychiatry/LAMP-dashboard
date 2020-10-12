@@ -10,6 +10,8 @@ import {
   DialogTitle,
   IconButton,
   Typography,
+  Backdrop,
+  CircularProgress
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
@@ -47,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
+  niceWorkbadge: { position: "relative" },
   dayNotification: {
     position: "absolute",
     top: 0,
@@ -54,6 +57,10 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: 50,
     "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
     "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
   },
 }))
 
@@ -63,7 +70,7 @@ async function getEvents(participantId: string, activityId: string) {
   let steak = 0
   activityEvents.map((activityEvent, i) => {
     let date = new Date(activityEvent.timestamp)
-    if (!dates.includes(date)) {
+    if (!dates.includes(date.toLocaleDateString())) {
       dates.push(date.toLocaleDateString())
     }
   })
@@ -86,6 +93,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     ;(async () => {
@@ -95,10 +103,12 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   useEffect(() => {
     if (activity !== null) {
       setLoaded(true)
+      setLoading(false)
     }
   }, [activity])
 
   const submitSurvey = (response, overwritingTimestamp) => {
+    setLoading(true)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: response.duration,
@@ -117,10 +127,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         .filter((x) => x.temporal_slices.length > 0)
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
-      getEvents(participant, activity.id).then(setSteak)
-      setOpenComplete(true)
+      getEvents(participant, activity.id).then((steak) => {
+        setSteak(steak)        
+        setOpenComplete(true)
+        setLoading(false)
+      })
       setTimeout(() => {
-        window.location.href = "/#/"
+      //  window.location.href = "/#/"
       }, 10000)
     })
   }
@@ -157,7 +170,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           </Dialog>
         ))}
       <Dialog
-        open={openComplete}
+        open={true}
         onClose={() => setOpenComplete(false)}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
@@ -181,16 +194,19 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             <Typography className={classes.ribbonText} component="p">
               You’re on a streak, keep it going
             </Typography>
-            <Box textAlign="center">
+            <Box textAlign="center" className={classes.niceWorkbadge}>
               <Ribbon width="170" height="226" />
               <Box className={classes.dayNotification}>
-                <Typography variant="h4"> {steak}</Typography>
+                <Typography variant="h4"> {steak}</Typography>{" "}
                 <Typography variant="h6">{steak > 1 ? "days" : "day"}</Typography>
               </Box>
             </Box>
           </Box>
         </DialogContent>
       </Dialog>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   )
 }

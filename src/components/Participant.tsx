@@ -157,7 +157,7 @@ async function getEvents(participant: ParticipantObj, activityId: string) {
   let steak = 0
   activityEvents.map((activityEvent, i) => {
     let date = new Date(activityEvent.timestamp)
-    if (!dates.includes(date)) {
+    if (!dates.includes(date.toLocaleDateString())) {
       dates.push(date.toLocaleDateString())
     }
   })
@@ -283,6 +283,7 @@ export default function Participant({
   }
 
   const submitSurvey = (response, overwritingTimestamp) => {
+    setLoading(true)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
       duration: response.duration,
@@ -301,8 +302,11 @@ export default function Participant({
         .filter((x) => x.temporal_slices.length > 0)
         .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
-      getEvents(participant, visibleActivities[0].id).then(setSteak)
-      setOpenComplete(true)
+      getEvents(participant, visibleActivities[0].id).then((steak) => {
+        setSteak(steak)        
+        setOpenComplete(true)
+        setLoading(false)
+      })
       setVisibleActivities([])
       // If a timestamp was provided to overwrite data, hide the original event too.
       if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
