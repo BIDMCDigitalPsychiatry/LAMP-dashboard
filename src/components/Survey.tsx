@@ -16,7 +16,7 @@ import {
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import LAMP, { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj, ActivityEvent } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
 import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
@@ -152,7 +152,6 @@ function _shouldRestrict() {
 export default function Survey({ id, activities, visibleActivities, setVisibleActivities, onComplete, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
-  const [openComplete, setOpenComplete] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
   const [surveyType, setSurveyType] = useState(null)
@@ -166,12 +165,12 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
 
   const handleClose = () => {
     setOpen(false)
-    setOpenComplete(false)
+    // setOpenComplete(false)
   }
 
   const submitSurveyType = (response) => {
     setOpenData(false)
-    setOpenComplete(true)
+
     onComplete(response)
   }
 
@@ -255,7 +254,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
               onClick={() => {
                 setOpenData(true)
                 setOpen(false)
-                setOpenComplete(false)
+                // setOpenComplete(false)
                 setSurveyType(dialogueType.replace(/\s/g, "_"))
               }}
               underline="none"
@@ -267,37 +266,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openComplete}
-        onClose={handleClose}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
-        }}
-      >
-        <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              Nice work!
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              You’re on a streak, keep it going
-            </Typography>
-            <Box textAlign="center">
-              <Ribbon width="170" height="226" />
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
       <ResponsiveDialog
         transient
         animate

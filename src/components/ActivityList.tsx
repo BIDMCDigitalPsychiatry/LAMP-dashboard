@@ -228,6 +228,7 @@ const useStyles = makeStyles((theme: Theme) =>
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
+      maxHeight: 400,
       marginTop: 75,
       marginLeft: 100,
       borderRadius: 10,
@@ -236,7 +237,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& li": {
         display: "inline-block",
         width: "100%",
-        padding: "15px 30px",
+        padding: "8px 30px",
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
       "& *": { cursor: "pointer" },
@@ -766,7 +767,7 @@ export default function ActivityList({ researcher, title, selectedStudies, ...pr
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
     console.dir(result)
     let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
-    let all = await LAMP.Activity.allByStudy(x.studyID)
+    let all = await LAMP.Activity.allByStudy(x.parentID)
     setActivities(all) // need to resave below to trigger detail panel correctly!
     setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
   }

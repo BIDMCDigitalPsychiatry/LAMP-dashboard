@@ -212,30 +212,7 @@ export default function GameCreator({
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
-            <Grid item xs>
-              <TextField
-                error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-                id="filled-select-currency"
-                select
-                label="Select"
-                value={studyId}
-                onChange={(e) => {
-                  setStudyId(e.target.value)
-                }}
-                helperText={
-                  typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
-                }
-                variant="filled"
-                disabled={!!value ? true : false}
-              >
-                {studies.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs>
+            <Grid item xs md={2}>
               <Tooltip
                 title={
                   !photo
@@ -264,19 +241,51 @@ export default function GameCreator({
               </Tooltip>
             </Grid>
             <Grid item md={10}>
-              <Box mb={3}>
-                <TextField
-                  error={
-                    typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false
-                  }
-                  fullWidth
-                  variant="filled"
-                  label="Activity Title"
-                  defaultValue={text}
-                  onChange={(event) => setText(event.target.value)}
-                  inputProps={{ maxLength: 80 }}
-                />
-              </Box>
+              <Grid container spacing={2}>
+                <Grid item lg={4}>
+                  <TextField
+                    error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+                    id="filled-select-currency"
+                    select
+                    label="Select"
+                    value={studyId}
+                    onChange={(e) => {
+                      setStudyId(e.target.value)
+                    }}
+                    helperText={
+                      typeof studyId == "undefined" || studyId === null || studyId === ""
+                        ? "Please select the study"
+                        : ""
+                    }
+                    variant="filled"
+                    disabled={!!value ? true : false}
+                  >
+                    {studies.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs>
+                  <Box mb={3}>
+                    <TextField
+                      error={
+                        typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "")
+                          ? true
+                          : false
+                      }
+                      fullWidth
+                      variant="filled"
+                      label="Activity Title"
+                      defaultValue={text}
+                      onChange={(event) => setText(event.target.value)}
+                      inputProps={{ maxLength: 80 }}
+                    />
+                  </Box>
+                </Grid>
+              </Grid>
+
               <Box>
                 <TextField
                   fullWidth
@@ -299,7 +308,7 @@ export default function GameCreator({
                 <Divider />
                 <Typography variant="h6">Game duration</Typography>
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.beginner_seconds < 30 ||
@@ -325,7 +334,7 @@ export default function GameCreator({
                   helperText={settings.beginner_seconds > 300 ? "Maximum value is 300" : ""}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.intermediate_seconds < 10 ||
@@ -351,7 +360,7 @@ export default function GameCreator({
                   helperText={settings.intermediate_seconds > 300 ? "Maximum value is 300" : ""}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.expert_seconds < 10 ||
@@ -377,7 +386,7 @@ export default function GameCreator({
                   helperText={settings.expert_seconds > 300 ? "Maximum value is 300" : ""}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.advanced_seconds > 300 ||
@@ -407,7 +416,7 @@ export default function GameCreator({
                 <Divider />
                 <Typography variant="h6">Settings</Typography>
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.diamond_count < 3 ||
@@ -433,7 +442,7 @@ export default function GameCreator({
                   helperText={settings.diamond_count > 25 ? "Maximum value is 25" : ""}
                 />
               </Grid>
-              <Grid item lg={6}>
+              <Grid item lg={6} md={6} sm={6} xs={12}>
                 <TextField
                   error={settings.bonus_point_count === 0 || settings.bonus_point_count === "" ? true : false}
                   type="number"
@@ -452,7 +461,7 @@ export default function GameCreator({
                   helperText={settings.bonus_point_count > 500 ? "Maximum value is 500" : ""}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
                     settings.shape_count <
@@ -484,7 +493,7 @@ export default function GameCreator({
                   helperText={settings.shape_count > 4 ? "Maximum value is 4" : ""}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   type="number"
                   variant="filled"
@@ -501,7 +510,7 @@ export default function GameCreator({
                   onChange={(e) => setSettings({ ...settings, x_changes_in_level_count: Number(e.target.value) })}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   type="number"
                   variant="filled"
@@ -518,7 +527,7 @@ export default function GameCreator({
                   onChange={(e) => setSettings({ ...settings, x_diamond_count: Number(e.target.value) })}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   type="number"
                   variant="filled"
@@ -535,7 +544,7 @@ export default function GameCreator({
                   onChange={(e) => setSettings({ ...settings, y_changes_in_level_count: Number(e.target.value) })}
                 />
               </Grid>
-              <Grid item lg={3}>
+              <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   type="number"
                   variant="filled"

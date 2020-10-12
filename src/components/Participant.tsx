@@ -1,9 +1,23 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, useTheme, useMediaQuery, Slide, Backdrop, CircularProgress } from "@material-ui/core"
+import {
+  Box,
+  useTheme,
+  useMediaQuery,
+  Slide,
+  Backdrop,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Typography,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 // Local Imports
+import CloseIcon from "@material-ui/icons/Close"
+
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
@@ -15,13 +29,48 @@ import Learn from "./Learn"
 import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
 import classes from "*.module.css"
-
+import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     scroll: { overflowY: "hidden" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    ribbonText: {
+      fontSize: "16px",
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: 600,
+      marginBottom: "30px",
+      padding: "0 42px",
+    },
+    niceWork: {
+      paddingBottom: 70,
+      "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+    },
+    dialogueStyle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    MuiDialogPaperScrollPaper: {
+      maxHeight: "100% !important",
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+    niceWorkbadge: { position: "relative" },
+    dayNotification: {
+      position: "absolute",
+      top: 0,
+      width: "100%",
+      paddingTop: 50,
+      "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
+      "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
     },
   })
 )
@@ -102,6 +151,28 @@ function saveBreatheMusicURL(id) {
   LAMP.Type.setAttachment(id, "me", "lamp.breathe.music_url", backgroundMusicURL)
 }
 
+async function getEvents(participant: ParticipantObj, activityId: string) {
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, activityId)
+  let dates = []
+  let steak = 0
+  activityEvents.map((activityEvent, i) => {
+    let date = new Date(activityEvent.timestamp)
+    if (!dates.includes(date)) {
+      dates.push(date.toLocaleDateString())
+    }
+  })
+  let currentDate = new Date()
+  for (let date of dates) {
+    if (date === currentDate.toLocaleDateString()) {
+      steak++
+    } else {
+      break
+    }
+    currentDate.setDate(currentDate.getDate() - 1)
+  }
+  return steak
+}
+
 export default function Participant({
   participant,
   ...props
@@ -150,6 +221,9 @@ export default function Participant({
   const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
   const [loading, setLoading] = useState(![3, 4].includes(getTab()))
+  const [openComplete, setOpenComplete] = React.useState(false)
+  const [steak, setSteak] = useState(1)
+
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -182,6 +256,7 @@ export default function Participant({
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {
       setActivities(e)
+      console.log(e)
       setLoading(false)
     })
     getHiddenEvents(participant).then(setHiddenEvents)
@@ -227,6 +302,8 @@ export default function Participant({
         .filter((x) => x.temporal_slices.length > 0)
         .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
     ).then((x) => {
+      getEvents(participant, visibleActivities[0].id).then(setSteak)
+      setOpenComplete(true)
       setVisibleActivities([])
       // If a timestamp was provided to overwrite data, hide the original event too.
       if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
@@ -349,6 +426,42 @@ export default function Participant({
           />
         </ResponsiveDialog>
       </Box>
+
+      <Dialog
+        open={openComplete}
+        onClose={() => setOpenComplete(false)}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+        }}
+      >
+        <DialogTitle>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <Box textAlign="center" pb={4} className={classes.niceWork}>
+            <Typography variant="h5" gutterBottom>
+              Nice work!
+            </Typography>
+            <Typography className={classes.ribbonText} component="p">
+              You’re on a streak, keep it going
+            </Typography>
+            <Box textAlign="center" className={classes.niceWorkbadge}>
+              <Ribbon width="170" height="226" />
+              <Box className={classes.dayNotification}>
+                <Typography variant="h4"> {steak}</Typography>{" "}
+                <Typography variant="h6">{steak > 1 ? "days" : "day"}</Typography>
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+      </Dialog>
     </React.Fragment>
   )
 }
