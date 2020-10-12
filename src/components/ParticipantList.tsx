@@ -456,7 +456,8 @@ export default function ParticipantList({
       let newCount = 1
       let ids = []
       for (let i = 0; i < newCount; i++) {
-        let id = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data?.id
+        let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
+        let id = typeof idData === "object" ? idData.id : idData
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
           enqueueSnackbar(`Could not create credential for ${id}.`, { variant: "error" })
         } else {
@@ -507,6 +508,7 @@ export default function ParticipantList({
   }
 
   let downloadFiles = async (filetype) => {
+    setLoading(true)
     let selectedRows = state.selectedRows
     setState({
       ...state,
@@ -532,6 +534,7 @@ export default function ParticipantList({
         })
       }
     }
+    setLoading(false)
     zip.generateAsync({ type: "blob" }).then((x) => saveAs(x, "export.zip"))
   }
 
