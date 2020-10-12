@@ -399,7 +399,6 @@ export default function ParticipantList({
   }
 
   const getParticipantsData = async (filteredStudy, noData = false) => {
-    console.log(filteredStudy)
     let participantFormat = await Promise.all(
       filteredStudy.map(async (x) => ({
         id_0: x.id,
