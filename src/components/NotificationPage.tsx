@@ -170,7 +170,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           </Dialog>
         ))}
       <Dialog
-        open={true}
+        open={openComplete}
         onClose={() => setOpenComplete(false)}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
