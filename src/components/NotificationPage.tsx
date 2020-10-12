@@ -133,7 +133,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         setLoading(false)
       })
       setTimeout(() => {
-      //  window.location.href = "/#/"
+        window.location.href = "/#/"
       }, 10000)
     })
   }
