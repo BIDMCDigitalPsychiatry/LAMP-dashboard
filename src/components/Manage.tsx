@@ -25,7 +25,6 @@ import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
-import Jewels from "./Jewels"
 import ScratchImage from "./ScratchImage"
 import { ReactComponent as ScratchCard } from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -258,7 +257,7 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
+        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
@@ -267,8 +266,8 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>New goal</Typography>
             </Card>
           </ButtonBase>
-        </Grid>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
+        </Grid> */}
+        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={1}>
@@ -277,7 +276,7 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>Hope box</Typography>
             </Card>
           </ButtonBase>
-        </Grid>
+        </Grid> */}
         <Grid
           item
           xs={6}
@@ -296,7 +295,7 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        <Grid
+        {/* <Grid
           item
           xs={6}
           sm={4}
@@ -313,7 +312,7 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>Medication tracker</Typography>
             </Card>
           </ButtonBase>
-        </Grid>
+        </Grid> */}
         {gamesActivities.map((entry) => (
           <Grid
             item

@@ -156,21 +156,14 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const [openData, setOpenData] = React.useState(false)
   const [surveyType, setSurveyType] = useState(null)
   const [questionCount, setQuestionCount] = useState(0)
-  const { enqueueSnackbar } = useSnackbar()
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
   }
 
-  const handleClose = () => {
-    setOpen(false)
-    // setOpenComplete(false)
-  }
-
   const submitSurveyType = (response) => {
     setOpenData(false)
-
     onComplete(response)
   }
 
@@ -215,7 +208,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
       <Dialog
         open={open}
         maxWidth="xs"
-        onClose={handleClose}
+        onClose={() => setOpen(false)}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
@@ -225,7 +218,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
         }}
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
@@ -254,7 +247,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
               onClick={() => {
                 setOpenData(true)
                 setOpen(false)
-                // setOpenComplete(false)
                 setSurveyType(dialogueType.replace(/\s/g, "_"))
               }}
               underline="none"
