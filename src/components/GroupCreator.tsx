@@ -143,135 +143,137 @@ export default function GroupCreator({
   }
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <Container className={classes.containerWidth}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6">{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-              id="filled-select-currency"
-              select
-              label="Select"
-              value={studyId}
-              onChange={(e) => {
-                setStudyId(e.target.value)
-              }}
-              helperText={
-                typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
-              }
-              variant="filled"
-              disabled={!!value ? true : false}
-            >
-              {studies.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
-                  {option.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Group Title"
-              defaultValue={text}
-              onChange={(event) => setText(event.target.value)}
-            />
-          </Grid>
-          <Box width={1}>
-            <Divider />
-          </Box>
-          <Grid item xs={12}>
-            <Typography variant="h6">Configure activities and options.</Typography>
-          </Grid>
-          <Grid item>
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="list">
-                {(provided) => (
-                  <Box ref={provided.innerRef} {...provided.droppableProps}>
-                    {items.map((x, idx) => (
-                      <ActivitySelector
-                        index={idx}
-                        key={`${idx}.${x}`}
-                        activities={activities.filter((x) => x.spec !== "lamp.group")}
-                        selected={x}
-                        onSave={(x) =>
-                          setItems((it) => {
-                            let y = [...it]
-                            y[idx] = x
-                            return y
-                          })
-                        }
-                        onDelete={() =>
-                          setItems((it) => {
-                            let x = [...it]
-                            x.splice(idx, 1)
-                            return x
-                          })
-                        }
-                      />
-                    ))}
-                    {provided.placeholder}
-                  </Box>
-                )}
-              </Droppable>
-            </DragDropContext>
-            <ButtonGroup>
-              <Button variant="contained" color="primary" onClick={() => setItems((items) => [...items, null])}>
-                <Icon>add_circle</Icon>
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                color="primary"
-                onClick={() => setItems((items) => [...items, null])}
+    <div>
+      <MuiThemeProvider theme={theme}>
+        <Container className={classes.containerWidth}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h6">{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+                id="filled-select-currency"
+                select
+                label="Select"
+                value={studyId}
+                onChange={(e) => {
+                  setStudyId(e.target.value)
+                }}
+                helperText={
+                  typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+                }
+                variant="filled"
+                disabled={!!value ? true : false}
               >
-                Add Activity
-              </Button>
-            </ButtonGroup>
-          </Grid>
-          <Grid
-            container
-            direction="column"
-            alignItems="flex-end"
-            spacing={1}
-            style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
-          >
+                {studies.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                variant="filled"
+                label="Group Title"
+                defaultValue={text}
+                onChange={(event) => setText(event.target.value)}
+              />
+            </Grid>
+            <Box width={1}>
+              <Divider />
+            </Box>
+            <Grid item xs={12}>
+              <Typography variant="h6">Configure activities and options.</Typography>
+            </Grid>
             <Grid item>
-              <Tooltip title="Save this activity group.">
-                <Fab
-                  color="secondary"
-                  aria-label="Save"
-                  variant="extended"
-                  onClick={() =>
-                    onSave(
-                      {
-                        id: undefined,
-                        name: text,
-                        spec: "lamp.group",
-                        schedule: [],
-                        settings: items.filter((i) => i !== null),
-                        studyID: studyId,
-                      },
-                      false /* overwrite */
-                    )
-                  }
-                  disabled={
-                    !onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text || !studyId
-                  }
+              <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="list">
+                  {(provided) => (
+                    <Box ref={provided.innerRef} {...provided.droppableProps}>
+                      {items.map((x, idx) => (
+                        <ActivitySelector
+                          index={idx}
+                          key={`${idx}.${x}`}
+                          activities={activities.filter((x) => x.spec !== "lamp.group")}
+                          selected={x}
+                          onSave={(x) =>
+                            setItems((it) => {
+                              let y = [...it]
+                              y[idx] = x
+                              return y
+                            })
+                          }
+                          onDelete={() =>
+                            setItems((it) => {
+                              let x = [...it]
+                              x.splice(idx, 1)
+                              return x
+                            })
+                          }
+                        />
+                      ))}
+                      {provided.placeholder}
+                    </Box>
+                  )}
+                </Droppable>
+              </DragDropContext>
+              <ButtonGroup>
+                <Button variant="contained" color="primary" onClick={() => setItems((items) => [...items, null])}>
+                  <Icon>add_circle</Icon>
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="primary"
+                  onClick={() => setItems((items) => [...items, null])}
                 >
-                  Save
-                  <span style={{ width: 8 }} />
-                  <Icon>save</Icon>
-                </Fab>
-              </Tooltip>
+                  Add Activity
+                </Button>
+              </ButtonGroup>
             </Grid>
           </Grid>
+        </Container>
+      </MuiThemeProvider>
+      <Grid
+        container
+        direction="column"
+        alignItems="flex-end"
+        spacing={1}
+        style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
+      >
+        <Grid item>
+          <Tooltip title="Save this activity group.">
+            <Fab
+              color="secondary"
+              aria-label="Save"
+              variant="extended"
+              onClick={() =>
+                onSave(
+                  {
+                    id: undefined,
+                    name: text,
+                    spec: "lamp.group",
+                    schedule: [],
+                    settings: items.filter((i) => i !== null),
+                    studyID: studyId,
+                  },
+                  false /* overwrite */
+                )
+              }
+              disabled={
+                !onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text || !studyId
+              }
+            >
+              Save
+              <span style={{ width: 8 }} />
+              <Icon>save</Icon>
+            </Fab>
+          </Tooltip>
         </Grid>
-      </Container>
-    </MuiThemeProvider>
+      </Grid>
+    </div>
   )
 }
