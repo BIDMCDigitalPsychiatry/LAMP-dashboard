@@ -189,6 +189,9 @@ export default function GameCreator({
       )
     } else {
       return !(
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
         duplicates.length > 0 ||
         typeof text === "undefined" ||
         (typeof text !== "undefined" && text?.trim() === "")
