@@ -260,6 +260,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& path": { fill: "#618EF7" },
       "&:hover": { backgroundColor: "#f3f3f3" },
     },
+    tableAccordian: { backgroundColor: "#f4f4f4" },
   })
 )
 
@@ -826,7 +827,7 @@ export default function ActivityList({ researcher, title, ...props }) {
             ]}
             onRowClick={(event, rowData, togglePanel) => modifyActivity(rowData)}
             detailPanel={(rowData) => (
-              <Box ml={6} borderLeft={1} borderColor="grey.300">
+              <Box className={classes.tableAccordian}>
                 <ActivityScheduler activity={rowData} onChange={(x) => updateSchedule({ ...rowData, schedule: x })} />
               </Box>
             )}
@@ -869,6 +870,22 @@ export default function ActivityList({ researcher, title, ...props }) {
               selection: true,
               actionsColumnIndex: -1,
               paging: false,
+              searchFieldStyle: {
+                borderRadius: 25,
+                backgroundColor: "#F8F8F8",
+                padding: 8,
+              },
+              headerStyle: {
+                fontWeight: 700,
+                textTransform: "uppercase",
+              },
+              rowStyle: (rowData) => ({
+                backgroundColor: rowData.tableData.checked
+                  ? "#ECF4FF"
+                  : rowData.tableData.id % 2 === 0
+                  ? "#FFF"
+                  : "#F8F8F8",
+              }),
             }}
             components={{
               Actions: (props) => {

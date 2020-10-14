@@ -18,7 +18,11 @@ import MaterialTable from "material-table"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 
 const theme = createMuiTheme({
-  overrides: {},
+  overrides: {
+    MuiTypography: {
+      h6: { fontSize: 16, fontWeight: 600 },
+    },
+  },
 })
 
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
@@ -225,6 +229,12 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
           actionsColumnIndex: -1,
           pageSize: 3,
           pageSizeOptions: [3, 5, 10],
+          headerStyle: {
+            fontWeight: 600,
+            fontSize: 13,
+            background: "transparent",
+            borderTop: "#ccc solid 1px",
+          },
         }}
         components={{ Container: (props) => <Box {...props} /> }}
       />
