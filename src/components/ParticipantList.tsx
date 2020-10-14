@@ -358,7 +358,7 @@ export default function ParticipantList({
       return this.indexOf(e.name) >= 0
     }, tagArray)
     if (filteredStudy.length > 0) {
-      let participantFormat = await getParticipantsData(filteredStudy, true)
+      let participantFormat = await getParticipantsData(filteredStudy)
       if (participantFormat.length === 0) {
         setParticipants([])
       }
@@ -383,22 +383,21 @@ export default function ParticipantList({
     setStudiesCount(studiesData)
   }
 
-  const participantFormatData = async (participantFormat) => {
-    let newparticipArray: any = []
+  const participantFormatData = (participantFormat) => {
+    let participantArray = []
     let k = 0
-    for (let i = 0; i < participantFormat.length; i++) {
-      let partDetailLen = participantFormat[i]["participant"]
-      for (let j = 0; j < partDetailLen.length; j++) {
-        participantFormat[i]["participant"][j]["study"] = participantFormat[i]["study"]
-        participantFormat[i]["participant"][j]["tableData"] = { id: k }
-        newparticipArray.push(participantFormat[i]["participant"][j])
+    participantFormat.forEach((eachParticipant) => {
+      eachParticipant.participant.forEach((innerObj) => {
+        innerObj.study = eachParticipant.study
+        innerObj.tableData = { id: k }
+        participantArray.push(innerObj)
         k++
-      }
-    }
-    return await newparticipArray
+      })
+    })
+    return participantArray
   }
 
-  const getParticipantsData = async (filteredStudy, noData = false) => {
+  const getParticipantsData = async (filteredStudy) => {
     let participantFormat = await Promise.all(
       filteredStudy.map(async (x) => ({
         id_0: x.id,
