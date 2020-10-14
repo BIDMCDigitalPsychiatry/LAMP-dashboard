@@ -586,19 +586,33 @@ export default function Feed({
                 selectedWeekViewDays = selectedWeekViewDays.concat(getDates(daily, date))
                 break
               case "custom":
-                schedule.completed = savedData.length > 0 ? true : false
-                schedule.custom_time.map((time) => {
+                schedule.custom_time.map((time, index) => {
                   let scheduledDate = new Date(currentDate)
                   scheduledDate.setHours(new Date(time).getHours())
                   scheduledDate.setMinutes(new Date(time).getMinutes())
-                  schedule.timeValue = getTimeValue(new Date(time))
-                  schedule.time = scheduledDate.getTime()
-                  schedule.clickable =
-                    new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
-                    scheduledDate.getTime() >= new Date().getTime()
-                      ? true
-                      : false
-                  currentFeed.push(schedule)
+                  
+                  let nextScheduleDate = new Date(currentDate)                  
+                  if(schedule.custom_time.length > 0 && index > 0) {
+                    nextScheduleDate.setHours(new Date(schedule.custom_time[index - 1]).getHours())
+                    nextScheduleDate.setMinutes(new Date(schedule.custom_time[index - 1]).getMinutes())
+                  }
+
+                  let filteredData = savedData.filter(
+                    (item) => item.timestamp <= scheduledDate.getTime() && (schedule.custom_time.length > 0 && index > 0 ?  
+                      item.timestamp >= nextScheduleDate.getTime(): true)
+                  )
+                  let completedVal = filteredData.length > 0 ? true : false
+                  let each = {
+                    ...schedule,
+                    clickable: new Date().toLocaleDateString() === new Date(currentDate).toLocaleDateString() &&
+                                scheduledDate.getTime() >= new Date().getTime()
+                                  ? true
+                                  : false,
+                    completed: completedVal,
+                    timeValue: getTimeValue(new Date(time)),
+                    time: scheduledDate.getTime(),
+                  }
+                  currentFeed.push(each)
                 })
                 selectedWeekViewDays = selectedWeekViewDays.concat(new Date(date).toLocaleDateString())
                 break
