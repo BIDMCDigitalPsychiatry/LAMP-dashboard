@@ -575,7 +575,7 @@ export default function GameCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+            <Tooltip title="Duplicate this activity and save it with a new title.">
               <Fab
                 color="primary"
                 aria-label="Duplicate"
