@@ -345,14 +345,14 @@ export function unspliceActivity(x) {
 const availableAtiveSpecs = [
   "lamp.group",
   "lamp.suvey",
-  "lamp.journal",
+  // "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",
-  "lamp.breathe",
+  // "lamp.breathe",
   "lamp.spatial_span",
   // "lamp.tips",
   "lamp.cats_and_dogs",
-  "lamp.scratch_image",
+  // "lamp.scratch_image",
 ]
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 export default function ActivityList({ researcher, title, ...props }) {
