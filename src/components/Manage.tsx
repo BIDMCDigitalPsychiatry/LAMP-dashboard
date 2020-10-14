@@ -229,7 +229,11 @@ export default function Manage({ participant, activities, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop>
       <Grid container spacing={2}>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Breathe")} className={classes.thumbMain}>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+            setSpec(null)
+            handleClickOpen("Breathe")
+          }} 
+          className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2}>
@@ -245,7 +249,10 @@ export default function Manage({ participant, activities, ...props }) {
           sm={4}
           md={3}
           lg={3}
-          onClick={() => handleClickOpen("Journals")}
+          onClick={() => {
+            setSpec(null)
+            handleClickOpen("Journals")
+          }}
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -257,7 +264,10 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
+        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+            setSpec(null)
+            handleClickOpen("Goals")
+          }} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
@@ -267,7 +277,10 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid> */}
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("HopeBox")} className={classes.thumbMain}>
+        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+              setSpec(null)
+              handleClickOpen("HopeBox")
+            }} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={1}>
@@ -283,7 +296,10 @@ export default function Manage({ participant, activities, ...props }) {
           sm={4}
           md={3}
           lg={3}
-          onClick={() => handleClickOpen("Scratch_card")}
+          onClick={() => {
+            setSpec(null)
+            handleClickOpen("Scratch_card")
+          }}
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -301,7 +317,10 @@ export default function Manage({ participant, activities, ...props }) {
           sm={4}
           md={3}
           lg={3}
-          onClick={() => handleClickOpen("Medication_tracker")}
+          onClick={() => {
+            setSpec(null)
+            handleClickOpen("Medication_tracker")
+          }}
           className={classes.thumbMain}
         >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
