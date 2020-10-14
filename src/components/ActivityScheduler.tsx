@@ -15,6 +15,15 @@ import {
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import MaterialTable from "material-table"
+import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+
+const theme = createMuiTheme({
+  overrides: {
+    MuiTypography: {
+      h6: { fontSize: 16, fontWeight: 600 },
+    },
+  },
+})
 
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
 // and needs to be fixed or it will silently rollback.
@@ -107,119 +116,128 @@ function InlineMenu({ customTimes, onChange, ...props }) {
 
 export default function ActivityScheduler({ activity, onChange, ...props }) {
   const schedules = activity?.schedule ?? []
+
   return (
-    <MaterialTable
-      title="Activity Schedule"
-      data={schedules}
-      columns={[
-        {
-          title: "Start Date",
-          field: "start_date",
-          initialEditValue: new Date(),
-          render: (rowData) => (
-            <span>{new Date(rowData.start_date).toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
-          ),
-          editComponent: (props) => (
-            <KeyboardDatePicker
-              autoOk
-              animateYearScrolling
-              variant="inline"
-              inputVariant="outlined"
-              format="MM/dd/yyyy"
-              label="Start Date"
-              helperText="Select the start date."
-              InputAdornmentProps={{ position: "start" }}
-              value={props.value}
-              onChange={(date) => date?.isValid() && props.onChange(date)}
-            />
-          ),
-        },
-        {
-          title: "Time",
-          field: "time",
-          initialEditValue: new Date(),
-          render: (rowData) => (
-            <span>{new Date(rowData.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
-          ),
-          editComponent: (props) => (
-            <KeyboardTimePicker
-              autoOk
-              variant="inline"
-              inputVariant="outlined"
-              format="h:mm a"
-              label="Time"
-              helperText="Select the start time."
-              InputAdornmentProps={{ position: "start" }}
-              value={props.value}
-              onChange={(date) => date?.isValid() && props.onChange(date)}
-            />
-          ),
-        },
-        {
-          title: "Repeat Interval",
-          field: "repeat_interval",
-          initialEditValue: "none",
-          lookup: {
-            hourly: "Every hour",
-            every3h: "Every 3 hours",
-            every6h: "Every 6 hours",
-            every12h: "Every 12 hours",
-            daily: "Every day",
-            biweekly: "Two times every week (Tue, Thurs)",
-            triweekly: "Three times every week (Mon, Wed, Fri)",
-            weekly: "Every week",
-            bimonthly: "Two times every month",
-            monthly: "Every month",
-            custom: "Use custom times instead",
-            none: "Do not repeat",
-          },
-        },
-        {
-          title: "Custom Times",
-          field: "custom_time",
-          initialEditValue: [],
-          render: (props) =>
-            props.repeat_interval === "custom" ? <span>{manyDates(props.custom_time)}</span> : "No custom times",
-          editComponent: (props) =>
-            props.rowData.repeat_interval !== "custom" ? (
-              <Button variant="outlined" disabled>
-                No custom times
-              </Button>
-            ) : (
-              <InlineMenu customTimes={props.value} onChange={(x) => props.onChange(x)} />
+    <MuiThemeProvider theme={theme}>
+      <MaterialTable
+        title="Activity Schedule"
+        data={schedules}
+        columns={[
+          {
+            title: "Start Date",
+            field: "start_date",
+            initialEditValue: new Date(),
+            render: (rowData) => (
+              <span>{new Date(rowData.start_date).toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
             ),
-        },
-      ]}
-      editable={{
-        onRowAdd: async (newData) => {
-          onChange([...schedules, newData])
-        },
-        onRowUpdate: async (newData, oldData: any) => {
-          let x = Array.from(schedules) // clone
-          x[oldData.tableData.id] = newData
-          onChange(x)
-        },
-        onRowDelete: async (oldData: any) => {
-          let x = Array.from(schedules) // clone
-          x.splice(oldData.tableData.id, 1)
-          onChange(x)
-        },
-      }}
-      localization={{
-        body: {
-          emptyDataSourceMessage: "No schedule.",
-          editRow: {
-            deleteText: "Are you sure you want to delete this schedule item?",
+            editComponent: (props) => (
+              <KeyboardDatePicker
+                autoOk
+                animateYearScrolling
+                variant="inline"
+                inputVariant="outlined"
+                format="MM/dd/yyyy"
+                label="Start Date"
+                helperText="Select the start date."
+                InputAdornmentProps={{ position: "start" }}
+                value={props.value}
+                onChange={(date) => date?.isValid() && props.onChange(date)}
+              />
+            ),
           },
-        },
-      }}
-      options={{
-        search: false,
-        actionsColumnIndex: -1,
-        pageSize: 3,
-        pageSizeOptions: [3, 5, 10],
-      }}
-      components={{ Container: (props) => <Box {...props} /> }}
-    />
+          {
+            title: "Time",
+            field: "time",
+            initialEditValue: new Date(),
+            render: (rowData) => (
+              <span>{new Date(rowData.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
+            ),
+            editComponent: (props) => (
+              <KeyboardTimePicker
+                autoOk
+                variant="inline"
+                inputVariant="outlined"
+                format="h:mm a"
+                label="Time"
+                helperText="Select the start time."
+                InputAdornmentProps={{ position: "start" }}
+                value={props.value}
+                onChange={(date) => date?.isValid() && props.onChange(date)}
+              />
+            ),
+          },
+          {
+            title: "Repeat Interval",
+            field: "repeat_interval",
+            initialEditValue: "none",
+            lookup: {
+              hourly: "Every hour",
+              every3h: "Every 3 hours",
+              every6h: "Every 6 hours",
+              every12h: "Every 12 hours",
+              daily: "Every day",
+              biweekly: "Two times every week (Tue, Thurs)",
+              triweekly: "Three times every week (Mon, Wed, Fri)",
+              weekly: "Every week",
+              bimonthly: "Two times every month",
+              monthly: "Every month",
+              custom: "Use custom times instead",
+              none: "Do not repeat",
+            },
+          },
+          {
+            title: "Custom Times",
+            field: "custom_time",
+            initialEditValue: [],
+            render: (props) =>
+              props.repeat_interval === "custom" ? <span>{manyDates(props.custom_time)}</span> : "No custom times",
+            editComponent: (props) =>
+              props.rowData.repeat_interval !== "custom" ? (
+                <Button variant="outlined" disabled>
+                  No custom times
+                </Button>
+              ) : (
+                <InlineMenu customTimes={props.value} onChange={(x) => props.onChange(x)} />
+              ),
+          },
+        ]}
+        editable={{
+          onRowAdd: async (newData) => {
+            onChange([...schedules, newData])
+          },
+          onRowUpdate: async (newData, oldData: any) => {
+            let x = Array.from(schedules) // clone
+            x[oldData.tableData.id] = newData
+            onChange(x)
+          },
+          onRowDelete: async (oldData: any) => {
+            let x = Array.from(schedules) // clone
+            x.splice(oldData.tableData.id, 1)
+            onChange(x)
+          },
+        }}
+        localization={{
+          body: {
+            emptyDataSourceMessage: "No schedule.",
+            editRow: {
+              deleteText: "Are you sure you want to delete this schedule item?",
+            },
+          },
+        }}
+        options={{
+          search: false,
+          actionsColumnIndex: -1,
+          pageSize: 3,
+          pageSizeOptions: [3, 5, 10],
+          headerStyle: {
+            fontWeight: 600,
+            fontSize: 13,
+            background: "transparent",
+            borderTop: "#ccc solid 1px",
+          },
+        }}
+        components={{ Container: (props) => <Box {...props} /> }}
+      />
+    </MuiThemeProvider>
   )
 }

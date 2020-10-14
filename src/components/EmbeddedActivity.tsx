@@ -13,18 +13,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
 const demoActivities = {
   "Balloon Risk": "balloonrisk",
-  "Spatial Span": "boxgame",
-  "Cats and Dogs": "catsndogs",
+  "lamp.spatial_span": "boxgame",
+  "lamp.cats_and_dogs": "catsndogs",
   "Dot Touch": "dottouch",
-  "Jewels Trails A": "jewels",
-  "Jewels Trails B": "jewelspro",
+  "lamp.jewels_a": "jewels",
+  "lamp.jewels_b": "jewelspro",
   "Pop The Bubbles": "popthebubbles",
 }
 
-export default function EmbeddedActivity({ participant, activities, name, onComplete, ...props }) {
+export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -35,7 +34,7 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    activateEmbeddedActivity(name)
+    activateEmbeddedActivity(activity)
   }, [])
 
   useEffect(() => {
@@ -78,21 +77,20 @@ export default function EmbeddedActivity({ participant, activities, name, onComp
     }
   }, [embeddedActivity])
 
-  const activateEmbeddedActivity = async (name) => {
-    if (demoActivities[name]) {
-      const details = (activities || []).filter((x) => x.name === name).map((y) => [y.id, y.settings])[0] ?? []
-      setActivityId(details[0] ?? [])
-      setGameSettings(details[1] ?? [])
-      setSaved(false)
-      let response = await fetch(
-        `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${demoActivities[name]}.html.b64`
-      )
-      // let response = await fetch(
-      //   `${id}.html.b64`
-      // )
-      setEmbeddedActivity(atob(await response.text()))
-      setLoading(false)
-    }
+  const activateEmbeddedActivity = async (activity) => {
+    setActivityId(activity.id)
+    setGameSettings(activity.settings)
+    setSaved(false)
+    let response = await fetch(
+      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
+        demoActivities[activity.spec]
+      }.html.b64`
+    )
+    // let response = await fetch(
+    //   `${id}.html.b64`
+    // )
+    setEmbeddedActivity(atob(await response.text()))
+    setLoading(false)
   }
 
   return (

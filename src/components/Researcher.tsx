@@ -183,7 +183,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function Study({ study, onParticipantSelect, researcher, ...props }) {
+function Study({ onParticipantSelect, researcher, ...props }) {
   const [showUnscheduled, setShowUnscheduled] = useState(false)
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -233,14 +233,14 @@ function Study({ study, onParticipantSelect, researcher, ...props }) {
           </Drawer>
           {currentTab === 0 && (
             <ParticipantList
-              title={study.name}
-              studyID={study.id}
+              title={null}
+              studyID={null}
               showUnscheduled={showUnscheduled}
               onParticipantSelect={onParticipantSelect}
               researcher={researcher}
             />
           )}
-          {currentTab === 1 && <ActivityList title={study.name} studyID={study.id} />}
+          {currentTab === 1 && <ActivityList title={null} researcher={researcher} />}
         </ResponsivePaper>
       </Container>
     </Container>
@@ -248,15 +248,15 @@ function Study({ study, onParticipantSelect, researcher, ...props }) {
 }
 
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
-  const [studies, setStudies] = useState([])
-  useEffect(() => {
-    LAMP.Study.allByResearcher(researcher.id).then(setStudies)
+  useEffect(() => {    
+    ;(async() => {
+      await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", null)
+    })()    
   }, [])
+  
   return (
     <React.Fragment>
-      {studies.map((study, index) => (
-        <Study study={study} onParticipantSelect={onParticipantSelect} key={index} researcher={researcher} />
-      ))}
+      <Study onParticipantSelect={onParticipantSelect} researcher={researcher} />
     </React.Fragment>
   )
 }

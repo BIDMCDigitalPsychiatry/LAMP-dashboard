@@ -79,8 +79,6 @@ export default function WeekView({
   const months = getDates().months
   const years = getDates().years
 
-  let currentMonth = new Date().getMonth() + 1
-  let currentYear = new Date().getFullYear()
   const [selectedDate, setSelectedDate] = useState(type === "feed" ? dates.indexOf(new Date().getDate()) : null)
 
   return (

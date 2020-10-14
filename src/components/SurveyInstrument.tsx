@@ -30,6 +30,8 @@ import {
   Tooltip,
   Icon,
   FormGroup,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
@@ -146,7 +148,10 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -1076,10 +1081,11 @@ function SurveyQuestions({
 export default function SurveyInstrument({ id, group, onComplete, type, setVisibleActivities, fromPrevent, ...props }) {
   const [survey, setSurvey] = useState<any>()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const startTime = new Date().getTime()
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
@@ -1089,10 +1095,16 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
         prefillTimestamp: !_patientMode() ? group[0].prefillTimestamp : undefined,
       })
     })
+    setTimeout(() => {
+      setLoading(false)
+    }, 2500)
   }, [group])
 
   return (
     <Grid container direction="row">
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid item style={{ width: "100%" }}>
         <SurveyQuestions
           validate={true}

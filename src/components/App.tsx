@@ -92,7 +92,6 @@ function AppRouter({ ...props }) {
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
-
       //
       reset({
         id: x[0],
