@@ -322,16 +322,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
-const games = [
-  "Balloon Risk",
-  "Spatial Span",
-  "Cats and Dogs",
-  "Dot Touch",
-  "Jewels Trails A",
-  "Jewels Trails B",
-  "Pop The Bubbles",
-]
 export default function Feed({
   participant,
   onComplete,
@@ -503,7 +495,7 @@ export default function Feed({
             scheduledDate.setMinutes(scheduleTime.getMinutes())
             schedule.icon = feed.name
             schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
-            schedule.type = feed.name
+            schedule.type = feed.spec
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
 
@@ -758,10 +750,10 @@ export default function Feed({
                             setDetails(feed.data[0].text)
                             setIndex(index)
                             setIcon(<SleepTips />)
-                            showFeedDetails(feed.type)
+                            showFeedDetails(feed.group)
                           }
                           if (feed.group == "manage") {
-                            if (games.includes(feed.title)) {
+                            if (games.includes(feed.type)) {
                               setActivityName(feed.title)
                               setActivityId(feed.activityData.id)
                               setVisibleActivities(feed.activityData)
@@ -842,7 +834,7 @@ export default function Feed({
                             <SleepTips width="80" height="80" />
                           ) : feed.icon === "Psychosis and Social" && feed.group === "assess" ? (
                             <AssessSocial width="80" height="80" />
-                          ) : feed.type === "Jewels Trails A" || feed.type === "Jewels Trails B" ? (
+                          ) : feed.type === "lamp.jewels_a" || feed.type === "lamp.jewels_b" ? (
                             <Jewels width="80" height="80" />
                           ) : (
                             <InfoIcon width="80" height="80" />

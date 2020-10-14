@@ -34,7 +34,7 @@ import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 // External Imports
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
-
+import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
 import LAMP from "lamp-core"
 import Activity from "./Activity"
@@ -139,6 +139,16 @@ const useStyles = makeStyles((theme: Theme) =>
         position: "absolute",
       },
     },
+    btnImport: {
+      height: 48,
+      width: 48,
+      background: "white",
+      boxShadow: "none",
+      marginRight: 15,
+      color: "#7599FF",
+
+      // "&:hover": { background: "#f4f4f4" },
+    },
     tableContainer: {
       "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
       "& div.MuiInput-underline:after": { borderBottom: "0 !important" },
@@ -171,7 +181,8 @@ const useStyles = makeStyles((theme: Theme) =>
     btnOptions: {
       textTransform: "capitalize",
       color: "#4C66D6",
-      margin: "0 45px 0 0",
+      margin: "0 25px 0 0",
+
       "& span": { cursor: "pointer" },
       "& svg": { width: 24, height: 24, fill: "#4C66D6" },
     },
@@ -208,7 +219,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "capitalize",
       boxShadow: "none",
       background: "transparent",
-      margin: "0 30px",
+      margin: "0 15px",
       paddingRight: 0,
       "& svg": { marginRight: 10 },
     },
@@ -228,7 +239,7 @@ const useStyles = makeStyles((theme: Theme) =>
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
-      maxHeight: 400,
+      maxHeight: 600,
       marginTop: 75,
       marginLeft: 100,
       borderRadius: 10,
@@ -595,6 +606,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     })
     setCreate(false)
     setShowCreate(false)
+    onChange()
   }
 
   // Create a new Activity object that represents a group of other Activities.
@@ -619,7 +631,9 @@ export default function ActivityList({ researcher, title, ...props }) {
       enqueueSnackbar("Successfully created a new group Activity.", {
         variant: "success",
       })
+    setCreate(false)
     setGroupCreate(false)
+    onChange()
   }
 
   // Create a new Activity object that represents a cognitive test.
@@ -775,6 +789,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     console.dir(result)
     let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
     let all = await LAMP.Activity.allByStudy(x.parentID)
+    all = all.map((el) => ({ ...el, parent: x.parent, parentID: x.parentID }))
     setActivities(all) // need to resave below to trigger detail panel correctly!
     setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
   }
@@ -867,6 +882,14 @@ export default function ActivityList({ researcher, title, ...props }) {
                       }}
                     >
                       <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                    </Fab>
+                    <Fab
+                      className={classes.btnImport}
+                      onClick={(event) => {
+                        setShowActivityImport(true)
+                      }}
+                    >
+                      <CloudUploadIcon />
                     </Fab>
                     <Fab
                       variant="extended"
