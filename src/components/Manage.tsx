@@ -466,7 +466,7 @@ export default function Manage({ participant, activities, ...props }) {
                 <Typography variant="body2" align="left">
                   Games
                 </Typography>
-                <Typography variant="h2">{dialogueType.replace(/_/g, " ") + " (" + spec + ")"}</Typography>
+                <Typography variant="h2">{dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}</Typography>
               </Box>
             )}
           </div>
