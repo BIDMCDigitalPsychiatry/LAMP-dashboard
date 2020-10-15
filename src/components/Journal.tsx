@@ -73,7 +73,6 @@ const getJournals = async (participantId) => {
       All: journals,
     },
   ]
-
   return data
 }
 
@@ -137,7 +136,7 @@ export default function Journals({ participant, ...props }) {
                   // onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
                 >
                   <Typography variant="caption" gutterBottom>
-                    {getDateString(journals[index][key][keyIndex].datetime)}
+                    {getDateString(new Date(journals[index][key][keyIndex].datetime))}
                   </Typography>
                   <Typography variant="body2" component="p">
                     {text}...
