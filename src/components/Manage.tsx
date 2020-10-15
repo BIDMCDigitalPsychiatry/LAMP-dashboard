@@ -20,8 +20,10 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
+import JournalImg from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
+import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -158,17 +160,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
-function getGameImageAct(activities: ActivityObj[]) {
-  let images = []
-  activities.map((activity) => {
-    ;(async () => {
-      images[activity.id] = await getGameImage(activity.id)
-    })()
-  })
-  return images
-}
-
-async function getGameImage(activityId: string) {
+async function getImage(activityId: string) {
   return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
     !!y.error ? undefined : y.data
   )[0]
@@ -183,25 +175,25 @@ export default function Manage({ participant, activities, ...props }) {
   const [activityName, setActivityName] = useState(null)
   const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
-  const [gamesActivities, setGameActivities] = useState([])
+  const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [spec, setSpec] = useState(null)
 
   useEffect(() => {
     setLoading(true)
-    let gActivities = activities.filter((x: any) => games.includes(x.spec))
-    setGameActivities(gActivities)
+    let gActivities = activities.filter((x: any) => games.includes(x.spec) || x.spec === "lamp.journal")
+    setSavedActivities(gActivities)
   }, [])
 
   useEffect(() => {
     setLoading(true)
     ;(async () => {
       let tags = []
-      let images = await gamesActivities.map((activity, index) => {
+      let images = await savedActivities.map((activity, index) => {
         ;(async () => {
-          tags[activity.id] = await getGameImage(activity.id)
+          tags[activity.id] = await getImage(activity.id)
           setTag(tags)
-          if (index === gamesActivities.length - 1) {
+          if (index === savedActivities.length - 1) {
             setLoading(false)
             setTag(tags)
             return tags
@@ -210,7 +202,7 @@ export default function Manage({ participant, activities, ...props }) {
       })
       setTag(images)
     })()
-  }, [gamesActivities])
+  }, [savedActivities])
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -250,31 +242,41 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
         </Grid>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => {
-            setSpec(null)
-            handleClickOpen("Journals")
-          }}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <JournalIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Journal</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
-            setSpec(null)
-            handleClickOpen("Goals")
-          }} className={classes.thumbMain}>
+        {activities
+          .filter((x: any) => x.spec === "lamp.journal")
+          .map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setActivity(activity)
+                handleClickOpen("Journals")
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      style={{
+                        margin: "auto",
+                        height: "100px",
+                        width: "100px",
+                        background: tag[activity.id]?.photo
+                          ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                          : `url(${JournalImg}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{activity.name}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))}
+        {/*  <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
@@ -283,8 +285,8 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>New goal</Typography>
             </Card>
           </ButtonBase>
-        </Grid> */}
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+        </Grid>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
               setSpec(null)
               handleClickOpen("HopeBox")
             }} className={classes.thumbMain}>
@@ -338,43 +340,45 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>Medication tracker</Typography>
             </Card>
           </ButtonBase>
-        </Grid> */}
-        {gamesActivities.map((entry) => (
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={3}
-            lg={3}
-            onClick={() => {
-              setActivityName(entry.name)
-              handleClickOpen("Game")
-              setSpec(entry?.spec?.replace("lamp.", ""))
-              setActivity(entry)
-            }}
-            className={classes.thumbMain}
-          >
-            <ButtonBase focusRipple className={classes.fullwidthBtn}>
-              <Tooltip title={entry?.spec?.replace("lamp.", "")} placement="bottom">
-                <Card className={classes.manage}>
-                  <Box mt={2} mb={1}>
-                    <Box
-                      style={{
-                        margin: "auto",
-                        height: "100px",
-                        width: "100px",
-                        background: tag[entry.id]?.photo
-                          ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Box>
-                  <Typography className={classes.cardlabel}>{entry.name}</Typography>
-                </Card>
-              </Tooltip>
-            </ButtonBase>
-          </Grid>
-        ))}
+         </Grid> */}
+        {savedActivities
+          .filter((x: any) => games.includes(x.spec))
+          .map((entry) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setActivityName(entry.name)
+                handleClickOpen("Game")
+                setSpec(entry?.spec?.replace("lamp.", ""))
+                setActivity(entry)
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Tooltip title={entry?.spec?.replace("lamp.", "")} placement="bottom">
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <Box
+                        style={{
+                          margin: "auto",
+                          height: "100px",
+                          width: "100px",
+                          background: tag[entry.id]?.photo
+                            ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
+                            : `url(${InfoIcon}) center center/contain no-repeat`,
+                        }}
+                      ></Box>
+                    </Box>
+                    <Typography className={classes.cardlabel}>{entry.name}</Typography>
+                  </Card>
+                </Tooltip>
+              </ButtonBase>
+            </Grid>
+          ))}
       </Grid>
       <ResponsiveDialog
         transient={launchedActivity === "Game" ? true : false}
@@ -400,6 +404,7 @@ export default function Manage({ participant, activities, ...props }) {
             Journals: (
               <JournalEntries
                 participant={participant}
+                activityId={activity?.id ?? null}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)

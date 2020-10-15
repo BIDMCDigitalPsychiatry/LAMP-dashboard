@@ -618,8 +618,6 @@ export default function Prevent({
       let selActivities = await getSelectedActivities(participant)
       setSelectedActivities(selActivities)
       let selSensors = await getSelectedSensors(participant)
-      let journalCount = await getJournalCount(participant)
-      setJournalCount(journalCount)
       let activities = await getActivities(participant)
       let goals = await getGoals(participant)
       let groupByType
@@ -630,18 +628,13 @@ export default function Prevent({
           }
         })
       }
-      if (journalCount > 0) activities.push({ name: "Journals" })
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-
+      console.log(activityEvents)
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
 
       setActivityEvents(activityEvents)
 
       let activityEventCount = getActivityEventCount(activityEvents)
-      if (journalCount > 0) {
-        activityEventCount["Journals"] = journalCount
-        timeSpans["Journals"] = { timestamp: new Date().getTime() }
-      }
       if (typeof goals !== "undefined") {
         groupByType = goals.reduce((goal, it) => {
           goal[it.goalType] = goal[it.goalType] + 1 || 1
@@ -691,12 +684,13 @@ export default function Prevent({
         {(activities || [])
           .filter((x) => (selectedActivities || []).includes(x.name))
           .map((activity) =>
-            activity.name === "Journals" ? (
+            activity.spec === "lamp.journal" ? (
               <Grid item xs={6} sm={3} md={3} lg={3}>
                 <ButtonBase focusRipple className={classes.fullwidthBtn}>
                   <Card
                     className={classes.prevent}
                     onClick={() => {
+                      setSelectedActivity(activityEvents?.[activity.name] ?? null)
                       setSelectedActivityName("Journal entries")
                       setOpenData(true)
                     }}
@@ -710,7 +704,7 @@ export default function Prevent({
                       </Box>
                     </Box>
                     <Box className={classes.preventGraph}>
-                      <Typography variant="h2">{journalCount}</Typography>
+                      <Typography variant="h2">{(activityEvents?.[activity.name] || []).length}</Typography>
                     </Box>
                     <Typography variant="h6">entries {timeAgo.format(timeSpans[activity.name].timestamp)}</Typography>
                   </Card>
@@ -1013,7 +1007,7 @@ export default function Prevent({
         </AppBar>
 
         {selectedActivityName === "Journal entries" ? (
-          <Journal participant={participant} />
+          <Journal participant={participant} selectedEvents={selectedActivity} />
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
         ) : (

@@ -147,11 +147,11 @@ export default function NavigationLayout({
 
   useInterval(
     () => {
-      if(!!id) {
+      if (!!id) {
         refreshMessages()
       }
     },
-    10 * 1000,
+    60000,
     true
   )
 

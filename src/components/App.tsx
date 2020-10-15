@@ -93,7 +93,7 @@ function AppRouter({ ...props }) {
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
       //
-     
+
       reset({
         id: x[0],
         password: x[1],
@@ -194,10 +194,10 @@ function AppRouter({ ...props }) {
 
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity).catch((e) => {
-        enqueueSnackbar("Invalid id or password.", {
+      enqueueSnackbar("Invalid id or password.", {
         variant: "error",
-      })  
-      return  
+      })
+      return
     })
     if (!!identity) {
       let type = {

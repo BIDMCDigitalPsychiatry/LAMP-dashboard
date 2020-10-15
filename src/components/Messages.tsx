@@ -12,6 +12,8 @@ import {
   Icon,
   InputBase,
   Divider,
+  useTheme,
+  useMediaQuery,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
@@ -23,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "10px",
     padding: "12px 20px 17px 20px",
     textAlign: "justify",
-    marginTop: 20,
+    marginBottom: 20,
 
     "& span": {
       color: "rgba(0, 0, 0, 0.4)",
@@ -55,6 +57,14 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbardashboard: {
     minHeight: 65,
+    [theme.breakpoints.up("md")]: {
+      paddingTop: "0 !important",
+      width: "100%",
+      maxWidth: "100% !important",
+    },
+    [theme.breakpoints.down("sm")]: {
+      padding: "0 16px !important",
+    },
     "& h5": {
       color: "rgba(0, 0, 0, 0.75)",
       textAlign: "center",
@@ -68,7 +78,39 @@ const useStyles = makeStyles((theme) => ({
     background: "#FFFFFF",
     boxShadow: "none",
 
-    "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
+    "& h5": {
+      fontSize: 25,
+      paddingLeft: 20,
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: 600,
+      lineHeight: "47px",
+      textAlign: "left",
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: 16,
+        lineHeight: "normal",
+      },
+    },
+  },
+  containerWidth: {
+    maxWidth: 1055,
+    [theme.breakpoints.down("sm")]: {
+      padding: 0,
+      marginTop: 30,
+    },
+  },
+  thumbContainer: {
+    maxWidth: 1055,
+    left: 0,
+    right: 0,
+    position: "absolute",
+    height: 50,
+
+    [theme.breakpoints.up("md")]: {
+      paddingLeft: 125,
+    },
+    [theme.breakpoints.up("lg")]: {
+      paddingLeft: 24,
+    },
   },
 }))
 
@@ -114,6 +156,8 @@ export default function Messages({
   const [sender, setSender] = useState(null)
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+
   useInterval(
     () => {
       refreshMessages()
@@ -229,12 +273,12 @@ export default function Messages({
   if (msgOpen) {
     return (
       <Container>
-        <Box style={{ marginTop: "5%" }}>{messageSection(0)}</Box>
+        <Box>{messageSection(0)}</Box>
       </Container>
     )
   } else {
     return (
-      <Container style={{ marginTop: "5%" }}>
+      <Container className={classes.containerWidth}>
         <Box>
           {getMessages().filter(
             (x) =>
@@ -251,6 +295,7 @@ export default function Messages({
                 <Box
                   border={0}
                   className={classes.conversationStyle}
+                  mx={2}
                   onClick={() => {
                     refreshMessages()
                     setSender(x.from)
@@ -277,7 +322,7 @@ export default function Messages({
                 </Box>
               ))[0]
           ) : (
-            <Box style={{ marginTop: "5%" }}>{messageSection(1)}</Box>
+            <Box style={{ marginTop: "20px" }}>{messageSection(1)}</Box>
           )}
         </Box>
 
@@ -292,15 +337,27 @@ export default function Messages({
         >
           <AppBar position="static" className={classes.inlineHeader}>
             <Toolbar className={classes.toolbardashboard}>
-              <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
-                <Icon>arrow_back</Icon>
-              </IconButton>
+              <Container maxWidth={false} className={classes.thumbContainer}>
+                <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
+                  <Icon>arrow_back</Icon>
+                </IconButton>
+
+                <Typography
+                  variant="h5"
+                  style={{
+                    marginLeft: supportsSidebar ? 0 : undefined,
+                  }}
+                >
+                  {sender}
+                </Typography>
+              </Container>
             </Toolbar>
-            <Typography variant="h5">{sender}</Typography>
           </AppBar>
-          <Box px={3} style={{ marginTop: "5%" }}>
-            {messageSection(1)}
-          </Box>
+          <Container className={classes.containerWidth}>
+            <Box px={2} style={{ marginTop: "20px" }}>
+              {messageSection(1)}
+            </Box>
+          </Container>
         </ResponsiveDialog>
       </Container>
     )

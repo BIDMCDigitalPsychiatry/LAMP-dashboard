@@ -42,47 +42,38 @@ function getWeekDates() {
   return week
 }
 
-const getJournals = async (participantId) => {
-  let journals = (
-    await Promise.all(
-      [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => [])])
-    )
-  )
-    .filter((x: any) => x[1].message !== "404.object-not-found")
-    .map((x: any) => x[1].data)[0]
-
+const getJournals = (journals: any) => {
   let weekdays = getWeekDates()
   let weekData = journals
     .filter(
       (journal: any) =>
-        new Date(journal.datetime).getMonth() === new Date().getMonth() &&
-        weekdays.indexOf(new Date(journal.datetime).getDate()) > -1
+        new Date(journal.timestamp).getMonth() === new Date().getMonth() &&
+        weekdays.indexOf(new Date(journal.timestamp).getDate()) > -1
     )
     .map((journal) => journal)
   let monthData = journals
-    .filter((journal: any) => new Date(journal.datetime).getMonth() === new Date().getMonth())
+    .filter((journal: any) => new Date(journal.timestamp).getMonth() === new Date().getMonth())
     .map((journal) => journal)
   let others = journals
-    .filter((journal: any) => new Date(journal.datetime).getMonth() !== new Date().getMonth())
+    .filter((journal: any) => new Date(journal.timestamp).getMonth() !== new Date().getMonth())
     .map((journal) => journal)
-  let data = [
-    {
-      "This week": weekData,
-      "This month": monthData,
-      Others: others,
-      All: journals,
-    },
-  ]
+
+  let data = {
+    "This week": weekData,
+    "This month": monthData,
+    Others: others,
+    All: journals,
+  }
   return data
 }
 
-export default function Journals({ participant, ...props }) {
+export default function Journals({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
   const [journals, setJournals] = useState([])
   const [allJournals, setAllJournals] = useState(null)
   const [open, setOpen] = useState(true)
   const [selectedDates, setSelectedDates] = useState()
-
+  const [date, setDate] = useState(null)
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -98,63 +89,106 @@ export default function Journals({ participant, ...props }) {
   }
 
   useEffect(() => {
-    ;(async () => {
-      let journals = await getJournals(participant.id)
-      setJournals(journals)
-      setAllJournals(journals[0]["All"])
-      setSelectedDates(journals[0]["All"].map((journal) => new Date(journal.datetime).toLocaleDateString()))
-    })()
+    setJournals(selectedEvents)
+    setAllJournals(getJournals(selectedEvents))
+    setSelectedDates(selectedEvents.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
   }, [])
 
   const getContent = (date: Date) => {
-    let data = allJournals
-      .filter((journal: any) => new Date(journal.datetime).toLocaleDateString() == new Date(date).toLocaleDateString())
-      .map((journal) => journal)
-    setJournals([{ "This date": data }])
+    setDate(date)
   }
-  const getData = () => {
-    let content = []
-    Object.keys(journals).forEach((index) => {
-      let eachData = []
-      Object.keys(journals[index]).forEach((key) => {
-        if (journals[index][key].length > 0 && key !== "All") {
-          eachData.push(
-            <Box fontWeight="fontWeightBold" className={classes.journalday}>
-              {key}
-            </Box>
-          )
-          Object.keys(journals[index][key]).forEach((keyIndex) => {
-            let fullText = journals[index][key][keyIndex].journalText
-            let text = fullText.substring(0, 80)
-            if (text.length != fullText.length) {
-              text = text.substr(0, Math.min(text.length, text.lastIndexOf(" ")))
-            }
-            eachData.push(
-              <Grid item>
-                <Box
-                  className={classes.journalStyle}
-                  // onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
-                >
-                  <Typography variant="caption" gutterBottom>
-                    {getDateString(new Date(journals[index][key][keyIndex].datetime))}
-                  </Typography>
-                  <Typography variant="body2" component="p">
-                    {text}...
-                  </Typography>
-                </Box>
-              </Grid>
-            )
-          })
-        }
-      })
-      content.push(<Box boxShadow={0}>{eachData}</Box>)
-    })
-    return content
-  }
+
   return (
     <div className={classes.root}>
       <WeekView type="journal" onSelect={getContent} daysWithdata={selectedDates} />
-      <Container className={classes.journalHistory}>{getData()}</Container>
+      <Container>
+        {date !== null ? (
+          <Container>
+            <Container className={classes.journalHistory}>
+              <Box fontWeight="fontWeightBold" className={classes.journalday}>
+                This date
+              </Box>
+              {journals
+                .filter(
+                  (journal) => new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
+                )
+                .map((journal) => (
+                  <Box boxShadow={0}>
+                    <Grid item>
+                      <Box
+                        className={classes.journalStyle}
+                        // onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
+                      >
+                        <Typography variant="caption" gutterBottom>
+                          {getDateString(new Date(journal.timestamp))}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {journal.static_data.journalText.substring(0, 80).length ===
+                          journal.static_data.journalText.length
+                            ? journal.static_data.journalText
+                            : journal.static_data.journalText
+                                .substring(0, 80)
+                                .substr(
+                                  0,
+                                  Math.min(
+                                    journal.static_data.journalText.substring(0, 80).length,
+                                    journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+                                  )
+                                )}
+                          ...
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  </Box>
+                ))}
+            </Container>
+          </Container>
+        ) : (
+          <div>
+            {allJournals !== null &&
+              Object.keys(allJournals).map((each) => (
+                <Container>
+                  {allJournals[each].length > 0 && (
+                    <Container className={classes.journalHistory}>
+                      <Box fontWeight="fontWeightBold" className={classes.journalday}>
+                        {each}
+                      </Box>
+                      {allJournals[each].map((journal) => (
+                        <Box boxShadow={0}>
+                          <Grid item>
+                            <Box
+                              className={classes.journalStyle}
+                              // onClick={() => handleOpen(fullText, journals[index][key][keyIndex].date)}
+                            >
+                              <Typography variant="caption" gutterBottom>
+                                {getDateString(new Date(journal.timestamp))}
+                              </Typography>
+                              <Typography variant="body2" component="p">
+                                {journal.static_data.journalText.substring(0, 80).length ===
+                                journal.static_data.journalText.length
+                                  ? journal.static_data.journalText
+                                  : journal.static_data.journalText
+                                      .substring(0, 80)
+                                      .substr(
+                                        0,
+                                        Math.min(
+                                          journal.static_data.journalText.substring(0, 80).length,
+                                          journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+                                        )
+                                      )}
+                                ...
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        </Box>
+                      ))}
+                    </Container>
+                  )}
+                </Container>
+              ))}
+          </div>
+        )}
+      </Container>
     </div>
   )
 }

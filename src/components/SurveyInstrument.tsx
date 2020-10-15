@@ -765,7 +765,7 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
       label: "Exellent",
     },
   ]
-  
+
   switch (type) {
     case "slider":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />

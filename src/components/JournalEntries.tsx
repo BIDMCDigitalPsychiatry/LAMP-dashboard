@@ -15,6 +15,8 @@ import {
   DialogContent,
   Link,
   Fab,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -107,53 +109,41 @@ const useStyles = makeStyles((theme) => ({
   howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
   btnNav: { marginBottom: 0 },
   dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }))
 
-async function getJournals(participantId) {
-  return Object.fromEntries(
-    (
-      await Promise.all(
-        [participantId || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.journals").catch((e) => [])])
-      )
-    )
-      .filter((x: any) => x[1].message !== "404.object-not-found")
-      .map((x: any) => [x[0], x[1].data])
-  )
-}
-
-export default function JournalEntries({ participant, ...props }) {
+export default function JournalEntries({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [journals, setJournals] = useState({})
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
+  const [loading, setLoading] = useState(false)
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
 
-  useEffect(() => {
-    ;(async () => {
-      let journals = await getJournals(participant.id)
-      setJournals(journals)
-    })()
-  }, [])
-
-  const getData = () => {
-    let x = (journals || {})[participant.id || ""] || []
-    return !Array.isArray(x) ? [] : x
-  }
-
-  const saveJournal = async () => {
-    let all = getData()
-    let journal = {
-      journalText: journalValue,
-      feedback: status,
-      datetime: new Date(),
+  const saveJournal = () => {
+    setLoading(true)
+    let data = {
+      timestamp: new Date().getTime(),
+      duration: 0,
+      activity: activityId,
+      static_data: {
+        journalText: journalValue,
+        feedback: status,
+      },
+      temporal_slices: {},
     }
-    all.push(journal)
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.journals", all)
-    setJournals({ ...(journals || {}), [participant]: all })
+    LAMP.ActivityEvent.create(participant.id, data)
+      .catch((e) => console.dir(e))
+      .then((x) => {
+        setLoading(false)
+      })
     props.onComplete()
   }
 
@@ -165,6 +155,9 @@ export default function JournalEntries({ participant, ...props }) {
 
   return (
     <div className={classes.root}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
           <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
@@ -199,15 +192,15 @@ export default function JournalEntries({ participant, ...props }) {
                 <Grid className={classes.btnNav}>
                   <Box textAlign="center">
                     <IconButton
-                      onClick={() => handleClickStatus("Yes")}
-                      className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("Good")}
+                      className={status === "Good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsUp />
                       <label>Good</label>
                     </IconButton>
                     <IconButton
-                      onClick={() => handleClickStatus("No")}
-                      className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("Bad")}
+                      className={status === "Bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsDown />
                       <label>Bad</label>
