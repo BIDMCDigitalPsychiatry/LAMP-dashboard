@@ -147,12 +147,14 @@ export default function NavigationLayout({
 
   useInterval(
     () => {
-      refreshMessages()
+      if(!!id) {
+        refreshMessages()
+      }
     },
     10 * 1000,
     true
   )
-  
+
   useEffect(() => {
     setMsgCount(getMessageCount())
   }, [conversations])
