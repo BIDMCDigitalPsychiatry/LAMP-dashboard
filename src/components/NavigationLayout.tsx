@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Button,
@@ -32,6 +32,8 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
+import LAMP from "lamp-core"
+import useInterval from "./useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -129,7 +131,9 @@ export default function NavigationLayout({
   const [confirmLogout, setConfirmLogout] = useState(false)
   const [passwordChange, setPasswordChange] = useState(false)
   const [openMessages, setOpenMessages] = useState(false)
+  const [conversations, setConversations] = useState({})
 
+  const [msgCount, setMsgCount] = useState(0)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
@@ -141,6 +145,37 @@ export default function NavigationLayout({
       ? classnames(classes.toolbar, classes.toolbarinner)
       : classnames(classes.toolbar, classes.toolbardashboard)
 
+  useInterval(
+    () => {
+      refreshMessages()
+    },
+    10 * 1000,
+    true
+  )
+  
+  useEffect(() => {
+    setMsgCount(getMessageCount())
+  }, [conversations])
+
+  const refreshMessages = async () => {
+    console.log("Fetching messages...")
+    setConversations(
+      Object.fromEntries(
+        (
+          await Promise.all(
+            [id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
+          )
+        )
+          .filter((x: any) => x[1].message !== "404.object-not-found")
+          .map((x: any) => [x[0], x[1].data])
+      )
+    )
+  }
+
+  const getMessageCount = () => {
+    let x = (conversations || {})[id || ""] || []
+    return !Array.isArray(x) ? 0 : x.filter((a) => a.from === "researcher").length
+  }
   return (
     <Box className={classes.scroll}>
       {!!noToolbar || !!print ? (
@@ -191,13 +226,19 @@ export default function NavigationLayout({
             <Box flexGrow={1} />
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
               <Box className={classes.headerRight}>
-                {hideNotifications.indexOf(activeTab) < 0 ?
-                <Tooltip title="Notifications">
-                  <Badge badgeContent={undefined} color="primary" onClick={() => setOpenMessages(true)}>
-                    <Message />
-                  </Badge>
-                </Tooltip>
-                :""}
+                {hideNotifications.indexOf(activeTab) < 0 ? (
+                  <Tooltip title="Notifications">
+                    <Badge
+                      badgeContent={msgCount > 0 ? msgCount : undefined}
+                      color="primary"
+                      onClick={() => setOpenMessages(true)}
+                    >
+                      <Message />
+                    </Badge>
+                  </Tooltip>
+                ) : (
+                  ""
+                )}
                 <Tooltip title="Profile & Settings">
                   <IconButton
                     aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
