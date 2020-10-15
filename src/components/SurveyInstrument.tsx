@@ -327,7 +327,7 @@ function _useTernaryBool() {
 }
 
 function RadioOption({ onChange, options, value, ...props }) {
-  const [selectedValue, setSelectedValue] = useState(value >= 0 ? value : "")
+  const [selectedValue, setSelectedValue] = useState(value)
   const classes = useStyles()
 
   return (
@@ -532,7 +532,7 @@ function TimeSelection({ onChange, value, ...props }) {
 
 function TextSection({ onChange, charLimit, value, ...props }) {
   const classes = useStyles()
-  const [text, setText] = useState(!!value ? value.value : undefined)
+  const [text, setText] = useState(value)
 
   return (
     <Box className={classes.textfieldwrapper}>
@@ -551,7 +551,7 @@ function TextSection({ onChange, charLimit, value, ...props }) {
             setText(e.target.value)
             onChange(e.target.value)
           }}
-          value={!!value ? value.value : undefined}
+          value={value}
           helperText={text ? `${text.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
@@ -765,7 +765,7 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
       label: "Exellent",
     },
   ]
-
+  
   switch (type) {
     case "slider":
       component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
