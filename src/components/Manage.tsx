@@ -229,11 +229,18 @@ export default function Manage({ participant, activities, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop>
       <Grid container spacing={2}>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+        <Grid
+          item
+          xs={6}
+          sm={4}
+          md={3}
+          lg={3}
+          onClick={() => {
             setSpec(null)
             handleClickOpen("Breathe")
-          }} 
-          className={classes.thumbMain}>
+          }}
+          className={classes.thumbMain}
+        >
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2}>
@@ -485,7 +492,9 @@ export default function Manage({ participant, activities, ...props }) {
                 <Typography variant="body2" align="left">
                   Games
                 </Typography>
-                <Typography variant="h2">{dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}</Typography>
+                <Typography variant="h2">
+                  {dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}
+                </Typography>
               </Box>
             )}
           </div>
