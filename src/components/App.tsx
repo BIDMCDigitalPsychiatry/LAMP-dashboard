@@ -98,8 +98,8 @@ function AppRouter({ ...props }) {
         password: x[1],
         serverAddress:
           x.length > 2 && typeof x[2] !== "undefined"
-            ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "")
-            : "",
+            ? x[2] + (x.length > 3 && typeof x[3] !== "undefined" ? ":" + x[3] : "api.lamp.digital")
+            : "api.lamp.digital",
       }).then((x) => {
         window.location.href = query[0]
       })
