@@ -205,7 +205,6 @@ function AppRouter({ ...props }) {
         auth: LAMP.Auth._auth,
         authType: LAMP.Auth._type,
       }
-      console.log(type)
       setState((state) => ({ ...state, ...type }))
       return type
     } else {
@@ -219,7 +218,6 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
-      console.log("sdf")
       return null
     }
   }
