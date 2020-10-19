@@ -301,24 +301,17 @@ export function spliceActivity({ raw, tag }) {
 }
 
 // Un-splice an object into its raw Tips Activity object
-export function unspliceTipsActivity(x) {
+export function unspliceTipsActivity(x) {     
   return {
     raw: {
       id: x.id,
-      spec: "lamp.tips",
       name: x.name,
+      spec: "lamp.tips",
+      icon: x.icon,
       schedule: x.schedule,
       settings: x.settings,
       studyID: x.studyID,
-    },
-    /*tag: {
-      description: x.description,
-      questions: x.settings?.map((y) => ({
-        multiselect: y?.type === "multiselect" ? true : undefined,
-        description: y?.description,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
-      })),
-    },*/
+    }
   }
 }
 
@@ -354,9 +347,9 @@ const availableAtiveSpecs = [
   "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",
-  // "lamp.breathe",
+  "lamp.breathe",
   "lamp.spatial_span",
-  // "lamp.tips",
+  //"lamp.tips",
   "lamp.cats_and_dogs",
   // "lamp.scratch_image",
 ]
@@ -587,24 +580,13 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
-    // FIXME: ensure this is a lamp.tips only!
-    //const { raw, tag } = unspliceTipsActivity(x)
-
-    console.log(88888, x)
-
-    const { raw } = unspliceTipsActivity(x)
-
-    console.log(99999, raw, !x.id && x.name, x.id, x.name)
-
-    //return false
-
+    const { raw } = unspliceTipsActivity(x) 
     let result
-    //return false
     if (!x.id && x.name) {
-      console.log(21)
-
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
-
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
+        icon: x.icon,
+      })
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
@@ -614,13 +596,13 @@ export default function ActivityList({ researcher, title, ...props }) {
           variant: "success",
         })
     } else {
-      console.log(22, x.id, x)
-
-      console.log(23, raw)
-
       result = (await LAMP.Activity.update(x.id, {
         settings: x.settings,
       })) as any
+
+      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
+        icon: x.icon,
+      })
 
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
@@ -631,12 +613,9 @@ export default function ActivityList({ researcher, title, ...props }) {
           variant: "success",
         })
     }
-
     setCreate(false)
-
     setShowTipCreate(false)
-
-    onChange()
+    onChange()  
   }
 
   // Create a new Activity object & survey descriptions if set.
@@ -685,7 +664,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     setGroupCreate(false)
     onChange()
   }
-
+  
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
@@ -743,16 +722,18 @@ export default function ActivityList({ researcher, title, ...props }) {
       )[0]
       setGameDetails(tag)
       setSelectedActivity(raw)
+    } else if (raw.spec === "lamp.breathe") {
+      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
+        !!y.error ? undefined : y.data
+      )[0]
+      setGameDetails(tag)
+      setSelectedActivity(raw)
     } //else setSelectedActivity(raw) // FIXME
     setLoading(false)
   }
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
-    console.log(6000, x, isDuplicated)
-
-    //return false
-
     let result
     setLoading(true)
     if (!["lamp.group", "lamp.survey", "lamp.tips"].includes(x.spec)) {
@@ -833,45 +814,35 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
       }
     } else if (x.spec === "lamp.tips") {
-      //
-
-      console.log(3000, selectedActivity)
-
-      console.log(3001, x.settings)
-
-      //return false
-
-      result = (await LAMP.Activity.update(selectedActivity.id, {
-        settings: x.settings,
-      })) as any
-
-      if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
-          variant: "error",
-        })
-      else
-        enqueueSnackbar("Successfully updated the Activity.", {
-          variant: "success",
-        })
-
+      if(x.id === undefined){
+        let tipObj = {
+          id: x.id,
+          name: x.name,
+          icon: x.icon,
+          studyID: selectedActivity.parentID,
+          spec: 'lamp.tips',
+          settings: selectedActivity.settings,
+          schedule: selectedActivity.schedule
+        }
+        saveTipsActivity(tipObj)
+      }else{
+        let obj = {
+          settings: x.settings,
+        }
+        result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
+                  icon: x.icon,
+                })
+        if (!!result.error)
+          enqueueSnackbar("Encountered an error: " + result?.error, {
+            variant: "error",
+          })
+        else
+          enqueueSnackbar("Successfully updated the Activity.", {
+            variant: "success",
+          })        
+      }      
       onChange()
-
-      /*
-      let result = (await LAMP.Activity.update(selectedActivity.id, {
-        settings: x.settings,
-      })) as any
-      
-      if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
-          variant: "error",
-        })
-      else
-        enqueueSnackbar("Successfully updated the Activity.", {
-          variant: "success",
-        })
-
-      onChange()
-      */
     }
     setSelectedActivity(undefined)
     setLoading(false)
@@ -908,6 +879,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                   "lamp.group": "Group",
                   "lamp.tips": "Tips",
                   "lamp.journal": "Journal",
+                  "lamp.breathe": "Breathe",
                 },
                 emptyValue: "Cognitive Test",
               },
@@ -1271,13 +1243,13 @@ export default function ActivityList({ researcher, title, ...props }) {
               activities={activities}
             />
           )}
-          {/* {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} />} */}
+          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} />}
           {!!showCreate && <SurveyCreator studies={studies} onSave={saveActivity} />}
           {!!showBreatheCreate && (
             <BreatheCreator
               activitySpecId={activitySpecId}
               studies={studies}
-              onSave={saveActivity}
+              onSave={saveCTest}
               activities={activities}
             />
           )}

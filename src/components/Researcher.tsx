@@ -248,12 +248,12 @@ function Study({ onParticipantSelect, researcher, ...props }) {
 }
 
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
-  useEffect(() => {    
-    ;(async() => {
+  useEffect(() => {
+    ;(async () => {
       await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", null)
-    })()    
+    })()
   }, [])
-  
+
   return (
     <React.Fragment>
       <Study onParticipantSelect={onParticipantSelect} researcher={researcher} />

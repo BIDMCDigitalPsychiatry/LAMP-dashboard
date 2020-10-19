@@ -191,7 +191,9 @@ export default function Manage({ participant, activities, ...props }) {
 
   useEffect(() => {
     setLoading(true)
-    let gActivities = activities.filter((x: any) => games.includes(x.spec) || x.spec === "lamp.journal")
+    let gActivities = activities.filter(
+      (x: any) => games.includes(x.spec) || x.spec === "lamp.journal" || x.spec === "lamp.breathe"
+    )
     setSavedActivities(gActivities)
   }, [])
 
@@ -231,27 +233,41 @@ export default function Manage({ participant, activities, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop>
       <Grid container spacing={2}>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => {
-            setSpec(null)
-            handleClickOpen("Breathe")
-          }}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2}>
-                <BreatheIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Breathe</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
+        {savedActivities
+          .filter((x: any) => x.spec === "lamp.breathe")
+          .map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setSpec(null)
+                setActivity(activity)
+                handleClickOpen("Breathe")
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      style={{
+                        margin: "auto",
+                        height: "100px",
+                        width: "100px",
+                        background: tag[activity.id]?.photo
+                          ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                          : `url(${BreatheIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{activity.name}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))}
         {activities
           .filter((x: any) => x.spec === "lamp.journal")
           .map((activity) => (
@@ -431,6 +447,7 @@ export default function Manage({ participant, activities, ...props }) {
             ),
             Breathe: (
               <Breathe
+                activity={activity}
                 participant={participant}
                 onComplete={() => {
                   setOpen(false)

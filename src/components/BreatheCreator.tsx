@@ -123,7 +123,6 @@ const PeachCheckbox = withStyles({
 })((props: CheckboxProps) => <Checkbox color="default" {...props} />)
 
 function compress(file, width, height) {
-  console.log(file)
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -170,7 +169,6 @@ export default function BreatheCreator({
   details?: any
   studies?: any
 }) {
-  console.log("hjsasasj")
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const initialCount = 0
@@ -180,9 +178,16 @@ export default function BreatheCreator({
   const [disabled, setDisabled] = useState(true)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(details?.photo ?? null)
-  const [audio, setAudio] = useState(details?.audio ?? null)
-
+  const [photo, setPhoto] = useState(details?.photo ?? BreatheIcon)
+  const [settings, setSettings] = useState(
+    !!value
+      ? value?.settings
+      : (value?.spec && ["lamp.breathe"].includes(value.spec)) || ["lamp.breathe"].includes(activitySpecId)
+      ? {
+          audio: null,
+        }
+      : {}
+  )
   const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
   // eslint-disable-next-line
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
@@ -230,30 +235,26 @@ export default function BreatheCreator({
   }
   const setAudioFileChange = (event) => {
     const file = event.target.files[0]
-    const fileName = event.target.files[0].name
     const fileSize = event.target.files[0].size / 1024 / 1024
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
-    const audioFormats = ["ogg", "mp3", "wav", "mp4"]
-    console.log("fileSize", fileSize)
-    console.log("EVENT HANDLING", file)
-    if (audioFormats.includes(extension) && fileSize <= 2) {
+    const audioFormats = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/ogg"]
+    if (fileSize <= 2 && audioFormats.includes(file.type.toLowerCase())) {
       setLoading(true)
-      console.log("included", extension)
       file &&
         getBase64(file, (result) => {
-          setAudio(result)
-          console.log("EVENT HANDLING1111", result)
+          setSettings({ ...settings, audio: result })
           setLoading(false)
         })
     } else {
-      enqueueSnackbar("Audio should be in the format ogg/mp3/wav/mp4 and the size should not exceed 2 MB.", {
-        variant: "error",
-      })
+      if (!audioFormats.includes(file.type.toLowerCase())) {
+        enqueueSnackbar("Not supported audio type.", {
+          variant: "error",
+        })
+      } else {
+        enqueueSnackbar("The audio size should not exceed 2 MB.", {
+          variant: "error",
+        })
+      }
     }
-  }
-
-  const handleRemoveAudio = () => {
-    setAudio(null)
   }
   const handleRemoveExistingEvent = (event) => {
     event.target.value = null
@@ -372,14 +373,21 @@ export default function BreatheCreator({
                   </label>
 
                   <Grid container direction="row" justify="flex-start" alignItems="center">
-                    <Grid>{audio && <audio controls src={audio}></audio>}</Grid>
                     <Grid>
-                      {audio && (
+                      {settings.audio && (
+                        <audio controls src={settings.audio}>
+                          Your browser does not support the
+                          <code>audio</code> element.
+                        </audio>
+                      )}
+                    </Grid>
+                    <Grid>
+                      {settings.audio && (
                         <Fab
                           className={classes.iconBtn}
                           aria-label="Remove-Audio"
                           variant="extended"
-                          onClick={() => handleRemoveAudio()}
+                          onClick={() => setSettings({ ...settings, audio: null })}
                         >
                           <DeleteIcon />
                         </Fab>
@@ -415,7 +423,7 @@ export default function BreatheCreator({
                         name: text,
                         spec: value?.spec,
                         schedule: [],
-                        settings: {},
+                        settings: settings,
                         description: description,
                         photo: photo,
                         studyID: studyId,
@@ -454,7 +462,7 @@ export default function BreatheCreator({
                       name: text,
                       spec: value?.spec ?? activitySpecId,
                       schedule: [],
-                      settings: {},
+                      settings: settings,
                       description: description,
                       photo: photo,
                       studyID: studyId,

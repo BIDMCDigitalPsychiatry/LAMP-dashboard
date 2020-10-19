@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect, useCallback, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Tooltip,
@@ -7,31 +7,24 @@ import {
   Grid,
   Fab,
   Divider,
-  IconButton,
   Icon,
   Button,
-  ButtonGroup,
   TextField,
-  InputAdornment,
-  Stepper,
-  Step,
-  StepLabel,
-  StepButton,
-  StepContent,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormGroup,
   Checkbox,
   Select,
-  TextareaAutosize,
   ButtonBase,
   Container,
-  MenuItem
+  MenuItem,
+  CircularProgress,
+  Backdrop,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import { useDropzone } from "react-dropzone"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import DeleteIcon from "@material-ui/icons/Delete"
+import { useSnackbar } from "notistack"
 
 const theme = createMuiTheme({
   palette: {
@@ -66,742 +59,730 @@ const theme = createMuiTheme({
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
+    activityContent: {
+      padding: "25px 50px 0",
+    },
+    btnText: {
+      color: "#333",
+      fontSize: 14,
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      boxShadow: "none",
+      background: "transparent",
+      margin: "15px 0",
+
+      "& svg": { marginRight: 10, color: "#7599FF" },
+    },
+    colorRed: {
+      color: "#FF0000",
+    },
+    inputFile: {
+      display: "none",
+    },
+    uploadFile: {
+      "& input": {
+        height: 154,
+        position: "absolute",
+        top: 0,
+        padding: 0,
+        opacity: 0,
+        zIndex: 111
+      },
+    },
   })
 )
-
-function compress(file, width, height) {
-
-  console.log(3546, file) 
-
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onerror = (error) => reject(error)
-    reader.onload = (event) => {
-      const img = new Image()
-      img.src = event.target.result as string
-      img.onload = () => {
-        const elem = document.createElement("canvas")
-        elem.width = width
-        elem.height = height
-        const ctx = elem.getContext("2d")
-        ctx.drawImage(img, 0, 0, width, height)
-        resolve(ctx.canvas.toDataURL())
-      }
-    }
-  })
+    
+function getBase64(file, cb) {
+  let reader = new FileReader()
+  reader.readAsDataURL(file)
+  reader.onloadend = () => {
+    cb(reader.result)
+  }
+  reader.onerror = function (error) {
+    console.log("Error: ", error)
+  }
 }
 
 export default function TipCreator({
   activities,
   onSave,
   onCancel,
-  studyID,
+  studies,
+  allActivities,
   ...props
 }: {
   activities?: any
   onSave?: any
   onCancel?: any
-  studyID?: any
+  studies?: any
+  allActivities?: any
 }) {
-
-  //console.log(100, value, props, 101)
-    
   const classes = useStyles()
-  const [activeStep, setActiveStep] = useState(0)
-  const [category, setCategory] = useState('')
+  const { enqueueSnackbar } = useSnackbar()
+  const [category, setCategory] = useState("")
+  const [categoryImage, setCategoryImage] = useState("")
   const [text, setText] = useState(!!activities ? activities.name : undefined)
-  /*
-  const [text, setText] = useState(!!value ? value.name : undefined)
-  const [description, setDescription] = useState(!!value ? value.description : undefined)
-  const [questions, setQuestions] = useState(!!value ? value.settings : [])
-  */
-  const [tipsTitle, setTipsTitle] = useState()
-  const [tipsLink, setTipsLink] = useState()
-  const [tipsDescription, setTipsDescription] = useState()
+  const [loading, setLoading] = useState(false)
   const [categoryArray, setCategoryArray] = useState([])
-  const [newTipText, setNewTipText] = useState('')
+  const [newTipText, setNewTipText] = useState("")
+  const [duplicateTipText, setDuplicateTipText] = useState("")
   const [selectedCategory, setSelectedCategory]: any = useState({})
-  const [selectedTipsCount, setSelectedTipsCount]: any = useState(0)
-  const [photo, setPhoto] = useState()
-  const [selectedPhotoArray, setSelectedPhotoArray] = useState([])
-  const [selectedPhotoId, setSelectedPhotoId] = useState('')
-  //const [tipsDataArray, setTipsDataArray] = useState([])
-  //const [tipsDataArray, setTipsDataArray] = useState([ { tipsTitle: '', tipsLink: '', tipsDescription: '' }])
-  const [tipsDataArray, setTipsDataArray] = useState([ { title: '', link: '', text: '', image:'' }])
-  const [newTipsData, setNewTipsData] = useState([{ title: '', link: '', text: '', image:'' }])
+  const [deletedIds, setDeletedIds]: any = useState("")
+  const [tipsDataArray, setTipsDataArray] = useState([{ title: "", link: "", text: "", image: "", author: "" }])
+  const [newTipsData, setNewTipsData] = useState([{ title: "", link: "", text: "", image: "", author: "" }])
+  const [studyId, setStudyId] = useState(!!activities ? activities.parentID : undefined)
+  const [openDialog, setOpenDialog] = useState(false)
+  const [clickDeleteId, setClickDeleteId] = useState("")
+  const [isDuplicate, setIsDuplicate] = useState(false)
 
-  /*
-  const [state, setState] = useState({
-    tips: [{tipsTitle:"", tipsLink:"", tipsDescription: ""}],
-  })
-  */
-  const inputRef = useRef(null)
+  useEffect(() => {
+    let id = deletedIds
+    let currentTipsArray = tipsDataArray
+    currentTipsArray.splice(id, 1)
+    setTipsDataArray([...currentTipsArray])
+    let currentSelectedCategory = selectedCategory
+    currentSelectedCategory.settings = currentTipsArray
+    setSelectedCategory(currentSelectedCategory)
+  }, [deletedIds])
 
-  /*
-  const onDropAccepted = useCallback((acceptedFiles,  item) => compress(acceptedFiles[0], 64, 64, item).then((res) => {
-      
-      console.log(2050, item.id, item)
-      
-
-    })
-  , [])
-  */
-  
-
-
-
-  const onDrop = useCallback((acceptedFiles, rejected, item) => compress(acceptedFiles[0], 64, 64).then((res: any) => {
-         
-
-       // console.log(1421, item.target.id, tipsDataArray, selectedTipsCount)  
-
-       // console.log(1422, item.target.id, selectedCategory)   
-
-        //setPhoto(res) 
-        
-        /*  
-        let itemId = item.target.id
-        let tipsData = tipsDataArray
-
-        console.log(1423, tipsData)
-
-        if(tipsData.length > 0){
-          //tipsData[itemId].image =  res
-          //setTipsDataArray(tips => ([...tipsData]));
-
-          
-        }
-        */
-
-        //funUpdate(item.target.id, res)
-
-        let itemId = item.target.id
-        let tipsData = tipsDataArray
-
-        //console.log(1423, tipsData)
-
-        if(selectedPhotoId === ""){
-          setPhoto(res);
-        }
-        
-     
-        if(tipsData.length > 0){
-          if(selectedPhotoId !== ""){
-            tipsData[selectedPhotoId].image =  res
-            setTipsDataArray(tips => ([...tipsData]));
-          }
-          
-        }
-
-
-        
-        console.log(1425, itemId, res)   
-        
-
-        console.log(1426, tipsData)   
-       /**/
-
-      console.log(1427, item, itemId)   
-
-      console.log(1428, selectedPhotoId)    
-
-
-    })
-    //, [tipsDataArray])
-  , [tipsDataArray, selectedPhotoId]) 
-
-
-
-  // eslint-disable-next-line
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
-    accept: "image/*",
-    maxSize: 2 * 1024 * 1024 /* 5MB */,
-    //onDropAccepted
-  })
-  
-
+  useEffect(() => {
+    setLoading(true)
+    if (category && category !== "add_new") {
+      let existsData = categoryArray.find((o) => o.id === category)
+      if (Object.keys(existsData).length > 0) {
+        setSelectedCategory(existsData)
+        setTipsDataArray(existsData.settings)
+      }
+    } else {
+      setSelectedCategory({})
+      setTipsDataArray([{ title: "", link: "", text: "", image: "", author: "" }])
+    }
+    setLoading(false)
+  }, [category])
 
   useEffect(() => {
     ;(async () => {
-        let activityData = await LAMP.Activity.allByStudy(studyID)
-        //let b = a.filter((x) => ["lamp.survey"].includes(x.spec))
+      setLoading(true)
+      if (studyId) {
+        let activityData = await LAMP.Activity.allByStudy(studyId)
         let tipsCategoryData = activityData.filter((activity) => activity.spec === "lamp.tips")
         setCategoryArray(tipsCategoryData)
-        //let tipsFormat = tipsData.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.name }), {})
-
-        //console.log(90, tipsData)
-
-      console.log(89, typeof activities)
-
-      if(!!activities) { 
-        //console.log(91, tipsCategoryData)
-        if(Object.keys(activities.settings).length > 0){
-          setCategory(activities.id)
-          setSelectedCategory(activities) 
-          setTipsDataArray(activities.settings)
-
-          console.log(113, activities.settings)
+      }
+      if (!!activities) {
+        let activitiesData = JSON.parse(JSON.stringify(activities))
+        if (Object.keys(activitiesData.settings).length > 0) {
+          setCategory(activitiesData.id)
+          setSelectedCategory(activitiesData)
+          setTipsDataArray(activitiesData.settings)
         }
-      } 
-      
-      
-
-
+        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.tip_details")
+        if (iconsData.hasOwnProperty("data")) {
+          setCategoryImage(iconsData.data.icon)
+        }
+      }
+      setLoading(false)
     })()
-  }, [])
+  }, [studyId])
 
-/*    
-  useEffect(() => {
-    console.log(410, tipsDataArray)
-
-  }, [tipsDataArray])
-*/
-
-  const handleCategory = (event) => {
-    setCategory(event.target.value)
-
-     console.log(102, event.target.value) 
-    if((event.target.value !== "add_new")){
-      let existsData = categoryArray.find(o => o.id === event.target.value);
-
-      console.log(125, existsData)
-
-      if(Object.keys(existsData).length > 0){
-        console.log(103, existsData)
-        setSelectedCategory(existsData) 
-
-        setSelectedTipsCount(Object.keys(existsData.settings).length)
-
-        /*
-        if(Object.keys(existsData.settings).length > 0){
-          setTipsDataArray(existsData.settings)
-
-          let photoArray = existsData.settings.map(function(obj) {return obj.image });
-          setSelectedPhotoArray(photoArray)
-
-          console.log(107, existsData.settings, photoArray)
-        }else{
-
-        }
-        */
-        
-        setTipsDataArray(existsData.settings)
-
-
-      }
-    }
-  }
-
-
-  const handleTipsData = (e :any , type, id) => {
-
-    console.log(306, e) 
-    
+  const handleTipsData = (e: any, type, id) => {
     let tipsData = tipsDataArray
-
-    //tipsData[id].type =  e.target.value
-    if(type === "title")
-    tipsData[id].title =  e.target.value
-
-    if(type === "link")
-    tipsData[id].link =  e.target.value
-
-    if(type === "text")
-    tipsData[id].text =  e.target.value
-
-    if(type === "image"){
-
-      if(e.target.value === undefined){
-        tipsData[id].image =  ""
-      }else{
-        tipsData[id].image =  e.target.value
-      }
-
-      setSelectedPhotoId(id)
+    if (type === "title") tipsData[id].title = e.target.value
+    if (type === "link") tipsData[id].link = e.target.value
+    if (type === "text") tipsData[id].text = e.target.value
+    if (type === "author") tipsData[id].author = e.target.value
+    if (type === "image") {
+      uploadImageFile(e, "all", id)
     }
-    
-    console.log(303, tipsData)
-
-    setTipsDataArray(tips => ([...tipsData]));
-
-
+    setTipsDataArray((tips) => [...tipsData])
   }
 
-  const handleNewTips = (e , type) => {
-    
-    let tipsData: any = newTipsData 
-
-    console.log(300, tipsData)
-
-
-    //tipsData[id].type =  e.target.value
-    if(type === "title")
-    tipsData[0].title =  e.target.value
-
-    if(type === "link")
-    tipsData[0].link =  e.target.value
-
-    if(type === "text")
-    tipsData[0].text =  e.target.value
-
-    if(type === "image")
-    tipsData[0].image =  e.target.value
-
-    //setNewTipsData([tipsData])
-    //setTipsDataArray(tips => ([...tipsData]));
-
-    setNewTipsData(tips => ([...tipsData]));
-
-    console.log(301, tipsData)
-
+  const handleNewTips = (e, type) => {
+    let tipsData: any = newTipsData
+    if (type === "title") tipsData[0].title = e.target.value
+    if (type === "link") tipsData[0].link = e.target.value
+    if (type === "text") tipsData[0].text = e.target.value
+    if (type === "author") tipsData[0].author = e.target.value
+    if (type === "image") {
+      uploadImageFile(e, "new")
+    }
+    setNewTipsData([...tipsData])
   }
 
+  const uploadImageFile = (event, type = "new", id = "") => {
+    const file = event.target.files[0]
+    const fileName = event.target.files[0].name
+    const fileSize = event.target.files[0].size / 1024 / 1024
+    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif"]
+    if (fileFormats.includes(extension) && fileSize <= 2) {
+      setLoading(true)
+      let tipsData: any
+      if (type === "new") {
+        tipsData = newTipsData
+        file &&
+          getBase64(file, (result: any) => {
+            tipsData[0].image = result
+            setNewTipsData([...tipsData])
+            setLoading(false)
+          })
+      } else if (type === "icon") {
+        file &&
+          getBase64(file, (result: any) => {
+            setCategoryImage(result)
+            setLoading(false)
+          })
+      } else {
+        tipsData = tipsDataArray
+        file &&
+          getBase64(file, (result: any) => {
+            tipsData[id].image = result
+            setTipsDataArray([...tipsData])
+            setLoading(false)
+          })
+      }
+    } else {
+      enqueueSnackbar("Images should be in the format jpeg/png/bmp/gif and the size should not exceed 2 MB.", {
+        variant: "error",
+      })
+    }
+  }
 
-  const handleSaveTips = () => {
-
-    console.log(1100, selectedCategory);
-
-    if(selectedCategory === "add_new"){
-      //if()
+  const handleSaveTips = (duplicate = false) => {
+    setLoading(true)
+    if (category === "add_new" || duplicate) {
       onSave(
         {
           id: undefined,
-          name: text,
+          //name: text,
+          name: duplicate ? duplicateTipText : newTipText,
           spec: "lamp.tips",
+          icon: categoryImage,
           schedule: [],
           settings: newTipsData,
+          studyID: studyId,
         },
         false /* overwrite */
       )
-    }else{
-      
+    } else {
       onSave(
         {
-          id: undefined,
+          id: activities?.id || category ? category : undefined,
           name: text,
           spec: "lamp.tips",
+          icon: categoryImage,
           schedule: [],
-          settings: tipsDataArray.concat(newTipsData),
+          settings: activities?.id ? tipsDataArray : category ? tipsDataArray.concat(newTipsData) : newTipsData,
+          studyID: studyId,
         },
         false /* overwrite */
       )
     }
-    
-    return false;
-
+    //return false
   }
-  
 
+  const deleteData = (id) => {
+    setDeletedIds(id)
+    setOpenDialog(false)
+  }
 
+  const validate = () => {
+    let validationData = false
+    if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
+      validationData = selectedCategory.settings.some((item) => item.title === "" || item.text === "")
+    }
+    if (!!activities) {
+      return !validationData
+    } else {
+      return !(
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        typeof category == "undefined" ||
+        category === null ||
+        category === "" ||
+        (category == "add_new" && (newTipText === null || newTipText === "")) ||
+        typeof newTipsData[0].title === "undefined" ||
+        (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "") ||
+        typeof newTipsData[0].text === "undefined" ||
+        (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "") ||
+        validationData
+      )
+    }
+  }
 
+  const removeImage = (type, id = 0) => {
+    let tipsData
+    if (type === "new") {
+      tipsData = newTipsData
+      tipsData[0].image = ""
+      setNewTipsData([...tipsData])
+      console.log(9111, newTipsData)
+    } else {
+      tipsData = tipsDataArray
+      tipsData[id].image = ""
+      setTipsDataArray([...tipsData])
+    }
+  }
 
-
+  const removeEventValue = (event) => {
+    event.target.value = null
+  }
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
-            
-            <Grid item md={10}>
-              <Box mb={3}>                        
-                <Select
-                  labelId="demo-simple-select-error-label"
-                  id="demo-simple-select-error"
-                  value={category}
-                  onChange={handleCategory}
+            <Grid item xs md={2}>
+              <Tooltip title={!categoryImage ? "Tap to select a photo." : "Tap to delete the photo."}>
+                <Box
+                  width={154}
+                  height={154}
+                  border={1}
+                  borderRadius={4}
+                  //borderColor={ (categoryImage === "" || categoryImage === undefined) ?
+                  //      "#FF0000" :  ((!!categoryImage) ? "text.secondary" : "#fff")}
+                  borderColor="text.secondary"
+                  //bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+                  color="text.secondary"
+                  style={{
+                    background: !!categoryImage ? `url(${categoryImage}) center center/contain no-repeat` : undefined,
+                  }}
                 >
-                  {categoryArray.map((x, idx) => (
-                    <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
-                  ))}
-                  <MenuItem value="add_new" key="add_new"> Add New</MenuItem>
-                </Select>
-                { category === "add_new" ?
+                  { !categoryImage ? 
+                  <label htmlFor="upload-image">
+                    <TextField
+                      name="upload-image"
+                      className={classes.uploadFile}
+                      type="file"
+                      onChange={(event) => uploadImageFile(event, "icon")}
+                    />
+                  </label>
+                  : ""  } 
+                  <ButtonBase
+                    style={{ width: "100%", height: "100%" }}
+                    onClick={(e) => {
+                      setCategoryImage("")
+                    }}
+                  >
+                    <Icon fontSize="large">
+                      {categoryImage === "" || categoryImage === undefined ? "add_a_photo" : "delete_forever"}
+                    </Icon>
+                  </ButtonBase>
+                  {/*(categoryImage === "" || categoryImage === undefined) ? 
+                    <Typography className={classes.colorRed}>Please upload an image</Typography> : "" */}
+                </Box>
+              </Tooltip>
+            </Grid>
+            <Grid item md={10}>
+              <Grid container spacing={2}>
+                <Grid item xs>
                   <TextField
-                    fullWidth
-                    variant="outlined"
-                    label="New Tip"
-                    defaultValue={newTipText}
-                    onChange={(event) => setNewTipText(event.target.value)}
-                  />
-                : ""
-                }
+                    error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+                    id="filled-select-currency"
+                    select
+                    label="Select"
+                    value={studyId}
+                    onChange={(e) => {
+                      setStudyId(e.target.value)
+                      setSelectedCategory({})
+                      setCategory("")
+                      console.log(3000, e.target.value)
+                    }}
+                    helperText={
+                      typeof studyId == "undefined" || studyId === null || studyId === ""
+                        ? "Please select the study"
+                        : ""
+                    }
+                    variant="filled"
+                    disabled={!!activities ? true : false}
+                  >
+                    {studies.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+                <Grid item xs>
+                  <Box mb={3}>
+                    <TextField
+                      error={typeof category == "undefined" || category === null || category === "" ? true : false}
+                      id="filled-select-currency"
+                      select
+                      label="Select"
+                      value={category}
+                      onChange={(event) => {
+                        setCategory(event.target.value)
+                      }}
+                      helperText={
+                        typeof category == "undefined" || category === null || category === ""
+                          ? "Please select the tip"
+                          : ""
+                      }
+                      variant="filled"
+                      disabled={!!activities ? true : false}
+                    >
+                      {categoryArray.map((x, idx) => (
+                        <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
+                      ))}
+                      <MenuItem value="add_new" key="add_new">
+                        {" "}
+                        Add New
+                      </MenuItem>
+                    </TextField>
 
-              </Box>
+                    {category === "add_new" ? (
+                      <TextField
+                        error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
+                        fullWidth
+                        variant="outlined"
+                        label="New Tip"
+                        defaultValue={newTipText}
+                        onChange={(event) => setNewTipText(event.target.value)}
+                        helperText={
+                          category == "add_new" && (newTipText === null || newTipText === "")
+                            ? "Please add new tip"
+                            : ""
+                        }
+                      />
+                    ) : (
+                      ""
+                    )}
+                  </Box>
+                </Grid>
+                {!!activities ? (
+                  <Grid item xs>
+                    <Box mb={3}>
+                      <Checkbox
+                        onChange={(event) => setIsDuplicate(event.target.checked)}
+                        color="primary"
+                        inputProps={{ "aria-label": "secondary checkbox" }}
+                      />{" "}
+                      Duplicate ?
+                    </Box>
+                    {isDuplicate ? (
+                      <Box mb={3}>
+                        <TextField
+                          fullWidth
+                          error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
+                          variant="filled"
+                          label="Tips"
+                          className="Tips"
+                          value={duplicateTipText}
+                          onChange={(event) => setDuplicateTipText(event.target.value)}
+                          helperText={
+                            isDuplicate && (duplicateTipText === null || duplicateTipText === "")
+                              ? "Please add new tip"
+                              : ""
+                          }
+                        />
+                      </Box>
+                    ) : (
+                      ""
+                    )}
+                  </Grid>
+                ) : (
+                  ""
+                )}
+              </Grid>
             </Grid>
           </Grid>
-          
 
-          { (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0)  ?
-            selectedCategory.settings.map((x, idx) => (
-              <Grid container spacing={2}>
-                <Grid item xs key={idx}>
-                  <Tooltip
-                    title={
-                      !photo
-                        ? "Drag a photo or tap to select a photo."
-                        : "Drag a photo to replace the existing photo or tap to delete the photo."
-                    }
-                  >
-                    <Box                    
-                      {...getRootProps({
-                        onClick: event =>  {
-                            setSelectedPhotoId(() => (idx))
-                            console.log(2223, event, " === ", idx, " *** ", selectedPhotoId)
-                          }
-                        })}
-                      my={2}
-                      width={128}
-                      height={128}
-                      border={1}
-                      borderRadius={4}
-                      //borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                      borderColor={!(isDragActive || isDragAccept || !!tipsDataArray[idx].image) ? "text.secondary" : "#fff"}
-                      bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
-                      color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                      style={{  
-                        //background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
-                        background: !!tipsDataArray[idx] ?  `url(${tipsDataArray[idx].image}) center center/contain no-repeat` : 
-                        (!!photo ? `url(${photo}) center center/contain no-repeat` : undefined),  
-                      }}
-                    > 
-                      {/*
-                        <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
-                          {!photo && <input {...getInputProps()} />}
-                          <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
-                        </ButtonBase>
-                      */}
-
-                      <ButtonBase style={{ width: "100%", height: "100%" }} 
-                        //onClick={() => !!photo && setPhoto(undefined)}
-                        //onClick={(e) => !!tipsDataArray[idx] && tipsDataArray[idx].image && handleTipsData(undefined, 'image', idx)}
-                        //onClick={(e) => !!tipsDataArray[idx] && tipsDataArray[idx].image && handleTipsData(e, 'image', idx)}
-                        /*
-                        onClick={(e: any) => {
-                          console.log(411, e, e.target.value)
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Divider />
+              <Typography variant="h6">Tip Details</Typography>
+            </Grid>
+          </Grid>
+          {Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0
+            ? selectedCategory.settings.map((x, idx) => (
+                <Grid container spacing={2} key={idx}>
+                  <Grid item xs md={2}>
+                    <Tooltip title={!x.image ? "Tap to select a photo." : "Tap to delete the photo."}>
+                      <Box
+                        width={154}
+                        height={154}
+                        border={1}
+                        borderRadius={4}
+                        borderColor="text.secondary"
+                        //bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+                        color="text.secondary"
+                        style={{
+                          background: !!x.image ? `url(${x.image}) center center/contain no-repeat` : undefined,
                         }}
-                        */
-                        onClick={(e) => !!tipsDataArray[idx] && tipsDataArray[idx].image && handleTipsData(e, 'image', idx)}
-                      > 
-                          {/* !tipsDataArray[idx].image && !photo && <input {...getInputProps()} /> */}
-                          
-                        {/* !tipsDataArray[idx].image && !photo && <input {...getInputProps({id: idx})} data-idx={idx}/> */} 
-
-                        {/* !tipsDataArray[idx].image && !photo && <input name="AbCdEf"  data-set={idx} id="AbCdEf" {...getInputProps({refKey: 'abcdef'})} data-idx={idx}/> */} 
-
-                        {/* !tipsDataArray[idx].image && !photo && <input {...getInputProps({id: idx})} data-idx={idx}/> */} 
-
-                          <input name={"name_" + idx} {...getInputProps({id: idx})} data-idx={idx}/>
-
-                          <Icon fontSize="large">{!tipsDataArray[idx].image && !photo ? "add_a_photo" : "delete_forever"}</Icon>
-                      </ButtonBase>
-
-                    </Box>
-                  </Tooltip>
+                      >
+                        { !x.image ?
+                        <label htmlFor="upload-image">
+                          <TextField
+                            name="upload-image"
+                            className={classes.uploadFile}
+                            type="file"
+                            onClick={(event) => removeEventValue(event)}
+                            onChange={(event) => handleTipsData(event, "image", idx)}
+                          />
+                        </label>
+                        : ""  }
+                        <ButtonBase
+                          style={{ width: "100%", height: "100%" }}
+                          onClick={(e) => {
+                            removeImage("all", idx)
+                          }}
+                        >
+                          <Icon fontSize="large">
+                            {x.image === "" || x.image === undefined ? "add_a_photo" : "delete_forever"}
+                          </Icon>
+                        </ButtonBase>
+                        {/*(x.image === "" || x.image === undefined) 
+                        ? <Typography className={classes.colorRed}>Please upload an image</Typography> : "" */}
+                      </Box>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item md={10}>
+                    <Grid container spacing={2}>
+                      <Grid item lg={4} md={6} sm={6} xs={12}>
+                        <Box>
+                          <TextField
+                            error={
+                              typeof x.title === "undefined" ||
+                              (typeof x.title !== "undefined" && x.title?.trim() === "")
+                                ? true
+                                : false
+                            }
+                            fullWidth
+                            variant="filled"
+                            label="Tips Title"
+                            value={x.title}
+                            className="tipsTitle"
+                            onChange={(e) => {
+                              handleTipsData(e, "title", idx)
+                            }}
+                            helperText={
+                              typeof x.title === "undefined" ||
+                              (typeof x.title !== "undefined" && x.title?.trim() === "")
+                                ? "Please enter Tips Title"
+                                : ""
+                            }
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item lg={4} md={6} sm={6} xs={12}>
+                        <Box>
+                          <TextField
+                            fullWidth
+                            variant="filled"
+                            label="Tips Link"
+                            value={x.link}
+                            className="tipsLink"
+                            onChange={(e) => {
+                              handleTipsData(e, "link", idx)
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item lg={4} md={6} sm={6} xs={12}>
+                        <Box>
+                          <TextField
+                            fullWidth
+                            variant="filled"
+                            label="Tips Author"
+                            value={x.author}
+                            className="tipsAutor"
+                            onChange={(e) => {
+                              handleTipsData(e, "author", idx)
+                            }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box>
+                          <TextField
+                            error={
+                              typeof x.text === "undefined" || (typeof x.text !== "undefined" && x.text?.trim() === "")
+                                ? true
+                                : false
+                            }
+                            fullWidth
+                            variant="filled"
+                            label="Tips Description"
+                            rows={2}
+                            value={x.text}
+                            onChange={(e) => {
+                              handleTipsData(e, "text", idx)
+                            }}
+                            multiline
+                            helperText={
+                              typeof x.text === "undefined" || (typeof x.text !== "undefined" && x.text?.trim() === "")
+                                ? "Please enter Tips Description"
+                                : ""
+                            }
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item lg={3} md={6} sm={6}>
+                        <Box>
+                          <Tooltip title="Delete">
+                            <Fab
+                              className={classes.btnText}
+                              aria-label="Save"
+                              variant="extended"
+                              onClick={() => {
+                                setOpenDialog(true)
+                                setClickDeleteId(idx)
+                              }}
+                            >
+                              <DeleteIcon /> Delete
+                            </Fab>
+                          </Tooltip>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
                 </Grid>
-                <Grid item md={10}>
-                  <Box>              
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      label="Tips Title"
-                      data-id={idx}
-                      defaultValue={ (tipsDataArray[idx]) ? tipsDataArray[idx].title : x.title}
-                      className="tipsTitle"
-                      onChange={(e) => { handleTipsData(e, 'title', idx)}}  
-                    />
-                  </Box>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      label="Tips Link"
-                      data-id={idx}
-                      defaultValue={ (tipsDataArray[idx]) ? tipsDataArray[idx].link : x.link}
-                      className="tipsLink"
-                      onChange={(e) => { handleTipsData(e, 'link', idx)}} 
-                    />
-                  </Box>
-                  <Box>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      label="Tips Description"
-                      rows={2}
-                      defaultValue={ (tipsDataArray[idx]) ? tipsDataArray[idx].text : x.text }
-                      onChange={(e) => { handleTipsData(e, 'text', idx)}} 
-                      multiline
-                    />
-                  </Box>
-                </Grid>                    
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>                
-              </Grid>
-            ))
-            : ""
-          }
+              ))
+            : ""}
 
-
-          
-          
-          { !activities ?  
+          {!activities ? (
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Divider />
-                <Typography variant="h6">Game duration</Typography>
+                <Typography variant="h6">Tip Details</Typography>
               </Grid>
-              <Grid item xs >
-
-                <Tooltip
-                  title={
-                    !photo
-                      ? "Drag a photo or tap to select a photo."
-                      : "Drag a photo to replace the existing photo or tap to delete the photo."
-                  }
-                >
+              <Grid item xs md={2} sm={12}>
+                <Tooltip title={!newTipsData[0].image ? "Tap to select a photo." : "Tap to delete the photo."}>
                   <Box
-                    {...getRootProps()}
-                    my={2}
-                    width={128}
-                    height={128}
+                    width={154}
+                    height={154}
                     border={1}
                     borderRadius={4}
-                    borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                    bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
-                    color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+                    borderColor="text.secondary"
+                    //bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+                    color="text.secondary"
                     style={{
-                      background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
+                      background: !!newTipsData[0].image
+                        ? `url(${newTipsData[0].image}) center center/contain no-repeat`
+                        : undefined,
                     }}
                   >
-                    <ButtonBase style={{ width: "100%", height: "100%" }} 
-                    onClick={() => {!!photo && setPhoto(undefined); setSelectedPhotoId("")}
-                      //&& selectedPhotoId(undefined)
-                    }
+                    { !newTipsData[0].image ?
+                    <label htmlFor="upload-image">
+                      <TextField
+                        name="upload-image"
+                        className={classes.uploadFile}
+                        type="file"
+                        onClick={(event) => removeEventValue(event)}
+                        onChange={(event) => handleNewTips(event, "image")}
+                      />
+                    </label>
+                    : ""  } 
+                    <ButtonBase
+                      style={{ width: "100%", height: "100%" }}
+                      onClick={(e) => {
+                        removeImage("new")
+                      }}
                     >
-                      {!photo && <input {...getInputProps()} />}
-                      <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
+                      <Icon fontSize="large">
+                        {newTipsData[0].image === "" || newTipsData[0].image === undefined
+                          ? "add_a_photo"
+                          : "delete_forever"}
+                      </Icon>
                     </ButtonBase>
+                    {/* (newTipsData[0].image === "" || newTipsData[0].image === undefined) 
+                    ? <Typography className={classes.colorRed}>Please upload an image</Typography> : "" */}
                   </Box>
                 </Tooltip>
-
               </Grid>
-              <Grid item md={10}>
-                <Box>   
-                  <TextField                  
-                    error={
-                      typeof newTipsData[0].title === "undefined" || (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "") ? true : false
-                    } 
-                    variant="outlined"
-                    label="Tips Title"
-                    /*defaultValue={settings?.beginner_seconds ?? 90}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                    inputProps={{
-                      max: 300,
-                    }}
-                    onChange={(e) => setSettings({ ...settings, beginner_seconds: Number(e.target.value) })}
-                    */
-                    onChange={(e) => { handleNewTips(e, 'title') }}
-                  />
-                </Box>
-                <Box>
-                <TextField
-                  /*error={
-                    settings.intermediate_seconds > 300 ||
-                    settings.intermediate_seconds === 0 ||
-                    settings.intermediate_seconds === ""
-                      ? true
-                      : false
-                  }*/
-                  variant="outlined"
-                  label="Tips Link"
-                  /*defaultValue={settings?.intermediate_seconds ?? 30}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 300,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, intermediate_seconds: Number(e.target.value) })}
-                  */
-                  onChange={(e) => { handleNewTips(e, 'link') }}
-                />
-              </Box>
-              <Box>
-                <TextField
-                  variant="outlined"
-                  label="Tips Description"
-                  onChange={(e) => { handleNewTips(e, 'text') }}  
-                />
-              </Box>
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  /*error={
-                    settings.advanced_seconds > 300 ||
-                    settings.advanced_seconds === 0 ||
-                    settings.advanced_seconds === ""
-                      ? true
-                      : false
-                  }*/
-                  type="number"
-                  variant="filled"
-                  id="advanced_seconds"
-                  label="Advanced seconds"
-                  /*defaultValue={settings?.advanced_seconds ?? 120}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 300,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, advanced_seconds: Number(e.target.value) })}*/
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Divider />
-                <Typography variant="h6">Settings</Typography>
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  /*error={
-                    settings.diamond_count > 25 || settings.diamond_count === 0 || settings.diamond_count === ""
-                      ? true
-                      : false
-                  }*/
-                  type="number"
-                  variant="filled"
-                  id="diamond_count"
-                  label="Number of diamonds for level 1"
-                  /*defaultValue={settings?.diamond_count ?? 15}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 25,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, diamond_count: Number(e.target.value) })}
-                  */
-                />
-              </Grid>
-              <Grid item lg={6}>
-                <TextField
-                  //error={settings.bonus_point_count === 0 || settings.bonus_point_count === "" ? true : false}
-                  type="number"
-                  id="bonus_point_count"
-                  label="Bonus points for next level"
-                  /*defaultValue={settings?.bonus_point_count ?? 50}
-                  variant="filled"
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 500,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, bonus_point_count: Number(e.target.value) })}*/
-                />
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  /*error={
-                    settings.shape_count > 4 || settings.shape_count === 0 || settings.shape_count === "" ? true : false
-                  }*/
-                  type="number"
-                  variant="filled"
-                  id="shape_count"
-                  label="Number of shapes"
-                  /*InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 4,
-                  }}
-                  defaultValue={settings?.shape_count ?? 1}
-                  onChange={(e) => setSettings({ ...settings, shape_count: Number(e.target.value) })}*/
-                />
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  type="number"
-                  variant="filled"
-                  id="x_changes_in_level_count"
-                  label="X changes in level count"
-                  /*defaultValue={settings?.x_changes_in_level_count ?? 1}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 25,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, x_changes_in_level_count: Number(e.target.value) })}
-                  */
-                />
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  type="number"
-                  variant="filled"
-                  id="x_diamond_count"
-                  label="X diamond count"
-                  /*
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 25,
-                  }}
-                  defaultValue={settings?.x_diamond_count ?? 4}
-                  onChange={(e) => setSettings({ ...settings, x_diamond_count: Number(e.target.value) })}
-                  */
-                />
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  type="number"
-                  variant="filled"
-                  id="y_changes_in_level_count"
-                  label="Y changes in level count"
-                  /*
-                  defaultValue={settings?.y_changes_in_level_count ?? 2}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 25,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, y_changes_in_level_count: Number(e.target.value) })}
-                  */
-                />
-              </Grid>
-              <Grid item lg={3}>
-                <TextField
-                  type="number"
-                  variant="filled"
-                  id="y_shape_count"
-                  label="Y shape count"
-                  /*
-                  defaultValue={settings?.y_shape_count ?? 1}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 4,
-                  }}
-                  onChange={(e) => setSettings({ ...settings, y_shape_count: Number(e.target.value) })}
-                  */
-                />
+              <Grid item md={10} sm={12}>
+                <Grid container spacing={2}>
+                  <Grid item lg={4} md={6} sm={6} xs={12}>
+                    <Box>
+                      <TextField
+                        error={
+                          typeof newTipsData[0].title === "undefined" ||
+                          (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "")
+                            ? true
+                            : false
+                        }
+                        variant="filled"
+                        label="Tips Title"
+                        onChange={(e) => {
+                          handleNewTips(e, "title")
+                        }}
+                        helperText={
+                          typeof newTipsData[0].title === "undefined" ||
+                          (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "")
+                            ? "Please enter Tips Title"
+                            : ""
+                        }
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item lg={4} md={6} sm={6} xs={12}>
+                    <Box>
+                      <TextField
+                        variant="filled"
+                        label="Tips Link"
+                        onChange={(e) => {
+                          handleNewTips(e, "link")
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item lg={4} md={6} sm={6} xs={12}>
+                    <Box>
+                      <TextField
+                        variant="filled"
+                        label="Tips Author"
+                        onChange={(e) => {
+                          handleNewTips(e, "author")
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box>
+                      <TextField
+                        error={
+                          typeof newTipsData[0].text === "undefined" ||
+                          (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "")
+                            ? true
+                            : false
+                        }
+                        variant="filled"
+                        multiline
+                        rows={2}
+                        label="Tips Description"
+                        onChange={(e) => {
+                          handleNewTips(e, "text")
+                        }}
+                        helperText={
+                          typeof newTipsData[0].text === "undefined" ||
+                          (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "")
+                            ? "Please enter Tips Description"
+                            : ""
+                        }
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
-          //)
-        
-        : "" }
+          ) : (
+            ""
+          )}
         </Container>
       </MuiThemeProvider>
-
       <Grid
         container
         direction="column"
@@ -809,62 +790,39 @@ export default function TipCreator({
         spacing={1}
         style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
       >
-        { // !!value && (
+        {!!activities ? (
           <Grid item>
-            <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+            <Tooltip title="Duplicate this activity.">
               <Fab
-                color="primary"
+                color="secondary"
                 aria-label="Duplicate"
                 variant="extended"
-                /*onClick={() => {
-                  if (validate()) {
-                    onSave(
-                      {
-                        id: undefined,
-                        name: text,
-                        spec: value?.spec,
-                        schedule: [],
-                        settings: settings,
-                        description: description,
-                        photo: photo,
-                      },
-                      true 
-                    )
-                  }
-                }}*/
-                //disabled={!onSave || !text || value.name.trim() === text.trim()}
+                onClick={() => {
+                  handleSaveTips(true)
+                }}
+                disabled={
+                  !validate() || (activities && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""
+                }
               >
                 Duplicate
                 <span style={{ width: 8 }} />
-                <Icon>file_copy</Icon>
+                <Icon>save</Icon>
               </Fab>
             </Tooltip>
           </Grid>
-        //)
-        }
+        ) : (
+          ""
+        )}
         <Grid item>
           <Tooltip title="Save this activity.">
             <Fab
               color="secondary"
               aria-label="Save"
               variant="extended"
-              /*onClick={() => {
-                if (validate()) {
-                  onSave(
-                    {
-                      id: value?.id ?? undefined,
-                      name: text,
-                      spec: value?.spec ?? activitySpecId,
-                      schedule: [],
-                      settings: settings,
-                      description: description,
-                      photo: photo,
-                    },
-                    false /
-                  )
-                }
-              }}*/
-              //disabled={!onSave || !text}
+              onClick={() => {
+                handleSaveTips()
+              }}
+              disabled={!validate()}
             >
               Save
               <span style={{ width: 8 }} />
@@ -873,6 +831,38 @@ export default function TipCreator({
           </Tooltip>
         </Grid>
       </Grid>
+
+      <Dialog
+        open={openDialog}
+        onClick={() => {
+          setOpenDialog(false)
+        }}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={3}>
+            <Typography variant="body2">Are you sure you want to delete this ?</Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="center" width={1} mb={3}>
+            <Button onClick={() => deleteData(clickDeleteId)} color="primary" autoFocus>
+              Yes
+            </Button>
+            <Button
+              onClick={() => {
+                setOpenDialog(false)
+              }}
+              color="secondary"
+              autoFocus
+            >
+              No
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
     </Grid>
   )
 }

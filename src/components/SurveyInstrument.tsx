@@ -667,6 +667,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
                   : _selection.filter((y) => y !== `${x.value}`)
                 let _target = CSV_stringify(targetValue)
                 setSelectedValue(_target)
+                console.log(_target)
                 onChange(_target)
               }}
               // icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
@@ -693,6 +694,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
+    console.log(value)
     onResponse({ item: text, value: value })
   }
   const _binaryOpts = [
