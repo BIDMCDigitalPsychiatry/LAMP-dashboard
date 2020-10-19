@@ -619,30 +619,29 @@ export default function Prevent({
       setSelectedActivities(selActivities)
       let selSensors = await getSelectedSensors(participant)
       let activities = await getActivities(participant)
-      let goals = await getGoals(participant)
-      let groupByType
-      if (typeof goals !== "undefined") {
-        goals.map((goal) => {
-          if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
-            activities.push({ name: goal.goalType, type: "goals" })
-          }
-        })
-      }
+      // let goals = await getGoals(participant)
+      // let groupByType
+      // if (typeof goals !== "undefined") {
+      //   goals.map((goal) => {
+      //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
+      //       activities.push({ name: goal.goalType, type: "goals" })
+      //     }
+      //   })
+      // }
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-      console.log(activityEvents)
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
 
       setActivityEvents(activityEvents)
 
       let activityEventCount = getActivityEventCount(activityEvents)
-      if (typeof goals !== "undefined") {
-        groupByType = goals.reduce((goal, it) => {
-          goal[it.goalType] = goal[it.goalType] + 1 || 1
-          activityEventCount[it.goalType] = goal[it.goalType]
-          timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
-          return goal
-        }, {})
-      }
+      // if (typeof goals !== "undefined") {
+      //   groupByType = goals.reduce((goal, it) => {
+      //     goal[it.goalType] = goal[it.goalType] + 1 || 1
+      //     activityEventCount[it.goalType] = goal[it.goalType]
+      //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
+      //     return goal
+      //   }, {})
+      // }
       setTimeSpans(timeSpans)
       setActivityCounts(activityEventCount)
       activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
@@ -697,7 +696,7 @@ export default function Prevent({
                   >
                     <Box display="flex">
                       <Box flexGrow={1}>
-                        <Typography className={classes.preventlabel}>Journal</Typography>
+                        <Typography className={classes.preventlabel}>{activity.name}</Typography>
                       </Box>
                       <Box mr={1} className={classes.preventRightSVG}>
                         <JournalBlue />
