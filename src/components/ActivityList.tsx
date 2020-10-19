@@ -21,6 +21,7 @@ import {
   Container,
   Typography,
   Popover,
+  TextField,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
@@ -391,6 +392,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
+  const [studyId, setStudyId] = useState(null)
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
@@ -442,7 +444,6 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
         setStudiesCount(counts)
         setActivities(activityData)
-        setLoading(false)
       })()
     })
   }
@@ -464,6 +465,10 @@ export default function ActivityList({ researcher, title, ...props }) {
   useEffect(() => {
     onChange()
   }, [groupCreate])
+
+  useEffect(() => {
+    setLoading(false)
+  }, [activities])
 
   const onDrop = useCallback((acceptedFiles) => {
     const reader = new FileReader()
@@ -950,7 +955,10 @@ export default function ActivityList({ researcher, title, ...props }) {
             ]}
             localization={{
               body: {
-                emptyDataSourceMessage: "No Activities. Add Activities by clicking the [+] button above.",
+                emptyDataSourceMessage:
+                  !loading && activities.length === 0
+                    ? "No Activities. Add Activities by clicking the [+] button above."
+                    : "",
                 editRow: {
                   deleteText: "Are you sure you want to delete this Activity?",
                 },
@@ -1173,6 +1181,26 @@ export default function ActivityList({ researcher, title, ...props }) {
           color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
         >
           <input {...getInputProps()} />
+          <TextField
+            error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+            id="filled-select-currency"
+            select
+            label="Select"
+            value={studyId}
+            onChange={(e) => {
+              setStudyId(e.target.value)
+            }}
+            helperText={
+              typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+            }
+            variant="filled"
+          >
+            {studies.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
           <Typography variant="h6">Drag files here, or click to select files.</Typography>
         </Box>
       </Dialog>

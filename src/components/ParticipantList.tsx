@@ -287,8 +287,8 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
     ;(async () => {
+      setLoading(true)
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
         return await Promise.all(
           res.map(async (x) => ({
@@ -305,8 +305,8 @@ export default function ParticipantList({
   }, [])
 
   useEffect(() => {
-    setLoading(true)
     ;(async () => {
+      setLoading(true)
       let selectedStudies =
         ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
         tagData.map((study) => {
@@ -326,6 +326,7 @@ export default function ParticipantList({
     setLoading(true)
     ;(async () => {
       await onLoadParticipantStudy(tagData)
+      setLoading(false)
     })()
   }, [tagArray])
 
@@ -350,7 +351,6 @@ export default function ParticipantList({
       })
       setNameArray(obj)
     }
-    setLoading(false)
   }
 
   const onChangeParticipantStudy = async (study, type = "") => {
@@ -732,7 +732,7 @@ export default function ParticipantList({
             }}
             localization={{
               body: {
-                emptyDataSourceMessage: "No Participants. Add Participants by clicking the [+] button above.",
+                emptyDataSourceMessage: "", //"No Participants. Add Participants by clicking the [+] button above.",
                 editRow: {
                   deleteText: "Are you sure you want to delete this Participant?",
                 },

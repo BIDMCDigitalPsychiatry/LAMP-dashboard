@@ -147,6 +147,16 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
+
+    mainIcons: {
+      width: 100,
+      height: 100,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
+    },
+
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
@@ -261,10 +271,10 @@ export default function Manage({ participant, activities, ...props }) {
                 <Card className={classes.manage}>
                   <Box mt={2} mb={1}>
                     <Box
+                      className={classes.mainIcons}
                       style={{
                         margin: "auto",
-                        height: "100px",
-                        width: "100px",
+
                         background: tag[activity.id]?.photo
                           ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
                           : `url(${JournalImg}) center center/contain no-repeat`,
@@ -314,7 +324,7 @@ export default function Manage({ participant, activities, ...props }) {
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
-                <ScratchCard width="100" height="100" />
+                <ScratchCard className={classes.mainIcons} />
               </Box>
               <Typography className={classes.cardlabel}>Scratch card</Typography>
             </Card>
@@ -363,10 +373,10 @@ export default function Manage({ participant, activities, ...props }) {
                   <Card className={classes.manage}>
                     <Box mt={2} mb={1}>
                       <Box
+                        className={classes.mainIcons}
                         style={{
                           margin: "auto",
-                          height: "100px",
-                          width: "100px",
+
                           background: tag[entry.id]?.photo
                             ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
                             : `url(${InfoIcon}) center center/contain no-repeat`,
