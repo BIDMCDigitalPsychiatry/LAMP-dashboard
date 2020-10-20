@@ -424,6 +424,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   const refreshData = () => {
     setLoading(true)
+    setAllFalse()
     let activityData = []
     let counts = studiesCount
     studies.map((study) => {
@@ -859,6 +860,16 @@ export default function ActivityList({ researcher, title, ...props }) {
     setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
   }
 
+  const setAllFalse = () => {
+    setCreate(false)
+    setGroupCreate(false)
+    setShowCTCreate(false)
+    setShowCreate(false)
+    setShowTipCreate(false)
+    setShowBreatheCreate(false)
+    setShowJournalCreate(false)
+  }
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -1194,36 +1205,10 @@ export default function ActivityList({ researcher, title, ...props }) {
         </DialogActions>
       </Dialog>
 
-      <ResponsiveDialog
-        fullScreen
-        transient={false}
-        animate
-        open={!!createDialogue}
-        onClose={() => {
-          setCreate(false)
-          setGroupCreate(false)
-          setShowCTCreate(false)
-          setShowCreate(false)
-          setShowTipCreate(false)
-          setShowBreatheCreate(false)
-          setShowJournalCreate(false)
-        }}
-      >
+      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={setAllFalse}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => {
-                setCreate(false)
-                setGroupCreate(false)
-                setShowCTCreate(false)
-                setShowCreate(false)
-                setShowTipCreate(false)
-                setShowBreatheCreate(false)
-                setShowJournalCreate(false)
-              }}
-              color="default"
-              aria-label="Menu"
-            >
+            <IconButton onClick={setAllFalse} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">Create a new activity</Typography>
