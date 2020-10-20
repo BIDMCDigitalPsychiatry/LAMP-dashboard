@@ -554,12 +554,11 @@ export default function Manage({ participant, activities, ...props }) {
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {dialogueType !== "Scratch_card" &&
-            tag[activity?.id]?.description(
-              <Typography variant="h4" gutterBottom>
-                {tag[activity?.id]?.description ? tag[activity.id]?.description.split(".")[0] : ""}
-              </Typography>
-            )}
+          {dialogueType !== "Scratch_card" && tag[activity?.id]?.description && (
+            <Typography variant="h4" gutterBottom>
+              {tag[activity?.id]?.description ? tag[activity.id]?.description.split(".")[0] : ""}
+            </Typography>
+          )}
 
           {dialogueType === "Scratch_card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
