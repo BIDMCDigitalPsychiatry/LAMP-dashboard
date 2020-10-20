@@ -289,6 +289,10 @@ const useStyles = makeStyles((theme) => ({
     "& span.MuiCheckbox-root": { color: "#C6C6C6 !important" },
     "& span.Mui-checked": { color: "#2F9D7E !important" },
   },
+  sliderValueLabel: {
+    width: "calc(100% + 105px)",
+    marginLeft: "-50px",
+  },
 }))
 
 // Splice together all selected activities & their tags.
@@ -576,6 +580,7 @@ function Rating({ onChange, options, value, ...props }) {
         }
       })
     }
+    onChange(valueText)
   }, [])
 
   const valuetext = (value: number) => {
@@ -620,7 +625,14 @@ function Rating({ onChange, options, value, ...props }) {
           getSliderValue(val)
         }}
       />
-      <Grid container spacing={10} style={{ marginTop: "-50px" }} direction="row" justify="center" alignItems="center">
+      <Grid
+        container
+        spacing={1}
+        className={classes.sliderValueLabel}
+        direction="row"
+        justify="center"
+        alignItems="center"
+      >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
             {options[0].description}

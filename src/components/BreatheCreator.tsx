@@ -104,10 +104,10 @@ const useStyles = makeStyles((theme: Theme) =>
       cursor: "pointer",
       textTransform: "capitalize",
       boxShadow: "none",
+      border: "#7599FF solid 1px",
       background: "transparent",
       margin: "15px 0",
-
-      "& svg": { marginRight: 10, color: "#7599FF" },
+      "& svg": { marginRight: 5, color: "#7599FF" },
     },
     iconBtn: { background: "white", boxShadow: "none", marginLeft: 15, color: "#7599FF", width: 48, height: 48 },
   })

@@ -504,10 +504,32 @@ export default function Manage({ participant, activities, ...props }) {
           </IconButton>
           <div className={classType}>
             <Box mt={2} mb={1}>
-              {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
+              {dialogueType === "Breathe" && (
+                <div
+                  style={{
+                    margin: "auto",
+                    height: "100px",
+                    width: "100px",
+                    background: tag[activity.id]?.photo
+                      ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                      : `url(${BreatheIcon}) center center/contain no-repeat`,
+                  }}
+                ></div>
+              )}
               {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
               {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
-              {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
+              {dialogueType === "Journals" && (
+                <div
+                  style={{
+                    margin: "auto",
+                    height: "100px",
+                    width: "100px",
+                    background: tag[activity.id]?.photo
+                      ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                      : `url(${JournalIcon}) center center/contain no-repeat`,
+                  }}
+                ></div>
+              )}
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
@@ -522,7 +544,7 @@ export default function Manage({ participant, activities, ...props }) {
             {dialogueType !== "Scratch_card" && (
               <Box>
                 <Typography variant="body2" align="left">
-                  {dialogueType.replace(/_/g, " ")}
+                  Manage
                 </Typography>
                 <Typography variant="h2">
                   {activity?.name ?? dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}
@@ -532,25 +554,24 @@ export default function Manage({ participant, activities, ...props }) {
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {dialogueType === "Breathe" && (
-            <Typography variant="h4" gutterBottom>
-              Breathing exercise (2 mins)
-            </Typography>
-          )}
+          {dialogueType !== "Scratch_card" &&
+            tag[activity?.id]?.description(
+              <Typography variant="h4" gutterBottom>
+                {tag[activity?.id]?.description ? tag[activity.id]?.description.split(".")[0] : ""}
+              </Typography>
+            )}
 
           {dialogueType === "Scratch_card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
           )}
-          {dialogueType === "Breathe" && (
-            <Typography variant="body2" component="p">
-              Follow the motion of the lotus flower opening and closing to control your breaths in and out.
-            </Typography>
-          )}
-          {dialogueType !== "Breathe" && dialogueType !== "Scratch_card" && (
-            <Typography variant="body2" component="p">
-              {activity?.description ?? "Test description"}
-            </Typography>
-          )}
+
+          {dialogueType !== "Scratch_card" &&
+            tag[activity?.id]?.description &&
+            tag[activity?.id]?.description.split(".").length > 1 && (
+              <Typography variant="body2" component="p">
+                {tag[activity?.id]?.description.split(".").slice(1).join(".")}
+              </Typography>
+            )}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
