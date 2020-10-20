@@ -253,10 +253,9 @@ export default function Manage({ participant, activities, ...props }) {
                 <Card className={classes.manage}>
                   <Box mt={2} mb={1}>
                     <Box
+                      className={classes.mainIcons}
                       style={{
                         margin: "auto",
-                        height: "100px",
-                        width: "100px",
                         background: tag[activity.id]?.photo
                           ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
                           : `url(${BreatheIcon}) center center/contain no-repeat`,
@@ -290,7 +289,6 @@ export default function Manage({ participant, activities, ...props }) {
                       className={classes.mainIcons}
                       style={{
                         margin: "auto",
-
                         background: tag[activity.id]?.photo
                           ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
                           : `url(${JournalImg}) center center/contain no-repeat`,
@@ -392,7 +390,6 @@ export default function Manage({ participant, activities, ...props }) {
                         className={classes.mainIcons}
                         style={{
                           margin: "auto",
-
                           background: tag[entry.id]?.photo
                             ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
                             : `url(${InfoIcon}) center center/contain no-repeat`,
@@ -504,41 +501,23 @@ export default function Manage({ participant, activities, ...props }) {
           </IconButton>
           <div className={classType}>
             <Box mt={2} mb={1}>
-              {dialogueType === "Breathe" && (
-               <Box
+              {dialogueType !== "Scratch_card" && (
+                <Box
                   className={classes.topicon}
                   style={{
                     margin: "auto",
-                    background: tag[activity.id]?.photo
-                      ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
-                      : `url(${BreatheIcon}) center center/contain no-repeat`,
+                    background: tag[activity?.id]?.photo
+                      ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                      : dialogueType === "Breathe"
+                      ? `url(${BreatheIcon}) center center/contain no-repeat`
+                      : dialogueType === "Journals"
+                      ? `url(${JournalIcon}) center center/contain no-repeat`
+                      : `url(${InfoIcon}) center center/contain no-repeat`,
                   }}
                 ></Box>
               )}
               {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
               {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
-              {dialogueType === "Journals" && (
-               <Box
-                  className={classes.topicon}
-                  style={{
-                    margin: "auto",
-                    background: tag[activity.id]?.photo
-                      ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
-                      : `url(${JournalIcon}) center center/contain no-repeat`,
-                  }}
-                ></Box>
-              )}
-              {activity && games.includes(activity?.spec) && (
-                <Box
-                  className={classes.topicon} 
-                  style={{
-                    margin: "auto",
-                    background: tag[activity?.id]?.photo
-                      ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                      : `url(${InfoIcon}) center center/contain no-repeat`,
-                  }}
-                ></Box>
-              )}
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
@@ -564,22 +543,20 @@ export default function Manage({ participant, activities, ...props }) {
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
           {dialogueType !== "Scratch_card" && tag[activity?.id]?.description && (
-            <Typography variant="h4" gutterBottom>
-              {tag[activity?.id]?.description ? tag[activity.id]?.description.split(".")[0] : ""}
-            </Typography>
+            <Box>
+              <Typography variant="h4" gutterBottom>
+                {tag[activity.id]?.description.split(".")[0]}
+              </Typography>
+              {tag[activity?.id]?.description.split(".").length > 1 && (
+                <Typography variant="body2" component="p">
+                  {tag[activity?.id]?.description.split(".").slice(1).join(".")}
+                </Typography>
+              )}
+            </Box>
           )}
-
           {dialogueType === "Scratch_card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
           )}
-
-          {dialogueType !== "Scratch_card" &&
-            tag[activity?.id]?.description &&
-            tag[activity?.id]?.description.split(".").length > 1 && (
-              <Typography variant="body2" component="p">
-                {tag[activity?.id]?.description.split(".").slice(1).join(".")}
-              </Typography>
-            )}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
