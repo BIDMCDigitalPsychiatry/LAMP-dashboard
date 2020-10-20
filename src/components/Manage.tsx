@@ -505,7 +505,8 @@ export default function Manage({ participant, activities, ...props }) {
           <div className={classType}>
             <Box mt={2} mb={1}>
               {dialogueType === "Breathe" && (
-                <div
+                <Box
+                  className={classes.mainIcons}
                   style={{
                     margin: "auto",
                     height: "100px",
@@ -514,12 +515,13 @@ export default function Manage({ participant, activities, ...props }) {
                       ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
                       : `url(${BreatheIcon}) center center/contain no-repeat`,
                   }}
-                ></div>
+                ></Box>
               )}
               {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
               {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
               {dialogueType === "Journals" && (
-                <div
+                <Box
+                  className={classes.mainIcons}
                   style={{
                     margin: "auto",
                     height: "100px",
@@ -528,7 +530,19 @@ export default function Manage({ participant, activities, ...props }) {
                       ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
                       : `url(${JournalIcon}) center center/contain no-repeat`,
                   }}
-                ></div>
+                ></Box>
+              )}
+              {activity && games.includes(activity?.spec) && (
+                <Box
+                  className={classes.mainIcons}
+                  style={{
+                    margin: "auto",
+
+                    background: tag[activity?.id]?.photo
+                      ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                      : `url(${InfoIcon}) center center/contain no-repeat`,
+                  }}
+                ></Box>
               )}
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
