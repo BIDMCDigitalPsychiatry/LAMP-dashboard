@@ -321,15 +321,6 @@ export default function Breathe({ participant, activity, ...props }) {
                   Start
                 </Fab>
               </Box>
-
-              {audio && (
-                <Box textAlign="center" mt={1}>
-                  <FormControlLabel
-                    control={<PeachCheckbox checked={playMusic} onChange={() => setPlayMusic(!playMusic)} />}
-                    label="Play music with exercise"
-                  />
-                </Box>
-              )}
             </Box>
           </Box>
         </Slide>
