@@ -565,34 +565,50 @@ function TextSection({ onChange, charLimit, value, ...props }) {
 
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
+  const [valueText, setValueText] = useState(!!value ? value : options[0].description)
+  const [sliderValue, setSliderValue] = useState(!!value ? 0 : parseInt(options[0].value))
+
+  useEffect(() => {
+    if (!!value) {
+      options.map(function (mark) {
+        if (mark.description == value) {
+          setSliderValue(parseInt(mark.value))
+        }
+      })
+    }
+  }, [])
 
   const valuetext = (value: number) => {
     return `${options[value]}`
   }
 
-  const getSliderValue = () => {
-    let sliderValue = options[0].label
-    let slValue = !!value ? value.value : undefined
+  const getSliderValue = (val) => {
+    let sliderValue = options[0].description
+    let slValue = val
 
     options.map(function (mark) {
       if (mark.value == slValue) {
-        sliderValue = mark.label
+        sliderValue = mark.description
       }
     })
+    setSliderValue(val)
+    setValueText(sliderValue)
+    onChange(sliderValue)
     return sliderValue
   }
 
   return (
     <Box textAlign="center" mt={5}>
       <Slider
-        defaultValue={!!value ? value.value : undefined}
+        defaultValue={sliderValue}
+        value={sliderValue}
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
-        step={10}
+        step={parseInt(options[1].value) - parseInt(options[0].value)}
         marks
-        min={0}
-        max={100}
+        min={parseInt(options[0].value)}
+        max={parseInt(options[options.length - 1].value)}
         track={false}
         classes={{
           root: classes.slider,
@@ -600,22 +616,24 @@ function Rating({ onChange, options, value, ...props }) {
           mark: classes.customTrack,
           thumb: classes.customThumb,
         }}
-        onChange={() => onChange(getSliderValue())}
+        onChange={(evt, val) => {
+          getSliderValue(val)
+        }}
       />
       <Grid container spacing={10} style={{ marginTop: "-50px" }} direction="row" justify="center" alignItems="center">
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            terrible
+            {options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            neutral
+            {options[Math.ceil(options.length / 2) - 1].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            excellent
+            {options[options.length - 1].description}
           </Typography>
         </Grid>
       </Grid>
@@ -623,7 +641,7 @@ function Rating({ onChange, options, value, ...props }) {
         <Typography variant="caption" display="block" gutterBottom>
           Your response:
         </Typography>
-        <Typography variant="h4">{getSliderValue()}</Typography>
+        <Typography variant="h4">{valueText}</Typography>
       </Box>
     </Box>
   )
@@ -667,7 +685,6 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
                   : _selection.filter((y) => y !== `${x.value}`)
                 let _target = CSV_stringify(targetValue)
                 setSelectedValue(_target)
-                console.log(_target)
                 onChange(_target)
               }}
               // icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
@@ -694,7 +711,6 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
 }
 function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
-    console.log(value)
     onResponse({ item: text, value: value })
   }
   const _binaryOpts = [
@@ -718,59 +734,65 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
     { label: "Several Times", value: 1 },
     { label: "Not at all", value: 0 },
   ]
-  const _ratingOpts = [
-    {
-      value: 0,
-      label: "Terrible",
-    },
+  // const _ratingOpts =  [
+  //   {
+  //     value: 0,
+  //     label: "Terrible",
+  //   },
 
-    {
-      value: 10,
-      label: "Very Poor",
-    },
-    {
-      value: 20,
-      label: "Very Poor",
-    },
-    {
-      value: 30,
-      label: "Poor",
-    },
-    {
-      value: 40,
-      label: "Poor",
-    },
+  //   {
+  //     value: 10,
+  //     label: "Very Poor",
+  //   },
+  //   {
+  //     value: 20,
+  //     label: "Very Poor",
+  //   },
+  //   {
+  //     value: 30,
+  //     label: "Poor",
+  //   },
+  //   {
+  //     value: 40,
+  //     label: "Poor",
+  //   },
 
-    {
-      value: 50,
-      label: "Neutral",
-    },
-    {
-      value: 60,
-      label: "Satisfactory",
-    },
-    {
-      value: 70,
-      label: "Good",
-    },
+  //   {
+  //     value: 50,
+  //     label: "Neutral",
+  //   },
+  //   {
+  //     value: 60,
+  //     label: "Satisfactory",
+  //   },
+  //   {
+  //     value: 70,
+  //     label: "Good",
+  //   },
 
-    {
-      value: 80,
-      label: "Pretty Good",
-    },
-    {
-      value: 90,
-      label: "Great",
-    },
-    {
-      value: 100,
-      label: "Exellent",
-    },
-  ]
+  //   {
+  //     value: 80,
+  //     label: "Pretty Good",
+  //   },
+  //   {
+  //     value: 90,
+  //     label: "Great",
+  //   },
+  //   {
+  //     value: 100,
+  //     label: "Exellent",
+  //   },
+  // ]
 
   switch (type) {
     case "slider":
-      component = <Rating options={_ratingOpts} onChange={onChange} value={!!value ? value.value : undefined} />
+      component = (
+        <Rating
+          options={options.sort((a, b) => parseInt(a.value) > parseInt(b.value))}
+          onChange={onChange}
+          value={!!value ? value.value : undefined}
+        />
+      )
       break
     case "likert":
     case "boolean":

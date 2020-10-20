@@ -160,7 +160,7 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400, minWidth: "280px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -522,10 +522,10 @@ export default function Manage({ participant, activities, ...props }) {
             {dialogueType !== "Scratch_card" && (
               <Box>
                 <Typography variant="body2" align="left">
-                  Games
+                  {dialogueType.replace(/_/g, " ")}
                 </Typography>
                 <Typography variant="h2">
-                  {dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}
+                  {activity?.name ?? dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}
                 </Typography>
               </Box>
             )}
@@ -548,7 +548,7 @@ export default function Manage({ participant, activities, ...props }) {
           )}
           {dialogueType !== "Breathe" && dialogueType !== "Scratch_card" && (
             <Typography variant="body2" component="p">
-              Test description for the manage section.
+              {activity?.description ?? "Test description"}
             </Typography>
           )}
         </DialogContent>

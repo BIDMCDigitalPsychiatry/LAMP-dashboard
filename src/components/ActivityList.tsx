@@ -301,7 +301,7 @@ export function spliceActivity({ raw, tag }) {
 }
 
 // Un-splice an object into its raw Tips Activity object
-export function unspliceTipsActivity(x) {     
+export function unspliceTipsActivity(x) {
   return {
     raw: {
       id: x.id,
@@ -311,7 +311,7 @@ export function unspliceTipsActivity(x) {
       schedule: x.schedule,
       settings: x.settings,
       studyID: x.studyID,
-    }
+    },
   }
 }
 
@@ -580,7 +580,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
-    const { raw } = unspliceTipsActivity(x) 
+    const { raw } = unspliceTipsActivity(x)
     let result
     if (!x.id && x.name) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
@@ -615,7 +615,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     }
     setCreate(false)
     setShowTipCreate(false)
-    onChange()  
+    onChange()
   }
 
   // Create a new Activity object & survey descriptions if set.
@@ -664,7 +664,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     setGroupCreate(false)
     onChange()
   }
-  
+
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
@@ -814,25 +814,25 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
       }
     } else if (x.spec === "lamp.tips") {
-      if(x.id === undefined){
+      if (x.id === undefined) {
         let tipObj = {
           id: x.id,
           name: x.name,
           icon: x.icon,
           studyID: selectedActivity.parentID,
-          spec: 'lamp.tips',
+          spec: "lamp.tips",
           settings: selectedActivity.settings,
-          schedule: selectedActivity.schedule
+          schedule: selectedActivity.schedule,
         }
         saveTipsActivity(tipObj)
-      }else{
+      } else {
         let obj = {
           settings: x.settings,
         }
         result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
         await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
-                  icon: x.icon,
-                })
+          icon: x.icon,
+        })
         if (!!result.error)
           enqueueSnackbar("Encountered an error: " + result?.error, {
             variant: "error",
@@ -840,8 +840,8 @@ export default function ActivityList({ researcher, title, ...props }) {
         else
           enqueueSnackbar("Successfully updated the Activity.", {
             variant: "success",
-          })        
-      }      
+          })
+      }
       onChange()
     }
     setSelectedActivity(undefined)
@@ -927,10 +927,10 @@ export default function ActivityList({ researcher, title, ...props }) {
             ]}
             localization={{
               body: {
-                emptyDataSourceMessage:
-                  !loading && activities.length === 0
-                    ? "No Activities. Add Activities by clicking the [+] button above."
-                    : "",
+                emptyDataSourceMessage: "",
+                // !loading && activities.length === 0
+                //   ? "No Activities. Add Activities by clicking the [+] button above."
+                //   : "",
                 editRow: {
                   deleteText: "Are you sure you want to delete this Activity?",
                 },

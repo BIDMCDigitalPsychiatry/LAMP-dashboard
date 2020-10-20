@@ -185,6 +185,7 @@ export default function BreatheCreator({
       : (value?.spec && ["lamp.breathe"].includes(value.spec)) || ["lamp.breathe"].includes(activitySpecId)
       ? {
           audio: null,
+          audio_name: null,
         }
       : {}
   )
@@ -237,11 +238,13 @@ export default function BreatheCreator({
     const file = event.target.files[0]
     const fileSize = event.target.files[0].size / 1024 / 1024
     const audioFormats = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/ogg"]
+    const fileName = file.name
+    console.log("fileName", fileName)
     if (fileSize <= 2 && audioFormats.includes(file.type.toLowerCase())) {
       setLoading(true)
       file &&
         getBase64(file, (result) => {
-          setSettings({ ...settings, audio: result })
+          setSettings({ ...settings, audio: result, audio_name: fileName })
           setLoading(false)
         })
     } else {
@@ -381,13 +384,14 @@ export default function BreatheCreator({
                         </audio>
                       )}
                     </Grid>
+                    {settings.audio_name && settings.audio_name}
                     <Grid>
                       {settings.audio && (
                         <Fab
                           className={classes.iconBtn}
                           aria-label="Remove-Audio"
                           variant="extended"
-                          onClick={() => setSettings({ ...settings, audio: null })}
+                          onClick={() => setSettings({ ...settings, audio: null, audio_name: null })}
                         >
                           <DeleteIcon />
                         </Fab>
