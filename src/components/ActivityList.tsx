@@ -424,7 +424,6 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   const refreshData = () => {
     setLoading(true)
-    setAllFalse()
     let activityData = []
     let counts = studiesCount
     studies.map((study) => {
@@ -451,14 +450,6 @@ export default function ActivityList({ researcher, title, ...props }) {
       selectedRows: [],
     }))
   }
-
-  useEffect(() => {
-    onChange()
-  }, [showCreate])
-
-  useEffect(() => {
-    onChange()
-  }, [groupCreate])
 
   useEffect(() => {
     setLoading(false)
@@ -614,8 +605,6 @@ export default function ActivityList({ researcher, title, ...props }) {
           variant: "success",
         })
     }
-    setCreate(false)
-    setShowTipCreate(false)
     onChange()
   }
 
@@ -632,8 +621,6 @@ export default function ActivityList({ researcher, title, ...props }) {
     })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    setCreate(false)
-    setShowCreate(false)
     onChange()
   }
 
@@ -661,8 +648,6 @@ export default function ActivityList({ researcher, title, ...props }) {
       })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    setCreate(false)
-    setGroupCreate(false)
     onChange()
   }
 
@@ -678,9 +663,6 @@ export default function ActivityList({ researcher, title, ...props }) {
     })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    setCreate(false)
-    setShowCTCreate(false)
-    setShowJournalCreate(false)
     onChange()
   }
 
@@ -1138,7 +1120,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                       ? setShowTipCreate(true)
                       : setShowSCImgCreate(true)
 
-                    setState((state) => ({ ...state, popoverAttachElement: null }))
+                    //    setState((state) => ({ ...state, popoverAttachElement: null }))
                   }}
                 >
                   {x?.name?.replace("lamp.", "")}
