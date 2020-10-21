@@ -281,6 +281,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       height: "calc(100vh - 380px)",
       overflow: "auto",
+      position: "relative",
+      top: 0
     },
   },
   fieldGroup: {
