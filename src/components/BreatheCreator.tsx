@@ -171,8 +171,6 @@ export default function BreatheCreator({
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
-  const initialCount = 0
-  // const [count, setCount] = useState(initialCount);
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
   const [disabled, setDisabled] = useState(true)
@@ -189,10 +187,18 @@ export default function BreatheCreator({
         }
       : {}
   )
-  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
-  // eslint-disable-next-line
+
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
+    onDropAccepted: useCallback((acceptedFiles) => {
+      compress(acceptedFiles[0], 64, 64).then(setPhoto)
+    }, []),
+    onDropRejected: useCallback((rejectedFiles) => {
+      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
+        enqueueSnackbar("Image size should not exceed 5 MB.", { variant: "error" })
+      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
+        enqueueSnackbar("Not supported image type.", { variant: "error" })
+      }
+    }, []),
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })

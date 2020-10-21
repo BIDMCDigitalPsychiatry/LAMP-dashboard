@@ -585,6 +585,7 @@ export default function Prevent({
   const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
   const [loading, setLoading] = React.useState(true)
+  const [disabledData, setDisabled] = React.useState(true)
 
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
@@ -615,6 +616,8 @@ export default function Prevent({
 
   React.useEffect(() => {
     ;(async () => {
+      let data = await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")
+      console.log(data)
       let selActivities = await getSelectedActivities(participant)
       setSelectedActivities(selActivities)
       let selSensors = await getSelectedSensors(participant)

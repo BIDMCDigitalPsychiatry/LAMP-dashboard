@@ -42,7 +42,7 @@ import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import QRCode from "qrcode.react"
 // Local Imports
-import LAMP from "lamp-core"
+import LAMP, { Study } from "lamp-core"
 import Messages from "./Messages"
 import EditUserField from "./EditUserField"
 import { CredentialManager } from "./CredentialManager"
@@ -248,6 +248,72 @@ const useStyles = makeStyles((theme: Theme) =>
     addNewDialog: { maxWidth: 350 },
   })
 )
+
+function StudyCreator({ addStudy, setAddStudy, createStudy, ...props }) {
+  const [studyName, setStudyName] = useState(undefined)
+  const classes = useStyles()
+
+  return (
+    <Dialog
+      open={addStudy}
+      onClose={() => {
+        setStudyName(undefined)
+        setAddStudy(false)
+      }}
+      onEnter={() => setStudyName(undefined)}
+      scroll="paper"
+      aria-labelledby="alert-dialog-slide-title"
+      aria-describedby="alert-dialog-slide-description"
+      classes={{ paper: classes.addNewDialog }}
+    >
+      <DialogTitle id="alert-dialog-slide-title">
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={() => {
+            setStudyName(undefined)
+            setAddStudy(false)
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+        <TextField
+          error={
+            typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === "")
+              ? true
+              : false
+          }
+          autoFocus
+          fullWidth
+          variant="filled"
+          label="Name for study"
+          defaultValue={studyName}
+          onChange={(e) => setStudyName(e.target.value)}
+          inputProps={{ maxLength: 80 }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Box textAlign="center" width={1} mt={3} mb={3}>
+          <Button
+            onClick={() => createStudy(studyName)}
+            color="primary"
+            autoFocus
+            disabled={
+              typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === "")
+                ? true
+                : false
+            }
+          >
+            Save
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 export default function ParticipantList({
   studyID,
@@ -285,8 +351,13 @@ export default function ParticipantList({
   const [selectedStudy, setSelectedStudy] = useState("")
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
+  const [addStudy, setAddStudy] = useState(false)
 
   useEffect(() => {
+    refreshPage()
+  }, [])
+
+  const refreshPage = async () => {
     ;(async () => {
       setLoading(true)
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
@@ -302,7 +373,7 @@ export default function ParticipantList({
       let studiesData = filterStudyData(studies)
       setStudiesCount(studiesData)
     })()
-  }, [])
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -627,6 +698,15 @@ export default function ParticipantList({
     let model = userAgent.hasOwnProperty("model") ? userAgent.model : ""
     return "App Version: " + appVersion + " OS Version: " + osVersion + " DeviceName:" + deviceName + " Model:" + model
   }
+  const createStudy = async (studyName: string) => {
+    setAddStudy(false)
+    setLoading(true)
+    let study = new Study()
+    study.name = studyName
+    await LAMP.Study.create(researcher.id, study)
+    refreshPage()
+    enqueueSnackbar(`Successfully created new study - ${studyName}.`, { variant: "success" })
+  }
 
   const handleClose = () => {
     setOpenDialog(false)
@@ -913,9 +993,14 @@ export default function ParticipantList({
               <Typography variant="h6">New patient</Typography>
               <Typography variant="body2">Create a new entry in this group.</Typography>
             </MenuItem>
-            <MenuItem>
-              <Typography variant="h6">Import patient list</Typography>
-              <Typography variant="body2">Add patients from a list or file.</Typography>
+            <MenuItem
+              onClick={() => {
+                setState((state) => ({ ...state, popoverAttachElement: null }))
+                setAddStudy(true)
+              }}
+            >
+              <Typography variant="h6">New study</Typography>
+              <Typography variant="body2">Create a new study.</Typography>
             </MenuItem>
           </React.Fragment>
         ) : state.selectedIcon === "delete" ? (
@@ -928,6 +1013,8 @@ export default function ParticipantList({
           <Box />
         )}
       </Popover>
+      <StudyCreator addStudy={addStudy} setAddStudy={setAddStudy} createStudy={createStudy} />
+
       <Dialog
         open={openDialog}
         onClose={handleClose}

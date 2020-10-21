@@ -282,7 +282,7 @@ const useStyles = makeStyles((theme) => ({
       height: "calc(100vh - 380px)",
       overflow: "auto",
       position: "relative",
-      top: 0
+      top: 0,
     },
   },
   fieldGroup: {

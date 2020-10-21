@@ -505,7 +505,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
       const { raw, tag } = unspliceActivity(x)
       try {
-        allIDs[raw.id] = ((await LAMP.Activity.create(x.studyID, {
+        allIDs[raw.id] = ((await LAMP.Activity.create(studyId, {
           ...raw,
           id: undefined,
           tableData: undefined,
@@ -519,7 +519,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     // CTests only.
     for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
       try {
-        allIDs[x.id] = ((await LAMP.Activity.create(x.studyID, {
+        allIDs[x.id] = ((await LAMP.Activity.create(studyId, {
           ...x,
           id: undefined,
           tableData: undefined,
