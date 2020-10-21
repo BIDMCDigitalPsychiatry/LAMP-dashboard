@@ -406,7 +406,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
-  const [studyId, setStudyId] = useState(null)
   const [selectedStudy, setSelectedStudy] = useState(undefined)
 
   useEffect(() => {
@@ -445,7 +444,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   }, [selected])
 
   const refreshData = () => {
-    setLoading(true)
     let activityData = []
     let counts = studiesCount
     studies.map((study) => {
@@ -459,6 +457,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
         setStudiesCount(counts)
         setActivities(activityData)
+        setLoading(false)
       })()
     })
   }
@@ -472,10 +471,6 @@ export default function ActivityList({ researcher, title, ...props }) {
       selectedRows: [],
     }))
   }
-
-  useEffect(() => {
-    setLoading(false)
-  }, [activities])
 
   const onDrop = useCallback((acceptedFiles) => {
     const reader = new FileReader()
@@ -999,14 +994,16 @@ export default function ActivityList({ researcher, title, ...props }) {
                     >
                       <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
-                    <Fab
-                      className={classes.btnImport}
-                      onClick={(event) => {
-                        setShowActivityImport(true)
-                      }}
-                    >
-                      <CloudUploadIcon />
-                    </Fab>
+                    <Tooltip title="Import">
+                      <Fab
+                        className={classes.btnImport}
+                        onClick={(event) => {
+                          setShowActivityImport(true)
+                        }}
+                      >
+                        <CloudUploadIcon />
+                      </Fab>
+                    </Tooltip>
                     <Fab
                       variant="extended"
                       color="primary"
