@@ -288,7 +288,7 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, ...props }) {
           autoFocus
           fullWidth
           variant="filled"
-          label="Name for study"
+          label="Name"
           defaultValue={studyName}
           onChange={(e) => setStudyName(e.target.value)}
           inputProps={{ maxLength: 80 }}
@@ -999,7 +999,7 @@ export default function ParticipantList({
                 setAddStudy(true)
               }}
             >
-              <Typography variant="h6">New study</Typography>
+              <Typography variant="h6">Add a new study</Typography>
               <Typography variant="body2">Create a new study.</Typography>
             </MenuItem>
           </React.Fragment>
