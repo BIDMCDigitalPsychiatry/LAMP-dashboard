@@ -5,6 +5,7 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogContent,
   Menu,
   MenuItem,
   AppBar,
@@ -21,7 +22,7 @@ import {
   Container,
   Typography,
   Popover,
-  TextField,
+  Select,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
@@ -105,6 +106,9 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 18,
         width: "calc(100% - 96px)",
       },
+    },
+    activityContent: {
+      padding: "25px 50px 0",
     },
     header: {
       padding: "25px 20px 10px",
@@ -265,6 +269,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { backgroundColor: "#f3f3f3" },
     },
     tableAccordian: { backgroundColor: "#f4f4f4" },
+    errorMsg: { color: "#FF0000", fontSize: 12 },
   })
 )
 
@@ -341,6 +346,22 @@ export function unspliceActivity(x) {
   }
 }
 
+export function unspliceCTActivity(x) {
+  return {
+    raw: {
+      id: x.id,
+      spec: x.spec,
+      name: x.name,
+      schedule: x.schedule,
+      settings: x.settings,
+    },
+    tag: {
+      description: x.description,
+      photo: x.photo,
+    },
+  }
+}
+
 const availableAtiveSpecs = [
   "lamp.group",
   "lamp.suvey",
@@ -386,6 +407,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
   const [studyId, setStudyId] = useState(null)
+  const [selectedStudy, setSelectedStudy] = useState(undefined)
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
@@ -487,6 +509,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async () => {
+    setLoading(true)
     const _importFile = [...importFile] // clone it so we can close the dialog first
     setImportFile(undefined)
 
@@ -500,14 +523,14 @@ export default function ActivityList({ researcher, title, ...props }) {
       })
       return
     }
-
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
       const { raw, tag } = unspliceActivity(x)
       try {
-        allIDs[raw.id] = ((await LAMP.Activity.create(studyId, {
+        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
           ...raw,
           id: undefined,
+          parentId: undefined,
           tableData: undefined,
         } as any)) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
@@ -518,21 +541,22 @@ export default function ActivityList({ researcher, title, ...props }) {
 
     // CTests only.
     for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
+      const { raw, tag } = unspliceCTActivity(x)
       try {
-        allIDs[x.id] = ((await LAMP.Activity.create(studyId, {
-          ...x,
+        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
+          ...raw,
           id: undefined,
-          tableData: undefined,
         })) as any).data
+        await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.activity_details", tag)
       } catch (e) {
-        enqueueSnackbar("Couldn't import one of the selected cognitive test Activities.", { variant: "error" })
+        enqueueSnackbar("Couldn't import one of the selected Activities.", { variant: "error" })
       }
     }
 
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
     for (let x of _importFile.filter((x) => ["lamp.group"].includes(x.spec))) {
       try {
-        await LAMP.Activity.create(x.studyID, {
+        await LAMP.Activity.create(selectedStudy, {
           ...x,
           id: undefined,
           tableData: undefined,
@@ -556,6 +580,15 @@ export default function ActivityList({ researcher, title, ...props }) {
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any
+          let activity = spliceActivity({
+            raw: { ...x, tableData: undefined },
+            tag: !!res.error ? undefined : res.data,
+          })
+          data.push(activity)
+        } catch (e) {}
+      } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
+        try {
+          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
           let activity = spliceActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
@@ -1139,35 +1172,47 @@ export default function ActivityList({ researcher, title, ...props }) {
         )}
       </Popover>
       <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
-        <Box
-          {...getRootProps()}
-          p={4}
-          bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-          color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
-        >
-          <input {...getInputProps()} />
-          <TextField
-            error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-            id="filled-select-currency"
-            select
-            label="Select"
-            value={studyId}
-            onChange={(e) => {
-              setStudyId(e.target.value)
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={3}>
+            <Typography variant="body2">Choose the Study you want to save this participant.</Typography>
+          </Box>
+
+          <Typography variant="caption">Study</Typography>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={selectedStudy}
+            onChange={(event) => {
+              setSelectedStudy(event.target.value)
             }}
-            helperText={
-              typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
-            }
-            variant="filled"
+            style={{ width: "100%" }}
           >
-            {studies.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
+            {studies.map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
               </MenuItem>
             ))}
-          </TextField>
-          <Typography variant="h6">Drag files here, or click to select files.</Typography>
-        </Box>
+          </Select>
+
+          {typeof selectedStudy === "undefined" ||
+          (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
+            <Box mt={1}>
+              <Typography className={classes.errorMsg}>Select a Study to import activities.</Typography>
+            </Box>
+          ) : (
+            ""
+          )}
+          <Box
+            {...getRootProps()}
+            p={4}
+            bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
+            color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+          >
+            <input {...getInputProps()} />
+
+            <Typography variant="h6">Drag files here, or click to select files.</Typography>
+          </Box>
+        </DialogContent>
       </Dialog>
       <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
         <MaterialTable
