@@ -362,6 +362,19 @@ export function unspliceCTActivity(x) {
   }
 }
 
+export function spliceCTActivity({ raw, tag }) {
+  return {
+    id: raw.id,
+    parentID: raw.parentID,
+    spec: "lamp.survey",
+    name: raw.name,
+    description: tag?.description,
+    photo: tag?.photo,
+    schedule: raw.schedule,
+    settings: raw.settings 
+  }    
+}
+
 const availableAtiveSpecs = [
   "lamp.group",
   "lamp.suvey",
@@ -583,8 +596,8 @@ export default function ActivityList({ researcher, title, ...props }) {
         } catch (e) {}
       } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
         try {
-          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
-          let activity = spliceActivity({
+          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any 
+          let activity = spliceCTActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
           })
