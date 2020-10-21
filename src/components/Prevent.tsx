@@ -616,8 +616,9 @@ export default function Prevent({
 
   React.useEffect(() => {
     ;(async () => {
-      let disabled =
-        ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
+      let disabled = ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data
+        ? true
+        : false
       setDisabled(disabled)
       if (!disabled) {
         let selActivities = await getSelectedActivities(participant)
