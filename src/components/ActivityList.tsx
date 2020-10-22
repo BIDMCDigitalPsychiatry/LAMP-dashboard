@@ -329,7 +329,7 @@ export function unspliceActivity(x) {
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
-      settings: x.settings?.map((y) => ({
+      settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type === "multiselect" ? "list" : y?.type,
         options: y?.options === null ? null : y?.options?.map((z) => z?.value),
@@ -337,7 +337,7 @@ export function unspliceActivity(x) {
     },
     tag: {
       description: x.description,
-      questions: x.settings?.map((y) => ({
+      questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
         options: y?.options === null ? null : y?.options?.map((z) => z?.description),
@@ -612,6 +612,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     }
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
+      console.log(x)
       const { raw, tag } = unspliceActivity(x)
       try {
         allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
