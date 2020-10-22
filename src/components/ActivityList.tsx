@@ -371,8 +371,8 @@ export function spliceCTActivity({ raw, tag }) {
     description: tag?.description,
     photo: tag?.photo,
     schedule: raw.schedule,
-    settings: raw.settings 
-  }    
+    settings: raw.settings,
+  }
 }
 
 const availableAtiveSpecs = [
@@ -388,6 +388,117 @@ const availableAtiveSpecs = [
   // "lamp.scratch_image",
 ]
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+
+function ImportActivity({
+  studies,
+  showActivityImport,
+  setShowActivityImport,
+  importActivities,
+  setLoading,
+  ...props
+}) {
+  const [selectedStudy, setSelectedStudy] = useState(undefined)
+  const classes = useStyles()
+  const [importFile, setImportFile] = useState<any>()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const reader = new FileReader()
+    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onload = () => {
+      setShowActivityImport(false)
+      setLoading(true)
+      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
+      if (
+        Array.isArray(obj) &&
+        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
+      )
+        setImportFile(obj)
+      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    }
+    acceptedFiles.forEach((file) => reader.readAsText(file))
+  }, [])
+  // eslint-disable-next-line
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+    onDrop,
+    accept: "application/json,.json",
+    maxSize: 5 * 1024 * 1024 /* 5MB */,
+  })
+
+  return (
+    <Container>
+      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={3}>
+            <Typography variant="body2">Choose the Study you want to import activities.</Typography>
+          </Box>
+
+          <Typography variant="caption">Study</Typography>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={selectedStudy}
+            onChange={(event) => {
+              setSelectedStudy(event.target.value)
+            }}
+            style={{ width: "100%" }}
+          >
+            {studies.map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {typeof selectedStudy === "undefined" ||
+          (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
+            <Box mt={1}>
+              <Typography className={classes.errorMsg}>Select a Study to import activities.</Typography>
+            </Box>
+          ) : (
+            ""
+          )}
+          <Box
+            {...getRootProps()}
+            p={4}
+            bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
+            color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+          >
+            <input {...getInputProps()} />
+
+            <Typography variant="h6">Drag files here, or click to select files.</Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!importFile} onEnter={() => setLoading(false)} onClose={() => setImportFile(undefined)}>
+        <MaterialTable
+          title="Continue importing?"
+          data={importFile || []}
+          columns={[{ title: "Activity Name", field: "name" }]}
+          options={{ search: false, selection: false }}
+          components={{ Container: (props) => <Box {...props} /> }}
+        />
+        <DialogActions>
+          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              importActivities(selectedStudy, importFile)
+              setImportFile(undefined)
+            }}
+            color="primary"
+            autoFocus
+          >
+            Import
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  )
+}
+
 export default function ActivityList({ researcher, title, ...props }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
@@ -407,7 +518,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   const [showBreatheCreate, setShowBreatheCreate] = useState(false)
   const [showSCImgCreate, setShowSCImgCreate] = useState(false)
   const [showActivityImport, setShowActivityImport] = useState(false)
-  const [importFile, setImportFile] = useState<any>()
   const [selectedActivity, setSelectedActivity] = useState<any>()
   const [activitySpecId, setActivitySpecId] = useState(null)
   const [createDialogue, setCreate] = useState(false)
@@ -419,7 +529,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
-  const [selectedStudy, setSelectedStudy] = useState(undefined)
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
@@ -485,46 +594,16 @@ export default function ActivityList({ researcher, title, ...props }) {
     }))
   }
 
-  const onDrop = useCallback((acceptedFiles) => {
-    const reader = new FileReader()
-    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onload = () => {
-      setShowActivityImport(false)
-      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
-      if (
-        Array.isArray(obj) &&
-        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
-      )
-        setImportFile(obj)
-      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    }
-    acceptedFiles.forEach((file) => reader.readAsText(file))
-  }, [])
-  // eslint-disable-next-line
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
-    accept: "application/json,.json",
-    maxSize: 5 * 1024 * 1024 /* 5MB */,
-  })
-  const _saveFile = (data) =>
-    saveAs(
-      new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(data))))], {
-        type: "text/plain;charset=utf-8",
-      }),
-      "export.json"
-    )
-
   // Import a file containing pre-linked Activity objects from another Study.
-  const importActivities = async () => {
+  const importActivities = async (selectedStudy: string, importFile: any) => {
     setLoading(true)
     const _importFile = [...importFile] // clone it so we can close the dialog first
-    setImportFile(undefined)
 
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
+
     if (brokenGroupsCount > 0) {
       enqueueSnackbar("Couldn't import the Activities because some Activities are misconfigured or missing.", {
         variant: "error",
@@ -580,11 +659,13 @@ export default function ActivityList({ researcher, title, ...props }) {
       variant: "success",
     })
   }
-
   // Export a file containing this Study's pre-linked Activity objects.
   const downloadActivities = async (rows) => {
     let data = []
     for (let x of rows) {
+      delete x["parent"]
+      delete x["parentID"]
+
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any
@@ -596,7 +677,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         } catch (e) {}
       } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
         try {
-          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any 
+          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
           let activity = spliceCTActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
@@ -610,6 +691,14 @@ export default function ActivityList({ researcher, title, ...props }) {
       variant: "info",
     })
   }
+
+  const _saveFile = (data) =>
+    saveAs(
+      new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(data))))], {
+        type: "text/plain;charset=utf-8",
+      }),
+      "export.json"
+    )
 
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
@@ -1181,66 +1270,6 @@ export default function ActivityList({ researcher, title, ...props }) {
           <Box />
         )}
       </Popover>
-      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
-        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-          <Box mt={2} mb={3}>
-            <Typography variant="body2">Choose the Study you want to save this participant.</Typography>
-          </Box>
-
-          <Typography variant="caption">Study</Typography>
-          <Select
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            value={selectedStudy}
-            onChange={(event) => {
-              setSelectedStudy(event.target.value)
-            }}
-            style={{ width: "100%" }}
-          >
-            {studies.map((study) => (
-              <MenuItem key={study.id} value={study.id}>
-                {study.name}
-              </MenuItem>
-            ))}
-          </Select>
-
-          {typeof selectedStudy === "undefined" ||
-          (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
-            <Box mt={1}>
-              <Typography className={classes.errorMsg}>Select a Study to import activities.</Typography>
-            </Box>
-          ) : (
-            ""
-          )}
-          <Box
-            {...getRootProps()}
-            p={4}
-            bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-            color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
-          >
-            <input {...getInputProps()} />
-
-            <Typography variant="h6">Drag files here, or click to select files.</Typography>
-          </Box>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
-        <MaterialTable
-          title="Continue importing?"
-          data={importFile || []}
-          columns={[{ title: "Activity Name", field: "name" }]}
-          options={{ search: false, selection: false }}
-          components={{ Container: (props) => <Box {...props} /> }}
-        />
-        <DialogActions>
-          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-            Cancel
-          </Button>
-          <Button onClick={importActivities} color="primary" autoFocus>
-            Import
-          </Button>
-        </DialogActions>
-      </Dialog>
 
       <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={setAllFalse}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
@@ -1277,7 +1306,13 @@ export default function ActivityList({ researcher, title, ...props }) {
           )}
         </Box>
       </ResponsiveDialog>
-
+      <ImportActivity
+        studies={studies}
+        showActivityImport={showActivityImport}
+        setLoading={setLoading}
+        setShowActivityImport={setShowActivityImport}
+        importActivities={importActivities}
+      />
       <ResponsiveDialog
         fullScreen
         transient={false}
