@@ -249,18 +249,36 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function StudyCreator({ addStudy, setAddStudy, createStudy, ...props }) {
-  const [studyName, setStudyName] = useState(undefined)
+function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props }) {
+  const [studyName, setStudyName] = useState("")
   const classes = useStyles()
+  const [duplicateCnt, setCount] = useState(0)
+
+  const validate = () => {
+    return (
+      duplicateCnt == 0 ||
+      typeof studyName === "undefined" ||
+      (typeof studyName !== "undefined" && studyName?.trim() === "")
+    )
+  }
+
+  useEffect(() => {
+    let duplicateCount = 0
+    if (!(typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === ""))) {
+      duplicateCount = studies.filter((study) => study.name?.trim().toLowerCase() === studyName?.trim().toLowerCase())
+        .length
+    }
+    setCount(duplicateCount)
+  }, [studyName])
 
   return (
     <Dialog
       open={addStudy}
       onClose={() => {
-        setStudyName(undefined)
+        setStudyName("")
         setAddStudy(false)
       }}
-      onEnter={() => setStudyName(undefined)}
+      onEnter={() => setStudyName("")}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
@@ -271,7 +289,7 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, ...props }) {
           aria-label="close"
           className={classes.closeButton}
           onClick={() => {
-            setStudyName(undefined)
+            setStudyName("")
             setAddStudy(false)
           }}
         >
@@ -280,31 +298,29 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, ...props }) {
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
         <TextField
-          error={
-            typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === "")
-              ? true
-              : false
-          }
+          error={!validate()}
           autoFocus
           fullWidth
           variant="filled"
           label="Name"
           defaultValue={studyName}
-          onChange={(e) => setStudyName(e.target.value)}
+          onChange={(e) => {
+            setStudyName(e.target.value)
+          }}
           inputProps={{ maxLength: 80 }}
+          helperText={duplicateCnt > 0 ? "Unique name required" : ""}
         />
       </DialogContent>
       <DialogActions>
         <Box textAlign="center" width={1} mt={3} mb={3}>
           <Button
-            onClick={() => createStudy(studyName)}
+            onClick={() => {
+              setAddStudy(false)
+              createStudy(studyName)
+            }}
             color="primary"
             autoFocus
-            disabled={
-              typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === "")
-                ? true
-                : false
-            }
+            disabled={!validate()}
           >
             Save
           </Button>
@@ -1013,7 +1029,7 @@ export default function ParticipantList({
           <Box />
         )}
       </Popover>
-      <StudyCreator addStudy={addStudy} setAddStudy={setAddStudy} createStudy={createStudy} />
+      <StudyCreator addStudy={addStudy} setAddStudy={setAddStudy} studies={tagData} createStudy={createStudy} />
 
       <Dialog
         open={openDialog}
