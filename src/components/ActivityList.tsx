@@ -383,7 +383,7 @@ const availableAtiveSpecs = [
   "lamp.jewels_b",
   "lamp.breathe",
   "lamp.spatial_span",
-  //"lamp.tips",
+  "lamp.tips",
   "lamp.cats_and_dogs",
   // "lamp.scratch_image",
 ]
@@ -703,6 +703,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
+    setLoading(true)
     const { raw } = unspliceTipsActivity(x)
     let result
     if (!x.id && x.name) {
@@ -714,10 +715,13 @@ export default function ActivityList({ researcher, title, ...props }) {
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
         })
-      else
+      else {
+        setAllFalse()
         enqueueSnackbar("Successfully created a new tip Activity.", {
           variant: "success",
         })
+        onChange()
+      }
     } else {
       result = (await LAMP.Activity.update(x.id, {
         settings: x.settings,
@@ -726,17 +730,18 @@ export default function ActivityList({ researcher, title, ...props }) {
       await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
         icon: x.icon,
       })
-
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
         })
-      else
+      else {
+        setAllFalse()
         enqueueSnackbar("Successfully updated the Activity.", {
           variant: "success",
         })
+        onChange()
+      }
     }
-    onChange()
   }
 
   // Create a new Activity object & survey descriptions if set.
@@ -1253,7 +1258,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                       ? setShowTipCreate(true)
                       : setShowSCImgCreate(true)
 
-                    //    setState((state) => ({ ...state, popoverAttachElement: null }))
+                      setState((state) => ({ ...state, popoverAttachElement: null }))
                   }}
                 >
                   {x?.name?.replace("lamp.", "")}
@@ -1295,7 +1300,7 @@ export default function ActivityList({ researcher, title, ...props }) {
               activities={activities}
             />
           )}
-          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} />}
+          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} allActivities={activities} />}
           {!!showCreate && <SurveyCreator studies={studies} onSave={saveActivity} />}
           {!!showBreatheCreate && (
             <BreatheCreator

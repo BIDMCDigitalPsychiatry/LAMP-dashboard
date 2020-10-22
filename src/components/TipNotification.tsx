@@ -10,8 +10,7 @@ import {
   Box,
   Fab,
   Container,
-  AppBar,
-  Toolbar,
+  Link,
 } from "@material-ui/core"
 
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -26,7 +25,6 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up("sm")]: {
         textAlign: "center",
       },
-
       "& h2": {
         fontSize: 25,
         fontWeight: 600,
@@ -43,9 +41,15 @@ const useStyles = makeStyles((theme: Theme) =>
       "& p": {
         fontSize: "16px",
         lineheight: "24px",
-
+        marginBottom: 20,
         color: "rgba(0, 0, 0, 0.75)",
       },
+      "& img": {
+        maxWidth: "100%",
+        marginBottom: 15,
+      },
+      "& h6": { fontSize: 14, fontWeight: 700, fontStyle: "italic" },
+      "& a": { fontSize: 14, fontStyle: "italic" },
     },
     lineyellow: {
       background: "#FFD645",
@@ -95,10 +99,9 @@ const useStyles = makeStyles((theme: Theme) =>
           "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
       },
     },
-
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
     colorLine: { maxWidth: 115 },
-    headerIcon: { textAlign: "center" },
+    headerIcon: { textAlign: "center", marginBottom: 15 },
     mainContainer: { padding: 0 },
   })
 )
@@ -115,7 +118,7 @@ export default function TipNotification({ ...props }) {
     <Container maxWidth={false} className={classes.mainContainer}>
       <Box className={classes.header}>
         <Box width={1} className={classes.headerIcon}>
-          {props.icon}
+          <img src={!!props.icon ? props.icon : undefined} alt={props.title} />
         </Box>
         <Typography variant="caption">Tip</Typography>
         <Typography variant="h2">{props.title}</Typography>
@@ -123,9 +126,17 @@ export default function TipNotification({ ...props }) {
       <Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12}>
           <CardContent className={classes.tipscontentarea}>
+            <img src={!!props.images ? props.images : undefined} alt={props.title} />
             <Typography variant="body2" color="textSecondary" component="p">
               {props.details}
             </Typography>
+            <Typography variant="subtitle2">{props.author}</Typography>
+
+            {props.link && (
+              <Link target="_blank" href={props.link}>
+                {props.link}
+              </Link>
+            )}
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
                 <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>

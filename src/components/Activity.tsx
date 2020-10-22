@@ -21,7 +21,7 @@ export default function Activity({ allActivities, activity, onSave, details, stu
   return (
     <div>
       {isGroup && <GroupCreator activities={allActivities} value={activity} onSave={onSave} studies={studies} />}
-      {isTip && <TipCreator activities={activity} onSave={onSave} studies={studies} />}
+      {isTip && <TipCreator activities={activity} onSave={onSave} studies={studies} allActivities={allActivities}/>}
       {isSurvey && <SurveyCreator value={activity} onSave={onSave} studies={studies} />}
       {isGames && (
         <GameCreator value={activity} onSave={onSave} details={details} activities={allActivities} studies={studies} />

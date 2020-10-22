@@ -313,7 +313,7 @@ export default function Participant({
       else hideEvent() // trigger a reload of dependent components anyway
     })
   }
-
+  
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -322,7 +322,7 @@ export default function Participant({
       <Box className={classes.scroll}>
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>
-            <Learn participant={participant} activeTab={activeTab} />
+            <Learn participant={participant} activities={activities} activeTab={activeTab} />
           </Box>
         </Slide>
         <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
