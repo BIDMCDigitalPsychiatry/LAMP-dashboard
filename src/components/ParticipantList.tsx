@@ -42,7 +42,7 @@ import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import QRCode from "qrcode.react"
 // Local Imports
-import LAMP from "lamp-core"
+import LAMP, { Study } from "lamp-core"
 import Messages from "./Messages"
 import EditUserField from "./EditUserField"
 import { CredentialManager } from "./CredentialManager"
@@ -140,6 +140,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: "#ECF4FF",
       border: "2px solid #FFFFFF",
       color: "#000000",
+      maxWidth: 250,
     },
     dataQuality: {
       margin: "4px 0",
@@ -248,6 +249,88 @@ const useStyles = makeStyles((theme: Theme) =>
     addNewDialog: { maxWidth: 350 },
   })
 )
+
+function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props }) {
+  const [studyName, setStudyName] = useState("")
+  const classes = useStyles()
+  const [duplicateCnt, setCount] = useState(0)
+
+  const validate = () => {
+    return (
+      duplicateCnt == 0 ||
+      typeof studyName === "undefined" ||
+      (typeof studyName !== "undefined" && studyName?.trim() === "")
+    )
+  }
+
+  useEffect(() => {
+    let duplicateCount = 0
+    if (!(typeof studyName === "undefined" || (typeof studyName !== "undefined" && studyName?.trim() === ""))) {
+      duplicateCount = studies.filter((study) => study.name?.trim().toLowerCase() === studyName?.trim().toLowerCase())
+        .length
+    }
+    setCount(duplicateCount)
+  }, [studyName])
+
+  return (
+    <Dialog
+      open={addStudy}
+      onClose={() => {
+        setStudyName("")
+        setAddStudy(false)
+      }}
+      onEnter={() => setStudyName("")}
+      scroll="paper"
+      aria-labelledby="alert-dialog-slide-title"
+      aria-describedby="alert-dialog-slide-description"
+      classes={{ paper: classes.addNewDialog }}
+    >
+      <DialogTitle id="alert-dialog-slide-title">
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={() => {
+            setStudyName("")
+            setAddStudy(false)
+          }}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+        <TextField
+          error={!validate()}
+          autoFocus
+          fullWidth
+          variant="filled"
+          label="Name"
+          defaultValue={studyName}
+          onChange={(e) => {
+            setStudyName(e.target.value)
+          }}
+          inputProps={{ maxLength: 80 }}
+          helperText={duplicateCnt > 0 ? "Unique name required" : ""}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Box textAlign="center" width={1} mt={3} mb={3}>
+          <Button
+            onClick={() => {
+              setAddStudy(false)
+              createStudy(studyName)
+            }}
+            color="primary"
+            autoFocus
+            disabled={!validate()}
+          >
+            Save
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 // TODO: Traffic Lights with Last Survey Date + Login+device + # completed events
 export default function ParticipantList({
   studyID,
@@ -285,10 +368,15 @@ export default function ParticipantList({
   const [selectedStudy, setSelectedStudy] = useState("")
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
+  const [addStudy, setAddStudy] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
+    refreshPage()
+  }, [])
+
+  const refreshPage = async () => {
     ;(async () => {
+      setLoading(true)
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
         return await Promise.all(
           res.map(async (x) => ({
@@ -302,11 +390,11 @@ export default function ParticipantList({
       let studiesData = filterStudyData(studies)
       setStudiesCount(studiesData)
     })()
-  }, [])
+  }
 
   useEffect(() => {
-    setLoading(true)
     ;(async () => {
+      setLoading(true)
       let selectedStudies =
         ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
         tagData.map((study) => {
@@ -326,6 +414,7 @@ export default function ParticipantList({
     setLoading(true)
     ;(async () => {
       await onLoadParticipantStudy(tagData)
+      setLoading(false)
     })()
   }, [tagArray])
 
@@ -350,7 +439,6 @@ export default function ParticipantList({
       })
       setNameArray(obj)
     }
-    setLoading(false)
   }
 
   const onChangeParticipantStudy = async (study, type = "") => {
@@ -627,6 +715,15 @@ export default function ParticipantList({
     let model = userAgent.hasOwnProperty("model") ? userAgent.model : ""
     return "App Version: " + appVersion + " OS Version: " + osVersion + " DeviceName:" + deviceName + " Model:" + model
   }
+  const createStudy = async (studyName: string) => {
+    setAddStudy(false)
+    setLoading(true)
+    let study = new Study()
+    study.name = studyName
+    await LAMP.Study.create(researcher.id, study)
+    refreshPage()
+    enqueueSnackbar(`Successfully created new study - ${studyName}.`, { variant: "success" })
+  }
 
   const handleClose = () => {
     setOpenDialog(false)
@@ -732,7 +829,7 @@ export default function ParticipantList({
             }}
             localization={{
               body: {
-                emptyDataSourceMessage: "No Participants. Add Participants by clicking the [+] button above.",
+                emptyDataSourceMessage: "", //"No Participants. Add Participants by clicking the [+] button above.",
                 editRow: {
                   deleteText: "Are you sure you want to delete this Participant?",
                 },
@@ -913,9 +1010,14 @@ export default function ParticipantList({
               <Typography variant="h6">New patient</Typography>
               <Typography variant="body2">Create a new entry in this group.</Typography>
             </MenuItem>
-            <MenuItem>
-              <Typography variant="h6">Import patient list</Typography>
-              <Typography variant="body2">Add patients from a list or file.</Typography>
+            <MenuItem
+              onClick={() => {
+                setState((state) => ({ ...state, popoverAttachElement: null }))
+                setAddStudy(true)
+              }}
+            >
+              <Typography variant="h6">Add a new study</Typography>
+              <Typography variant="body2">Create a new study.</Typography>
             </MenuItem>
           </React.Fragment>
         ) : state.selectedIcon === "delete" ? (
@@ -928,6 +1030,8 @@ export default function ParticipantList({
           <Box />
         )}
       </Popover>
+      <StudyCreator addStudy={addStudy} setAddStudy={setAddStudy} studies={tagData} createStudy={createStudy} />
+
       <Dialog
         open={openDialog}
         onClose={handleClose}

@@ -24,20 +24,21 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: 500,
       "&:focus": { background: "#ECF4FF !important" },
     },
+    filterChips: {
+      flexWrap: "wrap",
+      display: "flex",
+      justifyContent: "center",
+      maxWidth: 1055,
+      margin: "0 auto",
+      width: "100%",
+    },
   })
 )
 
 export default function MultipleSelect({ ...props }) {
   const classes = useStyles()
   return (
-    <Box
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        width: "100%",
-      }}
-    >
+    <Box className={classes.filterChips}>
       {(props.items || []).map((item) => (
         <Tooltip
           key={item}

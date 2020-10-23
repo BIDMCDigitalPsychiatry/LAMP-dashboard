@@ -20,8 +20,10 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import { ReactComponent as JournalIcon } from "../icons/Journal.svg"
+import JournalImg from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
+import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
+
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -145,10 +147,20 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
+
+    mainIcons: {
+      width: 100,
+      height: 100,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
+    },
+
     thumbMain: { maxWidth: 255 },
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400, minWidth: "280px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -158,17 +170,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
-function getGameImageAct(activities: ActivityObj[]) {
-  let images = []
-  activities.map((activity) => {
-    ;(async () => {
-      images[activity.id] = await getGameImage(activity.id)
-    })()
-  })
-  return images
-}
-
-async function getGameImage(activityId: string) {
+async function getImage(activityId: string) {
   return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
     !!y.error ? undefined : y.data
   )[0]
@@ -183,25 +185,27 @@ export default function Manage({ participant, activities, ...props }) {
   const [activityName, setActivityName] = useState(null)
   const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
-  const [gamesActivities, setGameActivities] = useState([])
+  const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [spec, setSpec] = useState(null)
 
   useEffect(() => {
     setLoading(true)
-    let gActivities = activities.filter((x: any) => games.includes(x.spec))
-    setGameActivities(gActivities)
+    let gActivities = activities.filter(
+      (x: any) => games.includes(x.spec) || x.spec === "lamp.journal" || x.spec === "lamp.breathe"
+    )
+    setSavedActivities(gActivities)
   }, [])
 
   useEffect(() => {
     setLoading(true)
     ;(async () => {
       let tags = []
-      let images = await gamesActivities.map((activity, index) => {
+      let images = await savedActivities.map((activity, index) => {
         ;(async () => {
-          tags[activity.id] = await getGameImage(activity.id)
+          tags[activity.id] = await getImage(activity.id)
           setTag(tags)
-          if (index === gamesActivities.length - 1) {
+          if (index === savedActivities.length - 1) {
             setLoading(false)
             setTag(tags)
             return tags
@@ -210,7 +214,7 @@ export default function Manage({ participant, activities, ...props }) {
       })
       setTag(images)
     })()
-  }, [gamesActivities])
+  }, [savedActivities])
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -229,45 +233,74 @@ export default function Manage({ participant, activities, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop>
       <Grid container spacing={2}>
-        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
-            setSpec(null)
-            handleClickOpen("Breathe")
-          }} 
-          className={classes.thumbMain}>
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2}>
-                <BreatheIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Breathe</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        <Grid
-          item
-          xs={6}
-          sm={4}
-          md={3}
-          lg={3}
-          onClick={() => {
-            setSpec(null)
-            handleClickOpen("Journals")
-          }}
-          className={classes.thumbMain}
-        >
-          <ButtonBase focusRipple className={classes.fullwidthBtn}>
-            <Card className={classes.manage}>
-              <Box mt={2} mb={1}>
-                <JournalIcon />
-              </Box>
-              <Typography className={classes.cardlabel}>Journal</Typography>
-            </Card>
-          </ButtonBase>
-        </Grid>
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
-            setSpec(null)
-            handleClickOpen("Goals")
-          }} className={classes.thumbMain}>
+        {savedActivities
+          .filter((x: any) => x.spec === "lamp.breathe")
+          .map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setSpec(null)
+                setActivity(activity)
+                handleClickOpen("Breathe")
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag[activity.id]?.photo
+                          ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                          : `url(${BreatheIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{activity.name}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))}
+        {activities
+          .filter((x: any) => x.spec === "lamp.journal")
+          .map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setActivity(activity)
+                handleClickOpen("Journals")
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag[activity.id]?.photo
+                          ? `url(${tag[activity.id]?.photo}) center center/contain no-repeat`
+                          : `url(${JournalImg}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{activity.name}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))}
+        {/*  <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
@@ -276,8 +309,8 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>New goal</Typography>
             </Card>
           </ButtonBase>
-        </Grid> */}
-        {/* <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
+        </Grid>
+        <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => {
               setSpec(null)
               handleClickOpen("HopeBox")
             }} className={classes.thumbMain}>
@@ -305,7 +338,7 @@ export default function Manage({ participant, activities, ...props }) {
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card className={classes.manage}>
               <Box mt={2} mb={1}>
-                <ScratchCard width="100" height="100" />
+                <ScratchCard className={classes.mainIcons} />
               </Box>
               <Typography className={classes.cardlabel}>Scratch card</Typography>
             </Card>
@@ -331,43 +364,44 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography className={classes.cardlabel}>Medication tracker</Typography>
             </Card>
           </ButtonBase>
-        </Grid> */}
-        {gamesActivities.map((entry) => (
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={3}
-            lg={3}
-            onClick={() => {
-              setActivityName(entry.name)
-              handleClickOpen("Game")
-              setSpec(entry?.spec?.replace("lamp.", ""))
-              setActivity(entry)
-            }}
-            className={classes.thumbMain}
-          >
-            <ButtonBase focusRipple className={classes.fullwidthBtn}>
-              <Tooltip title={entry?.spec?.replace("lamp.", "")} placement="bottom">
-                <Card className={classes.manage}>
-                  <Box mt={2} mb={1}>
-                    <Box
-                      style={{
-                        margin: "auto",
-                        height: "100px",
-                        width: "100px",
-                        background: tag[entry.id]?.photo
-                          ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Box>
-                  <Typography className={classes.cardlabel}>{entry.name}</Typography>
-                </Card>
-              </Tooltip>
-            </ButtonBase>
-          </Grid>
-        ))}
+         </Grid> */}
+        {savedActivities
+          .filter((x: any) => games.includes(x.spec))
+          .map((entry) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setActivityName(entry.name)
+                handleClickOpen("Game")
+                setSpec(entry?.spec?.replace("lamp.", ""))
+                setActivity(entry)
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Tooltip title={entry?.spec?.replace("lamp.", "")} placement="bottom">
+                  <Card className={classes.manage}>
+                    <Box mt={2} mb={1}>
+                      <Box
+                        className={classes.mainIcons}
+                        style={{
+                          margin: "auto",
+                          background: tag[entry.id]?.photo
+                            ? `url(${tag[entry.id]?.photo}) center center/contain no-repeat`
+                            : `url(${InfoIcon}) center center/contain no-repeat`,
+                        }}
+                      ></Box>
+                    </Box>
+                    <Typography className={classes.cardlabel}>{entry.name}</Typography>
+                  </Card>
+                </Tooltip>
+              </ButtonBase>
+            </Grid>
+          ))}
       </Grid>
       <ResponsiveDialog
         transient={launchedActivity === "Game" ? true : false}
@@ -393,6 +427,7 @@ export default function Manage({ participant, activities, ...props }) {
             Journals: (
               <JournalEntries
                 participant={participant}
+                activityId={activity?.id ?? null}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
@@ -409,6 +444,7 @@ export default function Manage({ participant, activities, ...props }) {
             ),
             Breathe: (
               <Breathe
+                activity={activity}
                 participant={participant}
                 onComplete={() => {
                   setOpen(false)
@@ -465,10 +501,23 @@ export default function Manage({ participant, activities, ...props }) {
           </IconButton>
           <div className={classType}>
             <Box mt={2} mb={1}>
-              {dialogueType === "Breathe" && <BreatheIcon className={classes.topicon} />}
+              {dialogueType !== "Scratch_card" && (
+                <Box
+                  className={classes.topicon}
+                  style={{
+                    margin: "auto",
+                    background: tag[activity?.id]?.photo
+                      ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                      : dialogueType === "Breathe"
+                      ? `url(${BreatheIcon}) center center/contain no-repeat`
+                      : dialogueType === "Journals"
+                      ? `url(${JournalIcon}) center center/contain no-repeat`
+                      : `url(${InfoIcon}) center center/contain no-repeat`,
+                  }}
+                ></Box>
+              )}
               {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
               {dialogueType === "Scratch_card" && <ScratchCard className={classes.topicon} />}
-              {dialogueType === "Journals" && <JournalIcon className={classes.topicon} />}
               {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
               {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />}
             </Box>
@@ -483,32 +532,30 @@ export default function Manage({ participant, activities, ...props }) {
             {dialogueType !== "Scratch_card" && (
               <Box>
                 <Typography variant="body2" align="left">
-                  Games
+                  Manage
                 </Typography>
-                <Typography variant="h2">{dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}</Typography>
+                <Typography variant="h2">
+                  {activity?.name ?? dialogueType.replace(/_/g, " ") + (spec !== null ? " (" + spec + ")" : "")}
+                </Typography>
               </Box>
             )}
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {dialogueType === "Breathe" && (
-            <Typography variant="h4" gutterBottom>
-              Breathing exercise (2 mins)
-            </Typography>
+          {dialogueType !== "Scratch_card" && tag[activity?.id]?.description && (
+            <Box>
+              <Typography variant="h4" gutterBottom>
+                {tag[activity.id]?.description.split(".")[0]}
+              </Typography>
+              {tag[activity?.id]?.description.split(".").length > 1 && (
+                <Typography variant="body2" component="p">
+                  {tag[activity?.id]?.description.split(".").slice(1).join(".")}
+                </Typography>
+              )}
+            </Box>
           )}
-
           {dialogueType === "Scratch_card" && (
             <Box textAlign="center">Swipe your finger around the screen to reveal the image hidden underneath</Box>
-          )}
-          {dialogueType === "Breathe" && (
-            <Typography variant="body2" component="p">
-              Follow the motion of the lotus flower opening and closing to control your breaths in and out.
-            </Typography>
-          )}
-          {dialogueType !== "Breathe" && dialogueType !== "Scratch_card" && (
-            <Typography variant="body2" component="p">
-              Test description for the manage section.
-            </Typography>
           )}
         </DialogContent>
         <DialogActions>

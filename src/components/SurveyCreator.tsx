@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-function SelectList({ checkbox, value, onChange, ...props }) {
+function SelectList({ checkbox, type, value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])
   useEffect(() => {
     onChange(options)
@@ -116,6 +116,7 @@ function SelectList({ checkbox, value, onChange, ...props }) {
                       })
                     )
                   }
+                  type={type === "slider" ? "number" : "text"}
                   InputProps={{
                     endAdornment: [
                       <InputAdornment position="end" key="adornment">
@@ -185,7 +186,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
       text,
       type,
       description,
-      options: ["list", "select", "multiselect"].includes(type) ? options : null,
+      options: ["list", "select", "multiselect", "slider"].includes(type) ? options : null,
     })
   }, [text, description, type, options])
 
@@ -257,10 +258,10 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               </Button>
             </ButtonGroup>
           </Grid>
-          {["list", "select", "multiselect"].includes(type) && (
+          {["list", "select", "multiselect", "slider"].includes(type) && (
             <Grid item>
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
-                <SelectList checkbox={type === "multiselect"} value={options} onChange={setOptions} />
+                <SelectList checkbox={type === "multiselect"} type={type} value={options} onChange={setOptions} />
               </Box>
             </Grid>
           )}

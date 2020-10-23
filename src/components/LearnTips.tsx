@@ -1,23 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import {
-  Typography,
-  makeStyles,
-  Box,
-  Grid,
-  IconButton,
-  useTheme,
-  Container,
-  AppBar,
-  Toolbar,
-  Icon,
-  CardMedia,
-  CardContent,
-  useMediaQuery,
-  CardActionArea,
-  Card,
-  Link,
-} from "@material-ui/core"
+import { Typography, makeStyles, Box, Grid, IconButton, Container, AppBar, Toolbar, Icon } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import TipNotification from "./TipNotification"
@@ -45,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("sm")]: {
       textAlign: "center",
     },
-
     "& h2": {
       fontSize: 25,
       fontWeight: 600,
@@ -143,50 +125,29 @@ export default function LearnTips({ ...props }) {
   const [openDialog, setOpenDialog] = useState(false)
   const [title, setTitle] = useState(null)
   const [details, setDetails] = useState(null)
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [status, setStatus] = useState("Yes")
-
-  const handleClickStatus = (statusVal: string) => {
-    setStatus(statusVal)
-  }
+  const [images, setImages] = useState(null)
+  const [author, setAuthor] = useState(null)
+  const [link, setLink] = useState(null)
 
   return (
     <Container>
       <Box pb={4}>
         <Grid container direction="row" alignItems="stretch">
-          {props.details.map((detail) =>
-            props.type === 2 ? (
-              <Grid item lg={6} sm={12} xs={12}>
-                <Card className={classes.root2}>
-                  <CardActionArea>
-                    <CardMedia className={classes.media} image={detail.image} />
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="h2">
-                        {detail.text}
-                        <br />
-                        {detail.author}
-                      </Typography>
-                      {detail.link && (
-                        <Link target="_blank" href={detail.link}>
-                          {detail.text}
-                        </Link>
-                      )}
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Grid>
-            ) : (
-              <Grid container direction="row" justify="center" alignItems="center">
-                <Grid item lg={6} sm={12} xs={12}>
-                  <Box
-                    className={classes.tipStyle}
-                    onClick={() => {
-                      setOpenDialog(true)
-                      setTitle(detail.title)
-                      setDetails(detail.text)
-                    }}
-                  >
-                    {supportsSidebar ? (
+          {Object.keys(props.details).length > 0
+            ? props.details.map((detail, index) => (
+                <Grid key={index} container direction="row" justify="center" alignItems="center">
+                  <Grid item lg={6} sm={12} xs={12}>
+                    <Box
+                      className={classes.tipStyle}
+                      onClick={() => {
+                        setOpenDialog(true)
+                        setTitle(detail.title)
+                        setDetails(detail.text)
+                        setImages(detail.image)
+                        setAuthor(detail.author)
+                        setLink(detail.link)
+                      }}
+                    >
                       <div>
                         <Grid container spacing={3}>
                           <Grid item xs>
@@ -197,14 +158,11 @@ export default function LearnTips({ ...props }) {
                           </Grid>
                         </Grid>
                       </div>
-                    ) : (
-                      <Typography variant="h6">{detail.title}</Typography>
-                    )}
-                  </Box>
+                    </Box>
+                  </Grid>
                 </Grid>
-              </Grid>
-            )
-          )}
+              ))
+            : ""}
         </Grid>
       </Box>
       <ResponsiveDialog
@@ -227,6 +185,9 @@ export default function LearnTips({ ...props }) {
           title={title}
           details={details}
           icon={props.icon}
+          images={images}
+          author={author}
+          link={link}
           onComplete={() => {
             setOpenDialog(false)
           }}

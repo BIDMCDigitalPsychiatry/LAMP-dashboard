@@ -590,24 +590,28 @@ export default function Feed({
                   let scheduledDate = new Date(currentDate)
                   scheduledDate.setHours(new Date(time).getHours())
                   scheduledDate.setMinutes(new Date(time).getMinutes())
-                  
-                  let nextScheduleDate = new Date(currentDate)                  
-                  if(schedule.custom_time.length > 0 && index > 0) {
+
+                  let nextScheduleDate = new Date(currentDate)
+                  if (schedule.custom_time.length > 0 && index > 0) {
                     nextScheduleDate.setHours(new Date(schedule.custom_time[index - 1]).getHours())
                     nextScheduleDate.setMinutes(new Date(schedule.custom_time[index - 1]).getMinutes())
                   }
 
                   let filteredData = savedData.filter(
-                    (item) => item.timestamp <= scheduledDate.getTime() && (schedule.custom_time.length > 0 && index > 0 ?  
-                      item.timestamp >= nextScheduleDate.getTime(): true)
+                    (item) =>
+                      item.timestamp <= scheduledDate.getTime() &&
+                      (schedule.custom_time.length > 0 && index > 0
+                        ? item.timestamp >= nextScheduleDate.getTime()
+                        : true)
                   )
                   let completedVal = filteredData.length > 0 ? true : false
                   let each = {
                     ...schedule,
-                    clickable: new Date().toLocaleDateString() === new Date(currentDate).toLocaleDateString() &&
-                                scheduledDate.getTime() >= new Date().getTime()
-                                  ? true
-                                  : false,
+                    clickable:
+                      new Date().toLocaleDateString() === new Date(currentDate).toLocaleDateString() &&
+                      scheduledDate.getTime() >= new Date().getTime()
+                        ? true
+                        : false,
                     completed: completedVal,
                     timeValue: getTimeValue(new Date(time)),
                     time: scheduledDate.getTime(),

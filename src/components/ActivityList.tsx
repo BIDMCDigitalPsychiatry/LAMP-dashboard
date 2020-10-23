@@ -5,6 +5,7 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogContent,
   Menu,
   MenuItem,
   AppBar,
@@ -21,6 +22,7 @@ import {
   Container,
   Typography,
   Popover,
+  Select,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
@@ -39,9 +41,12 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 import LAMP from "lamp-core"
 import Activity from "./Activity"
 import SurveyCreator from "./SurveyCreator"
+import JournalCreator from "./JournalCreator"
+
 import GroupCreator from "./GroupCreator"
 import TipCreator from "./TipCreator"
 import GameCreator from "./GameCreator"
+import BreatheCreator from "./BreatheCreator"
 import ActivityScheduler from "./ActivityScheduler"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as Filter } from "../icons/Filter.svg"
@@ -101,6 +106,9 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 18,
         width: "calc(100% - 96px)",
       },
+    },
+    activityContent: {
+      padding: "25px 50px 0",
     },
     header: {
       padding: "25px 20px 10px",
@@ -261,6 +269,14 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { backgroundColor: "#f3f3f3" },
     },
     tableAccordian: { backgroundColor: "#f4f4f4" },
+    errorMsg: { color: "#FF0000", fontSize: 12 },
+    dragDrop: {
+      outline: "none",
+      "& h6": {
+        color: "#7599FF",
+        fontSize: 14,
+      },
+    },
   })
 )
 
@@ -301,19 +317,13 @@ export function unspliceTipsActivity(x) {
   return {
     raw: {
       id: x.id,
-      spec: "lamp.tips",
       name: x.name,
+      spec: "lamp.tips",
+      icon: x.icon,
       schedule: x.schedule,
       settings: x.settings,
+      studyID: x.studyID,
     },
-    /*tag: {
-      description: x.description,
-      questions: x.settings?.map((y) => ({
-        multiselect: y?.type === "multiselect" ? true : undefined,
-        description: y?.description,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
-      })),
-    },*/
   }
 }
 
@@ -326,7 +336,7 @@ export function unspliceActivity(x) {
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
-      settings: x.settings?.map((y) => ({
+      settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type === "multiselect" ? "list" : y?.type,
         options: y?.options === null ? null : y?.options?.map((z) => z?.value),
@@ -334,7 +344,7 @@ export function unspliceActivity(x) {
     },
     tag: {
       description: x.description,
-      questions: x.settings?.map((y) => ({
+      questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
         options: y?.options === null ? null : y?.options?.map((z) => z?.description),
@@ -343,19 +353,160 @@ export function unspliceActivity(x) {
   }
 }
 
+export function unspliceCTActivity(x) {
+  return {
+    raw: {
+      id: x.id,
+      spec: x.spec,
+      name: x.name,
+      schedule: x.schedule,
+      settings: x.settings,
+    },
+    tag: {
+      description: x.description,
+      photo: x.photo,
+    },
+  }
+}
+
+export function spliceCTActivity({ raw, tag }) {
+  return {
+    id: raw.id,
+    parentID: raw.parentID,
+    spec: "lamp.survey",
+    name: raw.name,
+    description: tag?.description,
+    photo: tag?.photo,
+    schedule: raw.schedule,
+    settings: raw.settings,
+  }
+}
+
 const availableAtiveSpecs = [
   "lamp.group",
   "lamp.suvey",
-  // "lamp.journal",
+  "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",
-  // "lamp.breathe",
+  "lamp.breathe",
   "lamp.spatial_span",
-  // "lamp.tips",
+  "lamp.tips",
   "lamp.cats_and_dogs",
   // "lamp.scratch_image",
 ]
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+
+function ImportActivity({
+  studies,
+  showActivityImport,
+  setShowActivityImport,
+  importActivities,
+  setLoading,
+  ...props
+}) {
+  const [selectedStudy, setSelectedStudy] = useState(undefined)
+  const classes = useStyles()
+  const [importFile, setImportFile] = useState<any>()
+  const { enqueueSnackbar } = useSnackbar()
+
+  const onDrop = useCallback((acceptedFiles) => {
+    const reader = new FileReader()
+    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onload = () => {
+      setShowActivityImport(false)
+      setLoading(true)
+      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
+      if (
+        Array.isArray(obj) &&
+        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
+      )
+        setImportFile(obj)
+      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    }
+    acceptedFiles.forEach((file) => reader.readAsText(file))
+  }, [])
+  // eslint-disable-next-line
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+    onDrop,
+    accept: "application/json,.json",
+    maxSize: 5 * 1024 * 1024 /* 5MB */,
+  })
+
+  return (
+    <Container>
+      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={3}>
+            <Typography variant="body2">Choose the Study you want to import activities.</Typography>
+          </Box>
+
+          <Typography variant="caption">Study</Typography>
+          <Select
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={selectedStudy}
+            onChange={(event) => {
+              setSelectedStudy(event.target.value)
+            }}
+            style={{ width: "100%" }}
+          >
+            {studies.map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
+              </MenuItem>
+            ))}
+          </Select>
+
+          {typeof selectedStudy === "undefined" ||
+          (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
+            <Box mt={1}>
+              <Typography className={classes.errorMsg}>Select a Study to import activities.</Typography>
+            </Box>
+          ) : (
+            ""
+          )}
+          <Box
+            {...getRootProps()}
+            p={4}
+            bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
+            color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+            className={classes.dragDrop}
+          >
+            <input {...getInputProps()} />
+
+            <Typography variant="h6">Drag files here, or click to select files.</Typography>
+          </Box>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!importFile} onEnter={() => setLoading(false)} onClose={() => setImportFile(undefined)}>
+        <MaterialTable
+          title="Continue importing?"
+          data={importFile || []}
+          columns={[{ title: "Activity Name", field: "name" }]}
+          options={{ search: false, selection: false }}
+          components={{ Container: (props) => <Box {...props} /> }}
+        />
+        <DialogActions>
+          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              importActivities(selectedStudy, importFile)
+              setImportFile(undefined)
+            }}
+            color="primary"
+            autoFocus
+          >
+            Import
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  )
+}
+
 export default function ActivityList({ researcher, title, ...props }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
@@ -375,7 +526,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   const [showBreatheCreate, setShowBreatheCreate] = useState(false)
   const [showSCImgCreate, setShowSCImgCreate] = useState(false)
   const [showActivityImport, setShowActivityImport] = useState(false)
-  const [importFile, setImportFile] = useState<any>()
   const [selectedActivity, setSelectedActivity] = useState<any>()
   const [activitySpecId, setActivitySpecId] = useState(null)
   const [createDialogue, setCreate] = useState(false)
@@ -424,7 +574,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   }, [selected])
 
   const refreshData = () => {
-    setLoading(true)
     let activityData = []
     let counts = studiesCount
     studies.map((study) => {
@@ -453,67 +602,31 @@ export default function ActivityList({ researcher, title, ...props }) {
     }))
   }
 
-  useEffect(() => {
-    onChange()
-  }, [showCreate])
-
-  useEffect(() => {
-    onChange()
-  }, [groupCreate])
-
-  const onDrop = useCallback((acceptedFiles) => {
-    const reader = new FileReader()
-    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onload = () => {
-      setShowActivityImport(false)
-      let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
-      if (
-        Array.isArray(obj) &&
-        obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
-      )
-        setImportFile(obj)
-      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    }
-    acceptedFiles.forEach((file) => reader.readAsText(file))
-  }, [])
-  // eslint-disable-next-line
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
-    accept: "application/json,.json",
-    maxSize: 5 * 1024 * 1024 /* 5MB */,
-  })
-  const _saveFile = (data) =>
-    saveAs(
-      new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(data))))], {
-        type: "text/plain;charset=utf-8",
-      }),
-      "export.json"
-    )
-
   // Import a file containing pre-linked Activity objects from another Study.
-  const importActivities = async () => {
+  const importActivities = async (selectedStudy: string, importFile: any) => {
+    setLoading(true)
     const _importFile = [...importFile] // clone it so we can close the dialog first
-    setImportFile(undefined)
 
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
+
     if (brokenGroupsCount > 0) {
       enqueueSnackbar("Couldn't import the Activities because some Activities are misconfigured or missing.", {
         variant: "error",
       })
       return
     }
-
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
+      console.log(x)
       const { raw, tag } = unspliceActivity(x)
       try {
-        allIDs[raw.id] = ((await LAMP.Activity.create(x.studyID, {
+        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
           ...raw,
           id: undefined,
+          parentId: undefined,
           tableData: undefined,
         } as any)) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
@@ -524,21 +637,22 @@ export default function ActivityList({ researcher, title, ...props }) {
 
     // CTests only.
     for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
+      const { raw, tag } = unspliceCTActivity(x)
       try {
-        allIDs[x.id] = ((await LAMP.Activity.create(x.studyID, {
-          ...x,
+        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
+          ...raw,
           id: undefined,
-          tableData: undefined,
         })) as any).data
+        await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.activity_details", tag)
       } catch (e) {
-        enqueueSnackbar("Couldn't import one of the selected cognitive test Activities.", { variant: "error" })
+        enqueueSnackbar("Couldn't import one of the selected Activities.", { variant: "error" })
       }
     }
 
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
     for (let x of _importFile.filter((x) => ["lamp.group"].includes(x.spec))) {
       try {
-        await LAMP.Activity.create(x.studyID, {
+        await LAMP.Activity.create(selectedStudy, {
           ...x,
           id: undefined,
           tableData: undefined,
@@ -554,15 +668,26 @@ export default function ActivityList({ researcher, title, ...props }) {
       variant: "success",
     })
   }
-
   // Export a file containing this Study's pre-linked Activity objects.
   const downloadActivities = async (rows) => {
     let data = []
     for (let x of rows) {
+      delete x["parent"]
+      delete x["parentID"]
+
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any
           let activity = spliceActivity({
+            raw: { ...x, tableData: undefined },
+            tag: !!res.error ? undefined : res.data,
+          })
+          data.push(activity)
+        } catch (e) {}
+      } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
+        try {
+          let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
+          let activity = spliceCTActivity({
             raw: { ...x, tableData: undefined },
             tag: !!res.error ? undefined : res.data,
           })
@@ -576,22 +701,55 @@ export default function ActivityList({ researcher, title, ...props }) {
     })
   }
 
+  const _saveFile = (data) =>
+    saveAs(
+      new Blob([btoa(unescape(encodeURIComponent(JSON.stringify(data))))], {
+        type: "text/plain;charset=utf-8",
+      }),
+      "export.json"
+    )
+
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
-    // FIXME: ensure this is a lamp.tips only!
-    //const { raw, tag } = unspliceTipsActivity(x)
+    setLoading(true)
     const { raw } = unspliceTipsActivity(x)
+    let result
+    if (!x.id && x.name) {
+      result = (await LAMP.Activity.create(x.studyID, raw)) as any
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
+        icon: x.icon,
+      })
+      if (!!result.error)
+        enqueueSnackbar("Encountered an error: " + result?.error, {
+          variant: "error",
+        })
+      else {
+        setAllFalse()
+        enqueueSnackbar("Successfully created a new tip Activity.", {
+          variant: "success",
+        })
+        onChange()
+      }
+    } else {
+      result = (await LAMP.Activity.update(x.id, {
+        settings: x.settings,
+      })) as any
 
-    console.log(99999, raw)
-
-    return false
-
-    let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
-    //await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
-    enqueueSnackbar("Successfully created a new tip Activity.", {
-      variant: "success",
-    })
-    setShowCreate(false)
+      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
+        icon: x.icon,
+      })
+      if (!!result.error)
+        enqueueSnackbar("Encountered an error: " + result?.error, {
+          variant: "error",
+        })
+      else {
+        setAllFalse()
+        enqueueSnackbar("Successfully updated the Activity.", {
+          variant: "success",
+        })
+        onChange()
+      }
+    }
   }
 
   // Create a new Activity object & survey descriptions if set.
@@ -605,8 +763,8 @@ export default function ActivityList({ researcher, title, ...props }) {
     enqueueSnackbar("Successfully created a new survey Activity.", {
       variant: "success",
     })
-    setCreate(false)
-    setShowCreate(false)
+    let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
+    setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
     onChange()
   }
 
@@ -632,8 +790,8 @@ export default function ActivityList({ researcher, title, ...props }) {
       enqueueSnackbar("Successfully created a new group Activity.", {
         variant: "success",
       })
-    setCreate(false)
-    setGroupCreate(false)
+    let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
+    setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
     onChange()
   }
 
@@ -649,8 +807,6 @@ export default function ActivityList({ researcher, title, ...props }) {
     })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    setCreate(false)
-    setShowCTCreate(false)
     onChange()
   }
 
@@ -687,7 +843,13 @@ export default function ActivityList({ researcher, title, ...props }) {
       setSelectedActivity(raw)
     } else if (raw.spec === "lamp.tips") {
       setSelectedActivity(raw)
-    } else if (games.includes(raw.spec)) {
+    } else if (games.includes(raw.spec) || raw.spec === "lamp.journal") {
+      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
+        !!y.error ? undefined : y.data
+      )[0]
+      setGameDetails(tag)
+      setSelectedActivity(raw)
+    } else if (raw.spec === "lamp.breathe") {
       let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
@@ -699,11 +861,10 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
-    setLoading(true)
     let result
-    if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
+    setLoading(true)
+    if (!["lamp.group", "lamp.survey", "lamp.tips"].includes(x.spec)) {
       // Short-circuit for groups and CTests
-
       if (isDuplicated) {
         result = (await LAMP.Activity.create(x.studyID, x)) as any
         await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
@@ -722,7 +883,7 @@ export default function ActivityList({ researcher, title, ...props }) {
           //   photo: x?.photo ?? "",
           // })
         } else {
-          result = (await LAMP.Activity.update(x.id, { name: x.name, settings: x.settings })) as any
+          result = (await LAMP.Activity.update(x.id, { name: x.name, settings: x.settings ?? [] })) as any
           await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
             description: x.description,
             photo: x.photo,
@@ -779,6 +940,36 @@ export default function ActivityList({ researcher, title, ...props }) {
           variant: "error",
         })
       }
+    } else if (x.spec === "lamp.tips") {
+      if (x.id === undefined) {
+        let tipObj = {
+          id: x.id,
+          name: x.name,
+          icon: x.icon,
+          studyID: selectedActivity.parentID,
+          spec: "lamp.tips",
+          settings: selectedActivity.settings,
+          schedule: selectedActivity.schedule,
+        }
+        saveTipsActivity(tipObj)
+      } else {
+        let obj = {
+          settings: x.settings,
+        }
+        result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
+          icon: x.icon,
+        })
+        if (!!result.error)
+          enqueueSnackbar("Encountered an error: " + result?.error, {
+            variant: "error",
+          })
+        else
+          enqueueSnackbar("Successfully updated the Activity.", {
+            variant: "success",
+          })
+      }
+      onChange()
     }
     setSelectedActivity(undefined)
     setLoading(false)
@@ -793,6 +984,16 @@ export default function ActivityList({ researcher, title, ...props }) {
     all = all.map((el) => ({ ...el, parent: x.parent, parentID: x.parentID }))
     setActivities(all) // need to resave below to trigger detail panel correctly!
     setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
+  }
+
+  const setAllFalse = () => {
+    setCreate(false)
+    setGroupCreate(false)
+    setShowCTCreate(false)
+    setShowCreate(false)
+    setShowTipCreate(false)
+    setShowBreatheCreate(false)
+    setShowJournalCreate(false)
   }
 
   return (
@@ -810,7 +1011,13 @@ export default function ActivityList({ researcher, title, ...props }) {
               {
                 title: "Type",
                 field: "spec",
-                lookup: { "lamp.survey": "Survey", "lamp.group": "Group", "lamp.tips": "Tips" },
+                lookup: {
+                  "lamp.survey": "Survey",
+                  "lamp.group": "Group",
+                  "lamp.tips": "Tips",
+                  "lamp.journal": "Journal",
+                  "lamp.breathe": "Breathe",
+                },
                 emptyValue: "Cognitive Test",
               },
 
@@ -857,7 +1064,10 @@ export default function ActivityList({ researcher, title, ...props }) {
             ]}
             localization={{
               body: {
-                emptyDataSourceMessage: "No Activities. Add Activities by clicking the [+] button above.",
+                emptyDataSourceMessage: "",
+                // !loading && activities.length === 0
+                //   ? "No Activities. Add Activities by clicking the [+] button above."
+                //   : "",
                 editRow: {
                   deleteText: "Are you sure you want to delete this Activity?",
                 },
@@ -900,14 +1110,16 @@ export default function ActivityList({ researcher, title, ...props }) {
                     >
                       <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
-                    <Fab
-                      className={classes.btnImport}
-                      onClick={(event) => {
-                        setShowActivityImport(true)
-                      }}
-                    >
-                      <CloudUploadIcon />
-                    </Fab>
+                    <Tooltip title="Import">
+                      <Fab
+                        className={classes.btnImport}
+                        onClick={(event) => {
+                          setShowActivityImport(true)
+                        }}
+                      >
+                        <CloudUploadIcon />
+                      </Fab>
+                    </Tooltip>
                     <Fab
                       variant="extended"
                       color="primary"
@@ -1072,61 +1284,11 @@ export default function ActivityList({ researcher, title, ...props }) {
           <Box />
         )}
       </Popover>
-      <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
-        <Box
-          {...getRootProps()}
-          p={4}
-          bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-          color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
-        >
-          <input {...getInputProps()} />
-          <Typography variant="h6">Drag files here, or click to select files.</Typography>
-        </Box>
-      </Dialog>
-      <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
-        <MaterialTable
-          title="Continue importing?"
-          data={importFile || []}
-          columns={[{ title: "Activity Name", field: "name" }]}
-          options={{ search: false, selection: false }}
-          components={{ Container: (props) => <Box {...props} /> }}
-        />
-        <DialogActions>
-          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-            Cancel
-          </Button>
-          <Button onClick={importActivities} color="primary" autoFocus>
-            Import
-          </Button>
-        </DialogActions>
-      </Dialog>
 
-      <ResponsiveDialog
-        fullScreen
-        transient={false}
-        animate
-        open={!!createDialogue}
-        onClose={() => {
-          setCreate(false)
-          setGroupCreate(false)
-          setShowCTCreate(false)
-          setShowCreate(false)
-          setShowTipCreate(false)
-        }}
-      >
+      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={setAllFalse}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => {
-                setCreate(false)
-                setGroupCreate(false)
-                setShowCTCreate(false)
-                setShowCreate(false)
-                setShowTipCreate(false)
-              }}
-              color="default"
-              aria-label="Menu"
-            >
+            <IconButton onClick={setAllFalse} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">Create a new activity</Typography>
@@ -1138,11 +1300,33 @@ export default function ActivityList({ researcher, title, ...props }) {
           {!!showCTCreate && (
             <GameCreator onSave={saveCTest} activitySpecId={activitySpecId} studies={studies} activities={activities} />
           )}
-          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studyID={null} />}
+          {!!showJournalCreate && (
+            <JournalCreator
+              onSave={saveCTest}
+              activitySpecId={activitySpecId}
+              studies={studies}
+              activities={activities}
+            />
+          )}
+          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} allActivities={activities} />}
           {!!showCreate && <SurveyCreator studies={studies} onSave={saveActivity} />}
+          {!!showBreatheCreate && (
+            <BreatheCreator
+              activitySpecId={activitySpecId}
+              studies={studies}
+              onSave={saveCTest}
+              activities={activities}
+            />
+          )}
         </Box>
       </ResponsiveDialog>
-
+      <ImportActivity
+        studies={studies}
+        showActivityImport={showActivityImport}
+        setLoading={setLoading}
+        setShowActivityImport={setShowActivityImport}
+        importActivities={importActivities}
+      />
       <ResponsiveDialog
         fullScreen
         transient={false}
@@ -1156,7 +1340,7 @@ export default function ActivityList({ researcher, title, ...props }) {
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">
-              {!!selectedActivity ? "Modify an existing activity." : "Create a new activity."}
+              {!!selectedActivity ? "Modify an existing activity" : "Create a new activity"}
             </Typography>
           </Toolbar>
         </AppBar>
