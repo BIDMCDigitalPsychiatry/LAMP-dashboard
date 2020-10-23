@@ -140,6 +140,7 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: "#ECF4FF",
       border: "2px solid #FFFFFF",
       color: "#000000",
+      maxWidth: 250,
     },
     dataQuality: {
       margin: "4px 0",

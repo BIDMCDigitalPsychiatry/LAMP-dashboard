@@ -118,9 +118,7 @@ export default function TipNotification({ ...props }) {
     <Container maxWidth={false} className={classes.mainContainer}>
       <Box className={classes.header}>
         <Box width={1} className={classes.headerIcon}>
-          {!!props.icon ?
-            <img src={!!props.icon ? props.icon : undefined} alt={props.title} />
-          : "" }
+          {!!props.icon ? <img src={!!props.icon ? props.icon : undefined} alt={props.title} /> : ""}
         </Box>
         <Typography variant="caption">Tip</Typography>
         <Typography variant="h2">{props.title}</Typography>
@@ -128,9 +126,7 @@ export default function TipNotification({ ...props }) {
       <Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12}>
           <CardContent className={classes.tipscontentarea}>
-            {!!props.images ?
-              <img src={props.images} alt={props.title} />
-            : "" }
+            {!!props.images ? <img src={props.images} alt={props.title} /> : ""}
             <Typography variant="body2" color="textSecondary" component="p">
               {props.details}
             </Typography>
