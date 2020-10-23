@@ -1332,7 +1332,7 @@ export default function ActivityList({ researcher, title, ...props }) {
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">
-              {!!selectedActivity ? "Modify an existing activity." : "Create a new activity."}
+              {!!selectedActivity ? "Modify an existing activity" : "Create a new activity"}
             </Typography>
           </Toolbar>
         </AppBar>

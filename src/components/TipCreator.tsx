@@ -539,7 +539,7 @@ export default function TipCreator({
                           color="primary"
                           inputProps={{ "aria-label": "secondary checkbox" }}
                         />{" "}
-                        Duplicate ?
+                        Duplicate
                       </Box>
                     </Grid>
                     <Grid item xs sm={6} md={6} lg={4}>
