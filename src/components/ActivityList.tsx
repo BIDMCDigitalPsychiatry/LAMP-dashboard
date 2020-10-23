@@ -270,6 +270,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tableAccordian: { backgroundColor: "#f4f4f4" },
     errorMsg: { color: "#FF0000", fontSize: 12 },
+    dragDrop: {
+      outline: "none",
+      "& h6": {
+        color: "#7599FF",
+        fontSize: 14,
+      },
+    },
   })
 )
 
@@ -464,6 +471,7 @@ function ImportActivity({
             p={4}
             bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
             color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+            className={classes.dragDrop}
           >
             <input {...getInputProps()} />
 
@@ -585,7 +593,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   }
 
   const onChange = () => {
-    setAllFalse()
     refreshData()
     setState((state) => ({
       ...state,
@@ -1259,7 +1266,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                       ? setShowTipCreate(true)
                       : setShowSCImgCreate(true)
 
-                      setState((state) => ({ ...state, popoverAttachElement: null }))
+                    setState((state) => ({ ...state, popoverAttachElement: null }))
                   }}
                 >
                   {x?.name?.replace("lamp.", "")}

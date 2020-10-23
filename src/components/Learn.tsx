@@ -31,12 +31,14 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     cardlabel: {
       fontSize: 16,
+      lineHeight: "18px",
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
       width: "100%",
       [theme.breakpoints.up("lg")]: {
         fontSize: 18,
+        lineHeight: "22px",
       },
     },
     header: {
@@ -126,8 +128,8 @@ const useStyles = makeStyles((theme: Theme) =>
           height: 100,
         },
         [theme.breakpoints.up("lg")]: {
-          width: 150,
-          height: 150,
+          width: 140,
+          height: 140,
         },
       },
       [theme.breakpoints.up("lg")]: {

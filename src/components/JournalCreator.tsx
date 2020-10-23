@@ -114,6 +114,7 @@ export default function GameCreator({
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
+
   const validate = () => {
     let duplicates = []
     if (typeof text !== "undefined" && text?.trim() !== "") {
