@@ -172,7 +172,6 @@ export default function TipCreator({
       } else {
         setSelectedCategory({})
         setTipsDataArray([{ title: "", link: "", text: "", image: "", author: "" }])
-        setCategoryImage("")
       }
       setLoading(false)
     })()
