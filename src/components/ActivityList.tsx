@@ -585,6 +585,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   }
 
   const onChange = () => {
+    setAllFalse()
     refreshData()
     setState((state) => ({
       ...state,
