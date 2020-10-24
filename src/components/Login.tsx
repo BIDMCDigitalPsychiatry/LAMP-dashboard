@@ -261,6 +261,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   >
                     Try it
                   </Link>
+                  <br/>
+                  <Link
+                    underline="none"
+                    className={classes.linkBlue}
+                    onClick={(event) => window.location.href="https://www.digitalpsych.org/studies.html"}
+                  >
+                    Research studies using mindLAMP
+                  </Link>
                   <Menu
                     keepMounted
                     open={Boolean(tryitMenu)}

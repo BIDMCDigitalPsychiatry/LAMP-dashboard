@@ -197,23 +197,27 @@ export default function Manage({ participant, activities, ...props }) {
     setSavedActivities(gActivities)
   }, [])
 
-  useEffect(() => {
-    setLoading(true)
-    ;(async () => {
-      let tags = []
-      let images = await savedActivities.map((activity, index) => {
-        ;(async () => {
-          tags[activity.id] = await getImage(activity.id)
-          setTag(tags)
-          if (index === savedActivities.length - 1) {
-            setLoading(false)
+  useEffect(() => {   
+    if(savedActivities.length > 0) {
+      setLoading(true)
+      ;(async () => {
+        let tags = []
+        let images = await savedActivities.map((activity, index) => {
+          ;(async () => {
+            tags[activity.id] = await getImage(activity.id)
             setTag(tags)
-            return tags
-          }
-        })()
-      })
-      setTag(images)
-    })()
+            if (index === savedActivities.length - 1) {
+              setLoading(false)
+              setTag(tags)
+              return tags
+            }
+          })()
+        })
+        setTag(images)
+      })()
+    } else {
+      setLoading(false)
+    }
   }, [savedActivities])
 
   const handleClickOpen = (type: string) => {
