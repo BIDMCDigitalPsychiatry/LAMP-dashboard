@@ -129,6 +129,7 @@ export default function TipNotification({ ...props }) {
             <Typography variant="body2" color="textSecondary" component="p">
               {props.details}
             </Typography>
+            <Typography variant="subtitle2">{props.author}</Typography>            
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
                 <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>
