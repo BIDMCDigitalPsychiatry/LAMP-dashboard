@@ -45,6 +45,7 @@ import JournalCreator from "./JournalCreator"
 
 import GroupCreator from "./GroupCreator"
 import TipCreator from "./TipCreator"
+import DBTCreator from "./DBTCreator"
 import GameCreator from "./GameCreator"
 import BreatheCreator from "./BreatheCreator"
 import ActivityScheduler from "./ActivityScheduler"
@@ -97,13 +98,13 @@ const theme = createMuiTheme({
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {
-      minHeight: 65,
+      minHeight: 100,
       padding: "0 10px",
       "& h5": {
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "left",
         fontWeight: "600",
-        fontSize: 18,
+        fontSize: 30,
         width: "calc(100% - 96px)",
       },
     },
@@ -393,7 +394,9 @@ const availableAtiveSpecs = [
   "lamp.tips",
   "lamp.cats_and_dogs",
   // "lamp.scratch_image",
+  "lamp.dbt_diary_card",
 ]
+
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
 function ImportActivity({
@@ -525,6 +528,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const [showJournalCreate, setShowJournalCreate] = useState(false)
   const [showBreatheCreate, setShowBreatheCreate] = useState(false)
   const [showSCImgCreate, setShowSCImgCreate] = useState(false)
+  const [showDBTCreate, setShowDBTCreate] = useState(false)
   const [showActivityImport, setShowActivityImport] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<any>()
   const [activitySpecId, setActivitySpecId] = useState(null)
@@ -594,6 +598,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   const onChange = () => {
     refreshData()
+    setAllFalse()
     setState((state) => ({
       ...state,
       popoverAttachElement: null,
@@ -798,10 +803,12 @@ export default function ActivityList({ researcher, title, ...props }) {
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
-    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
-      description: x.description,
-      photo: x.photo,
-    })
+    if (x.spec !== "lamp.dbt_diary_card") {
+      await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
+        description: x.description,
+        photo: x.photo,
+      })
+    }
     enqueueSnackbar("Successfully created a new  Activity.", {
       variant: "success",
     })
@@ -839,23 +846,17 @@ export default function ActivityList({ researcher, title, ...props }) {
       )[0]
       const activity = spliceActivity({ raw, tag })
       setSelectedActivity(activity)
-    } else if (raw.spec === "lamp.group") {
+    } else if (raw.spec === "lamp.group" || raw.spec === "lamp.dbt_diary_card") {
       setSelectedActivity(raw)
     } else if (raw.spec === "lamp.tips") {
       setSelectedActivity(raw)
-    } else if (games.includes(raw.spec) || raw.spec === "lamp.journal") {
+    } else if (games.includes(raw.spec) || raw.spec === "lamp.journal" || raw.spec === "lamp.breathe") {
       let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
       setGameDetails(tag)
       setSelectedActivity(raw)
-    } else if (raw.spec === "lamp.breathe") {
-      let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
-        !!y.error ? undefined : y.data
-      )[0]
-      setGameDetails(tag)
-      setSelectedActivity(raw)
-    } //else setSelectedActivity(raw) // FIXME
+    }
     setLoading(false)
   }
 
@@ -900,17 +901,11 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
         onChange()
       }
-    } else if (x.spec === "lamp.group") {
-      //
-      if (selectedActivity.parentID !== x.studyID) {
-        await LAMP.Activity.delete(x.id)
-
-        result = (await LAMP.Activity.create(x.studyID, x)) as any
-      } else {
-        result = (await LAMP.Activity.update(selectedActivity.id, {
-          settings: x.settings,
-        })) as any
-      }
+    } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
+      result = (await LAMP.Activity.update(selectedActivity.id, {
+        name: x.name,
+        settings: x.settings,
+      })) as any
       if (!!result.error)
         enqueueSnackbar("Encountered an error: " + result?.error, {
           variant: "error",
@@ -994,8 +989,8 @@ export default function ActivityList({ researcher, title, ...props }) {
     setShowTipCreate(false)
     setShowBreatheCreate(false)
     setShowJournalCreate(false)
+    setShowDBTCreate(false)
   }
-
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -1017,6 +1012,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                   "lamp.tips": "Tips",
                   "lamp.journal": "Journal",
                   "lamp.breathe": "Breathe",
+                  "lamp.dbt_diary_card": "DBT diary card",
                 },
                 emptyValue: "Cognitive Test",
               },
@@ -1110,7 +1106,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                     >
                       <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
-                    <Tooltip title="Import">
+                    {/* <Tooltip title="Import">
                       <Fab
                         className={classes.btnImport}
                         onClick={(event) => {
@@ -1119,7 +1115,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                       >
                         <CloudUploadIcon />
                       </Fab>
-                    </Tooltip>
+                    </Tooltip> */}
                     <Fab
                       variant="extended"
                       color="primary"
@@ -1221,6 +1217,21 @@ export default function ActivityList({ researcher, title, ...props }) {
           </React.Fragment>
         ) : state.selectedIcon === "add" ? (
           <React.Fragment>
+            <MenuItem
+              onClick={() => {
+                setShowActivityImport(true)
+              }}
+            >
+              <Grid container style={{ marginLeft: "-15px" }}>
+                <Grid item xs={2} style={{ textAlign: "center" }}>
+                  <CloudUploadIcon />
+                </Grid>
+                <Grid item xs={10}>
+                  Import activities
+                </Grid>
+              </Grid>
+            </MenuItem>
+            <Divider />
             <MenuItem disabled divider>
               <b>Create a new...</b>
             </MenuItem>
@@ -1264,6 +1275,8 @@ export default function ActivityList({ researcher, title, ...props }) {
                       ? setShowBreatheCreate(true)
                       : x.id === "lamp.tips"
                       ? setShowTipCreate(true)
+                      : x.id === "lamp.dbt_diary_card"
+                      ? setShowDBTCreate(true)
                       : setShowSCImgCreate(true)
 
                     setState((state) => ({ ...state, popoverAttachElement: null }))
@@ -1318,6 +1331,15 @@ export default function ActivityList({ researcher, title, ...props }) {
               activities={activities}
             />
           )}
+          {!!showDBTCreate && (
+            <DBTCreator
+              activitySpecId={activitySpecId}
+              onCancel={setAllFalse}
+              studies={studies}
+              onSave={saveCTest}
+              activities={activities}
+            />
+          )}
         </Box>
       </ResponsiveDialog>
       <ImportActivity
@@ -1353,6 +1375,7 @@ export default function ActivityList({ researcher, title, ...props }) {
             onSave={updateActivity}
             details={gameDetails}
             studies={studies}
+            onCancel={setAllFalse}
           />
         </Box>
       </ResponsiveDialog>

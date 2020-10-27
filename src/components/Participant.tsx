@@ -313,7 +313,7 @@ export default function Participant({
       else hideEvent() // trigger a reload of dependent components anyway
     })
   }
-  
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -398,6 +398,7 @@ export default function Participant({
         <BottomMenu
           activeTab={activeTab}
           tabValue={tab}
+          participant={participant}
           showWelcome={openDialog}
           setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
         />

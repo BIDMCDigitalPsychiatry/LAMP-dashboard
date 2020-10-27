@@ -197,8 +197,8 @@ export default function Manage({ participant, activities, ...props }) {
     setSavedActivities(gActivities)
   }, [])
 
-  useEffect(() => {   
-    if(savedActivities.length > 0) {
+  useEffect(() => {
+    if (savedActivities.length > 0) {
       setLoading(true)
       ;(async () => {
         let tags = []

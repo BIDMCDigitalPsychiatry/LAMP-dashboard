@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Container,
   Typography,
@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj, ActivityEvent } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
@@ -24,11 +24,32 @@ import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
 import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
+import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 import { useSnackbar } from "notistack"
-
+import { DatePicker } from "@material-ui/pickers"
+const theme = createMuiTheme({
+  overrides: {
+    MuiInput: {
+      root: { width: "100%" },
+      underline: {
+        "&&&:before": {
+          borderBottom: "none",
+        },
+        "&&:after": {
+          borderBottom: "none",
+        },
+      },
+    },
+    MuiToolbar: {
+      root: { backgroundColor: "#38C396 !important" },
+    },
+    MuiButtonBase: {
+      root: {},
+    },
+  },
+})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -136,6 +157,10 @@ const useStyles = makeStyles((theme: Theme) =>
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    calendatInput: {
+      width: "100%",
+      "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+    },
   })
 )
 
@@ -156,6 +181,45 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const [openData, setOpenData] = React.useState(false)
   const [surveyType, setSurveyType] = useState(null)
   const [questionCount, setQuestionCount] = useState(0)
+  const [selectedDate, handleDateChange] = useState(new Date())
+  const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
+  const [iFrame, setIframe] = useState(null)
+  const [spec, setSpec] = useState(null)
+  const [dbtSettings, setDBTSettings] = useState({
+    livingGoal: "Test",
+    targetEffective: [
+      { target: "Test", measure: "Hours" },
+      { target: "Test 1", measure: "Times" },
+    ],
+    targetIneffective: [
+      { id: "Test_3_0", target: "Test 3", measure: "Hours" },
+      { id: "Test_4_1", target: "Test 4", measure: "Hours" },
+    ],
+    emotions: [
+      { id: "Test_5_6", emotion: "Test 5" },
+      { id: "Test_6_6", emotion: "Test 6" },
+    ],
+  })
+
+  useEffect(() => {
+    if (iFrame != null) {
+      iFrame.onload = function () {
+        console.log(dbtSettings)
+        iFrame.contentWindow.postMessage(dbtSettings, "*")
+      }
+    }
+  }, [iFrame])
+
+  const dbtHTML = () => {
+    ;(async () => {
+      let response = await fetch(`DBT.html.b64`)
+      console.log("sdf")
+      setEmbeddedActivity(atob(await response.text()))
+      //setLoading(false)
+      setOpenData(true)
+      setOpen(false)
+    })()
+  }
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -167,12 +231,24 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
     onComplete(response)
   }
 
+  var date = new Date()
+  date.setDate(date.getDate() - 21)
+
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const formattedDate = year + "-" + month + "-" + day
+
   return (
     <Container className={classes.thumbContainer}>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
-            .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+            .filter(
+              (x) =>
+                x.spec === "lamp.dbt_diary_card" ||
+                (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+            )
             .map((y) => (
               <Grid
                 item
@@ -181,8 +257,14 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 md={3}
                 lg={3}
                 onClick={() => {
-                  setVisibleActivities([y])
-                  setQuestionCount(y.settings.length)
+                  setSpec(y.spec)
+                  if (y.spec === "lamp.dbt_diary_card") {
+                    setDBTSettings(y.settings)
+                    setOpenData(true)
+                  } else {
+                    setVisibleActivities([y])
+                    setQuestionCount(y.settings.length)
+                  }
                   handleClickOpen(y.name)
                 }}
                 className={classes.thumbMain}
@@ -190,6 +272,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 <ButtonBase focusRipple className={classes.fullwidthBtn}>
                   <Card className={classes.assess}>
                     <Box mt={1} mb={1}>
+                      {y.spec === "lamp.dbt_diary_card" && <AssessDbt />}
                       {y.name === "Mood" && <AssessMood />}
                       {y.name === "Sleep and Social" && <AssessSleep />}
                       {y.name === "Anxiety" && <AssessAnxiety />}
@@ -222,6 +305,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
+            {dialogueType === "DBT Diary Card" && <AssessDbt className={classes.topicon} />}
             {dialogueType === "Mood" && <AssessMood className={classes.topicon} />}
             {dialogueType === "Sleep and Social" && <AssessSleep className={classes.topicon} />}
             {dialogueType === "Anxiety" && <AssessAnxiety className={classes.topicon} />}
@@ -240,14 +324,35 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             The following survey will assess your sleep and social behavior. For each of the statements, rate which is
             true for you.
           </Typography>
+          {spec === "lamp.dbt_diary_card" && (
+            <Box mt={5}>
+              <MuiThemeProvider theme={theme}>
+                <React.Fragment>
+                  <DatePicker
+                    className={classes.calendatInput}
+                    autoOk
+                    format="MMMM d, yyyy "
+                    minDate={formattedDate}
+                    disableFuture
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                  />
+                </React.Fragment>
+              </MuiThemeProvider>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               onClick={() => {
-                setOpenData(true)
-                setOpen(false)
-                setSurveyType(dialogueType.replace(/\s/g, "_"))
+                if (spec !== "lamp.dbt_diary_card") {
+                  setSurveyType(dialogueType.replace(/\s/g, "_"))
+                  setOpenData(true)
+                  setOpen(false)
+                } else {
+                  dbtHTML()
+                }
               }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
@@ -267,14 +372,28 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           setOpenData(false)
         }}
       >
-        <SurveyInstrument
-          id={id}
-          type={dialogueType}
-          fromPrevent={false}
-          group={visibleActivities}
-          setVisibleActivities={setVisibleActivities}
-          onComplete={submitSurveyType}
-        />
+        {embeddedActivity !== "" && (
+          <iframe
+            ref={(e) => {
+              setIframe(e)
+            }}
+            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
+            sandbox="allow-scripts"
+            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
+            srcDoc={embeddedActivity}
+          />
+        )}
+
+        {spec !== "lamp.dbt_diary_card" && (
+          <SurveyInstrument
+            id={id}
+            type={dialogueType}
+            fromPrevent={false}
+            group={visibleActivities}
+            setVisibleActivities={setVisibleActivities}
+            onComplete={submitSurveyType}
+          />
+        )}
       </ResponsiveDialog>
     </Container>
   )

@@ -262,13 +262,26 @@ export default function BottomMenu({ ...props }) {
   const [tabVal, _setTab] = useState(props.tabValue)
   const [viewedTabs, setViewedTabs] = useState([1])
 
-  const [openTabs, setOpenTabs] = useState([
-    props.tabValue === 0 ? true : false,
-    props.tabValue === 1 ? true : false,
-    props.tabValue === 2 ? true : false,
-    props.tabValue === 3 ? true : false,
-    props.tabValue === 4 ? true : false,
-  ])
+  const [openTabs, setOpenTabs] = useState(
+    !!localStorage.getItem("bottom-menu-tabs" + props.participant.id)
+      ? JSON.parse(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
+      : [
+          props.tabValue === 0 ? true : false,
+          props.tabValue === 1 ? true : false,
+          props.tabValue === 2 ? true : false,
+          props.tabValue === 3 ? true : false,
+          props.tabValue === 4 ? true : false,
+        ]
+  )
+
+  useEffect(() => {
+    console.log(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
+  }, [])
+
+  useEffect(() => {
+    console.log(openTabs, localStorage.getItem("bottom-menu-tabs" + props.participant.id))
+    localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(openTabs))
+  }, [openTabs])
 
   const setTab = (newTab) => {
     _setTab(newTab)
