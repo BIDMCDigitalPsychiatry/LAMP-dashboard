@@ -126,8 +126,7 @@ export default function LearnTips({ ...props }) {
   const [title, setTitle] = useState(null)
   const [details, setDetails] = useState(null)
   const [images, setImages] = useState(null)
-  const [author, setAuthor] = useState(null)
-  const [link, setLink] = useState(null)
+  
 
   return (
     <Container>
@@ -144,8 +143,6 @@ export default function LearnTips({ ...props }) {
                         setTitle(detail.title)
                         setDetails(detail.text)
                         setImages(detail.image)
-                        setAuthor(detail.author)
-                        setLink(detail.link)
                       }}
                     >
                       <div>
@@ -186,8 +183,6 @@ export default function LearnTips({ ...props }) {
           details={details}
           icon={props.icon}
           images={images}
-          author={author}
-          link={link}
           onComplete={() => {
             setOpenDialog(false)
           }}
