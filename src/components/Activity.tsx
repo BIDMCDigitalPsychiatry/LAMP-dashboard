@@ -11,7 +11,22 @@ import DBTCreator from "./DBTCreator"
 
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
-export default function Activity({ allActivities, activity, onSave, onCancel, details, studies, ...props }) {
+export default function Activity({
+  allActivities,
+  activity,
+  onSave,
+  onCancel,
+  details,
+  studies,
+  ...props
+}: {
+  allActivities?: any
+  activity?: any
+  onSave?: any
+  onCancel?: any
+  details?: any
+  studies?: any
+}) {
   const isTip = (activity || {}).spec === "lamp.tips"
   const isGroup = (activity || {}).spec === "lamp.group"
   const isSurvey = (activity || {}).spec === "lamp.survey"
@@ -23,7 +38,7 @@ export default function Activity({ allActivities, activity, onSave, onCancel, de
   return (
     <div>
       {isGroup && <GroupCreator activities={allActivities} value={activity} onSave={onSave} studies={studies} />}
-      {isTip && <TipCreator activities={activity} onSave={onSave} studies={studies} allActivities={allActivities}/>}
+      {isTip && <TipCreator activities={activity} onSave={onSave} studies={studies} allActivities={allActivities} />}
       {isSurvey && <SurveyCreator value={activity} onSave={onSave} studies={studies} />}
       {isGames && (
         <GameCreator value={activity} onSave={onSave} details={details} activities={allActivities} studies={studies} />

@@ -578,10 +578,13 @@ export default function ActivityList({ researcher, title, ...props }) {
   }, [selected])
 
   const refreshData = () => {
+    setLoading(true)
     let activityData = []
     let counts = studiesCount
+    let index = 0
     studies.map((study) => {
       ;(async () => {
+        setLoading(true)
         await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
           counts[study.name] = resActivities.length
           if (selected !== null && selected.includes(study.name)) {
@@ -591,7 +594,11 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
         setStudiesCount(counts)
         setActivities(activityData)
-        setLoading(false)
+        console.log(index, studies.length)
+        if (index === studies.length - 1) {
+          setLoading(false)
+        }
+        index++
       })()
     })
   }
@@ -802,6 +809,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
+    setLoading(true)
     let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
     if (x.spec !== "lamp.dbt_diary_card") {
       await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
@@ -834,7 +842,6 @@ export default function ActivityList({ researcher, title, ...props }) {
       variant: "success",
     })
     onChange()
-    setLoading(false)
   }
 
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
@@ -862,6 +869,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
+    setLoading(true)
     let result
     setLoading(true)
     if (!["lamp.group", "lamp.survey", "lamp.tips"].includes(x.spec)) {
@@ -967,7 +975,6 @@ export default function ActivityList({ researcher, title, ...props }) {
       onChange()
     }
     setSelectedActivity(undefined)
-    setLoading(false)
   }
 
   //
@@ -990,6 +997,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     setShowBreatheCreate(false)
     setShowJournalCreate(false)
     setShowDBTCreate(false)
+    setSelectedActivity(undefined)
   }
   return (
     <React.Fragment>
@@ -1371,7 +1379,6 @@ export default function ActivityList({ researcher, title, ...props }) {
           <Activity
             allActivities={activities}
             activity={selectedActivity}
-            studyID={null}
             onSave={updateActivity}
             details={gameDetails}
             studies={studies}

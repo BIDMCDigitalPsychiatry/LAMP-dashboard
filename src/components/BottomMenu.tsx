@@ -275,6 +275,7 @@ export default function BottomMenu({ ...props }) {
   )
 
   useEffect(() => {
+    console.log(props.participant.id)
     console.log(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
   }, [])
 
