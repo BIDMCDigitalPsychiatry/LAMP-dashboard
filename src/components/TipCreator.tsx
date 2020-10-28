@@ -293,12 +293,6 @@ export default function TipCreator({
       reader.onloadend = () => {
         cb(reader.result)
       }
-    } 
-    reader.onerror = function (error) {
-      console.log("Error: ", error)
-      enqueueSnackbar("An error occured while uploading. Please try again.", {
-        variant: "error",
-      })
     }
     reader.onerror = function (error) {
       console.log("Error: ", error)

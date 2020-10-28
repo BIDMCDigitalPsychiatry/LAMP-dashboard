@@ -353,7 +353,7 @@ export default function GameCreator({
               error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
               id="filled-select-currency"
               select
-              label="Select"
+              label="Study"
               className={classes.inputWidth}
               value={studyId}
               onChange={(e) => setStudyId(e.target.value)}

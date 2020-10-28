@@ -313,7 +313,7 @@ export default function Participant({
       else hideEvent() // trigger a reload of dependent components anyway
     })
   }
-  
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
