@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Typography,
@@ -230,6 +230,10 @@ export default function GameCreator({
   const [config, setConfig] = useState(!!value ? value?.settings : {})
   const [text, setText] = useState(!!value ? value.name : undefined)
   const { enqueueSnackbar } = useSnackbar()
+
+  useEffect(() => {
+    setConfig(!!value ? value?.settings : {})
+  }, [])
 
   const openTargetDialog = (type) => {
     setTargetDialog(type)

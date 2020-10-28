@@ -998,6 +998,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     setShowJournalCreate(false)
     setShowDBTCreate(false)
     setSelectedActivity(undefined)
+    refreshData()
   }
   return (
     <React.Fragment>
