@@ -1,11 +1,9 @@
 // Core Imports
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState } from "react"
 import {
   Box,
-  Tooltip,
   Typography,
   Grid,
-  Fab,
   Button,
   MenuItem,
   Icon,
@@ -15,12 +13,9 @@ import {
   InputBase,
   Container,
 } from "@material-ui/core"
-import { useDropzone } from "react-dropzone"
-import { makeStyles, Theme, createStyles, withStyles, MuiThemeProvider } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import Jewels from "../icons/Jewels.svg"
 import { TargetDialog, EmotionDialog } from "./Dialog"
-import ArrowBack from "@material-ui/icons/ArrowBack"
 import Close from "@material-ui/icons/Close"
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 const CssTextField = withStyles({
@@ -235,7 +230,7 @@ export default function GameCreator({
   const [config, setConfig] = useState(!!value ? value?.settings : {})
   const [text, setText] = useState(!!value ? value.name : undefined)
   const { enqueueSnackbar } = useSnackbar()
-  console.log(value)
+
   const openTargetDialog = (type) => {
     setTargetDialog(type)
   }
@@ -534,7 +529,13 @@ export default function GameCreator({
               >
                 <Typography className={classes.buttonText}>Save</Typography>
               </Button>
-              <Button className={classes.backContainer} onClick={onCancel}>
+              <Button
+                className={classes.backContainer}
+                onClick={() => {
+                  setConfig(!!value ? value?.settings : {})
+                  onCancel()
+                }}
+              >
                 <Typography className={classes.backText}>Cancel</Typography>
               </Button>
             </div>
