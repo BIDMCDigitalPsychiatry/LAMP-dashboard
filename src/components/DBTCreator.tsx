@@ -281,7 +281,7 @@ export default function GameCreator({
 
   const removeTarget = (type, index) => {
     if (type === "effective") {
-      let targets = config?.targetIneffective ?? []
+      let targets = config?.targetEffective ?? []
       targets.splice(index, 1)
       setConfig({ ...config, targetEffective: targets })
     } else {
@@ -361,6 +361,7 @@ export default function GameCreator({
                 typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
               }
               variant="filled"
+              disabled={!!value ? true : false}
             >
               {studies.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
@@ -394,7 +395,7 @@ export default function GameCreator({
                     <CssTextField
                       defaultValue={config?.livingGoal ?? ""}
                       onChange={(event) => setConfig({ ...config, livingGoal: event.target.value })}
-                      inputProps={{ disableunderline: "true" }}
+                      inputProps={{ disableunderline: "true", maxLength: 300 }}
                       multiline
                       rows={4}
                     />

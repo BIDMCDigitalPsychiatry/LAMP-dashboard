@@ -242,7 +242,7 @@ export function EmotionDialog({ ...props }) {
       open={dialogOpen}
     >
       <div>
-        <Typography className={classes.dialogTitle}>Add a emotion</Typography>
+        <Typography className={classes.dialogTitle}>Add an emotion</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
