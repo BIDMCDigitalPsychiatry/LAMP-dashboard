@@ -235,7 +235,12 @@ export function EmotionDialog({ ...props }) {
   }
 
   return (
-    <Dialog onClose={handleClose} aria-labelledby="simple-dialog-title" open={dialogOpen}>
+    <Dialog
+      classes={{ paper: classes.popWidth }}
+      onClose={handleClose}
+      aria-labelledby="simple-dialog-title"
+      open={dialogOpen}
+    >
       <div>
         <Typography className={classes.dialogTitle}>Add a emotion</Typography>
         <div className={classes.inputContainer}>
@@ -248,9 +253,11 @@ export function EmotionDialog({ ...props }) {
             />
           </div>
         </div>
-        <Button onClick={handleClose} className={classes.headerButton}>
-          <Typography className={classes.buttonText}>Add</Typography>
-        </Button>
+        <Box textAlign="center" mt={2}>
+          <Button onClick={handleClose} className={classes.headerButton}>
+            <Typography className={classes.buttonText}>Add</Typography>
+          </Button>
+        </Box>
       </div>
     </Dialog>
   )
