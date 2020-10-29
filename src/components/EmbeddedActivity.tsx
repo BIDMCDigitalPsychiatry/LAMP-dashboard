@@ -21,13 +21,14 @@ const demoActivities = {
   "lamp.jewels_a": "jewels",
   "lamp.jewels_b": "jewelspro",
   "Pop The Bubbles": "popthebubbles",
+  "lamp.dbt_diary_card": "dbtdiarycard",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
-  const [gameSettings, setGameSettings] = useState(null)
+  const [settings, setSettings] = useState(null)
   const [activityId, setActivityId] = useState(null)
   const [saved, setSaved] = useState(false)
   const [data, setData] = useState(null)
@@ -40,7 +41,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
-        iFrame.contentWindow.postMessage(gameSettings, "*")
+        iFrame.contentWindow.postMessage(settings, "*")
       }
     }
   }, [iFrame])
@@ -58,7 +59,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           data["activity"] = activityId
           setData(data)
           setEmbeddedActivity(undefined)
-          setGameSettings(null)
+          setSettings(null)
           setActivityId(null)
         }
       },
@@ -68,27 +69,29 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
-      LAMP.ActivityEvent.create(participant.id, data)
-        .catch((e) => console.dir(e))
-        .then((x) => {
-          setSaved(true)
-          onComplete()
-        })
+      if (activity.spec === "lamp.dbt_diary_card") {
+        setSaved(true)
+        onComplete()
+      } else {
+        LAMP.ActivityEvent.create(participant.id, data)
+          .catch((e) => console.dir(e))
+          .then((x) => {
+            setSaved(true)
+            onComplete()
+          })
+      }
     }
   }, [embeddedActivity])
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
-    setGameSettings(activity.settings)
+    setSettings(activity.settings)
     setSaved(false)
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]
       }.html.b64`
     )
-    // let response = await fetch(
-    //   `${id}.html.b64`
-    // )
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

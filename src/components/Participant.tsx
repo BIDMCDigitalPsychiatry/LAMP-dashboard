@@ -285,7 +285,11 @@ export default function Participant({
   const submitSurvey = (response, overwritingTimestamp) => {
     setLoading(true)
     if (response === null) {
-      setLoading(false)
+      getEvents(participant, visibleActivities[0].id).then((steak) => {
+        setSteak(steak)
+        setOpenComplete(true)
+        setLoading(false)
+      })
       setVisibleActivities([])
     } else {
       let events = response.map((x, idx) => ({
@@ -333,7 +337,7 @@ export default function Participant({
         <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>
             <Survey
-              id={participant.id}
+              participant={participant}
               activities={activities}
               visibleActivities={visibleActivities}
               onComplete={submitSurvey}

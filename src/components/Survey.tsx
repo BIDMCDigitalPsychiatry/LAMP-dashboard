@@ -17,8 +17,8 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import LAMP, { Participant as ParticipantObj, ActivityEvent } from "lamp-core"
+import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import LAMP from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
 import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
@@ -29,8 +29,9 @@ import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
-import { useSnackbar } from "notistack"
 import { DatePicker } from "@material-ui/pickers"
+import EmbeddedActivity from "./EmbeddedActivity"
+
 const theme = createMuiTheme({
   overrides: {
     MuiInput: {
@@ -180,84 +181,22 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
-export default function Survey({ id, activities, visibleActivities, setVisibleActivities, onComplete, ...props }) {
+export default function Survey({
+  participant,
+  activities,
+  visibleActivities,
+  setVisibleActivities,
+  onComplete,
+  ...props
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
-  const [surveyType, setSurveyType] = useState(null)
   const [questionCount, setQuestionCount] = useState(0)
-  const [selectedDate, handleDateChange] = useState(new Date())
-  const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
-  const [iFrame, setIframe] = useState(null)
   const [spec, setSpec] = useState(null)
-  const [activityId, setActivityId] = useState(null)
-  const [saved, setSaved] = useState(false)
+  const [activity, setActivity] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [data, setData] = useState(null)
-  const [dbtSettings, setDBTSettings] = useState({
-    livingGoal: "Test",
-    targetEffective: [
-      { target: "Test", measure: "Hours" },
-      { target: "Test 1", measure: "Times" },
-    ],
-    targetIneffective: [
-      { id: "Test_3_0", target: "Test 3", measure: "Hours" },
-      { id: "Test_4_1", target: "Test 4", measure: "Hours" },
-    ],
-    emotions: [
-      { id: "Test_5_6", emotion: "Test 5" },
-      { id: "Test_6_6", emotion: "Test 6" },
-    ],
-  })
-
-  useEffect(() => {
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
-    var eventer = window[eventMethod]
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
-    // Listen to message from child window
-    eventer(
-      messageEvent,
-      function (e) {
-        if (!saved && activityId !== null) {
-          let data = JSON.parse(e.data)
-          data["activity"] = activityId
-          setData(data)
-          setEmbeddedActivity(undefined)
-          setDBTSettings(null)
-          setActivityId(null)
-        }
-      },
-      false
-    )
-  }, [activityId])
-
-  useEffect(() => {
-    if (data !== null && !saved) {
-      // LAMP.ActivityEvent.create(id, data)
-      //   .catch((e) => console.dir(e))
-      //   .then((x) => {
-          setSaved(true)
-          setOpenData(false)
-          onComplete(null)
-        // })
-    }
-  }, [data])
-
-  useEffect(() => {
-    if (iFrame != null) {
-      iFrame.onload = function () {
-        iFrame.contentWindow.postMessage(dbtSettings, "*")
-      }
-    }
-  }, [iFrame])
-
-  const dbtHTML = () => {
-    ;(async () => {
-      let response = await fetch(`https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/DBT.html.b64`)
-      setEmbeddedActivity(atob(await response.text()))
-    })()
-  }
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -269,13 +208,13 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
     onComplete(response)
   }
 
-  var date = new Date()
-  date.setDate(date.getDate() - 21)
+  // var date = new Date()
+  // date.setDate(date.getDate() - 21)
 
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-  const formattedDate = year + "-" + month + "-" + day
+  // const year = date.getFullYear()
+  // const month = date.getMonth() + 1
+  // const day = date.getDate()
+  // const formattedDate = year + "-" + month + "-" + day
 
   return (
     <Container className={classes.thumbContainer}>
@@ -300,16 +239,12 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 onClick={() => {
                   setSpec(y.spec)
                   if (y.spec === "lamp.dbt_diary_card") {
-                    setActivityId(y.id)
-                    setLoading(true)
-                    setQuestionCount(6)
-                    dbtHTML()
-                    setDBTSettings(y.settings)
+                    setActivity(y)
                     setOpen(true)
                   } else {
-                    setVisibleActivities([y])
                     setQuestionCount(y.settings.length)
                   }
+                  setVisibleActivities([y])
                   handleClickOpen(y.name)
                 }}
                 className={classes.thumbMain}
@@ -394,7 +329,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <Link
               onClick={() => {
                 if (spec !== "lamp.dbt_diary_card") {
-                  setSurveyType(dialogueType.replace(/\s/g, "_"))
                   setOpenData(true)
                   setOpen(false)
                 } else {
@@ -421,21 +355,21 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           setOpenData(false)
         }}
       >
-        {embeddedActivity !== "" && (
-          <iframe
-            ref={(e) => {
-              setIframe(e)
+        {spec === "lamp.dbt_diary_card" && (
+          <EmbeddedActivity
+            name={activity?.name ?? ""}
+            activity={activity ?? []}
+            participant={participant}
+            onComplete={() => {
+              setOpenData(false)
+              onComplete(null)
             }}
-            style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-            sandbox="allow-scripts"
-            allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
-            srcDoc={embeddedActivity}
           />
         )}
 
         {spec !== "lamp.dbt_diary_card" && (
           <SurveyInstrument
-            id={id}
+            id={participant.id}
             type={dialogueType}
             fromPrevent={false}
             group={visibleActivities}
