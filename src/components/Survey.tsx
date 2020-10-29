@@ -254,7 +254,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
 
   const dbtHTML = () => {
     ;(async () => {
-      let response = await fetch(`DBT.html.b64`)
+      let response = await fetch(`https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/DBT.html.b64`)
       setEmbeddedActivity(atob(await response.text()))
     })()
   }
