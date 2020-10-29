@@ -234,13 +234,13 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
 
   useEffect(() => {
     if (data !== null && !saved) {
-      LAMP.ActivityEvent.create(id, data)
-        .catch((e) => console.dir(e))
-        .then((x) => {
+      // LAMP.ActivityEvent.create(id, data)
+      //   .catch((e) => console.dir(e))
+      //   .then((x) => {
           setSaved(true)
           setOpenData(false)
           onComplete(null)
-        })
+        // })
     }
   }, [data])
 
