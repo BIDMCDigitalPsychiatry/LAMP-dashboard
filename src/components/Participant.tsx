@@ -284,34 +284,39 @@ export default function Participant({
 
   const submitSurvey = (response, overwritingTimestamp) => {
     setLoading(true)
-    let events = response.map((x, idx) => ({
-      timestamp: new Date().getTime(),
-      duration: response.duration,
-      activity: visibleActivities[idx].id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: y.duration,
-      })),
-    }))
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
-    ).then((x) => {
-      getEvents(participant, visibleActivities[0].id).then((steak) => {
-        setSteak(steak)
-        setOpenComplete(true)
-        setLoading(false)
-      })
+    if (response === null) {
+      setLoading(false)
       setVisibleActivities([])
-      // If a timestamp was provided to overwrite data, hide the original event too.
-      if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
-      else hideEvent() // trigger a reload of dependent components anyway
-    })
+    } else {
+      let events = response.map((x, idx) => ({
+        timestamp: new Date().getTime(),
+        duration: response.duration,
+        activity: visibleActivities[idx].id,
+        static_data: {},
+        temporal_slices: (x || []).map((y) => ({
+          item: y !== undefined ? y.item : null,
+          value: y !== undefined ? y.value : null,
+          type: null,
+          level: null,
+          duration: y.duration,
+        })),
+      }))
+      Promise.all(
+        events
+          .filter((x) => x.temporal_slices.length > 0)
+          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
+      ).then((x) => {
+        getEvents(participant, visibleActivities[0].id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setLoading(false)
+        })
+        setVisibleActivities([])
+        // If a timestamp was provided to overwrite data, hide the original event too.
+        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
+        else hideEvent() // trigger a reload of dependent components anyway
+      })
+    }
   }
 
   return (

@@ -624,6 +624,8 @@ export default function Prevent({
         setSelectedActivities(selActivities)
         let selSensors = await getSelectedSensors(participant)
         let activities = await getActivities(participant)
+        activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
+
         // let goals = await getGoals(participant)
         // let groupByType
         // if (typeof goals !== "undefined") {
@@ -637,7 +639,6 @@ export default function Prevent({
         let timeSpans = Object.fromEntries(
           Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
         )
-
         setActivityEvents(activityEvents)
 
         let activityEventCount = getActivityEventCount(activityEvents)

@@ -12,6 +12,8 @@ import {
   DialogActions,
   IconButton,
   ButtonBase,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
@@ -161,6 +163,10 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -185,6 +191,10 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
   const [spec, setSpec] = useState(null)
+  const [activityId, setActivityId] = useState(null)
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [data, setData] = useState(null)
   const [dbtSettings, setDBTSettings] = useState({
     livingGoal: "Test",
     targetEffective: [
@@ -202,9 +212,41 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   })
 
   useEffect(() => {
+    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
+    var eventer = window[eventMethod]
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
+    // Listen to message from child window
+    eventer(
+      messageEvent,
+      function (e) {
+        if (!saved && activityId !== null) {
+          let data = JSON.parse(e.data)
+          data["activity"] = activityId
+          setData(data)
+          setEmbeddedActivity(undefined)
+          setDBTSettings(null)
+          setActivityId(null)
+        }
+      },
+      false
+    )
+  }, [activityId])
+
+  useEffect(() => {
+    if (data !== null && !saved) {
+      LAMP.ActivityEvent.create(id, data)
+        .catch((e) => console.dir(e))
+        .then((x) => {
+          setSaved(true)
+          setOpenData(false)
+          onComplete(null)
+        })
+    }
+  }, [data])
+
+  useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
-        console.log(dbtSettings)
         iFrame.contentWindow.postMessage(dbtSettings, "*")
       }
     }
@@ -213,11 +255,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
   const dbtHTML = () => {
     ;(async () => {
       let response = await fetch(`DBT.html.b64`)
-      console.log("sdf")
       setEmbeddedActivity(atob(await response.text()))
-      //setLoading(false)
-      setOpenData(true)
-      setOpen(false)
     })()
   }
 
@@ -241,6 +279,9 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
 
   return (
     <Container className={classes.thumbContainer}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
@@ -259,8 +300,12 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 onClick={() => {
                   setSpec(y.spec)
                   if (y.spec === "lamp.dbt_diary_card") {
+                    setActivityId(y.id)
+                    setLoading(true)
+                    setQuestionCount(6)
+                    dbtHTML()
                     setDBTSettings(y.settings)
-                    setOpenData(true)
+                    setOpen(true)
                   } else {
                     setVisibleActivities([y])
                     setQuestionCount(y.settings.length)
@@ -305,7 +350,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
-            {dialogueType === "DBT Diary Card" && <AssessDbt className={classes.topicon} />}
+            {spec === "lamp.dbt_diary_card" && <AssessDbt className={classes.topicon} />}
             {dialogueType === "Mood" && <AssessMood className={classes.topicon} />}
             {dialogueType === "Sleep and Social" && <AssessSleep className={classes.topicon} />}
             {dialogueType === "Anxiety" && <AssessAnxiety className={classes.topicon} />}
@@ -321,10 +366,12 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             {questionCount} questions (10 mins)
           </Typography>
           <Typography variant="body2" component="p">
-            The following survey will assess your sleep and social behavior. For each of the statements, rate which is
-            true for you.
+            {spec !== "lamp.dbt_diary_card" &&
+              "The following survey will assess your sleep and social behavior. For each of the statements, rate which is true for you."}
+            {spec === "lamp.dbt_diary_card" &&
+              "Daily log of events and related feelings. Track target behaviors and use of skills."}
           </Typography>
-          {spec === "lamp.dbt_diary_card" && (
+          {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
               <MuiThemeProvider theme={theme}>
                 <React.Fragment>
@@ -339,8 +386,8 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                   />
                 </React.Fragment>
               </MuiThemeProvider>
-            </Box>
-          )}
+            </Box> 
+          )}*/}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
@@ -351,7 +398,9 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                   setOpenData(true)
                   setOpen(false)
                 } else {
-                  dbtHTML()
+                  setOpenData(true)
+                  setOpen(false)
+                  setLoading(false)
                 }
               }}
               underline="none"
