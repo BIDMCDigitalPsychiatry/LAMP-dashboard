@@ -11,9 +11,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  ButtonBase,
-  Backdrop,
-  CircularProgress,
+  ButtonBase 
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
@@ -164,10 +162,6 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
-    backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
-      color: "#fff",
-    },
   })
 )
 
@@ -196,7 +190,6 @@ export default function Survey({
   const [questionCount, setQuestionCount] = useState(0)
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
-  const [loading, setLoading] = useState(false)
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -217,10 +210,7 @@ export default function Survey({
   // const formattedDate = year + "-" + month + "-" + day
 
   return (
-    <Container className={classes.thumbContainer}>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
+    <Container className={classes.thumbContainer}>      
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
@@ -241,7 +231,6 @@ export default function Survey({
                   if (y.spec === "lamp.dbt_diary_card") {
                     setActivity(y)
                     setQuestionCount(6)
-                    setOpen(true)
                   } else {
                     setQuestionCount(y.settings.length)
                   }
@@ -329,14 +318,8 @@ export default function Survey({
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               onClick={() => {
-                if (spec !== "lamp.dbt_diary_card") {
                   setOpenData(true)
-                  setOpen(false)
-                } else {
-                  setOpenData(true)
-                  setOpen(false)
-                  setLoading(false)
-                }
+                  setOpen(false)               
               }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
