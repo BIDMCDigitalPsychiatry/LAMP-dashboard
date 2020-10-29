@@ -240,6 +240,7 @@ export default function Survey({
                   setSpec(y.spec)
                   if (y.spec === "lamp.dbt_diary_card") {
                     setActivity(y)
+                    setQuestionCount(6)
                     setOpen(true)
                   } else {
                     setQuestionCount(y.settings.length)
