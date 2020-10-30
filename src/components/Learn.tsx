@@ -140,7 +140,12 @@ const useStyles = makeStyles((theme: Theme) =>
     thumbContainer: { maxWidth: 1055 },
     fullwidthBtn: { width: "100%" },
     topicon: {
-      minWidth: 120,
+      minWidth: 150,
+      minHeight: 150,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
     },
     tipicon: {
       minWidth: 200,

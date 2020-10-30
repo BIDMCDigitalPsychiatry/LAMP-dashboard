@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  ButtonBase 
+  ButtonBase,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
@@ -136,7 +136,12 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     topicon: {
-      minWidth: 120,
+      minWidth: 150,
+      minHeight: 150,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
     },
     surveytextarea: {
       padding: "20px 40px 40px",
@@ -210,7 +215,7 @@ export default function Survey({
   // const formattedDate = year + "-" + month + "-" + day
 
   return (
-    <Container className={classes.thumbContainer}>      
+    <Container className={classes.thumbContainer}>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
@@ -318,8 +323,8 @@ export default function Survey({
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               onClick={() => {
-                  setOpenData(true)
-                  setOpen(false)               
+                setOpenData(true)
+                setOpen(false)
               }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
