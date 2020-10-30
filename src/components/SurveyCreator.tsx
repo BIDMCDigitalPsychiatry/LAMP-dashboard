@@ -243,10 +243,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               </Button>
               <Button color={type === "boolean" ? "primary" : "default"} onClick={() => setType("boolean")}>
                 boolean
-              </Button>
-              <Button color={type === "likert" ? "primary" : "default"} onClick={() => setType("likert")}>
-                likert
-              </Button>
+              </Button>              
               <Button color={["list", "select"].includes(type) ? "primary" : "default"} onClick={() => setType("list")}>
                 list
               </Button>
