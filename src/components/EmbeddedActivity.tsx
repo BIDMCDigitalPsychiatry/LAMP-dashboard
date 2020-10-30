@@ -69,18 +69,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
-      console.log(data)
-      if (activity.spec === "lamp.dbt_diary_card") {
-        setSaved(true)
-        onComplete()
-      } else {
-        LAMP.ActivityEvent.create(participant.id, data)
-          .catch((e) => console.dir(e))
-          .then((x) => {
-            setSaved(true)
-            onComplete()
-          })
-      }
+      LAMP.ActivityEvent.create(participant.id, data)
+        .catch((e) => console.dir(e))
+        .then((x) => {
+          setSaved(true)
+          onComplete()
+        })
     }
   }, [embeddedActivity])
 
