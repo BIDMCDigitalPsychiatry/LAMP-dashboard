@@ -69,6 +69,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
+      console.log(data)
       if (activity.spec === "lamp.dbt_diary_card") {
         setSaved(true)
         onComplete()
