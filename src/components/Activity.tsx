@@ -8,6 +8,7 @@ import GameCreator from "./GameCreator"
 import JournalCreator from "./JournalCreator"
 import BreatheCreator from "./BreatheCreator"
 import DBTCreator from "./DBTCreator"
+import SCImageCreator from "./SCImageCreator"
 
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
@@ -34,6 +35,7 @@ export default function Activity({
   const isJournal = (activity || {}).spec === "lamp.journal"
   const isBreathe = (activity || {}).spec === "lamp.breathe"
   const isDBT = (activity || {}).spec === "lamp.dbt_diary_card"
+  const isSCImage = (activity || {}).spec === "lamp.scratch_image"
 
   return (
     <div>
@@ -69,6 +71,15 @@ export default function Activity({
           activities={allActivities}
           onCancel={onCancel}
           studies={studies}
+        />
+      )}
+      {isSCImage && (
+        <SCImageCreator
+          onSave={onSave}
+          studies={studies}
+          value={activity}
+          details={details}
+          activities={allActivities}
         />
       )}
     </div>

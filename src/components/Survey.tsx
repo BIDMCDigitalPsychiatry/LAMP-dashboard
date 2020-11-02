@@ -180,6 +180,12 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
+async function getDetails(activityId: string) {
+  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
+    !!y.error ? undefined : y.data
+  )[0]
+}
+
 export default function Survey({
   participant,
   activities,
@@ -195,6 +201,8 @@ export default function Survey({
   const [questionCount, setQuestionCount] = useState(0)
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
+  const [tag, setTag] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -206,6 +214,33 @@ export default function Survey({
     onComplete(response)
   }
 
+  useEffect(() => {
+    let savedActivities = (activities || []).filter(
+      (x) =>
+        x.spec === "lamp.dbt_diary_card" ||
+        (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+    )
+    if (savedActivities.length > 0) {
+      setLoading(true)
+      ;(async () => {
+        let tags = []
+        let details = await savedActivities.map((activity, index) => {
+          ;(async () => {
+            tags[activity.id] = await getDetails(activity.id)
+            setTag(tags)
+            if (index === savedActivities.length - 1) {
+              setLoading(false)
+              setTag(tags)
+              return tags
+            }
+          })()
+        })
+        setTag(details)
+      })()
+    } else {
+      setLoading(false)
+    }
+  }, [])
   // var date = new Date()
   // date.setDate(date.getDate() - 21)
 
@@ -233,12 +268,8 @@ export default function Survey({
                 lg={3}
                 onClick={() => {
                   setSpec(y.spec)
-                  if (y.spec === "lamp.dbt_diary_card") {
-                    setActivity(y)
-                    setQuestionCount(6)
-                  } else {
-                    setQuestionCount(y.settings.length)
-                  }
+                  setActivity(y)
+                  y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
                   setVisibleActivities([y])
                   handleClickOpen(y.name)
                 }}
@@ -288,16 +319,15 @@ export default function Survey({
             {dialogueType === "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
             {dialogueType === "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
             <Typography variant="h6">Survey</Typography>
-            <Typography variant="h2">{dialogueType}</Typography>
+            <Typography variant="h2">{activity?.name ?? null}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
-            {questionCount} questions (10 mins)
+            {questionCount} {questionCount > 1 ? " questions" : " question"} {/* (10 mins) */}
           </Typography>
           <Typography variant="body2" component="p">
-            {spec !== "lamp.dbt_diary_card" &&
-              "The following survey will assess your sleep and social behavior. For each of the statements, rate which is true for you."}
+            {spec !== "lamp.dbt_diary_card" && (tag[activity?.id]?.description ?? null)}
             {spec === "lamp.dbt_diary_card" &&
               "Daily log of events and related feelings. Track target behaviors and use of skills."}
           </Typography>

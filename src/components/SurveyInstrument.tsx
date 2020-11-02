@@ -723,7 +723,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
     </FormGroup>
   )
 }
-function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
+function Question({ onResponse, number, text, desc, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
     onResponse({ item: text, value: value })
   }
@@ -833,7 +833,9 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
   return (
     <Grid>
       <Box className={classes.questionhead}>
-        <Typography variant="h5">{text}</Typography>
+        <Typography variant="h5">
+          {text} {!!desc && ` (${desc})`}
+        </Typography>
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "likert" || type === "boolean" || type === "list" || type === "select"
             ? "(Select one)"
@@ -879,6 +881,7 @@ function Questions({
             number={idx + 1}
             text={x.text}
             type={x.type}
+            desc={x.description ?? null}
             options={x.options?.map((y) => ({ ...y, label: y.value }))}
             value={responses.current[idx]}
             onResponse={(response) => {
@@ -939,7 +942,7 @@ function Section({
   const [index, setIndex] = useState(0)
   const [slideElements, setSlideElements] = useState(null)
   const [elementIn, setElementIn] = useState(false)
-
+  console.log(value)
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
     if (slideElements == null) {

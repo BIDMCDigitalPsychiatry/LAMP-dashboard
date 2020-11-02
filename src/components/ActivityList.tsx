@@ -54,6 +54,7 @@ import { ReactComponent as Filter } from "../icons/Filter.svg"
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
+import SCImageCreator from "./SCImageCreator"
 
 const theme = createMuiTheme({
   palette: {
@@ -393,7 +394,7 @@ const availableAtiveSpecs = [
   "lamp.spatial_span",
   "lamp.tips",
   "lamp.cats_and_dogs",
-  // "lamp.scratch_image",
+  "lamp.scratch_image",
   "lamp.dbt_diary_card",
 ]
 
@@ -594,7 +595,6 @@ export default function ActivityList({ researcher, title, ...props }) {
         })
         setStudiesCount(counts)
         setActivities(activityData)
-        console.log(index, studies.length)
         if (index === studies.length - 1) {
           setLoading(false)
         }
@@ -857,7 +857,12 @@ export default function ActivityList({ researcher, title, ...props }) {
       setSelectedActivity(raw)
     } else if (raw.spec === "lamp.tips") {
       setSelectedActivity(raw)
-    } else if (games.includes(raw.spec) || raw.spec === "lamp.journal" || raw.spec === "lamp.breathe") {
+    } else if (
+      games.includes(raw.spec) ||
+      raw.spec === "lamp.journal" ||
+      raw.spec === "lamp.scratch_image" ||
+      raw.spec === "lamp.breathe"
+    ) {
       let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
@@ -997,6 +1002,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     setShowBreatheCreate(false)
     setShowJournalCreate(false)
     setShowDBTCreate(false)
+    setShowSCImgCreate(false)
     setSelectedActivity(undefined)
     refreshData()
   }
@@ -1020,6 +1026,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                   "lamp.group": "Group",
                   "lamp.tips": "Tips",
                   "lamp.journal": "Journal",
+                  "lamp.scratch_image": "Scratch image",
                   "lamp.breathe": "Breathe",
                   "lamp.dbt_diary_card": "DBT diary card",
                 },
@@ -1280,6 +1287,8 @@ export default function ActivityList({ researcher, title, ...props }) {
                       ? setShowCTCreate(true)
                       : x.id === "lamp.journal"
                       ? setShowJournalCreate(true)
+                      : x.id === "lamp.scratch_image"
+                      ? setShowSCImgCreate(true)
                       : x.id === "lamp.breathe"
                       ? setShowBreatheCreate(true)
                       : x.id === "lamp.tips"
@@ -1324,6 +1333,14 @@ export default function ActivityList({ researcher, title, ...props }) {
           )}
           {!!showJournalCreate && (
             <JournalCreator
+              onSave={saveCTest}
+              activitySpecId={activitySpecId}
+              studies={studies}
+              activities={activities}
+            />
+          )}
+          {!!showSCImgCreate && (
+            <SCImageCreator
               onSave={saveCTest}
               activitySpecId={activitySpecId}
               studies={studies}

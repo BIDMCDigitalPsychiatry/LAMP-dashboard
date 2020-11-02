@@ -239,8 +239,9 @@ export default function Breathe({ participant, activity, ...props }) {
   }
   useEffect(() => {
     ;(async () => {
-      if (activity.settings.audio) {
-        setAudio(new Audio(activity.settings.audio))
+      console.log(activity.settings)
+      if (!!activity.settings.audio_url || !!activity.settings.audio) {
+        setAudio(new Audio(activity.settings.audio_url ?? activity.settings.audio))
       }
     })()
   }, [])
