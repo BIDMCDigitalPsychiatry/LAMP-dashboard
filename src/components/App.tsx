@@ -510,7 +510,7 @@ function AppRouter({ ...props }) {
       />
 
       {/* Route API documentation ONLY. */}
-      <Route
+      {/* <Route
         exact
         path="/api"
         render={(props) => (
@@ -525,7 +525,7 @@ function AppRouter({ ...props }) {
             />
           </React.Fragment>
         )}
-      />
+      /> */}
     </Switch>
   )
 }
