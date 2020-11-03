@@ -377,24 +377,29 @@ export default function BreatheCreator({
                   />
                 </Box>
               </Grid>
-              <Grid item xs={12} spacing={2}>
-                <Box mb={3}>
-                  <TextField
-                    error={
-                      (settings?.audio_url?.trim() ?? "") === "" ||
-                      ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings.audio_url))
-                        ? true
-                        : false
-                    }
-                    fullWidth
-                    variant="filled"
-                    label="Audio URL"
-                    defaultValue={settings?.audio_url ?? ""}
-                    onChange={(event) => setSettings({ ...settings, audio_url: event.target.value })}
-                  />
-                </Box>
-              </Grid>
               <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Divider />
+                  <Typography variant="h6">Settings</Typography>
+                </Grid>
+                <Divider />
+                <Grid item xs={12} spacing={2}>
+                  <Box mb={3}>
+                    <TextField
+                      error={
+                        (settings?.audio_url?.trim() ?? "") === "" ||
+                        ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings.audio_url))
+                          ? true
+                          : false
+                      }
+                      fullWidth
+                      variant="filled"
+                      label="Audio URL"
+                      defaultValue={settings?.audio_url ?? ""}
+                      onChange={(event) => setSettings({ ...settings, audio_url: event.target.value })}
+                    />
+                  </Box>
+                </Grid>
                 <Grid item xs>
                   <label htmlFor="upload-audio">
                     <TextField
