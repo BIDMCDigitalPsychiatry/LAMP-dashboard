@@ -358,6 +358,8 @@ export default function Manage({ participant, activities, ...props }) {
             ),
             "lamp.scratch_image": (
               <ScratchImage
+                participant={participant}
+                activity={activity ?? []}
                 onComplete={() => {
                   setOpen(false)
                   setLaunchedActivity(undefined)
