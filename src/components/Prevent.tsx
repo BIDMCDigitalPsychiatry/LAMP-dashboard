@@ -48,6 +48,8 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
+import { spliceActivity } from "./ActivityList"
+
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -242,7 +244,27 @@ const useStyles = makeStyles((theme: Theme) =>
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
-
+// Splice together all selected activities & their tags.
+async function getSplicedSurveys(activities) {
+  let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
+  let spliced = res.map((y: any, idx) =>
+    spliceActivity({
+      raw: activities[idx],
+      tag: !!y.error ? undefined : y.data,
+    })
+  )
+  // Short-circuit the main title & description if there's only one survey.
+  const main = {
+    name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
+    description: spliced.length === 1 ? spliced[0].description : "Please complete all sections below. Thank you.",
+  }
+  if (spliced.length === 1) spliced[0].name = spliced[0].description = undefined
+  return {
+    name: main.name,
+    description: main.description,
+    sections: spliced,
+  }
+}
 function getSocialContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
   let events = [
@@ -403,6 +425,7 @@ async function getActivityEvents(
 
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
+  console.log(original)
   let custom =
     ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
       ...x,
@@ -504,6 +527,8 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else if (!!question && question.type === "slider")
+          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
@@ -513,6 +538,8 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  __default__: (slices, activity, scopedItem) =>
+    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
 
 export default function Prevent({
@@ -653,7 +680,19 @@ export default function Prevent({
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
         activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
-        setActivities(activities)
+        activities.map((activity, index) => {
+          if (activity.spec === "lamp.survey") {
+            getSplicedSurveys([activity]).then((e) => {
+              let data = activity
+              console.log(activities)
+              data.settings = e.sections[0].settings
+              activities[index] = data
+              console.log(activities)
+              setActivities(activities)
+            })
+          }
+        })
+
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
@@ -678,7 +717,7 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {!disabledData && (
+      {!disabledData && !loading && (
         <Container>
           <Grid container xs={12} spacing={0} className={classes.activityhd}>
             <Grid item xs className={classes.preventHeader}>
@@ -754,6 +793,7 @@ export default function Prevent({
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                         <Typography className={classes.preventlabelFull}>
+                          {console.log(activity)}
                           {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
                         </Typography>
                         <Box className={classes.maxw300}>

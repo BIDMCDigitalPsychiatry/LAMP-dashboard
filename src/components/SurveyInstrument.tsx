@@ -800,13 +800,8 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
 
   switch (type) {
     case "slider":
-      component = (
-        <Rating
-          options={options.sort((a, b) => parseInt(a.value) > parseInt(b.value))}
-          onChange={onChange}
-          value={!!value ? value.value : undefined}
-        />
-      )
+      options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))
+      component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "likert":
     case "boolean":
@@ -839,8 +834,10 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "likert" || type === "boolean" || type === "list" || type === "select"
             ? "(Select one)"
-            : type === "rating"
-            ? "(0 being terrible, 10 being excellent)"
+            : type === "slider"
+            ? `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
+                options[options.length - 1].description
+              })`
             : ""}
         </Typography>
       </Box>
@@ -1126,7 +1123,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const classes = useStyles()
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
-
+  console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {

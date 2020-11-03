@@ -181,7 +181,7 @@ function _shouldRestrict() {
 }
 
 async function getDetails(activityId: string) {
-  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
+  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.survey_description")].map((y: any) =>
     !!y.error ? undefined : y.data
   )[0]
 }
@@ -269,6 +269,7 @@ export default function Survey({
                 onClick={() => {
                   setSpec(y.spec)
                   setActivity(y)
+                  console.log(y)
                   y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
                   setVisibleActivities([y])
                   handleClickOpen(y.name)
