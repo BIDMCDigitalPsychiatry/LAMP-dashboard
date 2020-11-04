@@ -10,7 +10,6 @@ import {
   Box,
   Fab,
   Container,
-  Link,
 } from "@material-ui/core"
 
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
@@ -130,13 +129,6 @@ export default function TipNotification({ ...props }) {
             <Typography variant="body2" color="textSecondary" component="p">
               {props.details}
             </Typography>
-            <Typography variant="subtitle2">{props.author}</Typography>
-
-            {props.link && (
-              <Link target="_blank" href={props.link}>
-                {props.link}
-              </Link>
-            )}
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
                 <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={4}>

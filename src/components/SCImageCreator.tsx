@@ -18,7 +18,7 @@ import {
 import { useDropzone } from "react-dropzone"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import JournalIcon from "../icons/Journal.svg"
+import ScratchCard from "../icons/ScratchCard.svg"
 
 const theme = createMuiTheme({
   palette: {
@@ -80,7 +80,7 @@ function compress(file, width, height) {
   })
 }
 
-export default function JournalCreator({
+export default function SCImageCreator({
   activities,
   value,
   onSave,
@@ -102,7 +102,7 @@ export default function JournalCreator({
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(details?.photo ?? JournalIcon)
+  const [photo, setPhoto] = useState(details?.photo ?? ScratchCard)
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
@@ -229,7 +229,7 @@ export default function JournalCreator({
                   rows={2}
                   defaultValue={description}
                   onChange={(event) => setDescription(event.target.value)}
-                  inputProps={{ maxLength: 350 }}
+                  inputProps={{ maxLength: 2500 }}
                 />
               </Box>
             </Grid>

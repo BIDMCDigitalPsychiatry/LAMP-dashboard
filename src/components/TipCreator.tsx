@@ -23,6 +23,7 @@ import {
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import DeleteIcon from "@material-ui/icons/Delete"
+import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 
 const theme = createMuiTheme({
@@ -72,11 +73,20 @@ const useStyles = makeStyles((theme: Theme) =>
       cursor: "pointer",
       textTransform: "capitalize",
       boxShadow: "none",
-
       border: "#7599FF solid 1px",
       background: "transparent",
       margin: "15px 0",
-
+      "& svg": { marginRight: 5, color: "#7599FF" },
+    },
+    btnTextAdd: {
+      color: "#333",
+      fontSize: 14,
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      boxShadow: "none",
+      border: "#7599FF solid 1px",
+      background: "transparent",
       "& svg": { marginRight: 5, color: "#7599FF" },
     },
     colorRed: {
@@ -95,6 +105,21 @@ const useStyles = makeStyles((theme: Theme) =>
         opacity: 0,
         zIndex: 111,
       },
+    },
+    gridTitle: { margin: "50px 0 35px", paddingBottom: 15, borderBottom: "#ddd solid 1px" },
+    btnBlue: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+      lineHeight: "38px",
+
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "#fff",
+      "& svg": { marginRight: 8 },
+      "&:hover": { background: "#5680f9" },
     },
   })
 )
@@ -133,12 +158,23 @@ export default function TipCreator({
   const [duplicateTipText, setDuplicateTipText] = useState("")
   const [selectedCategory, setSelectedCategory]: any = useState({})
   const [deletedIds, setDeletedIds]: any = useState("")
-  const [tipsDataArray, setTipsDataArray] = useState([{ title: "", link: "", text: "", image: "", author: "" }])
-  const [newTipsData, setNewTipsData] = useState([{ title: "", link: "", text: "", image: "", author: "" }])
+  const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
   const [studyId, setStudyId] = useState(!!activities ? activities.parentID : undefined)
   const [openDialog, setOpenDialog] = useState(false)
   const [clickDeleteId, setClickDeleteId] = useState("")
   const [isDuplicate, setIsDuplicate] = useState(false)
+  const [addRow, setAddRow] = useState(false)
+  const [focusedTextfield, setFocusedTextfield] = useState(null)
+  const defaultSettingsArray = [{ title: "", text: "", image: "" }]
+  const defaultSelectedCategory = {
+    id: undefined,
+    name: "",
+    spec: "lamp.tips",
+    icon: "",
+    schedule: [],
+    settings: [{ title: "", text: "", image: "" }],
+    studyID: "",
+  }
 
   useEffect(() => {
     let id = deletedIds
@@ -166,12 +202,16 @@ export default function TipCreator({
               setCategoryImage(iconsData.data.icon)
             }
           }
+          if (!activities) {
+            let mergedSettings = existsData.settings.concat(defaultSettingsArray)
+            existsData.settings = mergedSettings
+          }
           setSelectedCategory(existsData)
           setTipsDataArray(existsData.settings)
         }
       } else {
-        setSelectedCategory({})
-        setTipsDataArray([{ title: "", link: "", text: "", image: "", author: "" }])
+        setTipsDataArray(defaultSettingsArray)
+        setSelectedCategory(defaultSelectedCategory)
       }
       setLoading(false)
     })()
@@ -181,6 +221,7 @@ export default function TipCreator({
     ;(async () => {
       setLoading(true)
       if (studyId) {
+        setSelectedCategory(defaultSelectedCategory)
         let activityData = await LAMP.Activity.allByStudy(studyId)
         let tipsCategoryData = activityData.filter((activity) => activity.spec === "lamp.tips")
         setCategoryArray(tipsCategoryData)
@@ -189,7 +230,6 @@ export default function TipCreator({
         let activitiesData = JSON.parse(JSON.stringify(activities))
         setCategory(activitiesData.id)
         if (Object.keys(activitiesData.settings).length > 0) {
-          //setCategory(activitiesData.id)
           setSelectedCategory(activitiesData)
           setTipsDataArray(activitiesData.settings)
         }
@@ -202,28 +242,33 @@ export default function TipCreator({
     })()
   }, [studyId])
 
+  useEffect(() => {
+    let currentSelectedCategory = selectedCategory
+    if (addRow) {
+      if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
+        currentSelectedCategory.settings = currentSelectedCategory.settings.concat(defaultSettingsArray)
+        setSelectedCategory(currentSelectedCategory)
+        setTipsDataArray(currentSelectedCategory.settings)
+      } else {
+        setSelectedCategory(defaultSelectedCategory)
+      }
+      let settingsLength = selectedCategory.settings.length
+      setFocusedTextfield("tipsTitle_" + (settingsLength - 1))
+    }
+    setAddRow(false)
+  }, [addRow])
+
   const handleTipsData = (e: any, type, id) => {
     let tipsData = tipsDataArray
     if (type === "title") tipsData[id].title = e.target.value
-    if (type === "link") tipsData[id].link = e.target.value
     if (type === "text") tipsData[id].text = e.target.value
-    if (type === "author") tipsData[id].author = e.target.value
     if (type === "image") {
       uploadImageFile(e, "all", id)
     }
     setTipsDataArray([...tipsData])
-  }
-
-  const handleNewTips = (e, type) => {
-    let tipsData: any = newTipsData
-    if (type === "title") tipsData[0].title = e.target.value
-    if (type === "link") tipsData[0].link = e.target.value
-    if (type === "text") tipsData[0].text = e.target.value
-    if (type === "author") tipsData[0].author = e.target.value
-    if (type === "image") {
-      uploadImageFile(e, "new")
-    }
-    setNewTipsData([...tipsData])
+    let currentSelectedCategory = selectedCategory
+    currentSelectedCategory.settings = tipsData
+    setSelectedCategory(currentSelectedCategory)
   }
 
   const getBase64 = (file, cb, type = "") => {
@@ -266,15 +311,7 @@ export default function TipCreator({
     if (fileFormats.includes(extension) && fileSize <= 4) {
       setLoading(true)
       let tipsData: any
-      if (type === "new") {
-        tipsData = newTipsData
-        file &&
-          getBase64(file, (result: any) => {
-            tipsData[0].image = result
-            setNewTipsData([...tipsData])
-            setLoading(false)
-          })
-      } else if (type === "icon") {
+      if (type === "icon") {
         file &&
           getBase64(
             file,
@@ -326,7 +363,7 @@ export default function TipCreator({
             spec: "lamp.tips",
             icon: categoryImage,
             schedule: [],
-            settings: newTipsData,
+            settings: selectedCategory.settings,
             studyID: studyId,
           },
           false
@@ -338,27 +375,20 @@ export default function TipCreator({
             spec: "lamp.tips",
             icon: categoryImage,
             schedule: [],
-            settings: activities?.id ? tipsDataArray : category ? tipsDataArray.concat(newTipsData) : newTipsData,
+            settings: selectedCategory.settings,
             studyID: studyId,
           },
           false
         )
-
     setLoading(true)
   }
 
   const deleteData = (id) => {
-    if (activities) {
-      if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length <= 1)
-        enqueueSnackbar("You are not allowed to delete all the details from the tip.", {
-          variant: "error",
-        })
-      else {
-        setLoading(true)
-        setOpenDialog(false)
-        setDeletedIds(id)
-      }
-    } else {
+    if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length <= 1)
+      enqueueSnackbar("You are not allowed to delete all the details from the tip.", {
+        variant: "error",
+      })
+    else {
       setLoading(true)
       setOpenDialog(false)
       setDeletedIds(id)
@@ -368,42 +398,25 @@ export default function TipCreator({
   const validate = () => {
     let validationData = false
     if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
-      validationData = selectedCategory.settings.some(
-        (item) => item.title === "" || item.text === "" || (item.link !== "" && !urlValidator(item.link))
-      )
+      validationData = selectedCategory.settings.some((item) => item.title === "" || item.text === "")
     }
-    if (!!activities) {
-      return !validationData
-    } else {
-      return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
-        typeof category == "undefined" ||
-        category === null ||
-        category === "" ||
-        (category == "add_new" && (newTipText === null || newTipText === "")) ||
-        typeof newTipsData[0].title === "undefined" ||
-        (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "") ||
-        typeof newTipsData[0].text === "undefined" ||
-        (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "") ||
-        (newTipsData[0].link?.trim() !== "" && !urlValidator(newTipsData[0].link)) ||
-        validationData
-      )
-    }
+    return !(
+      typeof studyId == "undefined" ||
+      studyId === null ||
+      studyId === "" ||
+      typeof category == "undefined" ||
+      category === null ||
+      category === "" ||
+      (category == "add_new" && (newTipText === null || newTipText === "")) ||
+      validationData
+    )
   }
 
-  const removeImage = (type, id = 0) => {
+  const removeImage = (id = 0) => {
     let tipsData
-    if (type === "new") {
-      tipsData = newTipsData
-      tipsData[0].image = ""
-      setNewTipsData([...tipsData])
-    } else {
-      tipsData = tipsDataArray
-      tipsData[id].image = ""
-      setTipsDataArray([...tipsData])
-    }
+    tipsData = tipsDataArray
+    tipsData[id].image = ""
+    setTipsDataArray([...tipsData])
   }
 
   const removeEventValue = (event) => {
@@ -571,12 +584,23 @@ export default function TipCreator({
               </Grid>
             </Grid>
           </Grid>
-
           {Object.keys(selectedCategory).length > 0 ? (
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Divider />
+            <Grid container direction="row" justify="space-between" alignItems="center" className={classes.gridTitle}>
+              <Grid item>
                 <Typography variant="h6">Tip Details</Typography>
+              </Grid>
+              <Grid item>
+                <Fab
+                  className={classes.btnBlue}
+                  aria-label="Add"
+                  variant="extended"
+                  onClick={() => {
+                    setAddRow(true)
+                  }}
+                  disabled={!category || !studyId ? true : false}
+                >
+                  <AddIcon /> Add
+                </Fab>
               </Grid>
             </Grid>
           ) : (
@@ -616,7 +640,7 @@ export default function TipCreator({
                         <ButtonBase
                           style={{ width: "100%", height: "100%" }}
                           onClick={(e) => {
-                            removeImage("all", idx)
+                            removeImage(idx)
                           }}
                         >
                           <Icon fontSize="large">
@@ -628,7 +652,7 @@ export default function TipCreator({
                   </Grid>
                   <Grid item sm={8} md={9} lg={10}>
                     <Grid container spacing={2}>
-                      <Grid item lg={4} md={6} sm={6} xs={12}>
+                      <Grid item lg={6} md={6} sm={6} xs={12}>
                         <Box>
                           <TextField
                             error={
@@ -637,10 +661,12 @@ export default function TipCreator({
                                 ? true
                                 : false
                             }
+                            autoFocus={focusedTextfield === "tipsTitle_" + idx ? true : false}
                             fullWidth
                             variant="filled"
                             label="Tips Title"
                             value={x.title}
+                            id={"tipsTitle_" + idx}
                             className="tipsTitle"
                             onChange={(e) => {
                               handleTipsData(e, "title", idx)
@@ -651,36 +677,6 @@ export default function TipCreator({
                                 ? "Please enter Tips Title"
                                 : ""
                             }
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <Box>
-                          <TextField
-                            error={x.link !== "" && !urlValidator(x.link) ? true : false}
-                            fullWidth
-                            variant="filled"
-                            label="Tips Link"
-                            value={x.link}
-                            className="tipsLink"
-                            onChange={(e) => {
-                              handleTipsData(e, "link", idx)
-                            }}
-                            helperText={x.link !== "" && !urlValidator(x.link) ? "Please enter valid link" : ""}
-                          />
-                        </Box>
-                      </Grid>
-                      <Grid item lg={4} md={6} sm={6} xs={12}>
-                        <Box>
-                          <TextField
-                            fullWidth
-                            variant="filled"
-                            label="Tips Author"
-                            value={x.author}
-                            className="tipsAutor"
-                            onChange={(e) => {
-                              handleTipsData(e, "author", idx)
-                            }}
                           />
                         </Box>
                       </Grid>
@@ -695,7 +691,8 @@ export default function TipCreator({
                             fullWidth
                             variant="filled"
                             label="Tips Description"
-                            rows={2}
+                            rows={4}
+                            rowsMax={15}
                             value={x.text}
                             onChange={(e) => {
                               handleTipsData(e, "text", idx)
@@ -734,146 +731,6 @@ export default function TipCreator({
                 </Grid>
               ))
             : ""}
-
-          {!activities ? (
-            <Grid container spacing={2}>
-              {Object.keys(selectedCategory).length === 0 ? (
-                <Grid item xs={12}>
-                  <Divider />
-                  <Typography variant="h6">Tip Details</Typography>
-                </Grid>
-              ) : (
-                ""
-              )}
-              <Grid item xs sm={4} md={3} lg={2}>
-                <Tooltip title={!newTipsData[0].image ? "Tap to select a photo." : "Tap to delete the photo."}>
-                  <Box
-                    width={154}
-                    height={154}
-                    border={1}
-                    borderRadius={4}
-                    borderColor="text.secondary"
-                    color="text.secondary"
-                    style={{
-                      background: !!newTipsData[0].image
-                        ? `url(${newTipsData[0].image}) center center/cover no-repeat`
-                        : undefined,
-                      position: "relative",
-                    }}
-                  >
-                    {!newTipsData[0].image ? (
-                      <label htmlFor="upload-image">
-                        <TextField
-                          name="upload-image"
-                          className={classes.uploadFile}
-                          variant="filled"
-                          type="file"
-                          onClick={(event) => removeEventValue(event)}
-                          onChange={(event) => handleNewTips(event, "image")}
-                        />
-                      </label>
-                    ) : (
-                      ""
-                    )}
-                    <ButtonBase
-                      style={{ width: "100%", height: "100%" }}
-                      onClick={(e) => {
-                        removeImage("new")
-                      }}
-                    >
-                      <Icon fontSize="large">
-                        {newTipsData[0].image === "" || newTipsData[0].image === undefined
-                          ? "add_a_photo"
-                          : "delete_forever"}
-                      </Icon>
-                    </ButtonBase>
-                  </Box>
-                </Tooltip>
-              </Grid>
-              <Grid item sm={8} md={9} lg={10}>
-                <Grid container spacing={2}>
-                  <Grid item xs sm={6} md={6} lg={4}>
-                    <Box>
-                      <TextField
-                        error={
-                          typeof newTipsData[0].title === "undefined" ||
-                          (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "")
-                            ? true
-                            : false
-                        }
-                        variant="filled"
-                        label="Tips Title"
-                        onChange={(e) => {
-                          handleNewTips(e, "title")
-                        }}
-                        helperText={
-                          typeof newTipsData[0].title === "undefined" ||
-                          (typeof newTipsData[0].title !== "undefined" && newTipsData[0].title?.trim() === "")
-                            ? "Please enter Tips Title"
-                            : ""
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item lg={4} md={6} sm={6} xs={12}>
-                    <Box>
-                      <TextField
-                        error={newTipsData[0].link !== "" && !urlValidator(newTipsData[0].link) ? true : false}
-                        variant="filled"
-                        label="Tips Link"
-                        onChange={(e) => {
-                          handleNewTips(e, "link")
-                        }}
-                        helperText={
-                          newTipsData[0].link !== "" && !urlValidator(newTipsData[0].link)
-                            ? "Please enter valid link"
-                            : ""
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item lg={4} md={6} sm={6} xs={12}>
-                    <Box>
-                      <TextField
-                        variant="filled"
-                        label="Tips Author"
-                        onChange={(e) => {
-                          handleNewTips(e, "author")
-                        }}
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box>
-                      <TextField
-                        error={
-                          typeof newTipsData[0].text === "undefined" ||
-                          (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "")
-                            ? true
-                            : false
-                        }
-                        variant="filled"
-                        multiline
-                        rows={2}
-                        label="Tips Description"
-                        onChange={(e) => {
-                          handleNewTips(e, "text")
-                        }}
-                        helperText={
-                          typeof newTipsData[0].text === "undefined" ||
-                          (typeof newTipsData[0].text !== "undefined" && newTipsData[0].text?.trim() === "")
-                            ? "Please enter Tips Description"
-                            : ""
-                        }
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          ) : (
-            ""
-          )}
         </Container>
       </MuiThemeProvider>
       <Grid

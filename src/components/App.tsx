@@ -8,8 +8,6 @@ import { SnackbarProvider, useSnackbar } from "notistack"
 
 // External Imports
 import DateFnsUtils from "@date-io/date-fns"
-import SwaggerUI from "swagger-ui-react"
-import "swagger-ui-react/swagger-ui.css"
 
 // Local Imports
 import LAMP from "lamp-core"
@@ -507,24 +505,6 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           )
         }
-      />
-
-      {/* Route API documentation ONLY. */}
-      <Route
-        exact
-        path="/api"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>LAMP Platform API</PageTitle>
-            <SwaggerUI
-              url="https://api.lamp.digital/"
-              docExpansion="list"
-              displayOperationId={true}
-              deepLinking={true}
-              displayRequestDuration={true}
-            />
-          </React.Fragment>
-        )}
       />
     </Switch>
   )

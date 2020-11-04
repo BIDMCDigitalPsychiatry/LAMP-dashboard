@@ -255,6 +255,7 @@ export default function Participant({
     props.activeTab(tabName)
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {
+      console.log(e)
       setActivities(e)
       setLoading(false)
     })
@@ -284,36 +285,45 @@ export default function Participant({
 
   const submitSurvey = (response, overwritingTimestamp) => {
     setLoading(true)
-    let events = response.map((x, idx) => ({
-      timestamp: new Date().getTime(),
-      duration: response.duration,
-      activity: visibleActivities[idx].id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: y.duration,
-      })),
-    }))
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
-    ).then((x) => {
+    if (response === null) {
       getEvents(participant, visibleActivities[0].id).then((steak) => {
         setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })
       setVisibleActivities([])
-      // If a timestamp was provided to overwrite data, hide the original event too.
-      if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
-      else hideEvent() // trigger a reload of dependent components anyway
-    })
+    } else {
+      let events = response.map((x, idx) => ({
+        timestamp: new Date().getTime(),
+        duration: response.duration,
+        activity: visibleActivities[idx].id,
+        static_data: {},
+        temporal_slices: (x || []).map((y) => ({
+          item: y !== undefined ? y.item : null,
+          value: y !== undefined ? y.value : null,
+          type: null,
+          level: null,
+          duration: y.duration,
+        })),
+      }))
+      Promise.all(
+        events
+          .filter((x) => x.temporal_slices.length > 0)
+          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
+      ).then((x) => {
+        getEvents(participant, visibleActivities[0].id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setLoading(false)
+        })
+        setVisibleActivities([])
+        // If a timestamp was provided to overwrite data, hide the original event too.
+        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
+        else hideEvent() // trigger a reload of dependent components anyway
+      })
+    }
   }
-  
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -328,7 +338,7 @@ export default function Participant({
         <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>
             <Survey
-              id={participant.id}
+              participant={participant}
               activities={activities}
               visibleActivities={visibleActivities}
               onComplete={submitSurvey}
@@ -398,6 +408,7 @@ export default function Participant({
         <BottomMenu
           activeTab={activeTab}
           tabValue={tab}
+          participant={participant}
           showWelcome={openDialog}
           setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
         />

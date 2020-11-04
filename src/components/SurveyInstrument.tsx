@@ -723,7 +723,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
     </FormGroup>
   )
 }
-function Question({ onResponse, number, text, type, options, value, startTime, ...props }) {
+function Question({ onResponse, number, text, desc, type, options, value, startTime, ...props }) {
   let onChange = (value) => {
     onResponse({ item: text, value: value })
   }
@@ -800,13 +800,8 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
 
   switch (type) {
     case "slider":
-      component = (
-        <Rating
-          options={options.sort((a, b) => parseInt(a.value) > parseInt(b.value))}
-          onChange={onChange}
-          value={!!value ? value.value : undefined}
-        />
-      )
+      options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))
+      component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "likert":
     case "boolean":
@@ -833,12 +828,16 @@ function Question({ onResponse, number, text, type, options, value, startTime, .
   return (
     <Grid>
       <Box className={classes.questionhead}>
-        <Typography variant="h5">{text}</Typography>
+        <Typography variant="h5">
+          {text} {!!desc && ` (${desc})`}
+        </Typography>
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "likert" || type === "boolean" || type === "list" || type === "select"
             ? "(Select one)"
-            : type === "rating"
-            ? "(0 being terrible, 10 being excellent)"
+            : type === "slider"
+            ? `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
+                options[options.length - 1].description
+              })`
             : ""}
         </Typography>
       </Box>
@@ -879,6 +878,7 @@ function Questions({
             number={idx + 1}
             text={x.text}
             type={x.type}
+            desc={x.description ?? null}
             options={x.options?.map((y) => ({ ...y, label: y.value }))}
             value={responses.current[idx]}
             onResponse={(response) => {
@@ -939,7 +939,7 @@ function Section({
   const [index, setIndex] = useState(0)
   const [slideElements, setSlideElements] = useState(null)
   const [elementIn, setElementIn] = useState(false)
-
+  console.log(value)
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
     if (slideElements == null) {
@@ -1123,7 +1123,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const classes = useStyles()
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
-
+  console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {

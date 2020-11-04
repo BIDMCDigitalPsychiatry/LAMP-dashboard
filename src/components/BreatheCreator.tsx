@@ -269,6 +269,19 @@ export default function BreatheCreator({
     event.target.value = null
   }
 
+  const validURL = (audioURL: string) => {
+    let pattern = new RegExp(
+      "^(https?:\\/\\/)?" + // protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + //port
+      "(\\?[;&amp;a-z\\d%_.~+=-]*)?" + // query string
+        "(\\#[-a-z\\d_]*)?$",
+      "i"
+    )
+    return pattern.test(audioURL)
+  }
+
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -312,7 +325,7 @@ export default function BreatheCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Select"
+                    label="Study"
                     value={studyId}
                     onChange={(e) => {
                       setStudyId(e.target.value)
@@ -350,7 +363,7 @@ export default function BreatheCreator({
                   </Box>
                 </Grid>
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} spacing={2}>
                 <Box>
                   <TextField
                     fullWidth
@@ -360,11 +373,33 @@ export default function BreatheCreator({
                     rows={2}
                     defaultValue={description}
                     onChange={(event) => setDescription(event.target.value)}
-                    inputProps={{ maxLength: 350 }}
+                    inputProps={{ maxLength: 2500 }}
                   />
                 </Box>
               </Grid>
               <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <Divider />
+                  <Typography variant="h6">Settings</Typography>
+                </Grid>
+                <Divider />
+                <Grid item xs={12} spacing={2}>
+                  <Box mb={3}>
+                    <TextField
+                      error={
+                        (settings?.audio_url?.trim() ?? "") === "" ||
+                        ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings.audio_url))
+                          ? true
+                          : false
+                      }
+                      fullWidth
+                      variant="filled"
+                      label="Audio URL"
+                      defaultValue={settings?.audio_url ?? ""}
+                      onChange={(event) => setSettings({ ...settings, audio_url: event.target.value })}
+                    />
+                  </Box>
+                </Grid>
                 <Grid item xs>
                   <label htmlFor="upload-audio">
                     <TextField

@@ -6,6 +6,7 @@ import { ReactComponent as Background04 } from "../icons/scratch/Background-04.s
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
 import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) => ({
   toolbardashboard: {
@@ -73,13 +74,14 @@ const background = () => {
   ]
   return images[Math.floor(Math.random() * images.length)]
 }
-export default function ScratchImage({ ...props }) {
+export default function ScratchImage({ participant, activity, ...props }) {
   let lastPoint, isDrawing, context
   const [canvas, setCanvas] = useState(null)
   const [visibility, setVisibility] = useState(false)
   const [done, setDone] = useState(false)
   const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
   const [image, setImage] = useState(null)
+  const [time, setTime] = useState(new Date().getTime())
 
   let brush = new Image()
   let cover = new Image()
@@ -105,6 +107,23 @@ export default function ScratchImage({ ...props }) {
     const y = (event.pageY || (event.touches && event.touches[0].clientY)) - offsetY
     return { x, y }
   }
+  useEffect(() => {
+    if (done) {
+      let duration = new Date().getTime() - time
+      let data = {
+        timestamp: new Date().getTime(),
+        duration: duration,
+        activity: activity.id,
+        static_data: {},
+      }
+      LAMP.ActivityEvent.create(participant.id, data)
+        .catch((e) => console.dir(e))
+        .then((x) => {
+          setCanvasComponent(null)
+          canvas.remove()
+        })
+    }
+  }, [done])
 
   const touchMove = (event: any) => {
     if (!isDrawing) return
@@ -122,10 +141,8 @@ export default function ScratchImage({ ...props }) {
         context.drawImage(brush, x, y, 80, 80)
         val = val + 1
         area = canvas.width * canvas.height
-        if (val > area / 150) {
+        if (val > area / 200) {
           setDone(true)
-          setCanvasComponent(null)
-          canvas.remove()
         }
       }
       lastPoint = b

@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Icon, IconButton, Tooltip, Typography, Divider, Popover } from "@material-ui/core"
+import { Box, Icon, IconButton, Tooltip, Typography, Divider, Container } from "@material-ui/core"
 import { blue } from "@material-ui/core/colors"
 
 // Local Imports
@@ -12,9 +12,12 @@ export const strategies = {
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
+        console.log(x.value)
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else if (!!question && question.type === "slider")
+          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
@@ -25,6 +28,8 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
+        else if (!!question && question.type === "slider")
+          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
         else return parseInt(x.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
@@ -55,6 +60,7 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
+  const [selectedActivity, setActivity] = useState(activity)
 
   return (
     <React.Fragment>
@@ -143,7 +149,7 @@ export default function ActivityCard({
                 y: strategies[activity.spec]
                   ? strategies[activity.spec](
                       activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
-                      activity,
+                      selectedActivity,
                       idx
                     )
                   : 0,
@@ -183,7 +189,7 @@ export default function ActivityCard({
             y: strategies[activity.spec]
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
-                  activity,
+                  selectedActivity,
                   undefined
                 )
               : 0,

@@ -300,7 +300,7 @@ export default function SurveyCreator({
                 error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                 id="filled-select-currency"
                 select
-                label="Select"
+                label="Study"
                 value={studyId}
                 onChange={(e) => {
                   setStudyId(e.target.value)

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Container,
   Typography,
@@ -15,8 +15,8 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import LAMP, { Participant as ParticipantObj, ActivityEvent } from "lamp-core"
+import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import LAMP from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
 import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
@@ -24,11 +24,33 @@ import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
 import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
+import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
-import { useSnackbar } from "notistack"
+import { DatePicker } from "@material-ui/pickers"
+import EmbeddedActivity from "./EmbeddedActivity"
 
+const theme = createMuiTheme({
+  overrides: {
+    MuiInput: {
+      root: { width: "100%" },
+      underline: {
+        "&&&:before": {
+          borderBottom: "none",
+        },
+        "&&:after": {
+          borderBottom: "none",
+        },
+      },
+    },
+    MuiToolbar: {
+      root: { backgroundColor: "#38C396 !important" },
+    },
+    MuiButtonBase: {
+      root: {},
+    },
+  },
+})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -114,7 +136,12 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     topicon: {
-      minWidth: 120,
+      minWidth: 150,
+      minHeight: 150,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
     },
     surveytextarea: {
       padding: "20px 40px 40px",
@@ -136,6 +163,10 @@ const useStyles = makeStyles((theme: Theme) =>
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    calendatInput: {
+      width: "100%",
+      "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+    },
   })
 )
 
@@ -149,13 +180,29 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
-export default function Survey({ id, activities, visibleActivities, setVisibleActivities, onComplete, ...props }) {
+async function getDetails(activityId: string) {
+  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.survey_description")].map((y: any) =>
+    !!y.error ? undefined : y.data
+  )[0]
+}
+
+export default function Survey({
+  participant,
+  activities,
+  visibleActivities,
+  setVisibleActivities,
+  onComplete,
+  ...props
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
-  const [surveyType, setSurveyType] = useState(null)
   const [questionCount, setQuestionCount] = useState(0)
+  const [spec, setSpec] = useState(null)
+  const [activity, setActivity] = useState(null)
+  const [tag, setTag] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -167,12 +214,51 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
     onComplete(response)
   }
 
+  useEffect(() => {
+    let savedActivities = (activities || []).filter(
+      (x) =>
+        x.spec === "lamp.dbt_diary_card" ||
+        (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+    )
+    if (savedActivities.length > 0) {
+      setLoading(true)
+      ;(async () => {
+        let tags = []
+        let details = await savedActivities.map((activity, index) => {
+          ;(async () => {
+            tags[activity.id] = await getDetails(activity.id)
+            setTag(tags)
+            if (index === savedActivities.length - 1) {
+              setLoading(false)
+              setTag(tags)
+              return tags
+            }
+          })()
+        })
+        setTag(details)
+      })()
+    } else {
+      setLoading(false)
+    }
+  }, [])
+  // var date = new Date()
+  // date.setDate(date.getDate() - 21)
+
+  // const year = date.getFullYear()
+  // const month = date.getMonth() + 1
+  // const day = date.getDate()
+  // const formattedDate = year + "-" + month + "-" + day
+
   return (
     <Container className={classes.thumbContainer}>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
         {[
           ...(activities || [])
-            .filter((x) => x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+            .filter(
+              (x) =>
+                x.spec === "lamp.dbt_diary_card" ||
+                (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+            )
             .map((y) => (
               <Grid
                 item
@@ -181,8 +267,11 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 md={3}
                 lg={3}
                 onClick={() => {
+                  setSpec(y.spec)
+                  setActivity(y)
+                  console.log(y)
+                  y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
                   setVisibleActivities([y])
-                  setQuestionCount(y.settings.length)
                   handleClickOpen(y.name)
                 }}
                 className={classes.thumbMain}
@@ -190,6 +279,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
                 <ButtonBase focusRipple className={classes.fullwidthBtn}>
                   <Card className={classes.assess}>
                     <Box mt={1} mb={1}>
+                      {y.spec === "lamp.dbt_diary_card" && <AssessDbt />}
                       {y.name === "Mood" && <AssessMood />}
                       {y.name === "Sleep and Social" && <AssessSleep />}
                       {y.name === "Anxiety" && <AssessAnxiety />}
@@ -222,6 +312,7 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
+            {spec === "lamp.dbt_diary_card" && <AssessDbt className={classes.topicon} />}
             {dialogueType === "Mood" && <AssessMood className={classes.topicon} />}
             {dialogueType === "Sleep and Social" && <AssessSleep className={classes.topicon} />}
             {dialogueType === "Anxiety" && <AssessAnxiety className={classes.topicon} />}
@@ -229,17 +320,35 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
             {dialogueType === "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
             {dialogueType === "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
             <Typography variant="h6">Survey</Typography>
-            <Typography variant="h2">{dialogueType}</Typography>
+            <Typography variant="h2">{activity?.name ?? null}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
-            {questionCount} questions (10 mins)
+            {questionCount} {questionCount > 1 ? " questions" : " question"} {/* (10 mins) */}
           </Typography>
           <Typography variant="body2" component="p">
-            The following survey will assess your sleep and social behavior. For each of the statements, rate which is
-            true for you.
+            {spec !== "lamp.dbt_diary_card" && (tag[activity?.id]?.description ?? null)}
+            {spec === "lamp.dbt_diary_card" &&
+              "Daily log of events and related feelings. Track target behaviors and use of skills."}
           </Typography>
+          {/* {spec === "lamp.dbt_diary_card" && (
+            <Box mt={5}>
+              <MuiThemeProvider theme={theme}>
+                <React.Fragment>
+                  <DatePicker
+                    className={classes.calendatInput}
+                    autoOk
+                    format="MMMM d, yyyy "
+                    minDate={formattedDate}
+                    disableFuture
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                  />
+                </React.Fragment>
+              </MuiThemeProvider>
+            </Box> 
+          )}*/}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
@@ -247,7 +356,6 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
               onClick={() => {
                 setOpenData(true)
                 setOpen(false)
-                setSurveyType(dialogueType.replace(/\s/g, "_"))
               }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
@@ -267,14 +375,28 @@ export default function Survey({ id, activities, visibleActivities, setVisibleAc
           setOpenData(false)
         }}
       >
-        <SurveyInstrument
-          id={id}
-          type={dialogueType}
-          fromPrevent={false}
-          group={visibleActivities}
-          setVisibleActivities={setVisibleActivities}
-          onComplete={submitSurveyType}
-        />
+        {spec === "lamp.dbt_diary_card" && (
+          <EmbeddedActivity
+            name={activity?.name ?? ""}
+            activity={activity ?? []}
+            participant={participant}
+            onComplete={() => {
+              setOpenData(false)
+              onComplete(null)
+            }}
+          />
+        )}
+
+        {spec !== "lamp.dbt_diary_card" && (
+          <SurveyInstrument
+            id={participant.id}
+            type={dialogueType}
+            fromPrevent={false}
+            group={visibleActivities}
+            setVisibleActivities={setVisibleActivities}
+            onComplete={submitSurveyType}
+          />
+        )}
       </ResponsiveDialog>
     </Container>
   )
