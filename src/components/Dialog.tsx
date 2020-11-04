@@ -121,7 +121,7 @@ const useStyles = makeStyles((theme) =>
       flex: 1,
       opacity: 0.4,
     },
-    popWidth: { width: "95%", maxWidth: "450px", padding: "0 40px" },
+    popWidth: { width: "95%", maxWidth: "500px", padding: "0 40px" },
   })
 )
 
@@ -210,6 +210,18 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
               unable={false}
               checked={measure == "Yes"}
               onChange={() => setMeasure("Yes")}
+              labelPlacement="right"
+            />
+          </Box>
+          <Box>
+            <RatioButton
+              value="Custom"
+              unable={false}
+              smallSpace={true}
+              title="Custom"
+              color="#618EF7"
+              checked={measure == "Custom"}
+              onChange={() => setMeasure("Custom")}
               labelPlacement="right"
             />
           </Box>
