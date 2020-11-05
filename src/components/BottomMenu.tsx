@@ -338,7 +338,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Feed</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can see recent activities.</Typography>
+                  <Typography variant="body1">Review today's activities.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -417,7 +417,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Assess</Box> section.
                   </Typography>
-                  <Typography variant="body1">Log feelings, behavior, and activity .</Typography>
+                  <Typography variant="body1">Log feelings, behavior, and activity.</Typography>
                 </React.Fragment>
               }
               arrow={true}
