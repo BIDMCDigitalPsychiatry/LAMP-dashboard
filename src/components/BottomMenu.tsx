@@ -263,15 +263,22 @@ export default function BottomMenu({ ...props }) {
   const [viewedTabs, setViewedTabs] = useState([1])
 
   const [openTabs, setOpenTabs] = useState(
-    !!localStorage.getItem("bottom-menu-tabs" + props.participant.id)
-      ? JSON.parse(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
-      : [
-          props.tabValue === 0 ? true : false,
-          props.tabValue === 1 ? true : false,
-          props.tabValue === 2 ? true : false,
-          props.tabValue === 3 ? true : false,
-          props.tabValue === 4 ? true : false,
-        ]
+    [
+      props.tabValue === 0 ? true : false,
+      props.tabValue === 1 ? true : false,
+      props.tabValue === 2 ? true : false,
+      props.tabValue === 3 ? true : false,
+      props.tabValue === 4 ? true : false,
+    ]
+    // !!localStorage.getItem("bottom-menu-tabs" + props.participant.id)
+    //   ? JSON.parse(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
+    //   : [
+    //       props.tabValue === 0 ? true : false,
+    //       props.tabValue === 1 ? true : false,
+    //       props.tabValue === 2 ? true : false,
+    //       props.tabValue === 3 ? true : false,
+    //       props.tabValue === 4 ? true : false,
+    //     ]
   )
 
   useEffect(() => {
@@ -373,7 +380,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Learn</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Find useful information and practice healthy habits.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -410,7 +417,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Assess</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Log feelings, behavior, and activity .</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -447,7 +454,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Manage</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Take steps to refocus, reflect, and recover.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -484,7 +491,7 @@ export default function BottomMenu({ ...props }) {
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Prevent</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Track progress and make connections.</Typography>
                 </React.Fragment>
               }
               arrow={true}
