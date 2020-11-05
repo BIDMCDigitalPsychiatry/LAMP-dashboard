@@ -80,6 +80,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
+    console.log(activity.settings)
     setSettings(activity.settings)
     setSaved(false)
     let response = await fetch(

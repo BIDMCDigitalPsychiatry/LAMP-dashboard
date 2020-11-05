@@ -57,6 +57,49 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    unableContainer: {
+      width: 24,
+      height: 24,
+      border: "3px solid #BFBFBF",
+      borderRadius: 12,
+      boxSizing: "border-box",
+      marginRight: 17,
+      opacity: 0.4,
+    },
+    unableCheck: {
+      fontSize: 14,
+      color: "rgba(0, 0, 0, 0.4)",
+      flex: 1,
+      opacity: 0.4,
+    },
+    uncheckContainer: {
+      width: 24,
+      height: 24,
+      border: "3px solid #C6C6C6",
+      borderRadius: 12,
+      boxSizing: "border-box",
+      arginRight: 17,
+    },
+    checkedContainer: {
+      width: 24,
+      height: 24,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#2F9D7E",
+      borderRadius: 12,
+      marginRight: 17,
+    },
+    titleChecked: {
+      fontSize: 14,
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: "bold",
+      flex: 1,
+    },
+    titleUncheck: {
+      fontSize: 14,
+      color: "rgba(0, 0, 0, 0.4)",
+      flex: 1,
+    },
   })
 )
 
@@ -80,6 +123,25 @@ function compress(file, width, height) {
   })
 }
 
+function RatioButton({ checked, onChange, title, value, unable, smallSpace, color, ...props }) {
+  const classes = useStyles()
+
+  return (
+    <Box display="flex" mx={3}>
+      <div
+        onClick={() => !unable && onChange(value)}
+        className={unable ? classes.unableContainer : checked ? classes.checkedContainer : classes.uncheckContainer}
+        style={{
+          marginRight: smallSpace ? 10 : 10,
+          backgroundColor: checked ? (color ? color : "#2F9D7E") : "transparent",
+        }}
+      />
+      <Typography className={unable ? classes.unableCheck : checked ? classes.titleChecked : classes.titleUncheck}>
+        {title}
+      </Typography>
+    </Box>
+  )
+}
 export default function GameCreator({
   activities,
   value,
@@ -303,6 +365,38 @@ export default function GameCreator({
               </Box>
             </Grid>
           </Grid>
+
+          {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
+            <Box style={{ marginTop: 80 }}>
+              <Typography variant="h6">Order of tapping:</Typography>
+              <Box display="flex" mt={2}>
+                <Box>
+                  <RatioButton
+                    value="Forward"
+                    unable={false}
+                    smallSpace={true}
+                    title="Forward"
+                    color="#618EF7"
+                    checked={!settings.reverse_tapping ? true : false}
+                    onChange={() => setSettings({ ...settings, reverse_tapping: false })}
+                    labelPlacement="right"
+                  />
+                </Box>
+                <Box>
+                  <RatioButton
+                    smallSpace={true}
+                    title="Backward"
+                    color="#618EF7"
+                    value="Backward"
+                    unable={false}
+                    checked={settings.reverse_tapping ? true : false}
+                    onChange={() => setSettings({ ...settings, reverse_tapping: true })}
+                    labelPlacement="right"
+                  />
+                </Box>
+              </Box>
+            </Box>
+          )}
 
           {((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
             ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)) && (
