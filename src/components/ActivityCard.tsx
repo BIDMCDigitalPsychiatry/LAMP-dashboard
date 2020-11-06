@@ -18,7 +18,7 @@ export const strategies = {
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
         else if (!!question && question.type === "slider")
           return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
-        else return parseInt(x.value) || 0
+        else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.dashboard.custom_survey_group": (slices, activity, scopedItem) =>
@@ -30,7 +30,7 @@ export const strategies = {
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
         else if (!!question && question.type === "slider")
           return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
-        else return parseInt(x.value) || 0
+        else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) =>

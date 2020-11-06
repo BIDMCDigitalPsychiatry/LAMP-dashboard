@@ -112,7 +112,6 @@ function AppRouter({ ...props }) {
         }))
       })
     }
-
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 

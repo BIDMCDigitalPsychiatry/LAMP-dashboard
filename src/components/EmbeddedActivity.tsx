@@ -41,6 +41,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
+        console.log(settings)
         iFrame.contentWindow.postMessage(settings, "*")
       }
     }
@@ -80,6 +81,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
+    console.log(activity.settings)
     setSettings(activity.settings)
     setSaved(false)
     let response = await fetch(
@@ -87,6 +89,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         demoActivities[activity.spec]
       }.html.b64`
     )
+    // let response = await fetch('boxgame.html.64')
+    // console.log(await response.text())
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

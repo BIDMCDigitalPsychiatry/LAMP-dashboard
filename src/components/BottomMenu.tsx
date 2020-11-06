@@ -260,38 +260,47 @@ export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
-  const [viewedTabs, setViewedTabs] = useState([1])
-
-  const [openTabs, setOpenTabs] = useState(
-    !!localStorage.getItem("bottom-menu-tabs" + props.participant.id)
+  const [viewedTabs, setViewedTabs] = useState([])
+  const [tabValues, setTabValues] = useState(
+    localStorage.getItem("bottom-menu-tabs" + props.participant.id) !== null
       ? JSON.parse(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
-      : [
-          props.tabValue === 0 ? true : false,
-          props.tabValue === 1 ? true : false,
-          props.tabValue === 2 ? true : false,
-          props.tabValue === 3 ? true : false,
-          props.tabValue === 4 ? true : false,
-        ]
+      : []
   )
+  const [openTabs, setOpenTabs] = useState([
+    props.tabValue === 0 ? true : false,
+    props.tabValue === 1 ? true : false,
+    props.tabValue === 2 ? true : false,
+    props.tabValue === 3 ? true : false,
+    props.tabValue === 4 ? true : false,
+  ])
 
   useEffect(() => {
-    console.log(props.participant.id)
-    console.log(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
+    openTabUpdate()
   }, [])
 
+  const openTabUpdate = () => {
+    setOpenTabs([
+      tabVal === 0 && typeof tabValues[0] === "undefined" ? true : false,
+      tabVal === 1 && typeof tabValues[1] === "undefined" ? true : false,
+      tabVal === 2 && typeof tabValues[2] === "undefined" ? true : false,
+      tabVal === 3 && typeof tabValues[3] === "undefined" ? true : false,
+      tabVal === 4 && typeof tabValues[4] === "undefined" ? true : false,
+    ])
+  }
+
   useEffect(() => {
-    console.log(openTabs, localStorage.getItem("bottom-menu-tabs" + props.participant.id))
-    localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(openTabs))
-  }, [openTabs])
+    localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(tabValues))
+  }, [tabValues])
+
+  useEffect(() => {
+    openTabUpdate()
+  }, [tabVal])
 
   const setTab = (newTab) => {
     _setTab(newTab)
-    //setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
     props.setShowDemoMessage(false)
-    if (viewedTabs.length == 0) setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
     if (!viewedTabs.includes(newTab)) {
       setViewedTabs(viewedTabs.concat(newTab))
-      setOpenTabs({ ...openTabs, [newTab]: true, [tabVal]: newTab === tabVal ? true : false })
     }
     props.activeTab(newTab)
   }
@@ -324,14 +333,17 @@ export default function BottomMenu({ ...props }) {
                   <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={() => setOpenTabs({ ...openTabs, 4: false })}
+                    onClick={() => {
+                      setTabValues({ ...tabValues, 4: false })
+                      setOpenTabs({ ...openTabs, 4: false })
+                    }}
                   >
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Feed</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can see recent activities.</Typography>
+                  <Typography variant="body1">Review today's activities.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -366,14 +378,17 @@ export default function BottomMenu({ ...props }) {
                   <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={() => setOpenTabs({ ...openTabs, 0: false })}
+                    onClick={() => {
+                      setTabValues({ ...tabValues, 0: false })
+                      setOpenTabs({ ...openTabs, 0: false })
+                    }}
                   >
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Learn</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Find useful information and practice healthy habits.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -396,21 +411,24 @@ export default function BottomMenu({ ...props }) {
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 1: false })}>
             <AssesTooltip
-              open={!props.showWelcome && openTabs[1]}
+              open={openTabs[1]}
               interactive={true}
               title={
                 <React.Fragment>
                   <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={() => setOpenTabs({ ...openTabs, 1: false })}
+                    onClick={() => {
+                      setTabValues({ ...tabValues, 1: false })
+                      setOpenTabs({ ...openTabs, 1: false })
+                    }}
                   >
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Assess</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Log feelings, behavior, and activity.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -440,14 +458,17 @@ export default function BottomMenu({ ...props }) {
                   <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={() => setOpenTabs({ ...openTabs, 2: false })}
+                    onClick={() => {
+                      setTabValues({ ...tabValues, 2: false })
+                      setOpenTabs({ ...openTabs, 2: false })
+                    }}
                   >
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Manage</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Take steps to refocus, reflect, and recover.</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -470,21 +491,24 @@ export default function BottomMenu({ ...props }) {
           </ClickAwayListener>
           <ClickAwayListener onClickAway={() => setOpenTabs({ ...openTabs, 3: false })}>
             <PreventTooltip
-              open={!props.showWelcome && openTabs[3]}
+              open={openTabs[3]}
               interactive={true}
               title={
                 <React.Fragment>
                   <IconButton
                     aria-label="close"
                     className={classes.closeButton}
-                    onClick={() => setOpenTabs({ ...openTabs, 3: false })}
+                    onClick={() => {
+                      setTabValues({ ...tabValues, 3: false })
+                      setOpenTabs({ ...openTabs, 3: false })
+                    }}
                   >
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="h6">
                     Welcome to the <Box component="span">Prevent</Box> section.
                   </Typography>
-                  <Typography variant="body1">Here you can take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="body1">Track progress and make connections.</Typography>
                 </React.Fragment>
               }
               arrow={true}

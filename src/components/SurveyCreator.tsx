@@ -104,7 +104,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
                 <TextField
                   fullWidth
                   variant="outlined"
-                  defaultValue={x.value || ""}
+                  defaultValue={x.value || (type === "slider" ? 0 : "")}
                   label="Question Option"
                   onBlur={(event) =>
                     setOptions((options) =>
@@ -243,9 +243,6 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               </Button>
               <Button color={type === "boolean" ? "primary" : "default"} onClick={() => setType("boolean")}>
                 boolean
-              </Button>
-              <Button color={type === "likert" ? "primary" : "default"} onClick={() => setType("likert")}>
-                likert
               </Button>
               <Button color={["list", "select"].includes(type) ? "primary" : "default"} onClick={() => setType("list")}>
                 list

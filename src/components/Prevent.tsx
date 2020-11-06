@@ -49,6 +49,7 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
 import { spliceActivity } from "./ActivityList"
+// import Vega from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -237,6 +238,12 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    automation: {
+      padding: "15px 30px 30px",
+      boxShadow: "none",
+      border: "#ccc solid 1px",
+      "& h6": { fontSize: 16, textAlign: "center", marginBottom: 20 },
     },
   })
 )
@@ -528,8 +535,10 @@ export const strategies = {
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
         else if (!!question && question.type === "slider")
-          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
-        else return parseInt(x.value) || 0
+          return !!x.value
+            ? parseInt(question.options.filter((option) => option.description === x.value)[0]?.value ?? 0)
+            : 0
+        else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) =>
@@ -541,7 +550,15 @@ export const strategies = {
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
-
+async function getVisualizations(participant: ParticipantObj) {
+  let visualizations = {}
+  for (let attachmentID of ((await LAMP.Type.listAttachments(participant.id)) as any).data) {
+    if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
+    let bstr = ((await LAMP.Type.getAttachment(participant.id, attachmentID)) as any).data
+    visualizations[attachmentID] = bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}` // defaults
+  }
+  return visualizations
+}
 export default function Prevent({
   participant,
   activeTab,
@@ -613,6 +630,8 @@ export default function Prevent({
   const [timeSpans, setTimeSpans] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [disabledData, setDisabled] = React.useState(true)
+  const [visualizations, setVisualizations] = React.useState({})
+  const [selectedExperimental, setSelectedExperimental] = React.useState([])
 
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
@@ -646,13 +665,14 @@ export default function Prevent({
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
+      getVisualizations(participant).then(setVisualizations)
+
       if (!disabled) {
         let selActivities = await getSelectedActivities(participant)
         setSelectedActivities(selActivities)
         let selSensors = await getSelectedSensors(participant)
         let activities = await getActivities(participant)
         activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
-
         // let goals = await getGoals(participant)
         // let groupByType
         // if (typeof goals !== "undefined") {
@@ -679,20 +699,20 @@ export default function Prevent({
         // }
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
+        activities.map((activity) => console.log(activity.name, activityEventCount[activity.name]))
         activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
         activities.map((activity, index) => {
           if (activity.spec === "lamp.survey") {
             getSplicedSurveys([activity]).then((e) => {
               let data = activity
-              console.log(activities)
               data.settings = e.sections[0].settings
               activities[index] = data
-              console.log(activities)
-              setActivities(activities)
             })
+          } else {
+            activities[index] = activity
           }
         })
-
+        setActivities(activities)
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
@@ -793,7 +813,6 @@ export default function Prevent({
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                         <Typography className={classes.preventlabelFull}>
-                          {console.log(activity)}
                           {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
                         </Typography>
                         <Box className={classes.maxw300}>
@@ -836,7 +855,7 @@ export default function Prevent({
                             />
                           </Sparkline>
                         </Box>
-                        <Typography variant="h6">{timeAgo.format(timeSpans[activity.name].timestamp)}</Typography>
+                        <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
                       </Card>
                     </ButtonBase>
                   </Grid>
@@ -977,6 +996,43 @@ export default function Prevent({
                 </ButtonBase>
               </Grid>
             )}
+            {Object.keys(visualizations).length > 0 && (
+              <Grid container xs={12} spacing={0} className={classes.sensorhd}>
+                <Grid item xs className={classes.preventHeader}>
+                  <Typography variant="h5">Automations</Typography>
+                </Grid>
+                <Grid item xs className={classes.addbtnmain}>
+                  <IconButton onClick={() => handleClickOpen(2)}>
+                    <AddCircleOutlineIcon className={classes.addicon} />
+                  </IconButton>
+                </Grid>
+              </Grid>
+            )}
+
+            <Grid container xs={12} spacing={2}>
+              {(selectedExperimental || []).map((x) => (
+                <Grid item xs={12} sm={12} md={12} lg={12}>
+                  <Card key={x} className={classes.automation}>
+                    <Typography component="h6" variant="h6">
+                      {x}
+                    </Typography>
+                    <Grid container justify="center">
+                      {/* {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
+                      visualizations["lamp.dashboard.experimental." + x] !== null ? (
+                        <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
+                      ) : ( */}
+                      <img
+                        alt="visualization"
+                        src={visualizations["lamp.dashboard.experimental." + x]}
+                        height="100%"
+                        width="100%"
+                      />
+                      {/* )} */}
+                    </Grid>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           </Grid>
         </Container>
       )}
@@ -1012,7 +1068,7 @@ export default function Prevent({
                 setSelectedActivities(x)
               }}
             />
-          ) : (
+          ) : dialogueType === 1 ? (
             <MultipleSelect
               selected={selectedSensors || []}
               items={[`Environmental Context`, `Step Count`, `Social Context`].filter(
@@ -1024,6 +1080,18 @@ export default function Prevent({
                 LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
                 setSelectedSensors(x)
               }}
+            />
+          ) : (
+            <MultipleSelect
+              tooltips={{}}
+              defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
+              selected={selectedExperimental || []}
+              items={Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", ""))}
+              showZeroBadges={false}
+              badges={Object.keys(visualizations)
+                .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+                .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
+              onChange={(x) => setSelectedExperimental(x)}
             />
           )}
         </DialogContent>

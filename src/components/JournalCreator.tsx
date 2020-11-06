@@ -229,7 +229,7 @@ export default function JournalCreator({
                   rows={2}
                   defaultValue={description}
                   onChange={(event) => setDescription(event.target.value)}
-                  inputProps={{ maxLength: 350 }}
+                  inputProps={{ maxLength: 2500 }}
                 />
               </Box>
             </Grid>

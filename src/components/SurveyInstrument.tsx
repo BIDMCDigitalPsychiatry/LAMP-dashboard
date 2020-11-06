@@ -797,7 +797,6 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   //     label: "Exellent",
   //   },
   // ]
-
   switch (type) {
     case "slider":
       options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))

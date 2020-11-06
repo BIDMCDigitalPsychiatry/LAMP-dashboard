@@ -5,7 +5,19 @@ import { ReactComponent as Background03 } from "../icons/scratch/Background-03.s
 import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
-import { Typography, makeStyles, Box, AppBar, Icon, IconButton, Toolbar, Button, Link, Fab } from "@material-ui/core"
+import {
+  Typography,
+  makeStyles,
+  Box,
+  AppBar,
+  Icon,
+  IconButton,
+  Toolbar,
+  Backdrop,
+  CircularProgress,
+  Link,
+  Fab,
+} from "@material-ui/core"
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) => ({
@@ -58,6 +70,10 @@ const useStyles = makeStyles((theme) => ({
     "& h4": { fontSize: 30, fontWeight: 600, marginBottom: 60 },
   },
   linkpeach: { fontSize: 16, color: "#BC453D", fontWeight: 600 },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+  },
 }))
 
 function CanvasElement({ setCanvas, ...props }) {
@@ -82,6 +98,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
   const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
   const [image, setImage] = useState(null)
   const [time, setTime] = useState(new Date().getTime())
+  const [loading, setLoading] = useState(true)
 
   let brush = new Image()
   let cover = new Image()
@@ -155,7 +172,6 @@ export default function ScratchImage({ participant, activity, ...props }) {
 
   useEffect(() => {
     if (canvas != null) {
-      setImage(background())
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
       context = canvas.getContext("2d")
@@ -174,6 +190,8 @@ export default function ScratchImage({ participant, activity, ...props }) {
         context.fillText("Swipe around the", canvas.width / 2, canvas.height / 2 - 35)
         context.fillText("screen to reveal", canvas.width / 2, canvas.height / 2)
         context.fillText("the hidden image", canvas.width / 2, canvas.height / 2 + 35)
+        setImage(background())
+        setLoading(false)
       }
     }
   }, [canvas])
@@ -189,6 +207,9 @@ export default function ScratchImage({ participant, activity, ...props }) {
 
   return (
     <div>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
           <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
