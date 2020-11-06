@@ -49,6 +49,7 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
 import { spliceActivity } from "./ActivityList"
+import Vega from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -237,6 +238,25 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    automation: {
+      padding: "15px 30px 30px",
+      boxShadow: "none",
+      border: "#ccc solid 1px",
+      "& h6": { fontSize: 16, textAlign: "center", marginBottom: 20 },
+      "& img": { maxHeight: 218 },
+      [theme.breakpoints.up("lg")]: {
+        minHeight: 306,
+        maxHeight: 306,
+      },
+      [theme.breakpoints.up("md")]: {
+        minHeight: 308,
+        maxHeight: 308,
+      },
+      [theme.breakpoints.up("sm")]: {
+        minHeight: 320,
+        maxHeight: 320,
+      },
     },
   })
 )
@@ -1001,23 +1021,31 @@ export default function Prevent({
                 </Grid>
               </Grid>
             )}
-            {(selectedExperimental || []).map((x) => (
-              <Grid item xs={6} sm={4} md={3} lg={3}>
-                <Card key={x} style={{ marginTop: 16, marginBottom: 16 }}>
-                  <Typography component="h6" variant="h6" align="center" style={{ width: "100%", margin: 16 }}>
-                    {x}
-                  </Typography>
-                  <Grid container justify="center">
-                    <img
-                      alt="visualization"
-                      src={visualizations["lamp.dashboard.experimental." + x]}
-                      height="85%"
-                      width="85%"
-                    />
-                  </Grid>
-                </Card>
-              </Grid>
-            ))}
+
+            <Grid container xs={12} spacing={2}>
+              {(selectedExperimental || []).map((x) => (
+                <Grid item xs={6} sm={6} md={6} lg={4}>
+                  <Card key={x} className={classes.automation}>
+                    <Typography component="h6" variant="h6">
+                      {x}
+                    </Typography>
+                    <Grid container justify="center">
+                      {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
+                      visualizations["lamp.dashboard.experimental." + x] !== null ? (
+                        <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
+                      ) : (
+                        <img
+                          alt="visualization"
+                          src={visualizations["lamp.dashboard.experimental." + x]}
+                          height="85%"
+                          width="85%"
+                        />
+                      )}
+                    </Grid>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
           </Grid>
         </Container>
       )}
