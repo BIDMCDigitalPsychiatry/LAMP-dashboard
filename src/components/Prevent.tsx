@@ -528,8 +528,10 @@ export const strategies = {
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
         else if (!!question && question.type === "slider")
-          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
-        else return parseInt(x.value) || 0
+          return !!x.value
+            ? parseInt(question.options.filter((option) => option.description === x.value)[0]?.value ?? 0)
+            : 0
+        else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
   "lamp.jewels_a": (slices, activity, scopedItem) =>
@@ -664,7 +666,17 @@ export default function Prevent({
         let selSensors = await getSelectedSensors(participant)
         let activities = await getActivities(participant)
         activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
-
+        activities.map((activity, index) => {
+          if (activity.spec === "lamp.survey") {
+            getSplicedSurveys([activity]).then((e) => {
+              let data = activity
+              data.settings = e.sections[0].settings
+              activities[index] = data
+            })
+          } else {
+            activities[index] = activity
+          }
+        })
         // let goals = await getGoals(participant)
         // let groupByType
         // if (typeof goals !== "undefined") {
@@ -692,19 +704,8 @@ export default function Prevent({
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
         activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
-        activities.map((activity, index) => {
-          if (activity.spec === "lamp.survey") {
-            getSplicedSurveys([activity]).then((e) => {
-              let data = activity
-              console.log(activities)
-              data.settings = e.sections[0].settings
-              activities[index] = data
-              console.log(activities)
-              setActivities(activities)
-            })
-          }
-        })
 
+        setActivities(activities)
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)

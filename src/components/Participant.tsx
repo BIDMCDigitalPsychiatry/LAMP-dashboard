@@ -253,9 +253,9 @@ export default function Participant({
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
+
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {
-      console.log(e)
       setActivities(e)
       setLoading(false)
     })
