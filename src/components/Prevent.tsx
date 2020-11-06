@@ -666,17 +666,6 @@ export default function Prevent({
         let selSensors = await getSelectedSensors(participant)
         let activities = await getActivities(participant)
         activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
-        activities.map((activity, index) => {
-          if (activity.spec === "lamp.survey") {
-            getSplicedSurveys([activity]).then((e) => {
-              let data = activity
-              data.settings = e.sections[0].settings
-              activities[index] = data
-            })
-          } else {
-            activities[index] = activity
-          }
-        })
         // let goals = await getGoals(participant)
         // let groupByType
         // if (typeof goals !== "undefined") {
@@ -703,8 +692,19 @@ export default function Prevent({
         // }
         setTimeSpans(timeSpans)
         setActivityCounts(activityEventCount)
+        activities.map((activity) => console.log(activity.name, activityEventCount[activity.name]))
         activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
-
+        activities.map((activity, index) => {
+          if (activity.spec === "lamp.survey") {
+            getSplicedSurveys([activity]).then((e) => {
+              let data = activity
+              data.settings = e.sections[0].settings
+              activities[index] = data
+            })
+          } else {
+            activities[index] = activity
+          }
+        })
         setActivities(activities)
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
@@ -806,7 +806,6 @@ export default function Prevent({
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                         <Typography className={classes.preventlabelFull}>
-                          {console.log(activity)}
                           {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
                         </Typography>
                         <Box className={classes.maxw300}>
@@ -849,7 +848,7 @@ export default function Prevent({
                             />
                           </Sparkline>
                         </Box>
-                        <Typography variant="h6">{timeAgo.format(timeSpans[activity.name].timestamp)}</Typography>
+                        <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
                       </Card>
                     </ButtonBase>
                   </Grid>
