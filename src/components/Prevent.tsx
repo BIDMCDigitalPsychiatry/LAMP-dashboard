@@ -1037,8 +1037,8 @@ export default function Prevent({
                         <img
                           alt="visualization"
                           src={visualizations["lamp.dashboard.experimental." + x]}
-                          height="85%"
-                          width="85%"
+                          height="100%"
+                          width="100%"
                         />
                       {/* )} */}
                     </Grid>
