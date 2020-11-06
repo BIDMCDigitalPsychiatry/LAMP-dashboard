@@ -50,9 +50,6 @@
     "react-jss": "^8.6.1",
     "react-router-dom": "^5.0.1",
     "regenerator-runtime": "^0.13.3",
-    "react-vega": "^7.3.0",
-    "vega": "^5.13.0",
-    "vega-lite": "^4.13.1",
     "url-search-params-polyfill": "^7.0.0"
   },
   "scripts": {

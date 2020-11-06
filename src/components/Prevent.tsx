@@ -49,7 +49,7 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
 import { spliceActivity } from "./ActivityList"
-import Vega from "react-vega"
+// import Vega from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -1030,17 +1030,17 @@ export default function Prevent({
                       {x}
                     </Typography>
                     <Grid container justify="center">
-                      {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
+                      {/* {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
                       visualizations["lamp.dashboard.experimental." + x] !== null ? (
                         <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
-                      ) : (
+                      ) : ( */}
                         <img
                           alt="visualization"
                           src={visualizations["lamp.dashboard.experimental." + x]}
                           height="85%"
                           width="85%"
                         />
-                      )}
+                      {/* )} */}
                     </Grid>
                   </Card>
                 </Grid>
