@@ -244,19 +244,6 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       border: "#ccc solid 1px",
       "& h6": { fontSize: 16, textAlign: "center", marginBottom: 20 },
-      "& img": { maxHeight: 218 },
-      [theme.breakpoints.up("lg")]: {
-        minHeight: 306,
-        maxHeight: 306,
-      },
-      [theme.breakpoints.up("md")]: {
-        minHeight: 308,
-        maxHeight: 308,
-      },
-      [theme.breakpoints.up("sm")]: {
-        minHeight: 320,
-        maxHeight: 320,
-      },
     },
   })
 )
@@ -1024,7 +1011,7 @@ export default function Prevent({
 
             <Grid container xs={12} spacing={2}>
               {(selectedExperimental || []).map((x) => (
-                <Grid item xs={6} sm={6} md={6} lg={4}>
+                <Grid item xs={12} sm={12} md={12} lg={12}>
                   <Card key={x} className={classes.automation}>
                     <Typography component="h6" variant="h6">
                       {x}
@@ -1034,12 +1021,12 @@ export default function Prevent({
                       visualizations["lamp.dashboard.experimental." + x] !== null ? (
                         <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
                       ) : ( */}
-                        <img
-                          alt="visualization"
-                          src={visualizations["lamp.dashboard.experimental." + x]}
-                          height="100%"
-                          width="100%"
-                        />
+                      <img
+                        alt="visualization"
+                        src={visualizations["lamp.dashboard.experimental." + x]}
+                        height="100%"
+                        width="100%"
+                      />
                       {/* )} */}
                     </Grid>
                   </Card>
