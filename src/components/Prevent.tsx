@@ -685,7 +685,6 @@ export default function Prevent({
         setSelectedActivities(selActivities)
         let selSensors = await getSelectedSensors(participant)
         let activities = await getActivities(participant)
-        activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
         // let goals = await getGoals(participant)
         // let groupByType
         // if (typeof goals !== "undefined") {
