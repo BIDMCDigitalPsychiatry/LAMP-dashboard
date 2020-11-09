@@ -332,6 +332,10 @@ export default function Survey({
             {spec === "lamp.dbt_diary_card" &&
               "Daily log of events and related feelings. Track target behaviors and use of skills."}
           </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "Mood" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "Mood" && "Log snapshot of current mood that can be compared to previous entries"}
+          </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
               <MuiThemeProvider theme={theme}>
