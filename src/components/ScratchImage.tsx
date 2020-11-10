@@ -99,6 +99,8 @@ export default function ScratchImage({ participant, activity, ...props }) {
   const [image, setImage] = useState(null)
   const [time, setTime] = useState(new Date().getTime())
   const [loading, setLoading] = useState(true)
+  const [savedX, setSavedx] = useState([])
+  const [savedY, setSavedY] = useState([])
 
   let brush = new Image()
   let cover = new Image()
@@ -156,11 +158,18 @@ export default function ScratchImage({ participant, activity, ...props }) {
         x = a.x + Math.sin(angle) * i - offsetX
         y = a.y + Math.cos(angle) * i - offsetY
         context.drawImage(brush, x, y, 80, 80)
-        val = val + (activity?.settings?.threshold  ?? 80)
-        console.log(val, activity?.settings)
-        area = canvas.width * canvas.height
-        if (val > (area * (activity?.settings?.threshold  ?? 80) / 100)) {
-          setDone(true)
+        if(!savedX.includes(x) && !savedY.includes(y)) {
+          let xValues = savedX
+          let yValues = savedY
+          xValues.push(y)
+          yValues.push(y)
+          setSavedx(xValues)
+          setSavedY(yValues)
+          val = val +  80
+          area = canvas.width * canvas.height
+          if (val > (area * ( activity?.settings?.threshold  ?? 80) / 100)) {
+            setDone(true)
+          }
         }
       }
       lastPoint = b
