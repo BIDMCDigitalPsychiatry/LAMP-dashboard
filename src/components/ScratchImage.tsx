@@ -156,10 +156,10 @@ export default function ScratchImage({ participant, activity, ...props }) {
         x = a.x + Math.sin(angle) * i - offsetX
         y = a.y + Math.cos(angle) * i - offsetY
         context.drawImage(brush, x, y, 80, 80)
-        val = val + (activity?.settings?.threashold ?? 80)
+        val = val + (activity?.settings?.threshold  ?? 80)
         console.log(val, activity?.settings)
         area = canvas.width * canvas.height
-        if (val > (area * (activity?.settings?.threashold ?? 80) / 100)) {
+        if (val > (area * (activity?.settings?.threshold  ?? 80) / 100)) {
           setDone(true)
         }
       }
