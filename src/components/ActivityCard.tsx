@@ -16,8 +16,6 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else if (!!question && question.type === "slider")
-          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
         else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),

@@ -48,8 +48,7 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
-import { spliceActivity } from "./ActivityList"
-// import Vega from "react-vega"
+import {Vega} from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -251,27 +250,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
-// Splice together all selected activities & their tags.
-async function getSplicedSurveys(activities) {
-  let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
-  let spliced = res.map((y: any, idx) =>
-    spliceActivity({
-      raw: activities[idx],
-      tag: !!y.error ? undefined : y.data,
-    })
-  )
-  // Short-circuit the main title & description if there's only one survey.
-  const main = {
-    name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
-    description: spliced.length === 1 ? spliced[0].description : "Please complete all sections below. Thank you.",
-  }
-  if (spliced.length === 1) spliced[0].name = spliced[0].description = undefined
-  return {
-    name: main.name,
-    description: main.description,
-    sections: spliced,
-  }
-}
+
 function getSocialContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
   let events = [
@@ -432,7 +411,6 @@ async function getActivityEvents(
 
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
-  console.log(original)
   let custom =
     ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
       ...x,
@@ -534,10 +512,6 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else if (!!question && question.type === "slider")
-          return !!x.value
-            ? parseInt(question.options.filter((option) => option.description === x.value)[0]?.value ?? 0)
-            : 0
         else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
@@ -555,7 +529,7 @@ async function getVisualizations(participant: ParticipantObj) {
   for (let attachmentID of ((await LAMP.Type.listAttachments(participant.id)) as any).data) {
     if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
     let bstr = ((await LAMP.Type.getAttachment(participant.id, attachmentID)) as any).data
-    visualizations[attachmentID] = bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}` // defaults
+    visualizations[attachmentID] = typeof bstr === "object" ? bstr : (typeof bstr === "string" &&  bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}`)   // defaults
   }
   return visualizations
 }
@@ -667,52 +641,40 @@ export default function Prevent({
       setDisabled(disabled)
       getVisualizations(participant).then(setVisualizations)
 
-      if (!disabled) {
-        let selActivities = await getSelectedActivities(participant)
-        setSelectedActivities(selActivities)
-        let selSensors = await getSelectedSensors(participant)
-        let activities = await getActivities(participant)
-        activities = activities.filter((activity) => activity.spec !== "lamp.dbt_diary_card")
-        // let goals = await getGoals(participant)
-        // let groupByType
-        // if (typeof goals !== "undefined") {
-        //   goals.map((goal) => {
-        //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
-        //       activities.push({ name: goal.goalType, type: "goals" })
-        //     }
-        //   })
-        // }
-        let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-        let timeSpans = Object.fromEntries(
-          Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
-        )
-        setActivityEvents(activityEvents)
+      let selActivities = await getSelectedActivities(participant)
+      setSelectedActivities(selActivities)
+      let selSensors = await getSelectedSensors(participant)
+      let activities = await getActivities(participant)
+      // let goals = await getGoals(participant)
+      // let groupByType
+      // if (typeof goals !== "undefined") {
+      //   goals.map((goal) => {
+      //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
+      //       activities.push({ name: goal.goalType, type: "goals" })
+      //     }
+      //   })
+      // }
+      activities = !disabled ? activities : activities.filter((activity) =>  activity.spec === "lamp.journal")
+      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
+      let timeSpans = Object.fromEntries(
+        Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
+      )
+      setActivityEvents(activityEvents)
 
-        let activityEventCount = getActivityEventCount(activityEvents)
-        // if (typeof goals !== "undefined") {
-        //   groupByType = goals.reduce((goal, it) => {
-        //     goal[it.goalType] = goal[it.goalType] + 1 || 1
-        //     activityEventCount[it.goalType] = goal[it.goalType]
-        //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
-        //     return goal
-        //   }, {})
-        // }
-        setTimeSpans(timeSpans)
-        setActivityCounts(activityEventCount)
-        activities.map((activity) => console.log(activity.name, activityEventCount[activity.name]))
-        activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
-        activities.map((activity, index) => {
-          if (activity.spec === "lamp.survey") {
-            getSplicedSurveys([activity]).then((e) => {
-              let data = activity
-              data.settings = e.sections[0].settings
-              activities[index] = data
-            })
-          } else {
-            activities[index] = activity
-          }
-        })
-        setActivities(activities)
+      let activityEventCount = getActivityEventCount(activityEvents)
+      // if (typeof goals !== "undefined") {
+      //   groupByType = goals.reduce((goal, it) => {
+      //     goal[it.goalType] = goal[it.goalType] + 1 || 1
+      //     activityEventCount[it.goalType] = goal[it.goalType]
+      //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
+      //     return goal
+      //   }, {})
+      // }
+      setTimeSpans(timeSpans)
+      setActivityCounts(activityEventCount)
+      activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
+      setActivities(activities)
+      if(!disabled) {
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
@@ -737,7 +699,7 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {!disabledData && !loading && (
+      {!loading && (
         <Container>
           <Grid container xs={12} spacing={0} className={classes.activityhd}>
             <Grid item xs className={classes.preventHeader}>
@@ -1017,17 +979,17 @@ export default function Prevent({
                       {x}
                     </Typography>
                     <Grid container justify="center">
-                      {/* {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
+                      {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
                       visualizations["lamp.dashboard.experimental." + x] !== null ? (
                         <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
-                      ) : ( */}
+                      ) : (
                       <img
                         alt="visualization"
                         src={visualizations["lamp.dashboard.experimental." + x]}
                         height="100%"
                         width="100%"
                       />
-                      {/* )} */}
+                      )}
                     </Grid>
                   </Card>
                 </Grid>

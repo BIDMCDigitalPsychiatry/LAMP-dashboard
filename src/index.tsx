@@ -6,6 +6,7 @@ import LAMP from "lamp-core"
 // Local Imports
 import App from "./components/App"
 import * as serviceWorker from "./serviceWorker"
+import demo_db from "./demo_db.json"
 
 // External Imports
 import "core-js/stable"
@@ -49,6 +50,9 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
   }
   ;(window.CustomEvent as any) = CustomEvent
 })()
+
+// Initialize the demo DB for "Try It" mode.
+LAMP.initializeDemoDB(demo_db)
 
 // Tie-in for the mobile apps.
 // Login only if we are a participant.

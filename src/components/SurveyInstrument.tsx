@@ -571,19 +571,19 @@ function TextSection({ onChange, charLimit, value, ...props }) {
 
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
-  const [valueText, setValueText] = useState(!!value ? value : options[0].description)
-  const [sliderValue, setSliderValue] = useState(!!value ? 0 : parseInt(options[0].value))
 
-  useEffect(() => {
-    if (!!value) {
-      options.map(function (mark) {
-        if (mark.description == value) {
-          setSliderValue(parseInt(mark.value))
-        }
-      })
-    }
-    onChange(valueText)
-  }, [])
+  const getText = (val) => {
+    let sliderValue = options[0].description
+    options.map(function (mark) {
+      if (mark.value == val) {
+        sliderValue = mark.description
+      }
+    })
+    return sliderValue
+  }
+
+  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
+  const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
   const valuetext = (value: number) => {
     return `${options[value]}`
@@ -600,7 +600,7 @@ function Rating({ onChange, options, value, ...props }) {
     })
     setSliderValue(val)
     setValueText(sliderValue)
-    onChange(sliderValue)
+    onChange(val)
     return sliderValue
   }
 
