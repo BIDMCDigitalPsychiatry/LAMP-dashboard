@@ -334,7 +334,33 @@ export default function Survey({
           </Typography>
           <Typography variant="body2" component="p">
             {dialogueType !== "Mood" && (tag[activity?.id]?.description ?? null)}
-            {dialogueType === "Mood" && "Log snapshot of current mood that can be compared to previous entries"}
+            {dialogueType === "Mood" &&
+              "Record daily emotions. Track mood and potential causes of significant changes."}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "Sleep and Social" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "Sleep and Social" &&
+              "A quick survey to record sleep duration and quality. You can use this to work out sleep patterns."}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "Anxiety" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "Anxiety" &&
+              "A quick survey to monitor your stress and anxiety levels. You can complete this on this on the good days as well as the bad ones."}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "App Usability" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "App Usability" &&
+              "Provide feedback on the app and it's role in helping you achieve goals and adjust your mindset."}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "Water and Nutrition" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "Water and Nutrition" &&
+              "Water and Nutrition are key factors in keeping active and healthy. Record a quick summary of your day to track your progress."}
+          </Typography>
+          <Typography variant="body2" component="p">
+            {dialogueType !== "Psychosis and Social" && (tag[activity?.id]?.description ?? null)}
+            {dialogueType === "Psychosis and Social" &&
+              "Track any feelings of an altered sense of reality or difficulties discerning what is real or not."}
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
