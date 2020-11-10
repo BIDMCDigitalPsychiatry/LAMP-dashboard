@@ -137,7 +137,7 @@ export default function Journals({ participant, selectedEvents, ...props }) {
   const [journals, setJournals] = useState([])
   const [allJournals, setAllJournals] = useState(null)
   const [open, setOpen] = useState(true)
-  const [selectedDates, setSelectedDates] = useState()
+  const [selectedDates, setSelectedDates] = useState(null)
   const [date, setDate] = useState(null)
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -272,7 +272,7 @@ export default function Journals({ participant, selectedEvents, ...props }) {
               }}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
                 const isSelected =
-                  isInCurrentMonth && !!selectedDates && selectedDates.indexOf(date.toLocaleDateString()) > -1
+                  isInCurrentMonth &&  !!selectedDates && selectedDates.indexOf(date.toLocaleDateString()) > -1
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (

@@ -106,6 +106,7 @@ export default function SCImageCreator({
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [settings, setSettings] = useState(!!value ? value?.settings: {threashold: 80})
 
   const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
   // eslint-disable-next-line
@@ -232,6 +233,33 @@ export default function SCImageCreator({
                   inputProps={{ maxLength: 2500 }}
                 />
               </Box>
+              <br/>
+              <Box>
+                <TextField
+                  fullWidth
+                  label="Threashold"
+                  error={
+                    settings.threashold < 10 ||
+                    settings.threashold > 100 ||
+                    settings.threashold === 0 ||
+                    settings.threashold === ""
+                      ? true
+                      : false
+                  }
+                  type="number"
+                  variant="filled"
+                  defaultValue={settings?.threashold ?? 80}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    max: 100,
+                    min: 10,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, threashold: Number(e.target.value) })}
+                  helperText={settings.threashold > 100 ? "Maximum value is 100" : ""}
+                />
+              </Box>
             </Grid>
           </Grid>
         </Container>
@@ -263,6 +291,7 @@ export default function SCImageCreator({
                         description: description,
                         photo: photo,
                         studyID: studyId,
+                        settings: settings
                       },
                       true /* duplicate */
                     )
@@ -301,6 +330,7 @@ export default function SCImageCreator({
                       description: description,
                       photo: photo,
                       studyID: studyId,
+                      settings: settings
                     },
                     false /* overwrite */
                   )
