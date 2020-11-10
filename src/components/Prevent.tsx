@@ -48,7 +48,6 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import TimeAgo from "javascript-time-ago"
-import { spliceActivity } from "./ActivityList"
 import {Vega} from "react-vega"
 
 TimeAgo.addLocale(en)
@@ -251,27 +250,7 @@ const useStyles = makeStyles((theme: Theme) =>
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
-// Splice together all selected activities & their tags.
-async function getSplicedSurveys(activities) {
-  let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))
-  let spliced = res.map((y: any, idx) =>
-    spliceActivity({
-      raw: activities[idx],
-      tag: !!y.error ? undefined : y.data,
-    })
-  )
-  // Short-circuit the main title & description if there's only one survey.
-  const main = {
-    name: spliced.length === 1 ? spliced[0].name : "Multi-questionnaire",
-    description: spliced.length === 1 ? spliced[0].description : "Please complete all sections below. Thank you.",
-  }
-  if (spliced.length === 1) spliced[0].name = spliced[0].description = undefined
-  return {
-    name: main.name,
-    description: main.description,
-    sections: spliced,
-  }
-}
+
 function getSocialContextGroups(gps_events?: SensorEventObj[]) {
   gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
   let events = [
@@ -533,10 +512,6 @@ export const strategies = {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else if (!!question && question.type === "slider")
-          return !!x.value
-            ? parseInt(question.options.filter((option) => option.description === x.value)[0]?.value ?? 0)
-            : 0
         else return parseInt(x?.value ?? 0) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
@@ -666,59 +641,46 @@ export default function Prevent({
       setDisabled(disabled)
       getVisualizations(participant).then(setVisualizations)
 
-        let selActivities = await getSelectedActivities(participant)
-        setSelectedActivities(selActivities)
-        let selSensors = await getSelectedSensors(participant)
-        let activities = await getActivities(participant)
-        // let goals = await getGoals(participant)
-        // let groupByType
-        // if (typeof goals !== "undefined") {
-        //   goals.map((goal) => {
-        //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
-        //       activities.push({ name: goal.goalType, type: "goals" })
-        //     }
-        //   })
-        // }
-        activities = !disabled ? activities : activities.filter((activity) =>  activity.spec === "lamp.journal")
-        let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-        let timeSpans = Object.fromEntries(
-          Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
-        )
-        setActivityEvents(activityEvents)
+      let selActivities = await getSelectedActivities(participant)
+      setSelectedActivities(selActivities)
+      let selSensors = await getSelectedSensors(participant)
+      let activities = await getActivities(participant)
+      // let goals = await getGoals(participant)
+      // let groupByType
+      // if (typeof goals !== "undefined") {
+      //   goals.map((goal) => {
+      //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
+      //       activities.push({ name: goal.goalType, type: "goals" })
+      //     }
+      //   })
+      // }
+      activities = !disabled ? activities : activities.filter((activity) =>  activity.spec === "lamp.journal")
+      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
+      let timeSpans = Object.fromEntries(
+        Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
+      )
+      setActivityEvents(activityEvents)
 
-        let activityEventCount = getActivityEventCount(activityEvents)
-        // if (typeof goals !== "undefined") {
-        //   groupByType = goals.reduce((goal, it) => {
-        //     goal[it.goalType] = goal[it.goalType] + 1 || 1
-        //     activityEventCount[it.goalType] = goal[it.goalType]
-        //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
-        //     return goal
-        //   }, {})
-        // }
-        setTimeSpans(timeSpans)
-        setActivityCounts(activityEventCount)
-        activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
-        if(!disabled) {
-        activities.map((activity, index) => {
-          if (activity.spec === "lamp.survey") {
-            getSplicedSurveys([activity]).then((e) => {
-              let data = activity
-              data.settings = e.sections[0].settings
-              activities[index] = data
-            })
-          } else {
-            activities[index] = activity
-          }
-        })
-      }
-        setActivities(activities)
-        if(!disabled) {
+      let activityEventCount = getActivityEventCount(activityEvents)
+      // if (typeof goals !== "undefined") {
+      //   groupByType = goals.reduce((goal, it) => {
+      //     goal[it.goalType] = goal[it.goalType] + 1 || 1
+      //     activityEventCount[it.goalType] = goal[it.goalType]
+      //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
+      //     return goal
+      //   }, {})
+      // }
+      setTimeSpans(timeSpans)
+      setActivityCounts(activityEventCount)
+      activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
+      setActivities(activities)
+      if(!disabled) {
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
         setSensorEvents(sensorEvents)
         setSensorCounts(sensorEventCount)
-        }
+      }
       setLoading(false)
     })()
   }, [])
