@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Backdrop, CircularProgress } from "@material-ui/core"
+import { useTranslation } from "react-i18next"
 
 import LAMP from "lamp-core"
 
@@ -33,6 +34,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [saved, setSaved] = useState(false)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+	const { t, i18n } = useTranslation();
 
   useEffect(() => {
     activateEmbeddedActivity(activity)
@@ -81,16 +83,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
-    console.log(activity.settings)
+    //activity.settings.language = i18n.language
     setSettings(activity.settings)
-    setSaved(false)
+    setSaved(false)   
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]
       }.html.b64`
     )
-    // let response = await fetch('boxgame.html.64')
-    // console.log(await response.text())
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

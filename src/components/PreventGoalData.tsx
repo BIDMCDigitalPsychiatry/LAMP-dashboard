@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { Typography, makeStyles, Box, Grid, Container, Link, Badge, Icon } from "@material-ui/core"
 import { ReactComponent as WaterBlue } from "../icons/PreventNutrition.svg"
 import { DatePicker } from "@material-ui/pickers"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,6 +37,7 @@ export default function JournalEntries({ ...props }) {
   const classes = useStyles()
   const [date, changeDate] = useState(new Date())
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
+	const { t } = useTranslation()
 
   return (
     <div className={classes.root}>
@@ -45,25 +47,25 @@ export default function JournalEntries({ ...props }) {
             <WaterBlue />
           </Box>
           <Box width="100%" pl={3} pt={1}>
-            <Typography variant="h6">80 ounces</Typography>
-            <Typography variant="body2">Daily (M, T, W, T, F, S)</Typography>
+            <Typography variant="h6">80 {t("ounces")}</Typography>
+            <Typography variant="body2">{t("Daily")} (M, T, W, T, F, S)</Typography>
             <Link underline="none" className={classes.linkBlue}>
-              Edit goal
+              {t("Edit goal")}
             </Link>
           </Box>
         </Box>
         <Box display="flex" py={5} className={classes.streakDetails}>
           <Box flexShrink={1}>
-            <Typography variant="h6">Current streak:</Typography>
+            <Typography variant="h6">{t("Current streak:")}</Typography>
           </Box>
           <Box width="100%" pl={1}>
             <Typography variant="h5" color="primary">
-              14 days
+              14 {t("days")}
             </Typography>
           </Box>
         </Box>
         <Box className={classes.streakDetails}>
-          <Typography variant="h6">Goal History</Typography>
+          <Typography variant="h6">{t("Goal History")}</Typography>
         </Box>
         <DatePicker
           autoOk

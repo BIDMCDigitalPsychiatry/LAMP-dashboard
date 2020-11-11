@@ -23,7 +23,6 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import JournalImg from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
-
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
@@ -39,6 +38,7 @@ import Goals from "./Goals"
 import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
 import EmbeddedActivity from "./EmbeddedActivity"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -188,6 +188,7 @@ export default function Manage({ participant, activities, ...props }) {
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [spec, setSpec] = useState(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     setLoading(true)
@@ -274,7 +275,7 @@ export default function Manage({ participant, activities, ...props }) {
                     }}
                   ></Box>
                 </Box>
-                <Typography className={classes.cardlabel}>{activity.name}</Typography>
+                <Typography className={classes.cardlabel}>{t(activity.name)}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -286,7 +287,7 @@ export default function Manage({ participant, activities, ...props }) {
               <Box mt={2} mb={1}>
                 <GoalIcon />
               </Box>
-              <Typography className={classes.cardlabel}>New goal</Typography>
+              <Typography className={classes.cardlabel}>{t('New Goal')}</Typography>
             </Card>
           </ButtonBase>
         </Grid>
@@ -324,7 +325,6 @@ export default function Manage({ participant, activities, ...props }) {
             </Card>
           </ButtonBase>
          </Grid> */}
-
       <ResponsiveDialog
         transient={games.includes(spec) ? true : false}
         animate
@@ -447,7 +447,7 @@ export default function Manage({ participant, activities, ...props }) {
             </Box>
             <Box>
               <Typography variant="body2" align="left">
-                Manage
+                {t("Manage")}
               </Typography>
               <Typography variant="h2">{activity?.name ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
             </Box>
@@ -457,11 +457,11 @@ export default function Manage({ participant, activities, ...props }) {
           {tag[activity?.id]?.description && (
             <Box>
               <Typography variant="h4" gutterBottom>
-                {tag[activity.id]?.description.split(".")[0]}
+                {t(tag[activity.id]?.description.split(".")[0])}
               </Typography>
               {tag[activity?.id]?.description.split(".").length > 1 && (
                 <Typography variant="body2" component="p">
-                  {tag[activity?.id]?.description.split(".").slice(1).join(".")}
+                  {t(tag[activity?.id]?.description.split(".").slice(1).join("."))}
                 </Typography>
               )}
             </Box>
@@ -476,7 +476,7 @@ export default function Manage({ participant, activities, ...props }) {
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
             >
-              Begin
+              {t("Begin")}
             </Link>
           </Box>
         </DialogActions>

@@ -8,6 +8,7 @@ import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
+import { useTranslation } from "react-i18next";
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
@@ -17,52 +18,72 @@ export default function Root({ ...props }) {
   //const [names, setNames] = useState({})
   const [passwordChange, setPasswordChange] = useState<boolean>()
   const { enqueueSnackbar } = useSnackbar()
+	const { t, i18n } = useTranslation();  
+  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
+                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]},
+                           {key: "fr_US", value: "French", lang_array: []}]
+
+  const getSelectedLanguage = () => {    
+    let lang = languagesArray.filter((x) =>{
+      return x.lang_array.includes(navigator.language)  
+    })
+    return lang
+  }  
 
   useEffect(() => {
     if (LAMP.Auth._type !== "admin") return
     LAMP.Researcher.all().then(setResearchers)
   }, [])
 
+  useEffect(() => {
+    let authId = LAMP.Auth._auth.id
+    let language = !!localStorage.getItem("LAMP_user_"+ authId)
+                  ? JSON.parse(localStorage.getItem("LAMP_user_"+ authId)).language
+                  : (getSelectedLanguage().length > 0) ? getSelectedLanguage()[0].key
+                  : "en_US"
+    i18n.changeLanguage(language);  
+  }, [])
+  
   return (
     <React.Fragment>
       <ResponsivePaper elevation={4}>
         <MaterialTable
-          title="Researchers"
+          title={t("Researchers")}
           data={researchers}
-          columns={[{ title: "Name", field: "name" }]}
+          columns={[{ title: t("Name"), field: "name" }]}
           onRowClick={(event, rowData, togglePanel) =>
             props.history.push(`/researcher/${researchers[rowData.tableData.id].id}`)
           }
           editable={{
             onRowAdd: async (newData) => {
               if (((await LAMP.Researcher.create(newData)) as any).error === undefined)
-                enqueueSnackbar(`Successfully created a new Researcher.`, {
+                enqueueSnackbar(t("Successfully created a new Researcher."), {
                   variant: "success",
                 })
               else
-                enqueueSnackbar(`Failed to create a new Researcher.`, {
+                enqueueSnackbar(t("Failed to create a new Researcher."), {
                   variant: "error",
                 })
               setResearchers(await LAMP.Researcher.all())
             },
             onRowUpdate: async (newData, oldData) => {
               if (((await LAMP.Researcher.update(oldData.id, newData)) as any).error === undefined)
-                enqueueSnackbar(`Successfully updated the Researcher.`, {
+                enqueueSnackbar(t("Successfully updated the Researcher."), {
                   variant: "success",
                 })
               else
-                enqueueSnackbar(`Failed to update the Researcher.`, {
+                enqueueSnackbar(t("Failed to update the Researcher."), {
                   variant: "error",
                 })
               setResearchers(await LAMP.Researcher.all())
             },
             onRowDelete: async (oldData) => {
               if (((await LAMP.Researcher.delete(oldData.id)) as any).error === undefined)
-                enqueueSnackbar(`Successfully deleted the Researcher.`, {
+                enqueueSnackbar(t("Successfully deleted the Researcher."), {
                   variant: "success",
                 })
               else
-                enqueueSnackbar(`Failed to delete the Researcher.`, {
+                enqueueSnackbar(t("Failed to delete the Researcher."), {
                   variant: "error",
                 })
               setResearchers(await LAMP.Researcher.all())
@@ -71,15 +92,18 @@ export default function Root({ ...props }) {
           actions={[
             {
               icon: "vpn_key",
-              tooltip: "Manage Credentials",
+              tooltip: t("Manage Credentials"),
               onClick: (event, rowData) => setPasswordChange(rowData.id),
             },
           ]}
           localization={{
+            header: {
+                actions: t('Actions')
+            },
             body: {
-              emptyDataSourceMessage: "No Researchers. Add Researchers by clicking the [+] button above.",
+              emptyDataSourceMessage: t("No Researchers. Add Researchers by clicking the [+] button above."),
               editRow: {
-                deleteText: "Are you sure you want to delete this Researcher?",
+                deleteText: t("Are you sure you want to delete this Researcher?"),
               },
             },
           }}

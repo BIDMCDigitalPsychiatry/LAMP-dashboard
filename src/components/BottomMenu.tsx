@@ -20,6 +20,7 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
 import { renderToStaticMarkup } from "react-dom/server"
+import { Trans, useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -260,6 +261,7 @@ export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
+  const { t } = useTranslation()
   const [viewedTabs, setViewedTabs] = useState([])
   const [tabValues, setTabValues] = useState(
     localStorage.getItem("bottom-menu-tabs" + props.participant.id) !== null
@@ -340,10 +342,8 @@ export default function BottomMenu({ ...props }) {
                   >
                     <CloseIcon />
                   </IconButton>
-                  <Typography variant="h6">
-                    Welcome to the <Box component="span">Feed</Box> section.
-                  </Typography>
-                  <Typography variant="body1">Review today's activities.</Typography>
+                  <Typography variant="h6">{t("Welcome to the Feed section")}</Typography>
+                  <Typography variant="body1">{t("Review today's activities.")}</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -352,7 +352,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 4}
-                label="Feed"
+                label={t("Feed")}
                 value={4}
                 classes={{
                   root: classes.navigation,
@@ -385,10 +385,8 @@ export default function BottomMenu({ ...props }) {
                   >
                     <CloseIcon />
                   </IconButton>
-                  <Typography variant="h6">
-                    Welcome to the <Box component="span">Learn</Box> section.
-                  </Typography>
-                  <Typography variant="body1">Find useful information and practice healthy habits.</Typography>
+                  <Typography variant="h6">{t("Welcome to the Learn section")}</Typography>
+                  <Typography variant="body1">{t("Find useful information and practice healthy habits.")}</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -397,7 +395,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 0}
-                label="Learn"
+                label={t("Learn")}
                 value={0}
                 classes={{
                   root: classes.navigation,
@@ -425,10 +423,8 @@ export default function BottomMenu({ ...props }) {
                   >
                     <CloseIcon />
                   </IconButton>
-                  <Typography variant="h6">
-                    Welcome to the <Box component="span">Assess</Box> section.
-                  </Typography>
-                  <Typography variant="body1">Log feelings, behavior, and activity.</Typography>
+                  <Typography variant="h6">{t("Welcome to the Assess section")}</Typography>
+                  <Typography variant="body1">{t("Log feelings, behavior, and activity.")}</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -437,7 +433,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 1}
-                label="Assess"
+                label={t("Assess")}
                 value={1}
                 classes={{
                   root: classes.navigation,
@@ -465,10 +461,8 @@ export default function BottomMenu({ ...props }) {
                   >
                     <CloseIcon />
                   </IconButton>
-                  <Typography variant="h6">
-                    Welcome to the <Box component="span">Manage</Box> section.
-                  </Typography>
-                  <Typography variant="body1">Take steps to refocus, reflect, and recover.</Typography>
+                  <Typography variant="h6">{t("Welcome to the Manage section")}</Typography>
+                  <Typography variant="body1">{t("Take steps to refocus, reflect, and recover.")}</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -477,7 +471,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 2}
-                label="Manage"
+                label={t("Manage")}
                 value={2}
                 classes={{
                   root: classes.navigation,
@@ -505,10 +499,8 @@ export default function BottomMenu({ ...props }) {
                   >
                     <CloseIcon />
                   </IconButton>
-                  <Typography variant="h6">
-                    Welcome to the <Box component="span">Prevent</Box> section.
-                  </Typography>
-                  <Typography variant="body1">Track progress and make connections.</Typography>
+                  <Typography variant="h6">{t("Welcome to the Prevent section")}</Typography>
+                  <Typography variant="body1">{t("Track progress and make connections.")}</Typography>
                 </React.Fragment>
               }
               arrow={true}
@@ -517,7 +509,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 3}
-                label="Prevent"
+                label={t("Prevent")}
                 value={3}
                 classes={{
                   root: classes.navigation,

@@ -5,6 +5,7 @@ import { ReactComponent as Background03 } from "../icons/scratch/Background-03.s
 import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
+import { useTranslation } from "react-i18next"
 import {
   Typography,
   makeStyles,
@@ -97,6 +98,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
   const [done, setDone] = useState(false)
   const [canvasComponent, setCanvasComponent] = useState(<CanvasElement setCanvas={setCanvas} />)
   const [image, setImage] = useState(null)
+  const { t } = useTranslation()
   const [time, setTime] = useState(new Date().getTime())
   const [loading, setLoading] = useState(true)
   const [savedX, setSavedx] = useState([])
@@ -158,16 +160,16 @@ export default function ScratchImage({ participant, activity, ...props }) {
         x = a.x + Math.sin(angle) * i - offsetX
         y = a.y + Math.cos(angle) * i - offsetY
         context.drawImage(brush, x, y, 80, 80)
-        if(!savedX.includes(x) && !savedY.includes(y)) {
+        if (!savedX.includes(x) && !savedY.includes(y)) {
           let xValues = savedX
           let yValues = savedY
           xValues.push(y)
           yValues.push(y)
           setSavedx(xValues)
           setSavedY(yValues)
-          val = val +  80
+          val = val + 80
           area = canvas.width * canvas.height
-          if (val > (area * ( activity?.settings?.threshold  ?? 80) / 100)) {
+          if (val > (area * (activity?.settings?.threshold ?? 80)) / 100) {
             setDone(true)
           }
         }
@@ -225,7 +227,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
           <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">Scratch card</Typography>
+          <Typography variant="h5">{t("Scratch card")}</Typography>
         </Toolbar>
       </AppBar>
       <div id="canvasDiv" className={classes.background}>
@@ -235,9 +237,9 @@ export default function ScratchImage({ participant, activity, ...props }) {
         </Box>
         <Box display={done ? "flex" : "none"} alignItems="center" className={classes.scratchCompleteMsg}>
           <Box width={1}>
-            <Typography variant="h4">Well done!</Typography>
+            <Typography variant="h4">{t("Well done!")}</Typography>
             <Fab className={classes.btnpeach} onClick={props.onComplete}>
-              Close
+              {t("Close")}
             </Fab>
             <Box width={1} mt={3}>
               <Link
@@ -248,7 +250,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
                   setDone(false)
                 }}
               >
-                Do another one
+                {t("Do another one")}
               </Link>
             </Box>
           </Box>

@@ -30,6 +30,8 @@ import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
 import classes from "*.module.css"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
+import { useTranslation } from "react-i18next"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     scroll: { overflowY: "hidden" },
@@ -223,6 +225,7 @@ export default function Participant({
   const [loading, setLoading] = useState(![3, 4].includes(getTab()))
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
+  const { t, i18n } = useTranslation()
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -250,10 +253,28 @@ export default function Participant({
     return tabName
   }
 
+  const languagesArray = [
+    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
+    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
+    { key: "fr_US", value: "French", lang_array: [] },
+  ]
+
+  const getSelectedLanguage = () => {
+    let lang = languagesArray.filter((x) => {
+      return x.lang_array.includes(navigator.language)
+    })
+    return lang
+  }
+
   useEffect(() => {
     const tabName = getTabName(tab)
     props.activeTab(tabName)
-
+    let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+      ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+      : getSelectedLanguage().length > 0
+      ? getSelectedLanguage()[0].key
+      : "en_US"
+    i18n.changeLanguage(language)
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {
       setActivities(e)
@@ -461,16 +482,16 @@ export default function Participant({
         <DialogContent>
           <Box textAlign="center" pb={4} className={classes.niceWork}>
             <Typography variant="h5" gutterBottom>
-              Nice work!
+              {t("Nice work!")}
             </Typography>
             <Typography className={classes.ribbonText} component="p">
-              You’re on a streak, keep it going
+              {t("You’re on a streak, keep it going")}
             </Typography>
             <Box textAlign="center" className={classes.niceWorkbadge}>
               <Ribbon width="170" height="226" />
               <Box className={classes.dayNotification}>
                 <Typography variant="h4"> {steak}</Typography>{" "}
-                <Typography variant="h6">{steak > 1 ? "days" : "day"}</Typography>
+                <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
               </Box>
             </Box>
           </Box>

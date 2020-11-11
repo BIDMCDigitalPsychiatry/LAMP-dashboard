@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core"
 import { DatePicker } from "@material-ui/pickers"
 import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next";
 
 interface MedicationItem {
   title: string
@@ -29,9 +30,10 @@ export default function MedicationTracker({ onComplete, ...props }) {
   const [open, setOpen] = React.useState(false)
   const [open2, setOpen2] = React.useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation();
 
   useEffect(() => {
-    enqueueSnackbar(`This is a demo only. Entries will not be saved.`, {
+    enqueueSnackbar(t("This is a demo only. Entries will not be saved."), {
       variant: "info",
     })
   }, [])
@@ -73,10 +75,10 @@ export default function MedicationTracker({ onComplete, ...props }) {
         />
       </Box>
       <Button style={{ margin: 8 }} variant="contained" startIcon={<Icon>star_border</Icon>} onClick={openDialog2}>
-        My Medications
+        {t("My Medications")}
       </Button>
       <Dialog fullWidth={true} open={open2} onClose={closeDialog2}>
-        <DialogTitle> My Medications </DialogTitle>
+        <DialogTitle> {t("My Medications")} </DialogTitle>
         <DialogContent>
           <Card style={{ margin: 16 }}>
             <CardContent>
@@ -85,7 +87,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
               <Icon fontSize="small">access_time</Icon>
               <Typography variant="body2">Every day at 12:00pm</Typography>
               <Button size="small" startIcon={<Icon>edit</Icon>}>
-                Edit
+                {t("Edit")}
               </Button>
             </CardContent>
           </Card>
@@ -96,7 +98,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
               <Icon fontSize="small">access_time</Icon>
               <Typography variant="body2">Every day at 12:00pm</Typography>
               <Button size="small" startIcon={<Icon>edit</Icon>}>
-                Edit
+                {t("Edit")}
               </Button>
             </CardContent>
           </Card>
@@ -107,43 +109,44 @@ export default function MedicationTracker({ onComplete, ...props }) {
               <Icon fontSize="small">access_time</Icon>
               <Typography variant="body2">Every day at 12:00pm</Typography>
               <Button size="small" startIcon={<Icon>edit</Icon>}>
-                Edit
+                {t("Edit")}
               </Button>
             </CardContent>
           </Card>
           <DialogActions>
             <Button onClick={closeDialog2} startIcon={<Icon>close</Icon>}>
-              Close
+              {t("Close")}
             </Button>
           </DialogActions>
         </DialogContent>
-      </Dialog>
+      </Dialog> 
       <Button style={{ margin: 8 }} variant="contained" startIcon={<Icon>add</Icon>} onClick={openDialog}>
-        Add Medication
+        {t("Add Medication")}
       </Button>
       <Dialog fullWidth={true} open={open} onClose={closeDialog}>
         <Container>
-          <DialogTitle>Add Medication </DialogTitle>
+          <DialogTitle> {t("Add Medication")} </DialogTitle>
           <DialogContent> </DialogContent>
-          <TextField fullWidth={true} autoFocus margin="normal" variant="outlined" label="Medication Name" />
+          <TextField fullWidth={true} autoFocus margin="normal" variant="outlined" label={t("Medication Name")} />
           <div></div>
-          <TextField autoFocus margin="normal" variant="outlined" label="Dose" />
-          <Typography>Set reminder? </Typography>
+          <TextField autoFocus margin="normal" variant="outlined" label={t("Dose")} />
+          <Typography>{t("Set reminder?")} </Typography>
           {/* <Switch color="primary"> fsdfg</Switch> */}
           <div></div>
-          <DatePicker label="Start Date" value={selectedDate} onChange={handleDateChange} animateYearScrolling />
+          <DatePicker label={t("Start Date")} value={selectedDate} onChange={handleDateChange} animateYearScrolling />
           <div></div>
-          <DatePicker label="End Date" value={selectedDateEnd} onChange={handleDateChangeEnd} animateYearScrolling />
+          <DatePicker label={t("End Date")} value={selectedDateEnd} onChange={handleDateChangeEnd} animateYearScrolling />
           <DialogActions>
             <Button onClick={closeDialog} startIcon={<Icon>delete</Icon>}>
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button onClick={closeDialog} startIcon={<Icon>save</Icon>}>
-              Save
+              {t("Save")} 
             </Button>
           </DialogActions>
         </Container>
       </Dialog>
     </Container>
   )
-}
+} 
+  

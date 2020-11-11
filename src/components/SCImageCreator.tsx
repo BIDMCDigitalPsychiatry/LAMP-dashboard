@@ -133,10 +133,6 @@ export default function SCImageCreator({
       typeof studyId == "undefined" ||
       studyId === null ||
       studyId === "" ||
-      settings.threshold < 30 ||
-      settings.threshold > 90 ||
-      settings.threshold === 0 ||
-      settings.threshold === "" ||
       duplicates.length > 0 ||
       typeof text === "undefined" ||
       (typeof text !== "undefined" && text?.trim() === "")

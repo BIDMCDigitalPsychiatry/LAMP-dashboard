@@ -22,6 +22,7 @@ import { ResponsivePaper } from "./Utils"
 import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
 import { fade, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -188,6 +189,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const { t } = useTranslation()
 
   return (
     <Container maxWidth={false}>
@@ -216,7 +218,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Patients />
                 </ListItemIcon>
-                <ListItemText primary="Patients" />
+                <ListItemText primary={t("Patients")} />
               </ListItem>
               <ListItem
                 className={classes.menuItems}
@@ -227,7 +229,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Activities />
                 </ListItemIcon>
-                <ListItemText primary="Activities" />
+                <ListItemText primary={t("Activities")} />
               </ListItem>
             </List>
           </Drawer>
@@ -248,10 +250,28 @@ function Study({ onParticipantSelect, researcher, ...props }) {
 }
 
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
+	const { t, i18n } = useTranslation();
+  
+  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
+                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]},
+                           {key: "fr_US", value: "French", lang_array: []}]
+
+  const getSelectedLanguage = () => {    
+    let lang = languagesArray.filter((x) =>{
+      return x.lang_array.includes(navigator.language)  
+    })
+    return lang
+  }  
+
   useEffect(() => {
     ;(async () => {
       await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", null)
     })()
+    let language = !!localStorage.getItem("LAMP_user_"+ researcher.id)
+                  ? JSON.parse(localStorage.getItem("LAMP_user_"+ researcher.id)).language
+                  : (getSelectedLanguage().length > 0) ? getSelectedLanguage()[0].key
+                  : "en_US"
+    i18n.changeLanguage(language);  
   }, [])
 
   return (

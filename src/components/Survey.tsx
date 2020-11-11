@@ -27,6 +27,8 @@ import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next"
 import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 
@@ -199,6 +201,7 @@ export default function Survey({
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
   const [questionCount, setQuestionCount] = useState(0)
+  const { t } = useTranslation()
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
@@ -287,7 +290,7 @@ export default function Survey({
                       {y.name === "Water and Nutrition" && <AssessNutrition />}
                       {y.name === "Psychosis and Social" && <AssessSocial />}
                     </Box>
-                    <Typography className={classes.cardlabel}>{y.name}</Typography>
+                    <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -319,18 +322,18 @@ export default function Survey({
             {dialogueType === "App Usability" && <AssessUsability className={classes.topicon} />}
             {dialogueType === "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
             {dialogueType === "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
-            <Typography variant="h6">Survey</Typography>
-            <Typography variant="h2">{activity?.name ?? null}</Typography>
+            <Typography variant="h6">{t("Survey")}</Typography>
+            <Typography variant="h2">{t(activity?.name ?? null)}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
-            {questionCount} {questionCount > 1 ? " questions" : " question"} {/* (10 mins) */}
+            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
           </Typography>
           <Typography variant="body2" component="p">
-            {spec !== "lamp.dbt_diary_card" && (tag[activity?.id]?.description ?? null)}
+            {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
             {spec === "lamp.dbt_diary_card" &&
-              "Daily log of events and related feelings. Track target behaviors and use of skills."}
+              t("Daily log of events and related feelings. Track target behaviors and use of skills.")}
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
@@ -360,7 +363,7 @@ export default function Survey({
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
             >
-              Start survey
+              {t("Start survey")}
             </Link>
           </Box>
         </DialogActions>

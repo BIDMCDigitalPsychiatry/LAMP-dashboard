@@ -26,6 +26,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import LearnTips from "./LearnTips"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -198,6 +199,7 @@ export default function Learn({
   const [loading, setLoading] = useState(true)
   const [savedActivities, setSavedActivities] = useState([])
   const [activitiesArray, setActivitiesArray] = useState({})
+  const { t } = useTranslation()
 
   useEffect(() => {
     let gActivities = activities.filter((x: any) => x.spec === "lamp.tips")
@@ -273,7 +275,7 @@ export default function Learn({
                     <Box mt={2} mb={1}>
                       {activitiesArray[key].icon ? <img src={activitiesArray[key].icon} /> : ""}
                     </Box>
-                    <Typography className={classes.cardlabel}>{key}</Typography>
+                    <Typography className={classes.cardlabel}>{t(key)}</Typography> 
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -302,7 +304,9 @@ export default function Learn({
             <Typography variant="h2">{tip}</Typography>
           </div>
         </DialogTitle>
-        <DialogContent className={classes.dialogueContent}>Quick Tips to Improve Your {tip}</DialogContent>
+        <DialogContent className={classes.dialogueContent}>
+          {t("Quick Tips to Improve Your")} {tip}
+        </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
@@ -313,7 +317,7 @@ export default function Learn({
               underline="none"
               className={classnames(classes.btnyellow, classes.linkButton)}
             >
-              Read
+              {t("Read")}
             </Link>
           </Box>
         </DialogActions>

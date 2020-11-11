@@ -24,6 +24,7 @@ import { useDropzone } from "react-dropzone"
 
 // Local Imports
 import LAMP from "lamp-core"
+import { useTranslation } from "react-i18next"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -52,6 +53,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   const [emailAddress, setEmailAddress] = useState("")
   const [password, setPassword] = useState("")
   const [showLink, setShowLink] = useState(false)
+	const { t } = useTranslation()
 
   useEffect(() => {
     setPhoto(auxData.photo)
@@ -82,8 +84,8 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
         <Tooltip
           title={
             !photo
-              ? "Drag a photo or tap to select a photo."
-              : "Drag a photo to replace the existing photo or tap to delete the photo."
+              ? t("Drag a photo or tap to select a photo.")
+              : t("Drag a photo to replace the existing photo or tap to delete the photo.")
           }
         >
           <Box
@@ -110,10 +112,10 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
       {["create-new"].includes(mode) && (
         <TextField
           fullWidth
-          label={`Name`}
+          label={t("Name")}
           type="text"
           variant="outlined"
-          helperText="Enter the family member or clinician's name here."
+          helperText={t("Enter the family member or clinician's name here.")}
           value={name}
           onChange={(event) => setName(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -122,10 +124,10 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
       {["create-new", "change-role"].includes(mode) && (
         <TextField
           fullWidth
-          label={`Role`}
+          label={t("Role")}
           type="text"
           variant="outlined"
-          helperText="Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+          helperText={t("Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.")}
           value={role}
           onChange={(event) => setRole(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -133,7 +135,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
             endAdornment: [
               !["change-role"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="a">
-                  <Tooltip title="Save Role & Photo">
+                  <Tooltip title={t("Save Role & Photo")}>
                     <IconButton
                       edge="end"
                       aria-label="save role"
@@ -161,10 +163,10 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
       {["create-new"].includes(mode) && (
         <TextField
           fullWidth
-          label={`Email Address`}
+          label={t("Email Address")}
           type="email"
           variant="outlined"
-          helperText="Enter the email address here."
+          helperText={t("Enter the email address here.")}
           value={emailAddress}
           onChange={(event) => setEmailAddress(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -173,17 +175,17 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
       {["create-new", "reset-password"].includes(mode) && (
         <TextField
           fullWidth
-          label={`Password`}
+          label={t("Password")}
           type="password"
           variant="outlined"
-          helperText="Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+          helperText={t("Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.")}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           InputProps={{
             endAdornment: [
               ["create-new"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="a">
-                  <Tooltip title="Copy one-time access link that can be used to log in without entering credentials.">
+                  <Tooltip title={t("Copy one-time access link that can be used to log in without entering credentials.")}>
                     <IconButton
                       edge="end"
                       aria-label="copy link"
@@ -197,7 +199,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
               ),
               !["reset-password", "create-new"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="b">
-                  <Tooltip title="Save Credential">
+                  <Tooltip title={t("Save Credential")}>
                     <IconButton
                       edge="end"
                       aria-label="submit credential"
@@ -231,7 +233,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
             value={_qrLink()}
             onChange={(event) => {}}
           />
-          <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+          <Tooltip title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}>
             <Grid container justify="center" style={{ padding: 16 }}>
               <QRCode size={256} level="H" value={_qrLink()} />
             </Grid>
@@ -257,6 +259,7 @@ export const CredentialManager: React.FunctionComponent<{
   const [allRoles, setAllRoles] = useState({})
   const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+	const { t } = useTranslation()
 
   useEffect(() => {
     LAMP.Type.parent(id)
@@ -286,7 +289,7 @@ export const CredentialManager: React.FunctionComponent<{
             secret_key: data.password,
           })) as any).error
         )
-          return enqueueSnackbar("Could not change password.", {
+          return enqueueSnackbar(t("Could not change password."), {
             variant: "error",
           })
       } else if (selected.mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
@@ -304,12 +307,12 @@ export const CredentialManager: React.FunctionComponent<{
           [data.credential.access_key]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
         })
       } else {
-        enqueueSnackbar("Could not perform operation for an unknown reason.", {
+        enqueueSnackbar(t("Could not perform operation for an unknown reason."), {
           variant: "error",
         })
       }
     } catch (err) {
-      enqueueSnackbar("Credential management failed. The email address could be in use already.", { variant: "error" })
+      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), { variant: "error" })
     }
     LAMP.Credential.list(id).then(setAllCreds)
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
@@ -325,13 +328,13 @@ export const CredentialManager: React.FunctionComponent<{
   const _deleteCredential = async (credential) => {
     try {
       if (!!((await LAMP.Credential.delete(id, credential.access_key)) as any).error)
-        return enqueueSnackbar("Could not delete.", { variant: "error" })
+        return enqueueSnackbar(t("Could not delete."), { variant: "error" })
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
         [credential.access_key]: undefined,
       })
     } catch (err) {
-      enqueueSnackbar("Credential management failed.", { variant: "error" })
+      enqueueSnackbar(t("Credential management failed."), { variant: "error" })
     }
     LAMP.Credential.list(id).then(setAllCreds)
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
@@ -344,7 +347,7 @@ export const CredentialManager: React.FunctionComponent<{
       <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
-            Manage Credentials
+            {t("Manage Credentials")}
           </Typography>
         </Grid>
         {allCreds.map((x, idx) => (
@@ -378,7 +381,7 @@ export const CredentialManager: React.FunctionComponent<{
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title="Add a new member of your care team.">
+          <Tooltip title={t("Add a new member of your care team.")}>
             <IconButton
               onClick={() =>
                 setSelected((selected) => ({
@@ -403,7 +406,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          Update Photo & Role
+          {t("Update Photo & Role")}
         </MenuItem>
         <MenuItem
           onClick={() =>
@@ -414,7 +417,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          Reset Password
+          {t("Reset Password")}
         </MenuItem>
         <MenuItem
           onClick={() =>
@@ -427,7 +430,7 @@ export const CredentialManager: React.FunctionComponent<{
             )
           }
         >
-          <b>Delete</b>
+          <b>{t("Delete")}</b>
         </MenuItem>
       </Menu>
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}

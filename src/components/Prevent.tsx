@@ -47,8 +47,10 @@ import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
 import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
+import hi from "javascript-time-ago/locale/hi"
 import TimeAgo from "javascript-time-ago"
-import {Vega} from "react-vega"
+import { useTranslation } from "react-i18next"
+import { Vega } from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -246,6 +248,8 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
+//const { t } = useTranslation()
 
 function _patientMode() {
   return LAMP.Auth._type === "participant"
@@ -529,7 +533,12 @@ async function getVisualizations(participant: ParticipantObj) {
   for (let attachmentID of ((await LAMP.Type.listAttachments(participant.id)) as any).data) {
     if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
     let bstr = ((await LAMP.Type.getAttachment(participant.id, attachmentID)) as any).data
-    visualizations[attachmentID] = typeof bstr === "object" ? bstr : (typeof bstr === "string" &&  bstr.startsWith("data:") ? bstr : `data:image/svg+xml;base64,${bstr}`)   // defaults
+    visualizations[attachmentID] =
+      typeof bstr === "object"
+        ? bstr
+        : typeof bstr === "string" && bstr.startsWith("data:")
+        ? bstr
+        : `data:image/svg+xml;base64,${bstr}` // defaults
   }
   return visualizations
 }
@@ -557,6 +566,11 @@ export default function Prevent({
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
+  const { t, i18n } = useTranslation()
+  const currentLanguage = i18n.language === "en_US" ? "en-US" : "hi-IN"
+  const currentLanguageCode = i18n.language === "en_US" ? en : hi
+  TimeAgo.addLocale(currentLanguageCode)
+  const timeAgo = new TimeAgo(currentLanguage)
 
   const handleClickOpen = (type: number) => {
     setDialogueType(type)
@@ -654,11 +668,9 @@ export default function Prevent({
       //     }
       //   })
       // }
-      activities = !disabled ? activities : activities.filter((activity) =>  activity.spec === "lamp.journal")
+      activities = !disabled ? activities : activities.filter((activity) => activity.spec === "lamp.journal")
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-      let timeSpans = Object.fromEntries(
-        Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
-      )
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
       setActivityEvents(activityEvents)
 
       let activityEventCount = getActivityEventCount(activityEvents)
@@ -674,7 +686,7 @@ export default function Prevent({
       setActivityCounts(activityEventCount)
       activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
       setActivities(activities)
-      if(!disabled) {
+      if (!disabled) {
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
@@ -684,6 +696,70 @@ export default function Prevent({
       setLoading(false)
     })()
   }, [])
+
+  const getSocialContextGroups = (gps_events?: SensorEventObj[]) => {
+    gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
+    let events = [
+      {
+        label: t("Alone"),
+        value: gps_events.filter((x) => x.data.context.social === "alone").length,
+      },
+      {
+        label: t("Friends"),
+        value: gps_events.filter((x) => x.data.context.social === "friends").length,
+      },
+      {
+        label: t("Family"),
+        value: gps_events.filter((x) => x.data.context.social === "family").length,
+      },
+      {
+        label: t("Peers"),
+        value: gps_events.filter((x) => x.data.context.social === "peers").length,
+      },
+      {
+        label: t("Crowd"),
+        value: gps_events.filter((x) => x.data.context.social === "crowd").length,
+      },
+    ]
+    return events
+  }
+
+  const getEnvironmentalContextGroups = (gps_events?: SensorEventObj[]) => {
+    gps_events = gps_events?.filter((x) => !!x.data?.context?.environment) ?? [] // Catch missing data.
+    let events = [
+      {
+        label: t("Home"),
+        value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
+          .length,
+      },
+      {
+        label: t("School"),
+        value: gps_events.filter((x) => x.data.context.environment === "school").length,
+      },
+      {
+        label: t("Work"),
+        value: gps_events.filter((x) => x.data.context.environment === "work").length,
+      },
+      {
+        label: t("Hospital"),
+        value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
+      },
+      {
+        label: t("Outside"),
+        value: gps_events.filter((x) => x.data.context.environment === "outside").length,
+      },
+      {
+        label: t("Shopping"),
+        value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
+      },
+      {
+        label: t("Transit"),
+        value: gps_events.filter((x) => x.data.context.environment === "transit").length,
+      },
+    ]
+
+    return events
+  }
 
   const earliestDate = () =>
     (activities || [])
@@ -703,7 +779,7 @@ export default function Prevent({
         <Container>
           <Grid container xs={12} spacing={0} className={classes.activityhd}>
             <Grid item xs className={classes.preventHeader}>
-              <Typography variant="h5">Activity</Typography>
+              <Typography variant="h5">{t("Activity")}</Typography>
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(0)}>
@@ -728,7 +804,7 @@ export default function Prevent({
                       >
                         <Box display="flex">
                           <Box flexGrow={1}>
-                            <Typography className={classes.preventlabel}>{activity.name}</Typography>
+                            <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
                             <JournalBlue />
@@ -738,7 +814,7 @@ export default function Prevent({
                           <Typography variant="h2">{(activityEvents?.[activity.name] || []).length}</Typography>
                         </Box>
                         <Typography variant="h6">
-                          entries {timeAgo.format(timeSpans[activity.name].timestamp)}
+                          {t("entries")} {timeAgo.format(timeSpans[activity.name].timestamp)}
                         </Typography>
                       </Card>
                     </ButtonBase>
@@ -755,7 +831,7 @@ export default function Prevent({
                       >
                         <Box display="flex">
                           <Box flexGrow={1}>
-                            <Typography className={classes.preventlabel}>{activity.name}</Typography>
+                            <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
                             {goalIcon(activity.name)}
@@ -765,7 +841,7 @@ export default function Prevent({
                           <Typography variant="h2">{activityCounts[activity.name]}</Typography>
                         </Box>
                         <Typography variant="h6">
-                          entries {timeAgo.format(timeSpans[activity.name + "-goal"].timestamp)}
+                          {t("entries")} {timeAgo.format(timeSpans[activity.name + "-goal"].timestamp)}
                         </Typography>
                       </Card>
                     </ButtonBase>
@@ -775,7 +851,8 @@ export default function Prevent({
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                         <Typography className={classes.preventlabelFull}>
-                          {activity.name} <Box component="span">({activityCounts[activity.name]})</Box>
+                          {t(activity.name)}
+                          <Box component="span">({activityCounts[activity.name]})</Box>
                         </Typography>
                         <Box className={classes.maxw300}>
                           <Sparkline
@@ -826,7 +903,7 @@ export default function Prevent({
           </Grid>
           <Grid container xs={12} spacing={0} className={classes.sensorhd}>
             <Grid item xs className={classes.preventHeader}>
-              <Typography variant="h5">Sensors</Typography>
+              <Typography variant="h5">{t("Sensors")}</Typography>
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(1)}>
@@ -852,7 +929,7 @@ export default function Prevent({
                     }
                   >
                     <Typography className={classes.preventlabel}>
-                      Social Context <Box component="span">({sensorCounts["Social Context"]})</Box>
+                      {t("Social Context")} <Box component="span">({sensorCounts["Social Context"]})</Box>
                     </Typography>
                     <Box>
                       <RadialDonutChart
@@ -884,7 +961,7 @@ export default function Prevent({
                     }
                   >
                     <Typography className={classes.preventlabel}>
-                      Environmental Context <Box component="span">({sensorCounts["Environmental Context"]})</Box>
+                      {t("Environmental Context")} <Box component="span">({sensorCounts["Environmental Context"]})</Box>
                     </Typography>
                     <Box>
                       <RadialDonutChart
@@ -917,7 +994,7 @@ export default function Prevent({
                     }
                   >
                     <Typography className={classes.preventlabel}>
-                      Step Count <Box component="span">({sensorCounts["Step Count"]})</Box>
+                      {t("Step Count")} <Box component="span">({sensorCounts["Step Count"]})</Box>
                     </Typography>
                     <Box mt={3} mb={1} className={classes.maxw150}>
                       <Sparkline
@@ -983,12 +1060,12 @@ export default function Prevent({
                       visualizations["lamp.dashboard.experimental." + x] !== null ? (
                         <Vega spec={visualizations["lamp.dashboard.experimental." + x]} />
                       ) : (
-                      <img
-                        alt="visualization"
-                        src={visualizations["lamp.dashboard.experimental." + x]}
-                        height="100%"
-                        width="100%"
-                      />
+                        <img
+                          alt="visualization"
+                          src={visualizations["lamp.dashboard.experimental." + x]}
+                          height="100%"
+                          width="100%"
+                        />
                       )}
                     </Grid>
                   </Card>
@@ -1010,19 +1087,19 @@ export default function Prevent({
         }}
       >
         <DialogTitle id="alert-dialog-slide-title">
-          {dialogueType === 0 ? "Activity data" : "Sensor Data"}
+          {dialogueType === 0 ? t("Activity data") : t("Sensor Data")}
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
           <Box mt={2}>
-            <Typography>Choose the data you want to see in your dashboard.</Typography>
+            <Typography>{t("Choose the data you want to see in your dashboard.")}</Typography>
           </Box>
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           {dialogueType === 0 ? (
             <MultipleSelect
               selected={selectedActivities}
-              items={(activities || []).map((x) => `${x.name}`)}
+              items={(activities || []).map((x) => t(`${x.name}`))}
               showZeroBadges={false}
               badges={activityCounts}
               onChange={(x) => {
@@ -1060,7 +1137,7 @@ export default function Prevent({
         <DialogActions>
           <Box textAlign="center" width={1} mt={3} mb={3}>
             <Link onClick={handleClose} className={classes.linkBlue}>
-              Done
+              {t("Done")}
             </Link>
           </Box>
         </DialogActions>

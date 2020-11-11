@@ -15,6 +15,7 @@ import {
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,6 +109,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function TipNotification({ ...props }) {
   const classes = useStyles()
   const [status, setStatus] = useState("Yes")
+	const { t } = useTranslation();
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
@@ -119,8 +121,8 @@ export default function TipNotification({ ...props }) {
         <Box width={1} className={classes.headerIcon}>
           {!!props.icon ? <img src={!!props.icon ? props.icon : undefined} alt={props.title} /> : ""}
         </Box>
-        <Typography variant="caption">Tip</Typography>
-        <Typography variant="h2">{props.title}</Typography>
+        <Typography variant="caption">{t("Tip")}</Typography>
+        <Typography variant="h2">{t(props.title)}</Typography>
       </Box>
       <Grid container direction="row" justify="center" alignItems="flex-start">
         <Grid item lg={4} sm={10} xs={12}>
@@ -139,26 +141,26 @@ export default function TipNotification({ ...props }) {
                 </Grid>
               </Grid>
             </Box>
-            <Box className={classes.howFeel}>Was this helpful today?</Box>
+            <Box className={classes.howFeel}>{t('Was this helpful today?')}</Box>
             <Box textAlign="center">
               <IconButton
                 onClick={() => handleClickStatus("Yes")}
                 className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
                 <ThumbsUp />
-                <label>Yes</label>
+                <label>{t("Yes")}</label>
               </IconButton>
               <IconButton
                 onClick={() => handleClickStatus("No")}
                 className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
                 <ThumbsDown />
-                <label>No</label>
+                <label>{t("No")}</label>
               </IconButton>
             </Box>
             <Box textAlign="center">
               <Fab variant="extended" color="primary" className={classes.btnyellow} onClick={props.onComplete}>
-                Mark complete
+                {t('Mark complete')}  
               </Fab>
             </Box>
           </CardContent>

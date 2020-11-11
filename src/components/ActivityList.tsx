@@ -54,6 +54,7 @@ import { ReactComponent as Filter } from "../icons/Filter.svg"
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
+import { useTranslation } from "react-i18next"
 import SCImageCreator from "./SCImageCreator"
 
 const theme = createMuiTheme({
@@ -412,11 +413,12 @@ function ImportActivity({
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
 
   const onDrop = useCallback((acceptedFiles) => {
     const reader = new FileReader()
-    reader.onabort = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
-    reader.onerror = () => enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+    reader.onabort = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
+    reader.onerror = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
     reader.onload = () => {
       setShowActivityImport(false)
       setLoading(true)
@@ -426,7 +428,7 @@ function ImportActivity({
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       )
         setImportFile(obj)
-      else enqueueSnackbar("Couldn't import the Activities.", { variant: "error" })
+      else enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
     }
     acceptedFiles.forEach((file) => reader.readAsText(file))
   }, [])
@@ -442,10 +444,10 @@ function ImportActivity({
       <Dialog open={!!showActivityImport} onClose={() => setShowActivityImport(false)}>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={3}>
-            <Typography variant="body2">Choose the Study you want to import activities.</Typography>
+            <Typography variant="body2">{t("Choose the Study you want to import activities.")}</Typography>
           </Box>
 
-          <Typography variant="caption">Study</Typography>
+          <Typography variant="caption">{t("Study")}</Typography>
           <Select
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
@@ -465,7 +467,7 @@ function ImportActivity({
           {typeof selectedStudy === "undefined" ||
           (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
             <Box mt={1}>
-              <Typography className={classes.errorMsg}>Select a Study to import activities.</Typography>
+              <Typography className={classes.errorMsg}>{t("Select a Study to import activities.")}</Typography>
             </Box>
           ) : (
             ""
@@ -479,7 +481,7 @@ function ImportActivity({
           >
             <input {...getInputProps()} />
 
-            <Typography variant="h6">Drag files here, or click to select files.</Typography>
+            <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
           </Box>
         </DialogContent>
       </Dialog>
@@ -493,7 +495,7 @@ function ImportActivity({
         />
         <DialogActions>
           <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             onClick={() => {
@@ -503,7 +505,7 @@ function ImportActivity({
             color="primary"
             autoFocus
           >
-            Import
+            {t("Import")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -542,6 +544,11 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
+  const { t } = useTranslation()  
+  const activitiesObj = {"lamp.journal" : t("Journal"), "lamp.scratch_image" : t("Scratch card"), "lamp.breathe" : t("Breathe"),
+                        "lamp.tips" : t("Tip"), "lamp.dbt_diary_card" : t("DBT diary card"), 
+                        "lamp.cats_and_dogs" : t("Cats and Dogs"), "lamp.jewels_a" : t("Jewels A"), 
+                        "lamp.jewels_b" : t("Jewels B"),"lamp.spatial_span" : t("Spatial Span")}
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
@@ -625,7 +632,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
 
     if (brokenGroupsCount > 0) {
-      enqueueSnackbar("Couldn't import the Activities because some Activities are misconfigured or missing.", {
+      enqueueSnackbar(t("Couldn't import the Activities because some Activities are misconfigured or missing."), {
         variant: "error",
       })
       return
@@ -643,7 +650,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         } as any)) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
       } catch (e) {
-        enqueueSnackbar("Couldn't import one of the selected survey Activities.", { variant: "error" })
+        enqueueSnackbar(t("Couldn't import one of the selected survey Activities."), { variant: "error" })
       }
     }
 
@@ -657,7 +664,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         })) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.activity_details", tag)
       } catch (e) {
-        enqueueSnackbar("Couldn't import one of the selected Activities.", { variant: "error" })
+        enqueueSnackbar(t("Couldn't import one of the selected Activities."), { variant: "error" })
       }
     }
 
@@ -671,12 +678,12 @@ export default function ActivityList({ researcher, title, ...props }) {
           settings: x.settings.map((y) => allIDs[y]),
         })
       } catch (e) {
-        enqueueSnackbar("Couldn't import one of the selected Activity groups.", { variant: "error" })
+        enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
       }
     }
 
     onChange()
-    enqueueSnackbar("The selected Activities were successfully imported.", {
+    enqueueSnackbar(t("The selected Activities were successfully imported."), {
       variant: "success",
     })
   }
@@ -708,7 +715,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       } else data.push({ ...x, tableData: undefined })
     }
     _saveFile(data)
-    enqueueSnackbar("The selected Activities were successfully exported.", {
+    enqueueSnackbar(t("The selected Activities were successfully exported."), {
       variant: "info",
     })
   }
@@ -732,12 +739,12 @@ export default function ActivityList({ researcher, title, ...props }) {
         icon: x.icon,
       })
       if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
+        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
           variant: "error",
         })
       else {
         setAllFalse()
-        enqueueSnackbar("Successfully created a new tip Activity.", {
+        enqueueSnackbar(t("Successfully created a new tip Activity."), {
           variant: "success",
         })
         onChange()
@@ -751,12 +758,12 @@ export default function ActivityList({ researcher, title, ...props }) {
         icon: x.icon,
       })
       if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
+        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
           variant: "error",
         })
       else {
         setAllFalse()
-        enqueueSnackbar("Successfully updated the Activity.", {
+        enqueueSnackbar(t("Successfully updated the Activity."), {
           variant: "success",
         })
         onChange()
@@ -772,7 +779,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
     let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
     await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
-    enqueueSnackbar("Successfully created a new survey Activity.", {
+    enqueueSnackbar(t("Successfully created a new survey Activity."), {
       variant: "success",
     })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
@@ -795,11 +802,11 @@ export default function ActivityList({ researcher, title, ...props }) {
       ],
     })) as any
     if (!!newItem.error)
-      enqueueSnackbar("Failed to create a new group Activity.", {
+      enqueueSnackbar(t("Failed to create a new group Activity."), {
         variant: "error",
       })
     else
-      enqueueSnackbar("Successfully created a new group Activity.", {
+      enqueueSnackbar(t("Successfully created a new group Activity."), {
         variant: "success",
       })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
@@ -817,7 +824,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         photo: x.photo,
       })
     }
-    enqueueSnackbar("Successfully created a new  Activity.", {
+    enqueueSnackbar(t("Successfully created a new Activity."), {
       variant: "success",
     })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
@@ -838,7 +845,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       setStudiesCount({ ...studiesCount, [selectedStudy.name]: --studiesCount[selectedStudy.name] })
       console.dir(raw)
     }
-    enqueueSnackbar("Successfully deleted the selected Activities.", {
+    enqueueSnackbar(t("Successfully deleted the selected Activities."), {
       variant: "success",
     })
     onChange()
@@ -885,7 +892,7 @@ export default function ActivityList({ researcher, title, ...props }) {
           description: x?.description ?? "",
           photo: x?.photo ?? "",
         })
-        enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: "success" })
+        enqueueSnackbar(t("Successfully duplicated the Activity under a new name."), { variant: "success" })
       } else {
         if (selectedActivity.parentID !== x.studyID) {
           // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
@@ -905,11 +912,11 @@ export default function ActivityList({ researcher, title, ...props }) {
         }
       }
       if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
+        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
           variant: "error",
         })
       else {
-        enqueueSnackbar("Successfully updated the Activity.", {
+        enqueueSnackbar(t("Successfully updated the Activity."), {
           variant: "success",
         })
         onChange()
@@ -920,11 +927,11 @@ export default function ActivityList({ researcher, title, ...props }) {
         settings: x.settings,
       })) as any
       if (!!result.error)
-        enqueueSnackbar("Encountered an error: " + result?.error, {
+        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
           variant: "error",
         })
       else
-        enqueueSnackbar("Successfully updated the Activity.", {
+        enqueueSnackbar(t("Successfully updated the Activity."), {
           variant: "success",
         })
 
@@ -935,7 +942,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       if (isDuplicated) {
         /* duplicate */ let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
         await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
-        enqueueSnackbar("Successfully duplicated the Activity under a new name.", { variant: "success" })
+        enqueueSnackbar(t("Successfully duplicated the Activity under a new name."), { variant: "success" })
         onChange()
       } /* overwrite */ else {
         /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
@@ -944,7 +951,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                 await LAMP.Activity.updateActivity(raw)
                 */
         await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
-        enqueueSnackbar("Only survey description content was modified to prevent irrecoverable data loss.", {
+        enqueueSnackbar(t("Only survey description content was modified to prevent irrecoverable data loss. (error message)"), {
           variant: "error",
         })
       }
@@ -969,11 +976,11 @@ export default function ActivityList({ researcher, title, ...props }) {
           icon: x.icon,
         })
         if (!!result.error)
-          enqueueSnackbar("Encountered an error: " + result?.error, {
+          enqueueSnackbar(t("Encountered an error: ") + result?.error, {
             variant: "error",
           })
         else
-          enqueueSnackbar("Successfully updated the Activity.", {
+          enqueueSnackbar(t("Successfully updated the Activity."), {
             variant: "success",
           })
       }
@@ -1014,27 +1021,26 @@ export default function ActivityList({ researcher, title, ...props }) {
       <MuiThemeProvider theme={theme}>
         <Box className={classes.tableContainer}>
           <MaterialTable
-            title={"Activities"}
+            title={t("Activities")}
             data={activities}
             columns={[
-              { title: "Name", field: "name" },
+              { title: t("Name"), field: "name" },
               {
-                title: "Type",
+                title: t("Type"),
                 field: "spec",
                 lookup: {
-                  "lamp.survey": "Survey",
-                  "lamp.group": "Group",
-                  "lamp.tips": "Tips",
-                  "lamp.journal": "Journal",
-                  "lamp.scratch_image": "Scratch image",
-                  "lamp.breathe": "Breathe",
-                  "lamp.dbt_diary_card": "DBT diary card",
+                  "lamp.survey": t("Survey"),
+                  "lamp.group": t("Group"),
+                  "lamp.tips": t("Tips"),
+                  "lamp.journal": t("Journal"),
+                  "lamp.breathe": t("Breathe"),
+                  "lamp.dbt_diary_card": t("DBT diary card"),
+                  "lamp.scratch_image": t("Scratch image"),
                 },
-                emptyValue: "Cognitive Test",
+                emptyValue: t("Cognitive Test"),
               },
-
               {
-                title: "Study",
+                title: t("Study"),
                 field: "parent",
                 searchable: false,
                 render: (rowData) => (
@@ -1053,24 +1059,24 @@ export default function ActivityList({ researcher, title, ...props }) {
             actions={[
               {
                 icon: "cloud_upload",
-                tooltip: "Import",
+                tooltip: t("Import"),
                 isFreeAction: true,
                 onClick: (event, rows) => setShowActivityImport(true),
               },
               {
                 icon: "cloud_download",
-                tooltip: "Export",
+                tooltip: t("Export"),
                 onClick: (event, rows) => downloadActivities(rows),
               },
               {
                 icon: "add_box",
-                tooltip: "Create",
+                tooltip: t("Create"),
                 isFreeAction: true,
                 onClick: (event, rows) => setCreateMenu(event.currentTarget.parentNode),
               },
               {
                 icon: "delete_forever",
-                tooltip: "Delete",
+                tooltip: t("Delete"),
                 onClick: async (event, rows) => deleteActivities(rows),
               },
             ]}
@@ -1081,11 +1087,12 @@ export default function ActivityList({ researcher, title, ...props }) {
                 //   ? "No Activities. Add Activities by clicking the [+] button above."
                 //   : "",
                 editRow: {
-                  deleteText: "Are you sure you want to delete this Activity?",
+                  deleteText: t("Are you sure you want to delete this Activity?"),
                 },
               },
               toolbar: {
-                nRowsSelected: "Activities",
+                nRowsSelected: t("Activities"),
+                searchPlaceholder: t("Search"),
               },
             }}
             options={{
@@ -1120,7 +1127,8 @@ export default function ActivityList({ researcher, title, ...props }) {
                         showFilter === true ? setShowFilter(false) : setShowFilter(true)
                       }}
                     >
-                      <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                      <Filter /> {t("Filter results")}{" "}
+                      {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
                     {/* <Tooltip title="Import">
                       <Fab
@@ -1145,7 +1153,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                         }))
                       }}
                     >
-                      <AddIcon /> Add
+                      <AddIcon /> {t("Add")}
                     </Fab>
                   </div>
                 )
@@ -1185,7 +1193,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                               }}
                               startIcon={<DeleteIcon />}
                             >
-                              Delete
+                              {t("Delete")}
                             </Button>
                           </Box>
                           <Box>
@@ -1196,7 +1204,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                               }}
                               startIcon={<ExportIcon />}
                             >
-                              Export
+                              {t("Export")}
                             </Button>
                           </Box>
                         </Box>
@@ -1243,13 +1251,13 @@ export default function ActivityList({ researcher, title, ...props }) {
                   <CloudUploadIcon />
                 </Grid>
                 <Grid item xs={10}>
-                  Import activities
+                  {t("Import activities")}
                 </Grid>
               </Grid>
             </MenuItem>
             <Divider />
             <MenuItem disabled divider>
-              <b>Create a new...</b>
+              <b>{t("Create a new...")}</b>
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -1259,7 +1267,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                 setState((state) => ({ ...state, popoverAttachElement: null }))
               }}
             >
-              Activity Group
+              {t("Activity Group")}
             </MenuItem>
             <MenuItem
               divider
@@ -1270,11 +1278,11 @@ export default function ActivityList({ researcher, title, ...props }) {
                 setState((state) => ({ ...state, popoverAttachElement: null }))
               }}
             >
-              Survey Instrument
+              {t("Survey Instrument")}
             </MenuItem>
             {!_hideCognitiveTesting() && [
               <MenuItem key="head" disabled>
-                <b>Smartphone Cognitive Tests</b>
+                <b>{t("Smartphone Cognitive Tests")}</b>
               </MenuItem>,
               ...activitySpecs.map((x) => (
                 <MenuItem
@@ -1300,7 +1308,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                     setState((state) => ({ ...state, popoverAttachElement: null }))
                   }}
                 >
-                  {x?.name?.replace("lamp.", "")}
+                  {x.name ? activitiesObj[x.name] : x?.name?.replace("lamp.", "")}  
                 </MenuItem>
               )),
             ]}
@@ -1322,7 +1330,7 @@ export default function ActivityList({ researcher, title, ...props }) {
             <IconButton onClick={setAllFalse} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">Create a new activity</Typography>
+            <Typography variant="h5">{t("Create a new activity")}</Typography>
           </Toolbar>
         </AppBar>
         <Divider />
@@ -1388,7 +1396,7 @@ export default function ActivityList({ researcher, title, ...props }) {
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">
-              {!!selectedActivity ? "Modify an existing activity" : "Create a new activity"}
+              {!!selectedActivity ? t("Modify an existing activity") : t("Create a new activity")}
             </Typography>
           </Toolbar>
         </AppBar>

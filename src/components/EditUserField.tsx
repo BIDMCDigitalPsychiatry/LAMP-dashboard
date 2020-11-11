@@ -5,6 +5,7 @@ import { useSnackbar } from "notistack"
 
 // Local Imports
 import LAMP from "lamp-core"
+import { useTranslation } from "react-i18next"
 
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized
@@ -29,6 +30,7 @@ export default function EditUserField({
   const [editComplete, setEditComplete] = useState(false)
   const [alias, setAlias] = useState<string>()
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
 
   // Load the current alias only upon initialization.
   useEffect(() => {
@@ -42,7 +44,13 @@ export default function EditUserField({
         if (!unmounted) setAlias((oldValue.current = res))
       })
       .catch((err) =>
-        enqueueSnackbar(`Failed to load ${participant.id}'s alias: '${err.message}'`, { variant: "error" })
+        enqueueSnackbar(
+          t("Failed to load participantId's alias: errorMessage", {
+            participantId: participant.id,
+            errorMessage: err.message,
+          }),
+          { variant: "error" }
+        )
       )
     return () => {
       unmounted = true
@@ -59,16 +67,28 @@ export default function EditUserField({
       .then((res) => {
         updateName(alias === "" ? participant.id : alias)
         if (alias === "")
-          enqueueSnackbar(`Removed ${participant.id}'s alias.`, {
+          enqueueSnackbar(t("Removed participantId's alias.", { participantId: participant.id }), {
             variant: "success",
           })
         else
-          enqueueSnackbar(`Set ${participant.id}'s alias to '${alias}'.`, {
-            variant: "success",
-          })
+          enqueueSnackbar(
+            t("Set participantId's alias to participantName", {
+              participantId: participant.id,
+              participantName: alias,
+            }),
+            {
+              variant: "success",
+            }
+          )
       })
       .catch((err) =>
-        enqueueSnackbar(`Failed to change ${participant.id}'s alias: '${err.message}'`, { variant: "error" })
+        enqueueSnackbar(
+          t("Failed to change participantId's alias: errorMessage", {
+            participantId: participant.id,
+            errorMessage: err.message,
+          }),
+          { variant: "error" }
+        )
       )
   }, [editing])
 
@@ -112,7 +132,11 @@ export default function EditUserField({
             style: { color: "#000" },
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title="Create or edit the alias for this Participant ID. Saving an empty text box will reset this value.">
+                <Tooltip
+                  title={t(
+                    "Create or edit the alias for this Participant ID. Saving an empty text box will reset this value."
+                  )}
+                >
                   <IconButton
                     edge="end"
                     aria-label="save edit"
@@ -127,10 +151,11 @@ export default function EditUserField({
           }}
         />
       ) : alias ? (
-        alias
+        t(alias)
       ) : (
         participant.id
       )}
     </div>
   )
 }
+  
