@@ -560,7 +560,7 @@ function TextSection({ onChange, charLimit, value, ...props }) {
             setText(e.target.value)
             onChange(e.target.value)
           }}
-          value={value}
+          defaultValue={value}
           helperText={text ? `${text.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
