@@ -145,8 +145,8 @@ export default function JournalEntries({ participant, activityId, ...props }) {
       .catch((e) => console.dir(e))
       .then((x) => {
         setLoading(false)
-      })
-    props.onComplete()
+        props.onComplete()
+      })    
   }
 
   const getDateString = (date: Date) => {

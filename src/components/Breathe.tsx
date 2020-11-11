@@ -440,7 +440,7 @@ export default function Breathe({ participant, activity, ...props }) {
                 </IconButton>
               </Box>
               <Box textAlign="center" pt={4}>
-                <Link href="#" className={classes.btnpeach} onClick={props.onComplete}>
+                <Link className={classes.btnpeach} onClick={props.onComplete}>
                   {t("Done")}
                 </Link>
               </Box>
