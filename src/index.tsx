@@ -13,6 +13,7 @@ import "core-js/stable"
 import "regenerator-runtime/runtime"
 import "url-search-params-polyfill"
 import "material-icons"
+import "./i18n"
 
 // in index.html: <!DOCTYPE html><html></html>
 let root = document.createElement("div")
