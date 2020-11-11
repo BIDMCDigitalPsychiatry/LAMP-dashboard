@@ -199,15 +199,15 @@ export default function ScratchImage({ participant, activity, ...props }) {
         context.drawImage(cover, 0, 0, canvas.width, canvas.height)
         context.textAlign = "center"
         context.font = "bold 30px inter"
-        context.fillText("Swipe around the", canvas.width / 2, canvas.height / 2 - 35)
-        context.fillText("screen to reveal", canvas.width / 2, canvas.height / 2)
-        context.fillText("the hidden image", canvas.width / 2, canvas.height / 2 + 35)
+        context.fillText(t("Swipe around the"), canvas.width / 2, canvas.height / 2 - 35)
+        context.fillText(t("Screen to reveal"), canvas.width / 2, canvas.height / 2)
+        context.fillText(t("The hidden image"), canvas.width / 2, canvas.height / 2 + 35)
         setImage(background())
         setLoading(false)
       }
     }
   }, [canvas])
-
+  
   const touchStart = (event: any) => {
     isDrawing = true
     setVisibility(true)

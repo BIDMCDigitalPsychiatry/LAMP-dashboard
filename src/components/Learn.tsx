@@ -301,7 +301,7 @@ export default function Learn({
             <Box mt={2} mb={1}>
               {icon ? <img src={icon} /> : ""}
             </Box>
-            <Typography variant="h2">{tip}</Typography>
+            <Typography variant="h2">{t(tip)}</Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>

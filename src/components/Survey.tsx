@@ -328,7 +328,7 @@ export default function Survey({
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
           <Typography variant="h4" gutterBottom>
-            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            {questionCount} {questionCount > 1 ? t("questions") : t("question")} {/* (10 mins) */}
           </Typography>
           <Typography variant="body2" component="p">
             {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
@@ -368,7 +368,7 @@ export default function Survey({
           </Box>
         </DialogActions>
       </Dialog>
-
+              
       <ResponsiveDialog
         transient
         animate

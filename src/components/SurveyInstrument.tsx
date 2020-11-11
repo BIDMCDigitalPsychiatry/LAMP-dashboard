@@ -1015,7 +1015,7 @@ function Section({
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Typography variant="h5">{type.replace(/_/g, " ")}</Typography>
+          <Typography variant="h5">{t(type.replace(/_/g, " "))}</Typography>
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>

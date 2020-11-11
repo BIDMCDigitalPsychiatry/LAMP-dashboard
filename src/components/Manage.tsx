@@ -449,7 +449,7 @@ export default function Manage({ participant, activities, ...props }) {
               <Typography variant="body2" align="left">
                 {t("Manage")}
               </Typography>
-              <Typography variant="h2">{activity?.name ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
             </Box>
           </div>
         </DialogTitle>

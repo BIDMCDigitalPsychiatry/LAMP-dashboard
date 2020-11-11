@@ -23,7 +23,7 @@ import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import LAMP from "lamp-core"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -123,7 +123,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
   const [loading, setLoading] = useState(false)
-	const { t } = useTranslation();
+  const { t } = useTranslation()
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
@@ -146,7 +146,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
       .then((x) => {
         setLoading(false)
         props.onComplete()
-      })    
+      })
   }
 
   const getDateString = (date: Date) => {
@@ -165,7 +165,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
           <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">{t('New journal entry')}</Typography>
+          <Typography variant="h5">{t("New journal entry")}</Typography>
         </Toolbar>
       </AppBar>
       <Box px={2}>
@@ -190,7 +190,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                   onChange={(event) => setJounalValue(event.target.value)}
                   classes={{ root: classes.textArea }}
                 />
-                <Box className={classes.howFeel}>{t('How do you feel today?')}</Box>
+                <Box className={classes.howFeel}>{t("How do you feel today?")}</Box>
                 <Grid className={classes.btnNav}>
                   <Box textAlign="center">
                     <IconButton
@@ -198,14 +198,14 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                       className={status === "Good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsUp />
-                      <label>{t('Good')}</label>
+                      <label>{t("Good")}</label>
                     </IconButton>
                     <IconButton
                       onClick={() => handleClickStatus("Bad")}
                       className={status === "Bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsDown />
-                      <label>{t('Bad')}</label>
+                      <label>{t("Bad")}</label>
                     </IconButton>
                   </Box>
                 </Grid>
@@ -237,8 +237,10 @@ export default function JournalEntries({ participant, activityId, ...props }) {
               </Box>
 
               <DialogContent className={classes.dialogueContent}>
-                <Typography variant="h4">{t('Leaving so soon?')}</Typography>
-                <Typography variant="body1">{t('If you leave without submitting, your entry will be lost.')}</Typography>
+                <Typography variant="h4">{t("Leaving so soon?")}</Typography>
+                <Typography variant="body1">
+                  {t("If you leave without submitting, your entry will be lost.")}
+                </Typography>
               </DialogContent>
               <Grid>
                 <Box textAlign="center" width={1} mt={1} mb={3}>
