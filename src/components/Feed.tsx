@@ -802,7 +802,7 @@ export default function Feed({
                                 {feed.timeValue}
                               </Box>
                             </Typography>
-                            <Typography variant="h5">{feed.title}</Typography>
+                            <Typography variant="h5">{t(feed.title)}</Typography>
                             <Typography className={classes.smalltext} color="textSecondary">
                               {feed.spec}
                             </Typography>
