@@ -6,6 +6,7 @@ import { blue } from "@material-ui/core/colors"
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
+import { useTranslation } from "react-i18next"
 
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
@@ -58,25 +59,26 @@ export default function ActivityCard({
   const [visibleSlice, setVisibleSlice] = useState<any>()
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
+  const { t } = useTranslation()
   const [selectedActivity, setActivity] = useState(activity)
 
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
         {!Boolean(visibleSlice) ? (
-          <Tooltip title="Switch Views">
+          <Tooltip title={t("Switch Views")}>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
               <Icon fontSize="small">dashboard</Icon>
             </IconButton>
           </Tooltip>
         ) : (
-          <Tooltip title="Go Back">
+          <Tooltip title={t("Go Back")}>
             <IconButton onClick={(event) => setVisibleSlice(undefined)}>
               <Icon fontSize="small">arrow_back</Icon>
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title={Boolean(visibleSlice) ? activity.name : `Activity Type`}>
+        <Tooltip title={Boolean(visibleSlice) ? activity.name : t(`Activity Type`)}>
           <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
             {!Boolean(visibleSlice)
               ? activity.name
@@ -85,28 +87,28 @@ export default function ActivityCard({
         </Tooltip>
         <Box>
           {!Boolean(visibleSlice) && (
-            <Tooltip title="Show App Screenshot">
+            <Tooltip title={t("Show App Screenshot")}>
               <IconButton onClick={(event) => setHelpAnchor(event.currentTarget)}>
                 <Icon fontSize="small">help</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onDeleteAction && (
-            <Tooltip title="Delete Entry">
+            <Tooltip title={t("Delete Entry")}>
               <IconButton onClick={(event) => onDeleteAction(visibleSlice)}>
                 <Icon fontSize="small">delete</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onCopyAction && (
-            <Tooltip title="Copy Entry">
+            <Tooltip title={t("Copy Entry")}>
               <IconButton onClick={(event) => onCopyAction(visibleSlice)}>
                 <Icon fontSize="small">file_copy</Icon>
               </IconButton>
             </Tooltip>
           )}
           {Boolean(visibleSlice) && !!onEditAction && (
-            <Tooltip title="Edit Entry">
+            <Tooltip title={t("Edit Entry")}>
               <IconButton onClick={(event) => onEditAction(visibleSlice)}>
                 <Icon fontSize="small">edit</Icon>
               </IconButton>
@@ -118,7 +120,7 @@ export default function ActivityCard({
       {Boolean(visibleSlice) ? (
         (visibleSlice.slice || []).length === 0 ? (
           <Typography variant="subtitle2" style={{ margin: 16 }}>
-            No detail view available.
+            {t("No detail view available.")}
           </Typography>
         ) : (
           <ArrayView
@@ -178,8 +180,8 @@ export default function ActivityCard({
         <Sparkline
           minWidth={250}
           minHeight={350}
-          XAxisLabel="Time"
-          YAxisLabel="Score"
+          XAxisLabel={t("Time")}
+          YAxisLabel={t("Score")}
           color={blue[500]}
           startDate={startDate}
           data={events.map((d) => ({

@@ -4,6 +4,7 @@ import { Typography, makeStyles, Box, Grid, IconButton, Container, AppBar, Toolb
 import ResponsiveDialog from "./ResponsiveDialog"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import TipNotification from "./TipNotification"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   topicon: {
@@ -126,8 +127,8 @@ export default function LearnTips({ ...props }) {
   const [title, setTitle] = useState(null)
   const [details, setDetails] = useState(null)
   const [images, setImages] = useState(null)
-  
-
+  const { t } = useTranslation();
+      
   return (
     <Container>
       <Box pb={4}>
@@ -148,7 +149,7 @@ export default function LearnTips({ ...props }) {
                       <div>
                         <Grid container spacing={3}>
                           <Grid item xs>
-                            <Typography variant="h6">{detail.title}</Typography>
+                            <Typography variant="h6">{t(detail.title)}</Typography>
                           </Grid>
                           <Grid item xs justify="center" className={classes.rightArrow}>
                             <ChevronRightIcon />

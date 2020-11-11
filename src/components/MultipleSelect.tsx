@@ -2,6 +2,7 @@
 import React from "react"
 import { Box, Chip, Tooltip } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { useTranslation } from "react-i18next"
 
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 
@@ -37,6 +38,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function MultipleSelect({ ...props }) {
   const classes = useStyles()
+  const { t } = useTranslation()
+
   return (
     <Box className={classes.filterChips}>
       {(props.items || []).map((item) => (
@@ -50,7 +53,7 @@ export default function MultipleSelect({ ...props }) {
             classes={{ root: classes.multiselect, colorPrimary: classes.multiselectPrimary }}
             label={
               <section>
-                {item}
+                {t(item)}
                 <span className={classes.badgeCount}>{(props.badges || {})[item] || props.defaultBadge || 0}</span>
               </section>
             }

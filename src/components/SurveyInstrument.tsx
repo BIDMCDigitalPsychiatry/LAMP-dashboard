@@ -42,6 +42,7 @@ import { spliceActivity } from "./ActivityList"
 import { useSnackbar } from "notistack"
 import Messages from "./Messages"
 import classes from "*.module.css"
+import { useTranslation } from "react-i18next"
 
 const GreenCheckbox = withStyles({
   root: {
@@ -335,6 +336,7 @@ function _useTernaryBool() {
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value)
   const classes = useStyles()
+  const { t } = useTranslation()
 
   return (
     <FormControl component="fieldset" className={classes.radioGroup}>
@@ -374,7 +376,7 @@ function RadioOption({ onChange, options, value, ...props }) {
                 variant="body2"
                 style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
               >
-                {x.label}
+                {t(x.label)}
                 {!!x.description && ` (${x.description})`}
               </Typography>
             }
@@ -395,6 +397,7 @@ function TimeSelection({ onChange, value, ...props }) {
   const [hourSelectedIndex, setHourSelectedIndex] = React.useState("01")
   const [minuteSelectedIndex, setMinuteSelectedIndex] = React.useState("00")
   const [ampmSelectedIndex, setAmPmSelectedIndex] = React.useState("am")
+  const { t } = useTranslation()
 
   const handleClickHours = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -444,7 +447,7 @@ function TimeSelection({ onChange, value, ...props }) {
       onClick={(event) => handleMenuItemClick(event, "am", 2)}
       classes={{ selected: classes.listSelected }}
     >
-      am
+      {t("am")}
     </MenuItem>
   )
   ampm.push(
@@ -454,7 +457,7 @@ function TimeSelection({ onChange, value, ...props }) {
       onClick={(event) => handleMenuItemClick(event, "pm", 2)}
       classes={{ selected: classes.listSelected }}
     >
-      pm
+      {t("pm")}
     </MenuItem>
   )
 
@@ -557,7 +560,7 @@ function TextSection({ onChange, charLimit, value, ...props }) {
             setText(e.target.value)
             onChange(e.target.value)
           }}
-          value={value}
+          defaultValue={value}
           helperText={text ? `${text.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
@@ -581,6 +584,7 @@ function Rating({ onChange, options, value, ...props }) {
     })
     return sliderValue
   }
+  const { t } = useTranslation()
 
   const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
@@ -653,9 +657,9 @@ function Rating({ onChange, options, value, ...props }) {
       </Grid>
       <Box className={classes.sliderResponse}>
         <Typography variant="caption" display="block" gutterBottom>
-          Your response:
+          {t("Your response:")}
         </Typography>
-        <Typography variant="h4">{valueText}</Typography>
+        <Typography variant="h4">{t(valueText)}</Typography>
       </Box>
     </Box>
   )
@@ -677,6 +681,8 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value || "")
   const _selection = CSV_parse(selectedValue)
   const classes = useStyles()
+  const { t } = useTranslation()
+
   return (
     <FormGroup
       {...props}
@@ -713,7 +719,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
               variant="body2"
               style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
             >
-              {x.label}
+              {t(x.label)}
               {!!x.description && ` (${x.description})`}
             </Typography>
           }
@@ -724,17 +730,19 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
   )
 }
 function Question({ onResponse, number, text, desc, type, options, value, startTime, ...props }) {
+  const { t } = useTranslation()
+
   let onChange = (value) => {
     onResponse({ item: text, value: value })
   }
   const _binaryOpts = [
-    { label: "Yes", value: "Yes" /* true */ },
-    { label: "No", value: "No" /* false */ },
+    { label: t("Yes"), value: "Yes" /* true */ },
+    { label: t("No"), value: "No" /* false */ },
   ]
   const _ternaryOpts = [
-    { label: "Yes", value: "Yes" /* true */ },
-    { label: "No", value: "No" /* false */ },
-    { label: "N/A", value: null /* null */ },
+    { label: t("Yes"), value: "Yes" /* true */ },
+    { label: t("No"), value: "No" /* false */ },
+    { label: t("N/A"), value: null /* null */ },
   ]
   // eslint-disable-next-line
   const _boolOpts = _useTernaryBool() ? _ternaryOpts : _binaryOpts // FIXME DEPRECATED
@@ -743,10 +751,10 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   const CHARACTER_LIMIT = 300
   let component = <Box />
   const _likertOpts = [
-    { label: "Nearly All the Time", value: 3 },
-    { label: "More than Half the Time", value: 2 },
-    { label: "Several Times", value: 1 },
-    { label: "Not at all", value: 0 },
+    { label: t("Nearly All the Time"), value: 3 },
+    { label: t("More than Half the Time"), value: 2 },
+    { label: t("Several Times"), value: 1 },
+    { label: t("Not at all"), value: 0 },
   ]
   // const _ratingOpts =  [
   //   {
@@ -832,11 +840,13 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
         </Typography>
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "likert" || type === "boolean" || type === "list" || type === "select"
-            ? "(Select one)"
+            ? t("(Select one)")
             : type === "slider"
-            ? `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
-                options[options.length - 1].description
-              })`
+            ? t(
+                `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
+                  options[options.length - 1].description
+                })`
+              )
             : ""}
         </Typography>
       </Box>
@@ -862,12 +872,13 @@ function Questions({
 }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const { t } = useTranslation()
 
   return (
     <Box style={{ marginTop: "100px" }}>
       <Box textAlign="center">
         <Typography gutterBottom align="center" classes={{ root: classes.questionTrack }}>
-          Question {idx + 1} of {value.settings.length}
+          {t("Question number of total", { number: idx + 1, total: value.settings.length })}
         </Typography>
       </Box>
 
@@ -908,7 +919,7 @@ function Questions({
           <div className={classes.sliderActionsContainer}>
             {supportsSidebar && idx === value.settings.length - 1 && (
               <Fab onClick={idx === value.settings.length - 1 ? onComplete : handleNext} className={classes.btngreen}>
-                {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : "Submit"}
+                {toolBarBack && !!prefillData ? (!!prefillTimestamp ? "Overwrite" : "Duplicate") : t("Submit")}
               </Fab>
             )}
           </div>
@@ -938,7 +949,8 @@ function Section({
   const [index, setIndex] = useState(0)
   const [slideElements, setSlideElements] = useState(null)
   const [elementIn, setElementIn] = useState(false)
-  console.log(value)
+  const { t } = useTranslation()
+
   // Force creation of result data whether survey was interacted with or not.
   useEffect(() => {
     if (slideElements == null) {
@@ -1003,7 +1015,7 @@ function Section({
     <Box>
       <AppBar position="fixed" style={{ background: "#E7F8F2", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Typography variant="h5">{type.replace(/_/g, " ")}</Typography>
+          <Typography variant="h5">{t(type.replace(/_/g, " "))}</Typography>
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
@@ -1048,8 +1060,8 @@ function Section({
                     ? !!prefillTimestamp
                       ? "Overwrite"
                       : "Duplicate"
-                    : "Submit"
-                  : "Next"}
+                    : t("Submit")
+                  : t("Next")}
               </Fab>
             )}
           </Box>
@@ -1122,7 +1134,8 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const classes = useStyles()
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
-  console.log(group)
+  const { t } = useTranslation()
+
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
@@ -1151,7 +1164,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
           prefillData={!!survey ? survey.prefillData : undefined}
           prefillTimestamp={!!survey ? survey.prefillTimestamp : undefined}
           onValidationFailure={() =>
-            enqueueSnackbar("Some responses are missing. Please complete all questions before submitting.", {
+            enqueueSnackbar(t("Some responses are missing. Please complete all questions before submitting."), {
               variant: "error",
             })
           }
@@ -1175,7 +1188,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
             <Box flexGrow={1} />
             <Messages refresh={!!survey} expandHeight privateOnly participant={id} msgOpen={true} />
           </Drawer>
-          <Tooltip title="Patient Notes" placement="left">
+          <Tooltip title={t("Patient Notes")} placement="left">
             <Fab
               color="primary"
               aria-label="Patient Notes"

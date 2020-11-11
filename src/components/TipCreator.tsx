@@ -25,6 +25,7 @@ import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } fro
 import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
   palette: {
@@ -166,6 +167,7 @@ export default function TipCreator({
   const [addRow, setAddRow] = useState(false)
   const [focusedTextfield, setFocusedTextfield] = useState(null)
   const defaultSettingsArray = [{ title: "", text: "", image: "" }]
+	const { t } = useTranslation()
   const defaultSelectedCategory = {
     id: undefined,
     name: "",
@@ -295,8 +297,7 @@ export default function TipCreator({
       }
     }
     reader.onerror = function (error) {
-      console.log("Error: ", error)
-      enqueueSnackbar("An error occured while uploading. Please try again.", {
+      enqueueSnackbar(t("An error occured while uploading. Please try again."), {
         variant: "error",
       })
     }
@@ -331,11 +332,11 @@ export default function TipCreator({
           })
       }
     } else {
-      enqueueSnackbar("Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB.", {
+      enqueueSnackbar(t("Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB."), {
         variant: "error",
       })
     }
-  }
+  } 
 
   const handleSaveTips = (duplicate = false) => {
     let duplicates = []
@@ -350,7 +351,7 @@ export default function TipCreator({
       )
 
       if (duplicates.length > 0) {
-        enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
         return false
       }
     }
@@ -385,7 +386,7 @@ export default function TipCreator({
 
   const deleteData = (id) => {
     if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length <= 1)
-      enqueueSnackbar("You are not allowed to delete all the details from the tip.", {
+      enqueueSnackbar(t("You are not allowed to delete all the details from the tip."), {
         variant: "error",
       })
     else {
@@ -432,7 +433,7 @@ export default function TipCreator({
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
             <Grid item xs sm={4} md={3} lg={2}>
-              <Tooltip title={!categoryImage ? "Tap to select a photo." : "Tap to delete the photo."}>
+              <Tooltip title={!categoryImage ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
                 <Box
                   width={154}
                   height={154}
@@ -478,7 +479,7 @@ export default function TipCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Study"
+                    label={t("Study")}
                     value={studyId || ""}
                     onChange={(e) => {
                       setStudyId(e.target.value)
@@ -487,7 +488,7 @@ export default function TipCreator({
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? "Please select the study"
+                        ? t("Please select the Study")
                         : ""
                     }
                     variant="filled"
@@ -505,21 +506,21 @@ export default function TipCreator({
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Tip"
+                    label={t("Tip")}
                     value={category || ""}
                     onChange={(event) => {
                       setCategory(event.target.value)
                     }}
                     helperText={
                       typeof category == "undefined" || category === null || category === ""
-                        ? "Please select the tip"
+                        ? t("Please select the tip")
                         : ""
                     }
                     variant="filled"
                     disabled={!!activities ? true : false}
                   >
                     <MenuItem value="add_new" key="add_new">
-                      Add New
+                      {t("Add New")}
                     </MenuItem>
                     {categoryArray.map((x, idx) => (
                       <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
@@ -532,11 +533,11 @@ export default function TipCreator({
                       error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
                       fullWidth
                       variant="filled"
-                      label="New Tip"
+                      label={t("New Tip")}
                       defaultValue={newTipText}
                       onChange={(event) => setNewTipText(event.target.value)}
                       helperText={
-                        category == "add_new" && (newTipText === null || newTipText === "") ? "Please add new tip" : ""
+                        category == "add_new" && (newTipText === null || newTipText === "") ? t("Please add new tip") : ""
                       }
                     />
                   ) : (
@@ -562,13 +563,13 @@ export default function TipCreator({
                             fullWidth
                             error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
                             variant="filled"
-                            label="Tip"
+                            label={t("Tip")}
                             className="Tips"
                             value={duplicateTipText}
                             onChange={(event) => setDuplicateTipText(event.target.value)}
                             helperText={
                               isDuplicate && (duplicateTipText === null || duplicateTipText === "")
-                                ? "Please add new tip"
+                                ? t("Please add new tip")
                                 : ""
                             }
                           />
@@ -587,7 +588,7 @@ export default function TipCreator({
           {Object.keys(selectedCategory).length > 0 ? (
             <Grid container direction="row" justify="space-between" alignItems="center" className={classes.gridTitle}>
               <Grid item>
-                <Typography variant="h6">Tip Details</Typography>
+                <Typography variant="h6">{t("Tip Details")}</Typography>
               </Grid>
               <Grid item>
                 <Fab
@@ -599,7 +600,7 @@ export default function TipCreator({
                   }}
                   disabled={!category || !studyId ? true : false}
                 >
-                  <AddIcon /> Add
+                  <AddIcon /> {t("Add")}
                 </Fab>
               </Grid>
             </Grid>
@@ -610,7 +611,7 @@ export default function TipCreator({
             ? selectedCategory.settings.map((x, idx) => (
                 <Grid container spacing={2} key={idx}>
                   <Grid item xs sm={4} md={3} lg={2}>
-                    <Tooltip title={!x.image ? "Tap to select a photo." : "Tap to delete the photo."}>
+                    <Tooltip title={!x.image ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
                       <Box
                         width={154}
                         height={154}
@@ -664,7 +665,7 @@ export default function TipCreator({
                             autoFocus={focusedTextfield === "tipsTitle_" + idx ? true : false}
                             fullWidth
                             variant="filled"
-                            label="Tips Title"
+                            label={t("Tips Title")}
                             value={x.title}
                             id={"tipsTitle_" + idx}
                             className="tipsTitle"
@@ -674,7 +675,7 @@ export default function TipCreator({
                             helperText={
                               typeof x.title === "undefined" ||
                               (typeof x.title !== "undefined" && x.title?.trim() === "")
-                                ? "Please enter Tips Title"
+                                ? t("Please enter Tips Title")
                                 : ""
                             }
                           />
@@ -690,7 +691,7 @@ export default function TipCreator({
                             }
                             fullWidth
                             variant="filled"
-                            label="Tips Description"
+                            label={t("Tips Description")}
                             rows={4}
                             rowsMax={15}
                             value={x.text}
@@ -700,7 +701,7 @@ export default function TipCreator({
                             multiline
                             helperText={
                               typeof x.text === "undefined" || (typeof x.text !== "undefined" && x.text?.trim() === "")
-                                ? "Please enter Tips Description"
+                                ? t("Please enter Tips Description")
                                 : ""
                             }
                           />
@@ -708,7 +709,7 @@ export default function TipCreator({
                       </Grid>
                       <Grid item lg={3} md={6} sm={6}>
                         <Box>
-                          <Tooltip title="Delete">
+                          <Tooltip title={t("Delete")}>
                             <Fab
                               className={classes.btnText}
                               aria-label="Delete"
@@ -718,7 +719,7 @@ export default function TipCreator({
                                 setClickDeleteId(idx)
                               }}
                             >
-                              <DeleteIcon /> Delete
+                              <DeleteIcon /> {t("Delete")}
                             </Fab>
                           </Tooltip>
                         </Box>
@@ -742,7 +743,7 @@ export default function TipCreator({
       >
         {!!activities ? (
           <Grid item>
-            <Tooltip title="Duplicate this activity.">
+            <Tooltip title={t("Duplicate this activity.")}>
               <span>
                 <Fab
                   color="secondary"
@@ -755,7 +756,7 @@ export default function TipCreator({
                     !validate() || (activities && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""
                   }
                 >
-                  Duplicate
+                  {t("Duplicate")}
                   <span style={{ width: 8 }} />
                   <Icon>save</Icon>
                 </Fab>
@@ -766,7 +767,7 @@ export default function TipCreator({
           ""
         )}
         <Grid item>
-          <Tooltip title="Save this activity.">
+          <Tooltip title={t("Save this activity.")}>
             <span>
               <Fab
                 color="secondary"
@@ -777,7 +778,7 @@ export default function TipCreator({
                 }}
                 disabled={!validate()}
               >
-                Save
+                {t("Save")}
                 <span style={{ width: 8 }} />
                 <Icon>save</Icon>
               </Fab>
@@ -797,13 +798,13 @@ export default function TipCreator({
       >
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={3}>
-            <Typography variant="body2">Are you sure you want to delete this ?</Typography>
+            <Typography variant="body2">{t("Are you sure you want to delete this?")}</Typography>
           </Box>
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mb={3}>
             <Button onClick={() => deleteData(clickDeleteId)} color="primary" autoFocus>
-              Yes
+              {t("Yes")}
             </Button>
             <Button
               onClick={() => {
@@ -812,7 +813,7 @@ export default function TipCreator({
               color="secondary"
               autoFocus
             >
-              No
+              {t("No")}
             </Button>
           </Box>
         </DialogActions>

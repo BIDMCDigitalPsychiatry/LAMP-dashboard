@@ -23,12 +23,13 @@ import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
       width: 90,
-      margin: "0 auto 60px",
+      margin: "0 auto 30px",
       textAlign: "center",
       [theme.breakpoints.down("xs")]: {
         width: 69,
@@ -59,12 +60,22 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
+  const { t, i18n } = useTranslation();
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
+  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
+                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]}]
+  const getSelectedLanguage = () => {    
+    let lang = languagesArray.filter((x) =>{
+      return x.lang_array.includes(navigator.language)  
+    })
+    return i18n.language ? i18n.language : (lang.length > 0 ? lang[0].key: "en_US")
+  }
+  const [selectedLanguage, setSelectedLanguage] = useState(getSelectedLanguage())
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -76,6 +87,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       }
     }
   }, [])
+
+  useEffect(() => {
+    i18n.changeLanguage(selectedLanguage);
+  }, [selectedLanguage])  
 
   let handleChange = (event) =>
     setState({
@@ -101,16 +116,19 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
             },
           } as any).then((res) => console.dir(res))
-        }
+        } 
+        localStorage.setItem("LAMP_user_"+res.identity.id, JSON.stringify({
+          language: selectedLanguage,
+        }))
         onComplete()
       })
       .catch((err) => {
         console.warn("error with auth request", err)
-        enqueueSnackbar("Incorrect username, password, or server address.", {
+        enqueueSnackbar(t("Incorrect username, password, or server address."), {
           variant: "error",
         })
         if (!srcLocked)
-          enqueueSnackbar("Are you sure you're logging into the right mindLAMP server?", { variant: "info" })
+          enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), { variant: "info" })
       })
   }
 
@@ -136,7 +154,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 window.open("https://docs.lamp.digital", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>Help & Support</b>
+              <b style={{ color: colors.grey["600"] }}>{t('Help & Support')}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -145,7 +163,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 window.open("https://community.lamp.digital", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
+              <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -154,7 +172,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 window.open("mailto:team@digitalpsych.org", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>Contact Us</b>
+              <b style={{ color: colors.grey["600"] }}>{t('Contact Us')}</b>
             </MenuItem>
           </Menu>
         </IconButton>
@@ -171,12 +189,28 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   <div
                     style={{
                       height: 6,
-                      marginBottom: 40,
+                      marginBottom: 30,
                       background:
                         "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
                     }}
                   />
                 </Box>
+                <TextField
+                  select
+                  label={t("Select Language")}
+                  style={{ width: "100%"}}
+                  onChange={(event) => {
+                    setSelectedLanguage(event.target.value)
+                  }}
+                  variant="filled"
+                  value={selectedLanguage || ""}
+                >
+                  {languagesArray.map((lang) => (
+                  <MenuItem value={lang.key} key={lang.key}>
+                    {lang.value}
+                  </MenuItem>
+                  )) }
+                </TextField>
 
                 <TextField
                   margin="normal"
@@ -185,7 +219,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   style={{ width: "100%", height: 90 }}
                   // label="Domain"
                   placeholder="api.lamp.digital"
-                  helperText="Don't enter a domain if you're not sure what this option does."
+                  helperText={t("Don't enter a domain if you're not sure what this option does.")}
                   value={state.serverAddress || ""}
                   onChange={handleChange}
                   disabled={srcLocked}
@@ -236,7 +270,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     style={{ background: "#7599FF", color: "White" }}
                     onClick={handleLogin}
                   >
-                    Login
+                    {t("Login")}
                     <input
                       type="submit"
                       style={{
@@ -253,13 +287,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   </Fab>
                 </Box>
 
-                <Box textAlign="center" width={1} mt={4}>
+                <Box textAlign="center" width={1} mt={4} mb={4}>
                   <Link
                     underline="none"
                     className={classes.linkBlue}
                     onClick={(event) => setTryitMenu(event.currentTarget)}
                   >
-                    Try it
+                    {t("Try it")}
                   </Link>
                   <br />
                   <Link
@@ -267,7 +301,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     className={classes.linkBlue}
                     onClick={(event) => (window.location.href = "https://www.digitalpsych.org/studies.html")}
                   >
-                    Research studies using mindLAMP
+                    {t("Research studies using mindLAMP")}
                   </Link>
                   <Menu
                     keepMounted
@@ -277,15 +311,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     onClose={() => setTryitMenu(undefined)}
                   >
                     <MenuItem disabled divider>
-                      <b>Try mindLAMP out as a...</b>
+                      <b>{t("Try mindLAMP out as a...")}</b>
                     </MenuItem>
                     <MenuItem
                       onClick={(event) => {
                         setTryitMenu(undefined)
                         handleLogin(event, "researcher")
                       }}
-                    >
-                      Researcher
+                    > 
+                      {t("Researcher")}
                     </MenuItem>
                     <MenuItem
                       divider
@@ -294,7 +328,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         handleLogin(event, "clinician")
                       }}
                     >
-                      Clinician
+                      {t("Clinician")}
                     </MenuItem>
                     <MenuItem
                       onClick={(event) => {
@@ -302,7 +336,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         handleLogin(event, "participant")
                       }}
                     >
-                      Participant
+                      {t("Participant")}
                     </MenuItem>
                     <MenuItem
                       onClick={(event) => {
@@ -310,7 +344,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         handleLogin(event, "patient")
                       }}
                     >
-                      Patient
+                      {t("Patient")}
                     </MenuItem>
                   </Menu>
                 </Box>

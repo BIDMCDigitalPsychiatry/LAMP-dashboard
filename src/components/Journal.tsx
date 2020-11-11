@@ -272,7 +272,7 @@ export default function Journals({ participant, selectedEvents, ...props }) {
               }}
               renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
                 const isSelected =
-                  isInCurrentMonth &&  !!selectedDates && selectedDates.indexOf(date.toLocaleDateString()) > -1
+                  isInCurrentMonth && !!selectedDates && selectedDates.indexOf(date.toLocaleDateString()) > -1
                 const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
                 const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
                 const view = isSelected ? (

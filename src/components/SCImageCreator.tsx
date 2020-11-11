@@ -106,7 +106,7 @@ export default function SCImageCreator({
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
-  const [settings, setSettings] = useState(!!value ? value?.settings: {threshold : 80})
+  const [settings, setSettings] = useState(!!value ? value?.settings : { threshold: 80 })
 
   const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
   // eslint-disable-next-line
@@ -233,22 +233,22 @@ export default function SCImageCreator({
                   inputProps={{ maxLength: 2500 }}
                 />
               </Box>
-              <br/>
+              <br />
               <Box>
                 <TextField
                   fullWidth
                   label="Threshold "
                   error={
-                    settings.threshold  < 30 ||
-                    settings.threshold  > 90 ||
-                    settings.threshold  === 0 ||
-                    settings.threshold  === ""
+                    settings.threshold < 30 ||
+                    settings.threshold > 90 ||
+                    settings.threshold === 0 ||
+                    settings.threshold === ""
                       ? true
                       : false
                   }
                   type="number"
                   variant="filled"
-                  defaultValue={settings?.threshold  ?? 80}
+                  defaultValue={settings?.threshold ?? 80}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -256,8 +256,8 @@ export default function SCImageCreator({
                     max: 90,
                     min: 30,
                   }}
-                  onChange={(e) => setSettings({ ...settings, threshold : Number(e.target.value) })}
-                  helperText={settings.threshold  > 100 ? "Maximum value is 90" : ""}
+                  onChange={(e) => setSettings({ ...settings, threshold: Number(e.target.value) })}
+                  helperText={settings.threshold > 100 ? "Maximum value is 90" : ""}
                 />
               </Box>
             </Grid>
@@ -291,7 +291,7 @@ export default function SCImageCreator({
                         description: description,
                         photo: photo,
                         studyID: studyId,
-                        settings: settings
+                        settings: settings,
                       },
                       true /* duplicate */
                     )
@@ -330,7 +330,7 @@ export default function SCImageCreator({
                       description: description,
                       photo: photo,
                       studyID: studyId,
-                      settings: settings
+                      settings: settings,
                     },
                     false /* overwrite */
                   )

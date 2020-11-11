@@ -18,6 +18,8 @@ import { useSnackbar } from "notistack"
 import { TargetDialog, EmotionDialog } from "./Dialog"
 import Close from "@material-ui/icons/Close"
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
+import { useTranslation } from "react-i18next"
+
 const CssTextField = withStyles({
   root: {
     "label + &": {},
@@ -230,6 +232,7 @@ export default function GameCreator({
   const [config, setConfig] = useState(!!value ? value?.settings : {})
   const [text, setText] = useState(!!value ? value.name : undefined)
   const { enqueueSnackbar } = useSnackbar()
+  const { t } = useTranslation()
 
   useEffect(() => {
     setConfig(!!value ? value?.settings : {})
@@ -300,7 +303,7 @@ export default function GameCreator({
             : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
       )
       if (duplicates.length > 0) {
-        enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
 
@@ -341,7 +344,7 @@ export default function GameCreator({
           }}
         >
           {/* <Link href='/clinician'> */}
-          <Typography className={classes.buttonText}>Save</Typography>
+          <Typography className={classes.buttonText}>{t("Save")}</Typography>
           {/* </Link> */}
         </Button>
         {/* </div> */}
@@ -352,7 +355,7 @@ export default function GameCreator({
               error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
               id="filled-select-currency"
               select
-              label="Study"
+              label={t("Study")}
               className={classes.inputWidth}
               value={studyId}
               onChange={(e) => setStudyId(e.target.value)}
@@ -377,7 +380,7 @@ export default function GameCreator({
                 }
                 fullWidth
                 variant="filled"
-                label="Activity Title"
+                label={t("Activity Title")}
                 defaultValue={text}
                 onChange={(event) => setText(event.target.value)}
                 inputProps={{ maxLength: 80 }}
@@ -408,11 +411,11 @@ export default function GameCreator({
             </Grid>
             <div style={{ border: "1px solid #C7C7C7", height: 0, width: "100%" }} />
 
-            <Typography className={classes.sectionTitle}>Target behaviors</Typography>
+            <Typography className={classes.sectionTitle}>{t("Target behaviors")}</Typography>
             <Grid container spacing={0}>
               <Grid item xs={10} sm={8}>
                 <div className={classes.rowContainer} style={{ marginTop: 55, height: 40 }}>
-                  <Typography className={classes.groupTitle}>effective</Typography>
+                  <Typography className={classes.groupTitle}>{t("effective")}</Typography>
                 </div>
                 {(config?.targetEffective ?? []).map((item, index) => {
                   return (
@@ -425,7 +428,7 @@ export default function GameCreator({
                         {item.target}
                       </Typography>
                       <Typography className={classes.contentText} style={{ width: 150 }}>
-                        {item.measure}
+                        {t(item.measure)}
                       </Typography>
                       <ButtonBase onClick={() => removeTarget("effective", index)} className={classes.deleteButton}>
                         <Close />
@@ -438,12 +441,12 @@ export default function GameCreator({
                     <AddCircleOutline />
                   </div>
                   <Typography onClick={() => openTargetDialog("effective")} className={classes.addButtonTitle}>
-                    Add item
+                    {t("Add item")}
                   </Typography>
                 </ButtonBase>
 
                 <div className={classes.rowContainer} style={{ marginTop: 55, height: 40 }}>
-                  <Typography className={classes.groupTitle}>ineffective</Typography>
+                  <Typography className={classes.groupTitle}>{t("ineffective")}</Typography>
                 </div>
                 {(config?.targetIneffective ?? []).map((item, index) => {
                   return (
@@ -456,7 +459,7 @@ export default function GameCreator({
                         {item.target}
                       </Typography>
                       <Typography className={classes.contentText} style={{ width: 150 }}>
-                        {item.measure}
+                        {t(item.measure)}
                       </Typography>
                       <ButtonBase onClick={() => removeTarget("ineffective", index)} className={classes.deleteButton}>
                         <Close />
@@ -469,7 +472,7 @@ export default function GameCreator({
                     <AddCircleOutline />
                   </div>
                   <Typography onClick={() => openTargetDialog("ineffective")} className={classes.addButtonTitle}>
-                    Add item
+                    {t("Add item")}
                   </Typography>
                 </ButtonBase>
               </Grid>
@@ -479,7 +482,7 @@ export default function GameCreator({
             <div style={{ border: "1px solid #C7C7C7", height: 0, width: "100%" }} />
 
             <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
-              Emotions
+              {t("Emotions")}
             </Typography>
             <Grid container spacing={0}>
               <Grid item xs={10} sm={8}>
@@ -504,7 +507,7 @@ export default function GameCreator({
                     <AddCircleOutline />
                   </div>
                   <Typography onClick={openEmotionDialog} className={classes.addButtonTitle}>
-                    Add item
+                    {t("Add item")}
                   </Typography>
                 </ButtonBase>
               </Grid>
@@ -531,7 +534,7 @@ export default function GameCreator({
                   }
                 }}
               >
-                <Typography className={classes.buttonText}>Save</Typography>
+                <Typography className={classes.buttonText}>{t("Save")}</Typography>
               </Button>
               <Button
                 className={classes.backContainer}
@@ -540,7 +543,7 @@ export default function GameCreator({
                   onCancel()
                 }}
               >
-                <Typography className={classes.backText}>Cancel</Typography>
+                <Typography className={classes.backText}>{t("Cancel")}</Typography>
               </Button>
             </div>
           </Grid>

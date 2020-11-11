@@ -3,6 +3,7 @@ import { scaleOrdinal } from "@vx/scale"
 import { RadialChart, ArcLabel, ArcSeries } from "@data-ui/radial-chart"
 import { Box, useMediaQuery, useTheme } from "@material-ui/core"
 import { LegendOrdinal } from "@vx/legend"
+import { useTranslation } from "react-i18next";
 
 function percentageCal(l, target) {
   var off =
@@ -16,6 +17,8 @@ function percentageCal(l, target) {
 }
 
 export default function RadialDonutChart(props) {
+  const { t } = useTranslation()
+  
   let data = props.data.sort((x, y) => (x.value > y.value ? -1 : 1))
   let total = data
     .map((val) => val.value)
@@ -54,13 +57,13 @@ export default function RadialDonutChart(props) {
             return (
               <div style={style}>
                 <div>
-                  <strong>{label}</strong>
+                  <strong>{t(label)}</strong>
                 </div>
                 <div>{datum.value}%</div>
               </div>
             )
           }}
-        >
+        >  
           <ArcSeries
             data={data}
             pieValue={(d) => d.value}
@@ -69,7 +72,7 @@ export default function RadialDonutChart(props) {
             cornerRadius={5}
             stroke="#fff"
             strokeWidth={1}
-            label={(arc) => (props.detailPage ? `${arc.data.label} - ${arc.data.value}%` : "")}
+            label={(arc) => (props.detailPage ? `${t(arc.data.label)} - ${arc.data.value}%` : "")}
             labelComponent={<ArcLabel />}
             innerRadius={(radius) => 0.35 * radius}
             outerRadius={(radius) => 0.6 * radius}
@@ -85,7 +88,7 @@ export default function RadialDonutChart(props) {
             shape="rect"
             fill={({ datum }) => (props?.type?.indexOf(datum.label) ? colorScale(datum) : "")}
             labelFormat={(label) =>
-              `${label} - ${
+              `${t(label)} - ${
                 data.find(function (item, i) {
                   if (item.label === label) {
                     return data[i]

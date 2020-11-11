@@ -19,6 +19,7 @@ import { useDropzone } from "react-dropzone"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import Jewels from "../icons/Jewels.svg"
+import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
   palette: {
@@ -168,6 +169,7 @@ export default function GameCreator({
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const { t } = useTranslation()
 
   const [settings, setSettings] = useState(
     !!value
@@ -672,7 +674,7 @@ export default function GameCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this activity and save it with a new title.">
+            <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -703,7 +705,7 @@ export default function GameCreator({
                   (value.name.trim() === text.trim() && value.parentID === studyId)
                 }
               >
-                Duplicate
+                {t("Duplicate")}
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -711,7 +713,7 @@ export default function GameCreator({
           </Grid>
         )}
         <Grid item>
-          <Tooltip title="Save this activity.">
+          <Tooltip title={t("Save this activity.")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -736,7 +738,7 @@ export default function GameCreator({
               }}
               disabled={!validate() || !disabled || !onSave || !text}
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

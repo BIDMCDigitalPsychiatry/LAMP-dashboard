@@ -21,6 +21,7 @@ import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
 import TipNotification from "./TipNotification"
 import NotificationPage from "./NotificationPage"
+import { useTranslation } from "react-i18next"
 
 // import VegaGraph from "./VegaGraph"
 
@@ -76,6 +77,7 @@ function AppRouter({ ...props }) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
+  const { t } = useTranslation()
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -83,9 +85,8 @@ function AppRouter({ ...props }) {
       //
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
-        enqueueSnackbar(`You're using the "${src}" server to log into mindLAMP.`, { variant: "info" })
+        enqueueSnackbar(t("You're using the src server to log into mindLAMP.", { src: src }), { variant: "info" })
       }
-
       //
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
@@ -117,16 +118,16 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     if (!deferredPrompt) return
-    enqueueSnackbar("Add mindLAMP to your home screen?", {
+    enqueueSnackbar(t("Add mindLAMP to your home screen?"), {
       variant: "info",
       persist: true,
       action: (key) => (
         <React.Fragment>
           <Button style={{ color: "#fff" }} onClick={promptInstall}>
-            Install
+            {t("Install")}
           </Button>
           <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-            Dismiss
+            {t("Dismiss")}
           </Button>
         </React.Fragment>
       ),
@@ -137,20 +138,20 @@ function AppRouter({ ...props }) {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
-      enqueueSnackbar("Proceed with caution: you are logged in as the administrator.", {
+      enqueueSnackbar(t("Proceed with caution: you are logged in as the administrator."), {
         key: "admin",
         variant: "info",
         persist: true,
         preventDuplicate: true,
         action: (key) => (
           <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-            Dismiss
+            {t("Dismiss")}
           </Button>
         ),
       })
     } else if (showDemoMessage && state.auth?.serverAddress === "demo.lamp.digital") {
       enqueueSnackbar(
-        "You're logged into a demo account. Any changes you make will be reset when you restart the app.",
+        t("You're logged into a demo account. Any changes you make will be reset when you restart the app."),
         {
           key: "demo",
           variant: "info",
@@ -158,7 +159,7 @@ function AppRouter({ ...props }) {
           preventDuplicate: true,
           action: (key) => (
             <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-              Dismiss
+              {t("Dismiss")}
             </Button>
           ),
         }
@@ -191,7 +192,7 @@ function AppRouter({ ...props }) {
 
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity).catch((e) => {
-      enqueueSnackbar("Invalid id or password.", {
+      enqueueSnackbar(t("Invalid id or password."), {
         variant: "error",
       })
       return
@@ -282,11 +283,11 @@ function AppRouter({ ...props }) {
     deferredPrompt.prompt()
     deferredPrompt.userChoice.then((c) => {
       if (c.outcome === "accepted") {
-        enqueueSnackbar("mindLAMP will be installed on your device.", {
+        enqueueSnackbar(t("mindLAMP will be installed on your device."), {
           variant: "info",
         })
       } else {
-        enqueueSnackbar("mindLAMP will not be installed on your device.", {
+        enqueueSnackbar(t("mindLAMP will not be installed on your device."), {
           variant: "warning",
         })
       }
@@ -301,7 +302,7 @@ function AppRouter({ ...props }) {
         path="/participant/:id/messages"
         render={(props) => (
           <React.Fragment>
-            <PageTitle>mindLAMP | Messages</PageTitle>
+            <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
             <NavigationLayout
               id={props.match.params.id}
               goBack={props.history.goBack}
@@ -326,7 +327,7 @@ function AppRouter({ ...props }) {
         path="/participant/:id/hopebox"
         render={(props) => (
           <React.Fragment>
-            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <PageTitle>mindLAMP | {t("Hope Box")}</PageTitle>
             <HopeBox goBack={props.history.goBack} />
           </React.Fragment>
         )}
@@ -337,7 +338,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | Login</PageTitle>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
               <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
@@ -358,7 +359,7 @@ function AppRouter({ ...props }) {
         path="/participant/:id/tip"
         render={(props) => (
           <React.Fragment>
-            <PageTitle>mindLAMP | Hope Box</PageTitle>
+            <PageTitle>mindLAMP | {t("Hope Box")}</PageTitle>
             <TipNotification goBack={props.history.goBack} />
           </React.Fragment>
         )}
@@ -371,7 +372,7 @@ function AppRouter({ ...props }) {
           !(window.location.hash.split("?").length > 1 && !state.identity) ? (
             !state.identity ? (
               <React.Fragment>
-                <PageTitle>mindLAMP | Login</PageTitle>
+                <PageTitle>mindLAMP | {t("Login")}</PageTitle>
                 <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                   <Login
                     setIdentity={async (identity) => await reset(identity)}
@@ -400,7 +401,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity || state.authType !== "admin" ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | Login</PageTitle>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
               <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
@@ -411,8 +412,8 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PageTitle>Administrator</PageTitle>
-              <NavigationLayout title="Administrator" goBack={props.history.goBack} onLogout={() => reset()}>
+              <PageTitle>{t("Administrator")}</PageTitle>
+              <NavigationLayout title={t("Administrator")} goBack={props.history.goBack} onLogout={() => reset()}>
                 <Root {...props} />
               </NavigationLayout>
             </React.Fragment>
@@ -425,7 +426,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | Login</PageTitle>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
               <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
@@ -469,7 +470,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | Login</PageTitle>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
               <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
@@ -482,10 +483,10 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{`Patient ${getParticipant(props.match.params.id).id}`}</PageTitle>
+              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <NavigationLayout
                 id={props.match.params.id}
-                title={`Patient ${getParticipant(props.match.params.id).id}`}
+                title={t("Patient") + " " + getParticipant(props.match.params.id).id}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}

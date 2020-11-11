@@ -60,6 +60,7 @@ import LAMP, {
 } from "lamp-core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
+import { useTranslation } from "react-i18next"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -358,6 +359,7 @@ export default function Feed({
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+	const { t } = useTranslation()
 
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -964,10 +966,10 @@ export default function Feed({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent>This activity is not yet available in mindLAMP 2.</DialogContent>
+        <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-            Ok
+            {t("Ok")}
           </Button>
         </DialogActions>
       </Dialog>

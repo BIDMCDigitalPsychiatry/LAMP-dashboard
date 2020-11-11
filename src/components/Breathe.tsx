@@ -33,6 +33,7 @@ import classnames from "classnames"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import CircularProgress from "@material-ui/core/CircularProgress"
+import { useTranslation } from "react-i18next"
 
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
@@ -209,6 +210,7 @@ export default function Breathe({ participant, activity, ...props }) {
   const [inhale, setInhale] = useState(true)
   const [playMusic, setPlayMusic] = useState(true)
   const [audio, setAudio] = useState(null)
+  const { t } = useTranslation()
 
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
@@ -291,7 +293,7 @@ export default function Breathe({ participant, activity, ...props }) {
           >
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">Breathe</Typography>
+          <Typography variant="h5">{t("Breathe")}</Typography>
         </Toolbar>
         <BorderLinearProgress variant="determinate" value={progressValue} />
       </AppBar>
@@ -301,10 +303,10 @@ export default function Breathe({ participant, activity, ...props }) {
             <Box textAlign="center">
               {supportsSidebar && (
                 <Box pt={4}>
-                  <Typography variant="h6">Prepare yourself</Typography>
+                  <Typography variant="h6">{t("Prepare yourself")}</Typography>
                   <Box textAlign="center" px={4} pt={2}>
                     <Typography variant="body2" component="p">
-                      Get yourself comfortable and when you’re ready tap the start button.
+                      {t("Get yourself comfortable and when you’re ready tap the start button.")}
                     </Typography>
                     <Lotus className={classes.flower} />
                   </Box>
@@ -313,10 +315,10 @@ export default function Breathe({ participant, activity, ...props }) {
               {!supportsSidebar && (
                 <Box>
                   <Lotus className={classes.flower} />
-                  <Typography variant="h6">Get ready</Typography>
+                  <Typography variant="h6">{t("Get ready")}</Typography>
                   <Box textAlign="center" px={4} pt={2} pb={5}>
                     <Typography variant="body2" component="p">
-                      Get yourself comfortable and when you’re ready tap the start button.
+                      {t("Get yourself comfortable and when you’re ready tap the start button.")}
                     </Typography>
                   </Box>
                 </Box>
@@ -324,7 +326,7 @@ export default function Breathe({ participant, activity, ...props }) {
 
               <Box textAlign="center" mt={1}>
                 <Fab className={classes.btnpeach} onClick={handleNext}>
-                  Start
+                  {t("Start")}
                 </Fab>
               </Box>
             </Box>
@@ -361,10 +363,10 @@ export default function Breathe({ participant, activity, ...props }) {
               {started && (
                 <Box className={classes.inhale_exhale}>
                   <Typography variant="overline" className={classes.ExhaleContainer}>
-                    Exhale
+                    {t("Exhale")}
                   </Typography>
                   <Typography variant="overline" className={classes.InhaleContainer}>
-                    Inhale
+                    {t("Inhale")}
                   </Typography>
                 </Box>
               )}
@@ -409,7 +411,7 @@ export default function Breathe({ participant, activity, ...props }) {
           <Box my={4}>
             <Box textAlign="center" className={classes.breatheReview}>
               <Lotus className={classes.flower} />
-              <Typography variant="h4">Nicely done!</Typography>
+              <Typography variant="h4">{t("Nicely done!")}</Typography>
               <Box mt={4} mb={2}>
                 <Grid container direction="row" justify="center" alignItems="center">
                   <Grid container className={classes.colorLine} spacing={0} xs={4} md={4} lg={2}>
@@ -420,26 +422,26 @@ export default function Breathe({ participant, activity, ...props }) {
                   </Grid>
                 </Grid>
               </Box>
-              <Typography variant="body2">Was this helpful today?</Typography>
+              <Typography variant="body2">{t("Was this helpful today?")}</Typography>
               <Box textAlign="center" mb={5}>
                 <IconButton
                   onClick={() => handleClickStatus("Yes")}
                   className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                 >
                   <ThumbsUp />
-                  <label>Yes</label>
+                  <label>{t("Yes")}</label>
                 </IconButton>
                 <IconButton
                   onClick={() => handleClickStatus("No")}
                   className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                 >
                   <ThumbsDown />
-                  <label>No</label>
+                  <label>{t("No")}</label>
                 </IconButton>
               </Box>
               <Box textAlign="center" pt={4}>
-                <Link href="#" className={classes.btnpeach} onClick={props.onComplete}>
-                  Done
+                <Link className={classes.btnpeach} onClick={props.onComplete}>
+                  {t("Done")}
                 </Link>
               </Box>
             </Box>

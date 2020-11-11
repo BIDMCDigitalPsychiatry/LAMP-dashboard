@@ -36,6 +36,7 @@ import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP from "lamp-core"
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next";
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -76,6 +77,7 @@ export default function NewMedication({ participant, ...props }) {
   const nameInput = useRef(null)
   const doseNameInput = useRef(null)
   const doseValueInput = useRef(null)
+	const { t } = useTranslation()
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -162,7 +164,7 @@ export default function NewMedication({ participant, ...props }) {
       var item = {
         type: "medication",
         timeValue: reminderTime,
-        title: "Medication: " + text,
+        title: t("Medication: ") + text,
         icon: "Medication",
         description: "test description",
         group: "manage",
@@ -175,7 +177,7 @@ export default function NewMedication({ participant, ...props }) {
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.medications", all)
       props.onComplete()
-      enqueueSnackbar(`The medication has been saved successfully.`, {
+      enqueueSnackbar(t("The medication has been saved successfully."), {
         variant: "success",
         anchorOrigin: {
           vertical: "top",
@@ -191,7 +193,7 @@ export default function NewMedication({ participant, ...props }) {
       if (duration != null && duration != 0) {
         return true
       } else {
-        enqueueSnackbar(`Please select duration.`, {
+        enqueueSnackbar(t("Please select duration."), {
           variant: "error",
           anchorOrigin: {
             vertical: "top",
@@ -202,7 +204,7 @@ export default function NewMedication({ participant, ...props }) {
       }
     } else {
       nameInput.current.focus()
-      enqueueSnackbar(`Please select medication name.`, {
+      enqueueSnackbar(t("Please select medication name."), {
         variant: "error",
         anchorOrigin: {
           vertical: "top",
@@ -219,7 +221,7 @@ export default function NewMedication({ participant, ...props }) {
         return true
       } else {
         doseValueInput.current.focus()
-        enqueueSnackbar(`Please enter dose.`, {
+        enqueueSnackbar(t("Please enter dose."), {
           variant: "error",
           anchorOrigin: {
             vertical: "top",
@@ -230,7 +232,7 @@ export default function NewMedication({ participant, ...props }) {
       }
     } else {
       doseNameInput.current.focus()
-      enqueueSnackbar(`Please enter name.`, {
+      enqueueSnackbar(t("Please enter name."), {
         variant: "error",
         anchorOrigin: {
           vertical: "top",
@@ -284,7 +286,7 @@ export default function NewMedication({ participant, ...props }) {
           <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">Add medication</Typography>
+          <Typography variant="h5">{t("Add medication")}</Typography>
         </Toolbar>
       </AppBar>
       <Box px={2}>
@@ -307,7 +309,7 @@ export default function NewMedication({ participant, ...props }) {
                     <TextField
                       {...params}
                       className={classes.autofill}
-                      placeholder="Medication name"
+                      placeholder={t("Medication name")}
                       variant="outlined"
                     />
                   )}
@@ -396,7 +398,7 @@ export default function NewMedication({ participant, ...props }) {
                 <Box display="flex" justifyContent="center" mb={5}>
                   <Box>
                     <ButtonBase className={classes.iconButton} onClick={() => openAddDosageDialog()}>
-                      <AddCircleOutlineIcon /> Add dosage
+                      <AddCircleOutlineIcon /> {t("Add dosage")}
                     </ButtonBase>
                   </Box>
                 </Box>
@@ -404,7 +406,7 @@ export default function NewMedication({ participant, ...props }) {
                 <Box width={1} mb={5}>
                   <Grid container direction="row" justify="space-between" alignItems="center">
                     <Grid item xs={6}>
-                      <Typography variant="body2">Start date</Typography>
+                      <Typography variant="body2">{t("Start date")}</Typography>
                     </Grid>
                     <Grid item xs={6} className={classes.medicationDetails}>
                       <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
@@ -428,11 +430,11 @@ export default function NewMedication({ participant, ...props }) {
                 <Box width={1} mb={5}>
                   <Grid container direction="row" justify="space-between" alignItems="center">
                     <Grid item xs={6}>
-                      <Typography variant="body2">Duration</Typography>
+                      <Typography variant="body2">{t("Duration")}</Typography>
                     </Grid>
                     <Grid item xs={6} className={classes.medicationDetails}>
                       <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
-                        {duration} days
+                        {duration} {t("days")}
                       </Typography>
                       <DatePicker
                         autoOk
@@ -472,7 +474,7 @@ export default function NewMedication({ participant, ...props }) {
                 <Box width={1} mb={5}>
                   <Grid container direction="row" justify="space-between" alignItems="center">
                     <Grid item xs={6}>
-                      <Typography variant="body2">Reminders</Typography>
+                      <Typography variant="body2"> {t("Reminders")}</Typography>
                     </Grid>
                     <Grid item xs={6} className={classes.medicationDetails}>
                       <TimePicker
@@ -487,12 +489,12 @@ export default function NewMedication({ participant, ...props }) {
 
                 <Box textAlign="center" mt={5}>
                   <ButtonBase className={classes.btnpeach} onClick={() => saveNewMedication()}>
-                    Save
+                    {t("Save")}
                   </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={props.onComplete}>
-                    Cancel
+                    {t("Cancel")}
                   </Link>
                 </Box>
               </FormControl>
@@ -514,8 +516,8 @@ export default function NewMedication({ participant, ...props }) {
               </Box>
 
               <DialogContent className={classes.dialogueContent}>
-                <Typography variant="h4">Leaving so soon?</Typography>
-                <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+                <Typography variant="h4">{t("Leaving so soon?")}</Typography>
+                <Typography variant="body1">{t("If you leave without submitting, your entry will be lost.")}</Typography>
               </DialogContent>
               <Grid>
                 <Box textAlign="center" width={1} mt={1} mb={3}>
@@ -524,13 +526,13 @@ export default function NewMedication({ participant, ...props }) {
                     onClick={() => setOpen(false)}
                     className={classnames(classes.btnpeach, classes.linkButton)}
                   >
-                    No, don’t leave yet
+                    {t("No, don’t leave yet")}
                   </Link>
                 </Box>
                 <Box textAlign="center" width={1} mb={4}>
                   <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
                     {" "}
-                    Yes, leave
+                    {t("Yes, leave")}
                   </Link>
                 </Box>
               </Grid>
@@ -549,7 +551,7 @@ export default function NewMedication({ participant, ...props }) {
               </Box>
 
               <DialogContent className={classes.dialogueContent}>
-                <Typography variant="h4">Add Dosage</Typography>
+                <Typography variant="h4">{t("Add Dosage")}</Typography>
                 <Box mt={3} mb={4}>
                   <InputBase
                     className={classes.inputText}
@@ -569,7 +571,7 @@ export default function NewMedication({ participant, ...props }) {
                   <InputBase
                     className={classes.inputText}
                     value={dosageValue}
-                    placeholder="Dose"
+                    placeholder={t("Dose")}
                     type="number"
                     onChange={(e) => setDosageValue(e.target.value)}
                     fullWidth={true}
@@ -590,12 +592,12 @@ export default function NewMedication({ participant, ...props }) {
                 </Box>
                 <Box textAlign="center" mt={5}>
                   <ButtonBase className={classes.btnpeach} onClick={() => addDosage()}>
-                    Save
+                    {t("Save")}
                   </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={closeAddDosageDialog}>
-                    Cancel
+                    {t("Cancel")}
                   </Link>
                 </Box>
               </DialogContent>
@@ -606,7 +608,7 @@ export default function NewMedication({ participant, ...props }) {
     </div>
   )
 }
-
+  
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",

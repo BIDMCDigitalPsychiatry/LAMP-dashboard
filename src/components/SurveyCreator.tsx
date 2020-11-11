@@ -27,6 +27,7 @@ import {
   Container,
 } from "@material-ui/core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
   palette: {
@@ -82,6 +83,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
   const AddIcon = checkbox ? "add_box" : "add_circle"
   const CheckedIcon = checkbox ? "check_box" : "radio_button_checked"
   const UncheckedIcon = checkbox ? "check_box_outline_blank" : "radio_button_unchecked"
+  const { t } = useTranslation()
 
   return (
     <React.Fragment>
@@ -105,7 +107,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
                   fullWidth
                   variant="outlined"
                   defaultValue={x.value || (type === "slider" ? 0 : "")}
-                  label="Question Option"
+                  label={t("Question Option")}
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
@@ -120,7 +122,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
                   InputProps={{
                     endAdornment: [
                       <InputAdornment position="end" key="adornment">
-                        <Tooltip title="Delete this option from the question's list of options.">
+                        <Tooltip title={t("Delete this option from the question's list of options.")}>
                           <IconButton
                             edge="end"
                             aria-label="delete"
@@ -142,7 +144,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
                   variant="filled"
                   style={{ marginBottom: 16 }}
                   defaultValue={x.description || ""}
-                  label="Option Description"
+                  label={t("Option Description")}
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
@@ -168,7 +170,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
               checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
             />
           }
-          label={<Typography>Add Option</Typography>}
+          label={<Typography>{t("Add Option")}</Typography>}
           labelPlacement="end"
         />
       </TypeGroup>
@@ -181,6 +183,8 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
+  const { t } = useTranslation()
+
   useEffect(() => {
     onChange({
       text,
@@ -200,13 +204,13 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
             <TextField
               fullWidth
               variant="outlined"
-              label="Question Title"
+              label={t("Question Title")}
               defaultValue={text}
               onBlur={(event) => setText(event.target.value)}
               InputProps={{
                 endAdornment: [
                   <InputAdornment position="end" variant="filled" key="adornment">
-                    <Tooltip title="Delete question from survey instrument.">
+                    <Tooltip title={t("Delete question from survey instrument.")}>
                       <IconButton
                         edge="end"
                         aria-label="delete"
@@ -229,7 +233,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
             <TextField
               fullWidth
               multiline
-              label="Question Description"
+              label={t("Question Description")}
               variant="filled"
               defaultValue={description}
               onBlur={(event) => setDescription(event.target.value)}
@@ -237,21 +241,21 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
           </Grid>
           <Grid item xs={12}>
             <ButtonGroup size="small">
-              <Button disabled>Question Type</Button>
+              <Button disabled>{t("Question Type")}</Button>
               <Button color={type === "text" ? "primary" : "default"} onClick={() => setType("text")}>
-                text
+                {t("text")}
               </Button>
               <Button color={type === "boolean" ? "primary" : "default"} onClick={() => setType("boolean")}>
-                boolean
+                {t("boolean")}
               </Button>
               <Button color={["list", "select"].includes(type) ? "primary" : "default"} onClick={() => setType("list")}>
-                list
+                {t("list")}
               </Button>
               <Button color={type === "multiselect" ? "primary" : "default"} onClick={() => setType("multiselect")}>
-                multi-select
+                {t("multi-select")}
               </Button>
               <Button color={type === "slider" ? "primary" : "default"} onClick={() => setType("slider")}>
-                Slider
+                {t("Slider")}
               </Button>
             </ButtonGroup>
           </Grid>
@@ -286,6 +290,7 @@ export default function SurveyCreator({
   const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const { t } = useTranslation()
 
   return (
     <div>
@@ -297,13 +302,15 @@ export default function SurveyCreator({
                 error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                 id="filled-select-currency"
                 select
-                label="Study"
+                label={t("Study")}
                 value={studyId}
                 onChange={(e) => {
                   setStudyId(e.target.value)
                 }}
                 helperText={
-                  typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+                  typeof studyId == "undefined" || studyId === null || studyId === ""
+                    ? t("Please select the Study")
+                    : ""
                 }
                 variant="filled"
                 disabled={!!value ? true : false}
@@ -319,7 +326,7 @@ export default function SurveyCreator({
               <TextField
                 fullWidth
                 variant="filled"
-                label="Survey Title"
+                label={t("Survey Title")}
                 defaultValue={text}
                 onChange={(event) => setText(event.target.value)}
               />
@@ -328,7 +335,7 @@ export default function SurveyCreator({
               <TextField
                 fullWidth
                 multiline
-                label="Survey Description"
+                label={t("Survey Description")}
                 variant="filled"
                 defaultValue={description}
                 onChange={(event) => setDescription(event.target.value)}
@@ -336,7 +343,7 @@ export default function SurveyCreator({
             </Grid>
             <Grid item sm={12}>
               <Divider />
-              <Typography variant="h6">Configure questions, parameters, and options.</Typography>
+              <Typography variant="h6">{t("Configure questions, parameters, and options.")}</Typography>
             </Grid>
             <Grid item>
               <Stepper nonLinear activeStep={activeStep} orientation="vertical">
@@ -365,7 +372,7 @@ export default function SurveyCreator({
                     <Icon fontSize="small">add_circle</Icon>
                   </Fab>
                   <Grid item>
-                    <Typography variant="subtitle2">Add Question</Typography>
+                    <Typography variant="subtitle2">{t("Add Question")}</Typography>
                   </Grid>
                 </Grid>
               </Stepper>
@@ -382,7 +389,7 @@ export default function SurveyCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+            <Tooltip title={t("Duplicate this survey instrument and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -408,7 +415,7 @@ export default function SurveyCreator({
                   (value.name.trim() === text.trim() && value.parentID === studyId)
                 }
               >
-                Duplicate
+                {t("Duplicate")}
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -416,7 +423,7 @@ export default function SurveyCreator({
           </Grid>
         )}
         <Grid item>
-          <Tooltip title="Save this survey instrument.">
+          <Tooltip title={t("Save this survey instrument")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -437,7 +444,7 @@ export default function SurveyCreator({
               }
               disabled={!onSave || questions.length === 0 || !text || !studyId}
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

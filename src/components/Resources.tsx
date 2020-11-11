@@ -11,6 +11,7 @@ import {
   CardContent,
   Grid,
 } from "@material-ui/core"
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -33,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Resources({ ...props }) {
   const classes = useStyles()
+	const { t } = useTranslation()
+	
   return (
     <Grid container direction="row">
       <Box p={4} my={4} width="100%">
@@ -45,7 +48,7 @@ export default function Resources({ ...props }) {
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  Department of Mental Health (DMH)
+                  {t("Department of Mental Health (DMH)")}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                   {
@@ -53,7 +56,7 @@ export default function Resources({ ...props }) {
                   }
                 </Typography>
                 <Link href="https://www.mass.gov/orgs/massachusetts-department-of-mental-health">
-                  Department of Mental Health (DMH)
+                {t("Department of Mental Health (DMH)")}
                 </Link>
               </CardContent>
             </CardActionArea>
@@ -66,14 +69,14 @@ export default function Resources({ ...props }) {
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  National Alliance on Mental Illness (NAMI)
+                  {t("National Alliance on Mental Illness (NAMI)")}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                   {
                     //option for description text
                   }
                 </Typography>
-                <Link href="https://www.nami.org/#">National Alliance on Mental Illness (NAMI)</Link>
+                <Link href="https://www.nami.org/#">{t("National Alliance on Mental Illness (NAMI)")}</Link>
               </CardContent>
             </CardActionArea>
           </Card>
@@ -85,14 +88,14 @@ export default function Resources({ ...props }) {
               />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  NAMI Massachussetts
+                  {t("NAMI Massachussetts")}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                   {
                     //option for description text
                   }
                 </Typography>
-                <Link href="https://namimass.org/">NAMI Massachussetts</Link>
+                <Link href="https://namimass.org/">{t("NAMI Massachussetts")}</Link>
               </CardContent>
             </CardActionArea>
           </Card>

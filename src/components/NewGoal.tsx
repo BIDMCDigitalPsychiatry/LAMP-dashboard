@@ -37,6 +37,7 @@ import { ReactComponent as Weight } from "../icons/Weight.svg"
 import { ReactComponent as Custom } from "../icons/Custom.svg"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -72,6 +73,7 @@ export default function NewGoal({ participant, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const nameInput = useRef(null)
   const valueInput = useRef(null)
+	const { t } = useTranslation()
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {
@@ -179,7 +181,7 @@ export default function NewGoal({ participant, ...props }) {
       var item = {
         type: "goal",
         timeValue: reminderTime,
-        title: "Goal: " + text,
+        title: t("Goal: ") + text,
         icon: props.goalType,
         description: goalValue + " " + goalUnit,
         frequency: selectedFrequency,
@@ -192,7 +194,7 @@ export default function NewGoal({ participant, ...props }) {
       all.push(item)
       LAMP.Type.setAttachment(participant.id, "me", "lamp.feed.goals", all)
       props.onComplete()
-      enqueueSnackbar(`The goal has been saved successfully.`, {
+      enqueueSnackbar(t("The goal has been saved successfully."), {
         variant: "success",
         anchorOrigin: {
           vertical: "top",
@@ -209,7 +211,7 @@ export default function NewGoal({ participant, ...props }) {
         if (duration != null && duration != 0) {
           return true
         } else {
-          enqueueSnackbar(`Please select duration.`, {
+          enqueueSnackbar(t("Please select duration."), {
             variant: "error",
             anchorOrigin: {
               vertical: "top",
@@ -220,7 +222,7 @@ export default function NewGoal({ participant, ...props }) {
         }
       } else {
         valueInput.current.focus()
-        enqueueSnackbar(`Please enter goal value.`, {
+        enqueueSnackbar(t("Please enter goal value."), {
           variant: "error",
           anchorOrigin: {
             vertical: "top",
@@ -231,7 +233,7 @@ export default function NewGoal({ participant, ...props }) {
       }
     } else {
       nameInput.current.focus()
-      enqueueSnackbar(`Please enter goal name.`, {
+      enqueueSnackbar(t("Please enter goal name."), {
         variant: "error",
         anchorOrigin: {
           vertical: "top",
@@ -276,7 +278,7 @@ export default function NewGoal({ participant, ...props }) {
           <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">New Goal</Typography>
+          <Typography variant="h5">{t('New Goal')}</Typography>
         </Toolbar>
       </AppBar>
       <Box px={2}>
@@ -290,7 +292,7 @@ export default function NewGoal({ participant, ...props }) {
                     inputProps={{
                       maxLength: 50,
                     }}
-                    placeholder="Goal Name"
+                    placeholder={t('Goal Name')}
                     value={goalName}
                     onChange={(e) => setGoalName(e.target.value)}
                     inputRef={nameInput}
@@ -299,7 +301,7 @@ export default function NewGoal({ participant, ...props }) {
               </Grid>
             </Grid>
             <Box className={classes.textfieldwrapper}>
-              <Typography variant="h5">Goal details</Typography>
+              <Typography variant="h5">{t('Goal details')}</Typography>
               <FormControl
                 component="fieldset"
                 classes={{
@@ -397,7 +399,7 @@ export default function NewGoal({ participant, ...props }) {
                   <Box width={1} mb={5}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                       <Grid item xs={6}>
-                        <Typography variant="body2">Start date</Typography>
+                          <Typography variant="body2">{t("Start date")}</Typography>
                       </Grid>
                       <Grid item xs={6} className={classes.goalDetails}>
                         <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
@@ -421,11 +423,11 @@ export default function NewGoal({ participant, ...props }) {
                   <Box width={1} mb={5}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                       <Grid item xs={6}>
-                        <Typography variant="body2">Duration</Typography>
+                        <Typography variant="body2">{t("Duration")}</Typography>
                       </Grid>
                       <Grid item xs={6} className={classes.goalDetails}>
                         <Typography variant="body2" onClick={() => setEndDateOpen(true)} align="right">
-                          {duration} days
+                          {duration} {t("days")}
                         </Typography>
                         <DatePicker
                           autoOk
@@ -447,7 +449,7 @@ export default function NewGoal({ participant, ...props }) {
                   <Box width={1} mb={5}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                       <Grid item xs={6}>
-                        <Typography variant="body2">Reminders</Typography>
+                        <Typography variant="body2">{t("Reminders")}</Typography>
                       </Grid>
                       <Grid item xs={6} className={classes.goalDetails}>
                         <TimePicker
@@ -463,12 +465,12 @@ export default function NewGoal({ participant, ...props }) {
 
                 <Box textAlign="center" mt={4}>
                   <ButtonBase className={classes.btnpeach} onClick={() => saveNewGoal()}>
-                    Save
+                    {t("Save")}
                   </ButtonBase>
                 </Box>
                 <Box textAlign="center" width={1} mt={3}>
                   <Link className={classes.linkpeach} onClick={props.onComplete}>
-                    Cancel
+                    {t("Cancel")}
                   </Link>
                 </Box>
               </FormControl>
@@ -494,8 +496,8 @@ export default function NewGoal({ participant, ...props }) {
               </Box>
 
               <DialogContent className={classes.dialogueContent}>
-                <Typography variant="h4">Leaving so soon?</Typography>
-                <Typography variant="body1">If you leave without submitting, your entry will be lost.</Typography>
+                <Typography variant="h4">{t("Leaving so soon?")}</Typography>
+                <Typography variant="body1">{t("If you leave without submitting, your entry will be lost.")}</Typography>
               </DialogContent>
               <Grid>
                 <Box textAlign="center" width={1} mt={1} mb={3}>
@@ -504,13 +506,13 @@ export default function NewGoal({ participant, ...props }) {
                     onClick={() => setOpen(false)}
                     className={classnames(classes.btnpeach, classes.linkButton)}
                   >
-                    No, don’t leave yet
+                    {t("No, don’t leave yet")}
                   </Link>
                 </Box>
                 <Box textAlign="center" width={1} mb={4}>
                   <Link underline="none" onClick={props.onComplete} className={classes.linkpeach}>
                     {" "}
-                    Yes, leave
+                    {t("Yes, leave")}
                   </Link>
                 </Box>
               </Grid>
@@ -521,7 +523,7 @@ export default function NewGoal({ participant, ...props }) {
     </div>
   )
 }
-
+  
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",

@@ -40,6 +40,7 @@ import JSZip from "jszip"
 import jsonexport from "jsonexport"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
+import hi from "javascript-time-ago/locale/hi"
 import QRCode from "qrcode.react"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
@@ -53,9 +54,10 @@ import { ReactComponent as Filter } from "../icons/Filter.svg"
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
+import { useTranslation } from "react-i18next"
 
-TimeAgo.addLocale(en)
-const timeAgo = new TimeAgo("en-US")
+//TimeAgo.addLocale(en)
+//const timeAgo = new TimeAgo("en-US")
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -254,6 +256,7 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props })
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
   const [duplicateCnt, setCount] = useState(0)
+  const { t } = useTranslation()
 
   const validate = () => {
     return (
@@ -303,13 +306,13 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props })
           autoFocus
           fullWidth
           variant="filled"
-          label="Name"
+          label={t("Name")}
           defaultValue={studyName}
           onChange={(e) => {
             setStudyName(e.target.value)
           }}
           inputProps={{ maxLength: 80 }}
-          helperText={duplicateCnt > 0 ? "Unique name required" : ""}
+          helperText={duplicateCnt > 0 ? t("Unique name required") : ""}
         />
       </DialogContent>
       <DialogActions>
@@ -323,7 +326,7 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props })
             autoFocus
             disabled={!validate()}
           >
-            Save
+            {t("Save")}
           </Button>
         </Box>
       </DialogActions>
@@ -369,6 +372,11 @@ export default function ParticipantList({
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
+  const { t, i18n } = useTranslation()
+  const currentLanguage = i18n.language === "en_US" ? "en-US" : "hi-IN"
+  const currentLanguageCode = i18n.language === "en_US" ? en : hi
+  TimeAgo.addLocale(currentLanguageCode)
+  const timeAgo = new TimeAgo(currentLanguage)
 
   useEffect(() => {
     refreshPage()
@@ -551,29 +559,38 @@ export default function ParticipantList({
         let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
         let id = typeof idData === "object" ? idData.id : idData
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
-          enqueueSnackbar(`Could not create credential for ${id}.`, { variant: "error" })
+          enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
         } else {
           generateStudyFilter(researcher)
           enqueueSnackbar(
-            `Successfully created Participant ${id}. Tap the expand icon on the right to see credentials and details.`,
+            t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
+              id: id,
+            }),
             {
               variant: "success",
               persist: true,
               content: (key: string, message: string) => (
                 <SnackMessage id={key} message={message}>
-                  <TextField variant="outlined" size="small" label="Temporary email address" value={`${id}@lamp.com`} />
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label={t("Temporary email address")}
+                    value={`${id}@lamp.com`}
+                  />
                   <Box style={{ height: 16 }} />
-                  <TextField variant="outlined" size="small" label="Temporary password" value={`${id}`} />
+                  <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
                   <Grid item>
                     <TextField
                       fullWidth
-                      label="One-time login link"
+                      label={t("One-time login link")}
                       style={{ marginTop: 16 }}
                       variant="outlined"
                       value={_qrLink(`${id}@lamp.com`, id)}
                       onChange={(event) => {}}
                     />
-                    <Tooltip title="Scan this QR code on a mobile device to automatically open a patient dashboard.">
+                    <Tooltip
+                      title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}
+                    >
                       <Grid container justify="center" style={{ padding: 16 }}>
                         <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
                       </Grid>
@@ -651,10 +668,10 @@ export default function ParticipantList({
   const daysSinceLast = (id) => ({
     gpsString: passive[id]?.gps?.timestamp
       ? timeAgo.format(new Date(((passive[id] || {}).gps || {}).timestamp))
-      : "Never",
+      : t("Never"),
     accelString: passive[id]?.accel?.timestamp
       ? timeAgo.format(new Date(((passive[id] || {}).accel || {}).timestamp))
-      : "Never",
+      : t("Never"),
     gps:
       (new Date().getTime() - new Date(parseInt(((passive[id] || {}).gps || {}).timestamp)).getTime()) /
       (1000 * 3600 * 24),
@@ -664,7 +681,7 @@ export default function ParticipantList({
   })
 
   const dataQuality = (id) => ({
-    title: `GPS: ${daysSinceLast(id).gpsString}, Accelerometer: ${daysSinceLast(id).accelString}`,
+    title: t("GPS") + `: ${daysSinceLast(id).gpsString}, ` + t("Accelerometer") + `: ${daysSinceLast(id).accelString}`,
     class:
       daysSinceLast(id).gps <= 2 && daysSinceLast(id).accel <= 2
         ? classes.dataGreen
@@ -675,11 +692,19 @@ export default function ParticipantList({
         : classes.dataGrey,
   })
 
-  const dateInfo = (id) => ({
+  const dateInfo_1 = (id) => ({
     relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
     absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
-    device: (logins[id] || { data: {} }).data.device_type || "an unknown device",
-    userAgent: (logins[id] || { data: {} }).data.user_agent || "unknown device model",
+    device: (logins[id] || { data: {} }).data.device_type || t("an unknown device"),
+    userAgent: (logins[id] || { data: {} }).data.user_agent || t("unknown device model"),
+  })
+
+  const dateInfo = (id) => ({
+    //relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
+    relative: (logins[id] || {}).timestamp,
+    absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
+    device: (logins[id] || { data: {} }).data.device_type || t("an unknown device"),
+    userAgent: (logins[id] || { data: {} }).data.user_agent || t("unknown device model"),
   })
 
   const saveSelectedUserState = (type, rows, event) => {
@@ -713,8 +738,21 @@ export default function ParticipantList({
     let osVersion = userAgent.hasOwnProperty("os_version") ? userAgent.os_version : ""
     let deviceName = userAgent.hasOwnProperty("deviceName") ? userAgent.deviceName : ""
     let model = userAgent.hasOwnProperty("model") ? userAgent.model : ""
-    return "App Version: " + appVersion + " OS Version: " + osVersion + " DeviceName:" + deviceName + " Model:" + model
+    return (
+      t("App Version:") +
+      appVersion +
+      " " +
+      t("OS Version:") +
+      osVersion +
+      " " +
+      t("DeviceName:") +
+      deviceName +
+      " " +
+      t("Model:") +
+      model
+    )
   }
+
   const createStudy = async (studyName: string) => {
     setAddStudy(false)
     setLoading(true)
@@ -722,7 +760,7 @@ export default function ParticipantList({
     study.name = studyName
     await LAMP.Study.create(researcher.id, study)
     refreshPage()
-    enqueueSnackbar(`Successfully created new study - ${studyName}.`, { variant: "success" })
+    enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), { variant: "success" })
   }
 
   const handleClose = () => {
@@ -742,11 +780,11 @@ export default function ParticipantList({
       <MuiThemeProvider theme={theme}>
         <Box className={classes.tableContainer}>
           <MaterialTable
-            title={"Patients"}
+            title={t("Patients")}
             data={participants}
             columns={[
               {
-                title: "Name",
+                title: t("Name"),
                 field: "id",
                 render: (x) => (
                   <div>
@@ -758,9 +796,9 @@ export default function ParticipantList({
                         updateName={updateName}
                       />
                     ) : aliasName && editUserId === x.id ? (
-                      aliasName
+                      t(aliasName)
                     ) : nameArray[x.id] ? (
-                      nameArray[x.id]
+                      t(nameArray[x.id])
                     ) : (
                       x.id
                     )}
@@ -768,7 +806,7 @@ export default function ParticipantList({
                 ),
               },
               {
-                title: "Last Active",
+                title: t("Last Active"),
                 field: "last_active",
                 searchable: false,
                 render: (rowData) => (
@@ -784,21 +822,24 @@ export default function ParticipantList({
                     }
                   >
                     <span>
-                      {dateInfo(rowData.id).relative !== "in NaN years" &&
-                        `${dateInfo(rowData.id).relative} on ${dateInfo(rowData.id).device}`}
+                      {dateInfo(rowData.id).relative !== undefined
+                        ? `${timeAgo.format(new Date(parseInt(dateInfo(rowData.id).relative)))} on ${
+                            dateInfo(rowData.id).device
+                          }`
+                        : ""}
                     </span>
                   </Tooltip>
                 ),
               },
               {
-                title: "Indicators",
+                title: t("Indicators"),
                 field: "data_health",
                 searchable: false,
                 render: (rowData) => (
                   <Box>
                     <Tooltip title={dataQuality(rowData.id).title}>
                       <Chip
-                        label="Data Quality"
+                        label={t("Data Quality")}
                         className={classes.dataQuality + " " + dataQuality(rowData.id).class}
                       />
                     </Tooltip>
@@ -806,7 +847,7 @@ export default function ParticipantList({
                 ),
               },
               {
-                title: "Study",
+                title: t("Study"),
                 field: "study",
                 searchable: false,
                 render: (rowData) => (
@@ -831,11 +872,12 @@ export default function ParticipantList({
               body: {
                 emptyDataSourceMessage: "", //"No Participants. Add Participants by clicking the [+] button above.",
                 editRow: {
-                  deleteText: "Are you sure you want to delete this Participant?",
+                  deleteText: t("Are you sure you want to delete this Participant?"),
                 },
               },
               toolbar: {
-                nRowsSelected: "Patients",
+                nRowsSelected: t("Patients"),
+                searchPlaceholder: t("Search"),
               },
             }}
             options={{
@@ -871,7 +913,8 @@ export default function ParticipantList({
                         showFilter === true ? setShowFilter(false) : setShowFilter(true)
                       }}
                     >
-                      <Filter /> Filter results {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                      <Filter /> {t("Filter results")}{" "}
+                      {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
                     <Fab
                       variant="extended"
@@ -887,7 +930,7 @@ export default function ParticipantList({
                         }))
                       }}
                     >
-                      <AddIcon /> Add
+                      <AddIcon /> {t("Add")}
                     </Fab>
                   </div>
                 )
@@ -928,7 +971,7 @@ export default function ParticipantList({
                               }}
                               startIcon={<RenameIcon />}
                             >
-                              Rename
+                              {t("Rename")}
                             </Button>
                           </Box>
                           <Box>
@@ -940,7 +983,7 @@ export default function ParticipantList({
                               }}
                               startIcon={<VpnKeyIcon />}
                             >
-                              Edit password
+                              {t("Edit password")}
                             </Button>
                           </Box>
                           <Box>
@@ -951,7 +994,7 @@ export default function ParticipantList({
                               }}
                               startIcon={<DeleteIcon />}
                             >
-                              Delete
+                              {t("Delete")}
                             </Button>
                           </Box>
                           <Box>
@@ -962,7 +1005,7 @@ export default function ParticipantList({
                               }}
                               startIcon={<ExportIcon />}
                             >
-                              Export
+                              {t("Export")}
                             </Button>
                           </Box>
                         </Box>
@@ -994,8 +1037,8 @@ export default function ParticipantList({
       >
         {state.selectedIcon === "download" ? (
           <React.Fragment>
-            <MenuItem onClick={() => downloadFiles("csv")}>CSV</MenuItem>
-            <MenuItem onClick={() => downloadFiles("json")}>JSON</MenuItem>
+            <MenuItem onClick={() => downloadFiles("csv")}>{t("CSV")}</MenuItem>
+            <MenuItem onClick={() => downloadFiles("json")}>{t("JSON")}</MenuItem>
           </React.Fragment>
         ) : state.selectedIcon === "add" ? (
           <React.Fragment>
@@ -1007,8 +1050,8 @@ export default function ParticipantList({
                 setState((state) => ({ ...state, popoverAttachElement: null, addUser: false }))
               }}
             >
-              <Typography variant="h6">New patient</Typography>
-              <Typography variant="body2">Create a new entry in this group.</Typography>
+              <Typography variant="h6">{t("New patient")}</Typography>
+              <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -1016,14 +1059,14 @@ export default function ParticipantList({
                 setAddStudy(true)
               }}
             >
-              <Typography variant="h6">Add a new study</Typography>
-              <Typography variant="body2">Create a new study.</Typography>
+              <Typography variant="h6">{t("Add a new study")}</Typography>
+              <Typography variant="body2">{t("Create a new study.")}</Typography>
             </MenuItem>
           </React.Fragment>
         ) : state.selectedIcon === "delete" ? (
           <Box style={{ padding: "20px" }}>
             <Button variant="contained" className={classes.deleteBtn} onClick={deleteParticipants}>
-              Are you sure you want to delete these participants?
+              {t("Are you sure you want to delete these participants?")}
             </Button>
           </Box>
         ) : (
@@ -1052,10 +1095,10 @@ export default function ParticipantList({
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={3}>
-            <Typography variant="body2">Choose the Study you want to save this participant.</Typography>
+            <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
           </Box>
 
-          <Typography variant="caption">Study</Typography>
+          <Typography variant="caption">{t("Study")}</Typography>
           <Select
             labelId="demo-simple-select-outlined-label"
             id="demo-simple-select-outlined"
@@ -1072,7 +1115,7 @@ export default function ParticipantList({
 
           {!!showErrorMsg ? (
             <Box mt={1}>
-              <Typography className={classes.errorMsg}>Select a Study to create a participant.</Typography>
+              <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
             </Box>
           ) : (
             ""
@@ -1086,7 +1129,7 @@ export default function ParticipantList({
               autoFocus
               disabled={!!studyBtnClicked ? true : false}
             >
-              Save
+              {t("Save")}
             </Button>
           </Box>
         </DialogActions>

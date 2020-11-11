@@ -3,8 +3,8 @@ import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
 import GridList from "@material-ui/core/GridList"
 import GridListTile from "@material-ui/core/GridListTile"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
-
 import { Typography, AppBar, Toolbar, IconButton, Icon, Grid } from "@material-ui/core"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 
 const tileData = [
   {
@@ -107,7 +108,8 @@ const tileData = [
   },
 ]
 export default function HopeBox({ ...props }) {
-  const classes = useStyles()
+  const classes = useStyles()  
+  const { t } = useTranslation()
 
   return (
     <div className={classes.root}>
@@ -123,10 +125,10 @@ export default function HopeBox({ ...props }) {
       <GridList cellHeight={180} spacing={2} className={classes.gridList} cols={3}>
         {tileData.map((tile) => (
           <GridListTile key={tile.img} cols={1} className={classes.singletile}>
-            <img src={tile.img} alt={tile.title} />
+            <img src={tile.img} alt={t(tile.title)} />
           </GridListTile>
         ))}
       </GridList>
     </div>
   )
-}
+} 

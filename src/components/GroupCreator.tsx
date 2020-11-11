@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
   palette: {
@@ -71,6 +72,7 @@ const reorder = (list, startIndex, endIndex) => {
 function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
   const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x?.id === selected)[0] ?? null : null)
   const [anchorEl, setAnchorEl] = useState<Element>()
+  const { t } = useTranslation()
   useEffect(() => {
     if (_selected !== selected && _selected !== null) onSave && onSave(_selected.id)
   }, [_selected])
@@ -80,7 +82,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
         <Box ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <Tooltip
             enterDelay={1000}
-            title="Drag the handle on the left to change the order in which this Activity appears in the group."
+            title={t("Drag the handle on the left to change the order in which this Activity appears in the group.")}
           >
             <ButtonGroup style={{ background: "#fff", marginBottom: 8 }}>
               <Button disabled variant="outlined" color={_selected?.name ? "primary" : "secondary"}>
@@ -91,7 +93,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
                 color={_selected?.name ? "primary" : "secondary"}
                 onClick={(e) => setAnchorEl(e.currentTarget)}
               >
-                {_selected?.name ?? "No selection"}
+                {t(_selected?.name ?? "No selection")}
               </Button>
               <Button
                 variant="outlined"
@@ -110,7 +112,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
                   setSelected(activity)
                 }}
               >
-                {activity.name}
+                {t(activity.name)}
               </MenuItem>
             ))}
           </Menu>
@@ -136,6 +138,7 @@ export default function GroupCreator({
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const { t } = useTranslation()
 
   const onDragEnd = (result) => {
     if (!result.destination || result.destination.index === result.source.index) return
@@ -148,20 +151,24 @@ export default function GroupCreator({
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Typography variant="h6">{!!value ? "Modify an existing group." : "Create a new group."}</Typography>
+              <Typography variant="h6">
+                {!!value ? t("Modify an existing group.") : t("Create a new group.")}
+              </Typography>
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                 id="filled-select-currency"
                 select
-                label="Study"
+                label={t("Study")}
                 value={studyId}
                 onChange={(e) => {
                   setStudyId(e.target.value)
                 }}
                 helperText={
-                  typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+                  typeof studyId == "undefined" || studyId === null || studyId === ""
+                    ? t("Please select the Study")
+                    : ""
                 }
                 variant="filled"
                 disabled={!!value ? true : false}
@@ -177,7 +184,7 @@ export default function GroupCreator({
               <TextField
                 fullWidth
                 variant="filled"
-                label="Group Title"
+                label={t("Group Title")}
                 defaultValue={text}
                 onChange={(event) => setText(event.target.value)}
               />
@@ -186,7 +193,7 @@ export default function GroupCreator({
               <Divider />
             </Box>
             <Grid item xs={12}>
-              <Typography variant="h6">Configure activities and options.</Typography>
+              <Typography variant="h6">{t("Configure activities and options.")}</Typography>
             </Grid>
             <Grid item>
               <DragDropContext onDragEnd={onDragEnd}>
@@ -230,7 +237,7 @@ export default function GroupCreator({
                   color="primary"
                   onClick={() => setItems((items) => [...items, null])}
                 >
-                  Add Activity
+                  {t("Add Activity")}
                 </Button>
               </ButtonGroup>
             </Grid>
@@ -245,7 +252,7 @@ export default function GroupCreator({
         style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
       >
         <Grid item>
-          <Tooltip title="Save this activity group.">
+          <Tooltip title={t("Save this activity group.")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -267,7 +274,7 @@ export default function GroupCreator({
                 !onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text || !studyId
               }
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

@@ -34,6 +34,8 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "./useInterval"
+import { useTranslation } from "react-i18next"
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -137,6 +139,7 @@ export default function NavigationLayout({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
+	const { t } = useTranslation(); 
   //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
   const hideNotifications = ["Researcher"]
@@ -207,11 +210,11 @@ export default function NavigationLayout({
                       marginLeft: supportsSidebar ? 35 : undefined,
                     }}
                   >
-                    {activeTab}
+                    {t(activeTab)}
                   </Typography>
                 )}
               </Container>
-            )}
+            )}  
             {!sameLineTitle && (
               <Container className={classes.thumbContainer}>
                 <Typography
@@ -221,7 +224,7 @@ export default function NavigationLayout({
                       supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                   }}
                 >
-                  {activeTab}
+                  {t(activeTab)}
                 </Typography>
               </Container>
             )}
@@ -229,7 +232,7 @@ export default function NavigationLayout({
             {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
               <Box className={classes.headerRight}>
                 {hideNotifications.indexOf(activeTab) < 0 ? (
-                  <Tooltip title="Notifications">
+                  <Tooltip title={t("Notifications")}>
                     <Badge
                       badgeContent={msgCount > 0 ? msgCount : undefined}
                       color="primary"
@@ -241,7 +244,7 @@ export default function NavigationLayout({
                 ) : (
                   ""
                 )}
-                <Tooltip title="Profile & Settings">
+                <Tooltip title={t("Profile & Settings")}>
                   <IconButton
                     aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
                     aria-haspopup="true"
@@ -258,11 +261,11 @@ export default function NavigationLayout({
                   onClose={() => setShowCustomizeMenu(undefined)}
                 >
                   <MenuItem disabled divider>
-                    <b>{title}</b>
+                    <b>{t(title)}</b>
                   </MenuItem>
-                  {!!id && <MenuItem onClick={() => setPasswordChange(true)}>Manage Credentials</MenuItem>}
+                  {!!id && <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>}
                   <MenuItem divider onClick={() => setConfirmLogout(true)}>
-                    Logout
+                    {t("Logout")}
                   </MenuItem>
                   <MenuItem
                     dense
@@ -271,7 +274,7 @@ export default function NavigationLayout({
                       window.open("https://docs.lamp.digital", "_blank")
                     }}
                   >
-                    <b style={{ color: colors.grey["600"] }}>Help & Support</b>
+                    <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
                   </MenuItem>
                   <MenuItem
                     dense
@@ -280,7 +283,7 @@ export default function NavigationLayout({
                       window.open("https://community.lamp.digital", "_blank")
                     }}
                   >
-                    <b style={{ color: colors.grey["600"] }}>LAMP Community</b>
+                    <b style={{ color: colors.grey["600"] }}>{t("LAMP Community")}</b>  
                   </MenuItem>
                   <MenuItem
                     dense
@@ -289,7 +292,7 @@ export default function NavigationLayout({
                       window.open("mailto:team@digitalpsych.org", "_blank")
                     }}
                   >
-                    <b style={{ color: colors.grey["600"] }}>Contact Us</b>
+                    <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
                   </MenuItem>
                 </Menu>
               </Box>
@@ -303,7 +306,7 @@ export default function NavigationLayout({
           paddingBottom: 56,
           width: "100%",
           overflowY: "auto",
-          overflow: "hidden",
+          overflow: !!id ? "hidden" :"initial",
         }}
       >
         <ResponsiveMargin
@@ -323,15 +326,15 @@ export default function NavigationLayout({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">Are you sure you want to log out of LAMP right now?</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t("Are you sure you want to log out of LAMP right now?")}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            If you've made some changes, make sure they're saved before you continue to log out.
+            {t("If you've made some changes, make sure they're saved before you continue to log out.")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmLogout(false)} color="secondary">
-            Go Back
+            {t("Go Back")}
           </Button>
           <Button
             onClick={() => {
@@ -341,7 +344,7 @@ export default function NavigationLayout({
             color="primary"
             autoFocus
           >
-            Logout
+            {t("Logout")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -370,7 +373,7 @@ export default function NavigationLayout({
             >
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">Conversations</Typography>
+            <Typography variant="h5">{t("Conversations")}</Typography>
           </Toolbar>
         </AppBar>
         <Messages
@@ -383,3 +386,4 @@ export default function NavigationLayout({
     </Box>
   )
 }
+  

@@ -6,6 +6,7 @@ import InputBase from "@material-ui/core/InputBase"
 import Dialog from "@material-ui/core/Dialog"
 import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
+import { useTranslation } from "react-i18next"
 
 const CssTextField = withStyles({
   root: {
@@ -149,6 +150,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
   const classes = useStyles()
   const [measure, setMeasure] = React.useState("Times")
   const [target, setTarget] = React.useState("")
+  const { t } = useTranslation()
 
   const handleClose = () => {
     onClose({ type: dialogOpen, target, measure })
@@ -164,25 +166,25 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
       open={dialogOpen != ""}
     >
       <div>
-        <Typography className={classes.dialogTitle}>Add a target behavior</Typography>
+        <Typography className={classes.dialogTitle}>{t("Add a target behavior")}</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
               value={target}
               onChange={(event) => setTarget(event.target.value)}
               inputProps={{ disableunderline: "true" }}
-              placeholder="Behavior name"
+              placeholder={t("Behavior name")}
             />
           </div>
         </div>
-        <Typography className={classes.measureTitle}>Measure of action:</Typography>
+        <Typography className={classes.measureTitle}>{t("Measure of action:")}</Typography>
         <Box display="flex" justifyContent="center" mt={2}>
           <Box>
             <RatioButton
               value="Times"
               unable={false}
               smallSpace={true}
-              title="Times"
+              title={t("Times")}
               color="#618EF7"
               checked={measure == "Times"}
               onChange={() => setMeasure("Times")}
@@ -192,7 +194,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
           <Box>
             <RatioButton
               smallSpace={true}
-              title="Hours"
+              title={t("Hours")}
               color="#618EF7"
               value="Hours"
               unable={false}
@@ -204,7 +206,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
           <Box>
             <RatioButton
               smallSpace={true}
-              title="Yes"
+              title={t("Yes")}
               color="#618EF7"
               value="Yes"
               unable={false}
@@ -228,7 +230,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
         </Box>
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} className={classes.headerButton}>
-            <Typography className={classes.buttonText}>Add</Typography>
+            <Typography className={classes.buttonText}>{t("Add")}</Typography>
           </Button>
         </Box>
       </div>
@@ -240,6 +242,7 @@ export function EmotionDialog({ ...props }) {
   const classes = useStyles()
   const [emotion, setEmotion] = React.useState("")
   const { onClose, dialogOpen } = props
+  const { t } = useTranslation()
 
   const handleClose = () => {
     onClose(emotion)
@@ -254,20 +257,20 @@ export function EmotionDialog({ ...props }) {
       open={dialogOpen}
     >
       <div>
-        <Typography className={classes.dialogTitle}>Add an emotion</Typography>
+        <Typography className={classes.dialogTitle}>{t("Add a emotion")}</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
               value={emotion}
               onChange={(event) => setEmotion(event.target.value)}
               inputProps={{ disableunderline: "true" }}
-              placeholder="Emotion name"
+              placeholder={t("Emotion name")}
             />
           </div>
         </div>
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} className={classes.headerButton}>
-            <Typography className={classes.buttonText}>Add</Typography>
+            <Typography className={classes.buttonText}>{t("Add")}</Typography>
           </Button>
         </Box>
       </div>

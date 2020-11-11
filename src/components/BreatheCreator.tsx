@@ -28,6 +28,8 @@ import AudiotrackIcon from "@material-ui/icons/Audiotrack"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import BreatheIcon from "../icons/Breathe.svg"
+import { useTranslation } from "react-i18next"
+
 const theme = createMuiTheme({
   palette: {
     secondary: {
@@ -177,6 +179,7 @@ export default function BreatheCreator({
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
   const [photo, setPhoto] = useState(details?.photo ?? BreatheIcon)
+  const { t } = useTranslation()
   const [settings, setSettings] = useState(
     !!value
       ? value?.settings
@@ -194,9 +197,9 @@ export default function BreatheCreator({
     }, []),
     onDropRejected: useCallback((rejectedFiles) => {
       if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar("Image size should not exceed 5 MB.", { variant: "error" })
+        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
       } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar("Not supported image type.", { variant: "error" })
+        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
       }
     }, []),
     accept: "image/*",
@@ -221,7 +224,7 @@ export default function BreatheCreator({
             : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
       )
       if (duplicates.length > 0) {
-        enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
     if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || ["lamp.breathe"].includes(activitySpecId)) {
@@ -255,11 +258,11 @@ export default function BreatheCreator({
         })
     } else {
       if (!audioFormats.includes(file.type.toLowerCase())) {
-        enqueueSnackbar("Not supported audio type.", {
+        enqueueSnackbar(t("Not supported audio type."), {
           variant: "error",
         })
       } else {
-        enqueueSnackbar("The audio size should not exceed 2 MB.", {
+        enqueueSnackbar(t("The audio size should not exceed 2 MB."), {
           variant: "error",
         })
       }
@@ -294,8 +297,8 @@ export default function BreatheCreator({
               <Tooltip
                 title={
                   !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
+                    ? t("Drag a photo or tap to select a photo.")
+                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
                 }
               >
                 <Box
@@ -325,14 +328,14 @@ export default function BreatheCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Study"
+                    label={t("Study")}
                     value={studyId}
                     onChange={(e) => {
                       setStudyId(e.target.value)
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? "Please select the study"
+                        ? t("Please select the Study")
                         : ""
                     }
                     variant="filled"
@@ -355,7 +358,7 @@ export default function BreatheCreator({
                       }
                       fullWidth
                       variant="filled"
-                      label="Activity Title"
+                      label={t("Activity Title")}
                       defaultValue={text}
                       onChange={(event) => setText(event.target.value)}
                       inputProps={{ maxLength: 80 }}
@@ -368,7 +371,7 @@ export default function BreatheCreator({
                   <TextField
                     fullWidth
                     multiline
-                    label="Activity Description"
+                    label={t("Activity Description")}
                     variant="filled"
                     rows={2}
                     defaultValue={description}
@@ -412,7 +415,7 @@ export default function BreatheCreator({
                     />
 
                     <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
-                      <AudiotrackIcon /> Upload audio
+                      <AudiotrackIcon /> {t("Upload audio")}
                     </Fab>
                   </label>
 
@@ -420,8 +423,8 @@ export default function BreatheCreator({
                     <Grid>
                       {settings.audio && (
                         <audio controls src={settings.audio}>
-                          Your browser does not support the
-                          <code>audio</code> element.
+                          {t("Your browser does not support the")}
+                          <code>{t("audio")}</code> {t("element.")}
                         </audio>
                       )}
                     </Grid>
@@ -454,7 +457,7 @@ export default function BreatheCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this survey instrument and save it with a new title.">
+            <Tooltip title={t("Duplicate this survey instrument and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -485,7 +488,7 @@ export default function BreatheCreator({
                   (value.name.trim() === text.trim() && value.parentID === studyId)
                 }
               >
-                Duplicate
+                {t("Duplicate")}
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -493,7 +496,7 @@ export default function BreatheCreator({
           </Grid>
         )}
         <Grid item>
-          <Tooltip title="Save this activity.">
+          <Tooltip title={t("Save this activity.")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -518,7 +521,7 @@ export default function BreatheCreator({
               }}
               disabled={!validate() || !disabled || !onSave || !text}
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>
