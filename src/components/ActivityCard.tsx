@@ -81,7 +81,7 @@ export default function ActivityCard({
         <Tooltip title={Boolean(visibleSlice) ? activity.name : t(`Activity Type`)}>
           <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
             {!Boolean(visibleSlice)
-              ? activity.name
+              ? t(activity.name)
               : visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))}
           </Typography>
         </Tooltip>
