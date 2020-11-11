@@ -305,7 +305,7 @@ export default function Learn({
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {t("Quick Tips to Improve Your")} {tip}
+          {t("Quick Tips to Improve Your")} {t(tip)}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
@@ -341,7 +341,7 @@ export default function Learn({
             >
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">{tip}</Typography>
+            <Typography variant="h5">{t(tip)}</Typography>
           </Toolbar>
         </AppBar>
         <LearnTips tip={tip} icon={icon} details={details} closeDialog={() => setOpenData(false)} />

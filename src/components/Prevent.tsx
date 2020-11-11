@@ -1162,7 +1162,7 @@ export default function Prevent({
             >
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">{selectedActivityName}</Typography>
+            <Typography variant="h5">{t(selectedActivityName)}</Typography>
           </Toolbar>
         </AppBar>
 
