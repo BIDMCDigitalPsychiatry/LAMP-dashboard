@@ -120,7 +120,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
-  const [status, setStatus] = useState("Good")
+  const [status, setStatus] = useState("good")
   const [loading, setLoading] = useState(false)
   const [time, setTime] = useState(new Date().getTime())
   const { t } = useTranslation()
@@ -194,18 +194,18 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                 <Grid className={classes.btnNav}>
                   <Box textAlign="center">
                     <IconButton
-                      onClick={() => handleClickStatus("Good")}
-                      className={status === "Good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("good")}
+                      className={status === "good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsUp />
-                      <label>{t("Good")}</label>
+                      <label>{t("good")}</label>
                     </IconButton>
                     <IconButton
-                      onClick={() => handleClickStatus("Bad")}
-                      className={status === "Bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("bad")}
+                      className={status === "bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsDown />
-                      <label>{t("Bad")}</label>
+                      <label>{t("bad")}</label>
                     </IconButton>
                   </Box>
                 </Grid>
