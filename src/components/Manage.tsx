@@ -199,6 +199,7 @@ export default function Manage({ participant, activities, ...props }) {
         x.spec === "lamp.breathe" ||
         x.spec === "lamp.scratch_image"
     )
+    console.log(gActivities)
     setSavedActivities(gActivities)
   }, [])
 
@@ -331,7 +332,6 @@ export default function Manage({ participant, activities, ...props }) {
         fullScreen
         open={!!launchedActivity}
         onClose={() => {
-          setOpen(false)
           setLaunchedActivity(undefined)
         }}
       >
@@ -341,7 +341,6 @@ export default function Manage({ participant, activities, ...props }) {
               <Goals
                 participant={participant}
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -351,7 +350,6 @@ export default function Manage({ participant, activities, ...props }) {
                 participant={participant}
                 activityId={activity?.id ?? null}
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -361,7 +359,6 @@ export default function Manage({ participant, activities, ...props }) {
                 participant={participant}
                 activity={activity ?? []}
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -371,7 +368,7 @@ export default function Manage({ participant, activities, ...props }) {
                 activity={activity}
                 participant={participant}
                 onComplete={() => {
-                  setOpen(false)
+                  console.log("ad", savedActivities)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -379,7 +376,6 @@ export default function Manage({ participant, activities, ...props }) {
             HopeBox: (
               <HopeBoxSelect
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -389,7 +385,6 @@ export default function Manage({ participant, activities, ...props }) {
               <NewMedication
                 participant={participant}
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -400,7 +395,6 @@ export default function Manage({ participant, activities, ...props }) {
                 activity={activity}
                 participant={participant}
                 onComplete={() => {
-                  setOpen(false)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -471,6 +465,7 @@ export default function Manage({ participant, activities, ...props }) {
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               onClick={() => {
+                setOpen(false)
                 setLaunchedActivity(games.includes(spec) ? "Game" : spec)
               }}
               underline="none"

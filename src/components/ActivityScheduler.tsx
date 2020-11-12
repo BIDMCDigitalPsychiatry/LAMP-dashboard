@@ -26,7 +26,6 @@ const theme = createMuiTheme({
   },
 })
 
-
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
 // and needs to be fixed or it will silently rollback.
 
@@ -176,9 +175,9 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
             initialEditValue: "none",
             lookup: {
               hourly: t("Every hour"),
-              every3h: t("Every {{number}} hours", {number: 3}),
-              every6h: t("Every {{number}} hours", {number: 6}),
-              every12h: t("Every {{number}} hours", {number: 12}),
+              every3h: t("Every {{number}} hours", { number: 3 }),
+              every6h: t("Every {{number}} hours", { number: 6 }),
+              every12h: t("Every {{number}} hours", { number: 12 }),
               daily: t("Every day"),
               biweekly: t("Two times every week (Tue, Thurs)"),
               triweekly: t("Three times every week (Mon, Wed, Fri)"),
@@ -222,7 +221,7 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
         }}
         localization={{
           header: {
-              actions: t('Actions')
+            actions: t("Actions"),
           },
           body: {
             emptyDataSourceMessage: t("No schedule."),

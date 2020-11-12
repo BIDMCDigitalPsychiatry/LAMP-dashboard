@@ -37,7 +37,7 @@ export default function JournalEntries({ ...props }) {
   const classes = useStyles()
   const [date, changeDate] = useState(new Date())
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <div className={classes.root}>

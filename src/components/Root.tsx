@@ -8,7 +8,7 @@ import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
@@ -18,17 +18,19 @@ export default function Root({ ...props }) {
   //const [names, setNames] = useState({})
   const [passwordChange, setPasswordChange] = useState<boolean>()
   const { enqueueSnackbar } = useSnackbar()
-	const { t, i18n } = useTranslation();  
-  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
-                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]},
-                           {key: "fr_US", value: "French", lang_array: []}]
+  const { t, i18n } = useTranslation()
+  const languagesArray = [
+    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
+    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
+    { key: "fr_US", value: "French", lang_array: [] },
+  ]
 
-  const getSelectedLanguage = () => {    
-    let lang = languagesArray.filter((x) =>{
-      return x.lang_array.includes(navigator.language)  
+  const getSelectedLanguage = () => {
+    let lang = languagesArray.filter((x) => {
+      return x.lang_array.includes(navigator.language)
     })
     return lang
-  }  
+  }
 
   useEffect(() => {
     if (LAMP.Auth._type !== "admin") return
@@ -37,13 +39,14 @@ export default function Root({ ...props }) {
 
   useEffect(() => {
     let authId = LAMP.Auth._auth.id
-    let language = !!localStorage.getItem("LAMP_user_"+ authId)
-                  ? JSON.parse(localStorage.getItem("LAMP_user_"+ authId)).language
-                  : (getSelectedLanguage().length > 0) ? getSelectedLanguage()[0].key
-                  : "en_US"
-    i18n.changeLanguage(language);  
+    let language = !!localStorage.getItem("LAMP_user_" + authId)
+      ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
+      : getSelectedLanguage().length > 0
+      ? getSelectedLanguage()[0].key
+      : "en_US"
+    i18n.changeLanguage(language)
   }, [])
-  
+
   return (
     <React.Fragment>
       <ResponsivePaper elevation={4}>
@@ -98,7 +101,7 @@ export default function Root({ ...props }) {
           ]}
           localization={{
             header: {
-                actions: t('Actions')
+              actions: t("Actions"),
             },
             body: {
               emptyDataSourceMessage: t("No Researchers. Add Researchers by clicking the [+] button above."),

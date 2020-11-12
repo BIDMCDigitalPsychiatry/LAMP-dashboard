@@ -60,20 +60,22 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation()
   const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
-                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]}]
-  const getSelectedLanguage = () => {    
-    let lang = languagesArray.filter((x) =>{
-      return x.lang_array.includes(navigator.language)  
+  const languagesArray = [
+    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
+    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
+  ]
+  const getSelectedLanguage = () => {
+    let lang = languagesArray.filter((x) => {
+      return x.lang_array.includes(navigator.language)
     })
-    return i18n.language ? i18n.language : (lang.length > 0 ? lang[0].key: "en_US")
+    return i18n.language ? i18n.language : lang.length > 0 ? lang[0].key : "en_US"
   }
   const [selectedLanguage, setSelectedLanguage] = useState(getSelectedLanguage())
 
@@ -89,8 +91,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }, [])
 
   useEffect(() => {
-    i18n.changeLanguage(selectedLanguage);
-  }, [selectedLanguage])  
+    i18n.changeLanguage(selectedLanguage)
+  }, [selectedLanguage])
 
   let handleChange = (event) =>
     setState({
@@ -116,10 +118,13 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
             },
           } as any).then((res) => console.dir(res))
-        } 
-        localStorage.setItem("LAMP_user_"+res.identity.id, JSON.stringify({
-          language: selectedLanguage,
-        }))
+        }
+        localStorage.setItem(
+          "LAMP_user_" + res.identity.id,
+          JSON.stringify({
+            language: selectedLanguage,
+          })
+        )
         onComplete()
       })
       .catch((err) => {
@@ -154,7 +159,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 window.open("https://docs.lamp.digital", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>{t('Help & Support')}</b>
+              <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
             </MenuItem>
             <MenuItem
               dense
@@ -172,7 +177,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 window.open("mailto:team@digitalpsych.org", "_blank")
               }}
             >
-              <b style={{ color: colors.grey["600"] }}>{t('Contact Us')}</b>
+              <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
             </MenuItem>
           </Menu>
         </IconButton>
@@ -198,7 +203,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 <TextField
                   select
                   label={t("Select Language")}
-                  style={{ width: "100%"}}
+                  style={{ width: "100%" }}
                   onChange={(event) => {
                     setSelectedLanguage(event.target.value)
                   }}
@@ -206,10 +211,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   value={selectedLanguage || ""}
                 >
                   {languagesArray.map((lang) => (
-                  <MenuItem value={lang.key} key={lang.key}>
-                    {lang.value}
-                  </MenuItem>
-                  )) }
+                    <MenuItem value={lang.key} key={lang.key}>
+                      {lang.value}
+                    </MenuItem>
+                  ))}
                 </TextField>
 
                 <TextField
@@ -318,7 +323,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         setTryitMenu(undefined)
                         handleLogin(event, "researcher")
                       }}
-                    > 
+                    >
                       {t("Researcher")}
                     </MenuItem>
                     <MenuItem

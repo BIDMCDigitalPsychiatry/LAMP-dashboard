@@ -18,7 +18,7 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -95,7 +95,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const [loading, setLoading] = useState(true)
-	const { t } = useTranslation();
+  const { t } = useTranslation()
 
   useEffect(() => {
     ;(async () => {
@@ -166,7 +166,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
             <DialogActions>
               <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-              {t("Ok")}
+                {t("Ok")}
               </Button>
             </DialogActions>
           </Dialog>
@@ -191,10 +191,10 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         <DialogContent>
           <Box textAlign="center" pb={4} className={classes.niceWork}>
             <Typography variant="h5" gutterBottom>
-              {t('Nice work!')}
+              {t("Nice work!")}
             </Typography>
             <Typography className={classes.ribbonText} component="p">
-              {t('You’re on a streak, keep it going')}
+              {t("You’re on a streak, keep it going")}
             </Typography>
             <Box textAlign="center" className={classes.niceWorkbadge}>
               <Ribbon width="170" height="226" />

@@ -250,28 +250,31 @@ function Study({ onParticipantSelect, researcher, ...props }) {
 }
 
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
-	const { t, i18n } = useTranslation();
-  
-  const languagesArray = [{key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"]}, 
-                            {key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"]},
-                           {key: "fr_US", value: "French", lang_array: []}]
+  const { t, i18n } = useTranslation()
 
-  const getSelectedLanguage = () => {    
-    let lang = languagesArray.filter((x) =>{
-      return x.lang_array.includes(navigator.language)  
+  const languagesArray = [
+    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
+    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
+    { key: "fr_US", value: "French", lang_array: [] },
+  ]
+
+  const getSelectedLanguage = () => {
+    let lang = languagesArray.filter((x) => {
+      return x.lang_array.includes(navigator.language)
     })
     return lang
-  }  
+  }
 
   useEffect(() => {
     ;(async () => {
       await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", null)
     })()
-    let language = !!localStorage.getItem("LAMP_user_"+ researcher.id)
-                  ? JSON.parse(localStorage.getItem("LAMP_user_"+ researcher.id)).language
-                  : (getSelectedLanguage().length > 0) ? getSelectedLanguage()[0].key
-                  : "en_US"
-    i18n.changeLanguage(language);  
+    let language = !!localStorage.getItem("LAMP_user_" + researcher.id)
+      ? JSON.parse(localStorage.getItem("LAMP_user_" + researcher.id)).language
+      : getSelectedLanguage().length > 0
+      ? getSelectedLanguage()[0].key
+      : "en_US"
+    i18n.changeLanguage(language)
   }, [])
 
   return (

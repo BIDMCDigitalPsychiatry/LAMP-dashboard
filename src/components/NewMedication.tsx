@@ -36,7 +36,7 @@ import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP from "lamp-core"
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import { useSnackbar } from "notistack"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 async function getAttachmentData(participantId, type: string) {
   return Object.fromEntries(
@@ -77,7 +77,7 @@ export default function NewMedication({ participant, ...props }) {
   const nameInput = useRef(null)
   const doseNameInput = useRef(null)
   const doseValueInput = useRef(null)
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -517,7 +517,9 @@ export default function NewMedication({ participant, ...props }) {
 
               <DialogContent className={classes.dialogueContent}>
                 <Typography variant="h4">{t("Leaving so soon?")}</Typography>
-                <Typography variant="body1">{t("If you leave without submitting, your entry will be lost.")}</Typography>
+                <Typography variant="body1">
+                  {t("If you leave without submitting, your entry will be lost.")}
+                </Typography>
               </DialogContent>
               <Grid>
                 <Box textAlign="center" width={1} mt={1} mb={3}>
@@ -608,7 +610,7 @@ export default function NewMedication({ participant, ...props }) {
     </div>
   )
 }
-  
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",

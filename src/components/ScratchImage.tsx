@@ -207,7 +207,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
       }
     }
   }, [canvas])
-  
+
   const touchStart = (event: any) => {
     isDrawing = true
     setVisibility(true)

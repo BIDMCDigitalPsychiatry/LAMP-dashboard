@@ -544,11 +544,18 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
-  const { t } = useTranslation()  
-  const activitiesObj = {"lamp.journal" : t("Journal"), "lamp.scratch_image" : t("Scratch card"), "lamp.breathe" : t("Breathe"),
-                        "lamp.tips" : t("Tip"), "lamp.dbt_diary_card" : t("DBT diary card"), 
-                        "lamp.cats_and_dogs" : t("Cats and Dogs"), "lamp.jewels_a" : t("Jewels A"), 
-                        "lamp.jewels_b" : t("Jewels B"),"lamp.spatial_span" : t("Spatial Span")}
+  const { t } = useTranslation()
+  const activitiesObj = {
+    "lamp.journal": t("Journal"),
+    "lamp.scratch_image": t("Scratch card"),
+    "lamp.breathe": t("Breathe"),
+    "lamp.tips": t("Tip"),
+    "lamp.dbt_diary_card": t("DBT diary card"),
+    "lamp.cats_and_dogs": t("Cats and Dogs"),
+    "lamp.jewels_a": t("Jewels A"),
+    "lamp.jewels_b": t("Jewels B"),
+    "lamp.spatial_span": t("Spatial Span"),
+  }
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
@@ -951,9 +958,12 @@ export default function ActivityList({ researcher, title, ...props }) {
                 await LAMP.Activity.updateActivity(raw)
                 */
         await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
-        enqueueSnackbar(t("Only survey description content was modified to prevent irrecoverable data loss. (error message)"), {
-          variant: "error",
-        })
+        enqueueSnackbar(
+          t("Only survey description content was modified to prevent irrecoverable data loss. (error message)"),
+          {
+            variant: "error",
+          }
+        )
       }
     } else if (x.spec === "lamp.tips") {
       if (x.id === undefined) {
@@ -1308,7 +1318,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                     setState((state) => ({ ...state, popoverAttachElement: null }))
                   }}
                 >
-                  {x.name ? activitiesObj[x.name] : x?.name?.replace("lamp.", "")}  
+                  {x.name ? activitiesObj[x.name] : x?.name?.replace("lamp.", "")}
                 </MenuItem>
               )),
             ]}

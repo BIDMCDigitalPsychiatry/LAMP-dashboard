@@ -246,7 +246,7 @@ export default function GameCreator({
     setEmotionDialog(true)
   }
 
-  const onAddTarget = ({ type, target, measure }) => {
+  const onAddTarget = ({ type, target, measure, customUnit }) => {
     setTargetDialog(false)
     if (target.trim() === "") {
       return
@@ -255,11 +255,11 @@ export default function GameCreator({
     if (type === "effective") {
       let targets = config?.targetEffective ?? []
 
-      targets.push({ target, measure })
+      targets.push({ target, measure, customUnit })
       setConfig({ ...config, targetEffective: targets })
     } else {
       let targets = config?.targetIneffective ?? []
-      targets.push({ target, measure })
+      targets.push({ target, measure, customUnit })
       setConfig({ ...config, targetIneffective: targets })
     }
   }
@@ -320,11 +320,6 @@ export default function GameCreator({
   return (
     <div className={classes.root}>
       <Container className={classes.containerWidth}>
-        {/* <div className={classes.headerContainer}> */}
-        {/* <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="left-arrow">
-          <ArrowBack />
-        </IconButton>
-        <Typography className={classes.headerTitle}>DBT Diary Card (U122346478)</Typography> */}
         <Button
           className={classes.headerButton}
           onClick={() => {

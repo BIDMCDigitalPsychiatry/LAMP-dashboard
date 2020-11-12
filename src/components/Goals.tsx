@@ -144,8 +144,7 @@ export default function Goals({ participant, ...props }) {
   const [dialogueType, setDialogueType] = React.useState("")
   const [classType, setClassType] = useState("")
   const [goalType, setGoalType] = useState("")
-	const { t } = useTranslation()
-
+  const { t } = useTranslation()
 
   const handleClickOpen = (type: string) => {
     setGoalType(type)
@@ -162,12 +161,12 @@ export default function Goals({ participant, ...props }) {
           <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">{t('Create goal')}</Typography>
+          <Typography variant="h5">{t("Create goal")}</Typography>
         </Toolbar>
       </AppBar>
       <Box className={classes.goalHeading}>
-        <Typography variant="h5">{t('What type of goal?')}</Typography>
-        <Typography variant="subtitle1">{t('Choose a category')}</Typography>
+        <Typography variant="h5">{t("What type of goal?")}</Typography>
+        <Typography variant="subtitle1">{t("Choose a category")}</Typography>
       </Box>
       <Container className={classes.thumbContainer}>
         <Grid container spacing={2}>
@@ -185,7 +184,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Exercise />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Exercise')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Exercise")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -203,7 +202,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Weight />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Weight')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Weight")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -231,7 +230,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Sleeping />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Sleep')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Sleep")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -249,9 +248,9 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <BreatheIcon />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Meditation')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Meditation")}</Typography>
               </Card>
-            </ButtonBase> 
+            </ButtonBase>
           </Grid>
           <Grid
             item
@@ -267,7 +266,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Reading />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Reading')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Reading")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -285,7 +284,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Savings />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Finances')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Finances")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -295,7 +294,7 @@ export default function Goals({ participant, ...props }) {
                 <Box mt={1}>
                   <Emotions />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Mood')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Mood")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -314,7 +313,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Medication />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Medication')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Medication")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
@@ -332,7 +331,7 @@ export default function Goals({ participant, ...props }) {
                 <Box>
                   <Custom />
                 </Box>
-                <Typography className={classes.cardlabel}>{t('Custom')}</Typography>
+                <Typography className={classes.cardlabel}>{t("Custom")}</Typography>
               </Card>
             </ButtonBase>
           </Grid>
