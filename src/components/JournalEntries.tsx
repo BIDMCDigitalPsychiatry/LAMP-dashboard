@@ -120,8 +120,9 @@ export default function JournalEntries({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
-  const [status, setStatus] = useState("Yes")
+  const [status, setStatus] = useState("good")
   const [loading, setLoading] = useState(false)
+  const [time, setTime] = useState(new Date().getTime())
   const { t } = useTranslation()
 
   const handleClickStatus = (statusVal: string) => {
@@ -132,11 +133,11 @@ export default function JournalEntries({ participant, activityId, ...props }) {
     setLoading(true)
     let data = {
       timestamp: new Date().getTime(),
-      duration: 0,
+      duration: new Date().getTime() - time,
       activity: activityId,
       static_data: {
-        journalText: journalValue,
-        feedback: status,
+        text: journalValue,
+        sentiment: status,
       },
       temporal_slices: {},
     }
@@ -193,15 +194,15 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                 <Grid className={classes.btnNav}>
                   <Box textAlign="center">
                     <IconButton
-                      onClick={() => handleClickStatus("Good")}
-                      className={status === "Good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("good")}
+                      className={status === "good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsUp />
                       <label>{t("Good")}</label>
                     </IconButton>
                     <IconButton
-                      onClick={() => handleClickStatus("Bad")}
-                      className={status === "Bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
+                      onClick={() => handleClickStatus("bad")}
+                      className={status === "bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsDown />
                       <label>{t("Bad")}</label>
