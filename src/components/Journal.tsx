@@ -170,16 +170,16 @@ export default function Journals({ participant, selectedEvents, ...props }) {
         if(allJournals[each].length > 0 && text.length === 0) {
           allJournals[each].map((journal, index) => {
             setOpen({...open, [index] : false})    
-            let jText = journal.static_data.journalText.substring(0, 80).length ===
-              journal.static_data.journalText.length
-              ? journal.static_data.journalText
-              : journal.static_data.journalText
+            let jText = journal.static_data.text.substring(0, 80).length ===
+              journal.static_data.text.length
+              ? journal.static_data.text
+              : journal.static_data.text
                   .substring(0, 80)
                   .substr(
                     0,
                     Math.min(
-                      journal.static_data.journalText.substring(0, 80).length,
-                      journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+                      journal.static_data.text.substring(0, 80).length,
+                      journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                     )
                   ) + "..."
             setText({...text, [index]: jText})
@@ -191,17 +191,17 @@ export default function Journals({ participant, selectedEvents, ...props }) {
 
   useEffect(() => {
     if(journal !== null) {
-      let jText = !!open[index] ? journal.static_data.journalText : 
-      (journal.static_data.journalText.substring(0, 80).length ===
-      journal.static_data.journalText.length
-      ? journal.static_data.journalText
-      : journal.static_data.journalText
+      let jText = !!open[index] ? journal.static_data.text : 
+      (journal.static_data.text.substring(0, 80).length ===
+      journal.static_data.text.length
+      ? journal.static_data.text
+      : journal.static_data.text
           .substring(0, 80)
           .substr(
             0,
             Math.min(
-              journal.static_data.journalText.substring(0, 80).length,
-              journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+              journal.static_data.text.substring(0, 80).length,
+              journal.static_data.text.substring(0, 80).lastIndexOf(" ")
             )
           ) + "...")
       setText({...text, [index]: jText})
@@ -248,16 +248,16 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                           </Typography>
                           <Typography variant="body2" component="p">
                             {text[index] ?? 
-                             (journal.static_data.journalText.substring(0, 80).length ===
-                                journal.static_data.journalText.length
-                                ? journal.static_data.journalText
-                                : journal.static_data.journalText
+                             (journal.static_data.text.substring(0, 80).length ===
+                                journal.static_data.text.length
+                                ? journal.static_data.text
+                                : journal.static_data.text
                                     .substring(0, 80)
                                     .substr(
                                       0,
                                       Math.min(
-                                        journal.static_data.journalText.substring(0, 80).length,
-                                        journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+                                        journal.static_data.text.substring(0, 80).length,
+                                        journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                                       )
                                     ) + "...")}                            
                           </Typography>
@@ -289,16 +289,16 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                {text[index] ?? (journal.static_data.journalText.substring(0, 80).length ===
-                                    journal.static_data.journalText.length
-                                    ? journal.static_data.journalText
-                                    : journal.static_data.journalText
+                                {text[index] ?? (journal.static_data.text.substring(0, 80).length ===
+                                    journal.static_data.text.length
+                                    ? journal.static_data.text
+                                    : journal.static_data.text
                                         .substring(0, 80)
                                         .substr(
                                           0,
                                           Math.min(
-                                            journal.static_data.journalText.substring(0, 80).length,
-                                            journal.static_data.journalText.substring(0, 80).lastIndexOf(" ")
+                                            journal.static_data.text.substring(0, 80).length,
+                                            journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                                           )
                                         ) + "...")}    
                                 </Typography>
