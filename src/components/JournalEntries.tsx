@@ -198,14 +198,14 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                       className={status === "good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsUp />
-                      <label>{t("good")}</label>
+                      <label>{t("Good")}</label>
                     </IconButton>
                     <IconButton
                       onClick={() => handleClickStatus("bad")}
                       className={status === "bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
                       <ThumbsDown />
-                      <label>{t("bad")}</label>
+                      <label>{t("Bad")}</label>
                     </IconButton>
                   </Box>
                 </Grid>
