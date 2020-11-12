@@ -19,7 +19,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
@@ -139,7 +139,7 @@ export default function Messages({
   const [currentMessage, setCurrentMessage] = useState<string>()
   const [addMsg, setAddMsg] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-	const { t } = useTranslation();
+  const { t } = useTranslation()
 
   useInterval(
     () => {
@@ -148,7 +148,6 @@ export default function Messages({
     !!refresh ? 10 * 1000 /* 10s */ : null,
     true
   )
-  
   const duration = (date: Date) => {
     var delta = Math.abs(date.getTime() - new Date().getTime()) / 1000
 
@@ -167,7 +166,6 @@ export default function Messages({
     var seconds = Math.floor(delta % 60)
     return seconds + (seconds > 1 ? "sec" : "secs")
   }
-  
   const refreshMessages = async () => {
     console.log("Fetching messages...")
     setConversations(
@@ -272,7 +270,7 @@ export default function Messages({
       </Box>
     )
   }
-  
+
   if (msgOpen) {
     return (
       <Container>

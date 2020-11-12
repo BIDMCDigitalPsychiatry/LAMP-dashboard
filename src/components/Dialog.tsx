@@ -150,12 +150,14 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
   const classes = useStyles()
   const [measure, setMeasure] = React.useState("Times")
   const [target, setTarget] = React.useState("")
+  const [customUnit, setCustomUnit] = React.useState(null)
   const { t } = useTranslation()
 
   const handleClose = () => {
-    onClose({ type: dialogOpen, target, measure })
+    onClose({ type: dialogOpen, target, measure, customUnit })
     setTarget("")
     setMeasure("Times")
+    setCustomUnit(null)
   }
 
   return (
@@ -228,6 +230,19 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
             />
           </Box>
         </Box>
+
+        {measure === "Custom" && (
+          <div className={classes.inputContainer}>
+            <div className={classes.contentContainer}>
+              <CssTextField
+                value={customUnit}
+                onChange={(event) => setCustomUnit(event.target.value)}
+                inputProps={{ disableunderline: "true" }}
+                placeholder={t("Custom unit")}
+              />
+            </div>
+          </div>
+        )}
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} className={classes.headerButton}>
             <Typography className={classes.buttonText}>{t("Add")}</Typography>

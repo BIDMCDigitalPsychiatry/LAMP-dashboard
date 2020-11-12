@@ -84,83 +84,109 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
   const CheckedIcon = checkbox ? "check_box" : "radio_button_checked"
   const UncheckedIcon = checkbox ? "check_box_outline_blank" : "radio_button_unchecked"
   const { t } = useTranslation()
-
   return (
     <React.Fragment>
       <TypeGroup name="option">
-        {options.map((x, idx) => (
-          <FormControlLabel
-            key={`${x.value}-${idx}`}
-            value={x.value}
-            style={{ width: "100%", alignItems: "flex-start" }}
-            control={
-              <TypeComponent
-                disabled
-                color="secondary"
-                icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
-                checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
-              />
+        {type === "rating" ? (
+          <TextField
+            error={
+              options[0]?.max_rating < 0 ||
+              options[0]?.max_rating > 10 ||
+              options[0]?.max_rating === 0 ||
+              options[0]?.max_rating === ""
+                ? true
+                : false
             }
-            label={
-              <React.Fragment>
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  defaultValue={x.value || (type === "slider" ? 0 : "")}
-                  label={t("Question Option")}
-                  onBlur={(event) =>
-                    setOptions((options) =>
-                      Object.assign([...options], {
-                        [idx]: {
-                          value: event.target.value,
-                          description: options[idx].description,
-                        },
-                      })
-                    )
-                  }
-                  type={type === "slider" ? "number" : "text"}
-                  InputProps={{
-                    endAdornment: [
-                      <InputAdornment position="end" key="adornment">
-                        <Tooltip title={t("Delete this option from the question's list of options.")}>
-                          <IconButton
-                            edge="end"
-                            aria-label="delete"
-                            onClick={() =>
-                              setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
-                            }
-                            onMouseDown={(event) => event.preventDefault()}
-                          >
-                            <Icon>delete_forever</Icon>
-                          </IconButton>
-                        </Tooltip>
-                      </InputAdornment>,
-                    ],
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  margin="dense"
-                  variant="filled"
-                  style={{ marginBottom: 16 }}
-                  defaultValue={x.description || ""}
-                  label={t("Option Description")}
-                  onBlur={(event) =>
-                    setOptions((options) =>
-                      Object.assign([...options], {
-                        [idx]: {
-                          value: options[idx].value,
-                          description: event.target.value,
-                        },
-                      })
-                    )
-                  }
-                />
-              </React.Fragment>
-            }
-            labelPlacement="end"
+            type="number"
+            variant="filled"
+            id="max_rating"
+            label="Max rating"
+            defaultValue={options[0]?.max_rating ?? 5}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              max: 300,
+              min: 30,
+            }}
+            onChange={(e) => setOptions({ ...options, [0]: { max_rating: Number(e.target.value) } })}
+            helperText={options[0]?.max_rating > 10 ? "Maximum value is 10" : ""}
           />
-        ))}
+        ) : (
+          options.map((x, idx) => (
+            <FormControlLabel
+              key={`${x.value}-${idx}`}
+              value={x.value}
+              style={{ width: "100%", alignItems: "flex-start" }}
+              control={
+                <TypeComponent
+                  disabled
+                  color="secondary"
+                  icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                  checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
+                />
+              }
+              label={
+                <React.Fragment>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    defaultValue={x.value || (type === "slider" ? 0 : "")}
+                    label={t("Question Option")}
+                    onBlur={(event) =>
+                      setOptions((options) =>
+                        Object.assign([...options], {
+                          [idx]: {
+                            value: event.target.value,
+                            description: options[idx].description,
+                          },
+                        })
+                      )
+                    }
+                    type={type === "slider" ? "number" : "text"}
+                    InputProps={{
+                      endAdornment: [
+                        <InputAdornment position="end" key="adornment">
+                          <Tooltip title={t("Delete this option from the question's list of options.")}>
+                            <IconButton
+                              edge="end"
+                              aria-label="delete"
+                              onClick={() =>
+                                setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
+                              }
+                              onMouseDown={(event) => event.preventDefault()}
+                            >
+                              <Icon>delete_forever</Icon>
+                            </IconButton>
+                          </Tooltip>
+                        </InputAdornment>,
+                      ],
+                    }}
+                  />
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    variant="filled"
+                    style={{ marginBottom: 16 }}
+                    defaultValue={x.description || ""}
+                    label={t("Option Description")}
+                    onBlur={(event) =>
+                      setOptions((options) =>
+                        Object.assign([...options], {
+                          [idx]: {
+                            value: options[idx].value,
+                            description: event.target.value,
+                          },
+                        })
+                      )
+                    }
+                  />
+                </React.Fragment>
+              }
+              labelPlacement="end"
+            />
+          ))
+        )}
         <FormControlLabel
           control={
             <TypeComponent
@@ -184,13 +210,18 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
   const { t } = useTranslation()
-
   useEffect(() => {
+    console.log({
+      text,
+      type,
+      description,
+      options: ["list", "select", "multiselect", "slider", "rating"].includes(type) ? options : null,
+    })
     onChange({
       text,
       type,
       description,
-      options: ["list", "select", "multiselect", "slider"].includes(type) ? options : null,
+      options: ["list", "select", "multiselect", "slider", "rating"].includes(type) ? options : null,
     })
   }, [text, description, type, options])
 
@@ -257,9 +288,15 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Button color={type === "slider" ? "primary" : "default"} onClick={() => setType("slider")}>
                 {t("Slider")}
               </Button>
+              <Button color={type === "short" ? "primary" : "default"} onClick={() => setType("short")}>
+                Short Answer
+              </Button>
+              <Button color={type === "rating" ? "primary" : "default"} onClick={() => setType("rating")}>
+                Rating
+              </Button>
             </ButtonGroup>
           </Grid>
-          {["list", "select", "multiselect", "slider"].includes(type) && (
+          {["list", "select", "multiselect", "slider", "rating"].includes(type) && (
             <Grid item>
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <SelectList checkbox={type === "multiselect"} type={type} value={options} onChange={setOptions} />
@@ -291,7 +328,6 @@ export default function SurveyCreator({
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
   const { t } = useTranslation()
-
   return (
     <div>
       <MuiThemeProvider theme={theme}>

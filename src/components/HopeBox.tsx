@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-
 const tileData = [
   {
     img: "https://www.success.com/wp-content/uploads/legacy/sites/default/files/new2.jpg",
@@ -108,7 +107,7 @@ const tileData = [
   },
 ]
 export default function HopeBox({ ...props }) {
-  const classes = useStyles()  
+  const classes = useStyles()
   const { t } = useTranslation()
 
   return (
@@ -131,4 +130,4 @@ export default function HopeBox({ ...props }) {
       </GridList>
     </div>
   )
-} 
+}

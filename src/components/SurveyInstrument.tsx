@@ -32,6 +32,7 @@ import {
   FormGroup,
   Backdrop,
   CircularProgress,
+  InputBase,
 } from "@material-ui/core"
 import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
@@ -77,6 +78,31 @@ const useStyles = makeStyles((theme) => ({
   button: {
     marginTop: theme.spacing(1),
     marginRight: theme.spacing(1),
+  },
+  uncheckContainer: {
+    width: 24,
+    height: 24,
+    border: "3px solid #C6C6C6",
+    borderRadius: 12,
+    display: "flex",
+    boxSizing: "border-box",
+    marginRight: 12,
+  },
+  checkedContainer: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
+    backgroundColor: "#2F9D7E",
+    borderRadius: 14,
+    marginRight: 12,
+  },
+  checkText: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
+    textAlign: "center",
   },
   sliderActionsContainer: {
     textAlign: "center",
@@ -333,6 +359,16 @@ function _useTernaryBool() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
 
+function RateAnswer({ checked, onChange, value }) {
+  const classes = useStyles()
+
+  return (
+    <div onClick={() => onChange(value)} className={checked ? classes.checkedContainer : classes.uncheckContainer}>
+      {checked && <Typography className={classes.checkText}>{value}</Typography>}
+    </div>
+  )
+}
+
 function RadioOption({ onChange, options, value, ...props }) {
   const [selectedValue, setSelectedValue] = useState(value)
   const classes = useStyles()
@@ -560,7 +596,7 @@ function TextSection({ onChange, charLimit, value, ...props }) {
             setText(e.target.value)
             onChange(e.target.value)
           }}
-          defaultValue={value}
+          defaultValue={text}
           helperText={text ? `${text.length}/${charLimit} max characters` : `${charLimit} max characters`}
           inputProps={{
             maxLength: charLimit,
@@ -568,6 +604,67 @@ function TextSection({ onChange, charLimit, value, ...props }) {
           classes={{ root: classes.textArea }}
         />
       </FormControl>
+    </Box>
+  )
+}
+const CssTextField = withStyles({
+  root: {
+    "label + &": {},
+    marginRight: 3,
+  },
+  input: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "rgba(0, 0, 0, 0.75)",
+    width: 44,
+    borderBottom: "3px solid #92E7CA",
+    padding: 0,
+    borderRadius: 0,
+    textAlign: "center",
+  },
+})(InputBase)
+
+function ShortTextSection({ onChange, value, ...props }) {
+  const classes = useStyles()
+  const [text, setText] = useState(value)
+
+  return (
+    <Box className={classes.textfieldwrapper}>
+      <FormControl component="fieldset">
+        <CssTextField
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value)
+            onChange(e.target.value)
+          }}
+        />
+        {/* <TextField
+          id="standard-multiline-flexible"
+          variant="outlined"
+          onChange={(e) => {
+            setText(e.target.value)
+            onChange(e.target.value)
+          }}
+          defaultValue={text}
+          inputProps={{
+            maxLength: 100,
+          }}
+        /> */}
+      </FormControl>
+    </Box>
+  )
+}
+
+function RadioRating({ onChange, options, value, ...props }) {
+  let ratingArray = [...Array(options[0]?.max_rating ? options[0]?.max_rating + 1 : 6).keys()]
+
+  return (
+    <Box textAlign="center" mt={5}>
+      <Grid direction="row" container justify="center" alignItems="center">
+        {ratingArray.map((ratingVal) => (
+          <RateAnswer checked={value === ratingVal} onChange={() => onChange(ratingVal)} value={ratingVal} />
+        ))}
+      </Grid>
     </Box>
   )
 }
@@ -729,6 +826,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
     </FormGroup>
   )
 }
+
 function Question({ onResponse, number, text, desc, type, options, value, startTime, ...props }) {
   const { t } = useTranslation()
 
@@ -756,59 +854,13 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
     { label: t("Several Times"), value: 1 },
     { label: t("Not at all"), value: 0 },
   ]
-  // const _ratingOpts =  [
-  //   {
-  //     value: 0,
-  //     label: "Terrible",
-  //   },
-
-  //   {
-  //     value: 10,
-  //     label: "Very Poor",
-  //   },
-  //   {
-  //     value: 20,
-  //     label: "Very Poor",
-  //   },
-  //   {
-  //     value: 30,
-  //     label: "Poor",
-  //   },
-  //   {
-  //     value: 40,
-  //     label: "Poor",
-  //   },
-
-  //   {
-  //     value: 50,
-  //     label: "Neutral",
-  //   },
-  //   {
-  //     value: 60,
-  //     label: "Satisfactory",
-  //   },
-  //   {
-  //     value: 70,
-  //     label: "Good",
-  //   },
-
-  //   {
-  //     value: 80,
-  //     label: "Pretty Good",
-  //   },
-  //   {
-  //     value: 90,
-  //     label: "Great",
-  //   },
-  //   {
-  //     value: 100,
-  //     label: "Exellent",
-  //   },
-  // ]
   switch (type) {
     case "slider":
       options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
+      break
+    case "rating":
+      component = <RadioRating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "likert":
     case "boolean":
@@ -816,6 +868,9 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
     case "list":
       const selectOptions = type === "boolean" ? _binaryOpts : type === "likert" ? _likertOpts : options
       component = <RadioOption options={selectOptions} onChange={onChange} value={!!value ? value.value : undefined} />
+      break
+    case "short":
+      component = <ShortTextSection onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "text":
       component = (
@@ -1135,7 +1190,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
-
+  console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {

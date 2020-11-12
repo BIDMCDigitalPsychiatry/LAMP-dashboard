@@ -435,6 +435,9 @@
 	"No Researchers. Add Researchers by clicking the [+] button above.": "No Researchers. Add Researchers by clicking the [+] button above.",
 	"Are you sure you want to delete this Researcher?": "Are you sure you want to delete this Researcher?",
 	"Well done!": "Well done!",
+	"Swipe around the": "Swipe around the",
+	"screen to reveal": "screen to reveal",
+	"the hidden image": "the hidden image",
 	"am": "am",
 	"pm": "pm",
 	"Your response:": "Your response:",
@@ -488,11 +491,7 @@
 	"You're using the src server to log into mindLAMP.": "You're using the {{src}} server to log into mindLAMP.",
 	"GPS": "GPS",
 	"Accelerometer": "Accelerometer",
-	"Never": "Never",
-	"Swipe around the": "Swipe around the",
-	"Screen to reveal": "screen to reveal",
-	"The hidden image": "the hidden image",
-
+	"Never": "Never",	
 	"Jewels A": "Jewels A",
 	"Jewels B": "Jewels B",
 	"Duplicate this activity and save it with a new title.": "Duplicate this activity and save it with a new title."

@@ -275,7 +275,7 @@ export default function Learn({
                     <Box mt={2} mb={1}>
                       {activitiesArray[key].icon ? <img src={activitiesArray[key].icon} /> : ""}
                     </Box>
-                    <Typography className={classes.cardlabel}>{t(key)}</Typography> 
+                    <Typography className={classes.cardlabel}>{t(key)}</Typography>
                   </Card>
                 </ButtonBase>
               </Grid>
@@ -305,7 +305,7 @@ export default function Learn({
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {t("Quick Tips to Improve Your")} {t(tip)}
+          {t("Quick Tips to Improve Your")} {tip}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>

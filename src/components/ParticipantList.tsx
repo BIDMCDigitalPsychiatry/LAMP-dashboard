@@ -692,13 +692,6 @@ export default function ParticipantList({
         : classes.dataGrey,
   })
 
-  const dateInfo_1 = (id) => ({
-    relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
-    absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
-    device: (logins[id] || { data: {} }).data.device_type || t("an unknown device"),
-    userAgent: (logins[id] || { data: {} }).data.user_agent || t("unknown device model"),
-  })
-
   const dateInfo = (id) => ({
     //relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
     relative: (logins[id] || {}).timestamp,

@@ -167,7 +167,7 @@ export default function TipCreator({
   const [addRow, setAddRow] = useState(false)
   const [focusedTextfield, setFocusedTextfield] = useState(null)
   const defaultSettingsArray = [{ title: "", text: "", image: "" }]
-	const { t } = useTranslation()
+  const { t } = useTranslation()
   const defaultSelectedCategory = {
     id: undefined,
     name: "",
@@ -336,7 +336,7 @@ export default function TipCreator({
         variant: "error",
       })
     }
-  } 
+  }
 
   const handleSaveTips = (duplicate = false) => {
     let duplicates = []
@@ -537,7 +537,9 @@ export default function TipCreator({
                       defaultValue={newTipText}
                       onChange={(event) => setNewTipText(event.target.value)}
                       helperText={
-                        category == "add_new" && (newTipText === null || newTipText === "") ? t("Please add new tip") : ""
+                        category == "add_new" && (newTipText === null || newTipText === "")
+                          ? t("Please add new tip")
+                          : ""
                       }
                     />
                   ) : (

@@ -53,7 +53,7 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   const [emailAddress, setEmailAddress] = useState("")
   const [password, setPassword] = useState("")
   const [showLink, setShowLink] = useState(false)
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     setPhoto(auxData.photo)
@@ -127,7 +127,9 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
           label={t("Role")}
           type="text"
           variant="outlined"
-          helperText={t("Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved.")}
+          helperText={t(
+            "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+          )}
           value={role}
           onChange={(event) => setRole(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -178,14 +180,18 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
           label={t("Password")}
           type="password"
           variant="outlined"
-          helperText={t("Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password.")}
+          helperText={t(
+            "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+          )}
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           InputProps={{
             endAdornment: [
               ["create-new"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="a">
-                  <Tooltip title={t("Copy one-time access link that can be used to log in without entering credentials.")}>
+                  <Tooltip
+                    title={t("Copy one-time access link that can be used to log in without entering credentials.")}
+                  >
                     <IconButton
                       edge="end"
                       aria-label="copy link"
@@ -259,7 +265,7 @@ export const CredentialManager: React.FunctionComponent<{
   const [allRoles, setAllRoles] = useState({})
   const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     LAMP.Type.parent(id)
@@ -312,7 +318,9 @@ export const CredentialManager: React.FunctionComponent<{
         })
       }
     } catch (err) {
-      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), { variant: "error" })
+      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
+        variant: "error",
+      })
     }
     LAMP.Credential.list(id).then(setAllCreds)
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>

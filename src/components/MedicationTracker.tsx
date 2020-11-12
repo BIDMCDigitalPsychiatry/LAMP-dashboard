@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core"
 import { DatePicker } from "@material-ui/pickers"
 import { useSnackbar } from "notistack"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 interface MedicationItem {
   title: string
@@ -30,7 +30,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
   const [open, setOpen] = React.useState(false)
   const [open2, setOpen2] = React.useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   useEffect(() => {
     enqueueSnackbar(t("This is a demo only. Entries will not be saved."), {
@@ -119,7 +119,7 @@ export default function MedicationTracker({ onComplete, ...props }) {
             </Button>
           </DialogActions>
         </DialogContent>
-      </Dialog> 
+      </Dialog>
       <Button style={{ margin: 8 }} variant="contained" startIcon={<Icon>add</Icon>} onClick={openDialog}>
         {t("Add Medication")}
       </Button>
@@ -135,18 +135,22 @@ export default function MedicationTracker({ onComplete, ...props }) {
           <div></div>
           <DatePicker label={t("Start Date")} value={selectedDate} onChange={handleDateChange} animateYearScrolling />
           <div></div>
-          <DatePicker label={t("End Date")} value={selectedDateEnd} onChange={handleDateChangeEnd} animateYearScrolling />
+          <DatePicker
+            label={t("End Date")}
+            value={selectedDateEnd}
+            onChange={handleDateChangeEnd}
+            animateYearScrolling
+          />
           <DialogActions>
             <Button onClick={closeDialog} startIcon={<Icon>delete</Icon>}>
               {t("Cancel")}
             </Button>
             <Button onClick={closeDialog} startIcon={<Icon>save</Icon>}>
-              {t("Save")} 
+              {t("Save")}
             </Button>
           </DialogActions>
         </Container>
       </Dialog>
     </Container>
   )
-} 
-  
+}

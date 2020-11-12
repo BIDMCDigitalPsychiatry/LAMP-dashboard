@@ -5,7 +5,7 @@ import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "la
 import Sparkline from "./Sparkline"
 import RadialDonutChart from "./RadialDonutChart"
 import ActivityCard from "./ActivityCard"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -58,16 +58,16 @@ export default function PreventData({
   onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
-	const { t } = useTranslation()
-	
+  const { t } = useTranslation()
+
   return (
     <Grid container direction="row" justify="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {graphType == 0 ? t(activity.name) : t(activity) }: <Box component="span">{/*fluctuating*/}</Box>
+            {graphType == 0 ? t(activity.name) : t(activity)}: <Box component="span">{/*fluctuating*/}</Box>
           </Typography>
-            <Typography variant="h5">{t("Summary")}</Typography>
+          <Typography variant="h5">{t("Summary")}</Typography>
           <Typography variant="body2">
             {/*You have a good distribution of locations, which means you’re getting out of the house and doing things.
             Studies show a change of scenery helps keep the mid engaged and positive.*/}

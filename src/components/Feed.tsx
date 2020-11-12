@@ -359,7 +359,7 @@ export default function Feed({
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
 
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-	const { t } = useTranslation()
+  const { t } = useTranslation()
 
   const completeFeed = (index: number) => {
     let feed = currentFeed

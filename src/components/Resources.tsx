@@ -11,7 +11,7 @@ import {
   CardContent,
   Grid,
 } from "@material-ui/core"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,8 +34,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Resources({ ...props }) {
   const classes = useStyles()
-	const { t } = useTranslation()
-	
+  const { t } = useTranslation()
+
   return (
     <Grid container direction="row">
       <Box p={4} my={4} width="100%">
@@ -56,7 +56,7 @@ export default function Resources({ ...props }) {
                   }
                 </Typography>
                 <Link href="https://www.mass.gov/orgs/massachusetts-department-of-mental-health">
-                {t("Department of Mental Health (DMH)")}
+                  {t("Department of Mental Health (DMH)")}
                 </Link>
               </CardContent>
             </CardActionArea>

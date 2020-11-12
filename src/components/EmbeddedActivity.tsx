@@ -34,7 +34,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [saved, setSaved] = useState(false)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
-	const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation()
 
   useEffect(() => {
     activateEmbeddedActivity(activity)
@@ -85,7 +85,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setActivityId(activity.id)
     //activity.settings.language = i18n.language
     setSettings(activity.settings)
-    setSaved(false)   
+    setSaved(false)
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]

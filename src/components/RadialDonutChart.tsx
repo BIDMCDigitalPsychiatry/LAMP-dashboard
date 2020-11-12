@@ -3,7 +3,7 @@ import { scaleOrdinal } from "@vx/scale"
 import { RadialChart, ArcLabel, ArcSeries } from "@data-ui/radial-chart"
 import { Box, useMediaQuery, useTheme } from "@material-ui/core"
 import { LegendOrdinal } from "@vx/legend"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 function percentageCal(l, target) {
   var off =
@@ -18,7 +18,7 @@ function percentageCal(l, target) {
 
 export default function RadialDonutChart(props) {
   const { t } = useTranslation()
-  
+
   let data = props.data.sort((x, y) => (x.value > y.value ? -1 : 1))
   let total = data
     .map((val) => val.value)
@@ -63,7 +63,7 @@ export default function RadialDonutChart(props) {
               </div>
             )
           }}
-        >  
+        >
           <ArcSeries
             data={data}
             pieValue={(d) => d.value}

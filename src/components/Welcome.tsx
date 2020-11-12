@@ -1,17 +1,21 @@
 import React, { useState } from "react"
 import { Typography, Fab, Box, Slide, Container, Icon, Card, Grid } from "@material-ui/core"
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"
 
 export default function Welcome({ activities, onClose, ...props }) {
   const [checked, setChecked] = useState(0)
-	const { t } = useTranslation()
-	
+  const { t } = useTranslation()
+
   return (
     <Container maxWidth="md">
       <Slide direction="left" in={checked === 0} mountOnEnter unmountOnExit>
         <Box p={4} my={4} width="100%">
           <Typography variant="h1">{t("Welcome to mindLAMP!")} </Typography>
-          <Typography variant="h4">{t("With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own.")}</Typography>
+          <Typography variant="h4">
+            {t(
+              "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own."
+            )}
+          </Typography>
           <br />
           <Fab color="primary" onClick={() => setChecked(1)}>
             <Icon>arrow_forward</Icon>

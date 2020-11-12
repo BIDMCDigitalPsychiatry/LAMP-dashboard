@@ -1099,7 +1099,7 @@ export default function Prevent({
           {dialogueType === 0 ? (
             <MultipleSelect
               selected={selectedActivities}
-              items={(activities || []).map((x) => `${x.name}`)}  
+              items={(activities || []).map((x) => t(`${x.name}`))}
               showZeroBadges={false}
               badges={activityCounts}
               onChange={(x) => {

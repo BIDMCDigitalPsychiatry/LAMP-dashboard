@@ -73,7 +73,7 @@ export default function NewGoal({ participant, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const nameInput = useRef(null)
   const valueInput = useRef(null)
-	const { t } = useTranslation()
+  const { t } = useTranslation()
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {
@@ -278,7 +278,7 @@ export default function NewGoal({ participant, ...props }) {
           <IconButton onClick={() => setOpen(true)} color="default" aria-label="Menu">
             <Icon>arrow_back</Icon>
           </IconButton>
-          <Typography variant="h5">{t('New Goal')}</Typography>
+          <Typography variant="h5">{t("New Goal")}</Typography>
         </Toolbar>
       </AppBar>
       <Box px={2}>
@@ -292,7 +292,7 @@ export default function NewGoal({ participant, ...props }) {
                     inputProps={{
                       maxLength: 50,
                     }}
-                    placeholder={t('Goal Name')}
+                    placeholder={t("Goal Name")}
                     value={goalName}
                     onChange={(e) => setGoalName(e.target.value)}
                     inputRef={nameInput}
@@ -301,7 +301,7 @@ export default function NewGoal({ participant, ...props }) {
               </Grid>
             </Grid>
             <Box className={classes.textfieldwrapper}>
-              <Typography variant="h5">{t('Goal details')}</Typography>
+              <Typography variant="h5">{t("Goal details")}</Typography>
               <FormControl
                 component="fieldset"
                 classes={{
@@ -399,7 +399,7 @@ export default function NewGoal({ participant, ...props }) {
                   <Box width={1} mb={5}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                       <Grid item xs={6}>
-                          <Typography variant="body2">{t("Start date")}</Typography>
+                        <Typography variant="body2">{t("Start date")}</Typography>
                       </Grid>
                       <Grid item xs={6} className={classes.goalDetails}>
                         <Typography variant="body2" onClick={() => setStartDateOpen(true)} align="right">
@@ -497,7 +497,9 @@ export default function NewGoal({ participant, ...props }) {
 
               <DialogContent className={classes.dialogueContent}>
                 <Typography variant="h4">{t("Leaving so soon?")}</Typography>
-                <Typography variant="body1">{t("If you leave without submitting, your entry will be lost.")}</Typography>
+                <Typography variant="body1">
+                  {t("If you leave without submitting, your entry will be lost.")}
+                </Typography>
               </DialogContent>
               <Grid>
                 <Box textAlign="center" width={1} mt={1} mb={3}>
@@ -523,7 +525,7 @@ export default function NewGoal({ participant, ...props }) {
     </div>
   )
 }
-  
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",

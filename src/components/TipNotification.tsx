@@ -109,7 +109,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function TipNotification({ ...props }) {
   const classes = useStyles()
   const [status, setStatus] = useState("Yes")
-	const { t } = useTranslation();
+  const { t } = useTranslation()
 
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
@@ -141,7 +141,7 @@ export default function TipNotification({ ...props }) {
                 </Grid>
               </Grid>
             </Box>
-            <Box className={classes.howFeel}>{t('Was this helpful today?')}</Box>
+            <Box className={classes.howFeel}>{t("Was this helpful today?")}</Box>
             <Box textAlign="center">
               <IconButton
                 onClick={() => handleClickStatus("Yes")}
@@ -160,7 +160,7 @@ export default function TipNotification({ ...props }) {
             </Box>
             <Box textAlign="center">
               <Fab variant="extended" color="primary" className={classes.btnyellow} onClick={props.onComplete}>
-                {t('Mark complete')}  
+                {t("Mark complete")}
               </Fab>
             </Box>
           </CardContent>

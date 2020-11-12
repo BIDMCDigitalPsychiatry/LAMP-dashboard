@@ -36,7 +36,6 @@ import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
 
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -139,7 +138,7 @@ export default function NavigationLayout({
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
-	const { t } = useTranslation(); 
+  const { t } = useTranslation()
   //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
   const hideNotifications = ["Researcher"]
@@ -214,7 +213,7 @@ export default function NavigationLayout({
                   </Typography>
                 )}
               </Container>
-            )}  
+            )}
             {!sameLineTitle && (
               <Container className={classes.thumbContainer}>
                 <Typography
@@ -283,7 +282,7 @@ export default function NavigationLayout({
                       window.open("https://community.lamp.digital", "_blank")
                     }}
                   >
-                    <b style={{ color: colors.grey["600"] }}>{t("LAMP Community")}</b>  
+                    <b style={{ color: colors.grey["600"] }}>{t("LAMP Community")}</b>
                   </MenuItem>
                   <MenuItem
                     dense
@@ -306,7 +305,7 @@ export default function NavigationLayout({
           paddingBottom: 56,
           width: "100%",
           overflowY: "auto",
-          overflow: !!id ? "hidden" :"initial",
+          overflow: !!id ? "hidden" : "initial",
         }}
       >
         <ResponsiveMargin
@@ -386,4 +385,3 @@ export default function NavigationLayout({
     </Box>
   )
 }
-  

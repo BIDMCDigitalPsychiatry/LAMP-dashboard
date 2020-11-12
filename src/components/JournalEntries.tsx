@@ -118,7 +118,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function JournalEntries({ participant, activityId, ...props }) {
   const classes = useStyles()
-  const [journals, setJournals] = useState({})
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
   const [status, setStatus] = useState("Yes")
