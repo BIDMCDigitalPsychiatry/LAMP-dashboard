@@ -120,8 +120,9 @@ export default function JournalEntries({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = useState(false)
   const [journalValue, setJounalValue] = useState("")
-  const [status, setStatus] = useState("Yes")
+  const [status, setStatus] = useState("Good")
   const [loading, setLoading] = useState(false)
+  const [time, setTime] = useState(new Date().getTime())
   const { t } = useTranslation()
 
   const handleClickStatus = (statusVal: string) => {
@@ -132,11 +133,11 @@ export default function JournalEntries({ participant, activityId, ...props }) {
     setLoading(true)
     let data = {
       timestamp: new Date().getTime(),
-      duration: 0,
+      duration: new Date().getTime() - time,
       activity: activityId,
       static_data: {
-        journalText: journalValue,
-        feedback: status,
+        text: journalValue,
+        sentiment: status,
       },
       temporal_slices: {},
     }
