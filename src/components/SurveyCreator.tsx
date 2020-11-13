@@ -112,8 +112,9 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
             onChange={(e) => setOptions({ ...options, [0]: { max_rating: Number(e.target.value) } })}
             helperText={options[0]?.max_rating > 10 ? "Maximum value is 10" : ""}
           />
-        ) : (
-          options.map((x, idx) => (
+        ) : 
+          (<Box>
+            {options.map((x, idx) => (
             <FormControlLabel
               key={`${x.value}-${idx}`}
               value={x.value}
@@ -185,20 +186,21 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
               }
               labelPlacement="end"
             />
-          ))
-        )}
-        <FormControlLabel
-          control={
-            <TypeComponent
-              checked
-              color="primary"
-              onClick={() => setOptions((options) => [...options, ""])}
-              checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
-            />
-          }
-          label={<Typography>{t("Add Option")}</Typography>}
-          labelPlacement="end"
-        />
+          ))}
+          <FormControlLabel
+            control={
+              <TypeComponent
+                checked
+                color="primary"
+                onClick={() => setOptions((options) => [...options, ""])}
+                checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
+              />
+            }
+            label={<Typography>{t("Add Option")}</Typography>}
+            labelPlacement="end"
+          />
+          </Box>
+        )}        
       </TypeGroup>
     </React.Fragment>
   )
