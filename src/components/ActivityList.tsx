@@ -29,9 +29,6 @@ import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as AddIcon } from "../icons/plus.svg"
 import { ReactComponent as DeleteIcon } from "../icons/DeleteBlue.svg"
-import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
-import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
-import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 // External Imports
 import { saveAs } from "file-saver"
@@ -599,17 +596,16 @@ export default function ActivityList({ researcher, title, ...props }) {
     let index = 0
     studies.map((study) => {
       ;(async () => {
-        setLoading(true)
         await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
           counts[study.name] = resActivities.length
           if (selected !== null && selected.includes(study.name)) {
             resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
             activityData = activityData.concat(resActivities)
           }
-        })
-        setStudiesCount(counts)
-        setActivities(activityData)
-        if (index === studies.length - 1) {
+        })      
+        if (index === studies.length - 1) {        
+          setStudiesCount(counts)
+          setActivities(activityData)
           setLoading(false)
         }
         index++
