@@ -83,7 +83,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
-    //activity.settings.language = i18n.language
+    activity.settings.language = i18n.language
     setSettings(activity.settings)
     setSaved(false)
     let response = await fetch(
