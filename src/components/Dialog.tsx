@@ -1,13 +1,35 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { Box } from "@material-ui/core"
-import { makeStyles, withStyles, createStyles } from "@material-ui/core/styles"
+import { Box, TextField } from "@material-ui/core"
+import { makeStyles, withStyles, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import InputBase from "@material-ui/core/InputBase"
 import Dialog from "@material-ui/core/Dialog"
 import Typography from "@material-ui/core/Typography"
 import Button from "@material-ui/core/Button"
 import { useTranslation } from "react-i18next"
+import Autocomplete from "@material-ui/lab/Autocomplete"
 
+const theme = createMuiTheme({
+  overrides: {
+    MuiFilledInput: {
+      root: {
+        border: 0,
+        backgroundColor: "#f4f4f4",
+      },
+      underline: {
+        "&&&:before": {
+          borderBottom: "none",
+        },
+        "&&:after": {
+          borderBottom: "none",
+        },
+      },
+    },
+    MuiTextField: {
+      root: { width: "100%" },
+    },
+  },
+})
 const CssTextField = withStyles({
   root: {
     "label + &": {},
@@ -123,6 +145,7 @@ const useStyles = makeStyles((theme) =>
       opacity: 0.4,
     },
     popWidth: { width: "95%", maxWidth: "500px", padding: "0 40px" },
+    autoComplete: { width: "100%" },
   })
 )
 
@@ -159,7 +182,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
     setMeasure("Times")
     setCustomUnit(null)
   }
-
+  const options = ["Times", "Hours", "Minutes"]
   return (
     <Dialog
       classes={{ paper: classes.popWidth }}
@@ -181,70 +204,28 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
         </div>
         <Typography className={classes.measureTitle}>{t("Measure of action:")}</Typography>
         <Box display="flex" justifyContent="center" mt={2}>
-          <Box>
-            <RatioButton
-              value="Times"
-              unable={false}
-              smallSpace={true}
-              title={t("Times")}
-              color="#618EF7"
-              checked={measure == "Times"}
-              onChange={() => setMeasure("Times")}
-              labelPlacement="right"
-            />
-          </Box>
-          <Box>
-            <RatioButton
-              smallSpace={true}
-              title={t("Hours")}
-              color="#618EF7"
-              value="Hours"
-              unable={false}
-              checked={measure == "Hours"}
-              onChange={() => setMeasure("Hours")}
-              labelPlacement="right"
-            />
-          </Box>
-          <Box>
-            <RatioButton
-              smallSpace={true}
-              title={t("Yes")}
-              color="#618EF7"
-              value="Yes"
-              unable={false}
-              checked={measure == "Yes"}
-              onChange={() => setMeasure("Yes")}
-              labelPlacement="right"
-            />
-          </Box>
-          <Box>
-            <RatioButton
-              value="Custom"
-              unable={false}
-              smallSpace={true}
-              title="Custom"
-              color="#618EF7"
-              checked={measure == "Custom"}
-              onChange={() => setMeasure("Custom")}
-              labelPlacement="right"
-            />
-          </Box>
-        </Box>
-
-        {measure === "Custom" && (
-          <div className={classes.inputContainer}>
-            <div className={classes.contentContainer}>
-              <CssTextField
-                value={customUnit}
-                onChange={(event) => setCustomUnit(event.target.value)}
-                inputProps={{ disableunderline: "true" }}
-                placeholder={t("Custom unit")}
-              />
-            </div>
-          </div>
-        )}
+          <MuiThemeProvider theme={theme}>
+            <Autocomplete
+              className={classes.autoComplete}
+              options={options}
+              onChange={(event: any, newValue: string | null) => {
+                setMeasure(newValue)
+              }}
+              value={measure}
+              inputValue={measure}
+              onInputChange={(event, newInputValue) => {
+                setMeasure(newInputValue)
+              }}
+              renderInput={(params) => <TextField {...params} label="Measure" variant="filled" />}
+            />  
+          </MuiThemeProvider>       
+        </Box>        
         <Box textAlign="center" mt={2}>
-          <Button onClick={handleClose} className={classes.headerButton}>
+          <Button
+            onClick={handleClose}
+            disabled={measure === "" || target === "" ? true : false}
+            className={classes.headerButton}
+          >
             <Typography className={classes.buttonText}>{t("Add")}</Typography>
           </Button>
         </Box>
@@ -284,7 +265,7 @@ export function EmotionDialog({ ...props }) {
           </div>
         </div>
         <Box textAlign="center" mt={2}>
-          <Button onClick={handleClose} className={classes.headerButton}>
+          <Button onClick={handleClose} disabled={emotion === "" ? true : false} className={classes.headerButton}>
             <Typography className={classes.buttonText}>{t("Add")}</Typography>
           </Button>
         </Box>
