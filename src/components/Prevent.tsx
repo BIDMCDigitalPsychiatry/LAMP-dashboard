@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Container,
   Typography,
@@ -461,6 +461,23 @@ async function getSelectedSensors(participant: ParticipantObj) {
   )
 }
 
+async function getSelectedExperimental(participant: ParticipantObj) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [
+            x,
+            await LAMP.Type.getAttachment(x, "lamp.selectedExperimental").catch((e) => []),
+          ])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""] ?? []
+  )
+}
+
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
   return Object.assign(
     {},
@@ -620,7 +637,7 @@ export default function Prevent({
   const [disabledData, setDisabled] = React.useState(true)
   const [visualizations, setVisualizations] = React.useState({})
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
-
+  const [cortex, setCortex] = React.useState({})
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
@@ -650,14 +667,200 @@ export default function Prevent({
 
   React.useEffect(() => {
     ;(async () => {
+      await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.experimental.MY_CUSTOM_VIZ_NAME_HERE", {
+        $schema: "https://vega.github.io/schema/vega/v5.json",
+        description: "A radar chart example, showing multiple dimensions in a radial layout.",
+        width: 400,
+        height: 400,
+        padding: 40,
+        autosize: { type: "none", contains: "padding" },
+
+        signals: [{ name: "radius", update: "width / 2" }],
+
+        data: [
+          {
+            name: "table",
+            values: [
+              { key: "key-0", value: 19, category: 0 },
+              { key: "key-1", value: 22, category: 0 },
+              { key: "key-2", value: 14, category: 0 },
+              { key: "key-3", value: 38, category: 0 },
+              { key: "key-4", value: 23, category: 0 },
+              { key: "key-5", value: 5, category: 0 },
+              { key: "key-6", value: 27, category: 0 },
+              { key: "key-0", value: 13, category: 1 },
+              { key: "key-1", value: 12, category: 1 },
+              { key: "key-2", value: 42, category: 1 },
+              { key: "key-3", value: 13, category: 1 },
+              { key: "key-4", value: 6, category: 1 },
+              { key: "key-5", value: 15, category: 1 },
+              { key: "key-6", value: 8, category: 1 },
+            ],
+          },
+          {
+            name: "keys",
+            source: "table",
+            transform: [
+              {
+                type: "aggregate",
+                groupby: ["key"],
+              },
+            ],
+          },
+        ],
+
+        scales: [
+          {
+            name: "angular",
+            type: "point",
+            range: { signal: "[-PI, PI]" },
+            padding: 0.5,
+            domain: { data: "table", field: "key" },
+          },
+          {
+            name: "radial",
+            type: "linear",
+            range: { signal: "[0, radius]" },
+            zero: true,
+            nice: false,
+            domain: { data: "table", field: "value" },
+            domainMin: 0,
+          },
+          {
+            name: "color",
+            type: "ordinal",
+            domain: { data: "table", field: "category" },
+            range: { scheme: "category10" },
+          },
+        ],
+
+        encode: {
+          enter: {
+            x: { signal: "radius" },
+            y: { signal: "radius" },
+          },
+        },
+
+        marks: [
+          {
+            type: "group",
+            name: "categories",
+            zindex: 1,
+            from: {
+              facet: { data: "table", name: "facet", groupby: ["category"] },
+            },
+            marks: [
+              {
+                type: "line",
+                name: "category-line",
+                from: { data: "facet" },
+                encode: {
+                  enter: {
+                    interpolate: { value: "linear-closed" },
+                    x: { signal: "scale('radial', datum.value) * cos(scale('angular', datum.key))" },
+                    y: { signal: "scale('radial', datum.value) * sin(scale('angular', datum.key))" },
+                    stroke: { scale: "color", field: "category" },
+                    strokeWidth: { value: 1 },
+                    fill: { scale: "color", field: "category" },
+                    fillOpacity: { value: 0.1 },
+                  },
+                },
+              },
+              {
+                type: "text",
+                name: "value-text",
+                from: { data: "category-line" },
+                encode: {
+                  enter: {
+                    x: { signal: "datum.x" },
+                    y: { signal: "datum.y" },
+                    text: { signal: "datum.datum.value" },
+                    align: { value: "center" },
+                    baseline: { value: "middle" },
+                    fill: { value: "black" },
+                  },
+                },
+              },
+            ],
+          },
+          {
+            type: "rule",
+            name: "radial-grid",
+            from: { data: "keys" },
+            zindex: 0,
+            encode: {
+              enter: {
+                x: { value: 0 },
+                y: { value: 0 },
+                x2: { signal: "radius * cos(scale('angular', datum.key))" },
+                y2: { signal: "radius * sin(scale('angular', datum.key))" },
+                stroke: { value: "lightgray" },
+                strokeWidth: { value: 1 },
+              },
+            },
+          },
+          {
+            type: "text",
+            name: "key-label",
+            from: { data: "keys" },
+            zindex: 1,
+            encode: {
+              enter: {
+                x: { signal: "(radius + 5) * cos(scale('angular', datum.key))" },
+                y: { signal: "(radius + 5) * sin(scale('angular', datum.key))" },
+                text: { field: "key" },
+                align: [
+                  {
+                    test: "abs(scale('angular', datum.key)) > PI / 2",
+                    value: "right",
+                  },
+                  {
+                    value: "left",
+                  },
+                ],
+                baseline: [
+                  {
+                    test: "scale('angular', datum.key) > 0",
+                    value: "top",
+                  },
+                  {
+                    test: "scale('angular', datum.key) == 0",
+                    value: "middle",
+                  },
+                  {
+                    value: "bottom",
+                  },
+                ],
+                fill: { value: "black" },
+                fontWeight: { value: "bold" },
+              },
+            },
+          },
+          {
+            type: "line",
+            name: "outer-line",
+            from: { data: "radial-grid" },
+            encode: {
+              enter: {
+                interpolate: { value: "linear-closed" },
+                x: { field: "x2" },
+                y: { field: "y2" },
+                stroke: { value: "lightgray" },
+                strokeWidth: { value: 1 },
+              },
+            },
+          },
+        ],
+      })
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
-      getVisualizations(participant).then(setVisualizations)
-
+      //  getVisualizations(participant).then(setVisualizations)
+      let visualizations = await getVisualizations(participant)
       let selActivities = await getSelectedActivities(participant)
       setSelectedActivities(selActivities)
       let selSensors = await getSelectedSensors(participant)
+      let selExperimental = await getSelectedExperimental(participant)
       let activities = await getActivities(participant)
       // let goals = await getGoals(participant)
       // let groupByType
@@ -686,12 +889,22 @@ export default function Prevent({
       setActivityCounts(activityEventCount)
       activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
       setActivities(activities)
+      setVisualizations(visualizations)
       if (!disabled) {
         let sensorEvents = await getSensorEvents(participant)
         let sensorEventCount = getSensorEventCount(sensorEvents)
         setSelectedSensors(selSensors)
+        setSelectedExperimental(selExperimental)
+        setCortex(
+          [`Environmental Context`, `Step Count`, `Social Context`]
+            .filter((sensor) => sensorEventCount[sensor] > 0)
+            .concat(Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+        )
         setSensorEvents(sensorEvents)
-        setSensorCounts(sensorEventCount)
+        let visualizationCount = Object.keys(visualizations)
+          .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+          .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+        setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
       }
       setLoading(false)
     })()
@@ -903,7 +1116,7 @@ export default function Prevent({
           </Grid>
           <Grid container xs={12} spacing={0} className={classes.sensorhd}>
             <Grid item xs className={classes.preventHeader}>
-              <Typography variant="h5">{t("Sensors")}</Typography>
+              <Typography variant="h5">{t("Cortex")}</Typography>
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(1)}>
@@ -1035,18 +1248,6 @@ export default function Prevent({
                 </ButtonBase>
               </Grid>
             )}
-            {Object.keys(visualizations).length > 0 && (
-              <Grid container xs={12} spacing={0} className={classes.sensorhd}>
-                <Grid item xs className={classes.preventHeader}>
-                  <Typography variant="h5">Automations</Typography>
-                </Grid>
-                <Grid item xs className={classes.addbtnmain}>
-                  <IconButton onClick={() => handleClickOpen(2)}>
-                    <AddCircleOutlineIcon className={classes.addicon} />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            )}
 
             <Grid container xs={12} spacing={2}>
               {(selectedExperimental || []).map((x) => (
@@ -1096,7 +1297,7 @@ export default function Prevent({
           </Box>
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-          {dialogueType === 0 ? (
+          {dialogueType === 0 && (
             <MultipleSelect
               selected={selectedActivities}
               items={(activities || []).map((x) => x.name)}
@@ -1107,30 +1308,22 @@ export default function Prevent({
                 setSelectedActivities(x)
               }}
             />
-          ) : dialogueType === 1 ? (
+          )}
+          {dialogueType === 1 && (
             <MultipleSelect
-              selected={selectedSensors || []}
-              items={[`Environmental Context`, `Step Count`, `Social Context`].filter(
-                (sensor) => sensorCounts[sensor] > 0
-              )}
+              selected={selectedSensors.concat(selectedExperimental) || []}
+              items={cortex}
               showZeroBadges={false}
               badges={sensorCounts}
               onChange={(x) => {
-                LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
-                setSelectedSensors(x)
+                if ([`Environmental Context`, `Step Count`, `Social Context`].includes(x[x.length - 1])) {
+                  LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
+                  setSelectedSensors(x)
+                } else {
+                  LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)
+                  setSelectedExperimental(x)
+                }
               }}
-            />
-          ) : (
-            <MultipleSelect
-              tooltips={{}}
-              defaultTooltip="An experimental visualization generated by an automation you or your clinician have installed."
-              selected={selectedExperimental || []}
-              items={Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", ""))}
-              showZeroBadges={false}
-              badges={Object.keys(visualizations)
-                .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-                .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})}
-              onChange={(x) => setSelectedExperimental(x)}
             />
           )}
         </DialogContent>
