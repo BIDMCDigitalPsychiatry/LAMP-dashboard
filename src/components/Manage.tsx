@@ -199,32 +199,24 @@ export default function Manage({ participant, activities, ...props }) {
         x.spec === "lamp.breathe" ||
         x.spec === "lamp.scratch_image"
     )
-    console.log(gActivities)
     setSavedActivities(gActivities)
-  }, [])
-
-  useEffect(() => {
-    if (savedActivities.length > 0) {
-      setLoading(true)
-      ;(async () => {
-        let tags = []
-        let images = await savedActivities.map((activity, index) => {
-          ;(async () => {
-            tags[activity.id] = await getImage(activity.id)
+    if (gActivities.length > 0) {
+      let tags = []
+      let count = 0
+      gActivities.map((activity, index) => {
+        getImage(activity.id).then((img) => {
+          tags[activity.id] = img
+          if (count === gActivities.length - 1) {
+            setLoading(false)
             setTag(tags)
-            if (index === savedActivities.length - 1) {
-              setLoading(false)
-              setTag(tags)
-              return tags
-            }
-          })()
+          }
+          count++
         })
-        setTag(images)
-      })()
+      })
     } else {
       setLoading(false)
     }
-  }, [savedActivities])
+  }, [])
 
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
@@ -368,7 +360,6 @@ export default function Manage({ participant, activities, ...props }) {
                 activity={activity}
                 participant={participant}
                 onComplete={() => {
-                  console.log("ad", savedActivities)
                   setLaunchedActivity(undefined)
                 }}
               />
