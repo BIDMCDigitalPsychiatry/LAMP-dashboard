@@ -248,7 +248,6 @@ export default function BreatheCreator({
     const fileSize = event.target.files[0].size / 1024 / 1024
     const audioFormats = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/ogg"]
     const fileName = file.name
-    console.log("fileName", fileName)
     if (fileSize <= 2 && audioFormats.includes(file.type.toLowerCase())) {
       setLoading(true)
       file &&

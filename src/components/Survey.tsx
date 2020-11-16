@@ -31,6 +31,7 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
+import InfoIcon from "../icons/Info.svg"
 
 const theme = createMuiTheme({
   overrides: {
@@ -169,6 +170,14 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
     },
+    mainIcons: {
+      width: 100,
+      height: 100,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
+    },
   })
 )
 
@@ -224,22 +233,18 @@ export default function Survey({
         (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
     )
     if (savedActivities.length > 0) {
-      setLoading(true)
-      ;(async () => {
-        let tags = []
-        let details = await savedActivities.map((activity, index) => {
-          ;(async () => {
-            tags[activity.id] = await getDetails(activity.id)
+      let tags = []
+      let count = 0
+      savedActivities.map((activity, index) => {
+        getDetails(activity.id).then((img) => {
+          tags[activity.id] = img
+          if (count === savedActivities.length - 1) {
+            setLoading(false)
             setTag(tags)
-            if (index === savedActivities.length - 1) {
-              setLoading(false)
-              setTag(tags)
-              return tags
-            }
-          })()
+          }
+          count++
         })
-        setTag(details)
-      })()
+      })
     } else {
       setLoading(false)
     }
@@ -272,7 +277,6 @@ export default function Survey({
                 onClick={() => {
                   setSpec(y.spec)
                   setActivity(y)
-                  console.log(y)
                   y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
                   setVisibleActivities([y])
                   handleClickOpen(y.name)
@@ -281,14 +285,16 @@ export default function Survey({
               >
                 <ButtonBase focusRipple className={classes.fullwidthBtn}>
                   <Card className={classes.assess}>
-                    <Box mt={1} mb={1}>
-                      {y.spec === "lamp.dbt_diary_card" && <AssessDbt />}
-                      {y.name === "Mood" && <AssessMood />}
-                      {y.name === "Sleep and Social" && <AssessSleep />}
-                      {y.name === "Anxiety" && <AssessAnxiety />}
-                      {y.name === "App Usability" && <AssessUsability />}
-                      {y.name === "Water and Nutrition" && <AssessNutrition />}
-                      {y.name === "Psychosis and Social" && <AssessSocial />}
+                    <Box mt={2} mb={1}>
+                      <Box
+                        className={classes.mainIcons}
+                        style={{
+                          margin: "auto",
+                          background: tag[y?.id]?.photo
+                            ? `url(${tag[y?.id]?.photo}) center center/contain no-repeat`
+                            : `url(${InfoIcon}) center center/contain no-repeat`,
+                        }}
+                      ></Box>
                     </Box>
                     <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
                   </Card>
@@ -315,13 +321,15 @@ export default function Survey({
             <CloseIcon />
           </IconButton>
           <div className={classes.header}>
-            {spec === "lamp.dbt_diary_card" && <AssessDbt className={classes.topicon} />}
-            {dialogueType === "Mood" && <AssessMood className={classes.topicon} />}
-            {dialogueType === "Sleep and Social" && <AssessSleep className={classes.topicon} />}
-            {dialogueType === "Anxiety" && <AssessAnxiety className={classes.topicon} />}
-            {dialogueType === "App Usability" && <AssessUsability className={classes.topicon} />}
-            {dialogueType === "Water and Nutrition" && <AssessNutrition className={classes.topicon} />}
-            {dialogueType === "Psychosis and Social" && <AssessSocial className={classes.topicon} />}
+            <Box
+              className={classes.topicon}
+              style={{
+                margin: "auto",
+                background: tag[activity?.id]?.photo
+                  ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                  : `url(${InfoIcon}) center center/contain no-repeat`,
+              }}
+            ></Box>
             <Typography variant="h6">{t("Survey")}</Typography>
             <Typography variant="h2">{t(activity?.name ?? null)}</Typography>
           </div>

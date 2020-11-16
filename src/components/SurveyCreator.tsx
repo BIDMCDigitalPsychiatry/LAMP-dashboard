@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import {
   Box,
   Tooltip,
@@ -25,9 +25,11 @@ import {
   Checkbox,
   MenuItem,
   Container,
+  ButtonBase,
 } from "@material-ui/core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import { useDropzone } from "react-dropzone"
 
 const theme = createMuiTheme({
   palette: {
@@ -112,9 +114,8 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
             onChange={(e) => setOptions({ ...options, [0]: { max_rating: Number(e.target.value) } })}
             helperText={options[0]?.max_rating > 10 ? "Maximum value is 10" : ""}
           />
-        ) : 
-          (<Box>
-            {options.map((x, idx) => (
+        ) : (
+          options.map((x, idx) => (
             <FormControlLabel
               key={`${x.value}-${idx}`}
               value={x.value}
@@ -186,21 +187,20 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
               }
               labelPlacement="end"
             />
-          ))}
-          <FormControlLabel
-            control={
-              <TypeComponent
-                checked
-                color="primary"
-                onClick={() => setOptions((options) => [...options, ""])}
-                checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
-              />
-            }
-            label={<Typography>{t("Add Option")}</Typography>}
-            labelPlacement="end"
-          />
-          </Box>
-        )}        
+          ))
+        )}
+        <FormControlLabel
+          control={
+            <TypeComponent
+              checked
+              color="primary"
+              onClick={() => setOptions((options) => [...options, ""])}
+              checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
+            />
+          }
+          label={<Typography>{t("Add Option")}</Typography>}
+          labelPlacement="end"
+        />
       </TypeGroup>
     </React.Fragment>
   )
@@ -213,12 +213,6 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [options, setOptions] = useState(question.options)
   const { t } = useTranslation()
   useEffect(() => {
-    console.log({
-      text,
-      type,
-      description,
-      options: ["list", "select", "multiselect", "slider", "rating"].includes(type) ? options : null,
-    })
     onChange({
       text,
       type,
@@ -311,6 +305,25 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   )
 }
 
+function compress(file, width, height) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onerror = (error) => reject(error)
+    reader.onload = (event) => {
+      const img = new Image()
+      img.src = event.target.result as string
+      img.onload = () => {
+        const elem = document.createElement("canvas")
+        elem.width = width
+        elem.height = height
+        const ctx = elem.getContext("2d")
+        ctx.drawImage(img, 0, 0, width, height)
+        resolve(ctx.canvas.toDataURL())
+      }
+    }
+  })
+}
 export default function SurveyCreator({
   value,
   onSave,
@@ -330,90 +343,134 @@ export default function SurveyCreator({
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
   const { t } = useTranslation()
+  const [photo, setPhoto] = useState(value?.photo ?? null)
+
+  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
+  // eslint-disable-next-line
+  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+    onDrop,
+    accept: "image/*",
+    maxSize: 2 * 1024 * 1024 /* 5MB */,
+  })
+
   return (
     <div>
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
-          <Grid container spacing={2} {...props}>
-            <Grid item xs sm={6}>
-              <TextField
-                error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-                id="filled-select-currency"
-                select
-                label={t("Study")}
-                value={studyId}
-                onChange={(e) => {
-                  setStudyId(e.target.value)
-                }}
-                helperText={
-                  typeof studyId == "undefined" || studyId === null || studyId === ""
-                    ? t("Please select the Study")
-                    : ""
+          <Grid container spacing={2}>
+            <Grid item xs md={2}>
+              <Tooltip
+                title={
+                  !photo
+                    ? "Drag a photo or tap to select a photo."
+                    : "Drag a photo to replace the existing photo or tap to delete the photo."
                 }
-                variant="filled"
-                disabled={!!value ? true : false}
               >
-                {studies.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {option.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+                <Box
+                  {...getRootProps()}
+                  width={154}
+                  height={154}
+                  border={1}
+                  borderRadius={4}
+                  borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+                  bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+                  color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+                  style={{
+                    background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
+                  }}
+                >
+                  <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
+                    {!photo && <input {...getInputProps()} />}
+                    <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
+                  </ButtonBase>
+                </Box>
+              </Tooltip>
             </Grid>
-            <Grid item xs sm={6}>
-              <TextField
-                fullWidth
-                variant="filled"
-                label={t("Survey Title")}
-                defaultValue={text}
-                onChange={(event) => setText(event.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                multiline
-                label={t("Survey Description")}
-                variant="filled"
-                defaultValue={description}
-                onChange={(event) => setDescription(event.target.value)}
-              />
-            </Grid>
-            <Grid item sm={12}>
-              <Divider />
-              <Typography variant="h6">{t("Configure questions, parameters, and options.")}</Typography>
-            </Grid>
-            <Grid item>
-              <Stepper nonLinear activeStep={activeStep} orientation="vertical">
-                {questions.map((x, idx) => (
-                  <QuestionCreator
-                    key={`${x.text}-${idx}`}
-                    question={x}
-                    onChange={(change) => setQuestions((questions) => Object.assign([...questions], { [idx]: change }))}
-                    onDelete={() => {
-                      setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
-                      setActiveStep((prev) => prev - 1)
+            <Grid item md={10}>
+              <Grid container spacing={2}>
+                <Grid item lg={4}>
+                  <TextField
+                    error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
+                    id="filled-select-currency"
+                    select
+                    label={t("Study")}
+                    value={studyId}
+                    onChange={(e) => {
+                      setStudyId(e.target.value)
                     }}
-                    isSelected={activeStep !== idx}
-                    setSelected={() => setActiveStep(idx)}
-                  />
-                ))}
-                <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
-                  <Fab
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      setQuestions((questions) => [...questions, {}])
-                      setActiveStep(questions.length)
-                    }}
+                    helperText={
+                      typeof studyId == "undefined" || studyId === null || studyId === ""
+                        ? t("Please select the Study")
+                        : ""
+                    }
+                    variant="filled"
+                    disabled={!!value ? true : false}
                   >
-                    <Icon fontSize="small">add_circle</Icon>
-                  </Fab>
-                  <Grid item>
-                    <Typography variant="subtitle2">{t("Add Question")}</Typography>
-                  </Grid>
+                    {studies.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </Grid>
-              </Stepper>
+                <Grid item xs>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    label={t("Survey Title")}
+                    defaultValue={text}
+                    onChange={(event) => setText(event.target.value)}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  multiline
+                  label={t("Survey Description")}
+                  variant="filled"
+                  defaultValue={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                />
+              </Grid>
+              <Grid item sm={12}>
+                <Divider />
+                <Typography variant="h6">{t("Configure questions, parameters, and options.")}</Typography>
+              </Grid>
+              <Grid item>
+                <Stepper nonLinear activeStep={activeStep} orientation="vertical">
+                  {questions.map((x, idx) => (
+                    <QuestionCreator
+                      key={`${x.text}-${idx}`}
+                      question={x}
+                      onChange={(change) =>
+                        setQuestions((questions) => Object.assign([...questions], { [idx]: change }))
+                      }
+                      onDelete={() => {
+                        setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
+                        setActiveStep((prev) => prev - 1)
+                      }}
+                      isSelected={activeStep !== idx}
+                      setSelected={() => setActiveStep(idx)}
+                    />
+                  ))}
+                  <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
+                    <Fab
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setQuestions((questions) => [...questions, {}])
+                        setActiveStep(questions.length)
+                      }}
+                    >
+                      <Icon fontSize="small">add_circle</Icon>
+                    </Fab>
+                    <Grid item>
+                      <Typography variant="subtitle2">{t("Add Question")}</Typography>
+                    </Grid>
+                  </Grid>
+                </Stepper>
+              </Grid>
             </Grid>
           </Grid>
         </Container>
@@ -442,6 +499,7 @@ export default function SurveyCreator({
                       settings: questions,
                       description,
                       studyID: studyId,
+                      photo: photo,
                     },
                     true /* duplicate */
                   )
@@ -476,6 +534,7 @@ export default function SurveyCreator({
                     settings: questions,
                     description,
                     studyID: studyId,
+                    photo: photo,
                   },
                   false /* overwrite */
                 )
