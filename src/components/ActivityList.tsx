@@ -595,21 +595,19 @@ export default function ActivityList({ researcher, title, ...props }) {
     let counts = studiesCount
     let index = 0
     studies.map((study) => {
-      ;(async () => {
-        await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
-          counts[study.name] = resActivities.length
-          if (selected !== null && selected.includes(study.name)) {
-            resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
-            activityData = activityData.concat(resActivities)
-          }
-        })      
+      LAMP.Activity.allByStudy(study.id).then((resActivities) => {
+        counts[study.name] = resActivities.length
+        if (selected !== null && selected.includes(study.name)) {
+          resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
+          activityData = activityData.concat(resActivities)
+        }
         if (index === studies.length - 1) {        
           setStudiesCount(counts)
           setActivities(activityData)
           setLoading(false)
         }
-        index++
-      })()
+        index++  
+      })    
     })
   }
 
