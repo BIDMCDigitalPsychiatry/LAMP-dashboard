@@ -673,32 +673,33 @@ function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
 
   const getText = (val) => {
-    let sliderValue = options[0].description
+    let sliderValue = options[0].label
     options.map(function (mark) {
       if (mark.value == val) {
-        sliderValue = mark.description
+        sliderValue = mark.label
       }
     })
     return sliderValue
   }
   const { t } = useTranslation()
 
-  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
+  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].label)
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
   const valuetext = (value: number) => {
     return `${options[value]}`
   }
-
+console.log(options)
   const getSliderValue = (val) => {
-    let sliderValue = options[0].description
+    let sliderValue = options[0].label
     let slValue = val
-
+console.log(val)
     options.map(function (mark) {
-      if (mark.value == slValue) {
-        sliderValue = mark.description
+      if (mark.value === slValue) {
+        sliderValue = mark.label
       }
     })
+    console.log(sliderValue)
     setSliderValue(val)
     setValueText(sliderValue)
     onChange(val)
@@ -713,7 +714,8 @@ function Rating({ onChange, options, value, ...props }) {
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
-        step={parseInt(options[1].value) - parseInt(options[0].value)}
+        step={options[0].value < 0 ? parseInt(options[0].value) - parseInt(options[1].value) :
+             parseInt(options[1].value) - parseInt(options[0].value)}
         marks
         min={parseInt(options[0].value)}
         max={parseInt(options[options.length - 1].value)}
@@ -856,7 +858,8 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))
+      options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
+      console.log(options)
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
@@ -898,8 +901,8 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
             ? t("(Select one)")
             : type === "slider"
             ? t(
-                `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
-                  options[options.length - 1].description
+                `(${options[0].value} being ${options[0].label}, ${options[options.length - 1].value} being ${
+                  options[options.length - 1].label
                 })`
               )
             : ""}
@@ -1190,6 +1193,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
+  console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
