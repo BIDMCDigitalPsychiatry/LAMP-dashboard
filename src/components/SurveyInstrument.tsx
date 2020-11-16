@@ -689,17 +689,15 @@ function Rating({ onChange, options, value, ...props }) {
   const valuetext = (value: number) => {
     return `${options[value]}`
   }
-console.log(options)
+
   const getSliderValue = (val) => {
     let sliderValue = options[0].label
     let slValue = val
-console.log(val)
     options.map(function (mark) {
       if (mark.value === slValue) {
         sliderValue = mark.label
       }
-    })
-    console.log(sliderValue)
+    })    
     setSliderValue(val)
     setValueText(sliderValue)
     onChange(val)
@@ -740,17 +738,19 @@ console.log(val)
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].description}
+            {options[0].label === null ? 0 : options[0].label}
           </Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[Math.ceil(options.length / 2) - 1].description}
-          </Typography>
+          {options.length > 2 && ( 
+            <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
+              {options[Math.ceil(options.length / 2) - 1].label === null ? 0 : options[Math.ceil(options.length / 2) - 1].label}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].description}
+            {options[options.length - 1].label === null ? 0 : options[options.length - 1].label}
           </Typography>
         </Grid>
       </Grid>
@@ -858,8 +858,8 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
+      options = JSON.parse(JSON.stringify(options).replace(null, "0")) 
       options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
-      console.log(options)
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
@@ -1193,7 +1193,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
-  console.log(group)
+ 
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
