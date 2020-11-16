@@ -122,32 +122,6 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
-function saveTodaysTip(id) {
-  let todayTip = {
-    type: "tip",
-    title: "Today's tip: Sleep",
-    timeValue: "08:30 am",
-    icon: "sleep_tip",
-    description: "Sleep Tips",
-    group: "learn",
-    time: new Date().getTime(),
-    completed: false,
-    data: [
-      {
-        title: "Weekends",
-        text:
-          "Dr. Epstein explains that psychiatric and psychological problems can be related to sleep. To improve " +
-          "your sleep, try sticking to a sleep schedule even on the weekends. If you sleep in on the weekends, it " +
-          "will be difficult to get back to your routine during the week. Waking up within the same hour everyday " +
-          "can help both your physical and mental health over time. For the next seven days, try waking up at the " +
-          "same time every day.",
-        link:
-          "https://www.insider.com/things-that-are-not-helping-your-mental-health-2018-9#those-retail-therapy-sessions-might-make-you-feel-poor-in-more-ways-than-one-5",
-      },
-    ],
-  }
-  LAMP.Type.setAttachment(id, "me", "lamp.feed.todays_tip", todayTip)
-}
 function saveBreatheMusicURL(id) {
   let backgroundMusicURL = { URL: "https://liquidmindmusic.com/mp3/breatheinme.mp3" }
   LAMP.Type.setAttachment(id, "me", "lamp.breathe.music_url", backgroundMusicURL)
@@ -282,8 +256,6 @@ export default function Participant({
     })
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
-    saveTodaysTip(participant.id)
-    saveBreatheMusicURL(participant.id)
   }, [])
 
   const activeTab = (newTab) => {
