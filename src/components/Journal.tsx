@@ -165,46 +165,46 @@ export default function Journals({ participant, selectedEvents, ...props }) {
   }, [])
 
   useEffect(() => {
-    if(allJournals !== null) {
+    if (allJournals !== null) {
       Object.keys(allJournals).map((each) => {
-        if(allJournals[each].length > 0 && text.length === 0) {
+        if (allJournals[each].length > 0 && text.length === 0) {
           allJournals[each].map((journal, index) => {
-            setOpen({...open, [index] : false})    
-            let jText = journal.static_data.text.substring(0, 80).length ===
-              journal.static_data.text.length
-              ? journal.static_data.text
-              : journal.static_data.text
-                  .substring(0, 80)
-                  .substr(
-                    0,
-                    Math.min(
-                      journal.static_data.text.substring(0, 80).length,
-                      journal.static_data.text.substring(0, 80).lastIndexOf(" ")
-                    )
-                  ) + "..."
-            setText({...text, [index]: jText})
+            setOpen({ ...open, [index]: false })
+            let jText =
+              journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+                ? journal.static_data.text
+                : journal.static_data.text
+                    .substring(0, 80)
+                    .substr(
+                      0,
+                      Math.min(
+                        journal.static_data.text.substring(0, 80).length,
+                        journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+                      )
+                    ) + "..."
+            setText({ ...text, [index]: jText })
           })
         }
-      })     
+      })
     }
   }, [allJournals])
 
   useEffect(() => {
-    if(journal !== null) {
-      let jText = !!open[index] ? journal.static_data.text : 
-      (journal.static_data.text.substring(0, 80).length ===
-      journal.static_data.text.length
-      ? journal.static_data.text
-      : journal.static_data.text
-          .substring(0, 80)
-          .substr(
-            0,
-            Math.min(
-              journal.static_data.text.substring(0, 80).length,
-              journal.static_data.text.substring(0, 80).lastIndexOf(" ")
-            )
-          ) + "...")
-      setText({...text, [index]: jText})
+    if (journal !== null) {
+      let jText = !!open[index]
+        ? journal.static_data.text
+        : journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+        ? journal.static_data.text
+        : journal.static_data.text
+            .substring(0, 80)
+            .substr(
+              0,
+              Math.min(
+                journal.static_data.text.substring(0, 80).length,
+                journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+              )
+            ) + "..."
+      setText({ ...text, [index]: jText })
     }
   }, [open])
 
@@ -212,10 +212,10 @@ export default function Journals({ participant, selectedEvents, ...props }) {
     setDate(date)
   }
 
-  const handleOpen = (index, journal) => { 
-    setIndex(index)  
-    setJournal(journal) 
-    setOpen({...open, [index] : !open[index]})    
+  const handleOpen = (index, journal) => {
+    setIndex(index)
+    setJournal(journal)
+    setOpen({ ...open, [index]: !open[index] })
   }
 
   return (
@@ -237,19 +237,13 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                   .map((journal, index) => (
                     <Box boxShadow={0}>
                       <Grid item>
-                        <Box
-                          className={classes.journalStyle}
-                           onClick={() =>
-                            handleOpen(index, journal)
-                            }
-                        >
+                        <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
                           <Typography variant="caption" gutterBottom>
                             {getDateString(new Date(journal.timestamp))}
                           </Typography>
                           <Typography variant="body2" component="p">
-                            {text[index] ?? 
-                             (journal.static_data.text.substring(0, 80).length ===
-                                journal.static_data.text.length
+                            {text[index] ??
+                              (journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
                                 ? journal.static_data.text
                                 : journal.static_data.text
                                     .substring(0, 80)
@@ -259,7 +253,7 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                                         journal.static_data.text.substring(0, 80).length,
                                         journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                                       )
-                                    ) + "...")}                            
+                                    ) + "...")}
                           </Typography>
                         </Box>
                       </Grid>
@@ -280,27 +274,24 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                         {allJournals[each].map((journal, index) => (
                           <Box boxShadow={0}>
                             <Grid item>
-                              <Box
-                                className={classes.journalStyle}
-                                onClick={() =>
-                                  handleOpen(index, journal)}
-                              >
+                              <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
                                 <Typography variant="caption" gutterBottom>
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                {text[index] ?? (journal.static_data.text.substring(0, 80).length ===
+                                  {text[index] ??
+                                    (journal.static_data.text.substring(0, 80).length ===
                                     journal.static_data.text.length
-                                    ? journal.static_data.text
-                                    : journal.static_data.text
-                                        .substring(0, 80)
-                                        .substr(
-                                          0,
-                                          Math.min(
-                                            journal.static_data.text.substring(0, 80).length,
-                                            journal.static_data.text.substring(0, 80).lastIndexOf(" ")
-                                          )
-                                        ) + "...")}    
+                                      ? journal.static_data.text
+                                      : journal.static_data.text
+                                          .substring(0, 80)
+                                          .substr(
+                                            0,
+                                            Math.min(
+                                              journal.static_data.text.substring(0, 80).length,
+                                              journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+                                            )
+                                          ) + "...")}
                                 </Typography>
                               </Box>
                             </Grid>

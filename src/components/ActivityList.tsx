@@ -29,6 +29,9 @@ import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as AddIcon } from "../icons/plus.svg"
 import { ReactComponent as DeleteIcon } from "../icons/DeleteBlue.svg"
+import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
+import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
+import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 // External Imports
 import { saveAs } from "file-saver"
@@ -294,6 +297,7 @@ export function spliceActivity({ raw, tag }) {
     spec: "lamp.survey",
     name: raw.name,
     description: tag?.description,
+    photo: tag?.photo,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
@@ -344,6 +348,7 @@ export function unspliceActivity(x) {
     },
     tag: {
       description: x.description,
+      photo: x.photo,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type === "multiselect" ? true : undefined,
         description: y?.description,
@@ -373,7 +378,7 @@ export function spliceCTActivity({ raw, tag }) {
   return {
     id: raw.id,
     parentID: raw.parentID,
-    spec: "lamp.survey",
+    spec: raw.spec,
     name: raw.name,
     description: tag?.description,
     photo: tag?.photo,
@@ -596,16 +601,17 @@ export default function ActivityList({ researcher, title, ...props }) {
     let index = 0
     studies.map((study) => {
       ;(async () => {
+        setLoading(true)
         await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
           counts[study.name] = resActivities.length
           if (selected !== null && selected.includes(study.name)) {
             resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
             activityData = activityData.concat(resActivities)
           }
-        })      
-        if (index === studies.length - 1) {        
-          setStudiesCount(counts)
-          setActivities(activityData)
+        })
+        setStudiesCount(counts)
+        setActivities(activityData)
+        if (index === studies.length - 1) {
           setLoading(false)
         }
         index++
@@ -642,7 +648,6 @@ export default function ActivityList({ researcher, title, ...props }) {
     }
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
-      console.log(x)
       const { raw, tag } = unspliceActivity(x)
       try {
         allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {

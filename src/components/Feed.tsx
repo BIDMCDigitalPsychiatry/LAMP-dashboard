@@ -655,7 +655,6 @@ export default function Feed({
           }
         })
       })
-      //   console.log(tip)
       //  currentFeed.push(tip)
       let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
       currentFeed = goalsFeedData.feed
