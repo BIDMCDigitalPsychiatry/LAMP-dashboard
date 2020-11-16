@@ -673,17 +673,17 @@ function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
 
   const getText = (val) => {
-    let sliderValue = options[0].label
+    let sliderValue = options[0].description
     options.map(function (mark) {
       if (mark.value == val) {
-        sliderValue = mark.label
+        sliderValue = mark.description
       }
     })
     return sliderValue
   }
   const { t } = useTranslation()
 
-  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].label)
+  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
   const valuetext = (value: number) => {
@@ -691,11 +691,11 @@ function Rating({ onChange, options, value, ...props }) {
   }
 
   const getSliderValue = (val) => {
-    let sliderValue = options[0].label
+    let sliderValue = options[0].description
     let slValue = val
     options.map(function (mark) {
-      if (mark.value === slValue) {
-        sliderValue = mark.label
+      if (mark.value == slValue) {
+        sliderValue = mark.description
       }
     })    
     setSliderValue(val)
@@ -738,19 +738,19 @@ function Rating({ onChange, options, value, ...props }) {
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].label === null ? 0 : options[0].label}
+            {options[0].description === null ? 0 : options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           {options.length > 2 && ( 
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-              {options[Math.ceil(options.length / 2) - 1].label === null ? 0 : options[Math.ceil(options.length / 2) - 1].label}
+              {options[Math.ceil(options.length / 2) - 1].description === null ? 0 : options[Math.ceil(options.length / 2) - 1].description}
             </Typography>
           )}
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].label === null ? 0 : options[options.length - 1].label}
+            {options[options.length - 1].description === null ? 0 : options[options.length - 1].description}
           </Typography>
         </Grid>
       </Grid>
@@ -902,7 +902,7 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
             : type === "slider"
             ? t(
                 `(${options[0].value} being ${options[0].label}, ${options[options.length - 1].value} being ${
-                  options[options.length - 1].label
+                  options[options.length - 1].description
                 })`
               )
             : ""}
