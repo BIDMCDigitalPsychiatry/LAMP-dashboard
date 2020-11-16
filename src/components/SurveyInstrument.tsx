@@ -693,12 +693,11 @@ function Rating({ onChange, options, value, ...props }) {
   const getSliderValue = (val) => {
     let sliderValue = options[0].description
     let slValue = val
-
     options.map(function (mark) {
       if (mark.value == slValue) {
         sliderValue = mark.description
       }
-    })
+    })    
     setSliderValue(val)
     setValueText(sliderValue)
     onChange(val)
@@ -713,7 +712,8 @@ function Rating({ onChange, options, value, ...props }) {
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
-        step={parseInt(options[1].value) - parseInt(options[0].value)}
+        step={options[0].value < 0 ? parseInt(options[0].value) - parseInt(options[1].value) :
+             parseInt(options[1].value) - parseInt(options[0].value)}
         marks
         min={parseInt(options[0].value)}
         max={parseInt(options[options.length - 1].value)}
@@ -738,17 +738,19 @@ function Rating({ onChange, options, value, ...props }) {
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].description}
+            {options[0].description === null ? 0 : options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
-          <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[Math.ceil(options.length / 2) - 1].description}
-          </Typography>
+          {options.length > 2 && ( 
+            <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
+              {options[Math.ceil(options.length / 2) - 1].description === null ? 0 : options[Math.ceil(options.length / 2) - 1].description}
+            </Typography>
+          )}
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].description}
+            {options[options.length - 1].description === null ? 0 : options[options.length - 1].description}
           </Typography>
         </Grid>
       </Grid>
@@ -856,7 +858,8 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = options.sort((a, b) => parseInt(a.value) > parseInt(b.value))
+      options = JSON.parse(JSON.stringify(options).replace(null, "0")) 
+      options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
@@ -898,7 +901,7 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
             ? t("(Select one)")
             : type === "slider"
             ? t(
-                `(${options[0].value} being ${options[0].description}, ${options[options.length - 1].value} being ${
+                `(${options[0].value} being ${options[0].label}, ${options[options.length - 1].value} being ${
                   options[options.length - 1].description
                 })`
               )
@@ -1190,6 +1193,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
+ 
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
