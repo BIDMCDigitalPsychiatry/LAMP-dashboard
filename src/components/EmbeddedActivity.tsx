@@ -43,7 +43,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
-        console.log(settings)
         iFrame.contentWindow.postMessage(settings, "*")
       }
     }

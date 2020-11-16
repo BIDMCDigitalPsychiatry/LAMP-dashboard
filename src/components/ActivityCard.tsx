@@ -13,7 +13,6 @@ export const strategies = {
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
-        console.log(x.value)
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
         else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)

@@ -1190,7 +1190,6 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
-  console.log(group)
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {
