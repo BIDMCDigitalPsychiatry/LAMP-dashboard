@@ -41,6 +41,7 @@ import jsonexport from "jsonexport"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
+import es from "javascript-time-ago/locale/es"
 import QRCode from "qrcode.react"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
@@ -373,8 +374,46 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t, i18n } = useTranslation()
-  const currentLanguage = i18n.language === "en_US" ? "en-US" : "hi-IN"
-  const currentLanguageCode = i18n.language === "en_US" ? en : hi
+
+  const getCurrentLanguage = () => {
+    let lang
+    switch (i18n.language) {
+      case "en_US":
+        lang = "en-US"
+        break
+      case "hi_IN":
+        lang = "hi-IN"
+        break
+      case "es_ES":
+        lang = "es-ES"
+        break
+      default:
+        lang = "en-US"
+        break
+    }
+    return lang
+  }
+
+  const getCurrentLanguageCode = () => {
+    let langCode
+    switch (i18n.language) {
+      case "en_US":
+        langCode = en
+        break
+      case "hi_IN":
+        langCode = hi
+        break
+      case "es_ES":
+        langCode = es
+        break
+      default:
+        langCode = en
+        break
+    }
+    return langCode
+  }
+  const currentLanguage = getCurrentLanguage()
+  const currentLanguageCode = getCurrentLanguageCode()
   TimeAgo.addLocale(currentLanguageCode)
   const timeAgo = new TimeAgo(currentLanguage)
 

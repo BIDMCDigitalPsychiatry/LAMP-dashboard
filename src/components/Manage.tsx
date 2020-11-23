@@ -26,6 +26,7 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
+import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 import ScratchImage from "./ScratchImage"
 import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -165,6 +166,10 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    blankMsg: {
+      "& path": { fill: "#666" },
+      "& p": { margin: "2px 5px" },
+    },
   })
 )
 
@@ -234,45 +239,52 @@ export default function Manage({ participant, activities, ...props }) {
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+
       <Grid container spacing={2}>
-        {savedActivities.map((activity) => (
-          <Grid
-            item
-            xs={6}
-            sm={4}
-            md={3}
-            lg={3}
-            onClick={() => {
-              setSpec(activity.spec)
-              setActivity(activity)
-              handleClickOpen(activity.spec)
-            }}
-            className={classes.thumbMain}
-          >
-            <ButtonBase focusRipple className={classes.fullwidthBtn}>
-              <Card className={classes.manage}>
-                <Box mt={2} mb={1}>
-                  <Box
-                    className={classes.mainIcons}
-                    style={{
-                      margin: "auto",
-                      background: tag[activity.id]?.photo
-                        ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                        : activity.spec === "lamp.breathe"
-                        ? `url(${BreatheIcon}) center center/contain no-repeat`
-                        : activity.spec === "lamp.journal"
-                        ? `url(${JournalIcon}) center center/contain no-repeat`
-                        : activity.spec === "lamp.scratch_image"
-                        ? `url(${ScratchCard}) center center/contain no-repeat`
-                        : `url(${InfoIcon}) center center/contain no-repeat`,
-                    }}
-                  ></Box>
-                </Box>
-                <Typography className={classes.cardlabel}>{t(activity.name)}</Typography>
-              </Card>
-            </ButtonBase>
-          </Grid>
-        ))}
+        {savedActivities.length ? (
+          savedActivities.map((activity) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setSpec(activity.spec)
+                setActivity(activity)
+                handleClickOpen(activity.spec)
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.manage}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag[activity.id]?.photo
+                          ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                          : activity.spec === "lamp.breathe"
+                          ? `url(${BreatheIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.journal"
+                          ? `url(${JournalIcon}) center center/contain no-repeat`
+                          : activity.spec === "lamp.scratch_image"
+                          ? `url(${ScratchCard}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{t(activity.name)}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))
+        ) : (
+          <Box display="flex" className={classes.blankMsg} ml={1}>
+            <EmptyManageIcon /> <p>There are no Manage activities available.</p>
+          </Box>
+        )}
       </Grid>
       {/*  <Grid item xs={6} sm={4} md={3} lg={3} onClick={() => handleClickOpen("Goals")} className={classes.thumbMain}>
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
