@@ -263,7 +263,7 @@ export default function Breathe({ participant, activity, ...props }) {
   useEffect(() => {
     if (started) {
       if (progressValue < 100) {
-        let val = progressValue + 0.8
+        let val = progressValue + (!!audio ? Math.round((100 / audio.duration) * 10) / 10 : 0.8)
         setProgressValue(val > 100 ? 100 : val)
       } else {
         setStarted(!started)

@@ -95,6 +95,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
               >
                 {t(_selected?.name ?? "No selection")}
               </Button>
+
               <Button
                 variant="outlined"
                 color={_selected?.name ? "primary" : "secondary"}
@@ -121,6 +122,8 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
     </Draggable>
   )
 }
+
+const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 
 export default function GroupCreator({
   activities,
@@ -186,7 +189,14 @@ export default function GroupCreator({
                 variant="filled"
                 label={t("Group Title")}
                 defaultValue={text}
-                onChange={(event) => setText(event.target.value)}
+                onChange={(event) => setText(removeExtraSpace(event.target.value))}
+                error={typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false}
+                helperText={
+                  typeof text == "undefined" || text === null || text === "" || !text.trim().length
+                    ? t("Please enter Group Title")
+                    : ""
+                }
+                inputProps={{ style: { textTransform: "capitalize" } }}
               />
             </Grid>
             <Box width={1}>
@@ -271,7 +281,12 @@ export default function GroupCreator({
                 )
               }
               disabled={
-                !onSave || items.length === 0 || items.filter((i) => i === null).length > 0 || !text || !studyId
+                !onSave ||
+                items.length === 0 ||
+                items.filter((i) => i === null).length > 0 ||
+                !text ||
+                !studyId ||
+                !text.trim().length
               }
             >
               {t("Save")}

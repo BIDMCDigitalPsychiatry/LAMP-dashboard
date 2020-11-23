@@ -217,9 +217,9 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
                 setMeasure(newInputValue)
               }}
               renderInput={(params) => <TextField {...params} label="Measure" variant="filled" />}
-            />  
-          </MuiThemeProvider>       
-        </Box>        
+            />
+          </MuiThemeProvider>
+        </Box>
         <Box textAlign="center" mt={2}>
           <Button
             onClick={handleClose}

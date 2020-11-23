@@ -606,13 +606,13 @@ export default function ActivityList({ researcher, title, ...props }) {
           resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
           activityData = activityData.concat(resActivities)
         }
-        if (index === studies.length - 1) {        
+        if (index === studies.length - 1) {
           setStudiesCount(counts)
           setActivities(activityData)
           setLoading(false)
         }
-        index++  
-      })    
+        index++
+      })
     })
   }
 
@@ -1042,7 +1042,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                   "lamp.tips": t("Tips"),
                   "lamp.journal": t("Journal"),
                   "lamp.breathe": t("Breathe"),
-                  "lamp.dbt_diary_card": t("DBT diary card"),
+                  "lamp.dbt_diary_card": t("DBT Diary Card"),
                   "lamp.scratch_image": t("Scratch image"),
                 },
                 emptyValue: t("Cognitive Test"),

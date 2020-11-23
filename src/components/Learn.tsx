@@ -27,6 +27,7 @@ import LearnTips from "./LearnTips"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 import { useTranslation } from "react-i18next"
+import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -178,6 +179,10 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    blankMsg: {
+      "& path": { fill: "#666" },
+      "& p": { margin: "2px 5px" },
+    },
   })
 )
 
@@ -255,32 +260,36 @@ export default function Learn({
         <CircularProgress color="inherit" />
       </Backdrop>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
-        {Object.keys(activitiesArray).length > 0
-          ? Object.keys(activitiesArray).map((key, index) => (
-              <Grid
-                item
-                key={index}
-                xs={6}
-                sm={4}
-                md={3}
-                lg={3}
-                className={classes.thumbMain}
-                onClick={() => {
-                  setData(key)
-                  setOpen(true)
-                }}
-              >
-                <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                  <Card className={classes.learn}>
-                    <Box mt={2} mb={1}>
-                      {activitiesArray[key].icon ? <img src={activitiesArray[key].icon} /> : ""}
-                    </Box>
-                    <Typography className={classes.cardlabel}>{t(key)}</Typography>
-                  </Card>
-                </ButtonBase>
-              </Grid>
-            ))
-          : ""}
+        {Object.keys(activitiesArray).length > 0 ? (
+          Object.keys(activitiesArray).map((key, index) => (
+            <Grid
+              item
+              key={index}
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              className={classes.thumbMain}
+              onClick={() => {
+                setData(key)
+                setOpen(true)
+              }}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.learn}>
+                  <Box mt={2} mb={1}>
+                    {activitiesArray[key].icon ? <img src={activitiesArray[key].icon} /> : ""}
+                  </Box>
+                  <Typography className={classes.cardlabel}>{t(key)}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))
+        ) : (
+          <Box display="flex" className={classes.blankMsg} ml={1}>
+            <EmptyManageIcon /> <p>There are no Learn activities available.</p>
+          </Box>
+        )}
       </Grid>
       <Dialog
         open={open}

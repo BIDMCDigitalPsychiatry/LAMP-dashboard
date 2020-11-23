@@ -47,6 +47,7 @@ import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as Jewels } from "../icons/Jewels.svg"
 import { ReactComponent as InfoIcon } from "../icons/Info.svg"
+import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
@@ -320,6 +321,10 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    blankMsg: {
+      "& path": { fill: "#666" },
+      "& p": { margin: "2px 5px" },
     },
   })
 )
@@ -666,6 +671,8 @@ export default function Feed({
       setSelectedDays(selectedDays)
       currentFeed = currentFeed.sort((x, y) => x.time - y.time)
       return currentFeed
+    } else {
+      return (currentFeed = [])
     }
   }
 
@@ -730,9 +737,21 @@ export default function Feed({
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
+
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      {loading == false ? (
+        currentFeed.length != 0 ? (
+          ""
+        ) : (
+          <Box display="flex" className={classes.blankMsg} ml={1}>
+            <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
+          </Box>
+        )
+      ) : (
+        " "
+      )}
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
           <Stepper
