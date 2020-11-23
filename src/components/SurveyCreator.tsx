@@ -30,6 +30,7 @@ import {
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
+import { id } from "vega"
 
 const theme = createMuiTheme({
   palette: {
@@ -72,6 +73,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 function SelectList({ checkbox, type, value, onChange, ...props }) {
   const [options, setOptions] = useState(value || [])
   useEffect(() => {
@@ -89,106 +91,83 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
   return (
     <React.Fragment>
       <TypeGroup name="option">
-        {type === "rating" ? (
-          <TextField
-            error={
-              options[0]?.max_rating < 0 ||
-              options[0]?.max_rating > 10 ||
-              options[0]?.max_rating === 0 ||
-              options[0]?.max_rating === ""
-                ? true
-                : false
+        {options.map((x, idx) => (
+          <FormControlLabel
+            key={`${x.value}-${idx}`}
+            value={x.value}
+            style={{ width: "100%", alignItems: "flex-start" }}
+            control={
+              <TypeComponent
+                disabled
+                color="secondary"
+                icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
+              />
             }
-            type="number"
-            variant="filled"
-            id="max_rating"
-            label="Max rating"
-            defaultValue={options[0]?.max_rating ?? 5}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputProps={{
-              max: 300,
-              min: 30,
-            }}
-            onChange={(e) => setOptions({ ...options, [0]: { max_rating: Number(e.target.value) } })}
-            helperText={options[0]?.max_rating > 10 ? "Maximum value is 10" : ""}
-          />
-        ) : (
-          options.map((x, idx) => (
-            <FormControlLabel
-              key={`${x.value}-${idx}`}
-              value={x.value}
-              style={{ width: "100%", alignItems: "flex-start" }}
-              control={
-                <TypeComponent
-                  disabled
-                  color="secondary"
-                  icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
-                  checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
+            label={
+              <React.Fragment>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={x.value || (type === "slider" ? "" : "")}
+                  label={t("Question Option")}
+                  error={typeof x.value == "undefined" || x.value === null || x.value === "" ? true : false}
+                  helperText={
+                    typeof x.value == "undefined" || x.value === null || x.value === "" ? t("Please enter Option") : ""
+                  }
+                  onBlur={(event) =>
+                    setOptions((options) =>
+                      Object.assign([...options], {
+                        [idx]: {
+                          value: removeExtraSpace(event.target.value),
+                          description: options[idx].description,
+                        },
+                      })
+                    )
+                  }
+                  type={type === "slider" || type === "rating" ? "number" : "text"}
+                  InputProps={{
+                    endAdornment: [
+                      <InputAdornment position="end" key="adornment">
+                        <Tooltip title={t("Delete this option from the question's list of options.")}>
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() =>
+                              setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
+                            }
+                            onMouseDown={(event) => event.preventDefault()}
+                          >
+                            <Icon>delete_forever</Icon>
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>,
+                    ],
+                  }}
                 />
-              }
-              label={
-                <React.Fragment>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    defaultValue={x.value || (type === "slider" ? 0 : "")}
-                    label={t("Question Option")}
-                    onBlur={(event) =>
-                      setOptions((options) =>
-                        Object.assign([...options], {
-                          [idx]: {
-                            value: event.target.value,
-                            description: options[idx].description,
-                          },
-                        })
-                      )
-                    }
-                    type={type === "slider" ? "number" : "text"}
-                    InputProps={{
-                      endAdornment: [
-                        <InputAdornment position="end" key="adornment">
-                          <Tooltip title={t("Delete this option from the question's list of options.")}>
-                            <IconButton
-                              edge="end"
-                              aria-label="delete"
-                              onClick={() =>
-                                setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
-                              }
-                              onMouseDown={(event) => event.preventDefault()}
-                            >
-                              <Icon>delete_forever</Icon>
-                            </IconButton>
-                          </Tooltip>
-                        </InputAdornment>,
-                      ],
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    margin="dense"
-                    variant="filled"
-                    style={{ marginBottom: 16 }}
-                    defaultValue={x.description || ""}
-                    label={t("Option Description")}
-                    onBlur={(event) =>
-                      setOptions((options) =>
-                        Object.assign([...options], {
-                          [idx]: {
-                            value: options[idx].value,
-                            description: event.target.value,
-                          },
-                        })
-                      )
-                    }
-                  />
-                </React.Fragment>
-              }
-              labelPlacement="end"
-            />
-          ))
-        )}
+                <TextField
+                  fullWidth
+                  margin="dense"
+                  variant="filled"
+                  style={{ marginBottom: 16 }}
+                  defaultValue={x.description || ""}
+                  label={t("Option Description")}
+                  onBlur={(event) =>
+                    setOptions((options) =>
+                      Object.assign([...options], {
+                        [idx]: {
+                          value: removeExtraSpace(options[idx].value),
+                          description: removeExtraSpace(event.target.value),
+                        },
+                      })
+                    )
+                  }
+                />
+              </React.Fragment>
+            }
+            labelPlacement="end"
+          />
+        ))}
         <FormControlLabel
           control={
             <TypeComponent
@@ -232,8 +211,14 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               fullWidth
               variant="outlined"
               label={t("Question Title")}
+              error={typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false}
+              helperText={
+                typeof text == "undefined" || text === null || text === "" || !text.trim().length
+                  ? t("Please enter Question Title")
+                  : ""
+              }
               defaultValue={text}
-              onBlur={(event) => setText(event.target.value)}
+              onBlur={(event) => setText(removeExtraSpace(event.target.value))}
               InputProps={{
                 endAdornment: [
                   <InputAdornment position="end" variant="filled" key="adornment">
@@ -263,7 +248,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               label={t("Question Description")}
               variant="filled"
               defaultValue={description}
-              onBlur={(event) => setDescription(event.target.value)}
+              onBlur={(event) => setDescription(removeExtraSpace(event.target.value))}
             />
           </Grid>
           <Grid item xs={12}>
@@ -324,6 +309,7 @@ function compress(file, width, height) {
     }
   })
 }
+const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 export default function SurveyCreator({
   value,
   onSave,
@@ -353,6 +339,43 @@ export default function SurveyCreator({
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
 
+  const [isOptionNull, setIsOptionNull] = useState(0)
+
+  useEffect(() => {
+    let optionsArray = []
+    {
+      questions.map((x, idx) =>
+        questions[idx].text == undefined ||
+        questions[idx].text == "" ||
+        questions[idx].text == null ||
+        !questions[idx].text.trim().length
+          ? optionsArray.push(idx)
+          : questions[idx].options != null
+          ? questions[idx].options.length == 0
+            ? optionsArray.push(idx)
+            : questions[idx].type == "list" ||
+              questions[idx].type == "multiselect" ||
+              questions[idx].type == "slider" ||
+              questions[idx].type == "rating"
+            ? questions[idx].options.map((x, id) =>
+                questions[idx].options[id].value == "" ||
+                questions[idx].options[id].value == null ||
+                questions[idx].options[id].value == undefined ||
+                !questions[idx].options[id].value.trim().length
+                  ? optionsArray.push(id)
+                  : ""
+              )
+            : ""
+          : ""
+      )
+    }
+
+    if (optionsArray.length > 0) {
+      setIsOptionNull(1)
+    } else {
+      setIsOptionNull(0)
+    }
+  }, [questions])
   return (
     <div>
       <MuiThemeProvider theme={theme}>
@@ -419,7 +442,15 @@ export default function SurveyCreator({
                     variant="filled"
                     label={t("Survey Title")}
                     defaultValue={text}
-                    onChange={(event) => setText(event.target.value)}
+                    onChange={(event) => setText(removeExtraSpace(event.target.value))}
+                    error={
+                      typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false
+                    }
+                    helperText={
+                      typeof text == "undefined" || text === null || text === "" || !text.trim().length
+                        ? t("Please enter Survey Title")
+                        : ""
+                    }
                   />
                 </Grid>
               </Grid>
@@ -430,7 +461,7 @@ export default function SurveyCreator({
                   label={t("Survey Description")}
                   variant="filled"
                   defaultValue={description}
-                  onChange={(event) => setDescription(event.target.value)}
+                  onChange={(event) => setDescription(removeExtraSpace(event.target.value))}
                 />
               </Grid>
               <Grid item sm={12}>
@@ -444,7 +475,14 @@ export default function SurveyCreator({
                       key={`${x.text}-${idx}`}
                       question={x}
                       onChange={(change) =>
-                        setQuestions((questions) => Object.assign([...questions], { [idx]: change }))
+                        setQuestions((questions) =>
+                          Object.assign(
+                            [...questions],
+                            {
+                              [idx]: change,
+                            } /*, setQuestionField(!questions[idx].text || questions[idx].text == undefined || questions[idx].text == null || questions[idx].text=='' || !questions[idx].text.trim().length)*/
+                          )
+                        )
                       }
                       onDelete={() => {
                         setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
@@ -539,7 +577,10 @@ export default function SurveyCreator({
                   false /* overwrite */
                 )
               }
-              disabled={!onSave || questions.length === 0 || !text || !studyId}
+              {...questions.map((x, idx) => console.log(questions[idx]))}
+              disabled={
+                !onSave || !text || !text.trim().length || !studyId || questions.length == 0 || isOptionNull == 1
+              }
             >
               {t("Save")}
               <span style={{ width: 8 }} />

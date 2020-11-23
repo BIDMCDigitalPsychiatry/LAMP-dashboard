@@ -36,6 +36,7 @@ import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
+import PreventDBT from "./PreventDBT"
 import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
 import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
 import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
@@ -48,6 +49,7 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
+import es from "javascript-time-ago/locale/es"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { Vega } from "react-vega"
@@ -584,8 +586,46 @@ export default function Prevent({
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
   const { t, i18n } = useTranslation()
-  const currentLanguage = i18n.language === "en_US" ? "en-US" : "hi-IN"
-  const currentLanguageCode = i18n.language === "en_US" ? en : hi
+
+  const getCurrentLanguage = () => {
+    let lang
+    switch (i18n.language) {
+      case "en_US":
+        lang = "en-US"
+        break
+      case "hi_IN":
+        lang = "hi-IN"
+        break
+      case "es_ES":
+        lang = "es-ES"
+        break
+      default:
+        lang = "en-US"
+        break
+    }
+    return lang
+  }
+
+  const getCurrentLanguageCode = () => {
+    let langCode
+    switch (i18n.language) {
+      case "en_US":
+        langCode = en
+        break
+      case "hi_IN":
+        langCode = hi
+        break
+      case "es_ES":
+        langCode = es
+        break
+      default:
+        langCode = en
+        break
+    }
+    return langCode
+  }
+  const currentLanguage = getCurrentLanguage()
+  const currentLanguageCode = getCurrentLanguageCode()
   TimeAgo.addLocale(currentLanguageCode)
   const timeAgo = new TimeAgo(currentLanguage)
 
@@ -629,7 +669,7 @@ export default function Prevent({
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [sensorCounts, setSensorCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
-  const [selectedActivity, setSelectedActivity] = React.useState({})
+  const [selectedActivity, setSelectedActivity] = React.useState(null)
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
@@ -1103,7 +1143,7 @@ export default function Prevent({
         }}
       >
         <DialogTitle id="alert-dialog-slide-title">
-          {dialogueType === 0 ? t("Activity data") : t("Sensor Data")}
+          {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
@@ -1178,6 +1218,8 @@ export default function Prevent({
           <Journal participant={participant} selectedEvents={selectedActivity} />
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
+        ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (
+          <PreventDBT participant={participant} selectedEvents={(activityData || {})[selectedActivityName]} />
         ) : (
           <PreventData
             participant={participant}

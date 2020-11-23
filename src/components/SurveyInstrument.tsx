@@ -656,7 +656,7 @@ function ShortTextSection({ onChange, value, ...props }) {
 }
 
 function RadioRating({ onChange, options, value, ...props }) {
-  let ratingArray = [...Array(options[0]?.max_rating ? options[0]?.max_rating + 1 : 6).keys()]
+  let ratingArray = [...Array(options.length).keys()]
 
   return (
     <Box textAlign="center" mt={5}>
@@ -671,7 +671,6 @@ function RadioRating({ onChange, options, value, ...props }) {
 
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
-
   const getText = (val) => {
     let sliderValue = options[0].description
     options.map(function (mark) {
@@ -681,6 +680,7 @@ function Rating({ onChange, options, value, ...props }) {
     })
     return sliderValue
   }
+
   const { t } = useTranslation()
 
   const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
@@ -689,7 +689,6 @@ function Rating({ onChange, options, value, ...props }) {
   const valuetext = (value: number) => {
     return `${options[value]}`
   }
-
   const getSliderValue = (val) => {
     let sliderValue = options[0].description
     let slValue = val
@@ -697,7 +696,7 @@ function Rating({ onChange, options, value, ...props }) {
       if (mark.value == slValue) {
         sliderValue = mark.description
       }
-    })    
+    })
     setSliderValue(val)
     setValueText(sliderValue)
     onChange(val)
@@ -712,9 +711,14 @@ function Rating({ onChange, options, value, ...props }) {
         getAriaValueText={valuetext}
         aria-labelledby="discrete-slider"
         valueLabelDisplay="auto"
-        step={options[0].value < 0 ? parseInt(options[0].value) - parseInt(options[1].value) :
-             parseInt(options[1].value) - parseInt(options[0].value)}
-        marks
+        step={
+          parseInt(options[0].value) < 0 && parseInt(options[1].value) < 0
+            ? Math.abs(parseInt(options[0].value)) + parseInt(options[1].value)
+            : parseInt(options[0].value) < 0 && parseInt(options[1].value) > 0
+            ? Math.abs(parseInt(options[0].value)) - parseInt(options[1].value)
+            : parseInt(options[1].value) - parseInt(options[0].value)
+        }
+        marks={options}
         min={parseInt(options[0].value)}
         max={parseInt(options[options.length - 1].value)}
         track={false}
@@ -742,9 +746,11 @@ function Rating({ onChange, options, value, ...props }) {
           </Typography>
         </Grid>
         <Grid item xs={4}>
-          {options.length > 2 && ( 
+          {options.length > 2 && (
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-              {options[Math.ceil(options.length / 2) - 1].description === null ? 0 : options[Math.ceil(options.length / 2) - 1].description}
+              {options[Math.ceil(options.length / 2) - 1].description === null
+                ? 0
+                : options[Math.ceil(options.length / 2) - 1].description}
             </Typography>
           )}
         </Grid>
@@ -858,7 +864,7 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = JSON.parse(JSON.stringify(options).replace(null, "0")) 
+      options = JSON.parse(JSON.stringify(options).replace(/null/g, "0"))
       options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
@@ -901,9 +907,9 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
             ? t("(Select one)")
             : type === "slider"
             ? t(
-                `(${options[0].value} being ${options[0].label}, ${options[options.length - 1].value} being ${
-                  options[options.length - 1].description
-                })`
+                `(${options[0].value} being ${!!options[0].description ?? options[0].value}, ${
+                  options[options.length - 1].value
+                } being ${options[options.length - 1].description})`
               )
             : ""}
         </Typography>
@@ -1193,7 +1199,7 @@ export default function SurveyInstrument({ id, group, onComplete, type, setVisib
   const startTime = new Date().getTime()
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
- 
+
   useEffect(() => {
     if (group.length === 0) return setSurvey(undefined)
     getSplicedSurveys(group).then((spliced) => {

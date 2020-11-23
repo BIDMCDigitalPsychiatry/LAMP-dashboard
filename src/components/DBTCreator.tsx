@@ -355,7 +355,7 @@ export default function GameCreator({
               value={studyId}
               onChange={(e) => setStudyId(e.target.value)}
               helperText={
-                typeof studyId == "undefined" || studyId === null || studyId === "" ? "Please select the study" : ""
+                typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the Study") : ""
               }
               variant="filled"
               disabled={!!value ? true : false}
@@ -384,7 +384,7 @@ export default function GameCreator({
           </Grid>
 
           <Grid item xs={12}>
-            <Typography className={classes.sectionTitle}>Life worth living goal</Typography>
+            <Typography className={classes.sectionTitle}>{t("Life worth living goal")}</Typography>
             <Grid container spacing={0}>
               <Grid item xs={10} sm={8}>
                 <div className={classes.inputContainer}>
@@ -396,9 +396,9 @@ export default function GameCreator({
                       multiline
                       rows={4}
                     />
-                    <Typography className={classes.inputDescription}>{`${
-                      (config?.livingGoal || "").length
-                    } / 300 max characters`}</Typography>
+                    <Typography className={classes.inputDescription}>
+                      {`${(config?.livingGoal || "").length} / ` + t("300 max characters")}
+                    </Typography>
                   </div>
                 </div>
               </Grid>

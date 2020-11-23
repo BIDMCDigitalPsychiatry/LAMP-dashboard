@@ -255,7 +255,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
   const languagesArray = [
     { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
     { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "fr_US", value: "French", lang_array: [] },
+    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
   ]
 
   const getSelectedLanguage = () => {
