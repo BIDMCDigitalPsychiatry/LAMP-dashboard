@@ -36,6 +36,7 @@ import MultipleSelect from "./MultipleSelect"
 import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
+import PreventDBT from "./PreventDBT"
 import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
 import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
 import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
@@ -48,6 +49,7 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
+import es from "javascript-time-ago/locale/es"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { Vega } from "react-vega"
@@ -584,8 +586,46 @@ export default function Prevent({
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
   const { t, i18n } = useTranslation()
-  const currentLanguage = i18n.language === "en_US" ? "en-US" : "hi-IN"
-  const currentLanguageCode = i18n.language === "en_US" ? en : hi
+
+  const getCurrentLanguage = () => {
+    let lang
+    switch (i18n.language) {
+      case "en_US":
+        lang = "en-US"
+        break
+      case "hi_IN":
+        lang = "hi-IN"
+        break
+      case "es_ES":
+        lang = "es-ES"
+        break
+      default:
+        lang = "en-US"
+        break
+    }
+    return lang
+  }
+
+  const getCurrentLanguageCode = () => {
+    let langCode
+    switch (i18n.language) {
+      case "en_US":
+        langCode = en
+        break
+      case "hi_IN":
+        langCode = hi
+        break
+      case "es_ES":
+        langCode = es
+        break
+      default:
+        langCode = en
+        break
+    }
+    return langCode
+  }
+  const currentLanguage = getCurrentLanguage()
+  const currentLanguageCode = getCurrentLanguageCode()
   TimeAgo.addLocale(currentLanguageCode)
   const timeAgo = new TimeAgo(currentLanguage)
 
@@ -629,7 +669,7 @@ export default function Prevent({
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [sensorCounts, setSensorCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
-  const [selectedActivity, setSelectedActivity] = React.useState({})
+  const [selectedActivity, setSelectedActivity] = React.useState(null)
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
   const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
@@ -667,191 +707,6 @@ export default function Prevent({
 
   React.useEffect(() => {
     ;(async () => {
-      await LAMP.Type.setAttachment(participant.id, "me", "lamp.dashboard.experimental.MY_CUSTOM_VIZ_NAME_HERE", {
-        $schema: "https://vega.github.io/schema/vega/v5.json",
-        description: "A radar chart example, showing multiple dimensions in a radial layout.",
-        width: 400,
-        height: 400,
-        padding: 40,
-        autosize: { type: "none", contains: "padding" },
-
-        signals: [{ name: "radius", update: "width / 2" }],
-
-        data: [
-          {
-            name: "table",
-            values: [
-              { key: "key-0", value: 19, category: 0 },
-              { key: "key-1", value: 22, category: 0 },
-              { key: "key-2", value: 14, category: 0 },
-              { key: "key-3", value: 38, category: 0 },
-              { key: "key-4", value: 23, category: 0 },
-              { key: "key-5", value: 5, category: 0 },
-              { key: "key-6", value: 27, category: 0 },
-              { key: "key-0", value: 13, category: 1 },
-              { key: "key-1", value: 12, category: 1 },
-              { key: "key-2", value: 42, category: 1 },
-              { key: "key-3", value: 13, category: 1 },
-              { key: "key-4", value: 6, category: 1 },
-              { key: "key-5", value: 15, category: 1 },
-              { key: "key-6", value: 8, category: 1 },
-            ],
-          },
-          {
-            name: "keys",
-            source: "table",
-            transform: [
-              {
-                type: "aggregate",
-                groupby: ["key"],
-              },
-            ],
-          },
-        ],
-
-        scales: [
-          {
-            name: "angular",
-            type: "point",
-            range: { signal: "[-PI, PI]" },
-            padding: 0.5,
-            domain: { data: "table", field: "key" },
-          },
-          {
-            name: "radial",
-            type: "linear",
-            range: { signal: "[0, radius]" },
-            zero: true,
-            nice: false,
-            domain: { data: "table", field: "value" },
-            domainMin: 0,
-          },
-          {
-            name: "color",
-            type: "ordinal",
-            domain: { data: "table", field: "category" },
-            range: { scheme: "category10" },
-          },
-        ],
-
-        encode: {
-          enter: {
-            x: { signal: "radius" },
-            y: { signal: "radius" },
-          },
-        },
-
-        marks: [
-          {
-            type: "group",
-            name: "categories",
-            zindex: 1,
-            from: {
-              facet: { data: "table", name: "facet", groupby: ["category"] },
-            },
-            marks: [
-              {
-                type: "line",
-                name: "category-line",
-                from: { data: "facet" },
-                encode: {
-                  enter: {
-                    interpolate: { value: "linear-closed" },
-                    x: { signal: "scale('radial', datum.value) * cos(scale('angular', datum.key))" },
-                    y: { signal: "scale('radial', datum.value) * sin(scale('angular', datum.key))" },
-                    stroke: { scale: "color", field: "category" },
-                    strokeWidth: { value: 1 },
-                    fill: { scale: "color", field: "category" },
-                    fillOpacity: { value: 0.1 },
-                  },
-                },
-              },
-              {
-                type: "text",
-                name: "value-text",
-                from: { data: "category-line" },
-                encode: {
-                  enter: {
-                    x: { signal: "datum.x" },
-                    y: { signal: "datum.y" },
-                    text: { signal: "datum.datum.value" },
-                    align: { value: "center" },
-                    baseline: { value: "middle" },
-                    fill: { value: "black" },
-                  },
-                },
-              },
-            ],
-          },
-          {
-            type: "rule",
-            name: "radial-grid",
-            from: { data: "keys" },
-            zindex: 0,
-            encode: {
-              enter: {
-                x: { value: 0 },
-                y: { value: 0 },
-                x2: { signal: "radius * cos(scale('angular', datum.key))" },
-                y2: { signal: "radius * sin(scale('angular', datum.key))" },
-                stroke: { value: "lightgray" },
-                strokeWidth: { value: 1 },
-              },
-            },
-          },
-          {
-            type: "text",
-            name: "key-label",
-            from: { data: "keys" },
-            zindex: 1,
-            encode: {
-              enter: {
-                x: { signal: "(radius + 5) * cos(scale('angular', datum.key))" },
-                y: { signal: "(radius + 5) * sin(scale('angular', datum.key))" },
-                text: { field: "key" },
-                align: [
-                  {
-                    test: "abs(scale('angular', datum.key)) > PI / 2",
-                    value: "right",
-                  },
-                  {
-                    value: "left",
-                  },
-                ],
-                baseline: [
-                  {
-                    test: "scale('angular', datum.key) > 0",
-                    value: "top",
-                  },
-                  {
-                    test: "scale('angular', datum.key) == 0",
-                    value: "middle",
-                  },
-                  {
-                    value: "bottom",
-                  },
-                ],
-                fill: { value: "black" },
-                fontWeight: { value: "bold" },
-              },
-            },
-          },
-          {
-            type: "line",
-            name: "outer-line",
-            from: { data: "radial-grid" },
-            encode: {
-              enter: {
-                interpolate: { value: "linear-closed" },
-                x: { field: "x2" },
-                y: { field: "y2" },
-                stroke: { value: "lightgray" },
-                strokeWidth: { value: 1 },
-              },
-            },
-          },
-        ],
-      })
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
@@ -1288,7 +1143,7 @@ export default function Prevent({
         }}
       >
         <DialogTitle id="alert-dialog-slide-title">
-          {dialogueType === 0 ? t("Activity data") : t("Sensor Data")}
+          {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
             <CloseIcon />
           </IconButton>
@@ -1363,6 +1218,8 @@ export default function Prevent({
           <Journal participant={participant} selectedEvents={selectedActivity} />
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
+        ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (
+          <PreventDBT participant={participant} selectedEvents={(activityData || {})[selectedActivityName]} />
         ) : (
           <PreventData
             participant={participant}
