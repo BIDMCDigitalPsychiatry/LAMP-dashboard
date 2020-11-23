@@ -298,7 +298,7 @@
 	"Successfully duplicated the Activity under a new name.": "Successfully duplicated the Activity under a new name.",
 	"Group": "Group",
 	"Tips": "Tips",
-	"DBT diary card": "DBT diary card",
+	"DBT Diary Card": "DBT Diary Card",
 	"Cognitive Test": "Cognitive Test",
 	"Study": "Study",
 	"Export": "Export",
@@ -494,5 +494,7 @@
 	"Never": "Never",	
 	"Jewels A": "Jewels A",
 	"Jewels B": "Jewels B",
-	"Duplicate this activity and save it with a new title.": "Duplicate this activity and save it with a new title."
+	"Duplicate this activity and save it with a new title.": "Duplicate this activity and save it with a new title.",
+	"300 max characters": "300 max characters",
+	"Life worth living goal": "Life worth living goal"
 }
