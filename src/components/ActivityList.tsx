@@ -600,22 +600,19 @@ export default function ActivityList({ researcher, title, ...props }) {
     let counts = studiesCount
     let index = 0
     studies.map((study) => {
-      ;(async () => {
-        setLoading(true)
-        await LAMP.Activity.allByStudy(study.id).then((resActivities) => {
-          counts[study.name] = resActivities.length
-          if (selected !== null && selected.includes(study.name)) {
-            resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
-            activityData = activityData.concat(resActivities)
-          }
-        })
-        setStudiesCount(counts)
-        setActivities(activityData)
+      LAMP.Activity.allByStudy(study.id).then((resActivities) => {
+        counts[study.name] = resActivities.length
+        if (selected !== null && selected.includes(study.name)) {
+          resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
+          activityData = activityData.concat(resActivities)
+        }
         if (index === studies.length - 1) {
+          setStudiesCount(counts)
+          setActivities(activityData)
           setLoading(false)
         }
         index++
-      })()
+      })
     })
   }
 
@@ -1045,7 +1042,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                   "lamp.tips": t("Tips"),
                   "lamp.journal": t("Journal"),
                   "lamp.breathe": t("Breathe"),
-                  "lamp.dbt_diary_card": t("DBT diary card"),
+                  "lamp.dbt_diary_card": t("DBT Diary Card"),
                   "lamp.scratch_image": t("Scratch image"),
                 },
                 emptyValue: t("Cognitive Test"),
