@@ -33,6 +33,8 @@ import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 
+import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
+
 const theme = createMuiTheme({
   overrides: {
     MuiInput: {
@@ -178,6 +180,10 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 150,
       },
     },
+    blankMsg: {
+      "& path": { fill: "#666" },
+      "& p": { margin: "2px 5px" },
+    },
   })
 )
 
@@ -215,7 +221,6 @@ export default function Survey({
   const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
   const [loading, setLoading] = useState(true)
-
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
@@ -256,52 +261,64 @@ export default function Survey({
   // const month = date.getMonth() + 1
   // const day = date.getDate()
   // const formattedDate = year + "-" + month + "-" + day
-
+  const activitiesArray = (activities || []).filter(
+    (x) =>
+      x.spec === "lamp.dbt_diary_card" ||
+      (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+  )
   return (
     <Container className={classes.thumbContainer}>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
-        {[
-          ...(activities || [])
-            .filter(
-              (x) =>
-                x.spec === "lamp.dbt_diary_card" ||
-                (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-            )
-            .map((y) => (
-              <Grid
-                item
-                xs={6}
-                sm={4}
-                md={3}
-                lg={3}
-                onClick={() => {
-                  setSpec(y.spec)
-                  setActivity(y)
-                  y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
-                  setVisibleActivities([y])
-                  handleClickOpen(y.name)
-                }}
-                className={classes.thumbMain}
-              >
-                <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                  <Card className={classes.assess}>
-                    <Box mt={2} mb={1}>
-                      <Box
-                        className={classes.mainIcons}
-                        style={{
-                          margin: "auto",
-                          background: tag[y?.id]?.photo
-                            ? `url(${tag[y?.id]?.photo}) center center/contain no-repeat`
-                            : `url(${InfoIcon}) center center/contain no-repeat`,
-                        }}
-                      ></Box>
-                    </Box>
-                    <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
-                  </Card>
-                </ButtonBase>
-              </Grid>
-            )),
-        ]}
+        {loading == true ? (
+          " "
+        ) : activitiesArray.length ? (
+          [
+            ...(activities || [])
+              .filter(
+                (x) =>
+                  x.spec === "lamp.dbt_diary_card" ||
+                  (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+              )
+              .map((y) => (
+                <Grid
+                  item
+                  xs={6}
+                  sm={4}
+                  md={3}
+                  lg={3}
+                  onClick={() => {
+                    setSpec(y.spec)
+                    setActivity(y)
+                    y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
+                    setVisibleActivities([y])
+                    handleClickOpen(y.name)
+                  }}
+                  className={classes.thumbMain}
+                >
+                  <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                    <Card className={classes.assess}>
+                      <Box mt={2} mb={1}>
+                        <Box
+                          className={classes.mainIcons}
+                          style={{
+                            margin: "auto",
+                            background: tag[y?.id]?.photo
+                              ? `url(${tag[y?.id]?.photo}) center center/contain no-repeat`
+                              : `url(${InfoIcon}) center center/contain no-repeat`,
+                          }}
+                        ></Box>
+                      </Box>
+                      <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
+                    </Card>
+                  </ButtonBase>
+                </Grid>
+              )),
+          ]
+        ) : (
+          <Box display="flex" className={classes.blankMsg} ml={1}>
+            <EmptyManageIcon /> <p>There are no Survey activities available.</p>
+          </Box>
+        )}
       </Grid>
 
       <Dialog
