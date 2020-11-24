@@ -199,7 +199,7 @@ export default function TipCreator({
         let existsData = categoryArray.find((o) => o.id === category)
         if (Object.keys(existsData).length > 0) {
           if (existsData.id) {
-            let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.tip_details")
+            let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.activity_details")
             if (iconsData.hasOwnProperty("data")) {
               setCategoryImage(iconsData.data.icon)
             }
@@ -235,7 +235,7 @@ export default function TipCreator({
           setSelectedCategory(activitiesData)
           setTipsDataArray(activitiesData.settings)
         }
-        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.tip_details")
+        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
         if (iconsData.hasOwnProperty("data")) {
           setCategoryImage(iconsData.data.icon)
         }

@@ -740,7 +740,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     let result
     if (!x.id && x.name) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
-      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         icon: x.icon,
       })
       if (!!result.error)
@@ -759,7 +759,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         settings: x.settings,
       })) as any
 
-      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
+      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
         icon: x.icon,
       })
       if (!!result.error)
@@ -980,7 +980,7 @@ export default function ActivityList({ researcher, title, ...props }) {
           settings: x.settings,
         }
         result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
           icon: x.icon,
         })
         if (!!result.error)
