@@ -19,7 +19,7 @@ const demoActivities = {
   "lamp.spatial_span": "boxgame",
   "lamp.cats_and_dogs": "catsndogs",
   "Dot Touch": "dottouch",
-  "lamp.jewels_a": "jewels",
+  "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
   "Pop The Bubbles": "popthebubbles",
   "lamp.dbt_diary_card": "dbtdiarycard",
@@ -89,7 +89,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         demoActivities[activity.spec]
       }.html.b64`
     )
-    //let response = await fetch(demoActivities[activity.spec]+'.html.b64')
+    // let response = await fetch(demoActivities[activity.spec]+'.html.b64')
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

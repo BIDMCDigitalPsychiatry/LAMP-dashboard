@@ -108,17 +108,25 @@ function compress(file, width, height) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
+    const fileName = file.name
+    const extension = fileName.split(".").reverse()[0].toLowerCase()
     reader.onerror = (error) => reject(error)
-    reader.onload = (event) => {
-      const img = new Image()
-      img.src = event.target.result as string
-      img.onload = () => {
-        const elem = document.createElement("canvas")
-        elem.width = width
-        elem.height = height
-        const ctx = elem.getContext("2d")
-        ctx.drawImage(img, 0, 0, width, height)
-        resolve(ctx.canvas.toDataURL())
+    if (extension !== "svg") {
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target.result as string
+        img.onload = () => {
+          const elem = document.createElement("canvas")
+          elem.width = width
+          elem.height = height
+          const ctx = elem.getContext("2d")
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(ctx.canvas.toDataURL())
+        }
+      }
+    } else {
+      reader.onload = (event) => {
+        resolve(reader.result)
       }
     }
   })
@@ -165,18 +173,25 @@ export default function GameCreator({
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(details?.photo ?? null)
+  const [photo, setPhoto] = useState(
+    details?.photo ??
+      ((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
+        ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId))
+      ? Jewels
+      : null
+  )
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
   const { t } = useTranslation()
-
   const [settings, setSettings] = useState(
     !!value
       ? value?.settings
       : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
         ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
       ? {
+          mode: 1,
+          variant: "trails_a",
           beginner_seconds: 90,
           intermediate_seconds: 30,
           advanced_seconds: 25,
@@ -192,13 +207,21 @@ export default function GameCreator({
       : {}
   )
 
-  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
-  // eslint-disable-next-line
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
+    onDropAccepted: useCallback((acceptedFiles) => {
+      compress(acceptedFiles[0], 64, 64).then(setPhoto)
+    }, []),
+    onDropRejected: useCallback((rejectedFiles) => {
+      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
+        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
+        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+      }
+    }, []),
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
+
   const validate = () => {
     let duplicates = []
     if (typeof text !== "undefined" && text?.trim() !== "") {
@@ -247,8 +270,7 @@ export default function GameCreator({
         settings.expert_seconds < 10 ||
         settings.advanced_seconds < 10 ||
         settings.diamond_count < 3 ||
-        settings.shape_count <
-          ((value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1) ||
+        settings.shape_count < 1 ||
         (typeof text !== "undefined" && text?.trim() === "")
       )
     } else {
@@ -262,14 +284,18 @@ export default function GameCreator({
       )
     }
   }
-  useEffect(() => {
-    if (
-      (photo === null && value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-      ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
-    ) {
-      setPhoto(Jewels)
-    }
-  }, [])
+
+  const modes = [
+    { name: "Beginner", value: 1 },
+    { name: "Intermediate", value: 2 },
+    { name: "Expert", value: 4 },
+    { name: "Advanced", value: 3 },
+  ]
+
+  const variants = [
+    { name: "Trails A", value: "trails_a" },
+    { name: "Trails B", value: "trails_b" },
+  ]
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
@@ -283,8 +309,8 @@ export default function GameCreator({
               <Tooltip
                 title={
                   !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
+                    ? t("Drag a photo or tap to select a photo.")
+                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
                 }
               >
                 <Box
@@ -314,14 +340,14 @@ export default function GameCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Select"
+                    label={t("Study")}
                     value={studyId}
                     onChange={(e) => {
                       setStudyId(e.target.value)
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? "Please select the study"
+                        ? t("Please select the study")
                         : ""
                     }
                     variant="filled"
@@ -329,7 +355,7 @@ export default function GameCreator({
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -344,7 +370,7 @@ export default function GameCreator({
                       }
                       fullWidth
                       variant="filled"
-                      label="Activity Title"
+                      label={t("Activity Title")}
                       defaultValue={text}
                       onChange={(event) => setText(event.target.value)}
                       inputProps={{ maxLength: 80 }}
@@ -357,7 +383,7 @@ export default function GameCreator({
                 <TextField
                   fullWidth
                   multiline
-                  label="Activity Description"
+                  label={t("Activity Description")}
                   variant="filled"
                   rows={2}
                   defaultValue={description}
@@ -370,14 +396,14 @@ export default function GameCreator({
 
           {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
             <Box style={{ marginTop: 80 }}>
-              <Typography variant="h6">Order of tapping:</Typography>
+              <Typography variant="h6">{t("Order of tapping:")}</Typography>
               <Box display="flex" mt={2}>
                 <Box>
                   <RatioButton
                     value="Forward"
                     unable={false}
                     smallSpace={true}
-                    title="Forward"
+                    title={t("Forward")}
                     color="#618EF7"
                     checked={!settings.reverse_tapping ? true : false}
                     onChange={() => setSettings({ ...settings, reverse_tapping: false })}
@@ -387,9 +413,9 @@ export default function GameCreator({
                 <Box>
                   <RatioButton
                     smallSpace={true}
-                    title="Backward"
+                    title={t("Backward")}
                     color="#618EF7"
-                    value="Backward"
+                    value={t("Backward")}
                     unable={false}
                     checked={settings.reverse_tapping ? true : false}
                     onChange={() => setSettings({ ...settings, reverse_tapping: true })}
@@ -403,9 +429,63 @@ export default function GameCreator({
           {((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
             ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)) && (
             <Grid container spacing={2}>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={
+                    typeof settings.mode == "undefined" || settings.mode === null || settings.mode === "" ? true : false
+                  }
+                  select
+                  label={t("Mode")}
+                  value={settings?.mode ?? 1}
+                  onChange={(e) => {
+                    setSettings({ ...settings, mode: Number(e.target.value) })
+                  }}
+                  helperText={
+                    typeof settings.mode == "undefined" || settings.mode === null || settings.mode === ""
+                      ? t("Please select the mode")
+                      : ""
+                  }
+                  variant="filled"
+                  disabled={!!value ? true : false}
+                >
+                  {modes.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.name)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={
+                    typeof settings.variant == "undefined" || settings.variant === null || settings.variant === ""
+                      ? true
+                      : false
+                  }
+                  select
+                  label={t("Variant")}
+                  value={settings?.variant ?? 1}
+                  onChange={(e) => {
+                    setSettings({ ...settings, variant: e.target.value })
+                  }}
+                  helperText={
+                    typeof settings.variant == "undefined" || settings.variant === null || settings.variant === ""
+                      ? t("Please select the variant")
+                      : ""
+                  }
+                  variant="filled"
+                  disabled={!!value ? true : false}
+                >
+                  {variants.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.name)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
               <Grid item xs={12}>
                 <Divider />
-                <Typography variant="h6">Game duration</Typography>
+                <Typography variant="h6">{t("Game duration")}</Typography>
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
                 <TextField
@@ -420,7 +500,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="beginner_seconds"
-                  label="Beginner seconds"
+                  label={t("Beginner seconds")}
                   defaultValue={settings?.beginner_seconds ?? 90}
                   InputLabelProps={{
                     shrink: true,
@@ -430,7 +510,7 @@ export default function GameCreator({
                     min: 30,
                   }}
                   onChange={(e) => setSettings({ ...settings, beginner_seconds: Number(e.target.value) })}
-                  helperText={settings.beginner_seconds > 300 ? "Maximum value is 300" : ""}
+                  helperText={settings.beginner_seconds > 300 ? t("Maximum value is 300") : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -446,7 +526,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="intermediate_seconds"
-                  label="Intermediate seconds"
+                  label={t("Intermediate seconds")}
                   defaultValue={settings?.intermediate_seconds ?? 30}
                   InputLabelProps={{
                     shrink: true,
@@ -456,7 +536,7 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, intermediate_seconds: Number(e.target.value) })}
-                  helperText={settings.intermediate_seconds > 300 ? "Maximum value is 300" : ""}
+                  helperText={settings.intermediate_seconds > 300 ? t("Maximum value is 300") : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -472,7 +552,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="expert_seconds"
-                  label="expert seconds"
+                  label={t("Expert seconds")}
                   defaultValue={settings?.expert_seconds ?? 100}
                   InputLabelProps={{
                     shrink: true,
@@ -482,7 +562,7 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, expert_seconds: Number(e.target.value) })}
-                  helperText={settings.expert_seconds > 300 ? "Maximum value is 300" : ""}
+                  helperText={settings.expert_seconds > 300 ? t("Maximum value is 300") : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -498,7 +578,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="advanced_seconds"
-                  label="Advanced seconds"
+                  label={t("Advanced seconds")}
                   defaultValue={settings?.advanced_seconds ?? 120}
                   InputLabelProps={{
                     shrink: true,
@@ -508,12 +588,12 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, advanced_seconds: Number(e.target.value) })}
-                  helperText={settings.advanced_seconds > 300 ? "Maximum value is 300" : ""}
+                  helperText={settings.advanced_seconds > 300 ? t("Maximum value is 300") : ""}
                 />
               </Grid>
               <Grid item xs={12}>
                 <Divider />
-                <Typography variant="h6">Settings</Typography>
+                <Typography variant="h6">{t("Settings")}</Typography>
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
                 <TextField
@@ -528,7 +608,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="diamond_count"
-                  label="Number of diamonds for level 1"
+                  label={t("Number of diamonds for level 1")}
                   defaultValue={settings?.diamond_count ?? 15}
                   InputLabelProps={{
                     shrink: true,
@@ -538,7 +618,7 @@ export default function GameCreator({
                     min: 3,
                   }}
                   onChange={(e) => setSettings({ ...settings, diamond_count: Number(e.target.value) })}
-                  helperText={settings.diamond_count > 25 ? "Maximum value is 25" : ""}
+                  helperText={settings.diamond_count > 25 ? t("Maximum value is 25") : ""}
                 />
               </Grid>
               <Grid item lg={6} md={6} sm={6} xs={12}>
@@ -546,7 +626,7 @@ export default function GameCreator({
                   error={settings.bonus_point_count === 0 || settings.bonus_point_count === "" ? true : false}
                   type="number"
                   id="bonus_point_count"
-                  label="Bonus points for next level"
+                  label={t("Bonus points for next level")}
                   defaultValue={settings?.bonus_point_count ?? 50}
                   variant="filled"
                   InputLabelProps={{
@@ -557,14 +637,13 @@ export default function GameCreator({
                     min: 0,
                   }}
                   onChange={(e) => setSettings({ ...settings, bonus_point_count: Number(e.target.value) })}
-                  helperText={settings.bonus_point_count > 500 ? "Maximum value is 500" : ""}
+                  helperText={settings.bonus_point_count > 500 ? t("Maximum value is 500") : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
                 <TextField
                   error={
-                    settings.shape_count <
-                      ((value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1) ||
+                    settings.shape_count < 1 ||
                     settings.shape_count > 4 ||
                     settings.shape_count === 0 ||
                     settings.shape_count === ""
@@ -574,22 +653,17 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="shape_count"
-                  label="Number of shapes"
+                  label={t("Number of shapes")}
                   InputLabelProps={{
                     shrink: true,
                   }}
                   inputProps={{
                     max: 4,
-                    //true,
-                    readOnly:
-                      (value?.spec && "lamp.jewels_a" === value.spec) || "lamp.jewels_a" == activitySpecId
-                        ? true
-                        : false,
-                    min: (value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1,
+                    min: 1,
                   }}
                   defaultValue={settings?.shape_count ?? 1}
                   onChange={(e) => setSettings({ ...settings, shape_count: Number(e.target.value) })}
-                  helperText={settings.shape_count > 4 ? "Maximum value is 4" : ""}
+                  helperText={settings.shape_count > 4 ? t("Maximum value is 4") : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -597,7 +671,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="x_changes_in_level_count"
-                  label="X changes in level count"
+                  label={t("X changes in level count")}
                   defaultValue={settings?.x_changes_in_level_count ?? 1}
                   InputLabelProps={{
                     shrink: true,
@@ -614,7 +688,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="x_diamond_count"
-                  label="X diamond count"
+                  label={t("X diamond count")}
                   InputLabelProps={{
                     shrink: true,
                   }}
@@ -631,7 +705,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="y_changes_in_level_count"
-                  label="Y changes in level count"
+                  label={t("Y changes in level count")}
                   defaultValue={settings?.y_changes_in_level_count ?? 2}
                   InputLabelProps={{
                     shrink: true,
@@ -648,7 +722,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="y_shape_count"
-                  label="Y shape count"
+                  label={t("Y shape count")}
                   defaultValue={settings?.y_shape_count ?? 1}
                   InputLabelProps={{
                     shrink: true,
