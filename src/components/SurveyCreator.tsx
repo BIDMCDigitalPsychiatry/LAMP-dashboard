@@ -31,6 +31,7 @@ import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } fro
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 import { id } from "vega"
+import { useSnackbar } from "notistack"
 
 const theme = createMuiTheme({
   palette: {
@@ -294,21 +295,30 @@ function compress(file, width, height) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
+    const fileName = file.name
+    const extension = fileName.split(".").reverse()[0].toLowerCase()
     reader.onerror = (error) => reject(error)
-    reader.onload = (event) => {
-      const img = new Image()
-      img.src = event.target.result as string
-      img.onload = () => {
-        const elem = document.createElement("canvas")
-        elem.width = width
-        elem.height = height
-        const ctx = elem.getContext("2d")
-        ctx.drawImage(img, 0, 0, width, height)
-        resolve(ctx.canvas.toDataURL())
+    if (extension !== "svg") {
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target.result as string
+        img.onload = () => {
+          const elem = document.createElement("canvas")
+          elem.width = width
+          elem.height = height
+          const ctx = elem.getContext("2d")
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(ctx.canvas.toDataURL())
+        }
+      }
+    } else {
+      reader.onload = (event) => {
+        resolve(reader.result)
       }
     }
   })
 }
+
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 export default function SurveyCreator({
   value,
@@ -322,6 +332,7 @@ export default function SurveyCreator({
   onCancel?: any
   studies?: any
 }) {
+  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const [activeStep, setActiveStep] = useState(0)
   const [text, setText] = useState(!!value ? value.name : undefined)
@@ -331,10 +342,17 @@ export default function SurveyCreator({
   const { t } = useTranslation()
   const [photo, setPhoto] = useState(value?.photo ?? null)
 
-  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
-  // eslint-disable-next-line
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
+    onDropAccepted: useCallback((acceptedFiles) => {
+      compress(acceptedFiles[0], 64, 64).then(setPhoto)
+    }, []),
+    onDropRejected: useCallback((rejectedFiles) => {
+      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
+        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
+        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+      }
+    }, []),
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
