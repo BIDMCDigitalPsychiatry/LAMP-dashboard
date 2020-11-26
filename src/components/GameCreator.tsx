@@ -446,7 +446,6 @@ export default function GameCreator({
                       : ""
                   }
                   variant="filled"
-                  disabled={!!value ? true : false}
                 >
                   {modes.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -474,7 +473,6 @@ export default function GameCreator({
                       : ""
                   }
                   variant="filled"
-                  disabled={!!value ? true : false}
                 >
                   {variants.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
