@@ -26,7 +26,7 @@ import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-
+	
 const theme = createMuiTheme({
   palette: {
     secondary: {
@@ -199,7 +199,7 @@ export default function TipCreator({
         let existsData = categoryArray.find((o) => o.id === category)
         if (Object.keys(existsData).length > 0) {
           if (existsData.id) {
-            let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.tip_details")
+            let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.activity_details")
             if (iconsData.hasOwnProperty("data")) {
               setCategoryImage(iconsData.data.icon)
             }
@@ -235,7 +235,7 @@ export default function TipCreator({
           setSelectedCategory(activitiesData)
           setTipsDataArray(activitiesData.settings)
         }
-        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.tip_details")
+        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
         if (iconsData.hasOwnProperty("data")) {
           setCategoryImage(iconsData.data.icon)
         }
@@ -277,20 +277,29 @@ export default function TipCreator({
     let reader = new FileReader()
     reader.readAsDataURL(file)
     if (type === "icon") {
-      let width = 300
-      let height = 300
-      reader.onload = (event) => {
-        let img = new Image()
-        img.src = event.target.result as string
-        img.onload = () => {
-          let elem = document.createElement("canvas")
-          elem.width = width
-          elem.height = height
-          let ctx = elem.getContext("2d")
-          ctx.drawImage(img, 0, 0, width, height)
-          cb(ctx.canvas.toDataURL())
+      const fileName = file.name
+      const extension = fileName.split(".").reverse()[0].toLowerCase()
+      const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
+      if (extension !==  "svg") {
+        let width = 300
+        let height = 300
+        reader.onload = (event) => {
+          let img = new Image()
+          img.src = event.target.result as string
+          img.onload = () => {
+            let elem = document.createElement("canvas")
+            elem.width = width
+            elem.height = height
+            let ctx = elem.getContext("2d")
+            ctx.drawImage(img, 0, 0, width, height)
+            cb(ctx.canvas.toDataURL())
+          }
         }
-      }
+      }else{
+        reader.onloadend = () => {
+          cb(reader.result)
+        }
+      }      
     } else {
       reader.onloadend = () => {
         cb(reader.result)

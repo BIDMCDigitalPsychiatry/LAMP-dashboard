@@ -128,21 +128,30 @@ function compress(file, width, height) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
+    const fileName = file.name
+    const extension = fileName.split(".").reverse()[0].toLowerCase()
     reader.onerror = (error) => reject(error)
-    reader.onload = (event) => {
-      const img = new Image()
-      img.src = event.target.result as string
-      img.onload = () => {
-        const elem = document.createElement("canvas")
-        elem.width = width
-        elem.height = height
-        const ctx = elem.getContext("2d")
-        ctx.drawImage(img, 0, 0, width, height)
-        resolve(ctx.canvas.toDataURL())
+    if (extension !== "svg") {
+      reader.onload = (event) => {
+        const img = new Image()
+        img.src = event.target.result as string
+        img.onload = () => {
+          const elem = document.createElement("canvas")
+          elem.width = width
+          elem.height = height
+          const ctx = elem.getContext("2d")
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(ctx.canvas.toDataURL())
+        }
+      }
+    } else {
+      reader.onload = (event) => {
+        resolve(reader.result)
       }
     }
   })
 }
+
 function getBase64(file, cb) {
   let reader = new FileReader()
   reader.readAsDataURL(file)
