@@ -16,6 +16,7 @@ import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
+import ReactMarkdown from 'react-markdown'
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -103,6 +104,18 @@ const useStyles = makeStyles((theme: Theme) =>
     colorLine: { maxWidth: 115 },
     headerIcon: { textAlign: "center", marginBottom: 15 },
     mainContainer: { padding: 0 },
+    tipsdetails: {
+      "& blockquote": { borderLeft: "5px solid #ccc", margin: "1.5em 10px", padding: "0.5em 10px" },
+      "& code": {
+        padding: ".2rem .5rem",
+        margin: "0 .2rem",
+        fontSize: "90%",
+        whiteSpace: "noWrap",
+        background: "#F1F1F1",
+        border: "1px solid #E1E1E1",
+        borderRadius: "4px"
+      },
+    },
   })
 )
 
@@ -128,8 +141,8 @@ export default function TipNotification({ ...props }) {
         <Grid item lg={4} sm={10} xs={12}>
           <CardContent className={classes.tipscontentarea}>
             {!!props.images ? <img src={props.images} alt={props.title} /> : ""}
-            <Typography variant="body2" color="textSecondary" component="p">
-              {props.details}
+            <Typography variant="body2" color="textSecondary" component="p" className={classes.tipsdetails}>
+            <ReactMarkdown>{props.details}</ReactMarkdown>
             </Typography>
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
