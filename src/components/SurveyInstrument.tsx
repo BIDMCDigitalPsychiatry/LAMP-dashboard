@@ -84,19 +84,19 @@ const useStyles = makeStyles((theme) => ({
     height: 24,
     border: "3px solid #C6C6C6",
     borderRadius: 12,
-    display: "flex",
+    display: "block",
     boxSizing: "border-box",
-    marginRight: 12,
+    margin: "0 auto",
   },
   checkedContainer: {
     width: 24,
     height: 24,
     alignItems: "center",
     justifyContent: "center",
-    display: "flex",
+    display: "block",
     backgroundColor: "#2F9D7E",
     borderRadius: 14,
-    marginRight: 12,
+    margin: "0 auto",
   },
   checkText: {
     fontSize: 14,
@@ -322,6 +322,11 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% + 105px)",
     marginLeft: "-50px",
   },
+  lightGray: { color: "#999", fontSize: "0.75rem" },
+  mxSmall: { margin: "0 6px" },
+  radioLabelText: { lineHeight: "16px" },
+
+  mrgBtm: { marginBottom: 15 },
 }))
 
 // Splice together all selected activities & their tags.
@@ -407,14 +412,17 @@ function RadioOption({ onChange, options, value, ...props }) {
               />
             }
             label={
-              <Typography
-                component="span"
-                variant="body2"
-                style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
-              >
-                {t(x.label)}
-                {!!x.description && ` (${x.description})`}
-              </Typography>
+              <Box className={classes.radioLabelText}>
+                <Typography
+                  variant="body2"
+                  style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.7)" }}
+                >
+                  {t(x.label)}
+                </Typography>
+                <Typography component="span" variant="caption" className={classes.lightGray}>
+                  {!!x.description && ` ${x.description}`}
+                </Typography>
+              </Box>
             }
             labelPlacement="end"
             className={classes.radioLabel}
@@ -638,31 +646,20 @@ function ShortTextSection({ onChange, value, ...props }) {
             onChange(e.target.value)
           }}
         />
-        {/* <TextField
-          id="standard-multiline-flexible"
-          variant="outlined"
-          onChange={(e) => {
-            setText(e.target.value)
-            onChange(e.target.value)
-          }}
-          defaultValue={text}
-          inputProps={{
-            maxLength: 100,
-          }}
-        /> */}
       </FormControl>
     </Box>
   )
 }
 
 function RadioRating({ onChange, options, value, ...props }) {
-  let ratingArray = [...Array(options.length).keys()]
-
   return (
     <Box textAlign="center" mt={5}>
       <Grid direction="row" container justify="center" alignItems="center">
-        {ratingArray.map((ratingVal) => (
-          <RateAnswer checked={value === ratingVal} onChange={() => onChange(ratingVal)} value={ratingVal} />
+        {options.map((option) => (
+          <Box mr={1}>
+            <RateAnswer checked={value === option.value} onChange={() => onChange(option.value)} value={option.value} />
+            <Typography variant="caption">{option.description}</Typography>
+          </Box>
         ))}
       </Grid>
     </Box>
@@ -797,6 +794,7 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
     >
       {options.map((x) => (
         <FormControlLabel
+          className={classes.mrgBtm}
           key={x.label}
           value={`${x.value}`}
           style={{ alignItems: x.value.length > 20 && !!x.description ? "flex-start" : undefined }}
@@ -819,14 +817,15 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
             />
           }
           label={
-            <Typography
-              component="span"
-              variant="body2"
-              style={{ color: selectedValue == `${x.value}` ? "black" : "rgba(0, 0, 0, 0.5)" }}
-            >
-              {t(x.label)}
-              {!!x.description && ` (${x.description})`}
-            </Typography>
+            <Box className={classes.radioLabelText}>
+              <Typography
+                variant="body2"
+                style={{ color: _selection.includes(`${x.value}`) ? "black" : "rgba(0, 0, 0, 0.7)" }}
+              >
+                {t(x.label)}
+              </Typography>
+              <Box className={classes.lightGray}>{!!x.description && ` ${x.description}`}</Box>
+            </Box>
           }
           labelPlacement="end"
         />
@@ -899,19 +898,15 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   return (
     <Grid>
       <Box className={classes.questionhead}>
-        <Typography variant="h5">
-          {text} {!!desc && ` (${desc})`}
-        </Typography>
+        <Typography variant="h5">{t(`${text}`)}</Typography>
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
-          {type === "likert" || type === "boolean" || type === "list" || type === "select"
-            ? t("(Select one)")
-            : type === "slider"
+          {type === "slider"
             ? t(
                 `(${options[0].value} being ${!!options[0].description ?? options[0].value}, ${
                   options[options.length - 1].value
                 } being ${options[options.length - 1].description})`
               )
-            : ""}
+            : !!desc && t(` (${desc})`)}
         </Typography>
       </Box>
       <Box className={classes.questionScroll}>{component}</Box>

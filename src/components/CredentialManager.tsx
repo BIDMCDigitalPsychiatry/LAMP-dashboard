@@ -47,6 +47,7 @@ function compress(file, width, height) {
 }
 
 function CredentialEditor({ credential, auxData, mode, onChange }) {
+  const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState()
   const [name, setName] = useState("")
   const [role, setRole] = useState("")
@@ -60,10 +61,17 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
     setRole(auxData.role)
   }, [auxData])
 
-  const onDrop = useCallback((acceptedFiles) => compress(acceptedFiles[0], 64, 64).then(setPhoto), [])
-  // eslint-disable-next-line
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDrop,
+    onDropAccepted: useCallback((acceptedFiles) => {
+      compress(acceptedFiles[0], 64, 64).then(setPhoto)
+    }, []),
+    onDropRejected: useCallback((rejectedFiles) => {
+      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
+        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
+        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+      }
+    }, []),
     accept: "image/*",
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
