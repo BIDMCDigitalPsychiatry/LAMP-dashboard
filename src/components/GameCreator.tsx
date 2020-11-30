@@ -191,7 +191,7 @@ export default function GameCreator({
         ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
       ? {
           mode: 1,
-          variant: "trails_a",
+          variant: (activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a"))? "trails_a": "trails_b",
           beginner_seconds: 90,
           intermediate_seconds: 30,
           advanced_seconds: 25,
@@ -463,7 +463,7 @@ export default function GameCreator({
                   }
                   select
                   label={t("Variant")}
-                  value={settings?.variant ?? 1}
+                  value={settings?.variant ?? "trails_a"}
                   onChange={(e) => {
                     setSettings({ ...settings, variant: e.target.value })
                   }}
