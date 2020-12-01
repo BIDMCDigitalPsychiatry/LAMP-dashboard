@@ -191,7 +191,10 @@ export default function GameCreator({
         ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
       ? {
           mode: 1,
-          variant: (activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a"))? "trails_a": "trails_b",
+          variant:
+            activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a")
+              ? "trails_a"
+              : "trails_b",
           beginner_seconds: 90,
           intermediate_seconds: 30,
           advanced_seconds: 25,
