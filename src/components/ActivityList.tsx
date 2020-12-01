@@ -546,6 +546,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
+  const [activityData, setActivityData] = useState(null)
   const { t } = useTranslation()
   const activitiesObj = {
     "lamp.journal": t("Journal"),
@@ -601,8 +602,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     let index = 0
     studies.sort((a, b) => (a.name < b.name ? -1 : 1))
     studies.map((study) => {
-      ;(async () => {
-        let resActivities = await LAMP.Activity.allByStudy(study.id)
+      LAMP.Activity.allByStudy(study.id).then((resActivities) => {
         counts[study.name] = resActivities.length
         if (selected !== null && selected.includes(study.name)) {
           resActivities.sort(function (a, b) {
@@ -612,13 +612,27 @@ export default function ActivityList({ researcher, title, ...props }) {
           activityData = activityData.concat(resActivities)
         }
         if (index === studies.length - 1) {
-          setActivities(activityData)
-          setLoading(false)
+          let data = []
+          studies.forEach((study) => {
+            data = data.concat(activityData.filter((d) => d.parent === study.name))
+          })
+          setActivityData(data)          
         }
         index++
-      })()
+      })        
     })
   }
+  useEffect(() => {
+    if(activityData !== null) {
+      setActivities(activityData)      
+    }
+  }, [activityData])
+
+  useEffect(() => {
+    if(activities !== null) {
+      setLoading(false)
+    }
+  }, [activities])
 
   const onChange = () => {
     refreshData()
