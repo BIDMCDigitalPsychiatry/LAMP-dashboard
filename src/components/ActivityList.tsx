@@ -38,7 +38,7 @@ import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
-import LAMP from "lamp-core"
+import LAMP, { Study } from "lamp-core"
 import Activity from "./Activity"
 import SurveyCreator from "./SurveyCreator"
 import JournalCreator from "./JournalCreator"
@@ -599,20 +599,24 @@ export default function ActivityList({ researcher, title, ...props }) {
     let activityData = []
     let counts = studiesCount
     let index = 0
+    studies.sort((a, b) => (a.name < b.name ? -1 : 1))
     studies.map((study) => {
-      LAMP.Activity.allByStudy(study.id).then((resActivities) => {
+      ;(async () => {
+        let resActivities = await LAMP.Activity.allByStudy(study.id)
         counts[study.name] = resActivities.length
         if (selected !== null && selected.includes(study.name)) {
+          resActivities.sort(function (a, b) {
+            return b.name > a.name ? -1 : 1
+          })
           resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
           activityData = activityData.concat(resActivities)
         }
         if (index === studies.length - 1) {
-          setStudiesCount(counts)
           setActivities(activityData)
           setLoading(false)
         }
         index++
-      })
+      })()
     })
   }
 
@@ -740,7 +744,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     let result
     if (!x.id && x.name) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
-      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         icon: x.icon,
       })
       if (!!result.error)
@@ -759,7 +763,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         settings: x.settings,
       })) as any
 
-      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
+      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
         icon: x.icon,
       })
       if (!!result.error)
@@ -980,7 +984,7 @@ export default function ActivityList({ researcher, title, ...props }) {
           settings: x.settings,
         }
         result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
           icon: x.icon,
         })
         if (!!result.error)

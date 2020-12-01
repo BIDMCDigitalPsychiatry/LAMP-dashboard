@@ -212,7 +212,7 @@ export default function Learn({
       ;(async () => {
         let activityResult = await Promise.all(
           gActivities.map(async (activity) => {
-            let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.tip_details")) as any
+            let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
             return {
               id: activity.id,
               spec: activity.spec,

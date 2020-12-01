@@ -433,6 +433,9 @@ export default function ParticipantList({
           }))
         )
       })
+      studies.sort(function (a, b) {
+        return a["name"] > b["name"] ? 1 : -1
+      })
       setTagData(studies)
       let studiesData = filterStudyData(studies)
       setStudiesCount(studiesData)
@@ -488,21 +491,6 @@ export default function ParticipantList({
     }
   }
 
-  const onChangeParticipantStudy = async (study, type = "") => {
-    let filteredStudy = tagData.filter(function (e) {
-      return this.indexOf(e.name) >= 0
-    }, tagArray)
-    if (filteredStudy.length > 0) {
-      let participantFormat = await getParticipantsData(filteredStudy)
-      if (participantFormat.length === 0) {
-        setParticipants([])
-      }
-    } else {
-      setParticipants([])
-    }
-    setLoading(false)
-  }
-
   const generateStudyFilter = async (researcher) => {
     let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
       return await Promise.all(
@@ -522,6 +510,9 @@ export default function ParticipantList({
     let participantArray = []
     let k = 0
     participantFormat.forEach((eachParticipant) => {
+      eachParticipant.participant.sort(function (a, b) {
+        return a["id"] > b["id"] ? 1 : -1
+      })
       eachParticipant.participant.forEach((innerObj) => {
         innerObj.study = eachParticipant.study
         innerObj.tableData = { id: k }
@@ -642,7 +633,7 @@ export default function ParticipantList({
         }
         ids = [...ids, id]
       }
-      onChangeParticipantStudy(tagArray, "add")
+      refreshPage()
       setState((state) => ({
         ...state,
         popoverAttachElement: null,
@@ -695,12 +686,11 @@ export default function ParticipantList({
     }))
     let selectedRows = state.selectedRows // tempRows = selectedRows.map(y => y.id)
     for (let row of selectedRows) await LAMP.Participant.delete(row.id)
-    onChangeParticipantStudy(tagArray, "delete")
+    refreshPage()
     setState((state) => ({
       ...state,
       selectedRows: [],
     }))
-    generateStudyFilter(researcher)
     setLoading(false)
   }
 
