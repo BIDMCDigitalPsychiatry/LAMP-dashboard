@@ -173,8 +173,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
-
 async function getImage(activityId: string) {
   return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
     !!y.error ? undefined : y.data
@@ -199,7 +197,6 @@ export default function Manage({ participant, activities, ...props }) {
     setLoading(true)
     let gActivities = activities.filter(
       (x: any) =>
-        games.includes(x.spec) ||
         x.spec === "lamp.journal" ||
         x.spec === "lamp.breathe" ||
         x.spec === "lamp.scratch_image"
@@ -331,7 +328,7 @@ export default function Manage({ participant, activities, ...props }) {
           </ButtonBase>
          </Grid> */}
       <ResponsiveDialog
-        transient={games.includes(spec) ? true : false}
+        transient={false}
         animate
         fullScreen
         open={!!launchedActivity}
@@ -391,17 +388,7 @@ export default function Manage({ participant, activities, ...props }) {
                   setLaunchedActivity(undefined)
                 }}
               />
-            ),
-            Game: (
-              <EmbeddedActivity
-                name={activity?.name ?? null}
-                activity={activity}
-                participant={participant}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
+            )
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -469,7 +456,7 @@ export default function Manage({ participant, activities, ...props }) {
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity(games.includes(spec) ? "Game" : spec)
+                setLaunchedActivity(spec)
               }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
