@@ -126,7 +126,7 @@ export default function EditUserField({
           onChange={(event) => setAlias(event.target.value)}
           onClick={(event) => event.stopPropagation()}
           onKeyUp={(event) => event.keyCode === 13 && setEditing(false)}
-          onBlur={() => updateEditing()}
+          //onBlur={() => updateEditing()}
           InputLabelProps={{ style: { color: "#000" } }}
           InputProps={{
             style: { color: "#000" },
