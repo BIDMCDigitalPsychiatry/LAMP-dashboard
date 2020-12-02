@@ -197,8 +197,9 @@ function _shouldRestrict() {
   return _patientMode() && _hideCareTeam()
 }
 
-async function getDetails(activityId: string) {
-  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.survey_description")].map((y: any) =>
+async function getDetails(activityId: string, spec: string) {
+  return [await LAMP.Type.getAttachment(activityId, spec === "lamp.survey" ? 
+    "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details")].map((y: any) =>
     !!y.error ? undefined : y.data
   )[0]
 }
@@ -244,7 +245,7 @@ export default function Survey({
       let tags = []
       let count = 0
       savedActivities.map((activity, index) => {
-        getDetails(activity.id).then((img) => {
+        getDetails(activity.id, activity.spec).then((img) => {
           tags[activity.id] = img
           if (count === savedActivities.length - 1) {
             setLoading(false)
