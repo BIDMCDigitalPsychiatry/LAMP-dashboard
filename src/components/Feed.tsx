@@ -501,7 +501,7 @@ export default function Feed({
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
             schedule.icon = feed.name
-            schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
+            schedule.group = feed.spec === "lamp.survey" || games.includes(feed.spec) ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
             schedule.type = feed.spec
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
