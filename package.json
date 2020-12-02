@@ -55,6 +55,8 @@
     "react-router-dom": "^5.0.1",
     "react-vega": "^7.4.1",
     "regenerator-runtime": "^0.13.3",
+    "remark-emoji": "^2.1.0",
+    "remark-gfm": "^1.0.0",
     "url-search-params-polyfill": "^7.0.0",
     "vega": "^5.17.0",
     "vega-lite": "^4.17.0"
