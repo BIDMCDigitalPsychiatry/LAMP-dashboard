@@ -26,7 +26,7 @@ import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-	
+
 const theme = createMuiTheme({
   palette: {
     secondary: {
@@ -237,7 +237,7 @@ export default function TipCreator({
         }
         let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
         if (iconsData.hasOwnProperty("data")) {
-          setCategoryImage(iconsData.data.icon)
+          setCategoryImage(iconsData.data.photo)
         }
       }
       setLoading(false)
@@ -276,11 +276,11 @@ export default function TipCreator({
   const getBase64 = (file, cb, type = "") => {
     let reader = new FileReader()
     reader.readAsDataURL(file)
-    if (type === "icon") {
+    if (type === "photo") {
       const fileName = file.name
       const extension = fileName.split(".").reverse()[0].toLowerCase()
       const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
-      if (extension !==  "svg") {
+      if (extension !== "svg") {
         let width = 300
         let height = 300
         reader.onload = (event) => {
@@ -295,11 +295,11 @@ export default function TipCreator({
             cb(ctx.canvas.toDataURL())
           }
         }
-      }else{
+      } else {
         reader.onloadend = () => {
           cb(reader.result)
         }
-      }      
+      }
     } else {
       reader.onloadend = () => {
         cb(reader.result)
@@ -321,7 +321,7 @@ export default function TipCreator({
     if (fileFormats.includes(extension) && fileSize <= 4) {
       setLoading(true)
       let tipsData: any
-      if (type === "icon") {
+      if (type === "photo") {
         file &&
           getBase64(
             file,
@@ -329,7 +329,7 @@ export default function TipCreator({
               setCategoryImage(result)
               setLoading(false)
             },
-            "icon"
+            "photo"
           )
       } else {
         tipsData = tipsDataArray
@@ -462,7 +462,7 @@ export default function TipCreator({
                         name="upload-image"
                         className={classes.uploadFile}
                         type="file"
-                        onChange={(event) => uploadImageFile(event, "icon")}
+                        onChange={(event) => uploadImageFile(event, "photo")}
                       />
                     </label>
                   ) : (

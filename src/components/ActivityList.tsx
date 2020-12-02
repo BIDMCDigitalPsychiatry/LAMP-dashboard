@@ -202,8 +202,8 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       left: "50%",
       right: "50%",
-      marginLeft: "-50vw",
-      marginRight: "-50vw",
+      marginLeft: "-50.6vw",
+      marginRight: "-50.6vw",
       marginBottom: 30,
       marginTop: -20,
       "& input": {
@@ -741,7 +741,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     if (!x.id && x.name) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
-        icon: x.icon,
+        photo: x.icon,
       })
       if (!!result.error)
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -760,7 +760,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       })) as any
 
       await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
-        icon: x.icon,
+        photo: x.icon,
       })
       if (!!result.error)
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -981,7 +981,7 @@ export default function ActivityList({ researcher, title, ...props }) {
         }
         result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
         await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
-          icon: x.icon,
+          photo: x.icon,
         })
         if (!!result.error)
           enqueueSnackbar(t("Encountered an error: ") + result?.error, {
