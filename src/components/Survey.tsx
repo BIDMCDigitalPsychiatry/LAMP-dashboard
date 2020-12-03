@@ -162,7 +162,14 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "0 42px",
     },
     thumbMain: { maxWidth: 255 },
-    thumbContainer: { maxWidth: 1055 },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     fullwidthBtn: { width: "100%" },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     niceWork: {
@@ -198,10 +205,12 @@ function _shouldRestrict() {
 }
 
 async function getDetails(activityId: string, spec: string) {
-  return [await LAMP.Type.getAttachment(activityId, spec === "lamp.survey" ? 
-    "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details")].map((y: any) =>
-    !!y.error ? undefined : y.data
-  )[0]
+  return [
+    await LAMP.Type.getAttachment(
+      activityId,
+      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
+    ),
+  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
 }
 
 const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
@@ -280,7 +289,8 @@ export default function Survey({
             ...(activities || [])
               .filter(
                 (x) =>
-                  x.spec === "lamp.dbt_diary_card" || games.includes(x.spec) ||
+                  x.spec === "lamp.dbt_diary_card" ||
+                  games.includes(x.spec) ||
                   (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
               )
               .map((y) => (
@@ -351,14 +361,22 @@ export default function Survey({
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>
-            {games.includes(spec) ? <Typography variant="h6">{t("Games")} </Typography> : <Typography variant="h6">{t("Survey")}</Typography>}
-            <Typography variant="h2">{t(activity?.name ?? null)} {games.includes(spec) && spec !== null && " (" + spec + ")" }</Typography>
+            {games.includes(spec) ? (
+              <Typography variant="h6">{t("Games")} </Typography>
+            ) : (
+              <Typography variant="h6">{t("Survey")}</Typography>
+            )}
+            <Typography variant="h2">
+              {t(activity?.name ?? null)} {games.includes(spec) && spec !== null && " (" + spec + ")"}
+            </Typography>
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {!games.includes(spec) && (<Typography variant="h4" gutterBottom>
-            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-          </Typography>)}
+          {!games.includes(spec) && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
           <Typography variant="body2" component="p">
             {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
             {spec === "lamp.dbt_diary_card" &&
@@ -408,7 +426,7 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-        {(spec === "lamp.dbt_diary_card" || games.includes(spec)) ? (
+        {spec === "lamp.dbt_diary_card" || games.includes(spec) ? (
           <EmbeddedActivity
             name={activity?.name ?? ""}
             activity={activity ?? []}
@@ -418,8 +436,7 @@ export default function Survey({
               onComplete(null)
             }}
           />
-        ) :
-        (
+        ) : (
           <SurveyInstrument
             id={participant.id}
             type={dialogueType}

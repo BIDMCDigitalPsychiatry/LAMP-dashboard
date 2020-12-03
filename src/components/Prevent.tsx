@@ -208,7 +208,14 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       maxHeight: "280px",
     },
-    thumbContainer: { maxWidth: 1055 },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     fullwidthBtn: { width: "100%" },
     preventGraph: {
       marginTop: -35,

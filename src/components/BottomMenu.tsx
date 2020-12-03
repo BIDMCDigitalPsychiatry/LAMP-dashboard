@@ -21,6 +21,7 @@ import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
 import { renderToStaticMarkup } from "react-dom/server"
 import { Trans, useTranslation } from "react-i18next"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,7 +101,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
     },
     leftbar: {
-      "& div": {
+      "& > div": {
         [theme.breakpoints.up("md")]: {
           backgroundColor: "#F8F8F8",
           border: 0,
@@ -110,6 +111,18 @@ const useStyles = makeStyles((theme: Theme) =>
           [theme.breakpoints.down("sm")]: {
             flex: 1,
           },
+        },
+      },
+    },
+    logResearcher: {
+      "& > div": {
+        marginTop: 50,
+        height: "calc(100vh - 55px)",
+        borderLeft: "#7599FF solid 5px",
+        zIndex: 1111,
+        [theme.breakpoints.down("sm")]: {
+          borderBottom: "#7599FF solid 5px",
+          borderRight: "#7599FF solid 5px",
         },
       },
     },
@@ -312,7 +325,7 @@ export default function BottomMenu({ ...props }) {
       <Box clone displayPrint="none">
         <Drawer
           open
-          className={classes.leftbar}
+          className={classes.leftbar + (LAMP.Auth._type === "participant" ? "" : " " + classes.logResearcher)}
           anchor={supportsSidebar ? "left" : "bottom"}
           variant="permanent"
           PaperProps={{

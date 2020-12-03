@@ -130,7 +130,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: 111111,
       color: "#fff",
     },
     btnBlue: {
@@ -616,20 +616,20 @@ export default function ActivityList({ researcher, title, ...props }) {
           studies.forEach((study) => {
             data = data.concat(activityData.filter((d) => d.parent === study.name))
           })
-          setActivityData(data)          
+          setActivityData(data)
         }
         index++
-      })        
+      })
     })
   }
   useEffect(() => {
-    if(activityData !== null) {
-      setActivities(activityData)      
+    if (activityData !== null) {
+      setActivities(activityData)
     }
   }, [activityData])
 
   useEffect(() => {
-    if(activities !== null) {
+    if (activities !== null) {
       setLoading(false)
     }
   }, [activities])

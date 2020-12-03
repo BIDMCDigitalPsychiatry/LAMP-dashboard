@@ -47,6 +47,7 @@ import QRCode from "qrcode.react"
 import LAMP, { Study } from "lamp-core"
 import Messages from "./Messages"
 import EditUserField from "./EditUserField"
+import EditStudyField from "./EditStudyField"
 import { CredentialManager } from "./CredentialManager"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SnackMessage from "./SnackMessage"
@@ -56,6 +57,7 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
 import { useTranslation } from "react-i18next"
+import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined"
 
 //TimeAgo.addLocale(en)
 //const timeAgo = new TimeAgo("en-US")
@@ -166,10 +168,11 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       left: "50%",
       right: "50%",
-      marginLeft: "-50vw",
-      marginRight: "-50vw",
+      marginLeft: "-50.6vw",
+      marginRight: "-50.6vw",
       marginBottom: 30,
       marginTop: -20,
+      // paddingTop: 40,
       "& input": {
         width: 350,
         [theme.breakpoints.down("md")]: {
@@ -194,7 +197,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "capitalize",
       boxShadow: "none",
       background: "transparent",
-      margin: "0 30px",
+      margin: "0 15px",
       paddingRight: 0,
       "& svg": { marginRight: 10 },
     },
@@ -231,7 +234,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     deleteBtn: { background: "#7599FF", color: "#fff", "&:hover": { background: "#5680f9" } },
     backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: 111111,
       color: "#fff",
     },
     dataGreen: { backgroundColor: "#e0ffe1 !important", color: "#4caf50" },
@@ -247,9 +250,25 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       padding: "25px 50px 0",
     },
+
+    manageStudypop: {
+      padding: "25px 25px 30px 35px",
+    },
+    studyList: {
+      borderBottom: "#e8e8e8 solid 1px",
+    },
     errorMsg: { color: "#FF0000", fontSize: 12 },
     studyOption: { width: "100%" },
     addNewDialog: { maxWidth: 350 },
+    manageStudyDialog: { maxWidth: 700 },
+    manageStudyBtn: {
+      marginRight: 15,
+      background: "#7599FF",
+      color: "#fff",
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+      "&:hover": { background: "#5680f9" },
+    },
+    studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
   })
 )
 
@@ -374,6 +393,15 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t, i18n } = useTranslation()
+
+  const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
+  const [editStudy, setEditStudy] = useState(false)
+  const [editStudyName, setEditStudyName] = useState("")
+  const [studyArray, setStudyNameArray] = useState([])
+  const [aliasStudyName, setAliasStudyName] = useState("")
+
+  const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
+  const [studyIdDelete, setStudyIdForDelete] = useState("")
 
   const getCurrentLanguage = () => {
     let lang
@@ -743,12 +771,25 @@ export default function ParticipantList({
     setEditUserId(selectedRows.id)
   }
 
+  const editStudyField = (selectedRows, event) => {
+    setEditStudy(true)
+    setEditStudyName(selectedRows)
+  }
+
   const updateName = (data) => {
     setEditData(false)
     setAliasName(data)
     let oldNameArray = Object.assign({}, nameArray)
     oldNameArray[editUserId] = data
     setNameArray(oldNameArray)
+  }
+
+  const updateStudyName = (data) => {
+    setEditStudy(false)
+    setAliasStudyName(data)
+    let oldNameArray = Object.assign({}, studyArray)
+    oldNameArray[editStudyName] = data
+    setStudyNameArray(oldNameArray)
   }
 
   const filterStudyData = (dataArray) => {
@@ -789,9 +830,40 @@ export default function ParticipantList({
     setOpenDialog(false)
   }
 
+  const handleCloseStudies = () => {
+    setOpenDialogManageStudies(false)
+  }
+
+  const handleCloseDeleteStudy = () => {
+    setOpenDialogDeleteStudy(false)
+  }
+
   const handleChangeStudy = (event) => {
     setShowErrorMsg(false)
     setSelectedStudy(event.target.value)
+  }
+
+  // Parent Component
+  const callbackModal = () => {
+    refreshPage()
+    setOpenDialogManageStudies(false)
+  }
+
+  useEffect(() => {
+    let unmounted = false
+    refreshPage()
+    return () => {
+      unmounted = true
+    }
+  }, [openDialogStudies])
+  const deleteStudy = async (studyId: string) => {
+    setOpenDialogDeleteStudy(false)
+    setOpenDialogManageStudies(false)
+    setLoading(true)
+    let study_id: any = new Study()
+    study_id = studyId
+    await LAMP.Study.delete(study_id)
+    enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
   }
 
   return (
@@ -938,6 +1010,16 @@ export default function ParticipantList({
                       <Filter /> {t("Filter results")}{" "}
                       {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
                     </Fab>
+                    <Tooltip title="Manage Studies">
+                      <IconButton
+                        className={classes.manageStudyBtn}
+                        onClick={(event) => {
+                          setOpenDialogManageStudies(true)
+                        }}
+                      >
+                        <DescriptionOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
                     <Fab
                       variant="extended"
                       color="primary"
@@ -954,6 +1036,14 @@ export default function ParticipantList({
                     >
                       <AddIcon /> {t("Add")}
                     </Fab>
+
+                    {/* <Fab
+                      variant="extended"
+                      color="primary"
+                   
+                    >
+                      {t("Manage Studies")}
+                    </Fab> */}
                   </div>
                 )
               },
@@ -1096,6 +1186,110 @@ export default function ParticipantList({
         )}
       </Popover>
       <StudyCreator addStudy={addStudy} setAddStudy={setAddStudy} studies={tagData} createStudy={createStudy} />
+
+      <Dialog
+        open={openDialogDeleteStudy}
+        onClose={handleCloseDeleteStudy}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{ paper: classes.manageStudyDialog }}
+      >
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={2}>
+            {t(
+              "Deleting study will delete all patients and activities associated with it. Are you sure you want to delete this study?"
+            )}
+          </Box>
+          <DialogActions>
+            <Box textAlign="center" width={1} mb={3}>
+              <Button onClick={() => deleteStudy(studyIdDelete)} color="primary" autoFocus>
+                {t("Delete")}
+              </Button>
+
+              <Button
+                onClick={() => {
+                  handleCloseDeleteStudy()
+                }}
+              >
+                {t("Cancel")}
+              </Button>
+            </Box>
+          </DialogActions>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={openDialogStudies}
+        onClose={handleCloseStudies}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{ paper: classes.manageStudyDialog }}
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          <IconButton
+            aria-label="close"
+            className={classes.closeButton}
+            onClick={handleCloseStudies}
+            //disabled={!!studyBtnClicked ? true : false}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers={false} classes={{ root: classes.manageStudypop }}>
+          <Box mb={3}>
+            <Typography variant="h5">{t("Manage Studies")}</Typography>
+          </Box>
+          {tagData.map((study) => (
+            <Box display="flex" key={study.id} className={classes.studyList}>
+              <Box flexGrow={1} className={classes.studyName}>
+                {editStudy && study.id == editStudyName ? (
+                  <EditStudyField
+                    study={study.id}
+                    studyName={study.name}
+                    editData={editStudy}
+                    editStudyName={editStudyName}
+                    updateName={updateStudyName}
+                    callbackModal={callbackModal}
+                  />
+                ) : aliasStudyName && editStudyName === study.id ? (
+                  t(aliasStudyName)
+                ) : studyArray[study.id] ? (
+                  t(studyArray[study.id])
+                ) : (
+                  t(study.name)
+                )}
+              </Box>
+              <Box>
+                <IconButton
+                  color="primary"
+                  disabled={study.id > 1 ? true : false}
+                  classes={{ disabled: classes.disabledButton }}
+                  onClick={(event) => {
+                    editStudyField(study.id, event)
+                  }}
+                >
+                  <RenameIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <Box>
+                <IconButton
+                  color="primary"
+                  disabled={study.id > 1 ? true : false}
+                  classes={{ disabled: classes.disabledButton }}
+                  onClick={() => {
+                    setOpenDialogDeleteStudy(true)
+                    setStudyIdForDelete(study.id)
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            </Box>
+          ))}
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={openDialog}

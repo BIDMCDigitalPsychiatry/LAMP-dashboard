@@ -8,10 +8,15 @@ import {
   ListItemText,
   Fab,
   Container,
-  Tooltip,
-  Chip,
+  MenuItem,
+  Typography,
   useMediaQuery,
   useTheme,
+  AppBar,
+  Toolbar,
+  Button,
+  Popover,
+  Divider,
 } from "@material-ui/core"
 
 // Local Imports
@@ -23,6 +28,8 @@ import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
 import { fade, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
+import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,8 +123,8 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "inline-block",
       textAlign: "center",
       color: "rgba(0, 0, 0, 0.4)",
-      paddingTop: 30,
-      paddingBottom: 25,
+      paddingTop: 40,
+      paddingBottom: 30,
       [theme.breakpoints.down("sm")]: {
         paddingTop: 16,
         paddingBottom: 9,
@@ -166,8 +173,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     tableContainerWidth: {
       maxWidth: 1055,
+      width: "80%",
       [theme.breakpoints.down("md")]: {
         padding: 0,
+      },
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
       },
     },
     tableContainerWidthPad: {
@@ -176,9 +187,21 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
     },
     menuOuter: {
+      paddingTop: 0,
       [theme.breakpoints.down("sm")]: {
         display: "flex",
         padding: 0,
+      },
+    },
+    logResearcher: {
+      marginTop: 50,
+      zIndex: 1111,
+      [theme.breakpoints.up("md")]: {
+        height: "calc(100vh - 55px)",
+      },
+      [theme.breakpoints.down("sm")]: {
+        borderBottom: "#7599FF solid 5px",
+        borderRight: "#7599FF solid 5px",
       },
     },
   })
@@ -205,7 +228,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
             anchor={supportsSidebar ? "left" : "bottom"}
             variant="permanent"
             classes={{
-              paper: classes.researcherMenu,
+              paper: classes.researcherMenu + " " + classes.logResearcher,
             }}
           >
             <List component="nav" className={classes.menuOuter}>
@@ -264,7 +287,19 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     })
     return lang
   }
+  const classes = useStyles()
+  const [anchorEl, setAnchorEl] = React.useState(null)
 
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const open = Boolean(anchorEl)
+  const id = open ? "simple-popover" : undefined
   useEffect(() => {
     ;(async () => {
       await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", null)
