@@ -124,7 +124,14 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     thumbMain: { maxWidth: 255 },
-    thumbContainer: { maxWidth: 1055 },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     fullwidthBtn: { width: "100%" },
     goalHeading: {
       textAlign: "center",

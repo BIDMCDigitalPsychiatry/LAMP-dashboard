@@ -240,7 +240,7 @@ const useStyles = makeStyles((theme: Theme) =>
     customstepper: {
       position: "relative",
       maxWidth: 500,
-      padding: 18,
+      padding: "0px 18px 18px 28px",
       "&::after": {
         content: "",
         position: "absolute",
@@ -266,7 +266,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     large_calendar: {
-      padding: "5px 0 0 50px",
+      padding: "0px 0 0 50px",
       "& span": {
         fontSize: 14,
         fontWeight: "bold",
@@ -292,7 +292,16 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    // thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      margin: "0 auto",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     day: {
       "& p": { fontSize: 10 },
     },
@@ -501,7 +510,7 @@ export default function Feed({
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
             schedule.icon = feed.name
-            schedule.group = feed.spec === "lamp.survey" || games.includes(feed.spec) ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
+            schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
             schedule.type = feed.spec
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))

@@ -304,6 +304,7 @@ function AppRouter({ ...props }) {
           <React.Fragment>
             <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
             <NavigationLayout
+              authType={state.authType}
               id={props.match.params.id}
               goBack={props.history.goBack}
               onLogout={() => reset()}
@@ -339,13 +340,11 @@ function AppRouter({ ...props }) {
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                <Login
-                  setIdentity={async (identity) => await reset(identity)}
-                  lastDomain={state.lastDomain}
-                  onComplete={() => props.history.replace("/")}
-                />
-              </NavigationLayout>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -373,13 +372,11 @@ function AppRouter({ ...props }) {
             !state.identity ? (
               <React.Fragment>
                 <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-                <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                  <Login
-                    setIdentity={async (identity) => await reset(identity)}
-                    lastDomain={state.lastDomain}
-                    onComplete={() => props.history.replace("/")}
-                  />
-                </NavigationLayout>
+                <Login
+                  setIdentity={async (identity) => await reset(identity)}
+                  lastDomain={state.lastDomain}
+                  onComplete={() => props.history.replace("/")}
+                />
               </React.Fragment>
             ) : state.authType === "admin" ? (
               <Redirect to="/researcher" />
@@ -402,18 +399,21 @@ function AppRouter({ ...props }) {
           !state.identity || state.authType !== "admin" ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                <Login
-                  setIdentity={async (identity) => await reset(identity)}
-                  lastDomain={state.lastDomain}
-                  onComplete={() => props.history.replace("/")}
-                />
-              </NavigationLayout>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
               <PageTitle>{t("Administrator")}</PageTitle>
-              <NavigationLayout title={t("Administrator")} goBack={props.history.goBack} onLogout={() => reset()}>
+              <NavigationLayout
+                authType={state.authType}
+                title={t("Administrator")}
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
                 <Root {...props} />
               </NavigationLayout>
             </React.Fragment>
@@ -427,13 +427,11 @@ function AppRouter({ ...props }) {
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                <Login
-                  setIdentity={async (identity) => await reset(identity)}
-                  lastDomain={state.lastDomain}
-                  onComplete={() => props.history.replace("/")}
-                />
-              </NavigationLayout>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
             </React.Fragment>
           ) : !getResearcher(props.match.params.id) ? (
             <React.Fragment />
@@ -441,6 +439,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
               <NavigationLayout
+                authType={state.authType}
                 id={props.match.params.id}
                 title={`${getResearcher(props.match.params.id).name}`}
                 goBack={props.history.goBack}
@@ -471,13 +470,11 @@ function AppRouter({ ...props }) {
           !state.identity ? (
             <React.Fragment>
               <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <NavigationLayout noToolbar goBack={props.history.goBack} onLogout={() => reset()}>
-                <Login
-                  setIdentity={async (identity) => await reset(identity)}
-                  lastDomain={state.lastDomain}
-                  onComplete={() => props.history.replace("/")}
-                />
-              </NavigationLayout>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
             </React.Fragment>
           ) : !getParticipant(props.match.params.id) ? (
             <React.Fragment />
@@ -485,6 +482,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <NavigationLayout
+                authType={state.authType}
                 id={props.match.params.id}
                 title={t("Patient") + " " + getParticipant(props.match.params.id).id}
                 goBack={props.history.goBack}
