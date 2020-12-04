@@ -97,7 +97,6 @@ export default function GroupActivity({ participant, activity, ...props }) {
   const [currentActivity, setCurrentActivity] = useState(null)
   const [groupActivities, setGroupActivities] = useState([])
 
-  const [loaded, setLoaded] = useState(false)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
@@ -121,8 +120,8 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   useEffect(() => {
     if (currentActivity !== null) {
+      setActivityId(currentActivity.id) 
       setActivityRun(false)
-      setActivityId(activity.id)
     }
   }, [currentActivity])
 
@@ -185,15 +184,14 @@ export default function GroupActivity({ participant, activity, ...props }) {
         }
         setActivityDetails(activityData)
       })()
-      setLoaded(true)
       setLoading(false)
     }
   }, [activity])
 
   return (
     <div style={{ height: "100%" }}>
-      {loaded &&
-        (currentActivity?.spec === "lamp.survey" ? (
+      { !activityRun && (
+        currentActivity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             id={participant}
             type={currentActivity?.name ?? ""}
