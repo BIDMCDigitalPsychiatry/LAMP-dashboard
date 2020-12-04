@@ -595,7 +595,6 @@ export default function SurveyCreator({
                   false /* overwrite */
                 )
               }
-              {...questions.map((x, idx) => console.log(questions[idx]))}
               disabled={
                 !onSave || !text || !text.trim().length || !studyId || questions.length == 0 || isOptionNull == 1
               }
