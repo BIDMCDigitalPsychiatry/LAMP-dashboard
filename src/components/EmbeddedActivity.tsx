@@ -89,7 +89,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         demoActivities[activity.spec]
       }.html.b64`
     )
-    // let response = await fetch(demoActivities[activity.spec]+'.html.b64')
+    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

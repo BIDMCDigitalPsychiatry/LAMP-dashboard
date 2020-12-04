@@ -214,7 +214,6 @@ export default function NavigationLayout({
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
       : classnames(classes.toolbar, classes.toolbardashboard)
-  console.log(id)
   useInterval(
     () => {
       if (!!id) {

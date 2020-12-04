@@ -683,6 +683,10 @@ function Rating({ onChange, options, value, ...props }) {
   const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
+  useEffect(() => {
+    onChange(sliderValue)
+  }, [])
+
   const valuetext = (value: number) => {
     return `${options[value]}`
   }

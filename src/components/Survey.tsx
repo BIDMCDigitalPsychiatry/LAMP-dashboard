@@ -32,7 +32,7 @@ import { useTranslation } from "react-i18next"
 import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
-
+import GroupActivity from "./GroupActivity"
 import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 const theme = createMuiTheme({
@@ -247,6 +247,7 @@ export default function Survey({
     let savedActivities = (activities || []).filter(
       (x) =>
         games.includes(x.spec) ||
+        x.spec === "lamp.group" ||
         x.spec === "lamp.dbt_diary_card" ||
         (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
     )
@@ -277,6 +278,7 @@ export default function Survey({
   const activitiesArray = (activities || []).filter(
     (x) =>
       x.spec === "lamp.dbt_diary_card" ||
+      x.spec === "lamp.group" ||
       (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
   )
   return (
@@ -290,6 +292,7 @@ export default function Survey({
               .filter(
                 (x) =>
                   x.spec === "lamp.dbt_diary_card" ||
+                  x.spec === "lamp.group" ||
                   games.includes(x.spec) ||
                   (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
               )
@@ -364,7 +367,7 @@ export default function Survey({
             {games.includes(spec) ? (
               <Typography variant="h6">{t("Games")} </Typography>
             ) : (
-              <Typography variant="h6">{t("Survey")}</Typography>
+              <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
             <Typography variant="h2">
               {t(activity?.name ?? null)} {games.includes(spec) && spec !== null && " (" + spec + ")"}
@@ -372,7 +375,7 @@ export default function Survey({
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {!games.includes(spec) && (
+          {!games.includes(spec) && spec !== "lamp.group" && (
             <Typography variant="h4" gutterBottom>
               {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
             </Typography>
@@ -406,19 +409,18 @@ export default function Survey({
               onClick={() => {
                 setOpenData(true)
                 setOpen(false)
-                console.log(spec, games.includes(spec))
               }}
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
             >
-              {!games.includes(spec) ? t("Start survey") : t("Begin")}
+              {!games.includes(spec) && spec !== "lamp.group" ? t("Start survey") : t("Begin")}
             </Link>
           </Box>
         </DialogActions>
       </Dialog>
 
       <ResponsiveDialog
-        transient
+        transient={spec === "lamp.group" ? false : true}
         animate
         fullScreen
         open={openData}
@@ -434,6 +436,14 @@ export default function Survey({
             onComplete={() => {
               setOpenData(false)
               onComplete(null)
+            }}
+          />
+        ) : spec === "lamp.group" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            onComplete={() => {
+              setOpenData(false)
             }}
           />
         ) : (
