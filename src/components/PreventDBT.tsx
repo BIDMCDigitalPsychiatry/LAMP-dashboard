@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import Typography from "@material-ui/core/Typography"
 import Grid from "@material-ui/core/Grid"
 import { Vega } from "react-vega"
-import ButtonBase from "@material-ui/core/ButtonBase"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import NativeSelect from "@material-ui/core/NativeSelect"
 import { useTranslation } from "react-i18next"
-
 import { emotions } from "./charts/emotions_chart"
 import { effective } from "./charts/effective_chart"
 import { ineffective } from "./charts/ineffective_chart"
@@ -110,17 +106,32 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let data = []
     let aData = []
     let sData = []
+    let effectivesData = []
+    let inEffectiveData = []
+    let emotionData = []
     selectedEvents.map((event) => {
-      event.temporal_slices.map((slice) => {
-        let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1 //Months are zero based
-        var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
-        data.push({ value: slice.value, date: dateString, symbol: slice.item })
-        aData.push({ action: slice.item, count: slice.value })
-        sData.push({ date: dateString, count: slice.value })
+      let date = new Date(event.timestamp)
+      var curr_date = date.getDate()
+      var curr_month = date.getMonth() + 1 //Months are zero based
+      var curr_year = date.getFullYear()
+      let dateString = curr_year + "-" + curr_month + "-" + curr_date
+      event.temporal_slices.map((slice) => {       
+        switch(slice.level) {
+          case "target_effective":
+            effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+            break
+          case "target_ineffective":
+            inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+            break
+          case "emotion":
+            emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+            break
+          case "skill":
+            aData.push({date: dateString, count: 1, action: slice.item })
+            break;  
+        }         
       })
+      sData.push({ date: dateString, count: !!event.static_data.skillToday ?? 0 })
     })
 
     let actionsD = actionsData
@@ -130,9 +141,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let selfcareD = selfcareData
 
     actionsD.data.values = aData
-    emotionsD.data.values = data
-    ineffectiveD.data.values = data
-    effectiveD.data.values = data
+    emotionsD.data.values = emotionData
+    ineffectiveD.data.values = inEffectiveData
+    effectiveD.data.values = effectivesData
     selfcareD.data.values = sData
 
     setActionsData(actionsD)
