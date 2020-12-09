@@ -115,8 +115,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-      event.temporal_slices.map((slice) => {       
-        switch(slice.level) {
+      event.temporal_slices.map((slice) => {
+        switch (slice.level) {
           case "target_effective":
             effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
             break
@@ -127,9 +127,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
             emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
             break
           case "skill":
-            aData.push({date: dateString, count: 1, action: slice.item })
-            break;  
-        }         
+            aData.push({ date: dateString, count: 1, action: slice.item })
+            break
+        }
       })
       sData.push({ date: dateString, count: !!event.static_data.skillToday ?? 0 })
     })
