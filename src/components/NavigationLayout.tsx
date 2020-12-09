@@ -21,6 +21,9 @@ import {
   Typography,
   colors,
   Container,
+  Popover,
+  Divider,
+  Fab,
 } from "@material-ui/core"
 
 // Local Imports
@@ -35,9 +38,12 @@ import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
+import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    scrollOuter: { overflowY: "hidden" },
     toolbar: {
       paddingLeft: 20,
       paddingRight: 20,
@@ -75,7 +81,6 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("xs")]: {
         display: "block",
         float: "right",
-        paddingTop: 10,
       },
     },
     toolbarinner: { minHeight: 95 },
@@ -97,21 +102,86 @@ const useStyles = makeStyles((theme: Theme) =>
       right: 0,
       position: "absolute",
       height: 50,
+      "& h5": { fontWeight: "bold", color: "rgba(0, 0, 0, 0.75)", fontSize: 30, padding: "15px 0", background: "#fff" },
 
       [theme.breakpoints.up("md")]: {
-        paddingLeft: 125,
+        // paddingLeft: 125,
+        width: "80%",
       },
       [theme.breakpoints.up("lg")]: {
-        paddingLeft: 24,
+        paddingLeft: 15,
       },
     },
-    scroll: { position: "absolute", width: "100%", height: "100%", overflowY: "scroll" },
+    scroll: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+      overflowY: "scroll",
+      left: 0,
+      top: 0,
+      paddingTop: 120,
+    },
+    appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
+    toolbarResearcher: { minHeight: 50, "& h5": { padding: "30px 0 25px" } },
+    logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent" },
+
+    customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
+    customPaper: {
+      maxWidth: 380,
+      maxHeight: 600,
+      marginTop: 25,
+      minWidth: 320,
+      marginLeft: 15,
+      borderRadius: 10,
+      padding: "10px 0",
+      "& h6": { fontSize: 16, fontWeight: 600 },
+      "& li": {
+        display: "inline-block",
+        width: "100%",
+        padding: "15px 30px",
+        fontSize: 16,
+        fontWeight: 600,
+        "&:hover": { backgroundColor: "#ECF4FF" },
+      },
+      "& *": { cursor: "pointer" },
+    },
+    researcherAccount: {
+      color: "#fff",
+      fontSize: 14,
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      boxShadow: "none",
+      background: "transparent",
+      paddingRight: 0,
+      "&:hover": { background: "transparent" },
+      "&:active": { background: "transparent", boxShadow: "none" },
+      "& svg": { marginRight: 10 },
+      "& path": { fill: "#fff", fillOpacity: "1" },
+    },
+    logResearcherToolbar: {
+      background: "#7599FF",
+      position: "fixed",
+      width: "100%",
+      zIndex: 1,
+      minHeight: 50,
+      "& $backbtn": { color: "#fff" },
+    },
+    logResearcherBorder: { paddingTop: 46, top: 50, height: "calc(100% - 50px)" },
+    logParticipantBorder: {
+      border: "#7599FF solid 5px",
+      borderTop: 0,
+      paddingTop: 96,
+      top: 50,
+      height: "calc(100% - 50px)",
+    },
   })
 )
 
 export default function NavigationLayout({
   title,
   id,
+  authType,
   noToolbar,
   goBack,
   onLogout,
@@ -121,6 +191,7 @@ export default function NavigationLayout({
 }: {
   title?: string
   id?: string
+  authType: string
   noToolbar?: boolean
   goBack?: any
   onLogout?: any
@@ -146,7 +217,6 @@ export default function NavigationLayout({
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
       : classnames(classes.toolbar, classes.toolbardashboard)
-
   useInterval(
     () => {
       if (!!id) {
@@ -180,13 +250,122 @@ export default function NavigationLayout({
     let x = (conversations || {})[id || ""] || []
     return !Array.isArray(x) ? 0 : x.filter((a) => a.from === "researcher").length
   }
+  const [anchorEl, setAnchorEl] = React.useState(null)
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
+
+  const open = Boolean(anchorEl)
+  const idp = open ? "simple-popover" : undefined
+  console.log(title)
   return (
-    <Box className={classes.scroll}>
+    <Box>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
-        <AppBar position="static" style={{ background: "transparent", boxShadow: "none" }}>
-          <Toolbar className={selectedClass}>
+        <AppBar classes={{ root: classes.appbarResearcher }}>
+          {(authType === "researcher" || authType === "admin") && (
+            <Toolbar className={classes.logResearcherToolbar}>
+              {typeof title != "undefined" && title.startsWith("Patient") ? (
+                <Box>
+                  <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
+                    <Icon>arrow_back</Icon>
+                  </IconButton>
+                  Patient View: {id}
+                </Box>
+              ) : (
+                <Box>
+                  {title !== "Administrator" && (
+                    <IconButton
+                      onClick={goBack}
+                      color="default"
+                      className={classes.backbtn}
+                      aria-label="Menu"
+                      style={{
+                        marginLeft:
+                          supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                      }}
+                    >
+                      <Icon>arrow_back</Icon>
+                    </IconButton>
+                  )}
+                  <Fab
+                    aria-describedby={id}
+                    variant="extended"
+                    className={classes.researcherAccount}
+                    onClick={handleClick}
+                  >
+                    <UserIcon /> {id} <ArrowDropDownIcon />
+                  </Fab>
+                  <Popover
+                    classes={{ root: classes.customPopover, paper: classes.customPaper }}
+                    id={idp}
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                  >
+                    {/* <MenuItem>
+                    <Typography variant="h6">{t("Manage team")}</Typography>
+                    <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
+                  </MenuItem> */}
+                    {!!id && <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>}
+                    {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
+                    <MenuItem divider onClick={() => setConfirmLogout(true)}>
+                      {t("Logout")}
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://docs.lamp.digital", "_blank")
+                      }}
+                    >
+                      {t("Help & Support")}
+                    </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("https://community.lamp.digital", "_blank")
+                      }}
+                    >
+                      {t("LAMP Community")}
+                    </MenuItem>
+                    <MenuItem
+                      dense
+                      onClick={() => {
+                        setShowCustomizeMenu(undefined)
+                        window.open("mailto:team@digitalpsych.org", "_blank")
+                      }}
+                    >
+                      {t("Contact Us")}
+                    </MenuItem>
+                  </Popover>
+                </Box>
+              )}
+            </Toolbar>
+          )}
+          <Toolbar
+            classes={{
+              root:
+                classes.toolbarResearcher +
+                (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
+            }}
+          >
             {dashboardMenus.indexOf(activeTab) < 0 && (
               <Container className={classes.thumbContainer}>
                 <IconButton
@@ -243,6 +422,10 @@ export default function NavigationLayout({
                 ) : (
                   ""
                 )}
+              </Box>
+            )}
+            {typeof title != "undefined" && title.startsWith("Patient") && (
+              <Box>
                 <Tooltip title={t("Profile & Settings")}>
                   <IconButton
                     aria-owns={!!showCustomizeMenu ? "menu-appbar" : null}
@@ -304,7 +487,7 @@ export default function NavigationLayout({
           marginTop: 0,
           paddingBottom: 56,
           width: "100%",
-          overflowY: "auto",
+          overflowY: "hidden",
           overflow: !!id ? "hidden" : "initial",
         }}
       >
@@ -316,7 +499,20 @@ export default function NavigationLayout({
             marginRight: "auto",
           }}
         >
-          {props.children}
+          <Box
+            className={
+              classes.scroll +
+              ((authType === "researcher" || authType === "admin") &&
+              typeof title != "undefined" &&
+              title.startsWith("Patient")
+                ? " " + classes.logParticipantBorder
+                : authType === "researcher"
+                ? " " + classes.logResearcherBorder
+                : "")
+            }
+          >
+            {props.children}
+          </Box>
         </ResponsiveMargin>
       </Box>
       <Dialog
