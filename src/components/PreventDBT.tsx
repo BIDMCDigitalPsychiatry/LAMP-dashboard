@@ -92,6 +92,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+function getDates() {
+  let dates = []
+  let first
+  let curr = new Date()
+  for (let i = 1; i < 8; i++) {
+    first = curr.getDate() - curr.getDay() + i
+    let day = new Date(curr.setDate(first)).toLocaleDateString()
+    dates.push(day)
+  }
+  return dates
+}
+
 export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -103,35 +115,49 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [selfcareData, setSelfcareData] = useState(JSON.parse(JSON.stringify(selfcare)))
 
   useEffect(() => {
-    let data = []
-    let aData = []
-    let sData = []
+    let dates = getDates()
     let effectivesData = []
     let inEffectiveData = []
     let emotionData = []
+    let summaryData = []
+    let timelineData = []
+    let tData = []
+    let dData = []
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-      event.temporal_slices.map((slice) => {       
-        switch(slice.level) {
-          case "target_effective":
-            effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
-            break
-          case "target_ineffective":
-            inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
-            break
-          case "emotion":
-            emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
-            break
-          case "skill":
-            aData.push({date: dateString, count: 1, action: slice.item })
-            break;  
-        }         
+      if (dates.includes(date.toLocaleDateString())) {
+        event.temporal_slices.map((slice) => {
+          let val = typeof slice.value === "number" ? slice.value : 1
+          tData[dateString] = tData[dateString] ? tData[dateString] + val : val
+          dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+          switch (slice.level) {
+            case "target_effective":
+              effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              break
+            case "target_ineffective":
+              inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              break
+            case "emotion":
+              emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              break
+          }
+        })
+      } else {
+        event.temporal_slices.map((slice) => {
+          let val = typeof slice.value === "number" ? slice.value : 1
+          dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+        })
+      }
+      Object.keys(tData).forEach(function (key) {
+        timelineData.push({ date: key, count: tData[key] })
       })
-      sData.push({ date: dateString, count: !!event.static_data.skillToday ?? 0 })
+      Object.keys(dData).forEach(function (key) {
+        summaryData.push({ action: key, count: dData[key] })
+      })
     })
 
     let actionsD = actionsData
@@ -140,11 +166,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let effectiveD = effectiveData
     let selfcareD = selfcareData
 
-    actionsD.data.values = aData
+    actionsD.data.values = summaryData
     emotionsD.data.values = emotionData
     ineffectiveD.data.values = inEffectiveData
     effectiveD.data.values = effectivesData
-    selfcareD.data.values = sData
+    selfcareD.data.values = timelineData
 
     setActionsData(actionsD)
     setEmotionsData(emotionsD)
