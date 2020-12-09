@@ -253,6 +253,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop: 15,
       fontSize: 12,
       color: "rgba(0, 0, 0, 0.5)",
+      lineHeight: "16px !important"
     },
   },
   timeHours: {
