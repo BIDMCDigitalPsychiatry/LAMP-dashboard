@@ -131,9 +131,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
-          let val = typeof slice.value === "number" ? slice.value : 1
-          tData[dateString] = tData[dateString] ? tData[dateString] + val : val
-          dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+          if(slice.level === "target_effective" || slice.level === "target_ineffective") {
+            let val = parseInt(slice.value)
+            tData[dateString] = tData[dateString] ? tData[dateString] + val : val
+            dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+          }
           switch (slice.level) {
             case "target_effective":
               effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
@@ -148,8 +150,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         })
       } else {
         event.temporal_slices.map((slice) => {
-          let val = typeof slice.value === "number" ? slice.value : 1
-          dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+          if(slice.level === "target_effective" || slice.level === "target_ineffective") {         
+            let val = parseInt(slice.value)
+            dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+          }
         })
       }
       Object.keys(tData).forEach(function (key) {
@@ -171,6 +175,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     ineffectiveD.data.values = inEffectiveData
     effectiveD.data.values = effectivesData
     selfcareD.data.values = timelineData
+    actionsD.title = t(actionsD.title)
+    emotionsD.title = t(emotionsD.title)
+    ineffectiveD.title = t(ineffectiveD.title)
+    effectiveD.title = t(effectiveD.title)
+    selfcareD.title = t(selfcareD.title)
 
     setActionsData(actionsD)
     setEmotionsData(emotionsD)
