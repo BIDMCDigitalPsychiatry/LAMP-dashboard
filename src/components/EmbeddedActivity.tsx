@@ -58,6 +58,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       function (e) {
         if (!saved && activityId !== null) {
           let data = JSON.parse(e.data)
+          delete data["activity"]
           data["activity"] = activityId
           setData(data)
           setEmbeddedActivity(undefined)
@@ -89,7 +90,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         demoActivities[activity.spec]
       }.html.b64`
     )
-    // let response = await fetch(demoActivities[activity.spec]+'.html.b64')
+    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

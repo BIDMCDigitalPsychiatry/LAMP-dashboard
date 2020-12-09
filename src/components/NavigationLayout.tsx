@@ -262,7 +262,6 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
-  console.log(title)
   return (
     <Box>
       {!!noToolbar || !!print ? (

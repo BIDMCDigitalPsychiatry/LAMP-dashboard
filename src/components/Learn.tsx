@@ -139,7 +139,14 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     thumbMain: { maxWidth: 255 },
-    thumbContainer: { maxWidth: 1055 },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     fullwidthBtn: { width: "100%" },
     topicon: {
       minWidth: 150,
@@ -212,7 +219,7 @@ export default function Learn({
       ;(async () => {
         let activityResult = await Promise.all(
           gActivities.map(async (activity) => {
-            let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.tip_details")) as any
+            let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
             return {
               id: activity.id,
               spec: activity.spec,

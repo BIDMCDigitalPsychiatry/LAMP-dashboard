@@ -159,7 +159,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     thumbMain: { maxWidth: 255 },
-    thumbContainer: { maxWidth: 1055 },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     fullwidthBtn: { width: "100%" },
     dialogueCurve: { borderRadius: 10, maxWidth: 400, minWidth: "280px" },
     backdrop: {
@@ -172,8 +179,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
 async function getImage(activityId: string) {
   return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
@@ -198,11 +203,7 @@ export default function Manage({ participant, activities, ...props }) {
   useEffect(() => {
     setLoading(true)
     let gActivities = activities.filter(
-      (x: any) =>
-        games.includes(x.spec) ||
-        x.spec === "lamp.journal" ||
-        x.spec === "lamp.breathe" ||
-        x.spec === "lamp.scratch_image"
+      (x: any) => x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image"
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
@@ -331,7 +332,7 @@ export default function Manage({ participant, activities, ...props }) {
           </ButtonBase>
          </Grid> */}
       <ResponsiveDialog
-        transient={games.includes(spec) ? true : false}
+        transient={false}
         animate
         fullScreen
         open={!!launchedActivity}
@@ -386,16 +387,6 @@ export default function Manage({ participant, activities, ...props }) {
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             Medication_tracker: (
               <NewMedication
-                participant={participant}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            Game: (
-              <EmbeddedActivity
-                name={activity?.name ?? null}
-                activity={activity}
                 participant={participant}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
@@ -469,7 +460,7 @@ export default function Manage({ participant, activities, ...props }) {
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity(games.includes(spec) ? "Game" : spec)
+                setLaunchedActivity(spec)
               }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}

@@ -322,7 +322,7 @@ export default function Participant({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Box className={classes.scroll}>
+      <Box>
         <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
           <Box mt={1} mb={4}>
             <Learn participant={participant} activities={activities} activeTab={activeTab} />

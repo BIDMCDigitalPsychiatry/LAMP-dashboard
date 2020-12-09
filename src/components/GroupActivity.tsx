@@ -23,6 +23,7 @@ import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
+import { SCALE_CATEGORY_INDEX } from "vega-lite/build/src/scale"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -91,42 +92,53 @@ async function getEvents(participantId: string, activityId: string) {
   return steak
 }
 
-export default function NotificationPage({ participant, activityId, ...props }) {
+export default function GroupActivity({ participant, activity, ...props }) {
   const classes = useStyles()
-  const [activity, setActivity] = useState(null)
-  const [loaded, setLoaded] = useState(false)
+  const [currentActivity, setCurrentActivity] = useState(null)
+  const [groupActivities, setGroupActivities] = useState([])
+
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const [loading, setLoading] = useState(true)
   const [activityDetails, setActivityDetails] = useState(null)
+  const [activityId, setActivityId] = useState(null)
+  const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
+  const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    ;(async () => {
-      LAMP.Activity.view(activityId).then(setActivity)
-    })()
-  }, [])
-  useEffect(() => {
-    if (activity !== null) {
-      ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
-        let activityData = {
-          id: activity.id,
-          spec: activity.spec,
-          name: activity.name,
-          settings: activity.settings,
-          schedule: activity.schedule,
-          icon: iconData.data ? iconData.data.icon : undefined,
-        }
-        setActivityDetails(activityData)
-      })()
-      setLoaded(true)
-      setLoading(false)
+    if (groupActivities.length > 0 && index <= groupActivities.length - 1) {
+      setLoading(true)
+      let actId = groupActivities[index]
+      LAMP.Activity.view(actId).then((activity) => {
+        setCurrentActivity(activity)
+        setLoading(false)
+      })
     }
-  }, [activity])
+  }, [groupActivities, index])
 
-  const submitSurvey = (response, overwritingTimestamp) => {
+  useEffect(() => {
+    if (currentActivity !== null) {
+      setActivityId(currentActivity.id) 
+      setActivityRun(false)
+    }
+  }, [currentActivity])
+
+  useEffect(() => {
+    setGroupActivities(activity.settings)
+  }, [])
+
+  const completeActivity = () => {
+    let val = index + 1
+    setIndex(val)
+    setActivityRun(true)
+    if (groupActivities.length === val) {
+      props.onComplete()
+    }
+  }
+
+  const submitSurvey = (response) => {
     setLoading(true)
     let events = response.map((x, idx) => ({
       timestamp: new Date().getTime(),
@@ -152,41 +164,74 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         setLoading(false)
       })
       setTimeout(() => {
-        window.location.href = "/#/"
+        setOpenComplete(false)
+        completeActivity()
       }, 10000)
     })
   }
+
+  useEffect(() => {
+    if (activity !== null) {
+      ;(async () => {
+        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
+        let activityData = {
+          id: activity.id,
+          spec: activity.spec,
+          name: activity.name,
+          settings: activity.settings,
+          schedule: activity.schedule,
+          icon: iconData.data ? iconData.data.icon : undefined,
+        }
+        setActivityDetails(activityData)
+      })()
+      setLoading(false)
+    }
+  }, [activity])
+
   return (
     <div style={{ height: "100%" }}>
-      {loaded &&
-        (activity?.spec === "lamp.survey" ? (
+      { !activityRun && (
+        currentActivity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             id={participant}
-            type={activity?.name ?? ""}
+            type={currentActivity?.name ?? ""}
             fromPrevent={false}
-            group={[activity]}
-            setVisibleActivities={setActivity}
+            group={[currentActivity]}
+            setVisibleActivities={setCurrentActivity}
             onComplete={submitSurvey}
           />
-        ) : activity?.spec === "lamp.cats_and_dogs" ||
-          activity?.spec === "lamp.jewels_a" ||
-          activity?.spec === "lamp.jewels_b" ||
-          activity?.spec === "lamp.spatial_span" ||
-          activity?.spec === "lamp.dbt_diary_card" ? (
-          <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.journal" ? (
-          <JournalEntries participant={participant} activityId={activity?.id ?? null} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.scratch_image" ? (
-          <ScratchImage participant={participant} activity={activity ?? []} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.breathe" ? (
-          <Breathe activity={activity} participant={participant} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.tips" ? (
+        ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
+          currentActivity?.spec === "lamp.jewels_a" ||
+          currentActivity?.spec === "lamp.jewels_b" ||
+          currentActivity?.spec === "lamp.spatial_span" ||
+          currentActivity?.spec === "lamp.dbt_diary_card" ? (
+          <EmbeddedActivity
+            name={currentActivity?.name}
+            activity={currentActivity}
+            participant={participant}
+            onComplete={() => completeActivity()}
+          />
+        ) : currentActivity?.spec === "lamp.journal" ? (
+          <JournalEntries
+            participant={participant}
+            activityId={currentActivity?.id ?? null}
+            onComplete={() => completeActivity()}
+          />
+        ) : currentActivity?.spec === "lamp.scratch_image" ? (
+          <ScratchImage
+            participant={participant}
+            activity={currentActivity ?? []}
+            onComplete={() => completeActivity()}
+          />
+        ) : currentActivity?.spec === "lamp.breathe" ? (
+          <Breathe activity={currentActivity} participant={participant} onComplete={() => completeActivity()} />
+        ) : currentActivity?.spec === "lamp.tips" ? (
           <TipNotification
             participant={participant}
-            title={activity.name}
-            details={activity?.settings ?? {}}
+            title={currentActivity.name}
+            details={currentActivity?.settings ?? {}}
             icon={activityDetails?.icon ?? undefined}
-            onComplete={() => {}}
+            onComplete={() => completeActivity()}
           />
         ) : (
           <Dialog
@@ -197,7 +242,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           >
             <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
             <DialogActions>
-              <Button onClick={() => setOpenNotImplemented(false)} color="primary">
+              <Button
+                onClick={() => {
+                  setOpenNotImplemented(false)
+                  completeActivity()
+                }}
+                color="primary"
+              >
                 {t("Ok")}
               </Button>
             </DialogActions>
@@ -205,7 +256,10 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         ))}
       <Dialog
         open={openComplete}
-        onClose={() => setOpenComplete(false)}
+        onClose={() => {
+          setOpenComplete(false)
+          completeActivity()
+        }}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"
@@ -216,7 +270,14 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         }}
       >
         <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
+          <IconButton
+            aria-label="close"
+            className={classes.closeButton}
+            onClick={() => {
+              setOpenComplete(false)
+              completeActivity()
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>

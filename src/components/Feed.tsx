@@ -46,14 +46,17 @@ import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
 import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
 import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
 import { ReactComponent as Jewels } from "../icons/Jewels.svg"
-import { ReactComponent as InfoIcon } from "../icons/Info.svg"
+import InfoIcon from "../icons/Info.svg"
 import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
-
+import JournalEntries from "./JournalEntries"
+import Breathe from "./Breathe"
+import ScratchImage from "./ScratchImage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
+import GroupActivity from "./GroupActivity"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -240,7 +243,7 @@ const useStyles = makeStyles((theme: Theme) =>
     customstepper: {
       position: "relative",
       maxWidth: 500,
-      padding: 18,
+      padding: "0px 18px 18px 28px",
       "&::after": {
         content: "",
         position: "absolute",
@@ -266,7 +269,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
 
     large_calendar: {
-      padding: "5px 0 0 50px",
+      padding: "0px 0 0 50px",
       "& span": {
         fontSize: 14,
         fontWeight: "bold",
@@ -292,7 +295,16 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    // thumbContainer: { maxWidth: 1055, margin: "0 auto" },
+    thumbContainer: {
+      maxWidth: 1055,
+      width: "80%",
+      margin: "0 auto",
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        paddingBottom: 80,
+      },
+    },
     day: {
       "& p": { fontSize: 10 },
     },
@@ -346,7 +358,6 @@ export default function Feed({
   const [selectedDays, setSelectedDays] = useState([])
   const [medications, setMedications] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [tip, setTip] = useState({})
   const [goals, setGoals] = useState({})
   const [surveyName, setSurveyName] = useState<string>()
   const [currentFeed, setCurrentFeed] = useState([])
@@ -358,20 +369,17 @@ export default function Feed({
   const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
   const [events, setEvents] = useState(null)
-  const [activityId, setActivityId] = useState(null)
   const [activityName, setActivityName] = useState(null)
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-
+  const [activity, setActivity] = useState(null)
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   const { t } = useTranslation()
 
   const completeFeed = (index: number) => {
     let feed = currentFeed
     feed[index].completed = true
-    //LAMP.Type.setAttachment(participant.id, "me", "lamp.current_feeds", JSON.stringify(feed))
     setCurrentFeed(feed)
-    //setCompleted(!completed)
   }
 
   const getFeedData = async () => {
@@ -382,21 +390,6 @@ export default function Feed({
             [participant.id || ""].map(async (x) => [
               x,
               await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )[participant.id || ""] ?? []
-    )
-
-    setTip(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.todays_tip").catch((e) => []),
             ])
           )
         )
@@ -500,12 +493,10 @@ export default function Feed({
             let scheduledDate = new Date(scheduleStartDate)
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
-            schedule.icon = feed.name
             schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
             schedule.type = feed.spec
             schedule.title = feed.name
             schedule.activityData = JSON.parse(JSON.stringify(feed))
-
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() >= new Date().getTime()
@@ -726,7 +717,11 @@ export default function Feed({
   }
 
   const showFeedDetails = (type) => {
-    setLaunchedActivity(type)
+    ;(async () => {
+      let iconData = ((await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any) || []
+      setIcon(iconData.data ? iconData.data.icon : undefined)
+      setLaunchedActivity(type)
+    })()
   }
   const submitSurvey = (response) => {
     completeFeed(index)
@@ -784,20 +779,25 @@ export default function Feed({
                             showFeedDetails(feed.group)
                           }
                           if (feed.group == "learn") {
-                            setTitle(feed.data[0].title)
-                            setDetails(feed.data[0].text)
+                            setTitle(feed.title)
+                            setDetails(feed.activityData.settings)
                             setIndex(index)
-                            setIcon(<SleepTips />)
                             showFeedDetails(feed.group)
                           }
                           if (feed.group == "manage") {
-                            if (games.includes(feed.type)) {
+                            if (games.includes(feed.type) || feed.type === "lamp.dbt_diary_card") {
                               setActivityName(feed.title)
-                              setActivityId(feed.activityData.id)
                               setVisibleActivities(feed.activityData)
                               showFeedDetails("game")
                             } else {
-                              setOpenNotImplemented(true)
+                              if (feed.type === "lamp.group") {
+                                setLaunchedActivity(feed.type)
+                                setActivity(feed.activityData)
+                                // let groupActivities = feed.activityData.settings
+                                // setGroupActivities(groupActivities)
+                              } else {
+                                setOpenNotImplemented(true)
+                              }
                             }
                           }
                         } else if (!feed.completed && feed.clickable) {
@@ -828,7 +828,17 @@ export default function Feed({
                         </Grid>
 
                         <Grid container justify="center" direction="column" className={classes.image}>
-                          {feed.icon == "Exercise" && feed.group === "goals" ? (
+                          <Box
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              margin: "auto",
+                              background: feed.icon
+                                ? `url(${feed.icon}) center center/contain no-repeat`
+                                : `url(${InfoIcon}) center center/contain no-repeat`,
+                            }}
+                          ></Box>
+                          {/* {feed.icon == "Exercise" && feed.group === "goals" ? (
                             <Exercise width="80" height="80" />
                           ) : feed.icon == "Weight" && feed.group === "goals" ? (
                             <Weight width="80" height="80" />
@@ -876,7 +886,7 @@ export default function Feed({
                             <Jewels width="80" height="80" />
                           ) : (
                             <InfoIcon width="80" height="80" />
-                          )}
+                          )} */}
                         </Grid>
                       </Grid>
                     </Card>
@@ -910,8 +920,7 @@ export default function Feed({
                 const view = isSelected ? (
                   <div onClick={() => getFeedByDate(date)}>
                     <span className={isCurrentDay || isActiveDate ? classes.currentDay : classes.selectedDay}>
-                      {" "}
-                      {dayComponent}{" "}
+                      {dayComponent}
                     </span>
                   </div>
                 ) : isCurrentDay || isActiveDate ? (
@@ -920,7 +929,7 @@ export default function Feed({
                   </span>
                 ) : (
                   <span onClick={() => getFeedByDate(date)} className={classes.day}>
-                    {dayComponent}{" "}
+                    {dayComponent}
                   </span>
                 )
                 return view
@@ -932,7 +941,7 @@ export default function Feed({
         </Grid>
       </Grid>
       <ResponsiveDialog
-        transient
+        transient={launchedActivity === "lamp.group" ? false : true}
         animate
         fullScreen
         open={!!launchedActivity}
@@ -960,7 +969,6 @@ export default function Feed({
                 icon={icon}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
-                  completeFeed(index)
                 }}
               />
             ),
@@ -970,7 +978,43 @@ export default function Feed({
                 activity={visibleActivities}
                 participant={participant}
                 onComplete={() => {
-                  completeFeed(index)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.journal": (
+              <JournalEntries
+                participant={participant}
+                activityId={activity?.id ?? null}
+                onComplete={() => {
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.scratch_image": (
+              <ScratchImage
+                participant={participant}
+                activity={activity ?? []}
+                onComplete={() => {
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.breathe": (
+              <Breathe
+                activity={activity}
+                participant={participant}
+                onComplete={() => {
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.group": (
+              <GroupActivity
+                activity={activity}
+                participant={participant}
+                submitSurvey={submitSurvey}
+                onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}
               />

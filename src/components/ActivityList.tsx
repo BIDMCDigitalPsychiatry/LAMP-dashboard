@@ -38,7 +38,7 @@ import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
-import LAMP from "lamp-core"
+import LAMP, { Study } from "lamp-core"
 import Activity from "./Activity"
 import SurveyCreator from "./SurveyCreator"
 import JournalCreator from "./JournalCreator"
@@ -130,7 +130,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
+      zIndex: 111111,
       color: "#fff",
     },
     btnBlue: {
@@ -202,8 +202,8 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       left: "50%",
       right: "50%",
-      marginLeft: "-50vw",
-      marginRight: "-50vw",
+      marginLeft: "-50.6vw",
+      marginRight: "-50.6vw",
       marginBottom: 30,
       marginTop: -20,
       "& input": {
@@ -546,6 +546,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const [studies, setStudies] = useState([])
   const [selected, setSelected] = useState(null)
+  const [activityData, setActivityData] = useState(null)
   const { t } = useTranslation()
   const activitiesObj = {
     "lamp.journal": t("Journal"),
@@ -599,22 +600,40 @@ export default function ActivityList({ researcher, title, ...props }) {
     let activityData = []
     let counts = studiesCount
     let index = 0
+    studies.sort((a, b) => (a.name < b.name ? -1 : 1))
     studies.map((study) => {
-      LAMP.Activity.allByStudy(study.id).then((resActivities) => {
+      ;(async () => {
+        let resActivities = await LAMP.Activity.allByStudy(study.id)
         counts[study.name] = resActivities.length
         if (selected !== null && selected.includes(study.name)) {
+          resActivities.sort(function (a, b) {
+            return b.name > a.name ? -1 : 1
+          })
           resActivities = resActivities.map((el) => ({ ...el, parent: study.name, parentID: study.id }))
           activityData = activityData.concat(resActivities)
         }
         if (index === studies.length - 1) {
-          setStudiesCount(counts)
-          setActivities(activityData)
-          setLoading(false)
+          let data = []
+          studies.forEach((study) => {
+            data = data.concat(activityData.filter((d) => d.parent === study.name))
+          })
+          setActivityData(data)
         }
         index++
-      })
+      })()
     })
   }
+  useEffect(() => {
+    if (activityData !== null) {
+      setActivities(activityData)
+    }
+  }, [activityData])
+
+  useEffect(() => {
+    if (activities !== null) {
+      setLoading(false)
+    }
+  }, [activities])
 
   const onChange = () => {
     refreshData()
@@ -740,8 +759,8 @@ export default function ActivityList({ researcher, title, ...props }) {
     let result
     if (!x.id && x.name) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
-      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.tip_details", {
-        icon: x.icon,
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+        photo: x.icon,
       })
       if (!!result.error)
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -759,8 +778,8 @@ export default function ActivityList({ researcher, title, ...props }) {
         settings: x.settings,
       })) as any
 
-      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.tip_details", {
-        icon: x.icon,
+      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+        photo: x.icon,
       })
       if (!!result.error)
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -806,6 +825,10 @@ export default function ActivityList({ researcher, title, ...props }) {
         },
       ],
     })) as any
+    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
+      photo: x.photo,
+    })
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new group Activity."), {
         variant: "error",
@@ -865,7 +888,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       )[0]
       const activity = spliceActivity({ raw, tag })
       setSelectedActivity(activity)
-    } else if (raw.spec === "lamp.group" || raw.spec === "lamp.dbt_diary_card") {
+    } else if (raw.spec === "lamp.dbt_diary_card") {
       setSelectedActivity(raw)
     } else if (raw.spec === "lamp.tips") {
       setSelectedActivity(raw)
@@ -873,7 +896,8 @@ export default function ActivityList({ researcher, title, ...props }) {
       games.includes(raw.spec) ||
       raw.spec === "lamp.journal" ||
       raw.spec === "lamp.scratch_image" ||
-      raw.spec === "lamp.breathe"
+      raw.spec === "lamp.breathe" ||
+      raw.spec === "lamp.group"
     ) {
       let tag = [await LAMP.Type.getAttachment(raw.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data
@@ -931,6 +955,11 @@ export default function ActivityList({ researcher, title, ...props }) {
         name: x.name,
         settings: x.settings,
       })) as any
+
+      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+        description: x.description,
+        photo: x.photo,
+      })
       if (!!result.error)
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
           variant: "error",
@@ -980,8 +1009,8 @@ export default function ActivityList({ researcher, title, ...props }) {
           settings: x.settings,
         }
         result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.tip_details", {
-          icon: x.icon,
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+          photo: x.icon,
         })
         if (!!result.error)
           enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -1000,7 +1029,6 @@ export default function ActivityList({ researcher, title, ...props }) {
   //
   const updateSchedule = async (x) => {
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
-    console.dir(result)
     let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
     let all = await LAMP.Activity.allByStudy(x.parentID)
     all = all.map((el) => ({ ...el, parent: x.parent, parentID: x.parentID }))
