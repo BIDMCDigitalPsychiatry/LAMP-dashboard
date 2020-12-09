@@ -20,6 +20,7 @@ import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
+import TextareaAutosize from "@material-ui/core/TextareaAutosize"
 
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
@@ -52,7 +53,17 @@ const useStyles = makeStyles((theme) => ({
     background: "#ECF4FF",
     borderRadius: "20px 0 20px 20px",
     float: "right",
-    "& input": { padding: 0, color: "#4C66D6" },
+    "& textarea": {
+      padding: 0,
+      height: 35,
+      color: "#4C66D6",
+      background: "transparent",
+      border: "none",
+      resize: "none",
+      fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+      minWidth: 250,
+      "&:focus": { border: 0, outline: 0 },
+    },
     "& svg": { color: "#4C66D6" },
     "& button": { padding: 0, color: "#4C66D6", marginRight: 0, "&:hover": { backgroundColor: "transparent" } },
   },
@@ -113,6 +124,7 @@ const useStyles = makeStyles((theme) => ({
       paddingLeft: 24,
     },
   },
+  composeTextarea: { display: "flex", alignItems: "center" },
 }))
 
 export default function Messages({
@@ -246,8 +258,8 @@ export default function Messages({
 
         <Divider />
         <Box my={2} display="flex" className={classes.composeMsg}>
-          <Box width="100%">
-            <InputBase
+          <Box width="100%" className={classes.composeTextarea}>
+            <TextareaAutosize
               placeholder={t("text")}
               value={currentMessage || ""}
               onChange={(event) => setCurrentMessage(event.target.value)}
