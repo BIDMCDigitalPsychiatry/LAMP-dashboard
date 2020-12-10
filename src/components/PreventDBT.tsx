@@ -132,9 +132,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
           if(slice.level === "target_effective" || slice.level === "target_ineffective") {
-            let val = parseInt(slice.value)
-            tData[dateString] = tData[dateString] ? tData[dateString] + val : val
-            dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+            tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
+            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
           switch (slice.level) {
             case "target_effective":
@@ -151,19 +150,17 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       } else {
         event.temporal_slices.map((slice) => {
           if(slice.level === "target_effective" || slice.level === "target_ineffective") {         
-            let val = parseInt(slice.value)
-            dData[slice.item] = dData[slice.item] ? dData[slice.item] + val : val
+            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
         })
-      }
-      Object.keys(tData).forEach(function (key) {
-        timelineData.push({ date: key, count: tData[key] })
-      })
-      Object.keys(dData).forEach(function (key) {
-        summaryData.push({ action: key, count: dData[key] })
-      })
+      }     
     })
-
+    Object.keys(tData).forEach(function (key) {
+      timelineData.push({ date: key, count: tData[key] })
+    })
+    Object.keys(dData).forEach(function (key) {
+      summaryData.push({ action: key, count: dData[key] })
+    })
     let actionsD = actionsData
     let emotionsD = emotionsData
     let ineffectiveD = ineffectiveData
