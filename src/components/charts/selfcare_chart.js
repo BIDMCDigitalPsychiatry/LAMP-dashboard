@@ -4,7 +4,7 @@ export const selfcare = {
   width: 440,
   height: 224,
   padding: 5,
-  title: "Self-care",
+  title: "Actions (Timeline)",
   data: {
     values: [
       { date: "2020-09-20", count: 1 },

@@ -4,7 +4,7 @@ export const actions = {
   width: 440,
   height: 224,
   padding: 5,
-  title: "Actions (times)",
+  title: "Actions (Summary)",
   data: {
     values: [
       { action: "Self-care", count: 9 },
