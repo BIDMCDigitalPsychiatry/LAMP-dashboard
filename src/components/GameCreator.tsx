@@ -399,15 +399,15 @@ export default function GameCreator({
 
           {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
             <Box style={{ marginTop: 80 }}>
-              <Typography variant="h6">{t("Order of tapping:")}</Typography>
+              <Typography variant="h6">{t("Order of tapping")}:</Typography>
               <Box display="flex" mt={2}>
                 <Box>
                   <RatioButton
-                    value="Forward"
-                    unable={false}
                     smallSpace={true}
                     title={t("Forward")}
+                    unable={false}
                     color="#618EF7"
+                    value="Forward"
                     checked={!settings.reverse_tapping ? true : false}
                     onChange={() => setSettings({ ...settings, reverse_tapping: false })}
                     labelPlacement="right"
@@ -418,7 +418,7 @@ export default function GameCreator({
                     smallSpace={true}
                     title={t("Backward")}
                     color="#618EF7"
-                    value={t("Backward")}
+                    value="Backward"
                     unable={false}
                     checked={settings.reverse_tapping ? true : false}
                     onChange={() => setSettings({ ...settings, reverse_tapping: true })}
@@ -511,7 +511,7 @@ export default function GameCreator({
                     min: 30,
                   }}
                   onChange={(e) => setSettings({ ...settings, beginner_seconds: Number(e.target.value) })}
-                  helperText={settings.beginner_seconds > 300 ? t("Maximum value is 300") : ""}
+                  helperText={settings.beginner_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -537,7 +537,7 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, intermediate_seconds: Number(e.target.value) })}
-                  helperText={settings.intermediate_seconds > 300 ? t("Maximum value is 300") : ""}
+                  helperText={settings.intermediate_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -563,7 +563,7 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, expert_seconds: Number(e.target.value) })}
-                  helperText={settings.expert_seconds > 300 ? t("Maximum value is 300") : ""}
+                  helperText={settings.expert_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -589,7 +589,7 @@ export default function GameCreator({
                     min: 10,
                   }}
                   onChange={(e) => setSettings({ ...settings, advanced_seconds: Number(e.target.value) })}
-                  helperText={settings.advanced_seconds > 300 ? t("Maximum value is 300") : ""}
+                  helperText={settings.advanced_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -609,7 +609,7 @@ export default function GameCreator({
                   type="number"
                   variant="filled"
                   id="diamond_count"
-                  label={t("Number of diamonds for level 1")}
+                  label={t("Number of diamonds for level number", { number: 1 })}
                   defaultValue={settings?.diamond_count ?? 15}
                   InputLabelProps={{
                     shrink: true,
@@ -619,7 +619,7 @@ export default function GameCreator({
                     min: 3,
                   }}
                   onChange={(e) => setSettings({ ...settings, diamond_count: Number(e.target.value) })}
-                  helperText={settings.diamond_count > 25 ? t("Maximum value is 25") : ""}
+                  helperText={settings.diamond_count > 25 ? t("Maximum value is number", { number: 25 }) : ""}
                 />
               </Grid>
               <Grid item lg={6} md={6} sm={6} xs={12}>
@@ -638,7 +638,7 @@ export default function GameCreator({
                     min: 0,
                   }}
                   onChange={(e) => setSettings({ ...settings, bonus_point_count: Number(e.target.value) })}
-                  helperText={settings.bonus_point_count > 500 ? t("Maximum value is 500") : ""}
+                  helperText={settings.bonus_point_count > 500 ? t("Maximum value is number", { number: 500 }) : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
@@ -664,7 +664,7 @@ export default function GameCreator({
                   }}
                   defaultValue={settings?.shape_count ?? 1}
                   onChange={(e) => setSettings({ ...settings, shape_count: Number(e.target.value) })}
-                  helperText={settings.shape_count > 4 ? t("Maximum value is 4") : ""}
+                  helperText={settings.shape_count > 4 ? t("Maximum value is number", { number: 4 }) : ""}
                 />
               </Grid>
               <Grid item lg={3} md={6} sm={6}>
