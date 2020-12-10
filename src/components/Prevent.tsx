@@ -47,6 +47,8 @@ import { ReactComponent as PreventBreatheIcon } from "../icons/PreventBreathe.sv
 import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
 import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
+import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
+
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
 import es from "javascript-time-ago/locale/es"
@@ -552,7 +554,7 @@ export const strategies = {
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,  
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
@@ -655,6 +657,7 @@ export default function Prevent({
     } else {
       setSelectedActivityName("")
     }
+    console.log(activity, data[activity.name])
     setActivityData(data)
     setOpenData(true)
   }
@@ -868,15 +871,19 @@ export default function Prevent({
             {(activities || [])
               .filter((x) => (selectedActivities || []).includes(x.name))
               .map((activity) =>
-                activity.spec === "lamp.journal" ? (
+                activity.spec === "lamp.journal" || activity.spec === "lamp.dbt_diary_card" ? (
                   <Grid item xs={6} sm={3} md={3} lg={3}>
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card
                         className={classes.prevent}
                         onClick={() => {
-                          setSelectedActivity(activityEvents?.[activity.name] ?? null)
-                          setSelectedActivityName("Journal entries")
-                          setOpenData(true)
+                          if(activity.spec === "lamp.dbt_diary_card") {
+                            openDetails(activity, activityEvents, 0)
+                          } else {
+                            setSelectedActivity(activityEvents?.[activity.name] ?? null)
+                            setSelectedActivityName( activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries")                                             
+                            setOpenData(true)
+                          }        
                         }}
                       >
                         <Box display="flex">
@@ -884,7 +891,7 @@ export default function Prevent({
                             <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
-                            <JournalBlue />
+                            {activity.spec === "lamp.journal" ? <JournalBlue /> : ""}
                           </Box>
                         </Box>
                         <Box className={classes.preventGraph}>
@@ -1217,6 +1224,7 @@ export default function Prevent({
               aria-label="Menu"
               className={classes.backbtn}
             >
+              {console.log(selectedActivity, (activityData || {})[selectedActivityName], selectedActivityName)}
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">{t(selectedActivityName)}</Typography>
