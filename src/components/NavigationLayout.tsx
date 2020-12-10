@@ -121,10 +121,6 @@ const useStyles = makeStyles((theme: Theme) =>
       top: 0,
       paddingTop: 120,
     },
-
-    logResearcher: {
-      "& $backbtn": { color: "#fff" },
-    },
     appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
     toolbarResearcher: { minHeight: 50, "& h5": { padding: "30px 0 25px" } },
     logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent" },
@@ -163,7 +159,14 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 10 },
       "& path": { fill: "#fff", fillOpacity: "1" },
     },
-    logResearcherToolbar: { background: "#7599FF", position: "fixed", width: "100%", zIndex: 1, minHeight: 50 },
+    logResearcherToolbar: {
+      background: "#7599FF",
+      position: "fixed",
+      width: "100%",
+      zIndex: 1,
+      minHeight: 50,
+      "& $backbtn": { color: "#fff" },
+    },
     logResearcherBorder: { paddingTop: 46, top: 50, height: "calc(100% - 50px)" },
     logParticipantBorder: {
       border: "#7599FF solid 5px",
@@ -259,31 +262,37 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
-
   return (
     <Box>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
         <AppBar classes={{ root: classes.appbarResearcher }}>
-          {authType === "researcher" && (
+          {(authType === "researcher" || authType === "admin") && (
             <Toolbar className={classes.logResearcherToolbar}>
               {typeof title != "undefined" && title.startsWith("Patient") ? (
-                <Box className={!!id ? classes.logResearcher : ""}>
-                  <IconButton
-                    className={classes.backbtn}
-                    onClick={() => {
-                      window.location.href = "/#/researcher/me"
-                    }}
-                    color="default"
-                    aria-label="Menu"
-                  >
+                <Box>
+                  <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
                   Patient View: {id}
                 </Box>
               ) : (
                 <Box>
+                  {title !== "Administrator" && (
+                    <IconButton
+                      onClick={goBack}
+                      color="default"
+                      className={classes.backbtn}
+                      aria-label="Menu"
+                      style={{
+                        marginLeft:
+                          supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
+                      }}
+                    >
+                      <Icon>arrow_back</Icon>
+                    </IconButton>
+                  )}
                   <Fab
                     aria-describedby={id}
                     variant="extended"
@@ -351,7 +360,9 @@ export default function NavigationLayout({
           )}
           <Toolbar
             classes={{
-              root: classes.toolbarResearcher + (authType === "researcher" ? " " + classes.logToolbarResearcher : ""),
+              root:
+                classes.toolbarResearcher +
+                (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
             }}
           >
             {dashboardMenus.indexOf(activeTab) < 0 && (
@@ -490,7 +501,9 @@ export default function NavigationLayout({
           <Box
             className={
               classes.scroll +
-              (authType === "researcher" && typeof title != "undefined" && title.startsWith("Patient")
+              ((authType === "researcher" || authType === "admin") &&
+              typeof title != "undefined" &&
+              title.startsWith("Patient")
                 ? " " + classes.logParticipantBorder
                 : authType === "researcher"
                 ? " " + classes.logResearcherBorder
