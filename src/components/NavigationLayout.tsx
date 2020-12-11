@@ -262,6 +262,7 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
+
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -279,7 +280,7 @@ export default function NavigationLayout({
                 </Box>
               ) : (
                 <Box>
-                  {title !== "Administrator" && (
+                  {authType === "admin" && title !== "Administrator" && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -299,7 +300,7 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <UserIcon /> {id} <ArrowDropDownIcon />
+                    <UserIcon /> {title} <ArrowDropDownIcon />
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}
