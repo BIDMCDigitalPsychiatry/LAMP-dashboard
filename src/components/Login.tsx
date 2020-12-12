@@ -56,6 +56,9 @@ const useStyles = makeStyles((theme: Theme) =>
     linkBlue: { color: "#6083E7", fontWeight: "bold", cursor: "pointer", "&:hover": { textDecoration: "underline" } },
     loginContainer: { height: "90vh", paddingTop: "3%" },
     loginInner: { maxWidth: 280 },
+    loginDisabled: {
+      opacity: 0.5,
+    },
   })
 )
 
@@ -65,6 +68,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
+  const [loginClick, setLoginClick] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const languagesArray = [
@@ -103,7 +107,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
 
   let handleLogin = (event: any, mode?: string): void => {
     event.preventDefault()
-    if (mode === undefined && (!state.id || !state.password)) return
+    setLoginClick(true)
+    if (mode === undefined && (!state.id || !state.password)) {
+      enqueueSnackbar(t("Incorrect username, password, or server address."), {
+        variant: "error",
+      })
+      setLoginClick(false)
+      return
+    }
     setIdentity({
       id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
       password: !!mode ? "demo" : state.password,
@@ -126,6 +137,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
+        setLoginClick(false)
         onComplete()
       })
       .catch((err) => {
@@ -135,6 +147,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         })
         if (!srcLocked)
           enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), { variant: "info" })
+        setLoginClick(false)
       })
   }
 
@@ -275,6 +288,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     type="submit"
                     style={{ background: "#7599FF", color: "White" }}
                     onClick={handleLogin}
+                    className={loginClick ? classes.loginDisabled : ""}
                   >
                     {t("Login")}
                     <input
@@ -289,6 +303,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                         width: "100%",
                         opacity: 0,
                       }}
+                      disabled={loginClick}
                     />
                   </Fab>
                 </Box>
