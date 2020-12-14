@@ -657,7 +657,6 @@ export default function Prevent({
     } else {
       setSelectedActivityName("")
     }
-    console.log(activity, data[activity.name])
     setActivityData(data)
     setOpenData(true)
   }
@@ -877,13 +876,15 @@ export default function Prevent({
                       <Card
                         className={classes.prevent}
                         onClick={() => {
-                          if(activity.spec === "lamp.dbt_diary_card") {
+                          if (activity.spec === "lamp.dbt_diary_card") {
                             openDetails(activity, activityEvents, 0)
                           } else {
                             setSelectedActivity(activityEvents?.[activity.name] ?? null)
-                            setSelectedActivityName( activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries")                                             
+                            setSelectedActivityName(
+                              activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries"
+                            )
                             setOpenData(true)
-                          }        
+                          }
                         }}
                       >
                         <Box display="flex">
@@ -891,7 +892,7 @@ export default function Prevent({
                             <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
-                            {activity.spec === "lamp.journal" ? <JournalBlue /> : ""}
+                            {activity.spec === "lamp.journal" ? <JournalBlue /> : <AssessDbt width="50" height="50" />}
                           </Box>
                         </Box>
                         <Box className={classes.preventGraph}>
@@ -1224,8 +1225,7 @@ export default function Prevent({
               aria-label="Menu"
               className={classes.backbtn}
             >
-              {console.log(selectedActivity, (activityData || {})[selectedActivityName], selectedActivityName)}
-              <Icon>arrow_back</Icon>
+               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">{t(selectedActivityName)}</Typography>
           </Toolbar>
