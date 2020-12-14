@@ -657,7 +657,6 @@ export default function Prevent({
     } else {
       setSelectedActivityName("")
     }
-    console.log(activity, data[activity.name])
     setActivityData(data)
     setOpenData(true)
   }
@@ -1226,8 +1225,7 @@ export default function Prevent({
               aria-label="Menu"
               className={classes.backbtn}
             >
-              {console.log(selectedActivity, (activityData || {})[selectedActivityName], selectedActivityName)}
-              <Icon>arrow_back</Icon>
+               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">{t(selectedActivityName)}</Typography>
           </Toolbar>

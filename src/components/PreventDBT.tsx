@@ -154,22 +154,12 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let timelineData = []
     let tData = []
     let dData = []
-    let reason = []
-    let note = []
-    console.log(selectedEvents)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-      note[getDateString(date)] = !!note[getDateString(date)] ? note[getDateString(date)] : []
-      reason[getDateString(date)] = !!reason[getDateString(date)] ? reason[getDateString(date)] : []
-      if (!!event.static_data.notes)
-        note[getDateString(date)].push({ date: getDateString(date), note: event.static_data.notes })
-      if (!!event.static_data.reason)
-        reason[getDateString(date)].push({ date: getDateString(date), reason: event.static_data.reason })
-
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
@@ -202,8 +192,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
-    // Why didn’t you use any skills?Didn't use skills because...
-    // Optional: Are there any other details you want to share about your day?Optional notes:
     let actionsD = actionsData
     let emotionsD = emotionsData
     let ineffectiveD = ineffectiveData
@@ -226,10 +214,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     setIneffectiveData(ineffectiveD)
     setSelfcareData(selfcareD)
     setEffectiveData(effectiveD)
-    setNotes(note)
-    setReasons(reason)
-    console.log(note, reason)
-  }, [])
+   }, [])
 
   return (
     <div className={classes.root}>
