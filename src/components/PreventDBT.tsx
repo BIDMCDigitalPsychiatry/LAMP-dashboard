@@ -160,9 +160,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-      
+      console.log(event)
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
+          console.log(slice)
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
@@ -181,6 +182,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         })
       } else {
         event.temporal_slices.map((slice) => {
+          console.log(slice)
+       
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
@@ -209,12 +212,15 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     ineffectiveD.title = t(ineffectiveD.title)
     effectiveD.title = t(effectiveD.title)
     selfcareD.title = t(selfcareD.title)
-
+    console.log(summaryData, emotionData, inEffectiveData, timelineData, effectivesData)
     setActionsData(actionsD)
     setEmotionsData(emotionsD)
     setIneffectiveData(ineffectiveD)
     setSelfcareData(selfcareD)
     setEffectiveData(effectiveD)
+    console.log(selectedEvents.filter((event) => !!event.static_data.reason), selectedEvents.filter((event) => !!event.static_data.reason).length > 0)
+    console.log(selectedEvents.filter((event) => !!event.static_data.notes), selectedEvents.filter((event) => !!event.static_data.notes).length > 0)
+
    }, [])
 
   return (
