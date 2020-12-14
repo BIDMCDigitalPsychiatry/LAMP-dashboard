@@ -160,6 +160,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
+      
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
@@ -222,53 +223,65 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         <Grid item xs={12} sm={3} />
         <Grid item xs={12} sm={6}>
           <div className={classes.graphContainer}>
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
+            {emotionsData.length > 0 && (
+              <Box>
+                <NativeSelect className={classes.selector}>
+                  <option value={10}>{t("TEN")}</option>
+                  <option value={20}>{t("TWENTY")}</option>
+                  <option value={30}>{t("THIRTY")}</option>
+                </NativeSelect>
+                <Vega spec={emotionsData} />
+                <div className={classes.separator} />
+              </Box>
+            )}
+           
+           {effectiveData.length > 0 && (
+             <Box>
+              <NativeSelect className={classes.selector}>
+                <option value={10}>{t("TEN")}</option>
+                <option value={20}>{t("TWENTY")}</option>
+                <option value={30}>{t("THIRTY")}</option>
+              </NativeSelect>
+              <Vega spec={effectiveData} />
+              <div className={classes.separator} />
+             </Box>
+           )}
+            
+            {ineffectiveData.length > 0 && (
+              <Box>
+                <NativeSelect className={classes.selector}>
+                  <option value={10}>{t("TEN")}</option>
+                  <option value={20}>{t("TWENTY")}</option>
+                  <option value={30}>{t("THIRTY")}</option>
+                </NativeSelect>
+                <Vega spec={ineffectiveData} />
+                <div className={classes.separator} />
+              </Box>
+            )}
 
-            <Vega spec={emotionsData} />
-
-            <div className={classes.separator} />
-
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
-
-            <Vega spec={effectiveData} />
-
-            <div className={classes.separator} />
-
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
-
-            <Vega spec={ineffectiveData} />
-
-            <div className={classes.separator} />
-
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
-
-            <Vega spec={actionsData} />
-
-            <div className={classes.separator} />
-
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
-
-            <Vega spec={selfcareData} />
+            {actionsData.length > 0 && (
+              <Box>
+                <NativeSelect className={classes.selector}>
+                  <option value={10}>{t("TEN")}</option>
+                  <option value={20}>{t("TWENTY")}</option>
+                  <option value={30}>{t("THIRTY")}</option>
+                </NativeSelect>
+                <Vega spec={actionsData} />
+                <div className={classes.separator} />
+              </Box>
+            )}
+            
+            {selfcareData.length > 0 && (
+              <Box>
+                <NativeSelect className={classes.selector}>
+                  <option value={10}>{t("TEN")}</option>
+                  <option value={20}>{t("TWENTY")}</option>
+                  <option value={30}>{t("THIRTY")}</option>
+                </NativeSelect>
+                <Vega spec={selfcareData} />
+                <div className={classes.separator} />
+              </Box>
+            )}           
 
             {/* <div className={classes.titleContainer}>
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
@@ -278,7 +291,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                     <Typography className={classes.addButtonTitle}>{t("ADD_ITEM")}</Typography>
                 </ButtonBase>
             </div> */}
-            <div className={classes.separator} />
+           
             {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
             <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
               <Box width={1} className={classes.graphSubContainer}>
