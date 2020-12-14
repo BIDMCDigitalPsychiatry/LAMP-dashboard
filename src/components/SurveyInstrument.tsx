@@ -744,21 +744,23 @@ function Rating({ onChange, options, value, ...props }) {
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].description === null ? 0 : options[0].description}
+            {options[0].description === null ? options[0].value : options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           {options.length > 2 && (
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
               {options[Math.ceil(options.length / 2) - 1].description === null
-                ? 0
+                ? options[Math.ceil(options.length / 2) - 1].value
                 : options[Math.ceil(options.length / 2) - 1].description}
             </Typography>
           )}
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].description === null ? 0 : options[options.length - 1].description}
+            {options[options.length - 1].description === null 
+              ? options[options.length - 1].value 
+              : options[options.length - 1].description}
           </Typography>
         </Grid>
       </Grid>
@@ -870,6 +872,7 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
     case "slider":
       options = JSON.parse(JSON.stringify(options).replace(/null/g, "0"))
       options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
+      console.log(options)
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
@@ -907,9 +910,9 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "slider"
             ? t(
-                `(${options[0].value} being ${!!options[0].description ?? options[0].value}, ${
+                `(${options[0].value} being ${!!options[0].description ? options[0].description : options[0].value}, ${
                   options[options.length - 1].value
-                } being ${options[options.length - 1].description})`
+                } being ${options[options.length - 1].description ? options[options.length - 1].description : options[options.length - 1].value})`
               )
             : !!desc && t(` (${desc})`)}
         </Typography>
