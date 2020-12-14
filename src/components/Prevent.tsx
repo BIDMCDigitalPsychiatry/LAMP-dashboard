@@ -877,13 +877,15 @@ export default function Prevent({
                       <Card
                         className={classes.prevent}
                         onClick={() => {
-                          if(activity.spec === "lamp.dbt_diary_card") {
+                          if (activity.spec === "lamp.dbt_diary_card") {
                             openDetails(activity, activityEvents, 0)
                           } else {
                             setSelectedActivity(activityEvents?.[activity.name] ?? null)
-                            setSelectedActivityName( activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries")                                             
+                            setSelectedActivityName(
+                              activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries"
+                            )
                             setOpenData(true)
-                          }        
+                          }
                         }}
                       >
                         <Box display="flex">
@@ -891,7 +893,7 @@ export default function Prevent({
                             <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
-                            {activity.spec === "lamp.journal" ? <JournalBlue /> : ""}
+                            {activity.spec === "lamp.journal" ? <JournalBlue /> : <AssessDbt width="50" height="50" />}
                           </Box>
                         </Box>
                         <Box className={classes.preventGraph}>

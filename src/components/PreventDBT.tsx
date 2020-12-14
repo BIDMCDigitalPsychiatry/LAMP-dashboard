@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import Grid from "@material-ui/core/Grid"
+import { Box, Typography, Grid } from "@material-ui/core"
 import { Vega } from "react-vega"
 import NativeSelect from "@material-ui/core/NativeSelect"
 import { useTranslation } from "react-i18next"
@@ -89,6 +89,22 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: -300,
       zIndex: 1000,
     },
+    blueBoxStyle: {
+      background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
+      borderRadius: "10px",
+      padding: "5px 20px 20px 20px",
+      textAlign: "justify",
+      marginBottom: 20,
+      "& span": {
+        color: "rgba(0, 0, 0, 0.4)",
+        fontSize: "12px",
+        lineHeight: "40px",
+      },
+    },
+    graphSubContainer: {
+      maxWidth: 500,
+      "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
+    },
   })
 )
 
@@ -113,7 +129,22 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [ineffectiveData, setIneffectiveData] = useState(JSON.parse(JSON.stringify(ineffective)))
   const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
   const [selfcareData, setSelfcareData] = useState(JSON.parse(JSON.stringify(selfcare)))
+  const [reasons, setReasons] = useState([])
+  const [notes, setNotes] = useState([])
 
+  const getDateString = (date: Date) => {
+    var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    return (
+      weekday[date.getDay()] +
+      " " +
+      monthname[date.getMonth()] +
+      ", " +
+      date.getDate() +
+      " " +
+      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    )
+  }
   useEffect(() => {
     let dates = getDates()
     let effectivesData = []
@@ -123,15 +154,25 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let timelineData = []
     let tData = []
     let dData = []
+    let reason = []
+    let note = []
+    console.log(selectedEvents)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
+      note[getDateString(date)] = !!note[getDateString(date)] ? note[getDateString(date)] : []
+      reason[getDateString(date)] = !!reason[getDateString(date)] ? reason[getDateString(date)] : []
+      if (!!event.static_data.notes)
+        note[getDateString(date)].push({ date: getDateString(date), note: event.static_data.notes })
+      if (!!event.static_data.reason)
+        reason[getDateString(date)].push({ date: getDateString(date), reason: event.static_data.reason })
+
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
-          if(slice.level === "target_effective" || slice.level === "target_ineffective") {
+          if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
@@ -149,11 +190,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         })
       } else {
         event.temporal_slices.map((slice) => {
-          if(slice.level === "target_effective" || slice.level === "target_ineffective") {         
+          if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
         })
-      }     
+      }
     })
     Object.keys(tData).forEach(function (key) {
       timelineData.push({ date: key, count: tData[key] })
@@ -161,6 +202,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
+    // Why didn’t you use any skills?Didn't use skills because...
+    // Optional: Are there any other details you want to share about your day?Optional notes:
     let actionsD = actionsData
     let emotionsD = emotionsData
     let ineffectiveD = ineffectiveData
@@ -183,6 +226,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     setIneffectiveData(ineffectiveD)
     setSelfcareData(selfcareD)
     setEffectiveData(effectiveD)
+    setNotes(note)
+    setReasons(reason)
+    console.log(note, reason)
   }, [])
 
   return (
@@ -239,19 +285,58 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
 
             <Vega spec={selfcareData} />
 
-            <div className={classes.separator} />
-
             {/* <div className={classes.titleContainer}>
-                            <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
-                                <div className={classes.addButton}>
-                                    <AddCircleOutline />
-                                </div>
-                                <Typography className={classes.addButtonTitle}>{t("ADD_ITEM")}</Typography>
-                            </ButtonBase>
-                        </div> */}
+                <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
+                    <div className={classes.addButton}>
+                        <AddCircleOutline />
+                    </div>
+                    <Typography className={classes.addButtonTitle}>{t("ADD_ITEM")}</Typography>
+                </ButtonBase>
+            </div> */}
+            <div className={classes.separator} />
+            {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
+            <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+              <Box width={1} className={classes.graphSubContainer}>
+                <Typography variant="h5">Didn't use skills because...</Typography>
+                {selectedEvents.map(
+                  (event) =>
+                    !!event.static_data.notes && (
+                      <Box className={classes.blueBoxStyle}>
+                        <Typography variant="caption" gutterBottom>
+                          {getDateString(new Date(event.timestamp))}
+                        </Typography>
+                        <Typography variant="body2" component="p">
+                          {event.static_data.notes}
+                        </Typography>
+                      </Box>
+                    )
+                )}
+              </Box>
+            </Box>
+            )}
+            {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
+              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                <div className={classes.separator} />
+                <Box width={1} className={classes.graphSubContainer}>
+                  <Typography variant="h5">Optional notes:</Typography>
+                  {selectedEvents.map(
+                    (event) =>
+                      !!event.static_data.reason && (
+                        <Box className={classes.blueBoxStyle}>
+                          <Typography variant="caption" gutterBottom>
+                            {getDateString(new Date(event.timestamp))}
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            {event.static_data.reason}
+                          </Typography>
+                        </Box>
+                      )
+                  )}
+                </Box>
+              </Box>
+            )}            
           </div>
         </Grid>
-        {/* <Grid item xs={12} sm={3} /> */}
       </Grid>
     </div>
   )
