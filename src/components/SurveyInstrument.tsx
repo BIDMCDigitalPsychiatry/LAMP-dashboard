@@ -872,7 +872,6 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
     case "slider":
       options = JSON.parse(JSON.stringify(options).replace(/null/g, "0"))
       options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
-      console.log(options)
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
