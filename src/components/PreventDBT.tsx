@@ -166,13 +166,13 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
           switch (slice.level) {
             case "target_effective":
-              effectivesData.push({ value: slice.value, date: date, symbol: slice.item })
+              effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
               break
             case "target_ineffective":
-              inEffectiveData.push({ value: slice.value, date: date, symbol: slice.item })
+              inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
               break
             case "emotion":
-              emotionData.push({ value: slice.value, date: date, symbol: slice.item })
+              emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
               break
           }
         })
