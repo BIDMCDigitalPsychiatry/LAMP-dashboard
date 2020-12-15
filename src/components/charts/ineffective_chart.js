@@ -118,7 +118,7 @@ export const ineffective = {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend" },
   },
   encoding: {
-    x: { field: "date", type: "ordinal", timeUnit: "utcyearmonthdate" },
+    x: { field: "date", type: "ordinal", timeUnit: "yearmonthdate" },
     y: { field: "value", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2 },
