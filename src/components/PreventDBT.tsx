@@ -129,8 +129,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [ineffectiveData, setIneffectiveData] = useState(JSON.parse(JSON.stringify(ineffective)))
   const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
   const [selfcareData, setSelfcareData] = useState(JSON.parse(JSON.stringify(selfcare)))
-  const [reasons, setReasons] = useState([])
-  const [notes, setNotes] = useState([])
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -160,36 +158,47 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-      console.log(event)
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
-          console.log(slice)
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
           switch (slice.level) {
             case "target_effective":
-              effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              effectivesData.push({ value: slice.value, date: date, symbol: slice.item })
               break
             case "target_ineffective":
-              inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              inEffectiveData.push({ value: slice.value, date: date, symbol: slice.item })
               break
             case "emotion":
-              emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+              emotionData.push({ value: slice.value, date: date, symbol: slice.item })
               break
           }
         })
-      } else {
-        event.temporal_slices.map((slice) => {
-          console.log(slice)
-       
+     } else {
+        event.temporal_slices.map((slice) => {       
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
         })
+       
       }
     })
+        
+    dates.map((d)=>{
+      if(effectivesData.filter((eff) => eff.date === d).length === 0) {
+        effectivesData.push({ value: null, date: d,  symbol:"None" })
+      }
+      if(inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+        inEffectiveData.push({ value: null, date: d,  symbol:"None" })
+      }
+      if(emotionData.filter((eff) => eff.date === d).length === 0) {
+        emotionData.push({ value: null, date: d, symbol:"None" })
+      }
+    }) 
+    
+
     Object.keys(tData).forEach(function (key) {
       timelineData.push({ date: key, count: tData[key] })
     })
@@ -201,7 +210,17 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let ineffectiveD = ineffectiveData
     let effectiveD = effectiveData
     let selfcareD = selfcareData
-
+    emotionsD.config.legend.values=emotionData.filter((eff) => eff.symbol !== "None").map((d) => d.symbol)
+    // if(emotionData.filter((eff) => eff.value !== null).length === 0) {
+    //   emotionsD.encoding.color.legend = null
+    // }
+    // if(inEffectiveData.filter((eff) => eff.value !== null).length === 0) {
+    //   ineffectiveD.encoding.color.legend = null
+    // }
+    // if(effectivesData.filter((eff) => eff.value !== null).length === 0) {
+    //   effectiveD.encoding.color.legend = null
+    // }
+    console.log(emotionsD)
     actionsD.data.values = summaryData
     emotionsD.data.values = emotionData
     ineffectiveD.data.values = inEffectiveData
@@ -212,15 +231,12 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     ineffectiveD.title = t(ineffectiveD.title)
     effectiveD.title = t(effectiveD.title)
     selfcareD.title = t(selfcareD.title)
-    console.log(summaryData, emotionData, inEffectiveData, timelineData, effectivesData)
     setActionsData(actionsD)
     setEmotionsData(emotionsD)
     setIneffectiveData(ineffectiveD)
     setSelfcareData(selfcareD)
     setEffectiveData(effectiveD)
-    console.log(selectedEvents.filter((event) => !!event.static_data.reason), selectedEvents.filter((event) => !!event.static_data.reason).length > 0)
-    console.log(selectedEvents.filter((event) => !!event.static_data.notes), selectedEvents.filter((event) => !!event.static_data.notes).length > 0)
-
+  
    }, [])
 
   return (
@@ -229,8 +245,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         <Grid item xs={12} sm={3} />
         <Grid item xs={12} sm={6}>
           <div className={classes.graphContainer}>
-            {emotionsData.length > 0 && (
-              <Box>
                 <NativeSelect className={classes.selector}>
                   <option value={10}>{t("TEN")}</option>
                   <option value={20}>{t("TWENTY")}</option>
@@ -238,11 +252,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </NativeSelect>
                 <Vega spec={emotionsData} />
                 <div className={classes.separator} />
-              </Box>
-            )}
-           
-           {effectiveData.length > 0 && (
-             <Box>
               <NativeSelect className={classes.selector}>
                 <option value={10}>{t("TEN")}</option>
                 <option value={20}>{t("TWENTY")}</option>
@@ -250,11 +259,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               </NativeSelect>
               <Vega spec={effectiveData} />
               <div className={classes.separator} />
-             </Box>
-           )}
-            
-            {ineffectiveData.length > 0 && (
-              <Box>
                 <NativeSelect className={classes.selector}>
                   <option value={10}>{t("TEN")}</option>
                   <option value={20}>{t("TWENTY")}</option>
@@ -262,11 +266,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </NativeSelect>
                 <Vega spec={ineffectiveData} />
                 <div className={classes.separator} />
-              </Box>
-            )}
-
-            {actionsData.length > 0 && (
-              <Box>
                 <NativeSelect className={classes.selector}>
                   <option value={10}>{t("TEN")}</option>
                   <option value={20}>{t("TWENTY")}</option>
@@ -274,11 +273,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </NativeSelect>
                 <Vega spec={actionsData} />
                 <div className={classes.separator} />
-              </Box>
-            )}
-            
-            {selfcareData.length > 0 && (
-              <Box>
                 <NativeSelect className={classes.selector}>
                   <option value={10}>{t("TEN")}</option>
                   <option value={20}>{t("TWENTY")}</option>
@@ -286,9 +280,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </NativeSelect>
                 <Vega spec={selfcareData} />
                 <div className={classes.separator} />
-              </Box>
-            )}           
-
+            
             {/* <div className={classes.titleContainer}>
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
                     <div className={classes.addButton}>
