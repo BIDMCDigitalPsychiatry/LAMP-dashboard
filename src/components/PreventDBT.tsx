@@ -110,12 +110,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function getDates() {
   let dates = []
-  let first
-  let curr = new Date()
-  for (let i = 1; i < 8; i++) {
-    first = curr.getDate() - curr.getDay() + i
-    let day = new Date(curr.setDate(first)).toLocaleDateString()
+  let curr = new Date()  
+  curr.setDate(curr.getDate() - 6)
+  while(curr.getTime() <= new Date().getTime()) {
+    let day = new Date(curr).toLocaleDateString()
     dates.push(day)
+    curr.setDate(curr.getDate() + 1)
   }
   return dates
 }
@@ -158,6 +158,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
+     
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
@@ -196,9 +197,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       if(emotionData.filter((eff) => eff.date === d).length === 0) {
         emotionData.push({ value: null, date: d, symbol:"None" })
       }
-    }) 
-    
-
+    })     
     Object.keys(tData).forEach(function (key) {
       timelineData.push({ date: key, count: tData[key] })
     })
@@ -210,17 +209,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let ineffectiveD = ineffectiveData
     let effectiveD = effectiveData
     let selfcareD = selfcareData
-    emotionsD.config.legend.values=emotionData.filter((eff) => eff.symbol !== "None").map((d) => d.symbol)
-    // if(emotionData.filter((eff) => eff.value !== null).length === 0) {
-    //   emotionsD.encoding.color.legend = null
-    // }
-    // if(inEffectiveData.filter((eff) => eff.value !== null).length === 0) {
-    //   ineffectiveD.encoding.color.legend = null
-    // }
-    // if(effectivesData.filter((eff) => eff.value !== null).length === 0) {
-    //   effectiveD.encoding.color.legend = null
-    // }
-    console.log(emotionsD)
+    
     actionsD.data.values = summaryData
     emotionsD.data.values = emotionData
     ineffectiveD.data.values = inEffectiveData
