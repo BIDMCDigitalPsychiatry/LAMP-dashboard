@@ -110,9 +110,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 function getDates() {
   let dates = []
-  let curr = new Date()  
+  let curr = new Date()
   curr.setDate(curr.getDate() - 6)
-  while(curr.getTime() <= new Date().getTime()) {
+  while (curr.getTime() <= new Date().getTime()) {
     let day = new Date(curr).toLocaleDateString()
     dates.push(day)
     curr.setDate(curr.getDate() + 1)
@@ -158,7 +158,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       var curr_month = date.getMonth() + 1 //Months are zero based
       var curr_year = date.getFullYear()
       let dateString = curr_year + "-" + curr_month + "-" + curr_date
-     
+
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
@@ -177,27 +177,26 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               break
           }
         })
-     } else {
-        event.temporal_slices.map((slice) => {       
+      } else {
+        event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
         })
-       
       }
     })
-        
-    dates.map((d)=>{
-      if(effectivesData.filter((eff) => eff.date === d).length === 0) {
-        effectivesData.push({ value: null, date: d,  symbol:"None" })
+
+    dates.map((d) => {
+      if (effectivesData.filter((eff) => eff.date === d).length === 0) {
+        effectivesData.push({ value: null, date: d, symbol: "None" })
       }
-      if(inEffectiveData.filter((eff) => eff.date === d).length === 0) {
-        inEffectiveData.push({ value: null, date: d,  symbol:"None" })
+      if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+        inEffectiveData.push({ value: null, date: d, symbol: "None" })
       }
-      if(emotionData.filter((eff) => eff.date === d).length === 0) {
-        emotionData.push({ value: null, date: d, symbol:"None" })
+      if (emotionData.filter((eff) => eff.date === d).length === 0) {
+        emotionData.push({ value: null, date: d, symbol: "None" })
       }
-    })     
+    })
     Object.keys(tData).forEach(function (key) {
       timelineData.push({ date: key, count: tData[key] })
     })
@@ -209,7 +208,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let ineffectiveD = ineffectiveData
     let effectiveD = effectiveData
     let selfcareD = selfcareData
-    
+
     actionsD.data.values = summaryData
     emotionsD.data.values = emotionData
     ineffectiveD.data.values = inEffectiveData
@@ -225,8 +224,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     setIneffectiveData(ineffectiveD)
     setSelfcareData(selfcareD)
     setEffectiveData(effectiveD)
-  
-   }, [])
+  }, [])
 
   return (
     <div className={classes.root}>
@@ -234,42 +232,42 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         <Grid item xs={12} sm={3} />
         <Grid item xs={12} sm={6}>
           <div className={classes.graphContainer}>
-                <NativeSelect className={classes.selector}>
-                  <option value={10}>{t("TEN")}</option>
-                  <option value={20}>{t("TWENTY")}</option>
-                  <option value={30}>{t("THIRTY")}</option>
-                </NativeSelect>
-                <Vega spec={emotionsData} />
-                <div className={classes.separator} />
-              <NativeSelect className={classes.selector}>
-                <option value={10}>{t("TEN")}</option>
-                <option value={20}>{t("TWENTY")}</option>
-                <option value={30}>{t("THIRTY")}</option>
-              </NativeSelect>
-              <Vega spec={effectiveData} />
-              <div className={classes.separator} />
-                <NativeSelect className={classes.selector}>
-                  <option value={10}>{t("TEN")}</option>
-                  <option value={20}>{t("TWENTY")}</option>
-                  <option value={30}>{t("THIRTY")}</option>
-                </NativeSelect>
-                <Vega spec={ineffectiveData} />
-                <div className={classes.separator} />
-                <NativeSelect className={classes.selector}>
-                  <option value={10}>{t("TEN")}</option>
-                  <option value={20}>{t("TWENTY")}</option>
-                  <option value={30}>{t("THIRTY")}</option>
-                </NativeSelect>
-                <Vega spec={actionsData} />
-                <div className={classes.separator} />
-                <NativeSelect className={classes.selector}>
-                  <option value={10}>{t("TEN")}</option>
-                  <option value={20}>{t("TWENTY")}</option>
-                  <option value={30}>{t("THIRTY")}</option>
-                </NativeSelect>
-                <Vega spec={selfcareData} />
-                <div className={classes.separator} />
-            
+            <NativeSelect className={classes.selector}>
+              <option value={10}>{t("TEN")}</option>
+              <option value={20}>{t("TWENTY")}</option>
+              <option value={30}>{t("THIRTY")}</option>
+            </NativeSelect>
+            <Vega spec={emotionsData} />
+            <div className={classes.separator} />
+            <NativeSelect className={classes.selector}>
+              <option value={10}>{t("TEN")}</option>
+              <option value={20}>{t("TWENTY")}</option>
+              <option value={30}>{t("THIRTY")}</option>
+            </NativeSelect>
+            <Vega spec={effectiveData} />
+            <div className={classes.separator} />
+            <NativeSelect className={classes.selector}>
+              <option value={10}>{t("TEN")}</option>
+              <option value={20}>{t("TWENTY")}</option>
+              <option value={30}>{t("THIRTY")}</option>
+            </NativeSelect>
+            <Vega spec={ineffectiveData} />
+            <div className={classes.separator} />
+            <NativeSelect className={classes.selector}>
+              <option value={10}>{t("TEN")}</option>
+              <option value={20}>{t("TWENTY")}</option>
+              <option value={30}>{t("THIRTY")}</option>
+            </NativeSelect>
+            <Vega spec={actionsData} />
+            <div className={classes.separator} />
+            <NativeSelect className={classes.selector}>
+              <option value={10}>{t("TEN")}</option>
+              <option value={20}>{t("TWENTY")}</option>
+              <option value={30}>{t("THIRTY")}</option>
+            </NativeSelect>
+            <Vega spec={selfcareData} />
+            <div className={classes.separator} />
+
             {/* <div className={classes.titleContainer}>
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
                     <div className={classes.addButton}>
@@ -278,35 +276,14 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                     <Typography className={classes.addButtonTitle}>{t("ADD_ITEM")}</Typography>
                 </ButtonBase>
             </div> */}
-           
-            {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
-            <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-              <Box width={1} className={classes.graphSubContainer}>
-                <Typography variant="h5">Didn't use skills because...</Typography>
-                {selectedEvents.map(
-                  (event) =>
-                    !!event.static_data.notes && (
-                      <Box className={classes.blueBoxStyle}>
-                        <Typography variant="caption" gutterBottom>
-                          {getDateString(new Date(event.timestamp))}
-                        </Typography>
-                        <Typography variant="body2" component="p">
-                          {event.static_data.notes}
-                        </Typography>
-                      </Box>
-                    )
-                )}
-              </Box>
-            </Box>
-            )}
+
             {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                <div className={classes.separator} />
                 <Box width={1} className={classes.graphSubContainer}>
-                  <Typography variant="h5">Optional notes:</Typography>
+                  <Typography variant="h5">Didn't use skills because...</Typography>
                   {selectedEvents.map(
                     (event) =>
-                      !!event.static_data.reason && (
+                      !!event.static_data.notes && (
                         <Box className={classes.blueBoxStyle}>
                           <Typography variant="caption" gutterBottom>
                             {getDateString(new Date(event.timestamp))}
@@ -319,7 +296,28 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   )}
                 </Box>
               </Box>
-            )}            
+            )}
+            {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
+              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                <div className={classes.separator} />
+                <Box width={1} className={classes.graphSubContainer}>
+                  <Typography variant="h5">Optional notes:</Typography>
+                  {selectedEvents.map(
+                    (event) =>
+                      !!event.static_data.reason && (
+                        <Box className={classes.blueBoxStyle}>
+                          <Typography variant="caption" gutterBottom>
+                            {getDateString(new Date(event.timestamp))}
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            {event.static_data.notes}
+                          </Typography>
+                        </Box>
+                      )
+                  )}
+                </Box>
+              </Box>
+            )}
           </div>
         </Grid>
       </Grid>

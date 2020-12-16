@@ -253,7 +253,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop: 15,
       fontSize: 12,
       color: "rgba(0, 0, 0, 0.5)",
-      lineHeight: "16px !important"
+      lineHeight: "16px !important",
     },
   },
   timeHours: {
@@ -670,10 +670,10 @@ function RadioRating({ onChange, options, value, ...props }) {
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
   const getText = (val) => {
-    let sliderValue = options[0].description
+    let sliderValue = !!options[0].description ? options[0].description : options[0].value
     options.map(function (mark) {
       if (mark.value == val) {
-        sliderValue = mark.description
+        sliderValue = !!mark.description ? mark.description : mark.value
       }
     })
     return sliderValue
@@ -681,7 +681,9 @@ function Rating({ onChange, options, value, ...props }) {
 
   const { t } = useTranslation()
 
-  const [valueText, setValueText] = useState(!!value ? getText(value) : options[0].description)
+  const [valueText, setValueText] = useState(
+    !!value ? getText(value) : !!options[0].description ? options[0].description : options[0].value
+  )
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
   useEffect(() => {
@@ -692,11 +694,11 @@ function Rating({ onChange, options, value, ...props }) {
     return `${options[value]}`
   }
   const getSliderValue = (val) => {
-    let sliderValue = options[0].description
+    let sliderValue = !!options[0].description ? options[0].description : options[0].value
     let slValue = val
     options.map(function (mark) {
       if (mark.value == slValue) {
-        sliderValue = mark.description
+        sliderValue = !!mark.description ? mark.description : mark.value
       }
     })
     setSliderValue(val)
@@ -704,7 +706,7 @@ function Rating({ onChange, options, value, ...props }) {
     onChange(val)
     return sliderValue
   }
-
+  console.log(options)
   return (
     <Box textAlign="center" mt={5}>
       <Slider
@@ -744,13 +746,13 @@ function Rating({ onChange, options, value, ...props }) {
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].description === null ? options[0].value : options[0].description}
+            {!!options[0].description ? options[0].value : options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           {options.length > 2 && (
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-              {options[Math.ceil(options.length / 2) - 1].description === null
+              {!!options[Math.ceil(options.length / 2) - 1].description
                 ? options[Math.ceil(options.length / 2) - 1].value
                 : options[Math.ceil(options.length / 2) - 1].description}
             </Typography>
@@ -758,8 +760,8 @@ function Rating({ onChange, options, value, ...props }) {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].description === null 
-              ? options[options.length - 1].value 
+            {!!options[options.length - 1].description
+              ? options[options.length - 1].value
               : options[options.length - 1].description}
           </Typography>
         </Grid>
@@ -870,7 +872,6 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = JSON.parse(JSON.stringify(options).replace(/null/g, "0"))
       options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
@@ -909,9 +910,12 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "slider"
             ? t(
-                `(${options[0].value} being ${!!options[0].description ? options[0].description : options[0].value}, ${
-                  options[options.length - 1].value
-                } being ${options[options.length - 1].description ? options[options.length - 1].description : options[options.length - 1].value})`
+                `(${options[0].value} being ${!!options[0].description ? options[0].description : options[0].value}, 
+                  ${options[options.length - 1].value} being ${
+                  !!options[options.length - 1].description
+                    ? options[options.length - 1].description
+                    : options[options.length - 1].value
+                })`
               )
             : !!desc && t(` (${desc})`)}
         </Typography>
