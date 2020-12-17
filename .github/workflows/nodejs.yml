@@ -16,4 +16,7 @@ jobs:
       - name: npm install, build, and test
         run: |
           npm install
+          npm test
           npm run build
+          npm run build-storybook
+          npm run chromatic
