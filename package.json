@@ -75,8 +75,7 @@
     "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
-    "build-storybook": "build-storybook --loglevel verbose -s public",
-    "chromatic": "chromatic --project-token CHROMATIC_PROJECT_TOKEN --exit-zero-on-changes --storybook-build-dir storybook-static"
+    "build-storybook": "build-storybook -s public"
   },
   "husky": {
     "hooks": {
