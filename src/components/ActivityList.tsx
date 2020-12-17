@@ -1029,11 +1029,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   //
   const updateSchedule = async (x) => {
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
-    let tbl = activities.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.tableData }), {})
-    let all = await LAMP.Activity.allByStudy(x.parentID)
-    all = all.map((el) => ({ ...el, parent: x.parent, parentID: x.parentID }))
-    setActivities(all) // need to resave below to trigger detail panel correctly!
-    setActivities(all.map((x) => ({ ...x, tableData: { ...tbl[x.id], id: undefined } })))
+    onChange()
   }
 
   const setAllFalse = () => {

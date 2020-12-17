@@ -120,9 +120,21 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       top: 0,
       paddingTop: 120,
+      [theme.breakpoints.down("sm")]: {
+        paddingTop: 94,
+      },
     },
     appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
-    toolbarResearcher: { minHeight: 50, "& h5": { padding: "30px 0 25px" } },
+    toolbarResearcher: {
+      minHeight: 50,
+      "& h5": {
+        padding: "55px 0 25px",
+        [theme.breakpoints.down("sm")]: {
+          paddingTop: 38,
+          paddingBottom: 20,
+        },
+      },
+    },
     logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent" },
 
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
