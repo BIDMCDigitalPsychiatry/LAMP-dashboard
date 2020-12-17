@@ -393,7 +393,7 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t, i18n } = useTranslation()
-
+  const [active, setActive] = useState({})
   const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
   const [editStudy, setEditStudy] = useState(false)
   const [editStudyName, setEditStudyName] = useState("")
@@ -597,11 +597,13 @@ export default function ParticipantList({
               )[0] ??
               [],
           },
+          active: (await LAMP.ActivityEvent.allByParticipant(x.id, undefined, undefined, undefined, 1))[0],
         }))
       )
       let filteredSensors = data.filter((y) => y.res.length > 0)
       setLogins((logins) => filteredSensors.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.res.shift() }), logins))
       setPassive((passive) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.passive }), setPassive))
+      setActive((active) => data.reduce((prev, curr) => ({ ...prev, [curr.id]: curr.active }), setActive))
     })()
   }, [participants])
 
@@ -750,8 +752,7 @@ export default function ParticipantList({
   })
 
   const dateInfo = (id) => ({
-    //relative: timeAgo.format(new Date(parseInt((logins[id] || {}).timestamp))),
-    relative: (logins[id] || {}).timestamp,
+    relative: (active[id] || {}).timestamp,
     absolute: new Date(parseInt((logins[id] || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),
     device: (logins[id] || { data: {} }).data.device_type || t("an unknown device"),
     userAgent: (logins[id] || { data: {} }).data.user_agent || t("unknown device model"),
@@ -898,33 +899,7 @@ export default function ParticipantList({
                     )}
                   </div>
                 ),
-              },
-              {
-                title: t("Last Active"),
-                field: "last_active",
-                searchable: false,
-                render: (rowData) => (
-                  <Tooltip
-                    title={
-                      <span>
-                        {dateInfo(rowData.id).absolute}
-                        <br />
-                        {typeof dateInfo(rowData.id).userAgent === "object"
-                          ? userAgentConcat(dateInfo(rowData.id).userAgent)
-                          : dateInfo(rowData.id).userAgent}
-                      </span>
-                    }
-                  >
-                    <span>
-                      {dateInfo(rowData.id).relative !== undefined
-                        ? `${timeAgo.format(new Date(parseInt(dateInfo(rowData.id).relative)))} on ${
-                            dateInfo(rowData.id).device
-                          }`
-                        : ""}
-                    </span>
-                  </Tooltip>
-                ),
-              },
+              },              
               {
                 title: t("Indicators"),
                 field: "data_health",
@@ -933,10 +908,34 @@ export default function ParticipantList({
                   <Box>
                     <Tooltip title={dataQuality(rowData.id).title}>
                       <Chip
-                        label={t("Data Quality")}
+                        label={t("Last Passive")}
                         className={classes.dataQuality + " " + dataQuality(rowData.id).class}
                       />
                     </Tooltip>
+                    {dateInfo(rowData.id).relative !== "in NaN years" && dateInfo(rowData.id).relative !== undefined ? (
+                      <Tooltip
+                        title={`${timeAgo.format(new Date(parseInt(dateInfo(rowData.id).relative)))} on ${
+                          dateInfo(rowData.id).device
+                        } (${dateInfo(rowData.id).absolute} 
+                         ${
+                           typeof dateInfo(rowData.id).userAgent === "object"
+                             ? userAgentConcat(dateInfo(rowData.id).userAgent)
+                             : dateInfo(rowData.id).userAgent
+                         })`}
+                      >
+                        <Chip
+                          label={t("Last Active")}
+                          className={classes.dataQuality + " " + dataQuality(rowData.id).class}
+                        />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip title={t("Never")}>
+                        <Chip
+                          label={t("Last Active")}
+                          className={classes.dataQuality + " " + dataQuality(rowData.id).class}
+                        />
+                      </Tooltip>
+                    )}
                   </Box>
                 ),
               },
