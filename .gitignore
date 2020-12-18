@@ -1,13 +1,9 @@
 # gitignore: /dashboard
+.DS_Store
 
-# NodeJS + React
+# NodeJS + React + Storybook
 node_modules
 npm-debug.log
+build-storybook.log
 build
-
-# AWS S3 Config
-.s3config
-
-# IntelliJ IDEA
-*.iml
-.DS_Store
+storybook-static
