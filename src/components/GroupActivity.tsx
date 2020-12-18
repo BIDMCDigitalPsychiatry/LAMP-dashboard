@@ -74,22 +74,24 @@ async function getEvents(participantId: string, activityId: string) {
   let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, activityId)
   let dates = []
   let steak = 0
-  activityEvents.map((activityEvent, i) => {
-    let date = new Date(activityEvent.timestamp)
-    if (!dates.includes(date.toLocaleDateString())) {
-      dates.push(date.toLocaleDateString())
+  if(!!activityEvents) {
+    activityEvents.map((activityEvent, i) => {
+      let date = new Date(activityEvent.timestamp)
+      if (!dates.includes(date.toLocaleDateString())) {
+        dates.push(date.toLocaleDateString())
+      }
+    })
+    let currentDate = new Date()
+    for (let date of dates) {
+      if (date === currentDate.toLocaleDateString()) {
+        steak++
+      } else {
+        break
+      }
+      currentDate.setDate(currentDate.getDate() - 1)
     }
-  })
-  let currentDate = new Date()
-  for (let date of dates) {
-    if (date === currentDate.toLocaleDateString()) {
-      steak++
-    } else {
-      break
-    }
-    currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak
+  return steak  
 }
 
 export default function GroupActivity({ participant, activity, ...props }) {

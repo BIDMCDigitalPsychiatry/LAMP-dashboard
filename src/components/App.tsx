@@ -410,7 +410,7 @@ function AppRouter({ ...props }) {
               <PageTitle>{t("Administrator")}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
-                title={t("Administrator")}
+                title="Administrator"
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
@@ -484,7 +484,7 @@ function AppRouter({ ...props }) {
               <NavigationLayout
                 authType={state.authType}
                 id={props.match.params.id}
-                title={t("Patient") + " " + getParticipant(props.match.params.id).id}
+                title={"Patient" + " " + getParticipant(props.match.params.id).id}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab={state.activeTab}

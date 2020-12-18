@@ -136,6 +136,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
+
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -223,7 +224,7 @@ export default function NavigationLayout({
   const { t } = useTranslation()
   //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
-  const hideNotifications = ["Researcher"]
+  const hideNotifications = ["Researcher", "Administrator"]
   const selectedClass =
     dashboardMenus.indexOf(activeTab) < 0
       ? classnames(classes.toolbar, classes.toolbarinner)
@@ -273,7 +274,7 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
-
+  console.log(authType)
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -377,7 +378,7 @@ export default function NavigationLayout({
                 (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
             }}
           >
-            {dashboardMenus.indexOf(activeTab) < 0 && (
+            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
               <Container className={classes.thumbContainer}>
                 <IconButton
                   onClick={goBack}
@@ -404,7 +405,7 @@ export default function NavigationLayout({
                 )}
               </Container>
             )}
-            {!sameLineTitle && (
+            {authType !== "admin" && !sameLineTitle && (
               <Container className={classes.thumbContainer}>
                 <Typography
                   variant="h5"
@@ -418,23 +419,25 @@ export default function NavigationLayout({
               </Container>
             )}
             <Box flexGrow={1} />
-            {(supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
-              <Box className={classes.headerRight}>
-                {hideNotifications.indexOf(activeTab) < 0 ? (
-                  <Tooltip title={t("Notifications")}>
-                    <Badge
-                      badgeContent={msgCount > 0 ? msgCount : undefined}
-                      color="primary"
-                      onClick={() => setOpenMessages(true)}
-                    >
-                      <Message />
-                    </Badge>
-                  </Tooltip>
-                ) : (
-                  ""
-                )}
-              </Box>
-            )}
+            {typeof title != "undefined" &&
+              title.startsWith("Patient") &&
+              (supportsSidebar || dashboardMenus.indexOf(activeTab) >= 0) && (
+                <Box className={classes.headerRight}>
+                  {hideNotifications.indexOf(activeTab) < 0 ? (
+                    <Tooltip title={t("Notifications")}>
+                      <Badge
+                        badgeContent={msgCount > 0 ? msgCount : undefined}
+                        color="primary"
+                        onClick={() => setOpenMessages(true)}
+                      >
+                        <Message />
+                      </Badge>
+                    </Tooltip>
+                  ) : (
+                    ""
+                  )}
+                </Box>
+              )}
             {typeof title != "undefined" && title.startsWith("Patient") && (
               <Box>
                 <Tooltip title={t("Profile & Settings")}>
