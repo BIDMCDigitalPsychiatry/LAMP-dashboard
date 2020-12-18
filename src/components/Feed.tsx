@@ -133,7 +133,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     image: {
       width: 65,
-      marginRight: "10px",
+      [theme.breakpoints.up("lg")]: {
+        width: 85,
+      },
+      // marginRight: "10px",
+      "& div": {
+        width: 60,
+        height: 60,
+        [theme.breakpoints.up("lg")]: {
+          width: 80,
+          height: 80,
+        },
+      },
     },
     feedtasks: {
       "& h5": {
@@ -318,6 +329,7 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "#fff",
     },
     blankMsg: {
+      padding: "0 14px",
       "& path": { fill: "#666" },
       "& p": { margin: "2px 5px" },
     },
@@ -587,7 +599,7 @@ export default function Feed({
               case "every6h":
               case "every12h":
                 while (first.getTime() <= end.getTime()) {
-                  if (date.getDate() === first.getDate()) {
+                  if (date.toLocaleDateString() === first.toLocaleDateString()) {
                     if (schedule.repeat_interval === "daily") {
                       schedule.completed = savedData.length > 0 ? true : false
                       currentFeed.push(schedule)
@@ -822,19 +834,19 @@ export default function Feed({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {loading == false ? (
-        currentFeed.length != 0 ? (
-          ""
-        ) : (
-          <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
-          </Box>
-        )
-      ) : (
-        " "
-      )}
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
+          {loading == false ? (
+            currentFeed.length != 0 ? (
+              ""
+            ) : (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
+              </Box>
+            )
+          ) : (
+            " "
+          )}
           <Stepper
             orientation="vertical"
             classes={{ root: classes.customstepper }}
@@ -908,8 +920,6 @@ export default function Feed({
                         <Grid container justify="center" direction="column" className={classes.image}>
                           <Box
                             style={{
-                              width: "80px",
-                              height: "80px",
                               margin: "auto",
                               background: feed.icon
                                 ? `url(${feed.icon}) center center/contain no-repeat`
@@ -936,7 +946,6 @@ export default function Feed({
       <ResponsiveDialog
         transient={
           launchedActivity === "lamp.dbt_diary_card" ||
-          games.includes(launchedActivity) ||
           launchedActivity === "lamp.survey" ||
           launchedActivity === "lamp.tips"
             ? true
@@ -968,6 +977,7 @@ export default function Feed({
                 details={details}
                 icon={icon}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -978,6 +988,7 @@ export default function Feed({
                 activity={visibleActivities}
                 participant={participant}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -987,6 +998,7 @@ export default function Feed({
                 participant={participant}
                 activityId={activity?.id ?? null}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -996,6 +1008,7 @@ export default function Feed({
                 participant={participant}
                 activity={activity ?? []}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -1005,6 +1018,7 @@ export default function Feed({
                 activity={activity}
                 participant={participant}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -1015,6 +1029,7 @@ export default function Feed({
                 participant={participant}
                 submitSurvey={submitSurvey}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />

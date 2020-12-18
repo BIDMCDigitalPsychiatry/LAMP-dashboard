@@ -135,8 +135,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
-    logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent" },
-
+    logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -183,7 +182,7 @@ const useStyles = makeStyles((theme: Theme) =>
     logParticipantBorder: {
       border: "#7599FF solid 5px",
       borderTop: 0,
-      paddingTop: 96,
+      paddingTop: 110,
       top: 50,
       height: "calc(100% - 50px)",
     },
