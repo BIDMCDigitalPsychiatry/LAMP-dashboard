@@ -664,7 +664,7 @@ export default function Feed({
                       scheduledDate.setHours(new Date(time).getHours())
                       scheduledDate.setMinutes(new Date(time).getMinutes())
                       let nextScheduleDate = new Date(first)
-                      if (schedule.custom_time.length > 0) {
+                      if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
                         nextScheduleDate.setHours(new Date(schedule.custom_time[index + 1]).getHours())
                         nextScheduleDate.setMinutes(new Date(schedule.custom_time[index + 1]).getMinutes())
                       }
@@ -672,7 +672,7 @@ export default function Feed({
                       let filteredData = savedData.filter(
                         (item) =>
                           item.timestamp >= scheduledDate.getTime() &&
-                          (schedule.custom_time.length > 0 ? item.timestamp <= nextScheduleDate.getTime() : true)
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]? item.timestamp <= nextScheduleDate.getTime() : true)
                       )
                       let completedVal = filteredData.length > 0 ? true : false
                       let each = {
@@ -680,7 +680,7 @@ export default function Feed({
                         clickable:
                           new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
                           scheduledDate.getTime() <= new Date().getTime() &&
-                          (schedule.custom_time.length > 0 ? new Date().getTime() <= nextScheduleDate.getTime() : true),
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1] ? new Date().getTime() <= nextScheduleDate.getTime() : true),
                         completed: completedVal,
                         timeValue: getTimeValue(new Date(time)),
                         time: scheduledDate.getTime(),
@@ -944,6 +944,7 @@ export default function Feed({
       </Grid>
       <ResponsiveDialog
         transient={
+          launchedActivity === "game" ||
           launchedActivity === "lamp.dbt_diary_card" ||
           launchedActivity === "lamp.survey" ||
           launchedActivity === "lamp.tips"
