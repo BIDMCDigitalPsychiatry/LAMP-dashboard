@@ -855,7 +855,7 @@ export default function Prevent({
         <CircularProgress color="inherit" />
       </Backdrop>
       {!loading && (
-        <Container>
+         <Box>
           <Grid container xs={12} spacing={0} className={classes.activityhd}>
             <Grid item xs className={classes.preventHeader}>
               <Typography variant="h5">{t("Activity")}</Typography>
@@ -1146,7 +1146,7 @@ export default function Prevent({
               ))}
             </Grid>
           </Grid>
-        </Container>
+        </Box>
       )}
       <Dialog
         open={open}

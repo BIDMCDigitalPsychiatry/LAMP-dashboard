@@ -133,7 +133,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     image: {
       width: 65,
-      marginRight: "10px",
+      [theme.breakpoints.up("lg")]: {
+        width: 85,
+      },
+      // marginRight: "10px",
+      "& div": {
+        width: 60,
+        height: 60,
+        [theme.breakpoints.up("lg")]: {
+          width: 80,
+          height: 80,
+        },
+      },
     },
     feedtasks: {
       "& h5": {
@@ -318,6 +329,7 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "#fff",
     },
     blankMsg: {
+      padding: "0 14px",
       "& path": { fill: "#666" },
       "& p": { margin: "2px 5px" },
     },
@@ -556,11 +568,11 @@ export default function Feed({
               case "biweekly":
                 schedule.completed = savedData.length > 0 ? true : false
                 let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
-
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
-                    feedCheck = type.indexOf(dayNumber) > -1 ? true : false
+                    feedCheck =
+                      type.indexOf(dayNumber) > -1 && date.getTime() >= scheduleStartDate.getTime() ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -573,7 +585,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (dayNo === dayNum) {
-                    feedCheck = dayNo === dayNumber ? true : false
+                    feedCheck = dayNo === dayNumber && date.getTime() >= scheduleStartDate.getTime() ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -587,7 +599,7 @@ export default function Feed({
               case "every6h":
               case "every12h":
                 while (first.getTime() <= end.getTime()) {
-                  if (date.getDate() === first.getDate()) {
+                  if (date.toLocaleDateString() === first.toLocaleDateString()) {
                     if (schedule.repeat_interval === "daily") {
                       schedule.completed = savedData.length > 0 ? true : false
                       currentFeed.push(schedule)
@@ -653,7 +665,7 @@ export default function Feed({
                       scheduledDate.setHours(new Date(time).getHours())
                       scheduledDate.setMinutes(new Date(time).getMinutes())
                       let nextScheduleDate = new Date(first)
-                      if (schedule.custom_time.length > 0) {
+                      if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
                         nextScheduleDate.setHours(new Date(schedule.custom_time[index + 1]).getHours())
                         nextScheduleDate.setMinutes(new Date(schedule.custom_time[index + 1]).getMinutes())
                       }
@@ -661,7 +673,9 @@ export default function Feed({
                       let filteredData = savedData.filter(
                         (item) =>
                           item.timestamp >= scheduledDate.getTime() &&
-                          (schedule.custom_time.length > 0 ? item.timestamp <= nextScheduleDate.getTime() : true)
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                            ? item.timestamp <= nextScheduleDate.getTime()
+                            : true)
                       )
                       let completedVal = filteredData.length > 0 ? true : false
                       let each = {
@@ -669,7 +683,9 @@ export default function Feed({
                         clickable:
                           new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
                           scheduledDate.getTime() <= new Date().getTime() &&
-                          (schedule.custom_time.length > 0 ? new Date().getTime() <= nextScheduleDate.getTime() : true),
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                            ? new Date().getTime() <= nextScheduleDate.getTime()
+                            : true),
                         completed: completedVal,
                         timeValue: getTimeValue(new Date(time)),
                         time: scheduledDate.getTime(),
@@ -688,7 +704,11 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
                     schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck = new Date(date).getDate() === new Date(scheduleStartDate).getDate() ? true : false
+                    feedCheck =
+                      new Date(date).getDate() === new Date(scheduleStartDate).getDate() &&
+                      date.getTime() >= scheduleStartDate.getTime()
+                        ? true
+                        : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -700,7 +720,10 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
                     schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
+                    feedCheck =
+                      [10, 20].indexOf(new Date(date).getDate()) > -1 && date.getTime() >= scheduleStartDate.getTime()
+                        ? true
+                        : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(
                       new Date(
                         new Date(first).getFullYear + "-" + new Date(first).getMonth + 1 + "-" + 10
@@ -822,19 +845,19 @@ export default function Feed({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {loading == false ? (
-        currentFeed.length != 0 ? (
-          ""
-        ) : (
-          <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
-          </Box>
-        )
-      ) : (
-        " "
-      )}
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
+          {loading == false ? (
+            currentFeed.length != 0 ? (
+              ""
+            ) : (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
+              </Box>
+            )
+          ) : (
+            " "
+          )}
           <Stepper
             orientation="vertical"
             classes={{ root: classes.customstepper }}
@@ -908,8 +931,6 @@ export default function Feed({
                         <Grid container justify="center" direction="column" className={classes.image}>
                           <Box
                             style={{
-                              width: "80px",
-                              height: "80px",
                               margin: "auto",
                               background: feed.icon
                                 ? `url(${feed.icon}) center center/contain no-repeat`
@@ -935,8 +956,8 @@ export default function Feed({
       </Grid>
       <ResponsiveDialog
         transient={
+          launchedActivity === "game" ||
           launchedActivity === "lamp.dbt_diary_card" ||
-          games.includes(launchedActivity) ||
           launchedActivity === "lamp.survey" ||
           launchedActivity === "lamp.tips"
             ? true
@@ -968,6 +989,7 @@ export default function Feed({
                 details={details}
                 icon={icon}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -978,6 +1000,7 @@ export default function Feed({
                 activity={visibleActivities}
                 participant={participant}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -987,6 +1010,7 @@ export default function Feed({
                 participant={participant}
                 activityId={activity?.id ?? null}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -996,6 +1020,7 @@ export default function Feed({
                 participant={participant}
                 activity={activity ?? []}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -1005,6 +1030,7 @@ export default function Feed({
                 activity={activity}
                 participant={participant}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -1015,6 +1041,7 @@ export default function Feed({
                 participant={participant}
                 submitSurvey={submitSurvey}
                 onComplete={() => {
+                  completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
               />

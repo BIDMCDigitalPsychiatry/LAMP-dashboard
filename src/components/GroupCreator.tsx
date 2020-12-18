@@ -155,6 +155,20 @@ function compress(file, width, height) {
 }
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 
+const availableAtiveSpecs = [
+  "lamp.group",
+  "lamp.suvey",
+  "lamp.journal",
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.breathe",
+  "lamp.spatial_span",
+  "lamp.tips",
+  "lamp.cats_and_dogs",
+  "lamp.scratch_image",
+  "lamp.dbt_diary_card",
+]
+
 export default function GroupCreator({
   activities,
   value,
@@ -174,7 +188,11 @@ export default function GroupCreator({
   const [items, setItems] = useState(!!value ? value.settings : [])
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
   const [studyActivities, setStudyActivities] = useState(
-    !!value ? activities.filter((x) => x.spec !== "lamp.group" && x.parentID === value.parentID) : []
+    !!value
+      ? activities.filter(
+          (x) => x.spec !== "lamp.group" && x.parentID === value.parentID && availableAtiveSpecs.includes(x.spec)
+        )
+      : []
   )
   const { t } = useTranslation()
   const [photo, setPhoto] = useState(details?.photo ?? null)
