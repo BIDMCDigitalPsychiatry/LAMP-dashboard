@@ -568,11 +568,10 @@ export default function Feed({
               case "biweekly":
                 schedule.completed = savedData.length > 0 ? true : false
                 let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
-
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
-                    feedCheck = type.indexOf(dayNumber) > -1 ? true : false
+                    feedCheck = type.indexOf(dayNumber) > -1 && date.getTime() >= scheduleStartDate.getTime()? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -584,8 +583,8 @@ export default function Feed({
                 let dayNo = getDayNumber(new Date(scheduleStartDate))
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
-                  if (dayNo === dayNum) {
-                    feedCheck = dayNo === dayNumber ? true : false
+                  if (dayNo === dayNum ) {
+                    feedCheck = dayNo === dayNumber && date.getTime() >= scheduleStartDate.getTime()? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -700,7 +699,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
                     schedule.timeValue = getTimeValue(scheduleTime)
-                    feedCheck = new Date(date).getDate() === new Date(scheduleStartDate).getDate() ? true : false
+                    feedCheck = new Date(date).getDate() === new Date(scheduleStartDate).getDate() && date.getTime() >= scheduleStartDate.getTime() ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
