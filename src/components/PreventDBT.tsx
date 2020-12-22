@@ -220,15 +220,14 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       }
     })
 
-    let prevCategory
+    let categories = []
     Object.keys(skills).map((key) => {
-      skills[key].sort((a, b) => a.category < b.category)
+      categories = []
       skills[key].map((skill, index) => {
-        if (prevCategory === skill.category) {
+        if (categories.includes(skill.category)) {
           delete skills[key][index].category
-        } else {
-          prevCategory = skill.category ?? null
-        }
+        } 
+        categories.push(skill.category)       
       })
     })
 
