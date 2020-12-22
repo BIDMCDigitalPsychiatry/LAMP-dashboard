@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Box, Typography, Grid } from "@material-ui/core"
+import { Box, Typography, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core"
 import { Vega } from "react-vega"
 import NativeSelect from "@material-ui/core/NativeSelect"
 import { useTranslation } from "react-i18next"
@@ -9,6 +9,7 @@ import { effective } from "./charts/effective_chart"
 import { ineffective } from "./charts/ineffective_chart"
 import { actions } from "./charts/actions_chart"
 import { selfcare } from "./charts/selfcare_chart"
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -105,6 +106,26 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
+    heading: {
+      fontSize: 17,
+      fontWeight: 600,
+    },
+    accordionContent: {
+      display: "block",
+      "& > div": {
+        "&:first-child": {
+          "& h6": {
+            borderTop: 0,
+            marginTop: 0,
+            paddingTop: 0,
+          },
+        },
+      },
+    },
+    accordionContentSub: {
+      "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
+      "& span": { color: "#666" },
+    },
   })
 )
 
@@ -129,6 +150,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [ineffectiveData, setIneffectiveData] = useState(JSON.parse(JSON.stringify(ineffective)))
   const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
   const [selfcareData, setSelfcareData] = useState(JSON.parse(JSON.stringify(selfcare)))
+  const [skillData, setSkillData] = useState(null)
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -152,6 +174,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let timelineData = []
     let tData = []
     let dData = []
+    let skills = {}
+    let category
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
@@ -161,6 +185,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
 
       if (dates.includes(date.toLocaleDateString())) {
         event.temporal_slices.map((slice) => {
+          if (slice.level === "skill") {
+            !!skills[curr_month + "/" + curr_date]
+              ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
+              : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
+          }
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
@@ -182,10 +211,28 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
+          if (slice.level === "skill") {
+            !!skills[curr_month + "/" + curr_date]
+              ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
+              : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
+          }
         })
       }
     })
 
+    let prevCategory
+    Object.keys(skills).map((key) => {
+      skills[key].sort((a, b) => a.category < b.category)
+      skills[key].map((skill, index) => {
+        if (prevCategory === skill.category) {
+          delete skills[key][index].category
+        } else {
+          prevCategory = skill.category ?? null
+        }
+      })
+    })
+
+    setSkillData(skills)
     dates.map((d) => {
       if (effectivesData.filter((eff) => eff.date === d).length === 0) {
         effectivesData.push({ value: null, date: d, symbol: "None" })
@@ -197,12 +244,14 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         emotionData.push({ value: null, date: d, symbol: "None" })
       }
     })
+
     Object.keys(tData).forEach(function (key) {
       timelineData.push({ date: key, count: tData[key] })
     })
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
+
     let actionsD = actionsData
     let emotionsD = emotionsData
     let ineffectiveD = ineffectiveData
@@ -297,6 +346,36 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </Box>
               </Box>
             )}
+            {skillData !== null && (
+              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                <div className={classes.separator} />
+                <Box width={1} className={classes.graphSubContainer}>
+                  <Typography variant="h5">Skills used:</Typography>
+                  {Object.keys(skillData).map((key) => (
+                    <Accordion>
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="panel1a-content"
+                        id="panel1a-header"
+                      >
+                        <Typography className={classes.heading}>{key}</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails className={classes.accordionContent}>
+                        {skillData[key].map((detail) => (
+                          <Box width={1} className={classes.accordionContentSub}>
+                            {!!detail.category && <Typography variant="h6">{detail.category}</Typography>}
+                            <Typography variant="body2" component="span">
+                              {detail.value}
+                            </Typography>
+                          </Box>
+                        ))}
+                      </AccordionDetails>
+                    </Accordion>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
             {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                 <div className={classes.separator} />

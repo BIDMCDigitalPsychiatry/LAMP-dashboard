@@ -670,10 +670,11 @@ function RadioRating({ onChange, options, value, ...props }) {
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
   const getText = (val) => {
-    let sliderValue = options[0].description.trim().length > 0 ? options[0].description : options[0].value
+    let sliderValue =
+      !!options[0].description && options[0].description.trim().length > 0 ? options[0].description : options[0].value
     options.map(function (mark) {
       if (mark.value == val) {
-        sliderValue = mark.description.trim().length > 0 ? mark.description : mark.value
+        sliderValue = !!mark.description && mark.description.trim().length > 0 ? mark.description : mark.value
       }
     })
     return sliderValue
@@ -682,7 +683,11 @@ function Rating({ onChange, options, value, ...props }) {
   const { t } = useTranslation()
 
   const [valueText, setValueText] = useState(
-    !!value ? getText(value) : options[0].description.trim().length > 0 ? options[0].description : options[0].value
+    !!value
+      ? getText(value)
+      : !!options[0].description && options[0].description.trim().length > 0
+      ? options[0].description
+      : options[0].value
   )
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
@@ -694,11 +699,12 @@ function Rating({ onChange, options, value, ...props }) {
     return `${options[value]}`
   }
   const getSliderValue = (val) => {
-    let sliderValue = options[0].description.trim().length > 0 ? options[0].description : options[0].value
+    let sliderValue =
+      !!options[0].description && options[0].description.trim().length > 0 ? options[0].description : options[0].value
     let slValue = val
     options.map(function (mark) {
       if (mark.value == slValue) {
-        sliderValue = mark.description.trim().length > 0 ? mark.description : mark.value
+        sliderValue = !!mark.description && mark.description.trim().length > 0 ? mark.description : mark.value
       }
     })
     setSliderValue(val)
@@ -745,13 +751,16 @@ function Rating({ onChange, options, value, ...props }) {
       >
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[0].description.trim().length === 0 ? options[0].value : options[0].description}
+            {!!options[0].description && options[0].description.trim().length === 0
+              ? options[0].value
+              : options[0].description}
           </Typography>
         </Grid>
         <Grid item xs={4}>
           {options.length > 2 && (
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-              {options[Math.ceil(options.length / 2) - 1].description.trim().length === 0
+              {!!options[Math.ceil(options.length / 2) - 1].description &&
+              options[Math.ceil(options.length / 2) - 1].description.trim().length === 0
                 ? options[Math.ceil(options.length / 2) - 1].value
                 : options[Math.ceil(options.length / 2) - 1].description}
             </Typography>
@@ -759,7 +768,7 @@ function Rating({ onChange, options, value, ...props }) {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
-            {options[options.length - 1].description.trim().length === 0
+            {!!options[options.length - 1].description && options[options.length - 1].description.trim().length === 0
               ? options[options.length - 1].value
               : options[options.length - 1].description}
           </Typography>
@@ -909,9 +918,13 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
         <Typography variant="caption" display="block" style={{ lineHeight: "0.66" }}>
           {type === "slider"
             ? t(
-                `(${options[0].value} being ${!!options[0].description ? options[0].description : options[0].value}, 
+                `(${options[0].value} being ${
+                  !!options[0].description && options[0].description.trim().length > 0
+                    ? options[0].description
+                    : options[0].value
+                }, 
                   ${options[options.length - 1].value} being ${
-                  !!options[options.length - 1].description
+                  !!options[options.length - 1].description && options[options.length - 1].description.trim().length > 0
                     ? options[options.length - 1].description
                     : options[options.length - 1].value
                 })`

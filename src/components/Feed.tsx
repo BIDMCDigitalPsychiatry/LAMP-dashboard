@@ -543,6 +543,10 @@ export default function Feed({
             startD.setSeconds(0)
             scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
             let scheduledDate = new Date(scheduleStartDate)
+            let scDate = new Date(scheduleStartDate)
+            scDate.setHours(0)
+            scDate.setMinutes(0)
+            scDate.setSeconds(0)
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
             schedule.group = feed.spec === "lamp.survey" ? "assess" : feed.spec === "lamp.tips" ? "learn" : "manage"
@@ -571,8 +575,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
-                    feedCheck =
-                      type.indexOf(dayNumber) > -1 && date.getTime() >= scheduleStartDate.getTime() ? true : false
+                    feedCheck = type.indexOf(dayNumber) > -1 && date.getTime() >= scDate.getTime() ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -585,7 +588,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (dayNo === dayNum) {
-                    feedCheck = dayNo === dayNumber && date.getTime() >= scheduleStartDate.getTime() ? true : false
+                    feedCheck = dayNo === dayNumber && date.getTime() >= scDate.getTime() ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -706,7 +709,7 @@ export default function Feed({
                     schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       new Date(date).getDate() === new Date(scheduleStartDate).getDate() &&
-                      date.getTime() >= scheduleStartDate.getTime()
+                      date.getTime() >= scDate.getTime()
                         ? true
                         : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
@@ -721,7 +724,7 @@ export default function Feed({
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
                     schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
-                      [10, 20].indexOf(new Date(date).getDate()) > -1 && date.getTime() >= scheduleStartDate.getTime()
+                      [10, 20].indexOf(new Date(date).getDate()) > -1 && date.getTime() >= scDate.getTime()
                         ? true
                         : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(
