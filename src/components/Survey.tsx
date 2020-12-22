@@ -306,7 +306,11 @@ export default function Survey({
                   onClick={() => {
                     setSpec(y.spec)
                     setActivity(y)
-                    y.spec === "lamp.dbt_diary_card" ? setQuestionCount(6) : setQuestionCount(y.settings.length)
+                    y.spec === "lamp.dbt_diary_card"
+                      ? setQuestionCount(6)
+                      : games.includes(y.spec)
+                      ? setQuestionCount(0)
+                      : setQuestionCount(y.settings.length)
                     setVisibleActivities([y])
                     handleClickOpen(y.name)
                   }}
@@ -370,7 +374,8 @@ export default function Survey({
               <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
             <Typography variant="h2">
-              {t(activity?.name ?? null)} {games.includes(spec) && spec !== null && " (" + spec + ")"}
+              {t(activity?.name ?? null)}{" "}
+              {games.includes(spec) && spec !== null && " (" + spec.replace("lamp.", "") + ")"}
             </Typography>
           </div>
         </DialogTitle>

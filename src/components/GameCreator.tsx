@@ -174,12 +174,14 @@ export default function GameCreator({
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
   const [photo, setPhoto] = useState(
-    details?.photo ??
-      ((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-        ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId))
+    details?.photo
+      ? details?.photo
+      : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
+        (!!activitySpecId && ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId))
       ? Jewels
       : null
   )
+
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
   const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)

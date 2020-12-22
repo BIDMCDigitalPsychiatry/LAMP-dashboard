@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Menu,
   MenuItem,
   AppBar,
   Toolbar,
@@ -29,9 +28,6 @@ import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as AddIcon } from "../icons/plus.svg"
 import { ReactComponent as DeleteIcon } from "../icons/DeleteBlue.svg"
-import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
-import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
-import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 // External Imports
 import { saveAs } from "file-saver"
@@ -113,22 +109,7 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       padding: "25px 50px 0",
     },
-    header: {
-      padding: "25px 20px 10px",
-      textAlign: "center",
 
-      "& h2": {
-        fontSize: 25,
-        fontWeight: 600,
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "left",
-      },
-      "& h6": {
-        fontSize: "14px",
-        fontWeight: "normal",
-        textAlign: "left",
-      },
-    },
     backdrop: {
       zIndex: 111111,
       color: "#fff",
@@ -180,11 +161,7 @@ const useStyles = makeStyles((theme: Theme) =>
       border: "2px solid #FFFFFF",
       color: "#000000",
     },
-    dataQuality: {
-      margin: "4px 0",
-      backgroundColor: "#E9F8E7",
-      color: "#FFF",
-    },
+
     tableOptions: {
       background: "#ECF4FF",
       padding: "10px 0",
@@ -215,9 +192,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& div.MuiToolbar-root": { maxWidth: 1232, width: "100%", margin: "0 auto" },
       "& h6": { fontSize: 30, fontWeight: 600 },
     },
-    tagFiltered: {
-      color: "#5784EE",
-    },
+
     tagFilteredBg: {
       color: "#5784EE !important",
       "& path": { fill: "#5784EE !important", fillOpacity: 1 },
@@ -238,15 +213,7 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 1055,
       width: "80%",
     },
-    sampleStyle: {
-      height: "150px",
-      width: "150px",
-      border: "2px solid red",
-    },
-    disabledButton: {
-      color: "#4C66D6 !important",
-      opacity: 0.5,
-    },
+
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -303,7 +270,7 @@ export function spliceActivity({ raw, tag }) {
       ? raw.settings
       : raw.settings.map((question, idx) => ({
           text: question.text,
-          type: tag?.questions?.[idx]?.multiselect === true ? "multiselect" : question.type,
+          type: question.type,
           description: tag?.questions?.[idx]?.description,
           options:
             question.options === null
@@ -342,7 +309,7 @@ export function unspliceActivity(x) {
       schedule: x.schedule,
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
-        type: y?.type === "multiselect" ? "list" : y?.type,
+        type: y?.type,
         options: y?.options === null ? null : y?.options?.map((z) => z?.value),
       })),
     },
@@ -350,7 +317,7 @@ export function unspliceActivity(x) {
       description: x.description,
       photo: x.photo,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
-        multiselect: y?.type === "multiselect" ? true : undefined,
+        multiselect: y?.type,
         description: y?.description,
         options: y?.options === null ? null : y?.options?.map((z) => z?.description),
       })),
@@ -553,7 +520,7 @@ export default function ActivityList({ researcher, title, ...props }) {
     "lamp.scratch_image": t("Scratch card"),
     "lamp.breathe": t("Breathe"),
     "lamp.tips": t("Tip"),
-    "lamp.dbt_diary_card": t("DBT diary card"),
+    "lamp.dbt_diary_card": t("DBT Diary Card"),
     "lamp.cats_and_dogs": t("Cats and Dogs"),
     "lamp.jewels_a": t("Jewels A"),
     "lamp.jewels_b": t("Jewels B"),
@@ -978,19 +945,18 @@ export default function ActivityList({ researcher, title, ...props }) {
         await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
         enqueueSnackbar(t("Successfully duplicated the Activity under a new name."), { variant: "success" })
         onChange()
-      } /* overwrite */ else {
-        /* // FIXME: DISABLED UNTIL FURTHER NOTICE!
-                raw.id = selectedActivity.id
-                raw.schedule = selectedActivity.schedule
-                await LAMP.Activity.updateActivity(raw)
-                */
+      } else {
+        result = (await LAMP.Activity.update(selectedActivity.id, raw)) as any
         await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
-        enqueueSnackbar(
-          t("Only survey description content was modified to prevent irrecoverable data loss. (error message)"),
-          {
+        if (!!result.error)
+          enqueueSnackbar(t("Encountered an error: ") + result?.error, {
             variant: "error",
-          }
-        )
+          })
+        else
+          enqueueSnackbar(t("Successfully updated the Activity."), {
+            variant: "success",
+          })
+        onChange()
       }
     } else if (x.spec === "lamp.tips") {
       if (x.id === undefined) {
@@ -1026,7 +992,6 @@ export default function ActivityList({ researcher, title, ...props }) {
     setSelectedActivity(undefined)
   }
 
-  //
   const updateSchedule = async (x) => {
     let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
     onChange()
@@ -1076,8 +1041,8 @@ export default function ActivityList({ researcher, title, ...props }) {
                 field: "parent",
                 searchable: false,
                 render: (rowData) => (
-                  <Tooltip title={rowData.parent}>
-                    <Chip label={rowData.parent} className={classes.studyCode} />
+                  <Tooltip title={t(rowData.parent)}>
+                    <Chip label={t(rowData.parent)} className={classes.studyCode} />
                   </Tooltip>
                 ),
               },
