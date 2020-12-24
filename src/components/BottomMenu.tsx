@@ -126,6 +126,26 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
+    btnCursor: {
+      "&:hover span ": {
+        cursor: "pointer !important",
+      },
+      "&:hover span > div": {
+        cursor: "pointer !important",
+      },
+      "&:hover span > div > svg": {
+        cursor: "pointer !important",
+      },
+      "&:hover span > div > svg > path": {
+        cursor: "pointer !important",
+      },
+      "&:hover span > svg": {
+        cursor: "pointer !important",
+      },
+      "&:hover span > svg > path": {
+        cursor: "pointer !important",
+      },
+    },
   })
 )
 
@@ -343,6 +363,7 @@ export default function BottomMenu({ ...props }) {
             <FeedTooltip
               open={openTabs[4]}
               interactive={true}
+              className={classes.btnCursor}
               title={
                 <React.Fragment>
                   <IconButton
@@ -386,6 +407,7 @@ export default function BottomMenu({ ...props }) {
             <LearnTooltip
               open={openTabs[0]}
               interactive={true}
+              className={classes.btnCursor}
               title={
                 <React.Fragment>
                   <IconButton
@@ -424,6 +446,7 @@ export default function BottomMenu({ ...props }) {
             <AssesTooltip
               open={openTabs[1]}
               interactive={true}
+              className={classes.btnCursor}
               title={
                 <React.Fragment>
                   <IconButton
@@ -462,6 +485,7 @@ export default function BottomMenu({ ...props }) {
             <ManageTooltip
               open={openTabs[2]}
               interactive={true}
+              className={classes.btnCursor}
               title={
                 <React.Fragment>
                   <IconButton
@@ -500,6 +524,7 @@ export default function BottomMenu({ ...props }) {
             <PreventTooltip
               open={openTabs[3]}
               interactive={true}
+              className={classes.btnCursor}
               title={
                 <React.Fragment>
                   <IconButton
