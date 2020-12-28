@@ -175,7 +175,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let tData = []
     let dData = []
     let skills = {}
-    let category
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
@@ -194,16 +193,18 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
             tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
             dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
           }
-          switch (slice.level) {
-            case "target_effective":
-              effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
-              break
-            case "target_ineffective":
-              inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
-              break
-            case "emotion":
-              emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
-              break
+          if (!!slice.value) {
+            switch (slice.level) {
+              case "target_effective":
+                effectivesData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
+                break
+              case "target_ineffective":
+                inEffectiveData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
+                break
+              case "emotion":
+                emotionData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
+                break
+            }
           }
         })
       } else {
@@ -223,24 +224,33 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let categories = []
     Object.keys(skills).map((key) => {
       categories = []
+      skills[key].sort((a, b) => {
+        return a.category.localeCompare(b.category)
+      })
       skills[key].map((skill, index) => {
         if (categories.includes(skill.category)) {
           delete skills[key][index].category
-        } 
-        categories.push(skill.category)       
+        }
+        categories.push(skill.category)
       })
     })
 
     setSkillData(skills)
     dates.map((d) => {
-      if (effectivesData.filter((eff) => eff.date === d).length === 0) {
-        effectivesData.push({ value: null, date: d, symbol: "None" })
+      if (effectivesData.length === 0) {
+        if (effectivesData.filter((eff) => eff.date === d).length === 0) {
+          effectivesData.push({ value: null, date: d, symbol: "None" })
+        }
       }
-      if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
-        inEffectiveData.push({ value: null, date: d, symbol: "None" })
+      if (inEffectiveData.length === 0) {
+        if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+          inEffectiveData.push({ value: null, date: d, symbol: "None" })
+        }
       }
-      if (emotionData.filter((eff) => eff.date === d).length === 0) {
-        emotionData.push({ value: null, date: d, symbol: "None" })
+      if (emotionData.length === 0) {
+        if (emotionData.filter((eff) => eff.date === d).length === 0) {
+          emotionData.push({ value: null, date: d, symbol: "None" })
+        }
       }
     })
 
@@ -256,7 +266,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let ineffectiveD = ineffectiveData
     let effectiveD = effectiveData
     let selfcareD = selfcareData
-
     actionsD.data.values = summaryData
     emotionsD.data.values = emotionData
     ineffectiveD.data.values = inEffectiveData
@@ -331,7 +340,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   <Typography variant="h5">Didn't use skills because...</Typography>
                   {selectedEvents.map(
                     (event) =>
-                      !!event.static_data.notes && (
+                      !!event.static_data.reason && (
                         <Box className={classes.blueBoxStyle}>
                           <Typography variant="caption" gutterBottom>
                             {getDateString(new Date(event.timestamp))}
@@ -382,7 +391,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   <Typography variant="h5">Optional notes:</Typography>
                   {selectedEvents.map(
                     (event) =>
-                      !!event.static_data.reason && (
+                      !!event.static_data.notes && (
                         <Box className={classes.blueBoxStyle}>
                           <Typography variant="caption" gutterBottom>
                             {getDateString(new Date(event.timestamp))}
