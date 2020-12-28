@@ -204,6 +204,26 @@ const useStyles = makeStyles((theme: Theme) =>
         "& span": { color: "#7599FF" },
       },
     },
+    btnCursor: {
+      "&:hover div": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg > g > rect": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg > g > g > path": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg > g > g > circle": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > span": {
+        cursor: "pointer !important",
+      },
+    },
   })
 )
 function Researchers({ history, ...props }) {
@@ -395,7 +415,7 @@ export default function Root({ ...props }) {
           >
             <List component="nav" className={classes.menuOuter}>
               <ListItem
-                className={classes.menuItems}
+                className={classes.menuItems + " " + classes.btnCursor}
                 button
                 selected={currentTab === 0}
                 onClick={(event) => setCurrentTab(0)}

@@ -204,6 +204,20 @@ const useStyles = makeStyles((theme: Theme) =>
         borderRight: "#7599FF solid 5px",
       },
     },
+    btnCursor: {
+      "&:hover div": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > svg > path": {
+        cursor: "pointer !important",
+      },
+      "&:hover div > span": {
+        cursor: "pointer !important",
+      },
+    },
   })
 )
 
