@@ -17,6 +17,8 @@ import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import ReactMarkdown from 'react-markdown'
+import gfm from "remark-gfm"
+import emoji from "remark-emoji"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -142,7 +144,7 @@ export default function TipNotification({ ...props }) {
           <CardContent className={classes.tipscontentarea}>
             {!!props.images ? <img src={props.images} alt={props.title} /> : ""}
             <Typography variant="body2" color="textSecondary" component="p" className={classes.tipsdetails}>
-            <ReactMarkdown>{props.details}</ReactMarkdown>
+            <ReactMarkdown plugins={[gfm, emoji]} allowDangerousHtml={true}>{props.details}</ReactMarkdown>
             </Typography>
             <Box mt={4} mb={2}>
               <Grid container direction="row" justify="center" alignItems="center">
