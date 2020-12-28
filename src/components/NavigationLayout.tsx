@@ -216,7 +216,6 @@ export default function NavigationLayout({
   const [passwordChange, setPasswordChange] = useState(false)
   const [openMessages, setOpenMessages] = useState(false)
   const [conversations, setConversations] = useState({})
-
   const [msgCount, setMsgCount] = useState(0)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
@@ -225,23 +224,53 @@ export default function NavigationLayout({
   //sameLineTitle
   const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
-  const selectedClass =
-    dashboardMenus.indexOf(activeTab) < 0
-      ? classnames(classes.toolbar, classes.toolbarinner)
-      : classnames(classes.toolbar, classes.toolbardashboard)
-  useInterval(
-    () => {
-      if (!!id) {
-        refreshMessages()
-      }
-    },
-    60000,
-    true
-  )
+  const [sensorData, setSensorData] = useState(null)
 
   useEffect(() => {
-    setMsgCount(getMessageCount())
+    console.log("sdf")
+    refresh()
+    setInterval(refresh, 60000)
+  }, [])
+
+  const refresh = () => {
+    console.log(id, title, sensorData)
+    if (!!id && id !== "me") {
+      if (sensorData === null) {
+        ;(async () => {
+          let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
+          data = data.filter((d) => d.data.page === "conversations")
+          setSensorData(data ? data[0] : [])
+        })()
+      }
+      refreshMessages()
+    }
+  }
+
+  useEffect(() => {
+    if (sensorData !== null && id !== "me") refreshMessages()
+  }, [sensorData])
+
+  useEffect(() => {
+    if (sensorData !== null && id !== "me") setMsgCount(getMessageCount())
   }, [conversations])
+
+  const updateAnalytics = async () => {
+    setSensorData(null)
+    await LAMP.SensorEvent.create(id, {
+      timestamp: new Date().getTime(),
+      sensor: "lamp.analytics",
+      data: {
+        type: "open_page",
+        page: "conversations",
+        duration: new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + id))),
+      },
+    })
+    localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+    let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
+    data = data.filter((d) => d.data.page === "conversations")
+    setSensorData(data ? data[0] : [])
+    setOpenMessages(false)
+  }
 
   const refreshMessages = async () => {
     console.log("Fetching messages...")
@@ -260,7 +289,9 @@ export default function NavigationLayout({
 
   const getMessageCount = () => {
     let x = (conversations || {})[id || ""] || []
-    return !Array.isArray(x) ? 0 : x.filter((a) => a.from === "researcher").length
+    return !Array.isArray(x)
+      ? 0
+      : x.filter((a) => a.from === "researcher" && new Date(a.date).getTime() > (sensorData?.timestamp ?? 0)).length
   }
   const [anchorEl, setAnchorEl] = React.useState(null)
 
@@ -274,7 +305,7 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
-  console.log(authType)
+
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -428,7 +459,10 @@ export default function NavigationLayout({
                       <Badge
                         badgeContent={msgCount > 0 ? msgCount : undefined}
                         color="primary"
-                        onClick={() => setOpenMessages(true)}
+                        onClick={() => {
+                          localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
+                          setOpenMessages(true)
+                        }}
                       >
                         <Message />
                       </Badge>
@@ -563,19 +597,13 @@ export default function NavigationLayout({
         </DialogContent>
       </Dialog>
 
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={openMessages}
-        onClose={() => {
-          setOpenMessages(false)
-        }}
-      >
+      <ResponsiveDialog transient={false} animate fullScreen open={openMessages} onClose={() => setOpenMessages(false)}>
         <AppBar position="static" className={classes.inlineHeader}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton
-              onClick={() => setOpenMessages(false)}
+              onClick={() => {
+                updateAnalytics()
+              }}
               color="default"
               className={classes.backbtn}
               aria-label="Menu"

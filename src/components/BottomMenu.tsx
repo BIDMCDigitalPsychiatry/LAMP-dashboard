@@ -311,8 +311,24 @@ export default function BottomMenu({ ...props }) {
     openTabUpdate()
   }, [tabVal])
 
+  const tabs = ["learn", "assess", "manage", "prevent", "feed"]
   const setTab = (newTab) => {
     _setTab(newTab)
+    if (newTab !== tabVal) {
+      ;(async () => {
+        await LAMP.SensorEvent.create(props.participant.id, {
+          timestamp: new Date().getTime(),
+          sensor: "lamp.analytics",
+          data: {
+            type: "open_page",
+            page: tabs[tabVal],
+            duration:
+              new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
+          },
+        })
+        localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
+      })()
+    }
     props.setShowDemoMessage(false)
     if (!viewedTabs.includes(newTab)) {
       setViewedTabs(viewedTabs.concat(newTab))
