@@ -129,12 +129,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function getDates() {
+function getDates(startDate, endDate) {
   let dates = []
-  let curr = new Date()
-  curr.setDate(curr.getDate() - 6)
-  while (curr.getTime() <= new Date().getTime()) {
-    let day = new Date(curr).toLocaleDateString()
+  let curr = new Date(parseInt(startDate))
+  let end = new Date(parseInt(endDate))
+  while (curr.getTime() <= end.getTime()) {
+    let day = curr.getFullYear() + "-" + (curr.getMonth() + 1) + "-" + curr.getDate()
     dates.push(day)
     curr.setDate(curr.getDate() + 1)
   }
@@ -144,13 +144,17 @@ function getDates() {
 export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-
-  const [emotionsData, setEmotionsData] = useState(JSON.parse(JSON.stringify(emotions)))
-  const [effectiveData, setEffectiveData] = useState(JSON.parse(JSON.stringify(effective)))
-  const [ineffectiveData, setIneffectiveData] = useState(JSON.parse(JSON.stringify(ineffective)))
+  const [emotionsData, setEmotionsData] = useState(null)
+  const [effectiveData, setEffectiveData] = useState(null)
+  const [ineffectiveData, setIneffectiveData] = useState(null)
   const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
-  const [selfcareData, setSelfcareData] = useState(JSON.parse(JSON.stringify(selfcare)))
+  const [selfcareData, setSelfcareData] = useState(null)
   const [skillData, setSkillData] = useState(null)
+  const [dateArray, setDateArray] = useState([])
+  const [emotionrange, setEmotionrange] = useState(null)
+  const [effectiverange, setEffectiverange] = useState(null)
+  const [inEffectiverange, setInEffectiverange] = useState(null)
+  const [actionrange, setActionrange] = useState(null)
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -165,60 +169,55 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     )
   }
+
   useEffect(() => {
-    let dates = getDates()
-    let effectivesData = []
-    let inEffectiveData = []
-    let emotionData = []
     let summaryData = []
-    let timelineData = []
-    let tData = []
     let dData = []
     let skills = {}
+    let dateArray = []
+    let weekend
+    let start = new Date(selectedEvents[selectedEvents.length - 1].timestamp)
+    let i = 0
+    while (start.getTime() >= selectedEvents[0].timestamp) {
+      weekend = new Date(start)
+      start.setHours(0)
+      start.setMinutes(0)
+      start.setSeconds(0)
+      weekend.setDate(weekend.getDate() - 7)
+      if (weekend.getTime() < selectedEvents[0].timestamp) {
+        weekend = new Date(selectedEvents[0].timestamp)
+      }
+      weekend.setHours(0)
+      weekend.setMinutes(0)
+      weekend.setSeconds(0)
+      let timestampFormat = start.getTime() + 86400000 + "-" + weekend.getTime()
+      let dateFormat =
+        weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
+      start.setDate(start.getDate() - 8)
+      if (i === 0) {
+        setEmotionrange(timestampFormat)
+        setEffectiverange(timestampFormat)
+        setInEffectiverange(timestampFormat)
+        setActionrange(timestampFormat)
+      }
+      i++
+      dateArray.push({ timestamp: timestampFormat, date: dateFormat })
+    }
+    setDateArray(dateArray)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
       var curr_date = date.getDate()
       var curr_month = date.getMonth() + 1 //Months are zero based
-      var curr_year = date.getFullYear()
-      let dateString = curr_year + "-" + curr_month + "-" + curr_date
-
-      if (dates.includes(date.toLocaleDateString())) {
-        event.temporal_slices.map((slice) => {
-          if (slice.level === "skill") {
-            !!skills[curr_month + "/" + curr_date]
-              ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-              : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
-          }
-          if (slice.level === "target_effective" || slice.level === "target_ineffective") {
-            tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
-            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
-          }
-          if (!!slice.value) {
-            switch (slice.level) {
-              case "target_effective":
-                effectivesData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
-                break
-              case "target_ineffective":
-                inEffectiveData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
-                break
-              case "emotion":
-                emotionData.push({ value: slice.value, date: date.toLocaleDateString(), symbol: slice.item })
-                break
-            }
-          }
-        })
-      } else {
-        event.temporal_slices.map((slice) => {
-          if (slice.level === "target_effective" || slice.level === "target_ineffective") {
-            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
-          }
-          if (slice.level === "skill") {
-            !!skills[curr_month + "/" + curr_date]
-              ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-              : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
-          }
-        })
-      }
+      event.temporal_slices.map((slice) => {
+        if (slice.level === "skill") {
+          !!skills[curr_month + "/" + curr_date]
+            ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
+            : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
+        }
+        if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
+          dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
+        }
+      })
     })
 
     let categories = []
@@ -236,52 +235,164 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     })
 
     setSkillData(skills)
-    dates.map((d) => {
-      if (effectivesData.length === 0) {
-        if (effectivesData.filter((eff) => eff.date === d).length === 0) {
-          effectivesData.push({ value: null, date: d, symbol: "None" })
-        }
-      }
-      if (inEffectiveData.length === 0) {
-        if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
-          inEffectiveData.push({ value: null, date: d, symbol: "None" })
-        }
-      }
-      if (emotionData.length === 0) {
-        if (emotionData.filter((eff) => eff.date === d).length === 0) {
-          emotionData.push({ value: null, date: d, symbol: "None" })
-        }
-      }
-    })
 
-    Object.keys(tData).forEach(function (key) {
-      timelineData.push({ date: key, count: tData[key] })
-    })
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
-
     let actionsD = actionsData
-    let emotionsD = emotionsData
-    let ineffectiveD = ineffectiveData
-    let effectiveD = effectiveData
-    let selfcareD = selfcareData
     actionsD.data.values = summaryData
-    emotionsD.data.values = emotionData
-    ineffectiveD.data.values = inEffectiveData
-    effectiveD.data.values = effectivesData
-    selfcareD.data.values = timelineData
     actionsD.title = t(actionsD.title)
-    emotionsD.title = t(emotionsD.title)
-    ineffectiveD.title = t(ineffectiveD.title)
-    effectiveD.title = t(effectiveD.title)
-    selfcareD.title = t(selfcareD.title)
     setActionsData(actionsD)
-    setEmotionsData(emotionsD)
-    setIneffectiveData(ineffectiveD)
-    setSelfcareData(selfcareD)
-    setEffectiveData(effectiveD)
   }, [])
+
+  useEffect(() => {
+    if (!!emotionrange) {
+      let emotionData = []
+      let timeStamp = emotionrange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        event.temporal_slices.map((slice) => {
+          if (!!slice.value) {
+            switch (slice.level) {
+              case "emotion":
+                if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
+                  emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                break
+            }
+          }
+        })
+      })
+
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      dates.map((d) => {
+        if (emotionData.length === 0) {
+          if (emotionData.filter((eff) => eff.date === d).length === 0) {
+            emotionData.push({ value: null, date: d, symbol: "None" })
+          }
+        }
+      })
+      let emotionsD = JSON.parse(JSON.stringify(emotions))
+      emotionsD.data.values = emotionData
+      emotionsD.title = t(emotionsD.title)
+      setEmotionsData(emotionsD)
+    }
+  }, [emotionrange])
+
+  useEffect(() => {
+    if (!!effectiverange) {
+      let effectivesData = []
+      let timeStamp = effectiverange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+
+        event.temporal_slices.map((slice) => {
+          if (!!slice.value) {
+            switch (slice.level) {
+              case "target_effective":
+                if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
+                  effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                break
+            }
+          }
+        })
+      })
+
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      dates.map((d) => {
+        if (effectivesData.length === 0) {
+          if (effectivesData.filter((eff) => eff.date === d).length === 0) {
+            effectivesData.push({ value: null, date: d, symbol: "None" })
+          }
+        }
+      })
+
+      let effectiveD = JSON.parse(JSON.stringify(effective))
+      effectiveD.data.values = effectivesData
+      effectiveD.title = t(effectiveD.title)
+      setEffectiveData(effectiveD)
+    }
+  }, [effectiverange])
+
+  useEffect(() => {
+    if (!!inEffectiverange) {
+      let inEffectiveData = []
+      let timeStamp = inEffectiverange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+
+        event.temporal_slices.map((slice) => {
+          if (!!slice.value) {
+            switch (slice.level) {
+              case "target_ineffective":
+                if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
+                  inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                break
+            }
+          }
+        })
+      })
+
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      dates.map((d) => {
+        if (inEffectiveData.length === 0) {
+          if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+            inEffectiveData.push({ value: null, date: d, symbol: "None" })
+          }
+        }
+      })
+
+      let ineffectiveD = JSON.parse(JSON.stringify(ineffective))
+      ineffectiveD.data.values = inEffectiveData
+      ineffectiveD.title = t(ineffectiveD.title)
+      setIneffectiveData(ineffectiveD)
+    }
+  }, [inEffectiverange])
+
+  useEffect(() => {
+    if (!!actionrange) {
+      let timelineData = []
+      let tData = []
+      let timeStamp = actionrange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+
+        event.temporal_slices.map((slice) => {
+          if (slice.level === "target_effective" || slice.level === "target_ineffective") {
+            if (
+              slice.type !== null &&
+              event.timestamp <= parseInt(timeStamp[0]) &&
+              event.timestamp >= parseInt(timeStamp[1])
+            )
+              tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
+          }
+        })
+      })
+      Object.keys(tData).forEach(function (key) {
+        timelineData.push({ date: key, count: tData[key], action: "Effective/Ineffective" })
+      })
+
+      let selfcareD = JSON.parse(JSON.stringify(selfcare))
+      selfcareD.data.values = timelineData
+      selfcareD.title = t(selfcareD.title)
+      setSelfcareData(selfcareD)
+    }
+  }, [actionrange])
 
   return (
     <div className={classes.root}>
@@ -289,53 +400,55 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         <Grid item xs={12} sm={3} />
         <Grid item xs={12} sm={6}>
           <div className={classes.graphContainer}>
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
+            <NativeSelect
+              className={classes.selector}
+              value={emotionrange}
+              onChange={(event) => setEmotionrange(event.target.value)}
+            >
+              {dateArray.map((dateString) => (
+                <option value={dateString.timestamp}>{dateString.date}</option>
+              ))}
             </NativeSelect>
-            <Vega spec={emotionsData} />
+            {emotionsData !== null && <Vega spec={emotionsData} />}
             <div className={classes.separator} />
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
+            <NativeSelect
+              className={classes.selector}
+              value={effectiverange}
+              onChange={(event) => setEffectiverange(event.target.value)}
+            >
+              {dateArray.map((dateString) => (
+                <option value={dateString.timestamp}>{dateString.date}</option>
+              ))}
             </NativeSelect>
-            <Vega spec={effectiveData} />
+            {effectiveData !== null && <Vega spec={effectiveData} />}
             <div className={classes.separator} />
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
+            <NativeSelect
+              className={classes.selector}
+              value={inEffectiverange}
+              onChange={(event) => setInEffectiverange(event.target.value)}
+            >
+              {dateArray.map((dateString) => (
+                <option value={dateString.timestamp}>{dateString.date}</option>
+              ))}
             </NativeSelect>
-            <Vega spec={ineffectiveData} />
+            {ineffectiveData !== null && <Vega spec={ineffectiveData} />}
             <div className={classes.separator} />
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
-            </NativeSelect>
             <Vega spec={actionsData} />
             <div className={classes.separator} />
-            <NativeSelect className={classes.selector}>
-              <option value={10}>{t("TEN")}</option>
-              <option value={20}>{t("TWENTY")}</option>
-              <option value={30}>{t("THIRTY")}</option>
+            <NativeSelect
+              className={classes.selector}
+              value={actionrange}
+              onChange={(event) => setActionrange(event.target.value)}
+            >
+              {dateArray.map((dateString) => (
+                <option value={dateString.timestamp}>{dateString.date}</option>
+              ))}
             </NativeSelect>
-            <Vega spec={selfcareData} />
-            <div className={classes.separator} />
-
-            {/* <div className={classes.titleContainer}>
-                <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
-                    <div className={classes.addButton}>
-                        <AddCircleOutline />
-                    </div>
-                    <Typography className={classes.addButtonTitle}>{t("ADD_ITEM")}</Typography>
-                </ButtonBase>
-            </div> */}
+            {selfcareData !== null && <Vega spec={selfcareData} />}
 
             {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                <div className={classes.separator} />
                 <Box width={1} className={classes.graphSubContainer}>
                   <Typography variant="h5">Didn't use skills because...</Typography>
                   {selectedEvents.map(
@@ -354,6 +467,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 </Box>
               </Box>
             )}
+
             {skillData !== null && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                 <div className={classes.separator} />
