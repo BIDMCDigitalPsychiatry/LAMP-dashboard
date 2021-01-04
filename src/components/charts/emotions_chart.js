@@ -90,7 +90,6 @@ export const emotions = {
       symbolSize: 150,
       symbolType: "circle",
       offset: 30,
-        
     },
     axisX: {
       orient: "bottom",
@@ -116,15 +115,15 @@ export const emotions = {
       title: null,
       grid: false,
     },
-  },  
+  },
   mark: { type: "line", interpolate: "cardinal", tension: 0.9 },
   selection: {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend" },
-  },  
+  },
   encoding: {
-    x: { field: "date", type: "ordinal", timeUnit: "yearmonthdate" },
-    y: { field: "value", type: "quantitative"},
-    color: { field: "symbol", type: "nominal"},
+    x: { field: "date", type: "ordinal", timeUnit: "utcyearmonthdate" },
+    y: { field: "value", type: "quantitative" },
+    color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2 },
     opacity: { condition: { selection: "symbol", value: 1 }, value: 0 },
   },
