@@ -39,7 +39,7 @@ export const selfcare = {
     },
     view: { stroke: "transparent" },
     selection: {
-      symbol: { type: "multi", fields: ["action"], bind: "legend" },
+      symbol: { type: "multi", fields: ["action"], bind: "legend", toggle: "true" },
     },
     mark: { cornerRadiusTopLeft: 2, cornerRadiusTopRight: 2 },
     legend: {

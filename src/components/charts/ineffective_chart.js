@@ -115,7 +115,7 @@ export const ineffective = {
     tension: 0.9,
   },
   selection: {
-    symbol: { type: "multi", fields: ["symbol"], bind: "legend" },
+    symbol: { type: "multi", fields: ["symbol"], bind: "legend", toggle: "true" },
   },
   encoding: {
     x: { field: "date", type: "ordinal", timeUnit: "utcyearmonthdate" },

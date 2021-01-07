@@ -19,7 +19,7 @@ export const actions = {
     ],
   },
   selection: {
-    action: { type: "multi", fields: ["action"], bind: "legend" },
+    action: { type: "multi", fields: ["action"], bind: "legend", toggle: "true" },
   },
   mark: "bar",
   encoding: {
