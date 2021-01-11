@@ -22,6 +22,8 @@ import {
   DialogContent,
   DialogActions,
   Select,
+  Switch,
+  FormControlLabel,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
@@ -33,6 +35,7 @@ import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 import { green, yellow, red, grey } from "@material-ui/core/colors"
 import CloseIcon from "@material-ui/icons/Close"
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward"
 
 // External Imports
 import { saveAs } from "file-saver"
@@ -126,6 +129,7 @@ const useStyles = makeStyles((theme: Theme) =>
         position: "absolute",
       },
     },
+    switchLabel: { color: "#4C66D6" },
     tableContainer: {
       "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
       "& div.MuiInput-underline:after": { borderBottom: "0 !important" },
@@ -402,6 +406,8 @@ export default function ParticipantList({
 
   const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
   const [studyIdDelete, setStudyIdForDelete] = useState("")
+  const [participantSettingArray, setParticipantSettingArray] = useState([])
+  const [notificationToggle, setNotificationToggle] = useState(false)
 
   const getCurrentLanguage = () => {
     let lang
@@ -446,8 +452,29 @@ export default function ParticipantList({
   const timeAgo = new TimeAgo(currentLanguage)
 
   useEffect(() => {
+    setLoading(true)
+    let selectedRows = state.selectedRows // tempRows = selectedRows.map(y => y.id)
+
+    for (let row of selectedRows) {
+      let notObj: any = { ...participantSettingArray[row.id], notification: notificationToggle }
+      LAMP.Type.setAttachment(row.id, "me", "to.unityhealth.psychiatry.settings", notObj)
+    }
+    refreshPage()
+    setState((state) => ({
+      ...state,
+      selectedRows: [],
+    }))
+
+    setLoading(false)
+  }, [notificationToggle])
+
+  useEffect(() => {
     refreshPage()
   }, [])
+
+  useEffect(() => {
+    console.log("Immediately change", participantSettingArray)
+  }, [participantSettingArray])
 
   const refreshPage = async () => {
     ;(async () => {
@@ -467,6 +494,7 @@ export default function ParticipantList({
       setTagData(studies)
       let studiesData = filterStudyData(studies)
       setStudiesCount(studiesData)
+      setNotificationToggle(false)
     })()
   }
 
@@ -516,6 +544,17 @@ export default function ParticipantList({
         obj[res["id"]] = res["name"]
       })
       setNameArray(obj)
+      let participantSettingArray = await Promise.all(
+        participantArray.map(async (x) => ({
+          id: x.id,
+          settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
+        }))
+      )
+      let objNot = []
+      participantSettingArray.forEach(function (res) {
+        objNot[res["id"]] = res["settings"]
+      })
+      setParticipantSettingArray(objNot)
     }
   }
 
@@ -567,6 +606,7 @@ export default function ParticipantList({
       participantArray.map(async (x) => ({
         id: x.id,
         name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
+        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
       }))
     )
     let obj = []
@@ -574,9 +614,26 @@ export default function ParticipantList({
       obj[res["id"]] = res["name"]
     })
     setNameArray(obj)
+    let participantSettingsArray = await Promise.all(
+      participantArray.map(async (x) => ({
+        id: x.id,
+        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
+      }))
+    )
+    let objNot = []
+    participantSettingsArray.forEach(function (res) {
+      objNot[res["id"]] = res["settings"]
+    })
+    setParticipantSettingArray(objNot)
     return participantFormatArray
   }
-
+  const saveSelectedUserSettings = (rows, val) => {
+    setNotificationToggle(val)
+    setState((state) => ({
+      ...state,
+      selectedRows: rows,
+    }))
+  }
   useEffect(() => {
     ;(async function () {
       let data = await Promise.all(
@@ -767,6 +824,17 @@ export default function ParticipantList({
     }))
   }
 
+  const saveIndividualUserSettings = async (id, val) => {
+    setLoading(true)
+    let oldSettingArray = Object.assign({}, participantSettingArray)
+    oldSettingArray[id] = { ...oldSettingArray[id], notification: val }
+    try {
+      await LAMP.Type.setAttachment(id, "me", "to.unityhealth.psychiatry.settings", oldSettingArray[id])
+      setParticipantSettingArray(oldSettingArray)
+    } catch (error) {}
+    setLoading(false)
+  }
+
   const editNameTextField = (selectedRows, event) => {
     setEditData(true)
     setEditUserId(selectedRows.id)
@@ -899,7 +967,7 @@ export default function ParticipantList({
                     )}
                   </div>
                 ),
-              },              
+              },
               {
                 title: t("Indicators"),
                 field: "data_health",
@@ -949,6 +1017,60 @@ export default function ParticipantList({
                   </Tooltip>
                 ),
               },
+              {
+                title: t("Notification"),
+                field: "notification",
+                searchable: false,
+                render: (rowData) => (
+                  <Tooltip title={t("Notification")}>
+                    {participantSettingArray[rowData.id] === undefined ||
+                    participantSettingArray[rowData.id].notification === true ||
+                    participantSettingArray[rowData.id] === "" ? (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={true}
+                            onChange={(event) => {
+                              saveIndividualUserSettings(rowData.id, event.target.checked)
+                            }}
+                          />
+                        }
+                        label=""
+                        className={classes.switchLabel}
+                      />
+                    ) : (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={false}
+                            onChange={(event) => {
+                              saveIndividualUserSettings(rowData.id, event.target.checked)
+                            }}
+                          />
+                        }
+                        label=""
+                        className={classes.switchLabel}
+                      />
+                    )}
+                  </Tooltip>
+                ),
+              },
+              {
+                title: null,
+                field: null,
+                searchable: false,
+                render: (rowData) => (
+                  <Tooltip title={t("Impersonate")}>
+                    <IconButton
+                      onClick={() => {
+                        onParticipantSelect(participants[rowData.tableData.id].id)
+                      }}
+                    >
+                      <ArrowForwardIcon />
+                    </IconButton>
+                  </Tooltip>
+                ),
+              },
             ]}
             detailPanel={(rowData) => (
               <Messages
@@ -958,9 +1080,6 @@ export default function ParticipantList({
                 participantOnly={false}
               />
             )}
-            onRowClick={(event, rowData, togglePanel) => {
-              onParticipantSelect(participants[rowData.tableData.id].id)
-            }}
             localization={{
               body: {
                 emptyDataSourceMessage: "", //"No Participants. Add Participants by clicking the [+] button above.",
