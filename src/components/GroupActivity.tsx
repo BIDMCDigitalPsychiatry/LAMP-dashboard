@@ -74,7 +74,7 @@ async function getEvents(participantId: string, activityId: string) {
   let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, activityId)
   let dates = []
   let steak = 0
-  if(!!activityEvents) {
+  if (!!activityEvents) {
     activityEvents.map((activityEvent, i) => {
       let date = new Date(activityEvent.timestamp)
       if (!dates.includes(date.toLocaleDateString())) {
@@ -91,14 +91,14 @@ async function getEvents(participantId: string, activityId: string) {
       currentDate.setDate(currentDate.getDate() - 1)
     }
   }
-  return steak  
+  return steak > 0 ? steak : 1
 }
 
 export default function GroupActivity({ participant, activity, ...props }) {
   const classes = useStyles()
   const [currentActivity, setCurrentActivity] = useState(null)
   const [groupActivities, setGroupActivities] = useState([])
-
+  const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
@@ -122,7 +122,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   useEffect(() => {
     if (currentActivity !== null) {
-      setActivityId(currentActivity.id) 
+      setActivityId(currentActivity.id)
       setActivityRun(false)
     }
   }, [currentActivity])
@@ -136,40 +136,54 @@ export default function GroupActivity({ participant, activity, ...props }) {
     setIndex(val)
     setActivityRun(true)
     if (groupActivities.length === val) {
+      LAMP.ActivityEvent.create(participant.id, {
+        timestamp: new Date().getTime(),
+        duration: new Date().getTime() - startTime,
+        activity: activity.id,
+        static_data: {},
+      })
       props.onComplete()
     }
   }
 
   const submitSurvey = (response) => {
     setLoading(true)
-    let events = response.map((x, idx) => ({
-      timestamp: new Date().getTime(),
-      duration: response.duration,
-      activity: activity.id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: y.duration,
-      })),
-    }))
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
-    ).then((x) => {
-      getEvents(participant, activity.id).then((steak) => {
+    if (response === null) {
+      getEvents(participant, currentActivity.id).then((steak) => {
         setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })
-      setTimeout(() => {
-        setOpenComplete(false)
-        completeActivity()
-      }, 10000)
-    })
+    } else {
+      let events = response.map((x, idx) => ({
+        timestamp: new Date().getTime(),
+        duration: response.duration,
+        activity: currentActivity.id,
+        static_data: {},
+        temporal_slices: (x || []).map((y) => ({
+          item: y !== undefined ? y.item : null,
+          value: y !== undefined ? y.value : null,
+          type: null,
+          level: null,
+          duration: y.duration,
+        })),
+      }))
+      Promise.all(
+        events
+          .filter((x) => x.temporal_slices.length > 0)
+          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
+      ).then((x) => {
+        getEvents(participant, currentActivity.id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setLoading(false)
+        })
+        setTimeout(() => {
+          setOpenComplete(false)
+          completeActivity()
+        }, 10000)
+      })
+    }
   }
 
   useEffect(() => {
@@ -192,8 +206,8 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   return (
     <div style={{ height: "100%" }}>
-      { !activityRun && (
-        currentActivity?.spec === "lamp.survey" ? (
+      {!activityRun &&
+        (currentActivity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             id={participant}
             type={currentActivity?.name ?? ""}
@@ -277,7 +291,6 @@ export default function GroupActivity({ participant, activity, ...props }) {
             className={classes.closeButton}
             onClick={() => {
               setOpenComplete(false)
-              completeActivity()
             }}
           >
             <CloseIcon />

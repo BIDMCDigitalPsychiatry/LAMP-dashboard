@@ -247,7 +247,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
           >
             <List component="nav" className={classes.menuOuter}>
               <ListItem
-                className={classes.menuItems}
+                className={classes.menuItems + " " + classes.btnCursor}
                 button
                 selected={currentTab === 0}
                 onClick={(event) => setCurrentTab(0)}
@@ -258,7 +258,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
                 <ListItemText primary={t("Patients")} />
               </ListItem>
               <ListItem
-                className={classes.menuItems}
+                className={classes.menuItems + " " + classes.btnCursor}
                 button
                 selected={currentTab === 1}
                 onClick={(event) => setCurrentTab(1)}
