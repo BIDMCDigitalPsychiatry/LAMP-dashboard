@@ -146,7 +146,7 @@ async function getEvents(participant: ParticipantObj, activityId: string) {
     }
     currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak
+  return steak > 1 ? steak : 1
 }
 
 export default function Participant({
