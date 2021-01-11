@@ -824,6 +824,17 @@ export default function ParticipantList({
     }))
   }
 
+  const saveIndividualUserSettings = async (id, val) => {
+    setLoading(true)
+    let oldSettingArray = Object.assign({}, participantSettingArray)
+    oldSettingArray[id] = { ...oldSettingArray[id], notification: val }
+    try {
+      await LAMP.Type.setAttachment(id, "me", "to.unityhealth.psychiatry.settings", oldSettingArray[id])
+      setParticipantSettingArray(oldSettingArray)
+    } catch (error) {}
+    setLoading(false)
+  }
+
   const editNameTextField = (selectedRows, event) => {
     setEditData(true)
     setEditUserId(selectedRows.id)
@@ -1010,14 +1021,39 @@ export default function ParticipantList({
                 title: t("Notification"),
                 field: "notification",
                 searchable: false,
-                render: (rowData) =>
-                  participantSettingArray[rowData.id] === undefined ||
-                  participantSettingArray[rowData.id].notification === true ||
-                  participantSettingArray[rowData.id] === "" ? (
-                    <Icon>toggle_on</Icon>
-                  ) : (
-                    <Icon>toggle_off</Icon>
-                  ),
+                render: (rowData) => (
+                  <Tooltip title={t("Notification")}>
+                    {participantSettingArray[rowData.id] === undefined ||
+                    participantSettingArray[rowData.id].notification === true ||
+                    participantSettingArray[rowData.id] === "" ? (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={true}
+                            onChange={(event) => {
+                              saveIndividualUserSettings(rowData.id, event.target.checked)
+                            }}
+                          />
+                        }
+                        label=""
+                        className={classes.switchLabel}
+                      />
+                    ) : (
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={false}
+                            onChange={(event) => {
+                              saveIndividualUserSettings(rowData.id, event.target.checked)
+                            }}
+                          />
+                        }
+                        label=""
+                        className={classes.switchLabel}
+                      />
+                    )}
+                  </Tooltip>
+                ),
               },
               {
                 title: null,
@@ -1201,22 +1237,6 @@ export default function ParticipantList({
                             >
                               {t("Export")}
                             </Button>
-                          </Box>
-                          <Box>
-                            {
-                              <FormControlLabel
-                                control={
-                                  <Switch
-                                    checked={notificationToggle}
-                                    onChange={(event) => {
-                                      saveSelectedUserSettings(props.selectedRows, event.target.checked)
-                                    }}
-                                  />
-                                }
-                                label="Notification"
-                                className={classes.switchLabel}
-                              />
-                            }
                           </Box>
                         </Box>
                       </Container>
