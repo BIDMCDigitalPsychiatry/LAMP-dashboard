@@ -407,7 +407,7 @@ export default function ParticipantList({
   const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
   const [studyIdDelete, setStudyIdForDelete] = useState("")
   const [participantSettingArray, setParticipantSettingArray] = useState([])
-  const [notificationToggle, setNotificationToggle] = useState(false)
+  const [showNotificationColumn, setNotificationColumn] = useState(false)
 
   const getCurrentLanguage = () => {
     let lang
@@ -452,29 +452,8 @@ export default function ParticipantList({
   const timeAgo = new TimeAgo(currentLanguage)
 
   useEffect(() => {
-    setLoading(true)
-    let selectedRows = state.selectedRows // tempRows = selectedRows.map(y => y.id)
-
-    for (let row of selectedRows) {
-      let notObj: any = { ...participantSettingArray[row.id], notification: notificationToggle }
-      LAMP.Type.setAttachment(row.id, "me", "to.unityhealth.psychiatry.settings", notObj)
-    }
-    refreshPage()
-    setState((state) => ({
-      ...state,
-      selectedRows: [],
-    }))
-
-    setLoading(false)
-  }, [notificationToggle])
-
-  useEffect(() => {
     refreshPage()
   }, [])
-
-  useEffect(() => {
-    console.log("Immediately change", participantSettingArray)
-  }, [participantSettingArray])
 
   const refreshPage = async () => {
     ;(async () => {
@@ -494,7 +473,9 @@ export default function ParticipantList({
       setTagData(studies)
       let studiesData = filterStudyData(studies)
       setStudiesCount(studiesData)
-      setNotificationToggle(false)
+      let notificationDisplay: any =
+        ((await LAMP.Type.getAttachment(researcher.id, "to.unityhealth.psychiatry.enabled")) as any).data ?? ""
+      if (notificationDisplay) setNotificationColumn(true)
     })()
   }
 
@@ -547,7 +528,9 @@ export default function ParticipantList({
       let participantSettingArray = await Promise.all(
         participantArray.map(async (x) => ({
           id: x.id,
-          settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
+          settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
+            notification: true,
+          },
         }))
       )
       let objNot = []
@@ -606,7 +589,6 @@ export default function ParticipantList({
       participantArray.map(async (x) => ({
         id: x.id,
         name: ((await LAMP.Type.getAttachment(x.id, "lamp.name")) as any).data ?? "",
-        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
       }))
     )
     let obj = []
@@ -617,7 +599,9 @@ export default function ParticipantList({
     let participantSettingsArray = await Promise.all(
       participantArray.map(async (x) => ({
         id: x.id,
-        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? "",
+        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
+          notification: true,
+        },
       }))
     )
     let objNot = []
@@ -627,13 +611,7 @@ export default function ParticipantList({
     setParticipantSettingArray(objNot)
     return participantFormatArray
   }
-  const saveSelectedUserSettings = (rows, val) => {
-    setNotificationToggle(val)
-    setState((state) => ({
-      ...state,
-      selectedRows: rows,
-    }))
-  }
+
   useEffect(() => {
     ;(async function () {
       let data = await Promise.all(
@@ -1020,6 +998,7 @@ export default function ParticipantList({
               {
                 title: t("Notification"),
                 field: "notification",
+                hidden: !showNotificationColumn,
                 searchable: false,
                 render: (rowData) => (
                   <Tooltip title={t("Notification")}>
