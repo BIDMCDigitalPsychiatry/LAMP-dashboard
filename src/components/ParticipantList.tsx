@@ -525,6 +525,7 @@ export default function ParticipantList({
         obj[res["id"]] = res["name"]
       })
       setNameArray(obj)
+      if(showNotificationColumn===true) {
       let participantSettingArray = await Promise.all(
         participantArray.map(async (x) => ({
           id: x.id,
@@ -538,6 +539,7 @@ export default function ParticipantList({
         objNot[res["id"]] = res["settings"]
       })
       setParticipantSettingArray(objNot)
+     }
     }
   }
 
@@ -596,6 +598,7 @@ export default function ParticipantList({
       obj[res["id"]] = res["name"]
     })
     setNameArray(obj)
+    if(showNotificationColumn===true) {
     let participantSettingsArray = await Promise.all(
       participantArray.map(async (x) => ({
         id: x.id,
@@ -608,7 +611,9 @@ export default function ParticipantList({
     participantSettingsArray.forEach(function (res) {
       objNot[res["id"]] = res["settings"]
     })
+  
     setParticipantSettingArray(objNot)
+   }
     return participantFormatArray
   }
 
