@@ -543,7 +543,9 @@ function ErrorFallback({ error }) {
           {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
         </code>
         <br />
-        <code>mindLAMP Version: {process.env.REACT_APP_GIT_SHA}</code>
+        <code>
+          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
+        </code>
       </pre>
     </div>
   )
@@ -592,7 +594,7 @@ export default function App({ ...props }) {
             opacity: 0.1,
           }}
         >
-          {process.env.REACT_APP_GIT_SHA}
+          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`}
         </span>
       </ThemeProvider>
     </ErrorBoundary>
