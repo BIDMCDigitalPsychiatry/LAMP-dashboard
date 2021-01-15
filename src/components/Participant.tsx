@@ -122,11 +122,6 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
-function saveBreatheMusicURL(id) {
-  let backgroundMusicURL = { URL: "https://liquidmindmusic.com/mp3/breatheinme.mp3" }
-  LAMP.Type.setAttachment(id, "me", "lamp.breathe.music_url", backgroundMusicURL)
-}
-
 async function getEvents(participant: ParticipantObj, activityId: string) {
   let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, activityId)
   let dates = []
@@ -146,7 +141,7 @@ async function getEvents(participant: ParticipantObj, activityId: string) {
     }
     currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak > 1 ? steak : 1
+  return steak > 0 ? steak : 1
 }
 
 export default function Participant({

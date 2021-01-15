@@ -140,6 +140,7 @@ export default function TipCreator({
   onCancel,
   studies,
   allActivities,
+  study,
   ...props
 }: {
   activities?: any
@@ -147,6 +148,7 @@ export default function TipCreator({
   onCancel?: any
   studies?: any
   allActivities?: any
+  study?: any
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -160,7 +162,7 @@ export default function TipCreator({
   const [selectedCategory, setSelectedCategory]: any = useState({})
   const [deletedIds, setDeletedIds]: any = useState("")
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
-  const [studyId, setStudyId] = useState(!!activities ? activities.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!activities ? activities.parentID : study)
   const [openDialog, setOpenDialog] = useState(false)
   const [clickDeleteId, setClickDeleteId] = useState("")
   const [isDuplicate, setIsDuplicate] = useState(false)
@@ -501,11 +503,11 @@ export default function TipCreator({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!activities ? true : false}
+                    disabled={!!activities || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -564,7 +566,7 @@ export default function TipCreator({
                           color="primary"
                           inputProps={{ "aria-label": "secondary checkbox" }}
                         />{" "}
-                        Duplicate
+                        {t("Duplicate")}
                       </Box>
                     </Grid>
                     <Grid item xs sm={6} md={6} lg={4}>

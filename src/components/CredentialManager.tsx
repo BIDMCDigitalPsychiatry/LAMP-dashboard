@@ -46,7 +46,7 @@ function compress(file, width, height) {
   })
 }
 
-function CredentialEditor({ credential, auxData, mode, onChange }) {
+export function CredentialEditor({ credential, auxData, mode, onChange }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState()
   const [name, setName] = useState("")
@@ -258,16 +258,47 @@ function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
+export async function updateDetails(id, data, mode, allRoles) {
+  try {
+    if (mode === "reset-password" && !!data.password) {
+      if (
+        !!((await LAMP.Credential.update(id, data.credential.access_key, {
+          ...data.credential,
+          secret_key: data.password,
+        })) as any).error
+      )
+        return -4
+    } else if (mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
+      if (!!((await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any).error) return -3
+      await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
+        ...allRoles,
+        [data.emailAddress]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
+      })
+    } else if (mode === "change-role") {
+      await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
+        ...allRoles,
+        [data.credential.access_key]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
+      })
+    } else {
+      return -1
+    }
+  } catch (err) {
+    return -2
+  }
+  return 1
+}
 export const CredentialManager: React.FunctionComponent<{
   id?: any
   onComplete?: any
   style?: any
-}> = ({ id, onComplete, ...props }) => {
+  credential?: any
+  mode?: string
+}> = ({ id, onComplete, credential, mode, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
-    credential: undefined,
-    mode: undefined,
+    credential: credential ?? undefined,
+    mode: mode ?? undefined,
   })
   const [allCreds, setAllCreds] = useState([])
   const [allRoles, setAllRoles] = useState({})
@@ -279,7 +310,10 @@ export const CredentialManager: React.FunctionComponent<{
     LAMP.Type.parent(id)
       .then((x) => Object.keys(x.data).length === 0)
       .then((x) => setShouldSyncWithChildren(x))
-    LAMP.Credential.list(id).then(setAllCreds)
+    LAMP.Credential.list(id).then((cred) => {
+      console.log(cred)
+      setAllCreds(cred)
+    })
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : {})
     )
@@ -295,50 +329,38 @@ export const CredentialManager: React.FunctionComponent<{
   }, [shouldSyncWithChildren, allRoles])
 
   const _submitCredential = async (data) => {
-    try {
-      if (selected.mode === "reset-password" && !!data.password) {
-        if (
-          !!((await LAMP.Credential.update(id, data.credential.access_key, {
-            ...data.credential,
-            secret_key: data.password,
-          })) as any).error
-        )
-          return enqueueSnackbar(t("Could not change password."), {
-            variant: "error",
-          })
-      } else if (selected.mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
-        if (!!((await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any).error)
-          return enqueueSnackbar("Could not create credential.", {
-            variant: "error",
-          })
-        await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
-          ...allRoles,
-          [data.emailAddress]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
-        })
-      } else if (selected.mode === "change-role") {
-        await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
-          ...allRoles,
-          [data.credential.access_key]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
-        })
-      } else {
-        enqueueSnackbar(t("Could not perform operation for an unknown reason."), {
-          variant: "error",
-        })
-      }
-    } catch (err) {
+    let result = await updateDetails(id, data, selected.mode, allRoles)
+    if (result === -4) {
+      return enqueueSnackbar(t("Could not change password."), {
+        variant: "error",
+      })
+    }
+    if (result === -1) {
+      enqueueSnackbar(t("Could not perform operation for an unknown reason."), {
+        variant: "error",
+      })
+    }
+    if (result === -3) {
+      enqueueSnackbar("Could not create credential.", {
+        variant: "error",
+      })
+    }
+    if (result === -2) {
       enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
         variant: "error",
       })
     }
-    LAMP.Credential.list(id).then(setAllCreds)
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
-      setAllRoles(!!res.data ? res.data : [])
-    )
-    return setSelected({
-      anchorEl: undefined,
-      credential: undefined,
-      mode: undefined,
-    })
+    if (result === 1) {
+      LAMP.Credential.list(id).then(setAllCreds)
+      LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
+        setAllRoles(!!res.data ? res.data : [])
+      )
+      return setSelected({
+        anchorEl: undefined,
+        credential: undefined,
+        mode: undefined,
+      })
+    }
   }
 
   const _deleteCredential = async (credential) => {

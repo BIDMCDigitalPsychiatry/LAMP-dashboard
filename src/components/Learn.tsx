@@ -321,7 +321,7 @@ export default function Learn({
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
-          {t("Quick Tips to Improve Your")} {tip}
+          {t("Quick Tips to Improve Your")} {t(tip)}
         </DialogContent>
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>

@@ -159,6 +159,7 @@ export default function GameCreator({
   activitySpecId,
   details,
   studies,
+  study,
   ...props
 }: {
   activities?: any
@@ -168,10 +169,11 @@ export default function GameCreator({
   activitySpecId?: string
   details?: any
   studies?: any
+  study?: any
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const [text, setText] = useState(!!value ? value.name : undefined)
+  const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
   const [photo, setPhoto] = useState(
     details?.photo
@@ -184,7 +186,7 @@ export default function GameCreator({
 
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const { t } = useTranslation()
   const [settings, setSettings] = useState(
     !!value
@@ -356,7 +358,7 @@ export default function GameCreator({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!value ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>

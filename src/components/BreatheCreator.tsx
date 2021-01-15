@@ -11,15 +11,11 @@ import {
   TextField,
   withStyles,
   ButtonBase,
-  Button,
   Container,
   Backdrop,
   CircularProgress,
-  FormControlLabel,
   Checkbox,
 } from "@material-ui/core"
-import AddIcon from "@material-ui/icons/Add"
-
 import { useDropzone } from "react-dropzone"
 import { CheckboxProps } from "@material-ui/core/Checkbox"
 import DeleteIcon from "@material-ui/icons/Delete"
@@ -66,39 +62,11 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-    cardHeader: {
-      textalign: "center",
-      align: "center",
-      backgroundColor: "white",
-    },
+
     input: {
       display: "none",
     },
-    button: {
-      color: "blue",
-      margin: 10,
-    },
-    btnpeach: {
-      background: "#FFAC98",
-      padding: "15px 25px 15px 25px",
-      borderRadius: "40px",
-      minWidth: "200px",
-      boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
-      lineHeight: "22px",
-      display: "inline-block",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
-      cursor: "pointer",
-      "& span": { cursor: "pointer" },
-      "&:hover": {
-        background: "#FFAC98",
-        boxShadow:
-          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
-        textDecoration: "none",
-      },
-    },
+
     btnText: {
       color: "#333",
       fontSize: 14,
@@ -170,6 +138,7 @@ export default function BreatheCreator({
   activitySpecId,
   details,
   studies,
+  study,
   ...props
 }: {
   activities?: any
@@ -179,11 +148,13 @@ export default function BreatheCreator({
   activitySpecId?: string
   details?: any
   studies?: any
+  study?: any
 }) {
+  console.log(study)
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const [disabled, setDisabled] = useState(true)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
@@ -347,11 +318,11 @@ export default function BreatheCreator({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!value ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -391,7 +362,7 @@ export default function BreatheCreator({
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <Divider />
-                  <Typography variant="h6">Settings</Typography>
+                  <Typography variant="h6">{t("Settings")}</Typography>
                 </Grid>
                 <Divider />
                 <Grid item xs={12} spacing={2}>
@@ -405,7 +376,7 @@ export default function BreatheCreator({
                       }
                       fullWidth
                       variant="filled"
-                      label="Audio URL"
+                      label={t("Audio URL")}
                       defaultValue={settings?.audio_url ?? ""}
                       onChange={(event) => setSettings({ ...settings, audio_url: event.target.value })}
                     />
@@ -536,13 +507,6 @@ export default function BreatheCreator({
           </Tooltip>
         </Grid>
       </Grid>
-
-      {/* <Grid container spacing={2}>
-  Count: {count}
-  <button onClick={() => setCount(initialCount)}>Reset</button>
-  <button onClick={() => setCount(prevCount => prevCount - 1)}>-</button>
-  <button onClick={() => setCount(prevCount => prevCount + 1)}>+</button>
-  </Grid> */}
     </Grid>
   )
 }

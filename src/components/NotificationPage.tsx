@@ -88,7 +88,7 @@ async function getEvents(participantId: string, activityId: string) {
     }
     currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak
+  return steak > 0 ? steak : 1
 }
 
 export default function NotificationPage({ participant, activityId, ...props }) {
@@ -104,13 +104,14 @@ export default function NotificationPage({ participant, activityId, ...props }) 
 
   useEffect(() => {
     ;(async () => {
+      console.log(activityId)
       LAMP.Activity.view(activityId).then(setActivity)
     })()
   }, [])
   useEffect(() => {
-    if (activity !== null) {
+    if (!!activity) {
       ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
+        let iconData = (await LAMP.Type.getAttachment(activity?.id, "lamp.dashboard.activity_details")) as any
         let activityData = {
           id: activity.id,
           spec: activity.spec,
