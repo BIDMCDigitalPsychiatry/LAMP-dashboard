@@ -357,6 +357,8 @@ export default function PatientProfile({
   const [password, setPassword] = useState(null)
   const [allRoles, setAllRoles] = useState({})
   const [mode, setMode] = useState(null)
+  const [ext, setExt] = useState([])
+  const [int, setInt] = useState([])
   const activitiesObj = {
     "lamp.journal": t("Journal"),
     "lamp.scratch_image": t("Scratch card"),
@@ -390,34 +392,26 @@ export default function PatientProfile({
       const prefix = "lamp.dashboard.credential_roles"
       let ext = ((await LAMP.Type.getAttachment(participant.id, `${prefix}.external`)) as any).data
       let int = ((await LAMP.Type.getAttachment(participant.id, `${prefix}`)) as any).data
+      setExt(Object.keys(ext))
+      setInt(Object.keys(int))
       setAccounts([
-        {
-          id: 0,
-          name: "0",
-          email: "me@me.com",
-          tooltip: "You",
-          children: ["ME"],
-          style: { background: theme.palette.primary.main },
-        },
         ...Object.entries(ext ?? {}).map((x: any, idx) => ({
           id: idx + 1,
-          name: `${idx + 1}`,
+          name: x?.[1]?.name ?? "",
           email: x?.[0],
           tooltip: x?.[1]?.role ?? "No role specified",
           image: x?.[1]?.photo,
         })),
         ...Object.entries(int ?? {}).map((x: any, idx) => ({
           id: idx + 1,
-          name: `${idx + 1}`,
+          name: x?.[1]?.name ?? "",
           onClick: () => setShowCredentials((x) => !x),
           email: x?.[0],
           tooltip: x?.[1]?.role ?? "No role specified",
           image: x?.[1]?.photo,
         })),
       ])
-      LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles").then((res: any) =>
-        setAllRoles(!!res.data ? res.data : [])
-      )
+      setAllRoles(Object.assign(ext, int))
       setLoading(false)
       setShowCredentials(false)
     })()
@@ -657,9 +651,11 @@ export default function PatientProfile({
   }
 
   const _deleteCredential = async () => {
+    console.log(credential)
     try {
       if (!!((await LAMP.Credential.delete(participant.id, credential.access_key)) as any).error)
         return enqueueSnackbar(t("Could not delete."), { variant: "error" })
+
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
         [credential.access_key]: undefined,
@@ -667,9 +663,6 @@ export default function PatientProfile({
     } catch (err) {
       enqueueSnackbar(t("Credential management failed."), { variant: "error" })
     }
-    LAMP.Type.getAttachment(participant.id, "lamp.dashboard.credential_roles").then((res: any) =>
-      setAllRoles(!!res.data ? res.data : [])
-    )
   }
   const handleClose = () => {
     setAnchorEl(null)
@@ -727,7 +720,14 @@ export default function PatientProfile({
                 </Box>
               </Grid>
               <Grid item>
-                <Link onClick={() => setShowCredentials(true)} className={classes.linkBtn}>
+                <Link
+                  onClick={() => {
+                    setMode(undefined)
+                    setCredential(undefined)
+                    setShowCredentials(true)
+                  }}
+                  className={classes.linkBtn}
+                >
                   <Key />
                   Reset account password
                 </Link>
@@ -768,7 +768,7 @@ export default function PatientProfile({
 
                     <IconButton
                       onClick={() => {
-                        setMode("change-role")
+                        setMode("update-profile")
                         setCredential(item)
                         setShowCredentials(true)
                       }}
@@ -1118,18 +1118,22 @@ export default function PatientProfile({
       </ResponsiveDialog>
       <Dialog open={showCredentials} onClose={() => setShowCredentials(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialEditor
-            credential={credential}
-            auxData={allRoles[(credential || {}).access_key] || {}}
-            mode={mode}
-            onChange={(data) => {
-              ;(async () => {
-                await updateDetails(participant.id, data, mode, allRoles)
-                onChangeAccounts()
-              })()
-            }}
-          />
-          {/* <CredentialManager id={participant.id} style={{ margin: 16 }} credential={credential} mode="change-role" /> */}
+          {!!mode ? (
+            <CredentialEditor
+              credential={credential}
+              auxData={allRoles[(credential || {}).access_key] || {}}
+              mode={mode}
+              onChange={(data) => {
+                ;(async () => {
+                  let type = ext.includes(data.emailAddress) ? 1 : 2
+                  await updateDetails(participant.id, data, mode, allRoles, type)
+                  onChangeAccounts()
+                })()
+              }}
+            />
+          ) : (
+            <CredentialManager id={participant.id} style={{ margin: 16 }} />
+          )}
         </DialogContent>
       </Dialog>
       <Dialog
@@ -1139,7 +1143,7 @@ export default function PatientProfile({
         open={dialogOpen}
       >
         <div className={classes.padding20}>
-          <Messages refresh participant={participant.id} msgOpen={true} participantOnly={false} />
+          <Messages refresh participant={participant.id} msgOpen={false} participantOnly={false} />
         </div>
       </Dialog>
 

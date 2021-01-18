@@ -48,14 +48,14 @@ function compress(file, width, height) {
 
 export function CredentialEditor({ credential, auxData, mode, onChange }) {
   const { enqueueSnackbar } = useSnackbar()
-  const [photo, setPhoto] = useState()
-  const [name, setName] = useState("")
-  const [role, setRole] = useState("")
-  const [emailAddress, setEmailAddress] = useState("")
+  const [photo, setPhoto] = useState(credential?.image ?? "")
+  const [name, setName] = useState(credential?.name ?? "")
+  const [role, setRole] = useState(credential?.tooltip ?? "")
+  const [emailAddress, setEmailAddress] = useState(credential?.email ?? "")
   const [password, setPassword] = useState("")
   const [showLink, setShowLink] = useState(false)
   const { t } = useTranslation()
-
+  console.log(credential)
   useEffect(() => {
     setPhoto(auxData.photo)
     setRole(auxData.role)
@@ -88,7 +88,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
 
   return (
     <Grid container justify="center" alignItems="center">
-      {["create-new", "change-role"].includes(mode) && (
+      {["create-new", "change-role", "update-profile"].includes(mode) && (
         <Tooltip
           title={
             !photo
@@ -117,7 +117,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
           </Box>
         </Tooltip>
       )}
-      {["create-new"].includes(mode) && (
+      {["create-new", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
           label={t("Name")}
@@ -129,7 +129,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
           style={{ marginBottom: 16 }}
         />
       )}
-      {["create-new", "change-role"].includes(mode) && (
+      {["create-new", "change-role", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
           label={t("Role")}
@@ -170,7 +170,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
           }}
         />
       )}
-      {["create-new"].includes(mode) && (
+      {["create-new", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
           label={t("Email Address")}
@@ -182,7 +182,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
           style={{ marginBottom: 16 }}
         />
       )}
-      {["create-new", "reset-password"].includes(mode) && (
+      {["create-new", "reset-password", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
           label={t("Password")}
@@ -211,7 +211,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
                   </Tooltip>
                 </InputAdornment>
               ),
-              !["reset-password", "create-new"].includes(mode) ? undefined : (
+              !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="b">
                   <Tooltip title={t("Save Credential")}>
                     <IconButton
@@ -258,7 +258,8 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
-export async function updateDetails(id, data, mode, allRoles) {
+export async function updateDetails(id, data, mode, allRoles, type) {
+  console.log(data)
   try {
     if (mode === "reset-password" && !!data.password) {
       if (
@@ -272,7 +273,23 @@ export async function updateDetails(id, data, mode, allRoles) {
       if (!!((await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any).error) return -3
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
-        [data.emailAddress]: !data.role && !data.photo ? undefined : { role: data.role, photo: data.photo },
+        [data.emailAddress]:
+          !data.role && !data.photo && !data.name ? undefined : { role: data.role, name: data.name, photo: data.photo },
+      })
+    } else if (mode === "update-profile" && !!data.name && !!data.emailAddress && !!data.password) {
+      if (
+        !!((await LAMP.Credential.update(id, data.credential.access_key, {
+          ...data.credential,
+          secret_key: data.password,
+        })) as any).error
+      )
+        return -4
+      let attachmentName = type === 1 ? "lamp.dashboard.credential_roles.external" : "lamp.dashboard.credential_roles"
+      console.log(attachmentName)
+      await LAMP.Type.setAttachment(id, "me", attachmentName, {
+        ...allRoles,
+        [data.emailAddress]:
+          !data.role && !data.photo && !data.name ? undefined : { role: data.role, name: data.name, photo: data.photo },
       })
     } else if (mode === "change-role") {
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
@@ -305,19 +322,35 @@ export const CredentialManager: React.FunctionComponent<{
   const [shouldSyncWithChildren, setShouldSyncWithChildren] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const [ext, setExt] = useState([])
+  const [int, setInt] = useState([])
 
   useEffect(() => {
     LAMP.Type.parent(id)
       .then((x) => Object.keys(x.data).length === 0)
       .then((x) => setShouldSyncWithChildren(x))
     LAMP.Credential.list(id).then((cred) => {
-      console.log(cred)
       setAllCreds(cred)
     })
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
-      setAllRoles(!!res.data ? res.data : {})
-    )
+    setRoles()
   }, [])
+
+  const setRoles = () => {
+    if (LAMP.Auth._type === "researcher") {
+      const prefix = "lamp.dashboard.credential_roles"
+      ;(async () => {
+        let ext = ((await LAMP.Type.getAttachment(id, `${prefix}.external`)) as any).data
+        let int = ((await LAMP.Type.getAttachment(id, `${prefix}`)) as any).data
+        setAllRoles(Object.assign(ext, int))
+        setExt(Object.keys(ext))
+        setInt(Object.keys(int))
+      })()
+    } else {
+      LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
+        setAllRoles(!!res.data ? res.data : {})
+      })
+    }
+  }
 
   useEffect(() => {
     if (shouldSyncWithChildren !== true) return
@@ -329,7 +362,8 @@ export const CredentialManager: React.FunctionComponent<{
   }, [shouldSyncWithChildren, allRoles])
 
   const _submitCredential = async (data) => {
-    let result = await updateDetails(id, data, selected.mode, allRoles)
+    let type = ext.includes(data.emailAddress) ? 1 : 2
+    let result = await updateDetails(id, data, selected.mode, allRoles, type)
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {
         variant: "error",
@@ -352,9 +386,7 @@ export const CredentialManager: React.FunctionComponent<{
     }
     if (result === 1) {
       LAMP.Credential.list(id).then(setAllCreds)
-      LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
-        setAllRoles(!!res.data ? res.data : [])
-      )
+      setRoles()
       return setSelected({
         anchorEl: undefined,
         credential: undefined,
@@ -477,7 +509,7 @@ export const CredentialManager: React.FunctionComponent<{
           credential={selected.credential}
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
           mode={selected.mode}
-          onChange={_submitCredential}
+          onChange={(data) => _submitCredential(data)}
         />
       )}
     </Box>

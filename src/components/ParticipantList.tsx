@@ -466,6 +466,7 @@ export default function ParticipantList({
   const timeAgo = new TimeAgo(currentLanguage)
 
   useEffect(() => {
+    console.log(profileDialog, participant)
     if (!profileDialog && participant !== null) {
       ;(async () => {
         let name = ((await LAMP.Type.getAttachment(participant.id, "lamp.name")) as any).data ?? ""
@@ -859,6 +860,7 @@ export default function ParticipantList({
     let oldNameArray = Object.assign({}, nameArray)
     oldNameArray[editUserId] = data
     setNameArray(oldNameArray)
+    setEditUserId(undefined)
   }
 
   const updateStudyName = (data) => {
