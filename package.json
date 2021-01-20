@@ -54,6 +54,7 @@
     "react-circular-progressbar": "^2.0.3",
     "react-dom": "^16.8.6",
     "react-dropzone": "^10.1.8",
+    "react-error-boundary": "^3.1.0",
     "react-i18next": "^11.7.3",
     "react-images-upload": "^1.2.8",
     "react-is": "^16.12.0",
@@ -64,15 +65,16 @@
     "regenerator-runtime": "^0.13.3",
     "remark-emoji": "^2.1.0",
     "remark-gfm": "^1.0.0",
+    "stacktrace-js": "^2.0.2",
     "url-search-params-polyfill": "^7.0.0",
     "vega": "^5.17.0",
     "vega-lite": "^4.17.0"
   },
   "scripts": {
-    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
-    "start-sw": "http-server ./build",
+    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
+    "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
-    "build": "GENERATE_SOURCEMAP=false CI=false REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
+    "build": "NODE_ENV=production CI=false REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
     "build-storybook": "build-storybook -s public"
