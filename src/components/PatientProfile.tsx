@@ -430,7 +430,7 @@ export default function PatientProfile({
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
     })
-    onChangeAccounts()
+    //  onChangeAccounts()
     onChangeActivities()
     onChangeSensors()
     setLoading(false)
@@ -737,7 +737,7 @@ export default function PatientProfile({
 
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
 
-          <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
+          {/* <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
             {t("Care team")}
           </Typography>
           <Grid container spacing={0}>
@@ -751,7 +751,7 @@ export default function PatientProfile({
                 </Typography>
                 <Typography className={classes.contentText} style={{ flex: 1 }}>
                   CONTACT
-                </Typography> */}
+                </Typography> 
               </div>
               {(accounts ?? []).map((item, index) => {
                 return (
@@ -759,9 +759,6 @@ export default function PatientProfile({
                     className={classes.rowContainer}
                     style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}
                   >
-                    {/* <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {item.name}
-                    </Typography> */}
                     <Typography className={classes.contentText} style={{ flex: 1 }}>
                       {item.email}
                     </Typography>
@@ -789,7 +786,7 @@ export default function PatientProfile({
                     </IconButton>
                   </div>
                 )
-              })}
+              })} 
               <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
                 <div className={classes.addButton}>
                   <AddCircleOutline onClick={() => setShowCredentials(true)} />
@@ -807,7 +804,7 @@ export default function PatientProfile({
               </ButtonBase>
             </Grid>
             <Grid item xs={10} sm={2} />
-          </Grid>
+          </Grid> */}
 
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
           <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>

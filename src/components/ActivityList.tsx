@@ -1149,8 +1149,10 @@ export default function ActivityList({ researcher, title, ...props }) {
                           showZeroBadges={false}
                           badges={studiesCount}
                           onChange={(x) => {
-                            LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
-                            setSelected(x)
+                            ;(async () => {
+                              await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
+                              setSelected(x)
+                            })()
                           }}
                         />
                       }

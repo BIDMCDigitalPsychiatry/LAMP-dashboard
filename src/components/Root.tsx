@@ -9,7 +9,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Icon,
+  Fab,
   Container,
   MenuItem,
   Typography,
@@ -26,7 +26,11 @@ import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 import { useTranslation } from "react-i18next"
+import { ReactComponent as Researcher } from "../icons/Researcher.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+
+// initial load = not working
+// TODO: <EditField researcher={x} />
 
 const theme = createMuiTheme({
   palette: {
@@ -417,7 +421,7 @@ export default function Root({ ...props }) {
                 onClick={(event) => setCurrentTab(0)}
               >
                 <ListItemIcon className={classes.menuIcon}>
-                  <Icon>biotech</Icon>
+                  <Researcher />
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>

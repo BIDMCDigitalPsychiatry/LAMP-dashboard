@@ -341,9 +341,9 @@ export const CredentialManager: React.FunctionComponent<{
       ;(async () => {
         let ext = ((await LAMP.Type.getAttachment(id, `${prefix}.external`)) as any).data
         let int = ((await LAMP.Type.getAttachment(id, `${prefix}`)) as any).data
-        setAllRoles(Object.assign(ext, int))
-        setExt(Object.keys(ext))
-        setInt(Object.keys(int))
+        setAllRoles(Object.assign(ext ?? {}, int ?? {}))
+        setExt(Object.keys(ext ?? {}))
+        setInt(Object.keys(int ?? {}))
       })()
     } else {
       LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
@@ -353,12 +353,14 @@ export const CredentialManager: React.FunctionComponent<{
   }
 
   useEffect(() => {
-    if (shouldSyncWithChildren !== true) return
-    LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
-      !!res.data
-        ? LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
-        : console.log("no roles to sync")
-    })
+    if (LAMP.Auth._type === "researcher") {
+      if (shouldSyncWithChildren !== true) return
+      LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
+        !!res.data
+          ? LAMP.Type.setAttachment(id, "Participant", "lamp.dashboard.credential_roles.external", res.data)
+          : console.log("no roles to sync")
+      })
+    }
   }, [shouldSyncWithChildren, allRoles])
 
   const _submitCredential = async (data) => {

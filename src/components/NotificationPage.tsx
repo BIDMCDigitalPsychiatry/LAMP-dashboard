@@ -23,7 +23,7 @@ import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
-
+import GroupActivity from "./GroupActivity"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -109,6 +109,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     })()
   }, [])
   useEffect(() => {
+    console.log(activity)
     if (!!activity) {
       ;(async () => {
         let iconData = (await LAMP.Type.getAttachment(activity?.id, "lamp.dashboard.activity_details")) as any
@@ -187,6 +188,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             title={activity.name}
             details={activity?.settings ?? {}}
             icon={activityDetails?.icon ?? undefined}
+            onComplete={() => {}}
+          />
+        ) : activity?.spec === "lamp.group" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            submitSurvey={submitSurvey}
             onComplete={() => {}}
           />
         ) : (
