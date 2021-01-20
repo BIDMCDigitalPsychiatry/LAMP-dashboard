@@ -58,7 +58,7 @@ export const effective = {
       labelFontSize: 10,
       ticks: false,
       labelPadding: 32,
-      title: null,
+      title: "Date",
       grid: false,
     },
     axisY: {
@@ -70,7 +70,7 @@ export const effective = {
       labelFontSize: 10,
       ticks: false,
       labelPadding: 10,
-      title: null,
+      title: "Intensity",
       grid: false,
     },
   },
@@ -84,7 +84,7 @@ export const effective = {
   },
   encoding: {
     x: { field: "date", type: "ordinal", timeUnit: "utcyearmonthdate" },
-    y: { field: "value", type: "quantitative" },
+    y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2 },
     opacity: {

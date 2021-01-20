@@ -27,6 +27,7 @@ export const selfcare = {
     strokeWidth: { value: 2 },
   },
   mark: "bar",
+
   config: {
     title: {
       color: "rgba(0, 0, 0, 0.75)",
@@ -83,7 +84,7 @@ export const selfcare = {
       tickCount: 6,
       gridColor: "#C8C8C8",
       gridWidth: 2,
-      title: null,
+      title: "Units",
       grid: false,
       ticks: false,
     },

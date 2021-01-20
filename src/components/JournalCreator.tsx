@@ -97,6 +97,7 @@ export default function JournalCreator({
   activitySpecId,
   details,
   studies,
+  study,
   ...props
 }: {
   activities?: any
@@ -106,6 +107,7 @@ export default function JournalCreator({
   activitySpecId?: string
   details?: any
   studies?: any
+  study?: any
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -114,7 +116,7 @@ export default function JournalCreator({
   const [photo, setPhoto] = useState(details?.photo ?? JournalIcon)
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const { t } = useTranslation()
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
@@ -142,7 +144,7 @@ export default function JournalCreator({
             : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
       )
       if (duplicates.length > 0) {
-        enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
     return !(
@@ -167,8 +169,8 @@ export default function JournalCreator({
               <Tooltip
                 title={
                   !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
+                    ? t("Drag a photo or tap to select a photo.")
+                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
                 }
               >
                 <Box
@@ -198,22 +200,22 @@ export default function JournalCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Study"
+                    label={t("Study")}
                     value={studyId}
                     onChange={(e) => {
                       setStudyId(e.target.value)
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? "Please select the study"
+                        ? t("Please select the Study")
                         : ""
                     }
                     variant="filled"
-                    disabled={!!value ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -228,7 +230,7 @@ export default function JournalCreator({
                       }
                       fullWidth
                       variant="filled"
-                      label="Activity Title"
+                      label={t("Activity Title")}
                       defaultValue={text}
                       onChange={(event) => setText(event.target.value)}
                       inputProps={{ maxLength: 80 }}
@@ -241,7 +243,7 @@ export default function JournalCreator({
                 <TextField
                   fullWidth
                   multiline
-                  label="Activity Description"
+                  label={t("Activity Description")}
                   variant="filled"
                   rows={2}
                   defaultValue={description}
@@ -263,7 +265,7 @@ export default function JournalCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this activity and save it with a new title.">
+            <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -293,7 +295,7 @@ export default function JournalCreator({
                   (value.name.trim() === text.trim() && value.parentID === studyId)
                 }
               >
-                Duplicate
+                {t("Duplicate")}
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -301,7 +303,7 @@ export default function JournalCreator({
           </Grid>
         )}
         <Grid item>
-          <Tooltip title="Save this activity.">
+          <Tooltip title={t("Save this activity.")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -325,7 +327,7 @@ export default function JournalCreator({
               }}
               disabled={!validate() || !disabled || !onSave || !text}
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

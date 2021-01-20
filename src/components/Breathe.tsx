@@ -18,11 +18,9 @@ import {
   Toolbar,
   Grid,
   Fab,
-  FormControlLabel,
   Checkbox,
 } from "@material-ui/core"
 import { CheckboxProps } from "@material-ui/core/Checkbox"
-import LAMP from "lamp-core"
 
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
@@ -154,9 +152,7 @@ const useStyles = makeStyles((theme) => ({
   progress: {
     color: "#E46759",
   },
-  completed: {
-    color: "#FFAC98",
-  },
+
   videoNav: {
     marginBottom: 30,
     "& video": {

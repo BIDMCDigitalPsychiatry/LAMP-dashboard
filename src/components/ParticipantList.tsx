@@ -7,7 +7,9 @@ import {
   Button,
   TextField,
   Popover,
-  Menu,
+  AppBar,
+  Toolbar,
+  Divider,
   MenuItem,
   Chip,
   Tooltip,
@@ -35,8 +37,7 @@ import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 import { green, yellow, red, grey } from "@material-ui/core/colors"
 import CloseIcon from "@material-ui/icons/Close"
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward"
-
+import PatientProfile from "./PatientProfile"
 // External Imports
 import { saveAs } from "file-saver"
 import JSZip from "jszip"
@@ -60,7 +61,6 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
 import { useTranslation } from "react-i18next"
-import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined"
 
 //TimeAgo.addLocale(en)
 //const timeAgo = new TimeAgo("en-US")
@@ -129,7 +129,17 @@ const useStyles = makeStyles((theme: Theme) =>
         position: "absolute",
       },
     },
-    switchLabel: { color: "#4C66D6" },
+    toolbardashboard: {
+      minHeight: 100,
+      padding: "0 10px",
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "left",
+        fontWeight: "600",
+        fontSize: 30,
+        width: "calc(100% - 96px)",
+      },
+    },
     tableContainer: {
       "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
       "& div.MuiInput-underline:after": { borderBottom: "0 !important" },
@@ -151,6 +161,8 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "#000000",
       maxWidth: 250,
     },
+    switchLabel: { color: "#4C66D6" },
+
     dataQuality: {
       margin: "4px 0",
       backgroundColor: "#E9F8E7",
@@ -281,7 +293,6 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props })
   const classes = useStyles()
   const [duplicateCnt, setCount] = useState(0)
   const { t } = useTranslation()
-
   const validate = () => {
     return (
       duplicateCnt == 0 ||
@@ -387,6 +398,7 @@ export default function ParticipantList({
   const [tagArray, setTagArray] = useState([])
   const [logins, setLogins] = useState({})
   const [passive, setPassive] = useState({})
+  const [active, setActive] = useState({})
   const [studiesCount, setStudiesCount] = useState({})
   const [nameArray, setNameArray] = useState([])
   const { enqueueSnackbar } = useSnackbar()
@@ -397,17 +409,19 @@ export default function ParticipantList({
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t, i18n } = useTranslation()
-  const [active, setActive] = useState({})
+  const [studyId, setStudyId] = useState(null)
   const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
   const [editStudy, setEditStudy] = useState(false)
   const [editStudyName, setEditStudyName] = useState("")
   const [studyArray, setStudyNameArray] = useState([])
   const [aliasStudyName, setAliasStudyName] = useState("")
-
+  const [participant, setParticipant] = useState(null)
   const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
   const [studyIdDelete, setStudyIdForDelete] = useState("")
   const [participantSettingArray, setParticipantSettingArray] = useState([])
   const [showNotificationColumn, setNotificationColumn] = useState(false)
+  const [profileDialog, setProfileDialog] = useState(false)
+  const [studies, setStudies] = useState([])
 
   const getCurrentLanguage = () => {
     let lang
@@ -452,6 +466,16 @@ export default function ParticipantList({
   const timeAgo = new TimeAgo(currentLanguage)
 
   useEffect(() => {
+    console.log(profileDialog, participant)
+    if (!profileDialog && participant !== null) {
+      ;(async () => {
+        let name = ((await LAMP.Type.getAttachment(participant.id, "lamp.name")) as any).data ?? ""
+        setNameArray({ ...nameArray, [participant.id]: name })
+      })()
+    }
+  }, [profileDialog])
+
+  useEffect(() => {
     refreshPage()
   }, [])
 
@@ -459,6 +483,7 @@ export default function ParticipantList({
     ;(async () => {
       setLoading(true)
       let studies: any = await LAMP.Study.allByResearcher(researcher.id).then(async (res) => {
+        setStudies(res)
         return await Promise.all(
           res.map(async (x) => ({
             id: x.id,
@@ -525,21 +550,21 @@ export default function ParticipantList({
         obj[res["id"]] = res["name"]
       })
       setNameArray(obj)
-      if(showNotificationColumn===true) {
-      let participantSettingArray = await Promise.all(
-        participantArray.map(async (x) => ({
-          id: x.id,
-          settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
-            notification: true,
-          },
-        }))
-      )
-      let objNot = []
-      participantSettingArray.forEach(function (res) {
-        objNot[res["id"]] = res["settings"]
-      })
-      setParticipantSettingArray(objNot)
-     }
+      if (showNotificationColumn === true) {
+        let participantSettingArray = await Promise.all(
+          participantArray.map(async (x) => ({
+            id: x.id,
+            settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
+              notification: true,
+            },
+          }))
+        )
+        let objNot = []
+        participantSettingArray.forEach(function (res) {
+          objNot[res["id"]] = res["settings"]
+        })
+        setParticipantSettingArray(objNot)
+      }
     }
   }
 
@@ -567,6 +592,7 @@ export default function ParticipantList({
       })
       eachParticipant.participant.forEach((innerObj) => {
         innerObj.study = eachParticipant.study
+        innerObj.studyId = eachParticipant.id_0
         innerObj.tableData = { id: k }
         participantArray.push(innerObj)
         k++
@@ -598,22 +624,22 @@ export default function ParticipantList({
       obj[res["id"]] = res["name"]
     })
     setNameArray(obj)
-    if(showNotificationColumn===true) {
-    let participantSettingsArray = await Promise.all(
-      participantArray.map(async (x) => ({
-        id: x.id,
-        settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
-          notification: true,
-        },
-      }))
-    )
-    let objNot = []
-    participantSettingsArray.forEach(function (res) {
-      objNot[res["id"]] = res["settings"]
-    })
-  
-    setParticipantSettingArray(objNot)
-   }
+    if (showNotificationColumn === true) {
+      let participantSettingsArray = await Promise.all(
+        participantArray.map(async (x) => ({
+          id: x.id,
+          settings: ((await LAMP.Type.getAttachment(x.id, "to.unityhealth.psychiatry.settings")) as any).data ?? {
+            notification: true,
+          },
+        }))
+      )
+      let objNot = []
+      participantSettingsArray.forEach(function (res) {
+        objNot[res["id"]] = res["settings"]
+      })
+
+      setParticipantSettingArray(objNot)
+    }
     return participantFormatArray
   }
 
@@ -834,6 +860,7 @@ export default function ParticipantList({
     let oldNameArray = Object.assign({}, nameArray)
     oldNameArray[editUserId] = data
     setNameArray(oldNameArray)
+    setEditUserId(undefined)
   }
 
   const updateStudyName = (data) => {
@@ -942,9 +969,9 @@ export default function ParticipantList({
                         updateName={updateName}
                       />
                     ) : aliasName && editUserId === x.id ? (
-                      t(aliasName)
+                      aliasName
                     ) : nameArray[x.id] ? (
-                      t(nameArray[x.id])
+                      nameArray[x.id]
                     ) : (
                       x.id
                     )}
@@ -995,8 +1022,8 @@ export default function ParticipantList({
                 field: "study",
                 searchable: false,
                 render: (rowData) => (
-                  <Tooltip title={rowData.study}>
-                    <Chip label={rowData.study ? rowData.study : ""} className={classes.studyCode} />
+                  <Tooltip title={t(rowData.study)}>
+                    <Chip label={rowData.study ? t(rowData.study) : ""} className={classes.studyCode} />
                   </Tooltip>
                 ),
               },
@@ -1044,26 +1071,36 @@ export default function ParticipantList({
                 field: null,
                 searchable: false,
                 render: (rowData) => (
+                  <Tooltip title={t("Update profile")}>
+                    <IconButton
+                      onClick={() => {
+                        setParticipant(participants[rowData.tableData.id])
+                        setStudyId(participants[rowData.tableData.id].studyId)
+                        setProfileDialog(true)
+                      }}
+                    >
+                      <Icon>settings</Icon>
+                    </IconButton>
+                  </Tooltip>
+                ),
+              },
+              {
+                title: null,
+                field: null,
+                searchable: false,
+                render: (rowData) => (
                   <Tooltip title={t("Impersonate")}>
                     <IconButton
                       onClick={() => {
                         onParticipantSelect(participants[rowData.tableData.id].id)
                       }}
                     >
-                      <ArrowForwardIcon />
+                      <Icon>arrow_forward</Icon>
                     </IconButton>
                   </Tooltip>
                 ),
               },
             ]}
-            detailPanel={(rowData) => (
-              <Messages
-                refresh
-                participant={participants[rowData.tableData.id].id}
-                msgOpen={false}
-                participantOnly={false}
-              />
-            )}
             localization={{
               body: {
                 emptyDataSourceMessage: "", //"No Participants. Add Participants by clicking the [+] button above.",
@@ -1119,7 +1156,7 @@ export default function ParticipantList({
                           setOpenDialogManageStudies(true)
                         }}
                       >
-                        <DescriptionOutlinedIcon />
+                        <Icon style={{ color: "#FFF" }}>description_outlined</Icon>
                       </IconButton>
                     </Tooltip>
                     <Fab
@@ -1138,14 +1175,6 @@ export default function ParticipantList({
                     >
                       <AddIcon /> {t("Add")}
                     </Fab>
-
-                    {/* <Fab
-                      variant="extended"
-                      color="primary"
-                   
-                    >
-                      {t("Manage Studies")}
-                    </Fab> */}
                   </div>
                 )
               },
@@ -1457,6 +1486,28 @@ export default function ParticipantList({
       </ResponsiveDialog>
       <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
         <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
+      </ResponsiveDialog>
+      <ResponsiveDialog fullScreen transient={false} animate open={!!profileDialog}>
+        <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
+          <Toolbar className={classes.toolbardashboard}>
+            <IconButton onClick={() => setProfileDialog(false)} color="default" aria-label="Menu">
+              <Icon>arrow_back</Icon>
+            </IconButton>
+            <Typography variant="h5">
+              {t("Profile")} {participant?.id ?? ""}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Divider />
+        <Box py={8} px={4}>
+          <PatientProfile
+            studies={studies}
+            studyId={studyId}
+            participant={participant}
+            name={participant?.id ? nameArray[participant.id] ?? "" : ""}
+            onClose={() => setProfileDialog(false)}
+          />
+        </Box>
       </ResponsiveDialog>
     </React.Fragment>
   )

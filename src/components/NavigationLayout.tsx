@@ -227,13 +227,11 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
 
   useEffect(() => {
-    console.log("sdf")
     refresh()
     setInterval(refresh, 60000)
   }, [])
 
   const refresh = () => {
-    console.log(id, title, sensorData)
     if (!!id && id !== "me") {
       if (sensorData === null) {
         ;(async () => {

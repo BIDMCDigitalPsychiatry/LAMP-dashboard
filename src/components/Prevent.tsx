@@ -754,7 +754,6 @@ export default function Prevent({
       //     return goal
       //   }, {})
       // }
-      console.log(activityEvents)
       setTimeSpans(timeSpans)
       setActivityCounts(activityEventCount)
       activities = activities.filter((activity) => activityEventCount[activity.name] > 0)

@@ -1,5 +1,4 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { Box, TextField } from "@material-ui/core"
 import { makeStyles, withStyles, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import InputBase from "@material-ui/core/InputBase"
@@ -80,11 +79,7 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.4)",
       marginTop: 40,
     },
-    measureContainer: {
-      // display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
+
     buttonText: {
       fontWeight: "bold",
       fontSize: 16,
@@ -97,7 +92,6 @@ const useStyles = makeStyles((theme) =>
       background: "#7599FF",
       boxShadow: "0px 10px 15px rgba(96, 131, 231, 0.2)",
       borderRadius: 25,
-
       marginBottom: 40,
       "&:hover": { background: "#5680f9" },
     },
@@ -182,7 +176,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
     setMeasure("Times")
     setCustomUnit(null)
   }
-  const options = ["Times", "Hours", "Minutes"]
+  const options = [t("Times"), t("Hours"), t("Minutes".toLowerCase())]
   return (
     <Dialog
       classes={{ paper: classes.popWidth }}
@@ -212,11 +206,11 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
                 setMeasure(newValue)
               }}
               value={measure}
-              inputValue={measure}
+              inputValue={t(measure)}
               onInputChange={(event, newInputValue) => {
                 setMeasure(newInputValue)
               }}
-              renderInput={(params) => <TextField {...params} label="Measure" variant="filled" />}
+              renderInput={(params) => <TextField {...params} label={t("Measure")} variant="filled" />}
             />
           </MuiThemeProvider>
         </Box>
@@ -266,6 +260,46 @@ export function EmotionDialog({ ...props }) {
         </div>
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} disabled={emotion === "" ? true : false} className={classes.headerButton}>
+            <Typography className={classes.buttonText}>{t("Add")}</Typography>
+          </Button>
+        </Box>
+      </div>
+    </Dialog>
+  )
+}
+
+export function NameDialog({ onClose, dialogOpen, ...props }) {
+  const classes = useStyles()
+  const [name, setName] = React.useState("")
+  const { t } = useTranslation()
+
+  const handleClose = () => {
+    onClose(name)
+    setName("")
+  }
+
+  return (
+    <Dialog
+      classes={{ paper: classes.popWidth }}
+      onClose={handleClose}
+      aria-labelledby="simple-dialog-title"
+      open={dialogOpen}
+    >
+      <div>
+        <Typography className={classes.dialogTitle}>{t("Add Sensor")}</Typography>
+        <div className={classes.inputContainer}>
+          <div className={classes.contentContainer}>
+            <CssTextField
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              inputProps={{ disableunderline: "true" }}
+              placeholder={t("Name")}
+            />
+          </div>
+        </div>
+
+        <Box textAlign="center" mt={2}>
+          <Button onClick={handleClose} disabled={name === "" ? true : false} className={classes.headerButton}>
             <Typography className={classes.buttonText}>{t("Add")}</Typography>
           </Button>
         </Box>

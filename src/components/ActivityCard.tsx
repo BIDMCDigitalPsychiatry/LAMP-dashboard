@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Icon, IconButton, Tooltip, Typography, Divider, Container } from "@material-ui/core"
+import { Box, Icon, IconButton, Tooltip, Typography, Divider } from "@material-ui/core"
 import { blue } from "@material-ui/core/colors"
 
 // Local Imports
@@ -38,7 +38,11 @@ export const strategies = {
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,  
+    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.scratch_image": (slices, activity, scopedItem) =>
+    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
@@ -149,7 +153,11 @@ export default function ActivityCard({
                 x: new Date(d.timestamp),
                 y: strategies[activity.spec]
                   ? strategies[activity.spec](
-                      activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                      activity.spec === "lamp.survey"
+                        ? d.temporal_slices
+                        : activity.spec === "lamp.scratch_image"
+                        ? d
+                        : d.static_data,
                       selectedActivity,
                       idx
                     )
@@ -189,7 +197,11 @@ export default function ActivityCard({
             x: new Date(d.timestamp),
             y: strategies[activity.spec]
               ? strategies[activity.spec](
-                  activity.spec === "lamp.survey" ? d.temporal_slices : d.static_data,
+                  activity.spec === "lamp.survey"
+                    ? d.temporal_slices
+                    : activity.spec === "lamp.scratch_image"
+                    ? d
+                    : d.static_data,
                   selectedActivity,
                   undefined
                 )
@@ -200,7 +212,7 @@ export default function ActivityCard({
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}
-          onClick={(datum) => setVisibleSlice(datum)}
+          onClick={(datum) => (activity.spec !== "lamp.scratch_image" ? setVisibleSlice(datum) : setVisibleSlice(null))}
         />
       )}
     </React.Fragment>

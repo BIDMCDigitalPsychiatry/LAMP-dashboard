@@ -15,7 +15,7 @@ import {
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import MaterialTable from "material-table"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
@@ -175,9 +175,9 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
             initialEditValue: "none",
             lookup: {
               hourly: t("Every hour"),
-              every3h: t("Every {{number}} hours", { number: 3 }),
-              every6h: t("Every {{number}} hours", { number: 6 }),
-              every12h: t("Every {{number}} hours", { number: 12 }),
+              every3h: t("Every number hours", { number: 3 }),
+              every6h: t("Every number hours", { number: 6 }),
+              every12h: t("Every number hours", { number: 12 }),
               daily: t("Every day"),
               biweekly: t("Two times every week (Tue, Thurs)"),
               triweekly: t("Three times every week (Mon, Wed, Fri)"),
@@ -227,7 +227,12 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
             emptyDataSourceMessage: t("No schedule."),
             editRow: {
               deleteText: t("Are you sure you want to delete this schedule item?"),
+              saveTooltip: t("Save"),
+              cancelTooltip: t("Cancel"),
             },
+            addTooltip: t("Add"),
+            editTooltip: t("Edit"),
+            deleteTooltip: t("Delete"),
           },
         }}
         options={{

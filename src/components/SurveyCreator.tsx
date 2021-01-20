@@ -325,12 +325,14 @@ export default function SurveyCreator({
   onSave,
   onCancel,
   studies,
+  study,
   ...props
 }: {
   value?: any
   onSave?: any
   onCancel?: any
   studies?: any
+  study?: any
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -338,7 +340,7 @@ export default function SurveyCreator({
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const { t } = useTranslation()
   const [photo, setPhoto] = useState(value?.photo ?? null)
 
@@ -394,6 +396,7 @@ export default function SurveyCreator({
       setIsOptionNull(0)
     }
   }, [questions])
+
   return (
     <div>
       <MuiThemeProvider theme={theme}>
@@ -403,8 +406,8 @@ export default function SurveyCreator({
               <Tooltip
                 title={
                   !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
+                    ? t("Drag a photo or tap to select a photo.")
+                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
                 }
               >
                 <Box
@@ -445,11 +448,11 @@ export default function SurveyCreator({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!value ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>

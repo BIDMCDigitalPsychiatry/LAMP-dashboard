@@ -46,7 +46,7 @@ export const actions = {
     y: {
       field: "count",
       type: "quantitative",
-      title: null,
+      title: "Units",
       axis: {
         labelColor: "rgba(0, 0, 0, 0.4)",
         labelFont: "Inter",
