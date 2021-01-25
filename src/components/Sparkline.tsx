@@ -16,6 +16,7 @@ import {
   LinearGradient,
   PatternLines,
 } from "@data-ui/xy-chart"
+import { VegaLite } from "react-vega"
 
 function PaperTooltip({ top, left, ...props }) {
   left = window.innerWidth < left + 196 ? left - 196 : left
@@ -122,168 +123,263 @@ const styles = {
   },
 }
 
-export default withParentSize(function Sparkline({ ...props }) {
+export default function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
-  const renderTooltip = ({ datum, series }) => (
-    <List dense>
-      <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
-        <ListItemText
-          primaryTypographyProps={{ variant: "overline", style: { lineHeight: "1.4" } }}
-          secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
-        >
-          {datum ? datum?.x?.toLocaleString("en-US", Date.formatStyle("full")) : null}
-        </ListItemText>
-      </ListItem>
-      {series && series[props.YAxisLabel ?? "Data"] && (
-        <ListItem>
-          <ListItemText
-            primaryTypographyProps={{
-              variant: "overline",
-              style: { lineHeight: "1.4" },
-            }}
-            secondaryTypographyProps={{
-              variant: "overline",
-              display: "block",
-              style: { color: "#f00", fontWeight: 900, lineHeight: "1.4" },
-            }}
-            secondary={series[props.YAxisLabel ?? "Data"]?.missing ? "Missing Data" : undefined}
-          >
-            <span
-              style={{
-                color: props.color,
-                textDecoration: series[props.YAxisLabel ?? "Data"] === datum ? `underline dotted ${props.color}` : null,
-                fontWeight: series[props.YAxisLabel ?? "Data"] === datum ? 900 : 500,
-              }}
-            >{`${props.YAxisLabel ?? "Data"} `}</span>
-            <span>{series[props.YAxisLabel ?? "Data"].y}</span>
-          </ListItemText>
-        </ListItem>
-      )}
-    </List>
-  )
-
   if (props.data.length === 1) {
     props.data[0].x = new Date(props.data[0].x).toLocaleString()
   }
+
   return (
-    <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
-      {({ onMouseLeave, onMouseMove, tooltipData }) => (
-        <XYChart
-          theme={theme}
-          ariaLabel="Chart"
-          width={Math.max(props.minWidth, props.parentWidth + (print ? 128 : 0))}
-          height={Math.max(props.minHeight, props.parentHeight)}
-          eventTrigger={"container"}
-          eventTriggerRefs={props.eventTriggerRefs}
-          margin={{
-            top: 5,
-            left: 45,
-            right: 20,
-            bottom: !!props.XAxisLabel ? 50 : 0,
-          }}
-          onClick={({ datum }) => !!props.onClick && props.onClick(datum)}
-          onMouseMove={onMouseMove}
-          onMouseLeave={onMouseLeave}
-          renderTooltip={null}
-          snapTooltipToData={false}
-          tooltipData={tooltipData}
-          xScale={{
-            type: props.data.length === 1 ? "ordinal" : "time",
-          }}
-          yScale={{ type: "linear" }}
-        >
-          <PatternLines
-            id={`brush-${rand}`}
-            height={12}
-            width={12}
-            stroke={props.color}
-            strokeWidth={1}
-            orientation={["diagonal"]}
-          />
-          <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
-          <YAxis
-            label={null}
-            numTicks={12}
-            rangePadding={4}
-            axisStyles={styles.axis}
-            tickStyles={styles.tick}
-            orientation="left"
-          />
-          {supportsSidebar ? (
-            <XAxis
-              label={null}
-              numTicks={7}
-              rangePadding={4}
-              axisStyles={styles.axis}
-              tickStyles={styles.tick}
-              orientation="bottom"
-              tickLabelProps={(d, i) => ({
-                dy: 0,
-                dx: "-1.25em",
-                fontSize: 9,
-                angle: 0,
-              })}
-            />
-          ) : (
-            <XAxis
-              label={null}
-              tickLabelProps={(d, i) => ({
-                scaleToFit: supportsSidebar ? true : false,
-                dy: 0,
-                fontSize: 9,
-                angle: supportsSidebar ? 0 : 90,
-              })}
-              numTicks={7}
-              rangePadding={4}
-              axisStyles={styles.axis}
-              tickStyles={styles.tick}
-              orientation="bottom"
-            />
-          )}
-          <LineSeries
-            data={props.data}
-            seriesKey={props.YAxisLabel ?? "Data"}
-            stroke={props.color}
-            strokeWidth={2}
-            strokeDasharray="3 1"
-            strokeLinecap="butt"
-            dashType="dotted"
-          />
-          <AreaSeries
-            data={props.data}
-            seriesKey={props.YAxisLabel ?? "Data"}
-            fill={`url('#gradient-${rand}')`}
-            strokeWidth={0}
-          />
-          <PointSeries
-            data={props.data.filter((x) => !x.missing)}
-            seriesKey={props.YAxisLabel ?? "Data"}
-            fill={props.color}
-            fillOpacity={1}
-            strokeWidth={0}
-          />
-          <PointSeries data={props.data.filter((x) => x.missing)} fill="#ff0000" fillOpacity={1} strokeWidth={0} />
-          <CrossHair
-            fullHeight
-            showHorizontalLine={true}
-            stroke={props.color}
-            strokeDasharray="3 1"
-            circleSize={(d) => (d.y === tooltipData?.datum?.y ? 8 : 4)}
-            circleStyles={{ strokeWidth: 0.0 }}
-            circleFill={(d) => (d.y === tooltipData?.datum?.y ? (d.missing ? "#f00" : props.color) : "#fff")}
-            showCircle
-          />
-          <Brush
-            selectedBoxStyle={{
-              fill: `url(#brush-${rand})`,
-              stroke: props.color,
-            }}
-          />
-        </XYChart>
-      )}
-    </WithTooltip>
+    <VegaLite
+      spec={{
+        $schema: "https://vega.github.io/schema/vega-lite/v4.json",
+        description: "A basic line chart example.",
+        background: "#00000000",
+        config: {
+          view: { stroke: "transparent" },
+          legend: {
+            title: null,
+            orient: "bottom",
+            columns: 2,
+            labelColor: "rgba(0, 0, 0, 0.75)",
+            labelFont: "Inter",
+            labelFontSize: 14,
+            labelFontWeight: 600,
+            rowPadding: 20,
+            columnPadding: 50,
+            symbolStrokeWidth: 12,
+            symbolSize: 150,
+            symbolType: "circle",
+          },
+          axisX: {
+            orient: "bottom",
+            format: "%b %d",
+            labelColor: "rgba(0, 0, 0, 0.4)",
+            labelFont: "Inter",
+            labelFontWeight: 500,
+            labelFontSize: 10,
+            labelPadding: 16,
+            title: null,
+            grid: false,
+          },
+          axisY: {
+            orient: "left",
+            tickCount: 5,
+            labelColor: "rgba(0, 0, 0, 0.4)",
+            labelFont: "Inter",
+            labelFontWeight: 500,
+            labelFontSize: 10,
+            labelPadding: 10,
+            title: null,
+            grid: false,
+          },
+        },
+        mark: {
+          type: "area",
+          interpolate: "cardinal",
+          tension: 0.9,
+          point: { color: "#2196f3" },
+          line: { color: "#2196f3" },
+          color: {
+            x1: 1,
+            y1: 1,
+            x2: 1,
+            y2: 0,
+            gradient: "linear",
+            stops: [
+              { offset: 0, color: "#ffffff00" },
+              { offset: 1, color: props.color },
+            ],
+          },
+        },
+        encoding: {
+          x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+          y: { field: "y", type: "quantitative" },
+          strokeWidth: { value: 2 },
+          tooltip: [
+            {
+              field: "x",
+              type: "ordinal",
+              timeUnit: "utcyearmonthdatehoursminutes",
+              title: "DATE",
+            },
+            { field: "y", type: "nominal", title: "SCORE" },
+          ],
+        },
+        data: {
+          values: props.data,
+        },
+      }}
+    />
   )
-})
+}
+
+// export default withParentSize(function Sparkline({ ...props }) {
+//   const [rand] = useState(Math.random())
+//   const print = useMediaQuery("print")
+//   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+
+//   const renderTooltip = ({ datum, series }) => (
+//     <List dense>
+//       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
+//         <ListItemText
+//           primaryTypographyProps={{ variant: "overline", style: { lineHeight: "1.4" } }}
+//           secondary={!series || Object.keys(series).length === 0 ? datum.y : undefined}
+//         >
+//           {datum ? datum?.x?.toLocaleString("en-US", Date.formatStyle("full")) : null}
+//         </ListItemText>
+//       </ListItem>
+//       {series && series[props.YAxisLabel ?? "Data"] && (
+//         <ListItem>
+//           <ListItemText
+//             primaryTypographyProps={{
+//               variant: "overline",
+//               style: { lineHeight: "1.4" },
+//             }}
+//             secondaryTypographyProps={{
+//               variant: "overline",
+//               display: "block",
+//               style: { color: "#f00", fontWeight: 900, lineHeight: "1.4" },
+//             }}
+//             secondary={series[props.YAxisLabel ?? "Data"]?.missing ? "Missing Data" : undefined}
+//           >
+//             <span
+//               style={{
+//                 color: props.color,
+//                 textDecoration: series[props.YAxisLabel ?? "Data"] === datum ? `underline dotted ${props.color}` : null,
+//                 fontWeight: series[props.YAxisLabel ?? "Data"] === datum ? 900 : 500,
+//               }}
+//             >{`${props.YAxisLabel ?? "Data"} `}</span>
+//             <span>{series[props.YAxisLabel ?? "Data"].y}</span>
+//           </ListItemText>
+//         </ListItem>
+//       )}
+//     </List>
+//   )
+
+//   if (props.data.length === 1) {
+//     props.data[0].x = new Date(props.data[0].x).toLocaleString()
+//   }
+
+//   return (
+//     <WithTooltip renderTooltip={renderTooltip} TooltipComponent={PaperTooltip}>
+//       {({ onMouseLeave, onMouseMove, tooltipData }) => (
+//         <XYChart
+//           theme={theme}
+//           ariaLabel="Chart"
+//           width={Math.max(props.minWidth, props.parentWidth + (print ? 128 : 0))}
+//           height={Math.max(props.minHeight, props.parentHeight)}
+//           eventTrigger={"container"}
+//           eventTriggerRefs={props.eventTriggerRefs}
+//           margin={{
+//             top: 5,
+//             left: 45,
+//             right: 20,
+//             bottom: !!props.XAxisLabel ? 50 : 0,
+//           }}
+//           onClick={({ datum }) => !!props.onClick && props.onClick(datum)}
+//           onMouseMove={onMouseMove}
+//           onMouseLeave={onMouseLeave}
+//           renderTooltip={null}
+//           snapTooltipToData={false}
+//           tooltipData={tooltipData}
+//           xScale={{
+//             type: props.data.length === 1 ? "ordinal" : "time",
+//           }}
+//           yScale={{ type: "linear" }}
+//         >
+//           <PatternLines
+//             id={`brush-${rand}`}
+//             height={12}
+//             width={12}
+//             stroke={props.color}
+//             strokeWidth={1}
+//             orientation={["diagonal"]}
+//           />
+//           <LinearGradient id={`gradient-${rand}`} from={props.color} to="#ffffff00" />
+//           <YAxis
+//             label={null}
+//             numTicks={12}
+//             rangePadding={4}
+//             axisStyles={styles.axis}
+//             tickStyles={styles.tick}
+//             orientation="left"
+//           />
+//           {supportsSidebar ? (
+//             <XAxis
+//               label={null}
+//               numTicks={7}
+//               rangePadding={4}
+//               axisStyles={styles.axis}
+//               tickStyles={styles.tick}
+//               orientation="bottom"
+//               tickLabelProps={(d, i) => ({
+//                 dy: 0,
+//                 dx: "-1.25em",
+//                 fontSize: 9,
+//                 angle: 0,
+//               })}
+//             />
+//           ) : (
+//             <XAxis
+//               label={null}
+//               tickLabelProps={(d, i) => ({
+//                 scaleToFit: supportsSidebar ? true : false,
+//                 dy: 0,
+//                 fontSize: 9,
+//                 angle: supportsSidebar ? 0 : 90,
+//               })}
+//               numTicks={7}
+//               rangePadding={4}
+//               axisStyles={styles.axis}
+//               tickStyles={styles.tick}
+//               orientation="bottom"
+//             />
+//           )}
+//           <LineSeries
+//             data={props.data}
+//             seriesKey={props.YAxisLabel ?? "Data"}
+//             stroke={props.color}
+//             strokeWidth={2}
+//             strokeDasharray="3 1"
+//             strokeLinecap="butt"
+//             dashType="dotted"
+//           />
+//           <AreaSeries
+//             data={props.data}
+//             seriesKey={props.YAxisLabel ?? "Data"}
+//             fill={`url('#gradient-${rand}')`}
+//             strokeWidth={0}
+//           />
+//           <PointSeries
+//             data={props.data.filter((x) => !x.missing)}
+//             seriesKey={props.YAxisLabel ?? "Data"}
+//             fill={props.color}
+//             fillOpacity={1}
+//             strokeWidth={0}
+//           />
+//           <PointSeries data={props.data.filter((x) => x.missing)} fill="#ff0000" fillOpacity={1} strokeWidth={0} />
+//           <CrossHair
+//             fullHeight
+//             showHorizontalLine={true}
+//             stroke={props.color}
+//             strokeDasharray="3 1"
+//             circleSize={(d) => (d.y === tooltipData?.datum?.y ? 8 : 4)}
+//             circleStyles={{ strokeWidth: 0.0 }}
+//             circleFill={(d) => (d.y === tooltipData?.datum?.y ? (d.missing ? "#f00" : props.color) : "#fff")}
+//             showCircle
+//           />
+//           <Brush
+//             selectedBoxStyle={{
+//               fill: `url(#brush-${rand})`,
+//               stroke: props.color,
+//             }}
+//           />
+//         </XYChart>
+//       )}
+//     </WithTooltip>
+//   )
+// })
