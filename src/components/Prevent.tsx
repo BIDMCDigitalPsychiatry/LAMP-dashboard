@@ -756,7 +756,9 @@ export default function Prevent({
       // }
       setTimeSpans(timeSpans)
       setActivityCounts(activityEventCount)
-      activities = activities.filter((activity) => activityEventCount[activity.name] > 0)
+      activities = activities.filter(
+        (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group"
+      )
       setActivities(activities)
       setVisualizations(visualizations)
       if (!disabled) {
