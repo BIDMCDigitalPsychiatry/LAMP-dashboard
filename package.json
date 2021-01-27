@@ -68,6 +68,7 @@
     "url-search-params-polyfill": "^7.0.0",
     "vega": "^5.17.0",
     "vega-lite": "^4.17.0",
+    "vega-tooltip": "^0.25.0",
     "workbox-build": "^6.0.2"
   },
   "scripts": {

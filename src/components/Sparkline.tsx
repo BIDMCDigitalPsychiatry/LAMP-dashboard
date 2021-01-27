@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import { Paper, List, ListItem, ListItemText, Box, useMediaQuery, useTheme } from "@material-ui/core"
 import {
   XYChart,
@@ -16,204 +16,221 @@ import {
   LinearGradient,
   PatternLines,
 } from "@data-ui/xy-chart"
-import { VegaLite } from "react-vega"
+import { Vega } from "react-vega"
+import { Handler } from "vega-tooltip"
+import "../vega/vega.css"
 
-function PaperTooltip({ top, left, ...props }) {
-  left = window.innerWidth < left + 196 ? left - 196 : left
-  return (
-    <Box clone displayPrint="none">
-      <Paper
-        {...props}
-        elevation={4}
-        style={{
-          ...props.style,
-          position: "absolute",
-          pointerEvents: "none",
-          background: "white",
-          top,
-          left,
-          width: 196,
-        }}
-      />
-    </Box>
-  )
-}
+// function PaperTooltip({ top, left, ...props }) {
+//   left = window.innerWidth < left + 196 ? left - 196 : left
+//   return (
+//     <Box clone displayPrint="none">
+//       <Paper
+//         {...props}
+//         elevation={4}
+//         style={{
+//           ...props.style,
+//           position: "absolute",
+//           pointerEvents: "none",
+//           background: "white",
+//           top,
+//           left,
+//           width: 196,
+//         }}
+//       />
+//     </Box>
+//   )
+// }
 
-const styles = {
-  axis: {
-    stroke: "#bdbdbd",
-    strokeWidth: 1,
-    label: {
-      bottom: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fontWeight: 700,
-        fill: "#616161",
-        fontSize: 12,
-        letterSpacing: 0.4,
-      },
-      top: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fontWeight: 700,
-        fill: "#616161",
-        fontSize: 12,
-        letterSpacing: 0.4,
-      },
-      left: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fontWeight: 700,
-        fill: "#616161",
-        fontSize: 12,
-        letterSpacing: 0.4,
-      },
-      right: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fontWeight: 700,
-        fill: "#616161",
-        fontSize: 12,
-        letterSpacing: 0.4,
-      },
-    },
-  },
-  tick: {
-    stroke: "#bdbdbd",
-    length: 18,
-    label: {
-      bottom: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fill: "#757575",
-        fontSize: "0.9em !important",
-        letterSpacing: 0.4,
-        dy: "0.25em",
-      },
-      top: {
-        pointerEvents: "none",
-        textAnchor: "middle",
-        fontWeight: 400,
-        fill: "#757575",
-        fontSize: 10,
-        letterSpacing: 0.4,
-        dy: "-0.25em",
-      },
-      left: {
-        pointerEvents: "none",
-        textAnchor: "end",
-        fontWeight: 400,
-        fill: "#757575",
-        fontSize: 10,
-        letterSpacing: 0.4,
-        dx: "-0.25em",
-        dy: "0.25em",
-      },
-      right: {
-        pointerEvents: "none",
-        textAnchor: "start",
-        fontWeight: 400,
-        fill: "#757575",
-        fontSize: 10,
-        letterSpacing: 0.4,
-        dx: "0.25em",
-        dy: "0.25em",
-      },
-    },
-  },
-}
+// const styles = {
+//   axis: {
+//     stroke: "#bdbdbd",
+//     strokeWidth: 1,
+//     label: {
+//       bottom: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fontWeight: 700,
+//         fill: "#616161",
+//         fontSize: 12,
+//         letterSpacing: 0.4,
+//       },
+//       top: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fontWeight: 700,
+//         fill: "#616161",
+//         fontSize: 12,
+//         letterSpacing: 0.4,
+//       },
+//       left: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fontWeight: 700,
+//         fill: "#616161",
+//         fontSize: 12,
+//         letterSpacing: 0.4,
+//       },
+//       right: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fontWeight: 700,
+//         fill: "#616161",
+//         fontSize: 12,
+//         letterSpacing: 0.4,
+//       },
+//     },
+//   },
+//   tick: {
+//     stroke: "#bdbdbd",
+//     length: 18,
+//     label: {
+//       bottom: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fill: "#757575",
+//         fontSize: "0.9em !important",
+//         letterSpacing: 0.4,
+//         dy: "0.25em",
+//       },
+//       top: {
+//         pointerEvents: "none",
+//         textAnchor: "middle",
+//         fontWeight: 400,
+//         fill: "#757575",
+//         fontSize: 10,
+//         letterSpacing: 0.4,
+//         dy: "-0.25em",
+//       },
+//       left: {
+//         pointerEvents: "none",
+//         textAnchor: "end",
+//         fontWeight: 400,
+//         fill: "#757575",
+//         fontSize: 10,
+//         letterSpacing: 0.4,
+//         dx: "-0.25em",
+//         dy: "0.25em",
+//       },
+//       right: {
+//         pointerEvents: "none",
+//         textAnchor: "start",
+//         fontWeight: 400,
+//         fill: "#757575",
+//         fontSize: 10,
+//         letterSpacing: 0.4,
+//         dx: "0.25em",
+//         dy: "0.25em",
+//       },
+//     },
+//   },
+// }
 
 export default function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [parentHeight, setParentHeight] = useState(null)
+  const [parentWidth, setParentWidth] = useState(null)
+  const div = useCallback((node) => {
+    if (node !== null) {
+      setParentHeight(node.getBoundingClientRect().height)
+      setParentWidth(node.getBoundingClientRect().width)
+    }
+  }, [])
 
   if (props.data.length === 1) {
     props.data[0].x = new Date(props.data[0].x).toLocaleString()
   }
 
+  const handleClick = (...args) => {
+    console.log(args)
+  }
+  const signalListeners = { click: handleClick, mouseover: handleClick }
+
   return (
-    <VegaLite
-      spec={{
-        $schema: "https://vega.github.io/schema/vega-lite/v4.json",
-        description: "A basic line chart example.",
-        background: "#00000000",
-        config: {
-          view: { stroke: "transparent" },
-          legend: {
-            title: null,
-            orient: "bottom",
-            columns: 2,
-            labelColor: "rgba(0, 0, 0, 0.75)",
-            labelFont: "Inter",
-            labelFontSize: 14,
-            labelFontWeight: 600,
-            rowPadding: 20,
-            columnPadding: 50,
-            symbolStrokeWidth: 12,
-            symbolSize: 150,
-            symbolType: "circle",
+    <div ref={div}>
+      <Vega
+        actions={false}
+        width={Math.max(props.minWidth, parentWidth + (print ? 128 : 0))}
+        height={Math.max(props.minHeight, props.parentHeight ? props.parentHeight : 0)}
+        signalListeners={signalListeners}
+        logLevel={2}
+        tooltip={new Handler().call}
+        spec={{
+          $schema: "https://vega.github.io/schema/vega-lite/v4.json",
+          description: "A basic line chart example.",
+          background: "#00000000",
+          width: Math.max(props.minWidth, parentWidth + (print ? 128 : 0)),
+          height: Math.max(props.minHeight, parentHeight ? parentHeight : 0),
+          signals: [
+            {
+              name: "click",
+              value: 0,
+              on: [{ events: "*:mousedown", update: "datum" }],
+            },
+          ],
+          config: {
+            view: { stroke: "transparent" },
+            axisX: {
+              orient: "bottom",
+              format: "%b %d",
+              labelColor: "rgba(0, 0, 0, 0.4)",
+              labelFont: "Inter",
+              labelFontWeight: 500,
+              labelFontSize: 10,
+              labelPadding: 4,
+              title: null,
+              grid: false,
+            },
+            axisY: {
+              orient: "left",
+              tickCount: 12,
+              labelColor: "rgba(0, 0, 0, 0.4)",
+              labelFont: "Inter",
+              labelFontWeight: 500,
+              labelFontSize: 10,
+              labelPadding: 4,
+              title: null,
+              grid: false,
+            },
           },
-          axisX: {
-            orient: "bottom",
-            format: "%b %d",
-            labelColor: "rgba(0, 0, 0, 0.4)",
-            labelFont: "Inter",
-            labelFontWeight: 500,
-            labelFontSize: 10,
-            labelPadding: 16,
-            title: null,
-            grid: false,
+          mark: {
+            type: "area",
+            tooltip: true,
+            point: { color: "#2196f3", size: 50 },
+            line: { color: "#2196f3", strokeDash: [3, 1] },
+            color: {
+              x1: 1,
+              y1: 1,
+              x2: 1,
+              y2: 0,
+              gradient: "linear",
+              stops: [
+                { offset: 0, color: "#ffffff00" },
+                { offset: 1, color: props.color },
+              ],
+            },
           },
-          axisY: {
-            orient: "left",
-            tickCount: 5,
-            labelColor: "rgba(0, 0, 0, 0.4)",
-            labelFont: "Inter",
-            labelFontWeight: 500,
-            labelFontSize: 10,
-            labelPadding: 10,
-            title: null,
-            grid: false,
-          },
-        },
-        mark: {
-          type: "area",
-          interpolate: "cardinal",
-          tension: 0.9,
-          point: { color: "#2196f3" },
-          line: { color: "#2196f3" },
-          color: {
-            x1: 1,
-            y1: 1,
-            x2: 1,
-            y2: 0,
-            gradient: "linear",
-            stops: [
-              { offset: 0, color: "#ffffff00" },
-              { offset: 1, color: props.color },
+          encoding: {
+            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+            y: { field: "y", type: "quantitative" },
+            strokeWidth: { value: 2 },
+            tooltip: [
+              {
+                field: "x",
+                type: "ordinal",
+                timeUnit: "utcyearmonthdatehoursminutes",
+                title: "DATE",
+              },
+              { field: "y", type: "nominal", title: "SCORE" },
             ],
           },
-        },
-        encoding: {
-          x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
-          y: { field: "y", type: "quantitative" },
-          strokeWidth: { value: 2 },
-          tooltip: [
-            {
-              field: "x",
-              type: "ordinal",
-              timeUnit: "utcyearmonthdatehoursminutes",
-              title: "DATE",
-            },
-            { field: "y", type: "nominal", title: "SCORE" },
-          ],
-        },
-        data: {
-          values: props.data,
-        },
-      }}
-    />
+          data: {
+            values: props.data,
+          },
+        }}
+      />
+    </div>
   )
 }
 

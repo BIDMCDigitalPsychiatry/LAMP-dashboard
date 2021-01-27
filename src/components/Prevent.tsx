@@ -941,6 +941,7 @@ export default function Prevent({
                         </Typography>
                         <Box className={classes.maxw300}>
                           <VegaLite
+                            actions={false}
                             style={{ backgroundColor: "#00000000" }}
                             spec={{
                               data: {
@@ -990,7 +991,7 @@ export default function Prevent({
                                   disable: true,
                                 },
                               },
-                              mark: { type: "line", interpolate: "cardinal", tension: 0.9 },
+                              mark: { type: "line", interpolate: "cardinal", tension: 0.8, color: "#3C5DDD" },
                               encoding: {
                                 x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
                                 y: { field: "y", type: "quantitative" },
@@ -1144,6 +1145,7 @@ export default function Prevent({
 
                     <Box mt={3} mb={1} className={classes.maxw150}>
                       <VegaLite
+                        actions={false}
                         spec={{
                           data: {
                             values:
@@ -1152,6 +1154,7 @@ export default function Prevent({
                                 y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
                               })) ?? [],
                           },
+                          background: "#00000000",
                           width: 126,
                           height: 70,
                           config: {
@@ -1207,7 +1210,7 @@ export default function Prevent({
                               disable: true,
                             },
                           },
-                          mark: { type: "line", interpolate: "cardinal", tension: 0.9 },
+                          mark: { type: "line", interpolate: "cardinal", tension: 0.9, color: "#3C5DDD" },
                           encoding: {
                             x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
                             y: { field: "y", type: "quantitative" },
