@@ -432,7 +432,7 @@ export default function PatientProfile({
     })
     //  onChangeAccounts()
     onChangeActivities()
-    onChangeSensors()
+    // onChangeSensors()
     setLoading(false)
   }, [])
 
@@ -879,7 +879,7 @@ export default function PatientProfile({
 
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
 
-          <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
+          {/* <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
             {t("Sensors")}
           </Typography>
           <Grid container spacing={0}>
@@ -937,9 +937,9 @@ export default function PatientProfile({
               </ButtonBase>
             </Grid>
             <Grid item xs={10} sm={2} />
-          </Grid>
+          </Grid> */}
 
-          <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
+          {/* <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
           <div className={classes.buttonsContainer}>
             <Button className={classes.buttonContainer} onClick={() => updateName()}>
               <Typography className={classes.buttonText}>{t("Save")}</Typography>
@@ -947,7 +947,7 @@ export default function PatientProfile({
             <Button className={classes.backContainer} onClick={() => onClose()}>
               <Typography className={classes.backText}>{t("Cancel")}</Typography>
             </Button>
-          </div>
+          </div> */}
         </Grid>
       </Container>
 
