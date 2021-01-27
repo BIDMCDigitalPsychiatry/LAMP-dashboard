@@ -33,7 +33,6 @@ import { useSnackbar } from "notistack"
 import Close from "@material-ui/icons/Close"
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as Key } from "../icons/Key.svg"
 import { ReactComponent as Message } from "../icons/Message.svg"
 import Messages from "./Messages"
 import LAMP, { Study, Sensor } from "lamp-core"
@@ -644,7 +643,7 @@ export default function PatientProfile({
 
   const updateName = () => {
     LAMP.Type.setAttachment(participant.id, "me", "lamp.name", nickname ?? null)
-    enqueueSnackbar(t("Successfully updated patient profile."), {
+    enqueueSnackbar(t("Successfully updated user profile."), {
       variant: "success",
     })
     onClose()
@@ -728,7 +727,7 @@ export default function PatientProfile({
                   }}
                   className={classes.linkBtn}
                 >
-                  <Key />
+                  <Icon>key</Icon>
                   Reset account password
                 </Link>
               </Grid>

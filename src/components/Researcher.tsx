@@ -6,17 +6,9 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Fab,
   Container,
-  MenuItem,
-  Typography,
   useMediaQuery,
   useTheme,
-  AppBar,
-  Toolbar,
-  Button,
-  Popover,
-  Divider,
 } from "@material-ui/core"
 
 // Local Imports
@@ -26,10 +18,8 @@ import ActivityList from "./ActivityList"
 import { ResponsivePaper } from "./Utils"
 import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
-import { fade, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -149,7 +139,7 @@ function Study({ onParticipantSelect, researcher, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Patients />
                 </ListItemIcon>
-                <ListItemText primary={t("Patients")} />
+                <ListItemText primary={t("Users")} />
               </ListItem>
               <ListItem
                 className={classes.menuItems + " " + classes.btnCursor}
