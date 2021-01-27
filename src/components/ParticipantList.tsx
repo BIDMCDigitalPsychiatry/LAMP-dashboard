@@ -714,9 +714,7 @@ export default function ParticipantList({
                       value={_qrLink(`${id}@lamp.com`, id)}
                       onChange={(event) => {}}
                     />
-                    <Tooltip
-                      title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}
-                    >
+                    <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
                       <Grid container justify="center" style={{ padding: 16 }}>
                         <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
                       </Grid>
@@ -953,7 +951,7 @@ export default function ParticipantList({
       <MuiThemeProvider theme={theme}>
         <Box className={classes.tableContainer}>
           <MaterialTable
-            title={t("Patients")}
+            title={t("Users")}
             data={participants}
             columns={[
               {
@@ -979,7 +977,7 @@ export default function ParticipantList({
                 ),
               },
               {
-                title: t("Indicators"),
+                title: t("User Activity"),
                 field: "data_health",
                 searchable: false,
                 render: (rowData) => (
@@ -1089,7 +1087,7 @@ export default function ParticipantList({
                 field: null,
                 searchable: false,
                 render: (rowData) => (
-                  <Tooltip title={t("Impersonate")}>
+                  <Tooltip title={t("View as User")}>
                     <IconButton
                       onClick={() => {
                         onParticipantSelect(participants[rowData.tableData.id].id)
@@ -1109,7 +1107,7 @@ export default function ParticipantList({
                 },
               },
               toolbar: {
-                nRowsSelected: t("Patients"),
+                nRowsSelected: t("Users"),
                 searchPlaceholder: t("Search"),
               },
             }}
@@ -1293,7 +1291,7 @@ export default function ParticipantList({
                 setState((state) => ({ ...state, popoverAttachElement: null, addUser: false }))
               }}
             >
-              <Typography variant="h6">{t("New patient")}</Typography>
+              <Typography variant="h6">{t("New user")}</Typography>
               <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
             </MenuItem>
             <MenuItem
@@ -1329,7 +1327,7 @@ export default function ParticipantList({
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={2}>
             {t(
-              "Deleting study will delete all patients and activities associated with it. Are you sure you want to delete this study?"
+              "Deleting study will delete all users and activities associated with it. Are you sure you want to delete this study?"
             )}
           </Box>
           <DialogActions>
