@@ -20,6 +20,7 @@ import { ReactComponent as Patients } from "../icons/Patients.svg"
 import { ReactComponent as Activities } from "../icons/Activities.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import locale_lang from "../locale_map.json"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -173,18 +174,12 @@ function Study({ onParticipantSelect, researcher, ...props }) {
 export default function Researcher({ researcher, onParticipantSelect, ...props }) {
   const { t, i18n } = useTranslation()
 
-  const languagesArray = [
-    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
-    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
-  ]
-
   const getSelectedLanguage = () => {
-    let lang = languagesArray.filter((x) => {
-      return x.lang_array.includes(navigator.language)
-    })
-    return lang
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
+
   const classes = useStyles()
   const [anchorEl, setAnchorEl] = React.useState(null)
 
@@ -204,9 +199,9 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
     })()
     let language = !!localStorage.getItem("LAMP_user_" + researcher.id)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + researcher.id)).language
-      : getSelectedLanguage().length > 0
-      ? getSelectedLanguage()[0].key
-      : "en_US"
+      : getSelectedLanguage()
+      ? getSelectedLanguage()
+      : "en-US"
     i18n.changeLanguage(language)
   }, [])
 

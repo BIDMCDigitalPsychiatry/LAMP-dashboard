@@ -31,6 +31,7 @@ import SurveyInstrument from "./SurveyInstrument"
 import classes from "*.module.css"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
+import locale_lang from "../locale_map.json"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -222,17 +223,10 @@ export default function Participant({
     return tabName
   }
 
-  const languagesArray = [
-    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
-    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
-  ]
-
   const getSelectedLanguage = () => {
-    let lang = languagesArray.filter((x) => {
-      return x.lang_array.includes(navigator.language)
-    })
-    return lang
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
   useEffect(() => {
@@ -240,9 +234,9 @@ export default function Participant({
     props.activeTab(tabName)
     let language = !!localStorage.getItem("LAMP_user_" + participant.id)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-      : getSelectedLanguage().length > 0
-      ? getSelectedLanguage()[0].key
-      : "en_US"
+      : getSelectedLanguage()
+      ? getSelectedLanguage()
+      : "en-US"
     i18n.changeLanguage(language)
     //  getShowWelcome(participant).then(setOpen)
     LAMP.Activity.allByParticipant(participant.id).then((e) => {

@@ -194,7 +194,13 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
-  slider: { width: "80%", color: "#2F9D7E" },
+  slider: {
+    width: "95%",
+    color: "#2F9D7E",
+    [theme.breakpoints.down("xs")]: {
+      width: "82%",
+    },
+  },
 
   btnBack: {
     borderRadius: "40px",
@@ -320,14 +326,14 @@ const useStyles = makeStyles((theme) => ({
     "& span.Mui-checked": { color: "#2F9D7E !important" },
   },
   sliderValueLabel: {
-    width: "calc(100% + 105px)",
-    marginLeft: "-50px",
+    width: "100%",
   },
   lightGray: { color: "#999", fontSize: "0.75rem" },
   mxSmall: { margin: "0 6px" },
   radioLabelText: { lineHeight: "16px" },
 
   mrgBtm: { marginBottom: 15 },
+  countlabel: { left: "calc(-50% - -8px)" },
 }))
 
 // Splice together all selected activities & their tags.
@@ -736,27 +742,21 @@ function Rating({ onChange, options, value, ...props }) {
           rail: classes.centerBar,
           mark: classes.customTrack,
           thumb: classes.customThumb,
+          valueLabel: classes.countlabel,
         }}
         onChange={(evt, val) => {
           getSliderValue(val)
         }}
       />
-      <Grid
-        container
-        spacing={1}
-        className={classes.sliderValueLabel}
-        direction="row"
-        justify="center"
-        alignItems="center"
-      >
-        <Grid item xs={4}>
+      <Grid container className={classes.sliderValueLabel} direction="row" justify="space-between" alignItems="center">
+        <Grid item>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
             {!!options[0].description && options[0].description.trim().length === 0
               ? options[0].value
               : options[0].description}
           </Typography>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item>
           {options.length > 2 && (
             <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
               {!!options[Math.ceil(options.length / 2) - 1].description &&
@@ -766,7 +766,7 @@ function Rating({ onChange, options, value, ...props }) {
             </Typography>
           )}
         </Grid>
-        <Grid item xs={4}>
+        <Grid item>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
             {!!options[options.length - 1].description && options[options.length - 1].description.trim().length === 0
               ? options[options.length - 1].value
