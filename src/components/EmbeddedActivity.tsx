@@ -88,12 +88,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setActivityId(activity.id)
     setSaved(false)
     setSettings({ ...settings, settings: activity.settings, configuration: { language: i18n.language } })
-    // let response = await fetch(
-    //   `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
-    //     demoActivities[activity.spec]
-    //   }.html.b64`
-    // )
-    let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    let response = await fetch(
+      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
+        demoActivities[activity.spec]
+      }.html.b64`
+    )
+    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
