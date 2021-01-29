@@ -605,13 +605,34 @@ export default function Prevent({
   const getCurrentLanguage = () => {
     let lang
     switch (i18n.language) {
-      case "en_US":
+      case "en":
         lang = "en-US"
         break
-      case "hi_IN":
+      case "en-US":
+        lang = "en-US"
+        break
+      case "en-IN":
+        lang = "en-US"
+        break
+      case "en-AU":
+        lang = "en-US"
+        break
+      case "en-CA":
+        lang = "en-US"
+        break
+      case "en-IE":
+        lang = "en-US"
+        break
+      case "hi":
         lang = "hi-IN"
         break
-      case "es_ES":
+      case "hi-IN":
+        lang = "hi-IN"
+        break
+      case "es":
+        lang = "es-ES"
+        break
+      case "es-ES":
         lang = "es-ES"
         break
       default:
@@ -624,13 +645,34 @@ export default function Prevent({
   const getCurrentLanguageCode = () => {
     let langCode
     switch (i18n.language) {
-      case "en_US":
+      case "en":
         langCode = en
         break
-      case "hi_IN":
+      case "en-US":
+        langCode = en
+        break
+      case "en-IN":
+        langCode = en
+        break
+      case "en-AU":
+        langCode = en
+        break
+      case "en-CA":
+        langCode = en
+        break
+      case "en-IE":
+        langCode = en
+        break
+      case "hi":
         langCode = hi
         break
-      case "es_ES":
+      case "hi-IN":
+        langCode = hi
+        break
+      case "es":
+        langCode = es
+        break
+      case "es-ES":
         langCode = es
         break
       default:
@@ -639,6 +681,7 @@ export default function Prevent({
     }
     return langCode
   }
+
   const currentLanguage = getCurrentLanguage()
   const currentLanguageCode = getCurrentLanguageCode()
   TimeAgo.addLocale(currentLanguageCode)
