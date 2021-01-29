@@ -652,13 +652,9 @@ export default function ParticipantList({
           passive: {
             gps:
               (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.gps", undefined, undefined, 5)).slice(-1)[0] ??
-              (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.gps", undefined, undefined, 5)).slice(-1)[0] ??
               [],
             accel:
               (await LAMP.SensorEvent.allByParticipant(x.id, "lamp.accelerometer", undefined, undefined, 5)).slice(
-                -1
-              )[0] ??
-              (await LAMP.SensorEvent.allByParticipant(x.id, "beiwe.accelerometer", undefined, undefined, 5)).slice(
                 -1
               )[0] ??
               [],
