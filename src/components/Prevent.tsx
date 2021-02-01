@@ -22,7 +22,6 @@ import {
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP, {
@@ -33,7 +32,6 @@ import LAMP, {
 } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
-import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
 import PreventDBT from "./PreventDBT"
@@ -555,6 +553,10 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.scratch_image": (slices, activity, scopedItem) =>
+    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
@@ -1000,46 +1002,6 @@ export default function Prevent({
                             }}
                           />
                         </Box>
-                        {/* <Box className={classes.maxw300}>
-                                <Sparkline
-                                  ariaLabel={activity.name}
-                                  margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                                  width={300}
-                                  height={20}
-                                  startDate={earliestDate()}
-                                  data={activityEvents?.[activity.name]?.map((d) => ({
-                                    x: new Date(d.timestamp),
-                                    y: strategies[activity.spec]
-                                      ? strategies[activity.spec](
-                                        activity.spec === "lamp.survey"
-                                          ? d?.temporal_slices ?? d["temporal_slices"]
-                                          : d.static_data,
-                                        activity,
-                                        undefined
-                                      )
-                                      : 0,
-                                  }))}
-                                  valueAccessor={(datum) => datum}
-                                >
-                                  <LinearGradient
-                                    id="gredient"
-                                    from="#ECF4FF"
-                                    to="#FFFFFF"
-                                    fromOffset="30%"
-                                    fromOpacity="1"
-                                    toOpacity="1"
-                                    toOffset="100%"
-                                    rotate={90}
-                                  />
-                                  <LineSeries
-                                    showArea={true}
-                                    fill={`url(#gradient)`}
-                                    stroke="#3C5DDD"
-                                    strokeWidth={activityEvents?.[activity.name]?.length === 1 ? 4 : 2}
-                                    strokeLinecap="round"
-                                  />
-                                </Sparkline>
-                              </Box> */}
                         <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
                       </Card>
                     </ButtonBase>
@@ -1078,13 +1040,13 @@ export default function Prevent({
                       {t("Social Context")} <Box component="span">({sensorCounts["Social Context"]})</Box>
                     </Typography>
                     <Box>
-                      <RadialDonutChart
+                      {/*<RadialDonutChart
                         type={socialContexts}
                         data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                         detailPage={false}
                         width={150}
                         height={150}
-                      />
+                      />*/}
                     </Box>
                   </Card>
                 </ButtonBase>
@@ -1110,13 +1072,13 @@ export default function Prevent({
                       {t("Environmental Context")} <Box component="span">({sensorCounts["Environmental Context"]})</Box>
                     </Typography>
                     <Box>
-                      <RadialDonutChart
+                      {/*<RadialDonutChart
                         type={envContexts}
                         data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                         detailPage={false}
                         width={150}
                         height={150}
-                      />
+                      />*/}
                     </Box>
                   </Card>
                 </ButtonBase>
@@ -1218,39 +1180,6 @@ export default function Prevent({
                           },
                         }}
                       />
-                      {/* <Sparkline
-                        ariaLabel="Step count"
-                        margin={{ top: 5, right: 0, bottom: 4, left: 0 }}
-                        width={126}
-                        height={20}
-                        XAxisLabel="Time"
-                        YAxisLabel="Steps Taken"
-                        startDate={earliestDate()}
-                        data={
-                          sensorEvents?.["lamp.steps"]?.map((d) => ({
-                            x: new Date(parseInt(d.timestamp)),
-                            y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
-                          })) ?? []
-                        }
-                      >
-                        <LinearGradient
-                          id="gredient"
-                          from="#ECF4FF"
-                          to="#FFFFFF"
-                          fromOffset="30%"
-                          fromOpacity="1"
-                          toOpacity="1"
-                          toOffset="100%"
-                          rotate={90}
-                        />
-                        <LineSeries
-                          showArea={true}
-                          fill={`url(#gradient)`}
-                          stroke="#3C5DDD"
-                          strokeWidth={2}
-                          strokeLinecap="butt"
-                        />
-                      </Sparkline> */}
                     </Box>
                   </Card>
                 </ButtonBase>
