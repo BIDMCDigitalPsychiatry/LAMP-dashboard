@@ -21,6 +21,7 @@ import {
   Checkbox,
 } from "@material-ui/core"
 import { CheckboxProps } from "@material-ui/core/Checkbox"
+import LAMP from "lamp-core"
 
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
@@ -275,15 +276,6 @@ export default function Breathe({ participant, activity, ...props }) {
   }
 
   const onBreatheComplete = () => {
-    console.dir({
-      timestamp: time,
-      duration: new Date().getTime() - time,
-      activity: activity.id,
-      static_data: {
-        sentiment: status,
-      },
-      temporal_slices: [],
-    })
     LAMP.ActivityEvent.create(participant.id, {
       timestamp: time,
       duration: new Date().getTime() - time,
