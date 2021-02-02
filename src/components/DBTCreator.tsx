@@ -9,11 +9,10 @@ import {
   Icon,
   TextField,
   ButtonBase,
-  IconButton,
   InputBase,
   Container,
 } from "@material-ui/core"
-import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
+import { makeStyles, createStyles, withStyles } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { TargetDialog, EmotionDialog } from "./Dialog"
 import Close from "@material-ui/icons/Close"
@@ -39,26 +38,7 @@ const useStyles = makeStyles((theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
-    menuButton: {
-      color: "rgba(0, 0, 0, 0.5)",
-    },
-    headerContainer: {
-      backgroundColor: "white",
-      width: "100%",
-      paddingLeft: 20,
-      paddingRight: 20,
-      height: 120,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    headerTitle: {
-      fontSize: 30,
-      color: "rgba(0, 0, 0, 0.75)",
-      flex: 1,
-      fontWeight: "bold",
-      textAlign: "left",
-    },
+
     buttonContainer: {
       width: 200,
       height: 50,
@@ -222,6 +202,7 @@ export default function GameCreator({
   activitySpecId,
   details,
   studies,
+  study,
   ...props
 }: {
   activities?: any
@@ -231,12 +212,13 @@ export default function GameCreator({
   activitySpecId?: string
   details?: any
   studies?: any
+  study?: any
 }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(value ?? null)
   const [targetDialog, setTargetDialog] = React.useState(false)
   const [emotionDialog, setEmotionDialog] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const [config, setConfig] = useState(!!value ? value?.settings : {})
   const [text, setText] = useState(!!value ? value.name : undefined)
   const { enqueueSnackbar } = useSnackbar()
@@ -366,11 +348,11 @@ export default function GameCreator({
                 typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the Study") : ""
               }
               variant="filled"
-              disabled={!!value ? true : false}
+              disabled={!!value || !!study ? true : false}
             >
               {studies.map((option) => (
                 <MenuItem key={option.id} value={option.id}>
-                  {option.name}
+                  {t(option.name)}
                 </MenuItem>
               ))}
             </TextField>
@@ -449,7 +431,7 @@ export default function GameCreator({
                 </ButtonBase>
 
                 <div className={classes.rowContainer} style={{ marginTop: 55, height: 40 }}>
-                  <Typography className={classes.groupTitle}>{t("ineffective")}</Typography>
+                  <Typography className={classes.groupTitle}>{t("Ineffective")}</Typography>
                 </div>
                 {(config?.targetIneffective ?? []).map((item, index) => {
                   return (

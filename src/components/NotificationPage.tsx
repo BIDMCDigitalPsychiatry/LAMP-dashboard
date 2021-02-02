@@ -23,7 +23,7 @@ import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
-
+import GroupActivity from "./GroupActivity"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -88,7 +88,7 @@ async function getEvents(participantId: string, activityId: string) {
     }
     currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak
+  return steak > 0 ? steak : 1
 }
 
 export default function NotificationPage({ participant, activityId, ...props }) {
@@ -104,13 +104,15 @@ export default function NotificationPage({ participant, activityId, ...props }) 
 
   useEffect(() => {
     ;(async () => {
+      console.log(activityId)
       LAMP.Activity.view(activityId).then(setActivity)
     })()
   }, [])
   useEffect(() => {
-    if (activity !== null) {
+    console.log(activity)
+    if (!!activity) {
       ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
+        let iconData = (await LAMP.Type.getAttachment(activity?.id, "lamp.dashboard.activity_details")) as any
         let activityData = {
           id: activity.id,
           spec: activity.spec,
@@ -186,6 +188,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             title={activity.name}
             details={activity?.settings ?? {}}
             icon={activityDetails?.icon ?? undefined}
+            onComplete={() => {}}
+          />
+        ) : activity?.spec === "lamp.group" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            submitSurvey={submitSurvey}
             onComplete={() => {}}
           />
         ) : (

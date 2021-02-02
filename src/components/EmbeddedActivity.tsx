@@ -53,10 +53,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
     // Listen to message from child window
+
     eventer(
       messageEvent,
       function (e) {
-        if (!saved && activityId !== null) {
+        if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
           delete data["activity"]
           data["activity"] = activityId
@@ -73,7 +74,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
       LAMP.ActivityEvent.create(participant.id, data)
-        .catch((e) => console.dir(e))
+        .catch((e) => {
+          console.dir(e)
+        })
         .then((x) => {
           setSaved(true)
           onComplete()

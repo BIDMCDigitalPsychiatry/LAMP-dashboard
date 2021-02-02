@@ -97,6 +97,7 @@ export default function SCImageCreator({
   activitySpecId,
   details,
   studies,
+  study,
   ...props
 }: {
   activities?: any
@@ -106,6 +107,7 @@ export default function SCImageCreator({
   activitySpecId?: string
   details?: any
   studies?: any
+  study?: any
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -114,7 +116,7 @@ export default function SCImageCreator({
   const [photo, setPhoto] = useState(details?.photo ?? ScratchCard)
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const [settings, setSettings] = useState(!!value ? value?.settings : { threshold: 80 })
   const { t } = useTranslation()
 
@@ -143,7 +145,7 @@ export default function SCImageCreator({
             : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
       )
       if (duplicates.length > 0) {
-        enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
     return !(
@@ -168,8 +170,8 @@ export default function SCImageCreator({
               <Tooltip
                 title={
                   !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
+                    ? t("Drag a photo or tap to select a photo.")
+                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
                 }
               >
                 <Box
@@ -199,7 +201,7 @@ export default function SCImageCreator({
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
                     select
-                    label="Study"
+                    label={t("Study")}
                     value={studyId}
                     onChange={(e) => {
                       setStudyId(e.target.value)
@@ -210,11 +212,11 @@ export default function SCImageCreator({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!value ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.name}
+                        {t(option.name)}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -229,7 +231,7 @@ export default function SCImageCreator({
                       }
                       fullWidth
                       variant="filled"
-                      label="Activity Title"
+                      label={t("Activity Title")}
                       defaultValue={text}
                       onChange={(event) => setText(event.target.value)}
                       inputProps={{ maxLength: 80 }}
@@ -242,7 +244,7 @@ export default function SCImageCreator({
                 <TextField
                   fullWidth
                   multiline
-                  label="Activity Description"
+                  label={t("Activity Description")}
                   variant="filled"
                   rows={2}
                   defaultValue={description}
@@ -254,7 +256,7 @@ export default function SCImageCreator({
               <Box>
                 <TextField
                   fullWidth
-                  label="Threshold "
+                  label={t("Threshold")}
                   error={
                     settings.threshold < 30 ||
                     settings.threshold > 90 ||
@@ -274,7 +276,7 @@ export default function SCImageCreator({
                     min: 30,
                   }}
                   onChange={(e) => setSettings({ ...settings, threshold: Number(e.target.value) })}
-                  helperText={settings.threshold > 100 ? "Maximum value is 90" : ""}
+                  helperText={settings.threshold > 100 ? t("Maximum value is number", { number: 90 }) : ""}
                 />
               </Box>
             </Grid>
@@ -291,7 +293,7 @@ export default function SCImageCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title="Duplicate this activity and save it with a new title.">
+            <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -330,7 +332,7 @@ export default function SCImageCreator({
           </Grid>
         )}
         <Grid item>
-          <Tooltip title="Save this activity.">
+          <Tooltip title={t("Save this activity.")}>
             <Fab
               color="secondary"
               aria-label="Save"
@@ -355,7 +357,7 @@ export default function SCImageCreator({
               }}
               disabled={!validate() || !disabled || !onSave || !text}
             >
-              Save
+              {t("Save")}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

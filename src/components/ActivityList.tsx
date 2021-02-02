@@ -36,14 +36,7 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
 import Activity from "./Activity"
-import SurveyCreator from "./SurveyCreator"
-import JournalCreator from "./JournalCreator"
-
-import GroupCreator from "./GroupCreator"
-import TipCreator from "./TipCreator"
-import DBTCreator from "./DBTCreator"
-import GameCreator from "./GameCreator"
-import BreatheCreator from "./BreatheCreator"
+import AddActivity from "./AddActivity"
 import ActivityScheduler from "./ActivityScheduler"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as Filter } from "../icons/Filter.svg"
@@ -51,7 +44,6 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
 import { useTranslation } from "react-i18next"
-import SCImageCreator from "./SCImageCreator"
 
 const theme = createMuiTheme({
   palette: {
@@ -482,6 +474,137 @@ function ImportActivity({
   )
 }
 
+// Create a new Activity object & survey descriptions if set.
+export async function saveTipActivity(x) {
+  const { raw } = unspliceTipsActivity(x)
+  let result
+  if (!x.id && x.name) {
+    result = (await LAMP.Activity.create(x.studyID, raw)) as any
+  } else {
+    result = (await LAMP.Activity.update(x.id, {
+      settings: x.settings,
+    })) as any
+  }
+  await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+    photo: x.icon,
+  })
+  return result
+}
+
+export async function saveCTestActivity(x) {
+  let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
+  if (x.spec !== "lamp.dbt_diary_card") {
+    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
+      photo: x.photo,
+    })
+  }
+  return newItem
+}
+
+export async function saveSurveyActivity(x) {
+  // FIXME: ensure this is a lamp.survey only!
+  const { raw, tag } = unspliceActivity(x)
+  //return false;
+
+  let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
+  await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
+  return newItem
+}
+
+export async function saveGroupActivity(x) {
+  let newItem = (await LAMP.Activity.create(x.studyID, {
+    ...x,
+    id: undefined,
+    schedule: [
+      {
+        start_date: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
+        time: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
+        repeat_interval: "none", // FIXME should not need this!
+        custom_time: null, // FIXME should not need this!
+      },
+    ],
+  })) as any
+  await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
+    description: x.description,
+    photo: x.photo,
+  })
+  return newItem
+}
+
+// Commit an update to an Activity object (ONLY DESCRIPTIONS).
+export async function updateActivityData(x, isDuplicated, selectedActivity) {
+  let result
+  if (!["lamp.group", "lamp.survey", "lamp.tips"].includes(x.spec)) {
+    // Short-circuit for groups and CTests
+    if (isDuplicated) {
+      result = (await LAMP.Activity.create(x.studyID, x)) as any
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+        description: x?.description ?? "",
+        photo: x?.photo ?? "",
+      })
+    } else {
+      if (selectedActivity.parentID !== x.studyID) {
+        // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
+        // console.dir("deleted tag " + JSON.stringify(tag))
+        // await LAMP.Activity.delete(x.id)
+        // result = (await LAMP.Activity.create(x.studyID, x)) as any
+        // await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+        //   description: x?.description ?? "",
+        //   photo: x?.photo ?? "",
+        // })
+      } else {
+        result = (await LAMP.Activity.update(x.id, { name: x.name, settings: x.settings ?? [] })) as any
+        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+          description: x.description,
+          photo: x.photo,
+        })
+      }
+    }
+  } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
+    result = (await LAMP.Activity.update(selectedActivity.id, {
+      name: x.name,
+      settings: x.settings,
+    })) as any
+
+    await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+      description: x.description,
+      photo: x.photo,
+    })
+  } else if (x.spec === "lamp.survey") {
+    const { raw, tag } = unspliceActivity(x)
+    if (isDuplicated) {
+      /* duplicate */ let result = (await LAMP.Activity.create(x.studyID, raw)) as any
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.survey_description", tag)
+    } else {
+      result = (await LAMP.Activity.update(selectedActivity.id, raw)) as any
+      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
+    }
+  } else if (x.spec === "lamp.tips") {
+    if (x.id === undefined) {
+      let tipObj = {
+        id: x.id,
+        name: x.name,
+        icon: x.icon,
+        studyID: selectedActivity.parentID,
+        spec: "lamp.tips",
+        settings: selectedActivity.settings,
+        schedule: selectedActivity.schedule,
+      }
+      result = await saveTipActivity(tipObj)
+    } else {
+      let obj = {
+        settings: x.settings,
+      }
+      result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
+      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+        photo: x.icon,
+      })
+    }
+  }
+  return result
+}
+
 export default function ActivityList({ researcher, title, ...props }) {
   const [state, setState] = useState({
     popoverAttachElement: null,
@@ -530,11 +653,12 @@ export default function ActivityList({ researcher, title, ...props }) {
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
 
-    LAMP.ActivitySpec.all().then((res) =>
+    LAMP.ActivitySpec.all().then((res) => {
+      console.log(res)
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
-    )
+    })
   }, [])
 
   useEffect(() => {
@@ -722,57 +846,31 @@ export default function ActivityList({ researcher, title, ...props }) {
   // Create a new Activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
     setLoading(true)
-    const { raw } = unspliceTipsActivity(x)
-    let result
-    if (!x.id && x.name) {
-      result = (await LAMP.Activity.create(x.studyID, raw)) as any
-      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
-        photo: x.icon,
+    let result = await saveTipActivity(x)
+    if (!!result.error)
+      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
+        variant: "error",
       })
-      if (!!result.error)
-        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-          variant: "error",
-        })
-      else {
-        setAllFalse()
-        enqueueSnackbar(t("Successfully created a new tip Activity."), {
-          variant: "success",
-        })
-        onChange()
-      }
-    } else {
-      result = (await LAMP.Activity.update(x.id, {
-        settings: x.settings,
-      })) as any
-
-      await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
-        photo: x.icon,
+    else {
+      setAllFalse()
+      enqueueSnackbar(t("Successfully updated the Activity."), {
+        variant: "success",
       })
-      if (!!result.error)
-        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-          variant: "error",
-        })
-      else {
-        setAllFalse()
-        enqueueSnackbar(t("Successfully updated the Activity."), {
-          variant: "success",
-        })
-        onChange()
-      }
+      onChange()
     }
   }
 
   // Create a new Activity object & survey descriptions if set.
   const saveActivity = async (x) => {
-    // FIXME: ensure this is a lamp.survey only!
-    const { raw, tag } = unspliceActivity(x)
-    //return false;
-
-    let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
-    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
-    enqueueSnackbar(t("Successfully created a new survey Activity."), {
-      variant: "success",
-    })
+    let newItem = await saveSurveyActivity(x)
+    if (!!newItem.error)
+      enqueueSnackbar(t("Failed to create a new survey Activity."), {
+        variant: "error",
+      })
+    else
+      enqueueSnackbar(t("Successfully created a new survey Activity."), {
+        variant: "success",
+      })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
     onChange()
@@ -780,22 +878,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   // Create a new Activity object that represents a group of other Activities.
   const saveGroup = async (x) => {
-    let newItem = (await LAMP.Activity.create(x.studyID, {
-      ...x,
-      id: undefined,
-      schedule: [
-        {
-          start_date: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
-          time: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
-          repeat_interval: "none", // FIXME should not need this!
-          custom_time: null, // FIXME should not need this!
-        },
-      ],
-    })) as any
-    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
-      description: x.description,
-      photo: x.photo,
-    })
+    let newItem = await saveGroupActivity(x)
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new group Activity."), {
         variant: "error",
@@ -812,16 +895,15 @@ export default function ActivityList({ researcher, title, ...props }) {
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     setLoading(true)
-    let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
-    if (x.spec !== "lamp.dbt_diary_card") {
-      await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
-        description: x.description,
-        photo: x.photo,
+    let newItem = await saveCTestActivity(x)
+    if (!!newItem.error)
+      enqueueSnackbar(t("Failed to create a new Activity."), {
+        variant: "error",
       })
-    }
-    enqueueSnackbar(t("Successfully created a new Activity."), {
-      variant: "success",
-    })
+    else
+      enqueueSnackbar(t("Successfully created a new Activity."), {
+        variant: "success",
+      })
     let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
     setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
     onChange()
@@ -878,117 +960,16 @@ export default function ActivityList({ researcher, title, ...props }) {
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
     setLoading(true)
-    let result
-    setLoading(true)
-    if (!["lamp.group", "lamp.survey", "lamp.tips"].includes(x.spec)) {
-      // Short-circuit for groups and CTests
-      if (isDuplicated) {
-        result = (await LAMP.Activity.create(x.studyID, x)) as any
-        await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
-          description: x?.description ?? "",
-          photo: x?.photo ?? "",
-        })
-        enqueueSnackbar(t("Successfully duplicated the Activity under a new name."), { variant: "success" })
-      } else {
-        if (selectedActivity.parentID !== x.studyID) {
-          // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
-          // console.dir("deleted tag " + JSON.stringify(tag))
-          // await LAMP.Activity.delete(x.id)
-          // result = (await LAMP.Activity.create(x.studyID, x)) as any
-          // await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
-          //   description: x?.description ?? "",
-          //   photo: x?.photo ?? "",
-          // })
-        } else {
-          result = (await LAMP.Activity.update(x.id, { name: x.name, settings: x.settings ?? [] })) as any
-          await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
-            description: x.description,
-            photo: x.photo,
-          })
-        }
-      }
-      if (!!result.error)
-        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-          variant: "error",
-        })
-      else {
-        enqueueSnackbar(t("Successfully updated the Activity."), {
-          variant: "success",
-        })
-        onChange()
-      }
-    } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
-      result = (await LAMP.Activity.update(selectedActivity.id, {
-        name: x.name,
-        settings: x.settings,
-      })) as any
-
-      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
-        description: x.description,
-        photo: x.photo,
+    let result = await updateActivityData(x, isDuplicated, selectedActivity)
+    if (!!result.error)
+      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
+        variant: "error",
       })
-      if (!!result.error)
-        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-          variant: "error",
-        })
-      else
-        enqueueSnackbar(t("Successfully updated the Activity."), {
-          variant: "success",
-        })
-
-      onChange()
-    } else if (x.spec === "lamp.survey") {
-      //
-      const { raw, tag } = unspliceActivity(x)
-      if (isDuplicated) {
-        /* duplicate */ let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
-        await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
-        enqueueSnackbar(t("Successfully duplicated the Activity under a new name."), { variant: "success" })
-        onChange()
-      } else {
-        result = (await LAMP.Activity.update(selectedActivity.id, raw)) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
-        if (!!result.error)
-          enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-            variant: "error",
-          })
-        else
-          enqueueSnackbar(t("Successfully updated the Activity."), {
-            variant: "success",
-          })
-        onChange()
-      }
-    } else if (x.spec === "lamp.tips") {
-      if (x.id === undefined) {
-        let tipObj = {
-          id: x.id,
-          name: x.name,
-          icon: x.icon,
-          studyID: selectedActivity.parentID,
-          spec: "lamp.tips",
-          settings: selectedActivity.settings,
-          schedule: selectedActivity.schedule,
-        }
-        saveTipsActivity(tipObj)
-      } else {
-        let obj = {
-          settings: x.settings,
-        }
-        result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
-          photo: x.icon,
-        })
-        if (!!result.error)
-          enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-            variant: "error",
-          })
-        else
-          enqueueSnackbar(t("Successfully updated the Activity."), {
-            variant: "success",
-          })
-      }
-      onChange()
-    }
+    else
+      enqueueSnackbar(t("Successfully updated the Activity."), {
+        variant: "success",
+      })
+    onChange()
     setSelectedActivity(undefined)
   }
 
@@ -1168,8 +1149,10 @@ export default function ActivityList({ researcher, title, ...props }) {
                           showZeroBadges={false}
                           badges={studiesCount}
                           onChange={(x) => {
-                            LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
-                            setSelected(x)
+                            ;(async () => {
+                              await LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
+                              setSelected(x)
+                            })()
                           }}
                         />
                       }
@@ -1332,45 +1315,25 @@ export default function ActivityList({ researcher, title, ...props }) {
         </AppBar>
         <Divider />
         <Box py={8} px={4}>
-          {!!groupCreate && <GroupCreator activities={activities} studies={studies} onSave={saveGroup} />}
-          {!!showCTCreate && (
-            <GameCreator onSave={saveCTest} activitySpecId={activitySpecId} studies={studies} activities={activities} />
-          )}
-          {!!showJournalCreate && (
-            <JournalCreator
-              onSave={saveCTest}
-              activitySpecId={activitySpecId}
-              studies={studies}
-              activities={activities}
-            />
-          )}
-          {!!showSCImgCreate && (
-            <SCImageCreator
-              onSave={saveCTest}
-              activitySpecId={activitySpecId}
-              studies={studies}
-              activities={activities}
-            />
-          )}
-          {!!showTipCreate && <TipCreator onSave={saveTipsActivity} studies={studies} allActivities={activities} />}
-          {!!showCreate && <SurveyCreator studies={studies} onSave={saveActivity} />}
-          {!!showBreatheCreate && (
-            <BreatheCreator
-              activitySpecId={activitySpecId}
-              studies={studies}
-              onSave={saveCTest}
-              activities={activities}
-            />
-          )}
-          {!!showDBTCreate && (
-            <DBTCreator
-              activitySpecId={activitySpecId}
-              onCancel={setAllFalse}
-              studies={studies}
-              onSave={saveCTest}
-              activities={activities}
-            />
-          )}
+          <AddActivity
+            activities={activities}
+            studies={studies}
+            groupCreate={groupCreate}
+            showJournalCreate={showJournalCreate}
+            showCTCreate={showCTCreate}
+            showSCImgCreate={showSCImgCreate}
+            showTipCreate={showTipCreate}
+            showCreate={showCreate}
+            showBreatheCreate={showBreatheCreate}
+            showDBTCreate={showDBTCreate}
+            saveGroup={saveGroup}
+            activitySpecId={activitySpecId}
+            saveCTest={saveCTest}
+            saveTipsActivity={saveTipsActivity}
+            saveActivity={saveActivity}
+            setAllFalse={setAllFalse}
+            activitySpecs={activitySpecs}
+          />
         </Box>
       </ResponsiveDialog>
       <ImportActivity

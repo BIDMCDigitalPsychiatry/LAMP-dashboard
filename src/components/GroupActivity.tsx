@@ -171,7 +171,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
       Promise.all(
         events
           .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
+          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
       ).then((x) => {
         getEvents(participant, currentActivity.id).then((steak) => {
           setSteak(steak)

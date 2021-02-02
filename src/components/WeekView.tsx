@@ -66,13 +66,11 @@ export default function WeekView({
   type,
   onSelect,
   daysWithdata,
-  setMonthchange,
   ...props
 }: {
   type: string
   onSelect?: Function
   daysWithdata?: any
-  setMonthchange?: Function
 }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))

@@ -8,7 +8,6 @@ import {
   BottomNavigationAction,
   IconButton,
   Typography,
-  Link,
   ClickAwayListener,
 } from "@material-ui/core"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
@@ -16,11 +15,9 @@ import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
-import { ReactComponent as Logo } from "../icons/Logo.svg"
 import CloseIcon from "@material-ui/icons/Close"
 import Tooltip from "@material-ui/core/Tooltip"
-import { renderToStaticMarkup } from "react-dom/server"
-import { Trans, useTranslation } from "react-i18next"
+import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -332,6 +329,7 @@ export default function BottomMenu({ ...props }) {
   }, [tabVal])
 
   const tabs = ["learn", "assess", "manage", "prevent", "feed"]
+
   const setTab = (newTab) => {
     _setTab(newTab)
     if (newTab !== tabVal) {

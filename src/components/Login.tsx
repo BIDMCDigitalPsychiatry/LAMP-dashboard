@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
+import locale_lang from "../locale_map.json"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
@@ -71,18 +72,14 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const [loginClick, setLoginClick] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const languagesArray = [
-    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
-    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
-  ]
+  const userLanguages = ["en-US", "es-ES", "hi-IN"]
+
   const getSelectedLanguage = () => {
-    let lang = languagesArray.filter((x) => {
-      return x.lang_array.includes(navigator.language)
-    })
-    return i18n.language ? i18n.language : lang.length > 0 ? lang[0].key : "en_US"
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
-  const [selectedLanguage, setSelectedLanguage] = useState(getSelectedLanguage())
+  const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
 
   useEffect(() => {
     let query = window.location.hash.split("?")
@@ -224,11 +221,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   variant="filled"
                   value={selectedLanguage || ""}
                 >
-                  {languagesArray.map((lang) => (
-                    <MenuItem value={lang.key} key={lang.key}>
-                      {lang.value}
-                    </MenuItem>
-                  ))}
+                  {Object.keys(locale_lang).map((key, value) => {
+                    if (userLanguages.includes(key)) {
+                      return (
+                        <MenuItem key={key} value={key}>
+                          {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+                        </MenuItem>
+                      )
+                    }
+                  })}
                 </TextField>
 
                 <TextField

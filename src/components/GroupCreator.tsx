@@ -175,6 +175,7 @@ export default function GroupCreator({
   details,
   onSave,
   studies,
+  study,
   ...props
 }: {
   activities?: any[]
@@ -182,15 +183,20 @@ export default function GroupCreator({
   details?: any
   onSave?: any
   studies: any
+  study?: any
 }) {
+  console.log(activities)
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : undefined)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
   const [studyActivities, setStudyActivities] = useState(
-    !!value
+    !!value || !!study
       ? activities.filter(
-          (x) => x.spec !== "lamp.group" && x.parentID === value.parentID && availableAtiveSpecs.includes(x.spec)
+          (x) =>
+            x.spec !== "lamp.group" &&
+            (!!study ? x.parentID === study : x.parentID === value.parentID) &&
+            availableAtiveSpecs.includes(x.spec)
         )
       : []
   )
@@ -276,7 +282,7 @@ export default function GroupCreator({
                       : ""
                   }
                   variant="filled"
-                  disabled={!!value ? true : false}
+                  disabled={!!value || !!study ? true : false}
                 >
                   {studies.map((option) => (
                     <MenuItem key={option.id} value={option.id}>

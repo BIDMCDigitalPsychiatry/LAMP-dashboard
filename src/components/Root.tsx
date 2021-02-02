@@ -10,7 +10,6 @@ import {
   ListItemIcon,
   ListItemText,
   Fab,
-  Icon,
   Container,
   MenuItem,
   Typography,
@@ -27,7 +26,9 @@ import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 import { useTranslation } from "react-i18next"
+import { ReactComponent as Researcher } from "../icons/Researcher.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import locale_lang from "../locale_map.json"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
@@ -232,17 +233,11 @@ function Researchers({ history, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t, i18n } = useTranslation()
   const classes = useStyles()
-  const languagesArray = [
-    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
-    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
-  ]
 
   const getSelectedLanguage = () => {
-    let lang = languagesArray.filter((x) => {
-      return x.lang_array.includes(navigator.language)
-    })
-    return lang
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
   useEffect(() => {
@@ -254,9 +249,9 @@ function Researchers({ history, ...props }) {
     let authId = LAMP.Auth._auth.id
     let language = !!localStorage.getItem("LAMP_user_" + authId)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
-      : getSelectedLanguage().length > 0
-      ? getSelectedLanguage()[0].key
-      : "en_US"
+      : getSelectedLanguage()
+      ? getSelectedLanguage()
+      : "en-US"
     i18n.changeLanguage(language)
   }, [])
 
@@ -365,20 +360,18 @@ export default function Root({ ...props }) {
   const [passwordChange, setPasswordChange] = useState<boolean>()
   const { enqueueSnackbar } = useSnackbar()
   const { t, i18n } = useTranslation()
-  const languagesArray = [
-    { key: "en_US", value: "English - United States", lang_array: ["en", "en-US", "en-us"] },
-    { key: "hi_IN", value: "Hindi - India", lang_array: ["hi", "hi-IN", "hi-in"] },
-    { key: "es_ES", value: "Spanish", lang_array: ["es", "es-ES", "es-es"] },
-  ]
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const getSelectedLanguage = () => {
-    let lang = languagesArray.filter((x) => {
-      return x.lang_array.includes(navigator.language)
-    })
-    return lang
+    const lang = Object.keys(locale_lang)
+      .filter((key) => navigator.language.includes(key))
+      .reduce((obj, key) => {
+        return key
+      }, {})
+
+    return i18n.language ? i18n.language : lang ? lang : "en"
   }
 
   useEffect(() => {
@@ -390,9 +383,9 @@ export default function Root({ ...props }) {
     let authId = LAMP.Auth._auth.id
     let language = !!localStorage.getItem("LAMP_user_" + authId)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
-      : getSelectedLanguage().length > 0
-      ? getSelectedLanguage()[0].key
-      : "en_US"
+      : getSelectedLanguage()
+      ? getSelectedLanguage()
+      : "en"
     i18n.changeLanguage(language)
   }, [])
 
@@ -421,7 +414,7 @@ export default function Root({ ...props }) {
                 onClick={(event) => setCurrentTab(0)}
               >
                 <ListItemIcon className={classes.menuIcon}>
-                  <Icon>biotech</Icon>
+                  <Researcher />
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>
