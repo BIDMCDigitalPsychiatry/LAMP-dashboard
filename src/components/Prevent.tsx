@@ -22,7 +22,6 @@ import {
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { Sparkline, LineSeries, LinearGradient } from "@data-ui/sparkline"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP, {
@@ -33,7 +32,6 @@ import LAMP, {
 } from "lamp-core"
 import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
-import RadialDonutChart from "./RadialDonutChart"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
 import PreventDBT from "./PreventDBT"
@@ -54,7 +52,7 @@ import hi from "javascript-time-ago/locale/hi"
 import es from "javascript-time-ago/locale/es"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
-import { Vega } from "react-vega"
+import { Vega, VegaLite } from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -788,6 +786,7 @@ export default function Prevent({
       let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
       setActivityEvents(activityEvents)
+
       let activityEventCount = getActivityEventCount(activityEvents)
       // if (typeof goals !== "undefined") {
       //   groupByType = goals.reduce((goal, it) => {
@@ -988,46 +987,65 @@ export default function Prevent({
                           <Box component="span">({activityCounts[activity.name]})</Box>
                         </Typography>
                         <Box className={classes.maxw300}>
-                          <Sparkline
-                            ariaLabel={activity.name}
-                            margin={{ top: 5, right: 0, bottom: 5, left: 0 }}
-                            width={300}
-                            height={70}
-                            startDate={earliestDate()}
-                            data={activityEvents?.[activity.name]?.map((d) => ({
-                              x: new Date(d.timestamp),
-                              y: strategies[activity.spec]
-                                ? strategies[activity.spec](
-                                    activity.spec === "lamp.survey"
-                                      ? d?.temporal_slices ?? d["temporal_slices"]
-                                      : activity.spec === "lamp.scratch_image"
-                                      ? d
-                                      : d.static_data,
-                                    activity,
-                                    undefined
-                                  )
-                                : 0,
-                            }))}
-                            valueAccessor={(datum) => datum}
-                          >
-                            <LinearGradient
-                              id="gredient"
-                              from="#ECF4FF"
-                              to="#FFFFFF"
-                              fromOffset="30%"
-                              fromOpacity="1"
-                              toOpacity="1"
-                              toOffset="100%"
-                              rotate={90}
-                            />
-                            <LineSeries
-                              showArea={true}
-                              fill={`url(#gradient)`}
-                              stroke="#3C5DDD"
-                              strokeWidth={activityEvents?.[activity.name]?.length === 1 ? 4 : 2}
-                              strokeLinecap="round"
-                            />
-                          </Sparkline>
+                          <VegaLite
+                            actions={false}
+                            style={{ backgroundColor: "#00000000" }}
+                            spec={{
+                              data: {
+                                values: activityEvents?.[activity.name]?.map((d) => ({
+                                  x: new Date(d.timestamp),
+                                  y: strategies[activity.spec]
+                                    ? strategies[activity.spec](
+                                        activity.spec === "lamp.survey"
+                                          ? d?.temporal_slices ?? d["temporal_slices"]
+                                          : d.static_data,
+                                        activity,
+                                        undefined
+                                      )
+                                    : 0,
+                                })),
+                              },
+                              width: 300,
+                              height: 70,
+                              background: "#00000000",
+                              config: {
+                                view: { stroke: "transparent" },
+                                title: {
+                                  color: "rgba(0, 0, 0, 0.75)",
+                                  fontSize: 25,
+                                  font: "Inter",
+                                  fontWeight: 600,
+                                  align: "left",
+                                  anchor: "start",
+                                },
+                                legend: {
+                                  title: null,
+                                  orient: "bottom",
+                                  columns: 2,
+                                  labelColor: "rgba(0, 0, 0, 0.75)",
+                                  labelFont: "Inter",
+                                  labelFontSize: 14,
+                                  labelFontWeight: 600,
+                                  symbolStrokeWidth: 12,
+                                  symbolSize: 150,
+                                  symbolType: "circle",
+                                  offset: 0,
+                                },
+                                axisX: {
+                                  disable: true,
+                                },
+                                axisY: {
+                                  disable: true,
+                                },
+                              },
+                              mark: { type: "line", interpolate: "cardinal", tension: 0.8, color: "#3C5DDD" },
+                              encoding: {
+                                x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+                                y: { field: "y", type: "quantitative" },
+                                strokeWidth: { value: 2 },
+                              },
+                            }}
+                          />
                         </Box>
                         <Typography variant="h6">{timeAgo.format(timeSpans[activity.name]?.timestamp)}</Typography>
                       </Card>
@@ -1067,13 +1085,13 @@ export default function Prevent({
                       {t("Social Context")} <Box component="span">({sensorCounts["Social Context"]})</Box>
                     </Typography>
                     <Box>
-                      <RadialDonutChart
+                      {/*<RadialDonutChart
                         type={socialContexts}
                         data={getSocialContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                         detailPage={false}
                         width={150}
                         height={150}
-                      />
+                      />*/}
                     </Box>
                   </Card>
                 </ButtonBase>
@@ -1099,13 +1117,13 @@ export default function Prevent({
                       {t("Environmental Context")} <Box component="span">({sensorCounts["Environmental Context"]})</Box>
                     </Typography>
                     <Box>
-                      <RadialDonutChart
+                      {/*<RadialDonutChart
                         type={envContexts}
                         data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])}
                         detailPage={false}
                         width={150}
                         height={150}
-                      />
+                      />*/}
                     </Box>
                   </Card>
                 </ButtonBase>
@@ -1131,40 +1149,82 @@ export default function Prevent({
                     <Typography className={classes.preventlabel}>
                       {t("Step Count")} <Box component="span">({sensorCounts["Step Count"]})</Box>
                     </Typography>
+
                     <Box mt={3} mb={1} className={classes.maxw150}>
-                      <Sparkline
-                        ariaLabel="Step count"
-                        margin={{ top: 5, right: 0, bottom: 4, left: 0 }}
-                        width={126}
-                        height={70}
-                        XAxisLabel="Time"
-                        YAxisLabel="Steps Taken"
-                        startDate={earliestDate()}
-                        data={
-                          sensorEvents?.["lamp.steps"]?.map((d) => ({
-                            x: new Date(parseInt(d.timestamp)),
-                            y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
-                          })) ?? []
-                        }
-                      >
-                        <LinearGradient
-                          id="gredient"
-                          from="#ECF4FF"
-                          to="#FFFFFF"
-                          fromOffset="30%"
-                          fromOpacity="1"
-                          toOpacity="1"
-                          toOffset="100%"
-                          rotate={90}
-                        />
-                        <LineSeries
-                          showArea={true}
-                          fill={`url(#gradient)`}
-                          stroke="#3C5DDD"
-                          strokeWidth={2}
-                          strokeLinecap="butt"
-                        />
-                      </Sparkline>
+                      <VegaLite
+                        actions={false}
+                        spec={{
+                          data: {
+                            values:
+                              sensorEvents?.["lamp.steps"]?.map((d) => ({
+                                x: new Date(parseInt(d.timestamp)),
+                                y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
+                              })) ?? [],
+                          },
+                          background: "#00000000",
+                          width: 126,
+                          height: 70,
+                          config: {
+                            view: { stroke: "transparent" },
+                            title: {
+                              color: "rgba(0, 0, 0, 0.75)",
+                              fontSize: 25,
+                              font: "Inter",
+                              fontWeight: 600,
+                              align: "left",
+                              anchor: "start",
+                              dy: -40,
+                            },
+                            legend: {
+                              title: null,
+                              orient: "bottom",
+                              columns: 2,
+                              labelColor: "rgba(0, 0, 0, 0.75)",
+                              labelFont: "Inter",
+                              labelFontSize: 14,
+                              labelFontWeight: 600,
+                              rowPadding: 20,
+                              columnPadding: 50,
+                              symbolStrokeWidth: 12,
+                              symbolSize: 150,
+                              symbolType: "circle",
+                              offset: 30,
+                            },
+                            axisX: {
+                              orient: "bottom",
+                              format: "%b %d",
+                              labelColor: "rgba(0, 0, 0, 0.4)",
+                              labelFont: "Inter",
+                              labelFontWeight: 500,
+                              labelFontSize: 10,
+                              ticks: false,
+                              labelPadding: 32,
+                              title: null,
+                              grid: false,
+                              disable: true,
+                            },
+                            axisY: {
+                              orient: "left",
+                              tickCount: 5,
+                              labelColor: "rgba(0, 0, 0, 0.4)",
+                              labelFont: "Inter",
+                              labelFontWeight: 500,
+                              labelFontSize: 10,
+                              ticks: false,
+                              labelPadding: 10,
+                              title: null,
+                              grid: false,
+                              disable: true,
+                            },
+                          },
+                          mark: { type: "line", interpolate: "cardinal", tension: 0.9, color: "#3C5DDD" },
+                          encoding: {
+                            x: { field: "x", type: "ordinal", timeUnit: "utcyearmonthdate" },
+                            y: { field: "y", type: "quantitative" },
+                            strokeWidth: { value: 2 },
+                          },
+                        }}
+                      />
                     </Box>
                   </Card>
                 </ButtonBase>

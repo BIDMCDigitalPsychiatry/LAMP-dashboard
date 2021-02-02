@@ -38,6 +38,9 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
     -ms-user-select: text;
     user-select: text;
     cursor: text;
+}
+#vg-tooltip-element {
+    z-index: 2000;
 }`
 
 // IE9+ CustomEvent polyfill.
