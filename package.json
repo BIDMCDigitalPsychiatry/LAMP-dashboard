@@ -43,7 +43,7 @@
     "jszip": "^3.3.0",
     "lamp-core": "^1.0.8",
     "material-icons": "^0.3.1",
-    "material-table": "1.69.0",
+    "material-table": "^1.42.0",
     "notistack": "^0.9.9",
     "qrcode.react": "^1.0.0",
     "react": "^16.14.0",
@@ -66,13 +66,13 @@
     "url-search-params-polyfill": "^7.0.0",
     "vega": "^5.17.0",
     "vega-lite": "^4.17.0",
-    "vega-tooltip": "^0.25.0"
+    "vega-tooltip": "^0.24.2"
   },
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true BROWSER=none NODE_ENV=production REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
+    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
-    "build": "SKIP_PREFLIGHT_CHECK=true NODE_ENV=production CI=false REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
+    "build": "NODE_ENV=production CI=false REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
     "build-storybook": "build-storybook -s public"
