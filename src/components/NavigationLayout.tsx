@@ -362,7 +362,9 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {!!id && <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>}
+                    {!!id && authType === "admin" && (
+                      <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
+                    )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
@@ -491,7 +493,6 @@ export default function NavigationLayout({
                   <MenuItem disabled divider>
                     <b>{t(title)}</b>
                   </MenuItem>
-                  {!!id && <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>}
                   <MenuItem divider onClick={() => setConfirmLogout(true)}>
                     {t("Logout")}
                   </MenuItem>
