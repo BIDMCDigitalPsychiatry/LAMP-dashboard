@@ -37,6 +37,13 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
+  "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
+    let temporalSlices = slices.filter(function (data) {
+      return data.type === true
+    })
+    return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
+  },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
@@ -153,7 +160,7 @@ export default function ActivityCard({
                 x: new Date(d.timestamp),
                 y: strategies[activity.spec]
                   ? strategies[activity.spec](
-                      activity.spec === "lamp.survey"
+                      activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                         ? d.temporal_slices
                         : activity.spec === "lamp.scratch_image"
                         ? d
@@ -164,7 +171,7 @@ export default function ActivityCard({
                   : 0,
                 slice: d.temporal_slices,
                 missing:
-                  activity.spec === "lamp.survey"
+                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                     ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null)
                     : false, // sometimes the slice itself is missing, not set to null
               }))}
@@ -197,7 +204,7 @@ export default function ActivityCard({
             x: new Date(d.timestamp),
             y: strategies[activity.spec]
               ? strategies[activity.spec](
-                  activity.spec === "lamp.survey"
+                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image"
                     ? d
@@ -208,7 +215,7 @@ export default function ActivityCard({
               : 0,
             slice: d.temporal_slices,
             missing:
-              activity.spec === "lamp.survey"
+              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}

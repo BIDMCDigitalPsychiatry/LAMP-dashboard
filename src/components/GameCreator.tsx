@@ -101,6 +101,9 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "rgba(0, 0, 0, 0.4)",
       flex: 1,
     },
+    mL14: {
+      marginLeft: "14px",
+    },
   })
 )
 
@@ -171,6 +174,14 @@ export default function GameCreator({
   studies?: any
   study?: any
 }) {
+  const defaultBallonCount = 15
+  const defaultMean = 64.5
+  const defaultSD = 37
+  const defaultBubbleCount = [60, 80, 80]
+  const defaultBubbleSpeed = [60, 80, 80]
+  const defaultIntertrialDuration = 0.5
+  const defaultBubbleDuration = 1.0
+
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : "")
@@ -210,6 +221,19 @@ export default function GameCreator({
           x_diamond_count: 0,
           y_changes_in_level_count: 1,
           y_shape_count: 1,
+        }
+      : ["lamp.balloon_risk"].includes(activitySpecId)
+      ? {
+          balloon_count: defaultBallonCount,
+          breakpoint_mean: defaultMean,
+          breakpoint_std: defaultSD,
+        }
+      : ["lamp.pop_the_bubbles"].includes(activitySpecId)
+      ? {
+          bubble_count: defaultBubbleCount,
+          bubble_speed: defaultBubbleSpeed,
+          intertrial_duration: defaultIntertrialDuration,
+          bubble_duration: defaultBubbleDuration,
         }
       : {}
   )
@@ -280,6 +304,40 @@ export default function GameCreator({
         settings.shape_count < 1 ||
         (typeof text !== "undefined" && text?.trim() === "")
       )
+    } else if (
+      (value?.spec && ["lamp.balloon_risk"].includes(value.spec)) ||
+      ["lamp.balloon_risk"].includes(activitySpecId)
+    ) {
+      return !(
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        duplicates.length > 0 ||
+        settings.balloon_count === 0 ||
+        settings.balloon_count === "" ||
+        settings.breakpoint_mean === 0 ||
+        settings.breakpoint_mean === "" ||
+        settings.breakpoint_std === 0 ||
+        settings.breakpoint_std === ""
+      )
+    } else if (
+      (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
+      ["lamp.pop_the_bubbles"].includes(activitySpecId)
+    ) {
+      return !(
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        duplicates.length > 0 ||
+        settings.bubble_count === 0 ||
+        settings.bubble_count === "" ||
+        settings.bubble_speed === 0 ||
+        settings.bubble_speed === "" ||
+        settings.intertrial_duration === 0 ||
+        settings.intertrial_duration === "" ||
+        settings.bubble_duration === 0 ||
+        settings.bubble_duration === ""
+      )
     } else {
       return !(
         typeof studyId == "undefined" ||
@@ -303,6 +361,11 @@ export default function GameCreator({
     { name: "Trails A", value: "trails_a" },
     { name: "Trails B", value: "trails_b" },
   ]
+
+  const numberCommaFormat = (num) => {
+    var regex = /^[0-9,\b]+$/
+    return regex.test(num)
+  }
 
   return (
     <Grid container direction="column" spacing={2} {...props}>
@@ -400,6 +463,200 @@ export default function GameCreator({
               </Box>
             </Grid>
           </Grid>
+
+          {((value?.spec && "lamp.balloon_risk" === value.spec) || "lamp.balloon_risk" === activitySpecId) && (
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Divider />
+                <Typography variant="h6">{t("Game Settings")}</Typography>
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={settings.balloon_count === 0 || settings.balloon_count === "" ? true : false}
+                  type="number"
+                  variant="filled"
+                  id="balloon_count"
+                  label={t("Balloon Count")}
+                  defaultValue={settings?.balloon_count ?? defaultBallonCount}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, balloon_count: Number(e.target.value) })}
+                  helperText={
+                    settings.balloon_count === 0 || settings.balloon_count === ""
+                      ? t("Please enter balloon count.")
+                      : ""
+                  }
+                />
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={settings.breakpoint_mean === 0 || settings.breakpoint_mean === "" ? true : false}
+                  type="number"
+                  variant="filled"
+                  id="breakpoint_mean"
+                  label={t("Breakpoint Mean")}
+                  defaultValue={settings?.breakpoint_mean ?? defaultMean}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, breakpoint_mean: Number(e.target.value) })}
+                  helperText={
+                    settings.breakpoint_mean === 0 || settings.breakpoint_mean === ""
+                      ? t("Please enter breakpoint mean.")
+                      : ""
+                  }
+                />
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={settings.breakpoint_std === 0 || settings.breakpoint_std === "" ? true : false}
+                  type="number"
+                  variant="filled"
+                  id="breakpoint_std"
+                  label={t("Breakpoint Standard Deviation")}
+                  defaultValue={settings?.breakpoint_std ?? defaultSD}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, breakpoint_std: Number(e.target.value) })}
+                  helperText={
+                    settings.breakpoint_std === 0 || settings.breakpoint_std === ""
+                      ? t("Please enter breakpoint standard deviation.")
+                      : ""
+                  }
+                />
+              </Grid>
+            </Grid>
+          )}
+
+          {((value?.spec && "lamp.pop_the_bubbles" === value.spec) || "lamp.pop_the_bubbles" === activitySpecId) && (
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Divider />
+                <Typography variant="h6">{t("Game Settings")}</Typography>
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={
+                    settings.bubble_count === 0 ||
+                    settings.bubble_count === "" ||
+                    !numberCommaFormat(settings.bubble_count)
+                      ? true
+                      : false
+                  }
+                  type="text"
+                  variant="filled"
+                  id="bubble_count"
+                  label={t("Bubble Count")}
+                  defaultValue={settings?.bubble_count ?? defaultBubbleCount}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, bubble_count: e.target.value.split(",").map((x) => +x) })}
+                  helperText={
+                    settings.balloon_count === 0 ||
+                    settings.balloon_count === "" ||
+                    !numberCommaFormat(settings.bubble_count)
+                      ? t("Please enter Bubble Count with comma seperated.")
+                      : ""
+                  }
+                />
+                <Typography variant="caption" display="block" className={classes.mL14}>
+                  {t("Multiple should be comma seperated")}
+                </Typography>
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={
+                    settings.bubble_speed === 0 ||
+                    settings.bubble_speed === "" ||
+                    !numberCommaFormat(settings.bubble_speed)
+                      ? true
+                      : false
+                  }
+                  type="text"
+                  variant="filled"
+                  id="bubble_speed"
+                  label={t("Bubble Speed")}
+                  defaultValue={settings?.bubble_speed ?? defaultBubbleSpeed}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, bubble_speed: e.target.value.split(",").map((x) => +x) })}
+                  helperText={
+                    settings.bubble_speed === 0 ||
+                    settings.bubble_speed === "" ||
+                    !numberCommaFormat(settings.bubble_speed)
+                      ? t("Please enter Bubble Speed with comma seperated.")
+                      : ""
+                  }
+                />
+                <Typography variant="caption" display="block" className={classes.mL14}>
+                  {t("Multiple should be comma seperated")}
+                </Typography>
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={settings.intertrial_duration === 0 || settings.intertrial_duration === "" ? true : false}
+                  type="text"
+                  variant="filled"
+                  id="intertrial_duration"
+                  label={t("Intertrial Duration")}
+                  defaultValue={settings?.intertrial_duration ?? defaultIntertrialDuration}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, intertrial_duration: Number(e.target.value) })}
+                  helperText={
+                    settings.intertrial_duration === 0 || settings.intertrial_duration === ""
+                      ? t("Please enter Intertrial Duration.")
+                      : ""
+                  }
+                />
+              </Grid>
+              <Grid item lg={3} md={6} sm={6}>
+                <TextField
+                  error={settings.bubble_duration === 0 || settings.bubble_duration === "" ? true : false}
+                  type="text"
+                  variant="filled"
+                  id="bubble_duration"
+                  label={t("Bubble Duration")}
+                  defaultValue={settings?.bubble_duration ?? defaultBubbleDuration}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: 1,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, bubble_duration: Number(e.target.value) })}
+                  helperText={
+                    settings.bubble_duration === 0 || settings.bubble_duration === ""
+                      ? t("Please enter Bubble Duration.")
+                      : ""
+                  }
+                />
+              </Grid>
+            </Grid>
+          )}
 
           {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
             <Box style={{ marginTop: 80 }}>

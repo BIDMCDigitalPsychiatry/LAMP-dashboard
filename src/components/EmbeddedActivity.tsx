@@ -15,7 +15,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 const demoActivities = {
-  "Balloon Risk": "balloonrisk",
   "lamp.spatial_span": "boxgame",
   "lamp.cats_and_dogs": "catsndogs",
   "Dot Touch": "dottouch",
@@ -23,6 +22,8 @@ const demoActivities = {
   "lamp.jewels_b": "jewelspro",
   "Pop The Bubbles": "popthebubbles",
   "lamp.dbt_diary_card": "dbtdiarycard",
+  "lamp.balloon_risk": "balloonrisk",
+  "lamp.pop_the_bubbles": "popthebubbles",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -87,7 +88,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
     setSaved(false)
-    setSettings({ ...settings, settings: activity.settings, configuration: { language: i18n.language } })
+    setSettings({
+      ...settings,
+      settings: activity.settings,
+      configuration: { language: i18n.language, participant_id: participant.id },
+    })
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]
@@ -106,9 +111,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             setIframe(e)
           }}
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
-          sandbox="allow-scripts"
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
           srcDoc={embeddedActivity}
+          sandbox="allow-same-origin allow-scripts"
         />
       )}
       <Backdrop className={classes.backdrop} open={loading}>
