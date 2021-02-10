@@ -91,7 +91,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSettings({
       ...settings,
       settings: activity.settings,
-      configuration: { language: i18n.language, participant_id: participant.id },
+      configuration: { language: i18n.language },
     })
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
