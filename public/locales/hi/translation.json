@@ -529,5 +529,11 @@
 	"Breakpoint Standard Deviation": "Breakpoint Standard Deviation",
 	"Please enter balloon count.": "Please enter balloon count.",
 	"Please enter breakpoint mean.": "Please enter breakpoint mean.",
-	"Game Settings": "Game Settings"	
+	"Game Settings": "Game Settings",
+	"Please enter breakpoint standard deviation.": "Please enter breakpoint standard deviation.",
+	"Multiple should be comma seperated": "Multiple should be comma seperated(Eg:60,80,80)",
+	"Please enter Bubble Count with comma seperated.": "Please enter Bubble Count with comma seperated.",
+	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated.",
+	"Please enter Intertrial Duration.": "Please enter Intertrial Duration.",
+	"Please enter Bubble Duration.": "Please enter Bubble Duration."	
 }

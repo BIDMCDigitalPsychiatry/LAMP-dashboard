@@ -551,6 +551,13 @@ export const strategies = {
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.spatial_span": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
+  "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
+    let temporalSlices = slices.filter(function (data) {
+      return data.type === true
+    })
+    return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
+  },
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
@@ -996,7 +1003,7 @@ export default function Prevent({
                                   x: new Date(d.timestamp),
                                   y: strategies[activity.spec]
                                     ? strategies[activity.spec](
-                                        activity.spec === "lamp.survey"
+                                        activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                                           ? d?.temporal_slices ?? d["temporal_slices"]
                                           : d.static_data,
                                         activity,

@@ -358,9 +358,18 @@ const availableAtiveSpecs = [
   "lamp.cats_and_dogs",
   "lamp.scratch_image",
   "lamp.dbt_diary_card",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
 ]
 
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+]
 
 function ImportActivity({
   studies,
@@ -648,6 +657,8 @@ export default function ActivityList({ researcher, title, ...props }) {
     "lamp.jewels_a": t("Jewels A"),
     "lamp.jewels_b": t("Jewels B"),
     "lamp.spatial_span": t("Spatial Span"),
+    "lamp.pop_the_bubbles": t("Pop the Bubbles"),
+    "lamp.balloon_risk": t("Balloon Risk"),
   }
 
   useEffect(() => {
