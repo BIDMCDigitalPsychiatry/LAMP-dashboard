@@ -36,7 +36,7 @@ export default function Activity({
   const isBreathe = (activity || {}).spec === "lamp.breathe"
   const isDBT = (activity || {}).spec === "lamp.dbt_diary_card"
   const isSCImage = (activity || {}).spec === "lamp.scratch_image"
-
+  console.log(activity)
   return (
     <div>
       {isGroup && (

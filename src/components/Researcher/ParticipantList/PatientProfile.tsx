@@ -33,14 +33,15 @@ import { useSnackbar } from "notistack"
 import Close from "@material-ui/icons/Close"
 import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as Message } from "../icons/Message.svg"
-import Messages from "./Messages"
+import { ReactComponent as Key } from "../icons/Key.svg"
+import { ReactComponent as Message } from "../../../icons/Message.svg"
+import Messages from "../../Messages"
 import LAMP, { Study, Sensor } from "lamp-core"
-import { CredentialManager, CredentialEditor, updateDetails } from "./CredentialManager"
-import ResponsiveDialog from "./ResponsiveDialog"
-import Participant from "./Participant"
-import AddActivity from "./AddActivity"
-import Activity from "./Activity"
+import { CredentialManager, CredentialEditor, updateDetails } from "../../CredentialManager"
+import ResponsiveDialog from "../../ResponsiveDialog"
+import Participant from "../../Participant"
+import AddActivity from "../ActivityList/AddActivity"
+import Activity from "../ActivityList/Activity"
 import {
   unspliceActivity,
   unspliceTipsActivity,
@@ -50,7 +51,9 @@ import {
   saveTipActivity,
   saveSurveyActivity,
   saveCTestActivity,
-} from "./ActivityList"
+} from "../ActivityList/Index"
+import SensorListItem from "../SensorsList/SensorListItem"
+import AddSensor from "../SensorsList/AddSensor"
 
 const theme = createMuiTheme({
   overrides: {
@@ -305,18 +308,14 @@ const availableAtiveSpecs = [
   "lamp.dbt_diary_card",
 ]
 export default function PatientProfile({
-  studyId,
   participant,
-  name,
-  studies,
   onClose,
+  studies,
   ...props
 }: {
-  studyId: string
   participant: any
-  name: string
-  studies: any
   onClose: Function
+  studies: any
 }) {
   const classes = useStyles()
   const [activities, setActivities] = useState([])
@@ -330,7 +329,7 @@ export default function PatientProfile({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [accounts, setAccounts] = useState([])
   const [showCredentials, setShowCredentials] = useState(false)
-  const [nickname, setNickname] = useState(name)
+  const [nickname, setNickname] = useState("")
   const [activitySpecs, setActivitySpecs] = useState([])
   const [sensorSpecs, setSensorSpecs] = useState([])
   const [createMenu, setCreateMenu] = useState<Element>()
@@ -370,7 +369,7 @@ export default function PatientProfile({
     "lamp.spatial_span": t("Spatial Span"),
   }
   const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
-
+  const studyId = ""
   const onChangeActivities = () => {
     LAMP.Activity.allByStudy(studyId).then((data) => {
       let activitydata = data.map((el) => ({ ...el, parentID: studyId }))
@@ -431,7 +430,7 @@ export default function PatientProfile({
     })
     //  onChangeAccounts()
     onChangeActivities()
-    onChangeSensors()
+    // onChangeSensors()
     setLoading(false)
   }, [])
 
@@ -891,49 +890,10 @@ export default function PatientProfile({
                   TYPE
                 </Typography>
               </div>
-              {(sensors ?? []).map((item, index) => {
-                return (
-                  <div
-                    className={classes.rowContainer}
-                    style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}
-                  >
-                    <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {item.name}
-                    </Typography>
-                    <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {item.spec?.replace("lamp.", "")}
-                    </Typography>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setConfirmationDialog(3)
-                      }}
-                      color="default"
-                      aria-label="Menu"
-                    >
-                      <Icon>edit</Icon>
-                    </IconButton>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setConfirmationDialog(4)
-                      }}
-                      color="default"
-                      aria-label="Menu"
-                    >
-                      <Icon>close</Icon>
-                    </IconButton>
-                  </div>
-                )
-              })}
-              <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
-                <div className={classes.addButton}>
-                  <AddCircleOutline onClick={() => setSensorDialog(true)} />
-                </div>
-                <Typography onClick={() => setSensorDialog(true)} className={classes.addButtonTitle}>
-                  {t("Add item")}
-                </Typography>
-              </ButtonBase>
+              {(sensors ?? []).map((item, index) => (
+                <SensorListItem sensor={item} studies={studies} />
+              ))}
+              <AddSensor studies={studies} />
             </Grid>
             <Grid item xs={10} sm={2} />
           </Grid>
@@ -1089,26 +1049,7 @@ export default function PatientProfile({
               onCancel={setAllFalse}
             />
           ) : (
-            <AddActivity
-              activities={activities}
-              studies={studies}
-              studyId={studyId}
-              groupCreate={groupCreate}
-              showJournalCreate={showJournalCreate}
-              showCTCreate={showCTCreate}
-              showSCImgCreate={showSCImgCreate}
-              showTipCreate={showTipCreate}
-              showCreate={showCreate}
-              showBreatheCreate={showBreatheCreate}
-              showDBTCreate={showDBTCreate}
-              saveGroup={saveGroup}
-              activitySpecId={activitySpecId}
-              saveCTest={saveCTest}
-              saveTipsActivity={saveTipsActivity}
-              saveActivity={saveActivity}
-              setAllFalse={setAllFalse}
-              activitySpecs={activitySpecs}
-            />
+            <AddActivity activities={activities} studies={studies} studyId={studyId} activitySpecs={activitySpecs} />
           )}
         </Box>
       </ResponsiveDialog>

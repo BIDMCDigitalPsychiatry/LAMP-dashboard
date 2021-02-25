@@ -1,3 +1,4 @@
+// Core Imports
 import React, { useState, useEffect, useCallback } from "react"
 import {
   Box,
@@ -9,21 +10,15 @@ import {
   MenuItem,
   Icon,
   TextField,
-  withStyles,
   ButtonBase,
   Container,
   Backdrop,
   CircularProgress,
-  Checkbox,
 } from "@material-ui/core"
 import { useDropzone } from "react-dropzone"
-import { CheckboxProps } from "@material-ui/core/Checkbox"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AudiotrackIcon from "@material-ui/icons/Audiotrack"
-
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import BreatheIcon from "../icons/Breathe.svg"
+import ScratchCard from "../../../icons/ScratchCard.svg"
 import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
@@ -55,6 +50,7 @@ const theme = createMuiTheme({
     },
   },
 })
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
@@ -62,35 +58,8 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-
-    input: {
-      display: "none",
-    },
-
-    btnText: {
-      color: "#333",
-      fontSize: 14,
-      lineHeight: "38px",
-      cursor: "pointer",
-      textTransform: "capitalize",
-      boxShadow: "none",
-      border: "#7599FF solid 1px",
-      background: "transparent",
-      margin: "15px 0",
-      "& svg": { marginRight: 5, color: "#7599FF" },
-    },
-    iconBtn: { background: "white", boxShadow: "none", marginLeft: 15, color: "#7599FF", width: 48, height: 48 },
   })
 )
-const PeachCheckbox = withStyles({
-  root: {
-    color: "#FEAC98",
-    "&$checked": {
-      color: "#FEAC98",
-    },
-  },
-  checked: {},
-})((props: CheckboxProps) => <Checkbox color="default" {...props} />)
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -120,17 +89,7 @@ function compress(file, width, height) {
   })
 }
 
-function getBase64(file, cb) {
-  let reader = new FileReader()
-  reader.readAsDataURL(file)
-  reader.onloadend = () => {
-    cb(reader.result)
-  }
-  reader.onerror = function (error) {
-    console.log("Error: ", error)
-  }
-}
-export default function BreatheCreator({
+export default function SCImageCreator({
   activities,
   value,
   onSave,
@@ -150,26 +109,16 @@ export default function BreatheCreator({
   studies?: any
   study?: any
 }) {
-  console.log(study)
-  const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
-  const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
-  const [disabled, setDisabled] = useState(true)
+  const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(details?.photo ?? BreatheIcon)
+  const [photo, setPhoto] = useState(details?.photo ?? ScratchCard)
+  const [disabled, setDisabled] = useState(true)
+  const [loading, setLoading] = React.useState(false)
+  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [settings, setSettings] = useState(!!value ? value?.settings : { threshold: 80 })
   const { t } = useTranslation()
-  const [settings, setSettings] = useState(
-    !!value
-      ? value?.settings
-      : (value?.spec && ["lamp.breathe"].includes(value.spec)) || ["lamp.breathe"].includes(activitySpecId)
-      ? {
-          audio: null,
-          audio_name: null,
-        }
-      : {}
-  )
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -186,14 +135,6 @@ export default function BreatheCreator({
     maxSize: 2 * 1024 * 1024 /* 5MB */,
   })
 
-  useEffect(() => {
-    if (
-      (photo === null && value?.spec && ["lamp.breathe"].includes(value.spec)) ||
-      ["lamp.breathe"].includes(activitySpecId)
-    ) {
-      setPhoto(BreatheIcon)
-    }
-  }, [])
   const validate = () => {
     let duplicates = []
     if (typeof text !== "undefined" && text?.trim() !== "") {
@@ -207,61 +148,14 @@ export default function BreatheCreator({
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
-    if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || ["lamp.breathe"].includes(activitySpecId)) {
-      return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
-        duplicates.length > 0 ||
-        (typeof text !== "undefined" && text?.trim() === "")
-      )
-    } else {
-      return !(
-        duplicates.length > 0 ||
-        typeof text === "undefined" ||
-        (typeof text !== "undefined" && text?.trim() === "")
-      )
-    }
-  }
-  const setAudioFileChange = (event) => {
-    const file = event.target.files[0]
-    const fileSize = event.target.files[0].size / 1024 / 1024
-    const audioFormats = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/ogg"]
-    const fileName = file.name
-    if (fileSize <= 2 && audioFormats.includes(file.type.toLowerCase())) {
-      setLoading(true)
-      file &&
-        getBase64(file, (result) => {
-          setSettings({ ...settings, audio: result, audio_name: fileName })
-          setLoading(false)
-        })
-    } else {
-      if (!audioFormats.includes(file.type.toLowerCase())) {
-        enqueueSnackbar(t("Not supported audio type."), {
-          variant: "error",
-        })
-      } else {
-        enqueueSnackbar(t("The audio size should not exceed 2 MB."), {
-          variant: "error",
-        })
-      }
-    }
-  }
-  const handleRemoveExistingEvent = (event) => {
-    event.target.value = null
-  }
-
-  const validURL = (audioURL: string) => {
-    let pattern = new RegExp(
-      "^(https?:\\/\\/)?" + // protocol
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|" + // domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // ip (v4) address
-      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + //port
-      "(\\?[;&amp;a-z\\d%_.~+=-]*)?" + // query string
-        "(\\#[-a-z\\d_]*)?$",
-      "i"
+    return !(
+      typeof studyId == "undefined" ||
+      studyId === null ||
+      studyId === "" ||
+      duplicates.length > 0 ||
+      typeof text === "undefined" ||
+      (typeof text !== "undefined" && text?.trim() === "")
     )
-    return pattern.test(audioURL)
   }
 
   return (
@@ -272,7 +166,7 @@ export default function BreatheCreator({
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
-            <Grid item xs>
+            <Grid item xs md={2}>
               <Tooltip
                 title={
                   !photo
@@ -302,7 +196,7 @@ export default function BreatheCreator({
             </Grid>
             <Grid item md={10}>
               <Grid container spacing={2}>
-                <Grid item sm={4}>
+                <Grid item lg={4}>
                   <TextField
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
@@ -314,7 +208,7 @@ export default function BreatheCreator({
                     }}
                     helperText={
                       typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? t("Please select the Study")
+                        ? "Please select the study"
                         : ""
                     }
                     variant="filled"
@@ -345,88 +239,51 @@ export default function BreatheCreator({
                   </Box>
                 </Grid>
               </Grid>
-              <Grid item xs={12} spacing={2}>
-                <Box>
-                  <TextField
-                    fullWidth
-                    multiline
-                    label={t("Activity Description")}
-                    variant="filled"
-                    rows={2}
-                    defaultValue={description}
-                    onChange={(event) => setDescription(event.target.value)}
-                    inputProps={{ maxLength: 2500 }}
-                  />
-                </Box>
-              </Grid>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Divider />
-                  <Typography variant="h6">{t("Settings")}</Typography>
-                </Grid>
-                <Divider />
-                <Grid item xs={12} spacing={2}>
-                  <Box mb={3}>
-                    <TextField
-                      error={
-                        (settings?.audio_url?.trim() ?? "") === "" ||
-                        ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings.audio_url))
-                          ? true
-                          : false
-                      }
-                      fullWidth
-                      variant="filled"
-                      label={t("Audio URL")}
-                      defaultValue={settings?.audio_url ?? ""}
-                      onChange={(event) => setSettings({ ...settings, audio_url: event.target.value })}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs>
-                  <label htmlFor="upload-audio">
-                    <TextField
-                      className={classes.input}
-                      id="upload-audio"
-                      name="upload-audio"
-                      type="file"
-                      onClick={(event) => handleRemoveExistingEvent(event)}
-                      onChange={(event) => setAudioFileChange(event)}
-                    />
 
-                    <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
-                      <AudiotrackIcon /> {t("Upload audio")}
-                    </Fab>
-                  </label>
-
-                  <Grid container direction="row" justify="flex-start" alignItems="center">
-                    <Grid>
-                      {settings.audio && (
-                        <audio controls src={settings.audio}>
-                          {t("Your browser does not support the")}
-                          <code>{t("audio")}</code> {t("element.")}
-                        </audio>
-                      )}
-                    </Grid>
-                    {settings.audio_name && settings.audio_name}
-                    <Grid>
-                      {settings.audio && (
-                        <Fab
-                          className={classes.iconBtn}
-                          aria-label="Remove-Audio"
-                          variant="extended"
-                          onClick={() => setSettings({ ...settings, audio: null, audio_name: null })}
-                        >
-                          <DeleteIcon />
-                        </Fab>
-                      )}
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
+              <Box>
+                <TextField
+                  fullWidth
+                  multiline
+                  label={t("Activity Description")}
+                  variant="filled"
+                  rows={2}
+                  defaultValue={description}
+                  onChange={(event) => setDescription(event.target.value)}
+                  inputProps={{ maxLength: 2500 }}
+                />
+              </Box>
+              <br />
+              <Box>
+                <TextField
+                  fullWidth
+                  label={t("Threshold")}
+                  error={
+                    settings.threshold < 30 ||
+                    settings.threshold > 90 ||
+                    settings.threshold === 0 ||
+                    settings.threshold === ""
+                      ? true
+                      : false
+                  }
+                  type="number"
+                  variant="filled"
+                  defaultValue={settings?.threshold ?? 80}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    max: 90,
+                    min: 30,
+                  }}
+                  onChange={(e) => setSettings({ ...settings, threshold: Number(e.target.value) })}
+                  helperText={settings.threshold > 100 ? t("Maximum value is number", { number: 90 }) : ""}
+                />
+              </Box>
             </Grid>
           </Grid>
         </Container>
       </MuiThemeProvider>
+
       <Grid
         container
         direction="column"
@@ -436,7 +293,7 @@ export default function BreatheCreator({
       >
         {!!value && (
           <Grid item>
-            <Tooltip title={t("Duplicate this survey instrument and save it with a new title.")}>
+            <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
               <Fab
                 color="primary"
                 aria-label="Duplicate"
@@ -450,10 +307,10 @@ export default function BreatheCreator({
                         name: text,
                         spec: value?.spec,
                         schedule: [],
-                        settings: settings,
                         description: description,
                         photo: photo,
                         studyID: studyId,
+                        settings: settings,
                       },
                       true /* duplicate */
                     )
@@ -467,7 +324,7 @@ export default function BreatheCreator({
                   (value.name.trim() === text.trim() && value.parentID === studyId)
                 }
               >
-                {t("Duplicate")}
+                Duplicate
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -489,10 +346,10 @@ export default function BreatheCreator({
                       name: text,
                       spec: value?.spec ?? activitySpecId,
                       schedule: [],
-                      settings: settings,
                       description: description,
                       photo: photo,
                       studyID: studyId,
+                      settings: settings,
                     },
                     false /* overwrite */
                   )

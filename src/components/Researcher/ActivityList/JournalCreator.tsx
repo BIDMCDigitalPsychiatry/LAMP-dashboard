@@ -18,7 +18,7 @@ import {
 import { useDropzone } from "react-dropzone"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import JournalIcon from "../icons/Journal.svg"
+import JournalIcon from "../../../icons/Journal.svg"
 import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({

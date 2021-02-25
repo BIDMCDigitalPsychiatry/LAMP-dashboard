@@ -17,7 +17,7 @@ import Login from "./Login"
 import Messages from "./Messages"
 
 import Root from "./Root"
-import Researcher from "./Researcher"
+import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
