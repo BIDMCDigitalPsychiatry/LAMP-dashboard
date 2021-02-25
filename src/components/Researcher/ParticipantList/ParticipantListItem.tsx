@@ -4,77 +4,38 @@ import {
   IconButton,
   Icon,
   Button,
-  TextField,
-  Popover,
   AppBar,
   Toolbar,
   Divider,
   MenuItem,
-  Chip,
-  Tooltip,
-  Grid,
-  Fab,
   DialogContentText,
   Typography,
-  Backdrop,
-  CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Select,
-  Switch,
-  FormControlLabel,
   Card,
   CardHeader,
   Menu,
   CardActions,
   CardContent,
 } from "@material-ui/core"
-import MaterialTable, { MTableToolbar } from "material-table"
-import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../icons/plus.svg"
-import { ReactComponent as DeleteIcon } from "../icons/DeleteBlue.svg"
-import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
-import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
-import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
-import { ReactComponent as ExportIcon } from "../icons/Export.svg"
-import { green, yellow, red, grey } from "@material-ui/core/colors"
-import CloseIcon from "@material-ui/icons/Close"
 import PatientProfile from "./PatientProfile"
-// External Imports
-import { saveAs } from "file-saver"
-import JSZip from "jszip"
-import jsonexport from "jsonexport"
-import TimeAgo from "javascript-time-ago"
-import en from "javascript-time-ago/locale/en"
-import hi from "javascript-time-ago/locale/hi"
-import es from "javascript-time-ago/locale/es"
-import QRCode from "qrcode.react"
+
 // Local Imports
-import LAMP, { Study } from "lamp-core"
-import Messages from "../../Messages"
-import EditUserField from "./EditUserField"
+import LAMP from "lamp-core"
 import { CredentialManager } from "../../CredentialManager"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-import { ReactComponent as Filter } from "../icons/Filter.svg"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
-import MultipleSelect from "../../MultipleSelect"
+import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import MoreVertIcon from "@material-ui/icons/MoreVert"
-import CreateIcon from "@material-ui/icons/Create"
-//TimeAgo.addLocale(en)
-//const timeAgo = new TimeAgo("en-US")
-import StudyCreator from "./StudyCreator"
-import Header from "./Header"
-
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"
 import Active from "./PassiveBubble"
 import NotificationSettings from "./NotificationSettings"
+import DeleteParticipant from "./DeleteParticipant"
+import Credentials from "./Credentials"
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -167,7 +128,6 @@ export default function ParticipantListItem({
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
   const [openPasswordReset, setOpenPasswordReset] = useState(null)
-  const [deleteConfirmationDialog, setDeleteConfirmationDialog] = useState(false)
   const { t } = useTranslation()
   const [name, setName] = useState("")
   const [notificationColumn, setNotificationColumn] = useState(false)
@@ -182,11 +142,6 @@ export default function ParticipantListItem({
     })()
   }, [])
 
-  let deleteParticipant = async (participantId) => {
-    await LAMP.Participant.delete(participantId)
-    refreshParticipants()
-  }
-
   return (
     <Card style={{ margin: 20 }}>
       <CardHeader
@@ -199,19 +154,11 @@ export default function ParticipantListItem({
         subheader={<Typography variant="overline">{participant.study}</Typography>}
       />
       <CardContent>
-        <Passive participantId={participant.id} />
-        <Active participantId={participant.id} />
+        <Passive participant={participant} />
+        <Active participant={participant} />
       </CardContent>
       <CardActions>
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => {
-            setProfileDialog(true)
-          }}
-        >
-          Configure
-        </Button>
+        <PatientProfile participant={participant} onClose={() => setProfileDialog(false)} studies={studies} />
         <Button
           size="small"
           color="primary"
@@ -225,56 +172,9 @@ export default function ParticipantListItem({
       {notificationColumn && <NotificationSettings participantId={participant.id} />}
 
       <Menu open={!!openMenu} anchorEl={openMenu} onClose={() => setOpenMenu(false)}>
-        <MenuItem onClick={() => setOpenPasswordReset(participant.id)}>Edit Credentials</MenuItem>
-        <MenuItem onClick={() => setDeleteConfirmationDialog(true)}>Delete</MenuItem>
+        <Credentials participant={participant} />
+        <DeleteParticipant participant={participant} />
       </Menu>
-
-      <ResponsiveDialog fullScreen transient={false} animate open={!!profileDialog}>
-        <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setProfileDialog(false)} color="default" aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">
-              {t("Profile")} {participant?.id ?? ""}
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Divider />
-        <Box py={8} px={4}>
-          <PatientProfile participant={participant} onClose={() => setProfileDialog(false)} studies={studies} />
-        </Box>
-      </ResponsiveDialog>
-      <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>
-        <CredentialManager style={{ margin: 16 }} id={openPasswordReset} />
-      </ResponsiveDialog>
-      <Dialog
-        open={deleteConfirmationDialog}
-        onClose={() => setDeleteConfirmationDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirmation"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {t("Are you sure you want to delete this Participant?")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmationDialog(false)} color="primary">
-            No
-          </Button>
-          <Button
-            onClick={() => {
-              deleteParticipant(participant.id)
-            }}
-            color="primary"
-            autoFocus
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Card>
   )
 }

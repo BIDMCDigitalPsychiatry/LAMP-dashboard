@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Chip, Tooltip } from "@material-ui/core"
 import { getTimeAgo, dataQuality } from "./Index"
-import LAMP from "lamp-core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
@@ -17,30 +16,18 @@ const useStyles = makeStyles((theme) => ({
   dataGrey: { backgroundColor: "#d4d4d4 !important", color: "#424242" },
 }))
 
-export default function Passive({ participantId, ...props }) {
+export default function Passive({ participant, ...props }) {
   const classes = useStyles()
   const [passive, setPassive] = useState(null)
   const { t, i18n } = useTranslation()
   const timeAgo = getTimeAgo(i18n.language)
 
   useEffect(() => {
-    ;(async function () {
-      // let passive = {
-      //   gps:
-      //     (await LAMP.SensorEvent.allByParticipant(participantId, "lamp.gps", undefined, undefined, 5)).slice(-1)[0] ??
-      //     (await LAMP.SensorEvent.allByParticipant(participantId, "beiwe.gps", undefined, undefined, 5)).slice(-1)[0] ??
-      //     [],
-      //   accel:
-      //     (await LAMP.SensorEvent.allByParticipant(participantId, "lamp.accelerometer", undefined, undefined, 5)).slice(
-      //       -1
-      //     )[0] ??
-      //     (
-      //       await LAMP.SensorEvent.allByParticipant(participantId, "beiwe.accelerometer", undefined, undefined, 5)
-      //     ).slice(-1)[0] ??
-      //     [],
-      // }
-      // setPassive(passive)
-    })()
+    let passive = {
+      gps: participant.gps,
+      accel: participant.accelerometer,
+    }
+    setPassive(passive)
   }, [])
 
   return (
