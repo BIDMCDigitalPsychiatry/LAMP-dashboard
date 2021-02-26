@@ -26,7 +26,7 @@ export default function Active({ participant, ...props }) {
 
   useEffect(() => {
     let res = participant.analytics
-    setLogins(res.shift())
+    setLogins(!!res ? res[0] : null)
     let passive = {
       gps: participant.gps,
       accel: participant.accelerometer,

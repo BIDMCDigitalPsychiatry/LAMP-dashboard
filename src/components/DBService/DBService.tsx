@@ -4,6 +4,10 @@ const DATABASE_NAME = "LAMP-DB"
 
 const dbPromise = idb.openDB(DATABASE_NAME, 1, {
   upgrade(upgradeDb) {
+    if (!upgradeDb.objectStoreNames.contains("researcher")) {
+      const studies = upgradeDb.createObjectStore("researcher", { keyPath: "id" })
+      studies.createIndex("id", "id", { unique: true })
+    }
     if (!upgradeDb.objectStoreNames.contains("studies")) {
       const studies = upgradeDb.createObjectStore("studies", { keyPath: "id" })
       studies.createIndex("id", "id", { unique: true })
@@ -60,8 +64,16 @@ class DBService {
   get(tablespace, key) {
     return dbPromise
       .then((db) => {
-        console.log(key, db.transaction(tablespace).objectStore(tablespace).get(key))
-        return db.transaction(tablespace).objectStore(tablespace).get(key)
+        ;(async () => {
+          let store = db.transaction([tablespace], "readonly").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            if (cursor.key === key) {
+              return cursor.value
+            }
+            cursor = await cursor.continue()
+          }
+        })()
       })
       .catch((error) => {
         // Do something?
@@ -75,6 +87,36 @@ class DBService {
         data.map((d) => {
           store.put(d)
         })
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  addRow(tablespace, data) {
+    return dbPromise
+      .then((db) => {
+        let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
+        store.put(data)
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  delete(tablespace, keys) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            if (keys.includes(cursor.key)) {
+              cursor.delete()
+            }
+            cursor = await cursor.continue()
+          }
+        })()
       })
       .catch((error) => {
         // Do something?

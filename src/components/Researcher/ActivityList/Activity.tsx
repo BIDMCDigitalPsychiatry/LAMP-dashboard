@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useState, useEffect } from "react"
 // Local Imports
 import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
@@ -9,15 +9,23 @@ import JournalCreator from "./JournalCreator"
 import BreatheCreator from "./BreatheCreator"
 import DBTCreator from "./DBTCreator"
 import SCImageCreator from "./SCImageCreator"
+import { spliceActivity } from "./Index"
+import LAMP from "lamp-core"
 
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+]
 
 export default function Activity({
   allActivities,
   activity,
   onSave,
   onCancel,
-  details,
   studies,
   ...props
 }: {
@@ -25,9 +33,9 @@ export default function Activity({
   activity?: any
   onSave?: any
   onCancel?: any
-  details?: any
   studies?: any
 }) {
+  const [details, setDetails] = useState(null)
   const isTip = (activity || {}).spec === "lamp.tips"
   const isGroup = (activity || {}).spec === "lamp.group"
   const isSurvey = (activity || {}).spec === "lamp.survey"
@@ -36,7 +44,37 @@ export default function Activity({
   const isBreathe = (activity || {}).spec === "lamp.breathe"
   const isDBT = (activity || {}).spec === "lamp.dbt_diary_card"
   const isSCImage = (activity || {}).spec === "lamp.scratch_image"
-  console.log(activity)
+  const [selectedActivity, setSelectedActivity] = useState(activity)
+
+  useEffect(() => {
+    ;(async () => {
+      if (activity.spec === "lamp.survey") {
+        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        let raw = activity
+        const activityData = spliceActivity({ raw, tag })
+        setSelectedActivity(activityData)
+      } else if (activity.spec === "lamp.dbt_diary_card") {
+        setSelectedActivity(activity)
+      } else if (activity.spec === "lamp.tips") {
+        setSelectedActivity(activity)
+      } else if (
+        games.includes(activity.spec) ||
+        activity.spec === "lamp.journal" ||
+        activity.spec === "lamp.scratch_image" ||
+        activity.spec === "lamp.breathe" ||
+        activity.spec === "lamp.group"
+      ) {
+        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+          !!y.error ? undefined : y.data
+        )[0]
+        setDetails(tag)
+        setSelectedActivity(activity)
+      }
+    })()
+  })
+
   return (
     <div>
       {isGroup && (

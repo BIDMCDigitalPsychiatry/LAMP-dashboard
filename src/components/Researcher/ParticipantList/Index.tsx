@@ -4,7 +4,6 @@ import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
 import es from "javascript-time-ago/locale/es"
-import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
@@ -111,6 +110,7 @@ export default function ParticipantList({
   onParticipantSelect,
   showUnscheduled,
   researcher,
+  notificationColumn,
   ...props
 }) {
   const classes = useStyles()
@@ -138,8 +138,8 @@ export default function ParticipantList({
               participant={eachParticipant}
               onParticipantSelect={onParticipantSelect}
               refreshParticipants={refreshParticipants}
-              researcher={researcher}
               studies={studies}
+              notificationColumn={notificationColumn}
             />
           ))}
       </Box>

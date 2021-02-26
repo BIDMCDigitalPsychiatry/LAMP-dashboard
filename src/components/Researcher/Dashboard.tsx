@@ -12,8 +12,6 @@ import {
   Icon,
 } from "@material-ui/core"
 
-// Local Imports
-import LAMP from "lamp-core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
 import SensorsList from "./SensorsList/Index"
@@ -23,8 +21,6 @@ import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import locale_lang from "../../locale_map.json"
-import { useWorker } from "@koale/useworker"
 import { Service } from "../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -117,11 +113,16 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const { t } = useTranslation()
   const [studies, setStudies] = useState(null)
+  const [notificationColumn, setNotification] = useState(false)
 
   useEffect(() => {
     ;(async () => {
       Service.getAll("studies").then((studies) => {
         setStudies(studies)
+      })
+      Service.getAll("researcher").then((data) => {
+        let researcherNotification = data[0]?.notification ?? false
+        setNotification(researcherNotification)
       })
       setCurrentTab(0)
     })()
@@ -199,6 +200,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 onParticipantSelect={onParticipantSelect}
                 researcher={researcher}
                 studies={studies}
+                notificationColumn={notificationColumn}
               />
             )}
             {currentTab === 1 && <ActivityList title={null} researcher={researcher} studies={studies} />}

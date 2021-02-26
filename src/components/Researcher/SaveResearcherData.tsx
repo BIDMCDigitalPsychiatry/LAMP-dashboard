@@ -31,6 +31,7 @@ const saveStudiesAndParticipants = (result) => {
       ),
     ])
   })
+
   Service.addData("studies", studies)
   Service.addData("participants", participants)
 }
@@ -47,6 +48,7 @@ const saveSettings = (newVal, key) => {
 export const saveDataToCache = (authString, id) => {
   fetchResult(authString, id, "participant", "researcher").then((result) => {
     saveStudiesAndParticipants(result)
+    Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
     result.studies.map((study) => {
       if (result.unityhealth_settings) {
         fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {

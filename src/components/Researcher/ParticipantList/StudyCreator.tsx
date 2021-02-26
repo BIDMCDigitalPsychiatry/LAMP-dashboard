@@ -18,6 +18,7 @@ import CloseIcon from "@material-ui/icons/Close"
 import LAMP, { Study } from "lamp-core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -67,8 +68,13 @@ export default function StudyCreator({ studies, researcher, ...props }) {
     setAddStudy(false)
     let study = new Study()
     study.name = studyName
-    await LAMP.Study.create(researcher.id, study)
-    enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), { variant: "success" })
+    LAMP.Study.create(researcher.id, study).then((res) => {
+      let result = JSON.parse(JSON.stringify(res))
+      Service.addData("studies", [{ id: result.data, name: studyName }])
+      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+        variant: "success",
+      })
+    })
   }
 
   return (

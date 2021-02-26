@@ -300,17 +300,6 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
 
       <Grid container spacing={0}>
         <Grid item xs={10} sm={8}>
-          <div className={classes.rowContainer}>
-            <Typography className={classes.contentText} style={{ flex: 1 }}>
-              NAME
-            </Typography>
-            <Typography className={classes.contentText} style={{ flex: 1 }}>
-              TYPE
-            </Typography>
-            <Typography className={classes.contentText} style={{ flex: 1 }}>
-              STUDY
-            </Typography>
-          </div>
           {(sensors ?? []).map((item, index) => (
             <SensorListItem sensor={item} studies={studies} />
           ))}

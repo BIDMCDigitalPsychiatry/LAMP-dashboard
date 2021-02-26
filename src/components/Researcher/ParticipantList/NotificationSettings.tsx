@@ -5,6 +5,7 @@ import { Tooltip, Switch, FormControlLabel } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -15,16 +16,15 @@ const useStyles = makeStyles((theme) => ({
   switchLabel: { color: "#4C66D6" },
 }))
 
-export default function NotificationSettings({ participantId, ...props }) {
+export default function NotificationSettings({ participant, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
 
   const [setting, setSetting] = useState(null)
   useEffect(() => {
     ;(async () => {
-      let settings = ((await LAMP.Type.getAttachment(participantId, "to.unityhealth.psychiatry.settings")) as any)
-        .data ?? {
-        notification: true,
+      let settings = {
+        notification: participant.unity_settings ?? false,
       }
       setSetting(settings)
     })()
@@ -33,7 +33,14 @@ export default function NotificationSettings({ participantId, ...props }) {
   const saveIndividualUserSettings = async (id, val) => {
     setSetting({ notification: val })
     try {
-      await LAMP.Type.setAttachment(id, "me", "to.unityhealth.psychiatry.settings", { notification: val })
+      LAMP.Type.setAttachment(id, "me", "to.unityhealth.psychiatry.settings", { notification: val }).then((res) => {
+        Service.update(
+          "participants",
+          { participants: [{ id: participant.id, unity_settings: val }] },
+          "unity_settings",
+          "id"
+        )
+      })
     } catch (error) {}
   }
 
@@ -45,7 +52,7 @@ export default function NotificationSettings({ participantId, ...props }) {
             <Switch
               checked={true}
               onChange={(event) => {
-                saveIndividualUserSettings(participantId, event.target.checked)
+                saveIndividualUserSettings(participant.id, event.target.checked)
               }}
             />
           }
@@ -58,7 +65,7 @@ export default function NotificationSettings({ participantId, ...props }) {
             <Switch
               checked={false}
               onChange={(event) => {
-                saveIndividualUserSettings(participantId, event.target.checked)
+                saveIndividualUserSettings(participant.id, event.target.checked)
               }}
             />
           }

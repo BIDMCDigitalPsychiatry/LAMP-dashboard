@@ -448,15 +448,16 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
       </Backdrop> */}
       <Header studies={studies} researcher={researcher} activities={activities} />
       <Box className={classes.tableContainer}>
-        {activities.map((activity) => (
-          <ActivityItem
-            activity={activity}
-            refreshActivities={refreshActivities}
-            researcher={researcher}
-            studies={studies}
-            activities={activities}
-          />
-        ))}
+        {!!activities &&
+          activities.map((activity) => (
+            <ActivityItem
+              activity={activity}
+              refreshActivities={refreshActivities}
+              researcher={researcher}
+              studies={studies}
+              activities={activities}
+            />
+          ))}
       </Box>
     </React.Fragment>
   )

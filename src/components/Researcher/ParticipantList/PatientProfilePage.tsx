@@ -54,7 +54,7 @@ import {
 } from "../ActivityList/Index"
 import SensorListItem from "../SensorsList/SensorListItem"
 import AddSensor from "../SensorsList/AddSensor"
-
+import ActivityItem from "../ActivityList/ActivityItem"
 const theme = createMuiTheme({
   overrides: {
     MuiFilledInput: {
@@ -576,6 +576,7 @@ export default function PatientProfilePage({
     })
     onChangeAccounts()
   }
+
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     setAllFalse()
@@ -823,54 +824,16 @@ export default function PatientProfilePage({
               </div>
               {(activities ?? []).map((item, index) => {
                 return (
-                  <div
-                    className={classes.rowContainer}
-                    style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}
-                  >
-                    <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {item.name}
-                    </Typography>
-                    <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {types[item.spec] ?? t("Cognitive Test")}
-                    </Typography>
-                    <Typography className={classes.contentText} style={{ flex: 1 }}>
-                      {(item?.schedule ?? []).map((sc) => (
-                        <Box>{sc.repeat_interval}</Box>
-                      ))}
-                    </Typography>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setConfirmationDialog(1)
-                      }}
-                      color="default"
-                      aria-label="Menu"
-                    >
-                      <Icon>edit</Icon>
-                    </IconButton>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedItem(item)
-                        setConfirmationDialog(2)
-                      }}
-                      color="default"
-                      aria-label="Menu"
-                    >
-                      <Icon>close</Icon>
-                    </IconButton>
-                  </div>
+                  <ActivityItem
+                    activity={item}
+                    refreshActivities={() => {}}
+                    researcher={null}
+                    studies={studies}
+                    activities={activities}
+                  />
                 )
               })}
-              <ButtonBase
-                className={classes.addContainer}
-                onClick={addActivity}
-                style={{ marginBottom: 52, marginTop: 15 }}
-              >
-                <div className={classes.addButton}>
-                  <AddCircleOutline />
-                </div>
-                <Typography className={classes.addButtonTitle}>{t("Add item")}</Typography>
-              </ButtonBase>
+              <AddActivity activities={activities} studies={studies} studyId={studyId} />
             </Grid>
             <Grid item xs={10} sm={2} />
           </Grid>
@@ -882,14 +845,6 @@ export default function PatientProfilePage({
           </Typography>
           <Grid container spacing={0}>
             <Grid item xs={10} sm={8}>
-              <div className={classes.rowContainer}>
-                <Typography className={classes.contentText} style={{ flex: 1 }}>
-                  NAME
-                </Typography>
-                <Typography className={classes.contentText} style={{ flex: 1 }}>
-                  TYPE
-                </Typography>
-              </div>
               {(sensors ?? []).map((item, index) => (
                 <SensorListItem sensor={item} studies={studies} />
               ))}
@@ -897,16 +852,6 @@ export default function PatientProfilePage({
             </Grid>
             <Grid item xs={10} sm={2} />
           </Grid>
-
-          <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
-          <div className={classes.buttonsContainer}>
-            <Button className={classes.buttonContainer} onClick={() => updateName()}>
-              <Typography className={classes.buttonText}>{t("Save")}</Typography>
-            </Button>
-            <Button className={classes.backContainer} onClick={() => onClose()}>
-              <Typography className={classes.backText}>{t("Cancel")}</Typography>
-            </Button>
-          </div>
         </Grid>
       </Container>
 
@@ -953,73 +898,6 @@ export default function PatientProfilePage({
         </DialogActions>
       </Dialog>
 
-      <Popover
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-        classes={{ root: classes.customPopover, paper: classes.customPaper }}
-        anchorEl={anchorEl}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <React.Fragment>
-          <MenuItem
-            onClick={() => {
-              setCreate(true)
-              setCreateMenu(undefined)
-              setGroupCreate(true)
-            }}
-          >
-            {t("Activity Group")}
-          </MenuItem>
-          <MenuItem
-            divider
-            onClick={() => {
-              setCreate(true)
-              setCreateMenu(undefined)
-              setShowCreate(true)
-            }}
-          >
-            {t("Survey Instrument")}
-          </MenuItem>
-          {[
-            <MenuItem key="head" disabled>
-              <b>{t("Smartphone Cognitive Tests")}</b>
-            </MenuItem>,
-            ...activitySpecs.map((x) => (
-              <MenuItem
-                key={x?.id}
-                onClick={() => {
-                  setCreateMenu(undefined)
-                  setActivitySpecId(x.id)
-                  setCreate(true)
-                  games.includes(x?.id)
-                    ? setShowCTCreate(true)
-                    : x.id === "lamp.journal"
-                    ? setShowJournalCreate(true)
-                    : x.id === "lamp.scratch_image"
-                    ? setShowSCImgCreate(true)
-                    : x.id === "lamp.breathe"
-                    ? setShowBreatheCreate(true)
-                    : x.id === "lamp.tips"
-                    ? setShowTipCreate(true)
-                    : x.id === "lamp.dbt_diary_card"
-                    ? setShowDBTCreate(true)
-                    : setShowSCImgCreate(true)
-                }}
-              >
-                {x.name ? activitiesObj[x.name] : x?.name?.replace("lamp.", "")}
-              </MenuItem>
-            )),
-          ]}
-        </React.Fragment>
-      </Popover>
-
       <ResponsiveDialog
         fullScreen
         transient={false}
@@ -1044,7 +922,6 @@ export default function PatientProfilePage({
               allActivities={activities}
               activity={selectedActivity}
               onSave={updateActivity}
-              details={gameDetails}
               studies={studies}
               onCancel={setAllFalse}
             />
@@ -1084,60 +961,6 @@ export default function PatientProfilePage({
         </div>
       </Dialog>
 
-      <Dialog
-        classes={{ paper: classes.popWidth }}
-        onClose={() => setSensorDialog(false)}
-        aria-labelledby="simple-dialog-title"
-        open={sensorDialog}
-      >
-        <div>
-          <Typography className={classes.dialogTitle}>{t("Add Sensor")}</Typography>
-          <div className={classes.inputContainer}>
-            <div className={classes.contentContainer}>
-              <CssTextField
-                value={sensorName}
-                onChange={(event) => setSensorName(event.target.value)}
-                inputProps={{ disableunderline: "true" }}
-                placeholder={t("Name")}
-              />
-            </div>
-          </div>
-          <Box mt={4}>
-            <MuiThemeProvider theme={theme}>
-              <TextField
-                error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-                id="filled-select-currency"
-                select
-                label={t("Sensor spec")}
-                value={sensorSpec}
-                onChange={(e) => {
-                  setSensorSpec(e.target.value)
-                }}
-                helperText={
-                  typeof studyId == "undefined" || studyId === null || studyId === ""
-                    ? t("Please select the sensor spec")
-                    : ""
-                }
-                variant="filled"
-              >
-                {sensorSpecs.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {t(option.id.replace("lamp.", ""))}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </MuiThemeProvider>
-          </Box>
-          <Box textAlign="center" mt={2}>
-            <Button
-              onClick={() => (selectedSensor !== null ? updateSensor() : saveSensor())}
-              className={classes.PopupButton}
-            >
-              <Typography className={classes.buttonText}>{t(selectedSensor !== null ? "Update" : "Add")}</Typography>
-            </Button>
-          </Box>
-        </div>
-      </Dialog>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

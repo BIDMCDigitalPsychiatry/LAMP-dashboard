@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized
@@ -65,6 +66,7 @@ export default function EditUserField({
     LAMP.Type.setAttachment(participant.id, "me", "lamp.name", alias ?? null)
       .then((res) => setAlias((oldValue.current = alias)))
       .then((res) => {
+        Service.update("participants", { participants: [{ id: participant.id, name: alias }] }, "name", "id")
         updateName(alias === "" ? participant.id : alias)
         if (alias === "")
           enqueueSnackbar(t("Removed participantId's alias.", { participantId: participant.id }), {

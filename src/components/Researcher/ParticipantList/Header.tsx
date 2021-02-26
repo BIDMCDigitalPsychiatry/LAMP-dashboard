@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Popover, MenuItem, Fab, Typography, Icon } from "@material-ui/core"
+import { Box, Popover, MenuItem, Fab, Typography, Icon, InputBase } from "@material-ui/core"
 
 import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
 import LAMP from "lamp-core"
@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next"
 import AddUser from "./AddUser"
 import StudyCreator from "./StudyCreator"
 import StudyFilter from "../ParticipantList/StudyFilter"
+import SearchIcon from "@material-ui/icons/Search"
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -60,6 +61,49 @@ const theme = createMuiTheme({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
+    header: {
+      "& h5": {
+        fontSize: "30px",
+        fontWeight: "bold",
+      },
+    },
+    search: {
+      position: "relative",
+      borderRadius: 50,
+      backgroundColor: "#F8F8F8",
+
+      "&:hover": {
+        backgroundColor: "#eee",
+      },
+      marginRight: theme.spacing(2),
+      marginLeft: 0,
+      width: "100%",
+      [theme.breakpoints.up("sm")]: {
+        width: "450px",
+      },
+    },
+    searchIcon: {
+      padding: theme.spacing(0, 2),
+      height: "100%",
+      position: "absolute",
+      pointerEvents: "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    inputRoot: {
+      color: "inherit",
+    },
+    inputInput: {
+      padding: "15px 10px",
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
+      transition: theme.transitions.create("width"),
+      width: "100%",
+      [theme.breakpoints.up("md")]: {
+        width: "20ch",
+      },
+    },
     btnBlue: {
       background: "#7599FF",
       borderRadius: "40px",
@@ -243,16 +287,42 @@ export default function Header({ studies, researcher, ...props }) {
   const [popover, setPopover] = useState(null)
 
   return (
-    <Box>
-      <StudyFilter researcher={researcher} studies={studies} type="participants" />
-      <Fab
-        variant="extended"
-        color="primary"
-        classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
-        onClick={(event) => setPopover(event.currentTarget)}
-      >
-        <Icon>add</Icon> {t("Add")}
-      </Fab>
+    <Box display="flex" className={classes.header}>
+      <Box flexGrow={1} pt={1}>
+        {" "}
+        <Typography variant="h5">Patients</Typography>
+      </Box>
+
+      <Box>
+        <StudyFilter researcher={researcher} studies={studies} type="participants" />
+      </Box>
+
+      <Box>
+        <div className={classes.search}>
+          <div className={classes.searchIcon}>
+            <SearchIcon />
+          </div>
+          <InputBase
+            placeholder="Search…"
+            classes={{
+              root: classes.inputRoot,
+              input: classes.inputInput,
+            }}
+            inputProps={{ "aria-label": "search" }}
+          />
+        </div>
+      </Box>
+      <Box>
+        {" "}
+        <Fab
+          variant="extended"
+          color="primary"
+          classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
+          onClick={(event) => setPopover(event.currentTarget)}
+        >
+          <Icon>add</Icon> {t("Add")}
+        </Fab>
+      </Box>
       <Popover
         classes={{ root: classes.customPopover, paper: classes.customPaper }}
         open={!!popover ? true : false}

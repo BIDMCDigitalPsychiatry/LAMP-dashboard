@@ -3,7 +3,7 @@ import { Box, IconButton, Grid } from "@material-ui/core"
 import CreateIcon from "@material-ui/icons/Create"
 import EditUserField from "./EditUserField"
 
-export default function ParticipantName({ participant, name, ...props }) {
+export default function ParticipantName({ participant, ...props }) {
   const [editData, setEditData] = useState(false)
   const [editUserId, setEditUserId] = useState("")
   const [aliasName, setAliasName] = useState("")
@@ -16,7 +16,6 @@ export default function ParticipantName({ participant, name, ...props }) {
   const updateName = (data) => {
     setEditData(false)
     setAliasName(data)
-    setEditUserId(undefined)
   }
   return (
     <Box>
@@ -31,8 +30,8 @@ export default function ParticipantName({ participant, name, ...props }) {
             />
           ) : aliasName && editUserId === participant.id ? (
             aliasName
-          ) : name ? (
-            name
+          ) : participant.name ? (
+            participant.name
           ) : (
             participant.id
           )}

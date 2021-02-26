@@ -404,7 +404,6 @@ export default function UpdateActivity({ activity, activities, studies, ...props
             allActivities={activities}
             activity={selectedActivity}
             onSave={updateActivity}
-            details={gameDetails}
             studies={studies}
             onCancel={() => {
               setShowUpdate(false)

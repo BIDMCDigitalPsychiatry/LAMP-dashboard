@@ -1,86 +1,19 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  IconButton,
-  Icon,
-  Button,
-  AppBar,
-  Toolbar,
-  Divider,
-  MenuItem,
-  DialogContentText,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Card,
-  CardHeader,
-  Menu,
-  CardActions,
-  CardContent,
-} from "@material-ui/core"
+import { IconButton, Button, Typography, Card, CardHeader, Menu, CardActions, CardContent } from "@material-ui/core"
 import PatientProfile from "./PatientProfile"
 
 // Local Imports
 import LAMP from "lamp-core"
-import { CredentialManager } from "../../CredentialManager"
-import ResponsiveDialog from "../../ResponsiveDialog"
-import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
-import { useTranslation } from "react-i18next"
+
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import MoreVertIcon from "@material-ui/icons/MoreVert"
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"
-import Active from "./PassiveBubble"
+import Active from "./ActiveBubble"
 import NotificationSettings from "./NotificationSettings"
 import DeleteParticipant from "./DeleteParticipant"
 import Credentials from "./Credentials"
-
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiTableCell: {
-      root: {
-        borderBottom: "#fff solid 1px",
-        padding: 10,
-      },
-    },
-    MuiToolbar: {
-      root: {
-        maxWidth: 1055,
-        width: "80%",
-        margin: "0 auto",
-        background: "#fff !important",
-      },
-    },
-    MuiInput: {
-      root: {
-        border: 0,
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiIcon: {
-      root: { color: "rgba(0, 0, 0, 0.4)" },
-    },
-  },
-})
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,27 +53,11 @@ export default function ParticipantListItem({
   participant,
   onParticipantSelect,
   refreshParticipants,
-  researcher,
   studies,
+  notificationColumn,
   ...props
 }) {
   const [openMenu, setOpenMenu] = React.useState(null)
-  const classes = useStyles()
-  const [profileDialog, setProfileDialog] = useState(false)
-  const [openPasswordReset, setOpenPasswordReset] = useState(null)
-  const { t } = useTranslation()
-  const [name, setName] = useState("")
-  const [notificationColumn, setNotificationColumn] = useState(false)
-
-  useEffect(() => {
-    ;(async () => {
-      let name = ((await LAMP.Type.getAttachment(participant.id, "lamp.name")) as any).data ?? ""
-      setName(name)
-      let notificationDisplay: any =
-        ((await LAMP.Type.getAttachment(researcher.id, "to.unityhealth.psychiatry.enabled")) as any).data ?? ""
-      if (notificationDisplay) setNotificationColumn(true)
-    })()
-  }, [])
 
   return (
     <Card style={{ margin: 20 }}>
@@ -150,15 +67,15 @@ export default function ParticipantListItem({
             <MoreVertIcon />
           </IconButton>
         }
-        title={<ParticipantName participant={participant} name={name} />}
-        subheader={<Typography variant="overline">{participant.study}</Typography>}
+        title={<ParticipantName participant={participant} />}
+        subheader={<Typography variant="overline">{participant.parent}</Typography>}
       />
       <CardContent>
         <Passive participant={participant} />
         <Active participant={participant} />
       </CardContent>
       <CardActions>
-        <PatientProfile participant={participant} onClose={() => setProfileDialog(false)} studies={studies} />
+        <PatientProfile participant={participant} studies={studies} />
         <Button
           size="small"
           color="primary"
@@ -169,7 +86,7 @@ export default function ParticipantListItem({
           View
         </Button>
       </CardActions>
-      {notificationColumn && <NotificationSettings participantId={participant.id} />}
+      {notificationColumn && <NotificationSettings participant={participant} />}
 
       <Menu open={!!openMenu} anchorEl={openMenu} onClose={() => setOpenMenu(false)}>
         <Credentials participant={participant} />

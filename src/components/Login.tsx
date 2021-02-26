@@ -25,6 +25,8 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import { saveDataToCache } from "./Researcher/SaveResearcherData"
+import { useWorker } from "@koale/useworker"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -73,6 +75,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
+  const [dataWorker] = useWorker(saveDataToCache)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -134,6 +137,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
+        ;(async () => {
+          await dataWorker(state.id + ":" + state.password, res.identity.id)
+        })()
+
         setLoginClick(false)
         onComplete()
       })

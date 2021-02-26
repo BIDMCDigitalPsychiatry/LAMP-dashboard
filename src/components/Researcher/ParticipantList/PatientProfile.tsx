@@ -22,16 +22,7 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
-export default function PatientProfile({
-  participant,
-  onClose,
-  studies,
-  ...props
-}: {
-  participant: any
-  onClose: Function
-  studies: any
-}) {
+export default function PatientProfile({ participant, studies, ...props }: { participant: any; studies: any }) {
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
   const { t } = useTranslation()
