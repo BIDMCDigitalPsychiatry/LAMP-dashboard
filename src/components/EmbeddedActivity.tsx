@@ -105,6 +105,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   return (
     <div style={{ display: "flex", width: "100%", height: "100vh", flexDirection: "column", overflow: "hidden" }}>
+      {console.log(activity.spec)}
       {embeddedActivity !== "" && (
         <iframe
           ref={(e) => {
@@ -113,7 +114,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
           srcDoc={embeddedActivity}
-          sandbox="allow-scripts"
+          sandbox={activity.spec === "lamp.balloon_risk" ? "allow-same-origin allow-scripts" : "allow-scripts"}
         />
       )}
       <Backdrop className={classes.backdrop} open={loading}>
