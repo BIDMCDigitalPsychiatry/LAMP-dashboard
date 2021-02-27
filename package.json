@@ -78,10 +78,10 @@
     "y18n": "^5.0.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "BROWSER=none NODE_ENV=production REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
-    "build": "react-scripts build",
+    "build": "NODE_ENV=production CI=false REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
     "build-storybook": "build-storybook -s public"
