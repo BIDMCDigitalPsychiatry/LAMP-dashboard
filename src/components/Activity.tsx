@@ -10,7 +10,14 @@ import BreatheCreator from "./BreatheCreator"
 import DBTCreator from "./DBTCreator"
 import SCImageCreator from "./SCImageCreator"
 
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+]
 
 export default function Activity({
   allActivities,

@@ -335,7 +335,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+]
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()

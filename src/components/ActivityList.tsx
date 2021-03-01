@@ -489,14 +489,17 @@ export async function saveTipActivity(x) {
   let result
   if (!x.id && x.name) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
+    await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+      photo: x.icon,
+    })
   } else {
     result = (await LAMP.Activity.update(x.id, {
       settings: x.settings,
     })) as any
+    await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+      photo: x.icon,
+    })
   }
-  await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
-    photo: x.icon,
-  })
   return result
 }
 
@@ -663,9 +666,7 @@ export default function ActivityList({ researcher, title, ...props }) {
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
-
     LAMP.ActivitySpec.all().then((res) => {
-      console.log(res)
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
@@ -972,7 +973,7 @@ export default function ActivityList({ researcher, title, ...props }) {
   const updateActivity = async (x, isDuplicated) => {
     setLoading(true)
     let result = await updateActivityData(x, isDuplicated, selectedActivity)
-    if (!!result.error)
+    if (result !== undefined && !!result.error)
       enqueueSnackbar(t("Encountered an error: ") + result?.error, {
         variant: "error",
       })
