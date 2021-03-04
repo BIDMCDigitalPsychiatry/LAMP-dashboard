@@ -189,13 +189,13 @@ export default function GroupCreator({
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
       ? activities.filter(
           (x) =>
             x.spec !== "lamp.group" &&
-            (!!study ? x.parentID === study : x.parentID === value.parentID) &&
+            (!!study ? x.study_id === study : x.study_id === value.study_id) &&
             availableAtiveSpecs.includes(x.spec)
         )
       : []
@@ -272,7 +272,7 @@ export default function GroupCreator({
                   value={studyId}
                   onChange={(e) => {
                     setStudyActivities(
-                      activities.filter((x) => x.spec !== "lamp.group" && x.parentID === e.target.value)
+                      activities.filter((x) => x.spec !== "lamp.group" && x.study_id === e.target.value)
                     )
                     setStudyId(e.target.value)
                   }}

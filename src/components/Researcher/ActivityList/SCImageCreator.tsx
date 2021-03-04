@@ -116,7 +116,7 @@ export default function SCImageCreator({
   const [photo, setPhoto] = useState(details?.photo ?? ScratchCard)
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [settings, setSettings] = useState(!!value ? value?.settings : { threshold: 80 })
   const { t } = useTranslation()
 
@@ -142,7 +142,7 @@ export default function SCImageCreator({
         (x) =>
           (!!value
             ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
+            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
@@ -321,7 +321,7 @@ export default function SCImageCreator({
                   !disabled ||
                   !onSave ||
                   !text ||
-                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                  (value.name.trim() === text.trim() && value.study_id === studyId)
                 }
               >
                 Duplicate

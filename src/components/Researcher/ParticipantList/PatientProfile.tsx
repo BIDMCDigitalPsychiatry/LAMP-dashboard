@@ -1,10 +1,10 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Typography, Button, AppBar, Toolbar, Icon, IconButton, Divider } from "@material-ui/core"
+import { Box, Typography, Fab, AppBar, Toolbar, Icon, IconButton, Divider } from "@material-ui/core"
 import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import ResponsiveDialog from "../../ResponsiveDialog"
-import PatientProfilePage from "./PatientProfilePage"
+import PatientProfilePage from "./Profile/PatientProfilePage"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -19,6 +19,17 @@ const useStyles = makeStyles((theme) =>
         width: "calc(100% - 96px)",
       },
     },
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -29,15 +40,16 @@ export default function PatientProfile({ participant, studies, ...props }: { par
 
   return (
     <Box>
-      <Button
+      <Fab
         size="small"
         color="primary"
+        className={classes.btnWhite}
         onClick={() => {
           setProfileDialog(true)
         }}
       >
-        Configure
-      </Button>
+        <Icon>settings</Icon>
+      </Fab>
       <ResponsiveDialog fullScreen transient={false} animate open={!!profileDialog}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>

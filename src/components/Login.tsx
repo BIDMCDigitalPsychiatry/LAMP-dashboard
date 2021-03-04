@@ -25,9 +25,10 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import { saveDataToCache } from "./Researcher/SaveResearcherData"
+import { Service } from "./DBService/DBService"
+import Participant from "./Participant"
 import { useWorker } from "@koale/useworker"
-
+import { saveDataToCache } from "./Researcher/SaveResearcherData"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
@@ -138,9 +139,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           })
         )
         ;(async () => {
-          await dataWorker(state.id + ":" + state.password, res.identity.id)
+          await saveDataToCache(state.id + ":" + state.password, res.identity.id)
         })()
-
         setLoginClick(false)
         onComplete()
       })

@@ -340,7 +340,7 @@ export default function SurveyCreator({
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(!!value ? value.description : undefined)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const { t } = useTranslation()
   const [photo, setPhoto] = useState(value?.photo ?? null)
 
@@ -567,7 +567,7 @@ export default function SurveyCreator({
                   !onSave ||
                   questions.length === 0 ||
                   !text ||
-                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                  (value.name.trim() === text.trim() && value.study_id === studyId)
                 }
               >
                 {t("Duplicate")}

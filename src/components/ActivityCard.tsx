@@ -115,7 +115,7 @@ export default function ActivityCard({
                 x: new Date(d.timestamp),
                 y: strategies[activity.spec]
                   ? strategies[activity.spec](
-                      activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                      activity.spec === "lamp.survey"
                         ? d.temporal_slices
                         : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
                         ? d
@@ -126,7 +126,7 @@ export default function ActivityCard({
                   : 0,
                 slice: d.temporal_slices,
                 missing:
-                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                  activity.spec === "lamp.survey"
                     ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null)
                     : false, // sometimes the slice itself is missing, not set to null
               }))}
@@ -159,7 +159,7 @@ export default function ActivityCard({
             x: new Date(d.timestamp),
             y: strategies[activity.spec]
               ? strategies[activity.spec](
-                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                  activity.spec === "lamp.survey"
                     ? d.temporal_slices
                     : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
                     ? d
@@ -170,7 +170,7 @@ export default function ActivityCard({
               : 0,
             slice: d.temporal_slices,
             missing:
-              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              activity.spec === "lamp.survey"
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}

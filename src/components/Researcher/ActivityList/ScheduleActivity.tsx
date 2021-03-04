@@ -73,18 +73,8 @@ import Activity from "./Activity"
 //const timeAgo = new TimeAgo("en-US")
 
 import Header from "./Header"
-
-import {
-  updateActivityData,
-  unspliceActivity,
-  unspliceTipsActivity,
-  spliceActivity,
-  saveGroupActivity,
-  saveTipActivity,
-  saveSurveyActivity,
-  saveCTestActivity,
-} from "./Index"
-import { availableAtiveSpecs, games } from "./Index"
+import UpdateActivity from "./UpdateActivity"
+import { updateActivityData } from "./Index"
 
 const theme = createMuiTheme({
   palette: {
@@ -128,24 +118,6 @@ const theme = createMuiTheme({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    btnBlue: {
-      background: "#7599FF",
-      borderRadius: "40px",
-      minWidth: 100,
-      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
-      lineHeight: "38px",
-
-      cursor: "pointer",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "#fff",
-      "& svg": { marginRight: 8 },
-      "&:hover": { background: "#5680f9" },
-      [theme.breakpoints.up("md")]: {
-        position: "absolute",
-      },
-    },
-
     btnWhite: {
       background: "#fff",
       borderRadius: "40px",
@@ -157,7 +129,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
-
     toolbardashboard: {
       minHeight: 100,
       padding: "0 10px",
@@ -317,110 +288,38 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function UpdateActivity({ activity, activities, studies, ...props }) {
+export default function ScheduleActivity({ activity, ...props }) {
   const classes = useStyles()
-  const { t } = useTranslation()
-  const [showUpdate, setShowUpdate] = useState(false)
-  const [gameDetails, setGameDetails] = useState(null)
-  const [selectedActivity, setSelectedActivity] = useState(null)
+  const { t, i18n } = useTranslation()
+  const [showScheduler, setShowScheduler] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  useEffect(() => {
-    ;(async () => {})()
-  }, [])
 
-  // Commit an update to an Activity object (ONLY DESCRIPTIONS).
-  const updateActivity = async (x, isDuplicated) => {
-    let result = await updateActivityData(x, isDuplicated, selectedActivity)
-    if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-        variant: "error",
-      })
-    else
-      enqueueSnackbar(t("Successfully updated the Activity."), {
-        variant: "success",
-      })
-    setSelectedActivity(undefined)
+  const updateSchedule = async (x) => {
+    let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
+    // onChange()
+    setShowScheduler(false)
   }
-
-  // Begin an Activity object modification (ONLY DESCRIPTIONS).
-  const modifyActivity = async (activity) => {
-    console.log(activity)
-    if (activity.spec === "lamp.survey") {
-      let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
-        !!y.error ? undefined : y.data
-      )[0]
-      let raw = activity
-      const activityData = spliceActivity({ raw, tag })
-      setSelectedActivity(activityData)
-    } else if (activity.spec === "lamp.dbt_diary_card") {
-      setSelectedActivity(activity)
-    } else if (activity.spec === "lamp.tips") {
-      setSelectedActivity(activity)
-    } else if (
-      games.includes(activity.spec) ||
-      activity.spec === "lamp.journal" ||
-      activity.spec === "lamp.scratch_image" ||
-      activity.spec === "lamp.breathe" ||
-      activity.spec === "lamp.group"
-    ) {
-      let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-        !!y.error ? undefined : y.data
-      )[0]
-      setGameDetails(tag)
-      setSelectedActivity(activity)
-    }
-    setShowUpdate(true)
-  }
-
-  useEffect(() => {
-    console.log(selectedActivity)
-  }, [selectedActivity])
-
   return (
     <Box>
       <Fab
         size="small"
         color="primary"
-        // classes={{ root: classes.btnBlue + " " + classes.popexpand }}
         classes={{ root: classes.btnWhite }}
-        onClick={(event) => modifyActivity(activity)}
-      >
-        <Icon>update</Icon>
-      </Fab>
-
-      <ResponsiveDialog
-        fullScreen
-        transient={false}
-        animate
-        open={!!showUpdate}
-        onClose={() => {
-          setShowUpdate(false)
-          setSelectedActivity(undefined)
+        onClick={() => {
+          setShowScheduler(true)
         }}
       >
-        <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setSelectedActivity(undefined)} color="default" aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">{t("Modify an existing activity")}</Typography>
-          </Toolbar>
-        </AppBar>
-        <Divider />
-        <Box py={8} px={4}>
-          <Activity
-            allActivities={activities}
-            activity={selectedActivity}
-            onSave={updateActivity}
-            studies={studies}
-            details={gameDetails}
-            onCancel={() => {
-              setShowUpdate(false)
-              setSelectedActivity(undefined)
-            }}
-          />
+        <Icon>calendar_today</Icon>
+      </Fab>
+
+      {!!showScheduler && (
+        <Box>
+          <IconButton onClick={() => setShowScheduler(false)}>
+            <Icon>close</Icon>
+          </IconButton>
+          <ActivityScheduler activity={activity} onChange={(x) => updateSchedule({ ...activity, schedule: x })} />
         </Box>
-      </ResponsiveDialog>
+      )}
     </Box>
   )
 }

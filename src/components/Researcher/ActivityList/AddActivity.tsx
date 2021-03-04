@@ -1,52 +1,24 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
   MenuItem,
   AppBar,
   Toolbar,
   Icon,
   IconButton,
   Divider,
-  Backdrop,
-  CircularProgress,
-  Chip,
-  Tooltip,
   Grid,
   Fab,
-  Container,
   Typography,
   Popover,
-  Select,
 } from "@material-ui/core"
-import SurveyCreator from "./SurveyCreator"
-import JournalCreator from "./JournalCreator"
-import GroupCreator from "./GroupCreator"
-import TipCreator from "./TipCreator"
-import DBTCreator from "./DBTCreator"
-import GameCreator from "./GameCreator"
-import BreatheCreator from "./BreatheCreator"
-import SCImageCreator from "./SCImageCreator"
 import LAMP from "lamp-core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import {
-  unspliceActivity,
-  unspliceTipsActivity,
-  spliceActivity,
-  updateActivityData,
-  saveGroupActivity,
-  saveTipActivity,
-  saveSurveyActivity,
-  saveCTestActivity,
-} from "../ActivityList/Index"
-import { availableAtiveSpecs, games } from "./Activities"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import { availableAtiveSpecs } from "./Index"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import ImportActivity from "./ImportActivity"
+import Activity from "./Activity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -60,14 +32,6 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 30,
         width: "calc(100% - 96px)",
       },
-    },
-    activityContent: {
-      padding: "25px 50px 0",
-    },
-
-    backdrop: {
-      zIndex: 111111,
-      color: "#fff",
     },
     btnBlue: {
       background: "#7599FF",
@@ -85,16 +49,9 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up("md")]: {
         position: "absolute",
       },
-    },
-    btnImport: {
-      height: 48,
-      width: 48,
-      background: "white",
-      boxShadow: "none",
-      marginRight: 15,
-      color: "#7599FF",
-
-      // "&:hover": { background: "#f4f4f4" },
+      [theme.breakpoints.down("sm")]: {
+        minWidth: "auto",
+      },
     },
     tableContainer: {
       "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
@@ -110,65 +67,6 @@ const useStyles = makeStyles((theme: Theme) =>
         "& button": { display: "none" },
       },
     },
-    studyCode: {
-      margin: "4px 0",
-      backgroundColor: "#ECF4FF",
-      border: "2px solid #FFFFFF",
-      color: "#000000",
-    },
-
-    tableOptions: {
-      background: "#ECF4FF",
-      padding: "10px 0",
-    },
-    btnOptions: {
-      textTransform: "capitalize",
-      color: "#4C66D6",
-      margin: "0 25px 0 0",
-
-      "& span": { cursor: "pointer" },
-      "& svg": { width: 24, height: 24, fill: "#4C66D6" },
-    },
-    tableOuter: {
-      width: "100vw",
-      position: "relative",
-      left: "50%",
-      right: "50%",
-      marginLeft: "-50.6vw",
-      marginRight: "-50.6vw",
-      marginBottom: 30,
-      marginTop: -20,
-      "& input": {
-        width: 350,
-        [theme.breakpoints.down("md")]: {
-          width: 200,
-        },
-      },
-      "& div.MuiToolbar-root": { maxWidth: 1232, width: "100%", margin: "0 auto" },
-      "& h6": { fontSize: 30, fontWeight: 600 },
-    },
-
-    tagFilteredBg: {
-      color: "#5784EE !important",
-      "& path": { fill: "#5784EE !important", fillOpacity: 1 },
-    },
-    btnFilter: {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: 14,
-      lineHeight: "38px",
-      cursor: "pointer",
-      textTransform: "capitalize",
-      boxShadow: "none",
-      background: "transparent",
-      margin: "0 15px",
-      paddingRight: 0,
-      "& svg": { marginRight: 10 },
-    },
-    tableContainerWidth: {
-      maxWidth: 1055,
-      width: "80%",
-    },
-
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -193,32 +91,19 @@ const useStyles = makeStyles((theme: Theme) =>
       "& path": { fill: "#618EF7" },
       "&:hover": { backgroundColor: "#f3f3f3" },
     },
-    tableAccordian: { backgroundColor: "#f4f4f4" },
-    errorMsg: { color: "#FF0000", fontSize: 12 },
-    dragDrop: {
-      outline: "none",
-      "& h6": {
-        color: "#7599FF",
-        fontSize: 14,
+    addText: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
       },
     },
   })
 )
 
-export default function AddActivity({ activities, studies, ...props }) {
+export default function AddActivity({ activities, studies, studyId, ...props }) {
   const [activitySpecs, setActivitySpecs] = useState([])
-  const [createMenu, setCreateMenu] = useState<Element>()
-  const [showCreate, setShowCreate] = useState(false)
-  const [groupCreate, setGroupCreate] = useState(false)
-  const [showTipCreate, setShowTipCreate] = useState(false)
-  const [showCTCreate, setShowCTCreate] = useState(false)
-  const [showJournalCreate, setShowJournalCreate] = useState(false)
-  const [showBreatheCreate, setShowBreatheCreate] = useState(false)
-  const [showSCImgCreate, setShowSCImgCreate] = useState(false)
-  const [showDBTCreate, setShowDBTCreate] = useState(false)
+  const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
   const [createDialogue, setCreate] = useState(false)
-  const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
@@ -236,97 +121,21 @@ export default function AddActivity({ activities, studies, ...props }) {
   }
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
-      console.log(res)
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
     })
   }, [])
 
-  // Create a new Activity object & survey descriptions if set.
-  const saveTipsActivity = async (x) => {
-    let result = await saveTipActivity(x)
-    if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-        variant: "error",
-      })
-    else {
-      enqueueSnackbar(t("Successfully updated the Activity."), {
-        variant: "success",
-      })
-      // onChange()
-    }
-  }
-
-  // Create a new Activity object & survey descriptions if set.
-  const saveActivity = async (x) => {
-    let newItem = await saveSurveyActivity(x)
-    if (!!newItem.error)
-      enqueueSnackbar(t("Failed to create a new survey Activity."), {
-        variant: "error",
-      })
-    else
-      enqueueSnackbar(t("Successfully created a new survey Activity."), {
-        variant: "success",
-      })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
-  }
-
-  // Create a new Activity object that represents a group of other Activities.
-  const saveGroup = async (x) => {
-    let newItem = await saveGroupActivity(x)
-    if (!!newItem.error)
-      enqueueSnackbar(t("Failed to create a new group Activity."), {
-        variant: "error",
-      })
-    else
-      enqueueSnackbar(t("Successfully created a new group Activity."), {
-        variant: "success",
-      })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
-  }
-
-  // Create a new Activity object that represents a cognitive test.
-  const saveCTest = async (x) => {
-    let newItem = await saveCTestActivity(x)
-    if (!!newItem.error)
-      enqueueSnackbar(t("Failed to create a new Activity."), {
-        variant: "error",
-      })
-    else
-      enqueueSnackbar(t("Successfully created a new Activity."), {
-        variant: "success",
-      })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
-  }
-
-  const setAllFalse = () => {
-    setCreate(false)
-    setGroupCreate(false)
-    setShowCTCreate(false)
-    setShowCreate(false)
-    setShowTipCreate(false)
-    setShowBreatheCreate(false)
-    setShowJournalCreate(false)
-    setShowDBTCreate(false)
-    setShowSCImgCreate(false)
-  }
-
   return (
-    <Box py={8} px={4}>
+    <Box pl={3}>
       <Fab
         variant="extended"
         color="primary"
         classes={{ root: classes.btnBlue + " " + classes.popexpand }}
         onClick={(event) => setPopover(event.currentTarget)}
       >
-        <Icon>add</Icon> {t("Add")}
+        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
       </Fab>
 
       <Popover
@@ -348,6 +157,7 @@ export default function AddActivity({ activities, studies, ...props }) {
             onClick={() => {
               setCreate(true)
               setShowActivityImport(true)
+              setCreateMenu(false)
             }}
           >
             <Grid container style={{ marginLeft: "-15px" }}>
@@ -366,8 +176,8 @@ export default function AddActivity({ activities, studies, ...props }) {
           <MenuItem
             onClick={() => {
               setCreate(true)
-              setCreateMenu(undefined)
-              setGroupCreate(true)
+              setActivitySpecId("lamp.group")
+              setCreateMenu(true)
             }}
           >
             {t("Activity Group")}
@@ -376,8 +186,8 @@ export default function AddActivity({ activities, studies, ...props }) {
             divider
             onClick={() => {
               setCreate(true)
-              setCreateMenu(undefined)
-              setShowCreate(true)
+              setCreateMenu(true)
+              setActivitySpecId("lamp.survey")
             }}
           >
             {t("Survey Instrument")}
@@ -390,22 +200,9 @@ export default function AddActivity({ activities, studies, ...props }) {
               <MenuItem
                 key={x?.id}
                 onClick={() => {
-                  setCreateMenu(undefined)
+                  setCreateMenu(true)
                   setActivitySpecId(x.id)
                   setCreate(true)
-                  games.includes(x?.id)
-                    ? setShowCTCreate(true)
-                    : x.id === "lamp.journal"
-                    ? setShowJournalCreate(true)
-                    : x.id === "lamp.scratch_image"
-                    ? setShowSCImgCreate(true)
-                    : x.id === "lamp.breathe"
-                    ? setShowBreatheCreate(true)
-                    : x.id === "lamp.tips"
-                    ? setShowTipCreate(true)
-                    : x.id === "lamp.dbt_diary_card"
-                    ? setShowDBTCreate(true)
-                    : setShowSCImgCreate(true)
                 }}
               >
                 {x.name ? activitiesObj[x.name] : x?.name?.replace("lamp.", "")}
@@ -414,10 +211,10 @@ export default function AddActivity({ activities, studies, ...props }) {
           ]}
         </React.Fragment>
       </Popover>
-      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={setAllFalse}>
+      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={() => setCreate(false)}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={setAllFalse} color="default" aria-label="Menu">
+            <IconButton onClick={() => setCreate(false)} color="default" aria-label="Menu">
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">{t("Create a new activity")}</Typography>
@@ -426,69 +223,12 @@ export default function AddActivity({ activities, studies, ...props }) {
         <Divider />
         <Box py={8} px={4}>
           {!!showActivityImport && <ImportActivity studies={studies} activitieas={activities} />}
-          {!!groupCreate && (
-            <GroupCreator
-              activities={props.activities}
-              study={props.studyId ?? undefined}
-              studies={props.studies}
-              onSave={props.saveGroup}
-            />
-          )}
-          {!!showCTCreate && (
-            <GameCreator
-              onSave={props.saveCTest}
-              activitySpecId={props.activitySpecId}
-              studies={props.studies}
-              activities={props.activities}
-              study={props.studyId ?? undefined}
-            />
-          )}
-          {!!showJournalCreate && (
-            <JournalCreator
-              onSave={props.saveCTest}
-              activitySpecId={props.activitySpecId}
-              studies={props.studies}
-              activities={props.activities}
-              study={props.studyId ?? undefined}
-            />
-          )}
-          {!!showSCImgCreate && (
-            <SCImageCreator
-              onSave={props.saveCTest}
-              activitySpecId={props.activitySpecId}
-              studies={props.studies}
-              activities={props.activities}
-              study={props.studyId ?? undefined}
-            />
-          )}
-          {!!showTipCreate && (
-            <TipCreator
-              onSave={props.saveTipsActivity}
-              studies={props.studies}
-              allActivities={props.activities}
-              study={props.studyId ?? undefined}
-            />
-          )}
-          {!!showCreate && (
-            <SurveyCreator studies={props.studies} onSave={props.saveActivity} study={props.studyId ?? undefined} />
-          )}
-          {!!showBreatheCreate && (
-            <BreatheCreator
-              activitySpecId={props.activitySpecId}
-              studies={props.studies}
-              onSave={props.saveCTest}
-              activities={props.activities}
-              study={props.studyId ?? undefined}
-            />
-          )}
-          {!!showDBTCreate && (
-            <DBTCreator
-              activitySpecId={props.activitySpecId}
-              onCancel={props.setAllFalse}
-              studies={props.studies}
-              onSave={props.saveCTest}
-              activities={props.activities}
-              study={props.studyId ?? undefined}
+          {!!createMenu && (
+            <Activity
+              allActivities={activities}
+              studyId={studyId ?? undefined}
+              activitySpecId={activitySpecId}
+              studies={studies}
             />
           )}
         </Box>

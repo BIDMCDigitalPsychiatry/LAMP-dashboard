@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react"
-import { IconButton, Button, Typography, Card, CardHeader, Menu, CardActions, CardContent } from "@material-ui/core"
+import {
+  IconButton,
+  Fab,
+  Icon,
+  Typography,
+  Card,
+  CardHeader,
+  Menu,
+  CardActions,
+  CardContent,
+  Box,
+} from "@material-ui/core"
 import PatientProfile from "./PatientProfile"
 
 // Local Imports
@@ -14,6 +25,7 @@ import NotificationSettings from "./NotificationSettings"
 import DeleteParticipant from "./DeleteParticipant"
 import Credentials from "./Credentials"
 import { Service } from "../../DBService/DBService"
+import Checkbox from "@material-ui/core/Checkbox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,6 +58,26 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    cardMain: {
+      boxShadow: "none !important ",
+      background: "#F8F8F8",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    checkboxActive: { color: "#7599FF !important" },
+    participantHeader: { padding: "12px 5px 0" },
+    moreBtn: {},
+    participantSub: { padding: "0 5px", "&:last-child": { paddingBottom: 10 } },
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -58,40 +90,63 @@ export default function ParticipantListItem({
   ...props
 }) {
   const [openMenu, setOpenMenu] = React.useState(null)
+  const classes = useStyles()
+  const [checked, setChecked] = React.useState(false)
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked)
+  }
 
   return (
-    <Card style={{ margin: 20 }}>
-      <CardHeader
-        action={
-          <IconButton onClick={(e) => setOpenMenu(e.currentTarget)}>
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title={<ParticipantName participant={participant} />}
-        subheader={<Typography variant="overline">{participant.parent}</Typography>}
-      />
-      <CardContent>
-        <Passive participant={participant} />
-        <Active participant={participant} />
-      </CardContent>
-      <CardActions>
-        <PatientProfile participant={participant} studies={studies} />
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => {
-            onParticipantSelect(participant.id)
-          }}
-        >
-          View
-        </Button>
-      </CardActions>
+    <Card className={classes.cardMain}>
+      <Box display="flex" p={1}>
+        <Box>
+          <Checkbox
+            checked={checked}
+            onChange={handleChange}
+            classes={{ checked: classes.checkboxActive }}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
+        </Box>
+        <Box flexGrow={1}>
+          <CardHeader
+            // action={
+            //   <IconButton onClick={(e) => setOpenMenu(e.currentTarget)}>
+            //     <MoreVertIcon />
+            //   </IconButton>
+            // }
+            title={<ParticipantName participant={participant} />}
+            subheader={<Typography variant="overline">{participant.parent}</Typography>}
+            className={classes.participantHeader}
+          />
+          <CardContent className={classes.participantSub}>
+            <Passive participant={participant} />
+            <Active participant={participant} />
+          </CardContent>
+        </Box>
+        <Box>
+          <CardActions>
+            <Fab size="small" classes={{ root: classes.btnWhite }}>
+              <Icon>vpn_key</Icon>
+            </Fab>
+            <PatientProfile participant={participant} studies={studies} />
+            <Fab
+              size="small"
+              classes={{ root: classes.btnWhite }}
+              onClick={() => {
+                onParticipantSelect(participant.id)
+              }}
+            >
+              <Icon>arrow_forward</Icon>
+            </Fab>
+          </CardActions>
+        </Box>
+      </Box>
       {notificationColumn && <NotificationSettings participant={participant} />}
 
-      <Menu open={!!openMenu} anchorEl={openMenu} onClose={() => setOpenMenu(false)}>
+      {/* <Menu open={!!openMenu} anchorEl={openMenu} onClose={() => setOpenMenu(false)}>
         <Credentials participant={participant} />
         <DeleteParticipant participant={participant} />
-      </Menu>
+      </Menu> */}
     </Card>
   )
 }

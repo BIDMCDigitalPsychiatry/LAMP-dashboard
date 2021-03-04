@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Backdrop, CircularProgress } from "@material-ui/core"
+import { Box, Grid } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
@@ -182,7 +182,7 @@ function _hideCognitiveTesting() {
 export function spliceActivity({ raw, tag }) {
   return {
     id: raw.id,
-    parentID: raw.parentID,
+    study_id: raw.study_id,
     spec: "lamp.survey",
     name: raw.name,
     description: tag?.description,
@@ -225,7 +225,7 @@ export function unspliceActivity(x) {
   return {
     raw: {
       id: x.id,
-      parentID: x.parentID,
+      study_id: x.study_id,
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
@@ -266,7 +266,7 @@ export function unspliceCTActivity(x) {
 export function spliceCTActivity({ raw, tag }) {
   return {
     id: raw.id,
-    parentID: raw.parentID,
+    study_id: raw.study_id,
     spec: raw.spec,
     name: raw.name,
     description: tag?.description,
@@ -346,7 +346,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         photo: x?.photo ?? "",
       })
     } else {
-      if (selectedActivity.parentID !== x.studyID) {
+      if (selectedActivity.study_id !== x.studyID) {
         // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
         // console.dir("deleted tag " + JSON.stringify(tag))
         // await LAMP.Activity.delete(x.id)
@@ -388,7 +388,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         id: x.id,
         name: x.name,
         icon: x.icon,
-        studyID: selectedActivity.parentID,
+        studyID: selectedActivity.study_id,
         spec: "lamp.tips",
         settings: selectedActivity.settings,
         schedule: selectedActivity.schedule,
@@ -430,8 +430,10 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
   const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const classes = useStyles()
+  const [selectedActivities, setSelectedActivities] = useState([])
 
   useEffect(() => {
+    console.log(studies)
     ;(async () => {
       Service.getAll("activities").then((activities) => {
         console.log(activities)
@@ -440,24 +442,46 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
     })()
   }, [])
 
+  const handleChange = (activity, checked) => {
+    let selected = selectedActivities
+    if (checked) {
+      selected.push(activity)
+    } else {
+      selected = selected.filter((item) => item.id != activity.id)
+    }
+    console.log(selected)
+    setSelectedActivities(selected)
+  }
+
   const refreshActivities = () => {}
   return (
     <React.Fragment>
       {/* <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop> */}
-      <Header studies={studies} researcher={researcher} activities={activities} />
-      <Box className={classes.tableContainer}>
-        {!!activities &&
-          activities.map((activity) => (
-            <ActivityItem
-              activity={activity}
-              refreshActivities={refreshActivities}
-              researcher={researcher}
-              studies={studies}
-              activities={activities}
-            />
-          ))}
+      <Header
+        studies={studies}
+        researcher={researcher}
+        activities={activities}
+        selectedActivities={selectedActivities}
+      />
+      <Box className={classes.tableContainer} py={4}>
+        <Grid container spacing={3}>
+          {!!activities &&
+            activities.map((activity) => (
+              <Grid item lg={6} xs={12}>
+                <ActivityItem
+                  activity={activity}
+                  refreshActivities={refreshActivities}
+                  researcher={researcher}
+                  studies={studies}
+                  activities={activities}
+                  handleSelectionChange={handleChange}
+                  selectedActivities={selectedActivities}
+                />
+              </Grid>
+            ))}
+        </Grid>
       </Box>
     </React.Fragment>
   )

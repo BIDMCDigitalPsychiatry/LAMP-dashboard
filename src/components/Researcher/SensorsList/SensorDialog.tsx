@@ -32,6 +32,7 @@ import SnackMessage from "../../SnackMessage"
 import { makeStyles, Theme, createStyles, withStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 import Header from "./Header"
 const _qrLink = (credID, password) =>
@@ -282,10 +283,12 @@ const useStyles = makeStyles((theme) =>
 export default function SensorDialog({
   sensor,
   studies,
+  modifySensor,
   ...props
 }: {
-  sensor?: JSON
+  sensor?: any
   studies?: Array<any>
+  modifySensor?: any
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
@@ -302,42 +305,70 @@ export default function SensorDialog({
     setShowErrorMsg(false)
     setSelectedStudy(event.target.value)
   }
+
   useEffect(() => {
     LAMP.SensorSpec.all().then((res) => setSensorSpecs(res))
   }, [])
 
+  useEffect(() => {
+    setSelectedSensor(sensor)
+    setSelectedStudy(sensor ? sensor.study_id : "")
+    setSensorName(sensor ? sensor.name : "")
+    setSensorSpec(sensor ? sensor.spec : "")
+  }, [sensor])
+
   const updateSensor = async () => {
-    // setLoading(true)
     const result = await LAMP.Sensor.update(selectedSensor.id, {
       name: sensorName,
       spec: sensorSpec,
+    }).then((res) => {
+      Service.updateMultipleKeys(
+        "sensors",
+        { sensors: [{ id: selectedSensor.id, name: sensorName, spec: sensorSpec }] },
+        ["name", "spec"],
+        "id"
+      )
+      enqueueSnackbar(t("Successfully updated a sensor."), {
+        variant: "success",
+      })
+      modifySensor(true)
+      setSelectedSensor(null)
     })
-    enqueueSnackbar(t("Successfully updated a sensor."), {
-      variant: "success",
-    })
-    setSelectedSensor(null)
-    // refreshPage()
   }
 
   const saveSensor = async () => {
-    // setLoading(true)
     const result = await LAMP.Sensor.create(selectedStudy, {
       name: sensorName,
       spec: sensorSpec,
+    }).then((res) => {
+      let result = JSON.parse(JSON.stringify(res))
+      Service.getData("studies", selectedStudy).then((studiesObject) => {
+        Service.addData("sensors", [
+          { id: result.data, name: sensorName, spec: sensorSpec, study_id: selectedStudy, study: selectedStudy },
+        ])
+        Service.updateMultipleKeys(
+          "studies",
+          {
+            studies: [
+              { id: studiesObject.id, sensor_count: studiesObject.sensor_count ? studiesObject.sensor_count + 1 : 1 },
+            ],
+          },
+          ["sensor_count"],
+          "id"
+        )
+      })
+      enqueueSnackbar(t("Successfully created a sensor."), {
+        variant: "success",
+      })
+      modifySensor(true)
+      setSelectedSensor(null)
     })
-    enqueueSnackbar(t("Successfully created a sensor."), {
-      variant: "success",
-    })
-    setSelectedSensor(null)
-    // refreshPage()
   }
 
   return (
     <Dialog {...props} classes={{ paper: classes.popWidth }} aria-labelledby="simple-dialog-title">
       <div>
-        <Typography className={classes.dialogTitle}>
-          {sensor === null ? t("Add Sensor") : t("Update Sensor")}
-        </Typography>
+        <Typography className={classes.dialogTitle}>{selectedSensor ? t("Update Sensor") : t("Add Sensor")}</Typography>
         <Box mt={4}>
           <MuiThemeProvider theme={theme}>
             <TextField
@@ -349,6 +380,7 @@ export default function SensorDialog({
               label={t("Study")}
               value={selectedStudy}
               onChange={(e) => {
+                console.log(2001, e.target.value)
                 setSelectedStudy(e.target.value)
               }}
               helperText={
@@ -369,11 +401,16 @@ export default function SensorDialog({
 
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
-            <CssTextField
+            <TextField
+              error={typeof sensorName == "undefined" || sensorName === null || sensorName === "" ? true : false}
               value={sensorName}
               onChange={(event) => setSensorName(event.target.value)}
-              inputProps={{ disableunderline: "true" }}
               placeholder={t("Name")}
+              helperText={
+                typeof sensorName == "undefined" || sensorName === null || sensorName === ""
+                  ? t("Please enter Name")
+                  : ""
+              }
             />
           </div>
         </div>
@@ -405,8 +442,8 @@ export default function SensorDialog({
           </MuiThemeProvider>
         </Box>
         <Box textAlign="center" mt={2}>
-          <Button onClick={() => (sensor === null ? saveSensor() : updateSensor())} className={classes.PopupButton}>
-            <Typography className={classes.buttonText}>{sensor === null ? t("Add") : t("Update")}</Typography>
+          <Button onClick={() => (selectedSensor ? updateSensor() : saveSensor())} className={classes.PopupButton}>
+            <Typography className={classes.buttonText}>{selectedSensor ? t("Update") : t("Add")}</Typography>
           </Button>
         </Box>
       </div>

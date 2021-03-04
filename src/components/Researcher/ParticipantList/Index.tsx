@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box } from "@material-ui/core"
+import { Box, Grid } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -117,31 +117,36 @@ export default function ParticipantList({
   const [participants, setParticipants] = useState(null)
 
   useEffect(() => {
-    Service.getAll("participants").then((participants) => {
-      console.log(participants)
-      setParticipants(participants)
-    })
+    refreshParticipants()
   }, [])
 
-  const refreshParticipants = () => {}
+  const refreshParticipants = () => {
+    Service.getAll("participants").then((participants) => {
+      setParticipants(participants)
+    })
+  }
 
   return (
     <React.Fragment>
       {/* <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop> */}
-      <Header studies={studies} researcher={researcher} />
-      <Box className={classes.tableContainer}>
-        {!!participants &&
-          participants.map((eachParticipant) => (
-            <ParticipantListItem
-              participant={eachParticipant}
-              onParticipantSelect={onParticipantSelect}
-              refreshParticipants={refreshParticipants}
-              studies={studies}
-              notificationColumn={notificationColumn}
-            />
-          ))}
+      <Header studies={studies} researcher={researcher} refreshParticipants={refreshParticipants} />
+      <Box className={classes.tableContainer} py={4}>
+        <Grid container spacing={3}>
+          {!!participants &&
+            participants.map((eachParticipant) => (
+              <Grid item lg={6} xs={12}>
+                <ParticipantListItem
+                  participant={eachParticipant}
+                  onParticipantSelect={onParticipantSelect}
+                  refreshParticipants={refreshParticipants}
+                  studies={studies}
+                  notificationColumn={notificationColumn}
+                />
+              </Grid>
+            ))}
+        </Grid>
       </Box>
     </React.Fragment>
   )

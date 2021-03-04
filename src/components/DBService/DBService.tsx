@@ -5,8 +5,8 @@ const DATABASE_NAME = "LAMP-DB"
 const dbPromise = idb.openDB(DATABASE_NAME, 1, {
   upgrade(upgradeDb) {
     if (!upgradeDb.objectStoreNames.contains("researcher")) {
-      const studies = upgradeDb.createObjectStore("researcher", { keyPath: "id" })
-      studies.createIndex("id", "id", { unique: true })
+      const researcher = upgradeDb.createObjectStore("researcher", { keyPath: "id" })
+      researcher.createIndex("id", "id", { unique: true })
     }
     if (!upgradeDb.objectStoreNames.contains("studies")) {
       const studies = upgradeDb.createObjectStore("studies", { keyPath: "id" })
@@ -61,6 +61,31 @@ class DBService {
       })
   }
 
+  updateMultipleKeys(tablespace, newVal, key, conditionKey) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            newVal[tablespace].map((data) => {
+              if (cursor.key === data[conditionKey]) {
+                let value = cursor.value
+                key.forEach(function (eachKey) {
+                  value[eachKey] = data[eachKey]
+                })
+                cursor.update(value)
+              }
+            })
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
   get(tablespace, key) {
     return dbPromise
       .then((db) => {
@@ -74,6 +99,16 @@ class DBService {
             cursor = await cursor.continue()
           }
         })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  getData(tablespace, key) {
+    return dbPromise
+      .then((db) => {
+        return db.transaction([tablespace], "readonly").objectStore(tablespace).get(key)
       })
       .catch((error) => {
         // Do something?

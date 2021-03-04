@@ -70,7 +70,9 @@ export default function StudyCreator({ studies, researcher, ...props }) {
     study.name = studyName
     LAMP.Study.create(researcher.id, study).then((res) => {
       let result = JSON.parse(JSON.stringify(res))
-      Service.addData("studies", [{ id: result.data, name: studyName }])
+      Service.addData("studies", [
+        { id: result.data, name: studyName, participants_count: 0, activity_count: 0, sensor_count: 0 },
+      ])
       enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
         variant: "success",
       })

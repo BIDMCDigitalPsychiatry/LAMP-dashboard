@@ -162,7 +162,7 @@ export default function TipCreator({
   const [selectedCategory, setSelectedCategory]: any = useState({})
   const [deletedIds, setDeletedIds]: any = useState("")
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
-  const [studyId, setStudyId] = useState(!!activities ? activities.parentID : study)
+  const [studyId, setStudyId] = useState(!!activities ? activities.study_id : study)
   const [openDialog, setOpenDialog] = useState(false)
   const [clickDeleteId, setClickDeleteId] = useState("")
   const [isDuplicate, setIsDuplicate] = useState(false)

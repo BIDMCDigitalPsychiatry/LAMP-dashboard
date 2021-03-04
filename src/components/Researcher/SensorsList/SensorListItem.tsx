@@ -197,6 +197,11 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function ActivityItem({ sensor, studies, ...props }) {
   const classes = useStyles()
 
+  const updateDataSensor = () => {
+    console.log(2011, props)
+    props.updateDataSensor(true)
+  }
+
   return (
     <Card style={{ margin: 20 }}>
       <CardHeader
@@ -214,7 +219,7 @@ export default function ActivityItem({ sensor, studies, ...props }) {
         }
       />
       <CardActions>
-        <UpdateSensor sensor={sensor} studies={studies} />
+        <UpdateSensor sensor={sensor} studies={studies} type="list" updateDataSensor={updateDataSensor} />
       </CardActions>
     </Card>
   )

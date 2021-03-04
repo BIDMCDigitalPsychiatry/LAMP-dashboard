@@ -196,7 +196,7 @@ export default function GameCreator({
 
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const { t } = useTranslation()
   const [settings, setSettings] = useState(
     !!value
@@ -259,7 +259,7 @@ export default function GameCreator({
         (x) =>
           (!!value
             ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
+            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
@@ -1037,7 +1037,7 @@ export default function GameCreator({
                   !disabled ||
                   !onSave ||
                   !text ||
-                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                  (value.name.trim() === text.trim() && value.study_id === studyId)
                 }
               >
                 {t("Duplicate")}

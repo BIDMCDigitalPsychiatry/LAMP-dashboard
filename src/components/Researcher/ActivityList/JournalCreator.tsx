@@ -109,6 +109,7 @@ export default function JournalCreator({
   studies?: any
   study?: any
 }) {
+  console.log(value)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
@@ -116,7 +117,7 @@ export default function JournalCreator({
   const [photo, setPhoto] = useState(details?.photo ?? JournalIcon)
   const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const { t } = useTranslation()
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
@@ -141,7 +142,7 @@ export default function JournalCreator({
         (x) =>
           (!!value
             ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
+            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
@@ -213,11 +214,16 @@ export default function JournalCreator({
                     variant="filled"
                     disabled={!!value || !!study ? true : false}
                   >
-                    {studies.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {t(option.name)}
-                      </MenuItem>
-                    ))}
+                    {console.log(studies)}
+                    {studies.map((option) => {
+                      console.log(option, option.name)
+                    })}
+                    {!!studies &&
+                      studies.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {t(option.name)}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Grid>
                 <Grid item xs>
@@ -292,7 +298,7 @@ export default function JournalCreator({
                   !disabled ||
                   !onSave ||
                   !text ||
-                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                  (value.name.trim() === text.trim() && value.study_id === studyId)
                 }
               >
                 {t("Duplicate")}

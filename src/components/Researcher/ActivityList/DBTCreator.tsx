@@ -218,7 +218,7 @@ export default function GameCreator({
   const [activity, setActivity] = useState(value ?? null)
   const [targetDialog, setTargetDialog] = React.useState(false)
   const [emotionDialog, setEmotionDialog] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [config, setConfig] = useState(!!value ? value?.settings : {})
   const [text, setText] = useState(!!value ? value.name : undefined)
   const { enqueueSnackbar } = useSnackbar()
@@ -290,7 +290,7 @@ export default function GameCreator({
         (x) =>
           (!!value
             ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
+            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })

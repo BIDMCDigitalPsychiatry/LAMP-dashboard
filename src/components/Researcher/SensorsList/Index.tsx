@@ -278,14 +278,23 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
+  const [dataModified, setDataModified] = useState(false)
 
   useEffect(() => {
     ;(async () => {
       Service.getAll("sensors").then((sensors) => {
         setSensors(sensors)
+        setDataModified(false)
+        console.log(800)
       })
     })()
-  }, [])
+    // }, [])
+  }, [dataModified])
+
+  const updateDataSensor = () => {
+    console.log(700)
+    setDataModified(true)
+  }
 
   return (
     <React.Fragment>
@@ -296,12 +305,12 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
         {t("Sensors")}
       </Typography>
 
-      <Header studies={studies} researcher={researcher} />
+      <Header studies={studies} researcher={researcher} updateDataSensor={updateDataSensor} />
 
       <Grid container spacing={0}>
         <Grid item xs={10} sm={8}>
           {(sensors ?? []).map((item, index) => (
-            <SensorListItem sensor={item} studies={studies} />
+            <SensorListItem sensor={item} studies={studies} updateDataSensor={updateDataSensor} />
           ))}
           <AddSensor studies={studies} />
         </Grid>

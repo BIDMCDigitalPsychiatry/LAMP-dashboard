@@ -1,75 +1,15 @@
-import React, { useState } from "react"
-import {
-  Box,
-  IconButton,
-  Button,
-  TextField,
-  Popover,
-  MenuItem,
-  Tooltip,
-  Grid,
-  Fab,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  ButtonBase,
-} from "@material-ui/core"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
-
-import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
-
-import CloseIcon from "@material-ui/icons/Close"
-
-import QRCode from "qrcode.react"
-// Local Imports
-import LAMP, { Study } from "lamp-core"
-
-import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-
-import { useTranslation } from "react-i18next"
-
-import SensorDialog from "./SensorDialog"
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
-const theme = createMuiTheme({
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-        borderRadius: "10px !important",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
-
+// Core Imports
+import React, { useState, useEffect } from "react"
+import { Box, Typography, Icon, IconButton } from "@material-ui/core"
+import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Service } from "../../../DBService/DBService"
+import ConfirmationDialog from "./ConfirmationDialog"
+import UpdateSensor from "../../SensorsList/UpdateSensor"
 const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
     },
     backdrop: {
@@ -99,7 +39,7 @@ const useStyles = makeStyles((theme) =>
       borderRadius: 25,
       backgroundColor: "transparent",
       marginTop: 10,
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
       display: "flex",
     },
@@ -114,7 +54,7 @@ const useStyles = makeStyles((theme) =>
       flexDirection: "column",
       marginTop: 55,
       marginBottom: 55,
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
     },
     headerButton: {
@@ -152,7 +92,7 @@ const useStyles = makeStyles((theme) =>
       marginTop: 17,
       display: "flex",
       flexDirection: "column",
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
       height: 60,
       paddingRight: 20,
@@ -178,7 +118,7 @@ const useStyles = makeStyles((theme) =>
     rowContainer: {
       display: "flex",
       width: "100%",
-      alignItems: "center",
+      alignsensors: "center",
       height: 36,
       fontWeight: 600,
     },
@@ -194,12 +134,12 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.45)",
       marginRight: 10,
       display: "flex",
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
     },
     addContainer: {
       display: "flex",
-      alignItems: "center",
+      alignsensors: "center",
     },
     addButtonTitle: {
       color: "#5784EE",
@@ -213,7 +153,7 @@ const useStyles = makeStyles((theme) =>
       height: 22,
       marginLeft: 6,
       display: "flex",
-      alignItems: "center",
+      alignsensors: "center",
       justifyContent: "center",
     },
     popWidth: { width: "95%", maxWidth: "500px", padding: "0 40px" },
@@ -266,42 +206,18 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-
-export default function AddSensor({
-  studies,
-  updateDataSensor,
-  ...props
-}: {
-  studies?: Array<any>
-  updateDataSensor?: any
-}) {
+export default function SensorRow({ sensor, index, studies, ...props }: { sensor: any; index: number; studies: any }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
-  const [sensorDialog, setSensorDialog] = useState(false)
-
-  const modifySensor = () => {
-    console.log(4000)
-    updateDataSensor(true)
-    setSensorDialog(false)
-  }
 
   return (
-    <Box>
-      <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
-        <div className={classes.addButton}>
-          <AddCircleOutline onClick={() => setSensorDialog(true)} />
-        </div>
-        <Typography onClick={() => setSensorDialog(true)} className={classes.addButtonTitle}>
-          {t("Add item")}
-        </Typography>
-      </ButtonBase>
-      <SensorDialog
-        studies={studies}
-        modifySensor={modifySensor}
-        // modifySensor={updateDataSensor}
-        onClose={() => setSensorDialog(false)}
-        open={sensorDialog}
-      />
-    </Box>
+    <div className={classes.rowContainer} style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}>
+      <Typography className={classes.contentText} style={{ flex: 1 }}>
+        {sensor.name}
+      </Typography>
+      <Typography className={classes.contentText} style={{ flex: 1 }}>
+        {sensor.spec?.replace("lamp.", "")}
+      </Typography>
+      <UpdateSensor sensor={sensor} studies={studies} type="profile" />
+    </div>
   )
 }

@@ -121,7 +121,7 @@ export default function EditUserField({
         <TextField
           inputRef={inputRef}
           variant="outlined"
-          margin="dense"
+          size="small"
           disabled={editData && editUserId === participant.id ? false : true}
           label={participant.id}
           value={alias || ""}

@@ -131,16 +131,17 @@ export default function JournalEntries({ participant, activityId, ...props }) {
 
   const saveJournal = () => {
     setLoading(true)
-    LAMP.ActivityEvent.create(participant.id, {
-      timestamp: time,
+    let data = {
+      timestamp: new Date().getTime(),
       duration: new Date().getTime() - time,
       activity: activityId,
       static_data: {
         text: journalValue,
         sentiment: status,
       },
-      temporal_slices: [],
-    } as any)
+      temporal_slices: {},
+    }
+    LAMP.ActivityEvent.create(participant.id, data)
       .catch((e) => console.dir(e))
       .then((x) => {
         setLoading(false)

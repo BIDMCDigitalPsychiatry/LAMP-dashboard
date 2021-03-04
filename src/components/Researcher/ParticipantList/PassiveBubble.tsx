@@ -6,14 +6,14 @@ import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
-    margin: "4px 0",
+    margin: "4px 5px 4px 0",
     backgroundColor: "#E9F8E7",
     color: "#FFF",
   },
   dataGreen: { backgroundColor: "#e0ffe1 !important", color: "#4caf50" },
   dataYellow: { backgroundColor: "#fff8bc !important", color: "#a99700" },
   dataRed: { backgroundColor: "#ffcfcc !important", color: "#f44336" },
-  dataGrey: { backgroundColor: "#d4d4d4 !important", color: "#424242" },
+  dataGrey: { backgroundColor: "#e4e4e4 !important", color: "#424242" },
 }))
 
 export default function Passive({ participant, ...props }) {

@@ -81,6 +81,9 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up("sm")]: {
         width: "450px",
       },
+      [theme.breakpoints.down("md")]: {
+        width: "300px",
+      },
     },
     searchIcon: {
       padding: theme.spacing(0, 2),
@@ -119,6 +122,9 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
       [theme.breakpoints.up("md")]: {
         position: "absolute",
+      },
+      [theme.breakpoints.down("sm")]: {
+        minWidth: "auto",
       },
     },
     toolbardashboard: {
@@ -277,72 +283,120 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    addText: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
+    },
+    optionsMain: {
+      background: "#ECF4FF",
+      borderTop: "1px solid #C7C7C7",
+
+      marginTop: 20,
+      width: "99.4vw",
+      position: "relative",
+      left: "50%",
+      right: "50%",
+      marginLeft: "-50vw",
+      marginRight: "-50vw",
+    },
+    optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
+    btnText: {
+      background: "transparent",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      paddingLeft: "10px !important",
+      paddingRight: "15px !important",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff" },
+      "& span.MuiIcon-root": { fontSize: 20, marginRight: 3 },
+      [theme.breakpoints.up("md")]: {
+        //position: "absolute",
+      },
+    },
   })
 )
 
-export default function Header({ studies, researcher, ...props }) {
+export default function Header({ studies, researcher, refreshParticipants, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
   const [openDialog, setOpenDialog] = useState(false)
   const [popover, setPopover] = useState(null)
 
   return (
-    <Box display="flex" className={classes.header}>
-      <Box flexGrow={1} pt={1}>
-        {" "}
-        <Typography variant="h5">Patients</Typography>
-      </Box>
+    <Box>
+      <Box display="flex" className={classes.header}>
+        <Box flexGrow={1} pt={1}>
+          <Typography variant="h5">Patients</Typography>
+        </Box>
 
-      <Box>
-        <StudyFilter researcher={researcher} studies={studies} type="participants" />
-      </Box>
+        <Box>
+          <StudyFilter researcher={researcher} studies={studies} type="participants" />
+        </Box>
 
-      <Box>
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
-            <SearchIcon />
+        <Box>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}>
+              <SearchIcon />
+            </div>
+            <InputBase
+              placeholder="Search…"
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }}
+              inputProps={{ "aria-label": "search" }}
+            />
           </div>
-          <InputBase
-            placeholder="Search…"
-            classes={{
-              root: classes.inputRoot,
-              input: classes.inputInput,
-            }}
-            inputProps={{ "aria-label": "search" }}
-          />
-        </div>
-      </Box>
-      <Box>
-        {" "}
-        <Fab
-          variant="extended"
-          color="primary"
-          classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
-          onClick={(event) => setPopover(event.currentTarget)}
+        </Box>
+        <Box>
+          <Fab
+            variant="extended"
+            color="primary"
+            classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
+            onClick={(event) => setPopover(event.currentTarget)}
+          >
+            <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+          </Fab>
+        </Box>
+        <Popover
+          classes={{ root: classes.customPopover, paper: classes.customPaper }}
+          open={!!popover ? true : false}
+          anchorPosition={!!popover && popover.getBoundingClientRect()}
+          anchorReference="anchorPosition"
+          onClose={() => setPopover(null)}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
         >
-          <Icon>add</Icon> {t("Add")}
-        </Fab>
+          <React.Fragment>
+            <StudyCreator studies={studies} researcher={researcher} />
+            <AddUser researcher={researcher} studies={studies} refreshParticipants={refreshParticipants} />
+          </React.Fragment>
+        </Popover>
       </Box>
-      <Popover
-        classes={{ root: classes.customPopover, paper: classes.customPaper }}
-        open={!!popover ? true : false}
-        anchorPosition={!!popover && popover.getBoundingClientRect()}
-        anchorReference="anchorPosition"
-        onClose={() => setPopover(null)}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <React.Fragment>
-          <StudyCreator studies={studies} researcher={researcher} />
-          <AddUser researcher={researcher} studies={studies} />
-        </React.Fragment>
-      </Popover>
+      <Box className={classes.optionsMain}>
+        <Box className={classes.optionsSub}>
+          <Fab
+            variant="extended"
+            size="small"
+            classes={{ root: classes.btnText }}
+            // onClick={(event) => setConfirmationDialog(6)}
+          >
+            <Icon>delete_outline</Icon> {t("Delete")}
+          </Fab>
+        </Box>
+      </Box>
     </Box>
   )
 }

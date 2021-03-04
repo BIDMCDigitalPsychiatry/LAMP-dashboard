@@ -27,6 +27,12 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
       "& svg": { marginRight: 10 },
     },
+
+    filterText: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
+    },
   })
 )
 
@@ -73,7 +79,8 @@ export default function StudyFilter({ researcher, studies, type, ...props }) {
           showFilter === true ? setShowFilter(false) : setShowFilter(true)
         }}
       >
-        <Filter /> {t("Filter results")} {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+        <Filter /> <span className={classes.filterText}>{t("Filter results")}</span>{" "}
+        {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
       </Fab>
       {showFilter === true && (
         <Box mt={1}>

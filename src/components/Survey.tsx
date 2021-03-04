@@ -213,14 +213,7 @@ async function getDetails(activityId: string, spec: string) {
   ].map((y: any) => (!!y.error ? undefined : y.data))[0]
 }
 
-const games = [
-  "lamp.jewels_a",
-  "lamp.jewels_b",
-  "lamp.spatial_span",
-  "lamp.cats_and_dogs",
-  "lamp.pop_the_bubbles",
-  "lamp.balloon_risk",
-]
+const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
 export default function Survey({
   participant,

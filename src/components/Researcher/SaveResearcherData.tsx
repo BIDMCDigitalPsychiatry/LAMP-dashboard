@@ -20,18 +20,19 @@ const saveStudiesAndParticipants = (result) => {
   let participants = []
   result.studies.map((study) => {
     let each = study.participants
-    participants = participants.concat([
-      Object.assign(
-        {},
-        ...each.map((item) => ({
-          parent: study.name,
-          parentID: study.id,
-          id: item.id,
-        }))
-      ),
-    ])
+    if (each.length > 0) {
+      participants = participants.concat([
+        Object.assign(
+          {},
+          ...each.map((item) => ({
+            parent: study.name,
+            parentID: study.id,
+            id: item.id,
+          }))
+        ),
+      ])
+    }
   })
-
   Service.addData("studies", studies)
   Service.addData("participants", participants)
 }

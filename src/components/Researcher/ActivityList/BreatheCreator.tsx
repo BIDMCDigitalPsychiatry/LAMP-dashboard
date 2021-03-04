@@ -154,7 +154,7 @@ export default function BreatheCreator({
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.parentID : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [disabled, setDisabled] = useState(true)
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [description, setDescription] = useState(details?.description ?? null)
@@ -201,7 +201,7 @@ export default function BreatheCreator({
         (x) =>
           (!!value
             ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.parentID
+            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
@@ -400,7 +400,7 @@ export default function BreatheCreator({
 
                   <Grid container direction="row" justify="flex-start" alignItems="center">
                     <Grid>
-                      {settings.audio && (
+                      {!!settings?.audio && (
                         <audio controls src={settings.audio}>
                           {t("Your browser does not support the")}
                           <code>{t("audio")}</code> {t("element.")}
@@ -464,7 +464,7 @@ export default function BreatheCreator({
                   !disabled ||
                   !onSave ||
                   !text ||
-                  (value.name.trim() === text.trim() && value.parentID === studyId)
+                  (value.name.trim() === text.trim() && value.study_id === studyId)
                 }
               >
                 {t("Duplicate")}

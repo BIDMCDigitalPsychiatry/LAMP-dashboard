@@ -71,10 +71,11 @@ import ActivityScheduler from "./ActivityScheduler"
 import Activity from "./Activity"
 //TimeAgo.addLocale(en)
 //const timeAgo = new TimeAgo("en-US")
-
+import ScheduleActivity from "./ScheduleActivity"
 import Header from "./Header"
 import UpdateActivity from "./UpdateActivity"
 import { updateActivityData } from "./Index"
+import Checkbox from "@material-ui/core/Checkbox"
 
 const theme = createMuiTheme({
   palette: {
@@ -291,94 +292,88 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    activityHeader: { padding: "12px 5px" },
+    cardMain: {
+      boxShadow: "none !important ",
+      background: "#F8F8F8",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    btnSchedule: {
+      background: "#fff",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "none",
+      lineHeight: "38px",
+
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    checkboxActive: { color: "#7599FF !important" },
   })
 )
 
-export default function ActivityItem({ activity, refreshActivities, researcher, studies, activities, ...props }) {
+export default function ActivityItem({
+  activity,
+  refreshActivities,
+  researcher,
+  studies,
+  activities,
+  handleSelectionChange,
+  selectedActivities,
+  ...props
+}) {
   const classes = useStyles()
   const [deleteConfirmationDialog, setDeleteConfirmationDialog] = useState(false)
   const { t, i18n } = useTranslation()
   const [showScheduler, setShowScheduler] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const [checked, setChecked] = React.useState(false)
+
+  const handleChange = (activity, event) => {
+    setChecked(event.target.checked)
+    handleSelectionChange(activity, event.target.checked)
+  }
 
   useEffect(() => {
     ;(async () => {})()
   }, [])
 
-  // Commit an update to an Activity object (ONLY DESCRIPTIONS).
-  const updateActivity = async (x, isDuplicated) => {
-    let result = await updateActivityData(x, isDuplicated, selectedActivity)
-    if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-        variant: "error",
-      })
-    else
-      enqueueSnackbar(t("Successfully updated the Activity."), {
-        variant: "success",
-      })
-    setSelectedActivity(undefined)
-  }
-
-  const deleteActivities = async (activities) => {
-    for (let activity of activities) {
-      let tag
-      if (activity.spec === "lamp.survey") {
-        tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
-      } else {
-        tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
-      }
-      console.dir("deleted tag " + JSON.stringify(tag))
-
-      let raw = await LAMP.Activity.delete(activity.id)
-      // let selectedStudy = studies.filter((study) => study.id === activity.parentID)[0]
-      // setStudiesCount({ ...studiesCount, [selectedStudy.name]: --studiesCount[selectedStudy.name] })
-      // console.dir(raw)
-    }
-    enqueueSnackbar(t("Successfully deleted the selected Activities."), {
-      variant: "success",
-    })
-  }
-
-  const updateSchedule = async (x) => {
-    let result = await LAMP.Activity.update(x.id, { schedule: x.schedule })
-    // onChange()
-    setShowScheduler(false)
-  }
   return (
-    <Card style={{ margin: 20 }}>
-      <CardHeader
-        title={activity.name}
-        subheader={
-          <Box>
-            <Typography variant="overline">{activity.spec?.replace("lamp.", "")}</Typography>
-            <Typography variant="overline">{activity.parent}</Typography>
-          </Box>
-        }
-      />
-      <CardContent></CardContent>
-      <CardActions>
-        <UpdateActivity activity={activity} activities={activities} studies={studies} />
-
-        <Button
-          size="small"
-          color="primary"
-          onClick={() => {
-            setShowScheduler(true)
-          }}
-        >
-          Schedule
-        </Button>
-      </CardActions>
-
-      {!!showScheduler && (
+    <Card className={classes.cardMain}>
+      <Box display="flex" p={1}>
         <Box>
-          <IconButton onClick={() => setShowScheduler(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-          <ActivityScheduler activity={activity} onChange={(x) => updateSchedule({ ...activity, schedule: x })} />
+          <Checkbox
+            checked={checked}
+            onChange={(event) => handleChange(activity, event)}
+            classes={{ checked: classes.checkboxActive }}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
         </Box>
-      )}
+        <Box flexGrow={1}>
+          <CardHeader
+            className={classes.activityHeader}
+            title={activity.name}
+            subheader={
+              <Box>
+                <Typography variant="subtitle1">{activity.spec?.replace("lamp.", "")}</Typography>
+                <Typography variant="body2">{activity.study_name}</Typography>
+              </Box>
+            }
+          />
+        </Box>
+        <Box>
+          <CardActions>
+            <UpdateActivity activity={activity} activities={activities} studies={studies} />
+
+            <ScheduleActivity activity={activity} />
+          </CardActions>
+        </Box>
+      </Box>
     </Card>
   )
 }

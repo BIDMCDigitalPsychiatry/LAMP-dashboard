@@ -120,10 +120,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
       Service.getAll("studies").then((studies) => {
         setStudies(studies)
       })
-      Service.getAll("researcher").then((data) => {
-        let researcherNotification = data[0]?.notification ?? false
-        setNotification(researcherNotification)
-      })
+      // Service.getAll("researcher").then((data) => {
+      //   let researcherNotification = data[0]?.notification ?? false
+      //   setNotification(researcherNotification)
+      // })
       setCurrentTab(0)
     })()
   }, [])

@@ -3,6 +3,7 @@ import React from "react"
 import { Typography, makeStyles, Box, Grid, colors, CardContent } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
+import RadialDonutChart from "./RadialDonutChart"
 import ActivityCard from "./ActivityCard"
 import { useTranslation } from "react-i18next"
 
@@ -78,9 +79,8 @@ export default function PreventData({
           style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
         >
           {graphType === 1 ? (
-            <div />
-          ) : /*<RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />*/
-          graphType === 2 ? (
+            <RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />
+          ) : graphType === 2 ? (
             <Sparkline
               minWidth={250}
               minHeight={450}

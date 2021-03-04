@@ -365,13 +365,9 @@ export default function Root({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const getSelectedLanguage = () => {
-    const lang = Object.keys(locale_lang)
-      .filter((key) => navigator.language.includes(key))
-      .reduce((obj, key) => {
-        return key
-      }, {})
-
-    return i18n.language ? i18n.language : lang ? lang : "en"
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
   useEffect(() => {

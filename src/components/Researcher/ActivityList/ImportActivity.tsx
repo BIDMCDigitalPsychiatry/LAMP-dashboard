@@ -274,7 +274,7 @@ export default function ImportActivity({ studies, ...props }) {
         allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
           ...raw,
           id: undefined,
-          parentId: undefined,
+          study_id: undefined,
           tableData: undefined,
         } as any)) as any).data
         await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
