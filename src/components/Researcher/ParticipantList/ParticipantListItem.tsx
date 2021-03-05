@@ -87,13 +87,16 @@ export default function ParticipantListItem({
   refreshParticipants,
   studies,
   notificationColumn,
+  handleSelectionChange,
   ...props
 }) {
   const [openMenu, setOpenMenu] = React.useState(null)
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
+    handleSelectionChange(participant.id, event.target.checked)
   }
 
   return (
@@ -102,18 +105,13 @@ export default function ParticipantListItem({
         <Box>
           <Checkbox
             checked={checked}
-            onChange={handleChange}
+            onChange={(event) => handleChange(participant, event)}
             classes={{ checked: classes.checkboxActive }}
             inputProps={{ "aria-label": "primary checkbox" }}
           />
         </Box>
         <Box flexGrow={1}>
           <CardHeader
-            // action={
-            //   <IconButton onClick={(e) => setOpenMenu(e.currentTarget)}>
-            //     <MoreVertIcon />
-            //   </IconButton>
-            // }
             title={<ParticipantName participant={participant} />}
             subheader={<Typography variant="overline">{participant.parent}</Typography>}
             className={classes.participantHeader}
@@ -125,9 +123,7 @@ export default function ParticipantListItem({
         </Box>
         <Box>
           <CardActions>
-            <Fab size="small" classes={{ root: classes.btnWhite }}>
-              <Icon>vpn_key</Icon>
-            </Fab>
+            <Credentials participant={participant} />
             <PatientProfile participant={participant} studies={studies} />
             <Fab
               size="small"
@@ -142,11 +138,6 @@ export default function ParticipantListItem({
         </Box>
       </Box>
       {notificationColumn && <NotificationSettings participant={participant} />}
-
-      {/* <Menu open={!!openMenu} anchorEl={openMenu} onClose={() => setOpenMenu(false)}>
-        <Credentials participant={participant} />
-        <DeleteParticipant participant={participant} />
-      </Menu> */}
     </Card>
   )
 }

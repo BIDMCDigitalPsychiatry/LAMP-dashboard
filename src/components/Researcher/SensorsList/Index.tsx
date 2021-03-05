@@ -82,6 +82,27 @@ const useStyles = makeStyles((theme) =>
       color: "#fff",
     },
 
+    header: {
+      "& h5": {
+        fontSize: "30px",
+        fontWeight: "bold",
+      },
+    },
+    tableContainer: {
+      "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
+      "& div.MuiInput-underline:after": { borderBottom: "0 !important" },
+      "& div.MuiInput-underline": {
+        "& span.material-icons": {
+          width: 21,
+          height: 19,
+          fontSize: 27,
+          lineHeight: "23PX",
+          color: "rgba(0, 0, 0, 0.4)",
+        },
+        "& button": { display: "none" },
+      },
+    },
+
     buttonContainer: {
       width: 200,
       height: 50,
@@ -278,44 +299,96 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
-  const [dataModified, setDataModified] = useState(false)
+  const [updatedData, setUpdatedData] = useState({})
+  const [selectedSensors, setSelectedSensors] = useState([])
 
   useEffect(() => {
     ;(async () => {
       Service.getAll("sensors").then((sensors) => {
         setSensors(sensors)
-        setDataModified(false)
-        console.log(800)
       })
     })()
-    // }, [])
-  }, [dataModified])
+  }, [])
 
-  const updateDataSensor = () => {
-    console.log(700)
-    setDataModified(true)
+  const updatedSensor = (data) => {
+    // setLoading(true)
+    if (data.fn_type === "update") {
+      let dataSensors = [...sensors]
+      let index = dataSensors.findIndex((obj) => obj.id === data.id)
+      dataSensors[index].name = data.name
+      dataSensors[index].spec = data.spec
+      setSensors(dataSensors)
+    } else {
+      setSensors((prevState) => {
+        const tasks = prevState.filter((eachSensor) => eachSensor.id !== data.id)
+        return tasks
+      })
+    }
+    // setLoading(false)
+  }
+
+  const addedSensor = (data) => {
+    setSensors((prevState) => [...prevState, data])
+  }
+
+  const handleChange = (activity, checked) => {
+    let selected = selectedSensors
+    if (checked) {
+      selected.push(activity)
+    } else {
+      selected = selected.filter((item) => item.id != activity.id)
+    }
+    setSelectedSensors(selected)
+  }
+
+  const handleDeleted = (val) => {
+    if (val) {
+      let newSensors = sensors.filter((i) => !selectedSensors.some((j) => j.id === i.id))
+      setSensors(newSensors)
+    }
+  }
+
+  const handleSearchData = (val) => {
+    if (val) {
+      let newSensors = sensors.filter((i) => i.name.includes(val))
+      setSensors(newSensors)
+    } else {
+      Service.getAll("sensors").then((sensors) => {
+        setSensors(sensors)
+      })
+    }
   }
 
   return (
     <React.Fragment>
-      {/* <Backdrop className={classes.backdrop} open={loading}>
+      {/*
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
-      </Backdrop> */}
-      <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
-        {t("Sensors")}
-      </Typography>
-
-      <Header studies={studies} researcher={researcher} updateDataSensor={updateDataSensor} />
-
-      <Grid container spacing={0}>
-        <Grid item xs={10} sm={8}>
+      </Backdrop>
+      */}
+      <Header
+        studies={studies}
+        researcher={researcher}
+        selectedSensors={selectedSensors}
+        deleted={handleDeleted}
+        addedSensor={addedSensor}
+        searchData={handleSearchData}
+      />
+      <Box className={classes.tableContainer} py={4}>
+        <Grid container spacing={3}>
           {(sensors ?? []).map((item, index) => (
-            <SensorListItem sensor={item} studies={studies} updateDataSensor={updateDataSensor} />
+            <Grid item lg={6} xs={12}>
+              <SensorListItem
+                sensor={item}
+                studies={studies}
+                updatedSensor={updatedSensor}
+                handleSelectionChange={handleChange}
+                selectedSensors={selectedSensors}
+              />
+            </Grid>
           ))}
-          <AddSensor studies={studies} />
         </Grid>
-        <Grid item xs={10} sm={2} />
-      </Grid>
+      </Box>
     </React.Fragment>
   )
 }

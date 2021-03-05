@@ -46,6 +46,8 @@ export default function ConfirmationDialog({
             ? t("Are you sure you want to delete this sensor?.")
             : confirmationDialog === 6
             ? t("Are you sure you want to delete this activity(s)?.")
+            : confirmationDialog === 7
+            ? t("Are you sure you want to delete this Participant(s)?")
             : t("Are you sure you want to delete this care team member? ")}
         </DialogContentText>
       </DialogContent>

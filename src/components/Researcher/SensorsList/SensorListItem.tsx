@@ -15,6 +15,7 @@ import MoreVertIcon from "@material-ui/icons/MoreVert"
 
 import Header from "./Header"
 import UpdateSensor from "./UpdateSensor"
+import Checkbox from "@material-ui/core/Checkbox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -191,36 +192,78 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    activityHeader: { padding: "12px 5px" },
+    cardMain: {
+      boxShadow: "none !important ",
+      background: "#F8F8F8",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    btnSchedule: {
+      background: "#fff",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "none",
+      lineHeight: "38px",
+
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    checkboxActive: { color: "#7599FF !important" },
   })
 )
 
-export default function ActivityItem({ sensor, studies, ...props }) {
+export default function ActivityItem({
+  sensor,
+  studies,
+  updatedSensor,
+  handleSelectionChange,
+  selectedSensors,
+  ...props
+}) {
   const classes = useStyles()
+  const [checked, setChecked] = React.useState(false)
 
-  const updateDataSensor = () => {
-    console.log(2011, props)
-    props.updateDataSensor(true)
+  const handleChange = (sensor, event) => {
+    setChecked(event.target.checked)
+    handleSelectionChange(sensor, event.target.checked)
+  }
+
+  const updatedData = (data) => {
+    updatedSensor(data)
   }
 
   return (
-    <Card style={{ margin: 20 }}>
-      <CardHeader
-        // action={
-        //   <IconButton onClick={(e) => setOpenMenu(e.currentTarget)}>
-        //     <MoreVertIcon />
-        //   </IconButton>
-        // }
-        title={sensor.name}
-        subheader={
-          <Box>
-            <Typography variant="overline">{sensor.spec?.replace("lamp.", "")}</Typography>
-            <Typography variant="overline">{sensor.study}</Typography>
-          </Box>
-        }
-      />
-      <CardActions>
-        <UpdateSensor sensor={sensor} studies={studies} type="list" updateDataSensor={updateDataSensor} />
-      </CardActions>
+    <Card className={classes.cardMain}>
+      <Box display="flex" p={1}>
+        <Box>
+          <Checkbox
+            checked={checked}
+            onChange={(event) => handleChange(sensor, event)}
+            classes={{ checked: classes.checkboxActive }}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
+        </Box>
+        <Box flexGrow={1}>
+          <CardHeader
+            className={classes.activityHeader}
+            title={sensor.name}
+            subheader={
+              <Box>
+                <Typography variant="subtitle1">{sensor.spec?.replace("lamp.", "")}</Typography>
+                <Typography variant="body2">{sensor.study_name}</Typography>
+              </Box>
+            }
+          />
+
+          <CardActions>
+            <UpdateSensor sensor={sensor} studies={studies} type="list" updatedData={updatedData} />
+          </CardActions>
+        </Box>
+      </Box>
     </Card>
   )
 }

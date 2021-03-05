@@ -1,10 +1,9 @@
 import React, { useState } from "react"
-import { Box, Icon, Fab } from "@material-ui/core"
+import { Icon, Fab } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-import ResponsiveDialog from "../../ResponsiveDialog"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 
@@ -31,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteActivity({ activities, ...props }) {
+export default function DeleteActivity({ sensors, deleted, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -39,23 +38,17 @@ export default function DeleteActivity({ activities, ...props }) {
 
   const confirmAction = async (status) => {
     if (status === "Yes") {
-      let activityIds = activities.map((a) => {
+      let sensorIds = sensors.map((a) => {
         return a.id
       })
-      for (let activity of activities) {
-        let tag
-        if (activity.spec === "lamp.survey") {
-          tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.survey_description", null)
-        } else {
-          tag = await LAMP.Type.setAttachment(activity.id, "me", "lamp.dashboard.activity_details", null)
-        }
-        console.dir("deleted tag " + JSON.stringify(tag))
-        let raw = await LAMP.Activity.delete(activity.id)
+      for (let eachSensorIds of sensorIds) {
+        await LAMP.Activity.delete(eachSensorIds)
       }
-      Service.delete("activities", activityIds)
-      enqueueSnackbar(t("Successfully deleted the selected Activities."), {
+      Service.delete("sensors", sensorIds)
+      enqueueSnackbar(t("Successfully deleted the selected Sensors."), {
         variant: "success",
       })
+      deleted(true)
     }
     setConfirmationDialog(0)
   }
@@ -66,11 +59,10 @@ export default function DeleteActivity({ activities, ...props }) {
         variant="extended"
         size="small"
         classes={{ root: classes.btnText }}
-        onClick={(event) => setConfirmationDialog(6)}
+        onClick={(event) => setConfirmationDialog(5)}
       >
         <Icon>delete_outline</Icon> {t("Delete")}
       </Fab>
-
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
         open={confirmationDialog > 0 ? true : false}

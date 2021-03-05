@@ -115,6 +115,7 @@ export default function ParticipantList({
 }) {
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
+  const [selectedParticipants, setSelectedParticipants] = useState([])
 
   useEffect(() => {
     refreshParticipants()
@@ -126,12 +127,29 @@ export default function ParticipantList({
     })
   }
 
+  const handleChange = (participant, checked) => {
+    let selected = selectedParticipants
+    if (checked) {
+      selected.push(participant)
+    } else {
+      selected = selected.filter((item, index) => {
+        return selected.indexOf(item) !== index
+      })
+    }
+    setSelectedParticipants(selected)
+  }
+
   return (
     <React.Fragment>
       {/* <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop> */}
-      <Header studies={studies} researcher={researcher} refreshParticipants={refreshParticipants} />
+      <Header
+        studies={studies}
+        researcher={researcher}
+        refreshParticipants={refreshParticipants}
+        selectedParticipants={selectedParticipants}
+      />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
           {!!participants &&
@@ -143,6 +161,7 @@ export default function ParticipantList({
                   refreshParticipants={refreshParticipants}
                   studies={studies}
                   notificationColumn={notificationColumn}
+                  handleSelectionChange={handleChange}
                 />
               </Grid>
             ))}

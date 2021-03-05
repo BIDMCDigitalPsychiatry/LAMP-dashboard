@@ -283,12 +283,12 @@ const useStyles = makeStyles((theme) =>
 export default function SensorDialog({
   sensor,
   studies,
-  modifySensor,
+  newData,
   ...props
 }: {
   sensor?: any
   studies?: Array<any>
-  modifySensor?: any
+  newData?: any
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
@@ -300,11 +300,14 @@ export default function SensorDialog({
   const [sensorName, setSensorName] = useState("")
   const [sensorSpecs, setSensorSpecs] = useState(null)
   const [sensorSpec, setSensorSpec] = useState("")
+  const [selectedStudyName, setSelectedStudyName] = useState("")
 
+  /*
   const handleChangeStudy = (event) => {
     setShowErrorMsg(false)
     setSelectedStudy(event.target.value)
   }
+  */
 
   useEffect(() => {
     LAMP.SensorSpec.all().then((res) => setSensorSpecs(res))
@@ -331,8 +334,9 @@ export default function SensorDialog({
       enqueueSnackbar(t("Successfully updated a sensor."), {
         variant: "success",
       })
-      modifySensor(true)
+      newData({ id: selectedSensor.id, name: sensorName, spec: sensorSpec, fn_type: "update" })
       setSelectedSensor(null)
+      sensor = null
     })
   }
 
@@ -360,7 +364,13 @@ export default function SensorDialog({
       enqueueSnackbar(t("Successfully created a sensor."), {
         variant: "success",
       })
-      modifySensor(true)
+      newData({
+        id: result.data,
+        name: sensorName,
+        spec: sensorSpec,
+        study_id: selectedStudy,
+        study_name: selectedStudyName,
+      })
       setSelectedSensor(null)
     })
   }
@@ -380,8 +390,8 @@ export default function SensorDialog({
               label={t("Study")}
               value={selectedStudy}
               onChange={(e) => {
-                console.log(2001, e.target.value)
                 setSelectedStudy(e.target.value)
+                setSelectedStudyName(e.currentTarget.dataset.selectedStudyName)
               }}
               helperText={
                 typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
@@ -391,7 +401,7 @@ export default function SensorDialog({
               variant="filled"
             >
               {studies.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
+                <MenuItem key={option.id} value={option.id} data-selected-study-name={t(option.name)}>
                   {t(option.name)}
                 </MenuItem>
               ))}

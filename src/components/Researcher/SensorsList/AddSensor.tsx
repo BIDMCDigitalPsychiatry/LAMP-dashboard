@@ -9,6 +9,7 @@ import {
   Tooltip,
   Grid,
   Fab,
+  Icon,
   Typography,
   Dialog,
   DialogTitle,
@@ -77,6 +78,38 @@ const useStyles = makeStyles((theme) =>
       color: "#fff",
     },
 
+    btnBlue: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+      lineHeight: "38px",
+
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "#fff",
+      "& svg": { marginRight: 8 },
+      "&:hover": { background: "#5680f9" },
+      [theme.breakpoints.up("md")]: {
+        position: "absolute",
+      },
+      [theme.breakpoints.down("sm")]: {
+        minWidth: "auto",
+      },
+    },
+    popexpand: {
+      backgroundColor: "#fff",
+      color: "#618EF7",
+      zIndex: 11111,
+      "& path": { fill: "#618EF7" },
+      "&:hover": { backgroundColor: "#f3f3f3" },
+    },
+    addText: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
+    },
     buttonContainer: {
       width: 200,
       height: 50,
@@ -270,38 +303,33 @@ const useStyles = makeStyles((theme) =>
 export default function AddSensor({
   studies,
   updateDataSensor,
+  addedSensor,
   ...props
 }: {
   studies?: Array<any>
   updateDataSensor?: any
+  addedSensor?: any
 }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
 
-  const modifySensor = () => {
-    console.log(4000)
-    updateDataSensor(true)
+  const addNewData = (data) => {
+    addedSensor(data)
     setSensorDialog(false)
   }
 
   return (
     <Box>
-      <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
-        <div className={classes.addButton}>
-          <AddCircleOutline onClick={() => setSensorDialog(true)} />
-        </div>
-        <Typography onClick={() => setSensorDialog(true)} className={classes.addButtonTitle}>
-          {t("Add item")}
-        </Typography>
-      </ButtonBase>
-      <SensorDialog
-        studies={studies}
-        modifySensor={modifySensor}
-        // modifySensor={updateDataSensor}
-        onClose={() => setSensorDialog(false)}
-        open={sensorDialog}
-      />
+      <Fab
+        variant="extended"
+        color="primary"
+        classes={{ root: classes.btnBlue + " " + classes.popexpand }}
+        onClick={() => setSensorDialog(true)}
+      >
+        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+      </Fab>
+      <SensorDialog studies={studies} onClose={() => setSensorDialog(false)} open={sensorDialog} newData={addNewData} />
     </Box>
   )
 }

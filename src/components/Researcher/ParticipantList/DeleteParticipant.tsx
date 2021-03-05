@@ -1,94 +1,72 @@
 import React, { useState } from "react"
-import {
-  Box,
-  Button,
-  MenuItem,
-  DialogContentText,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@material-ui/core"
-// Local Imports
+import { Box, Icon, Fab } from "@material-ui/core"
 import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import ResponsiveDialog from "../../ResponsiveDialog"
+import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    toolbardashboard: {
-      minHeight: 100,
-      padding: "0 10px",
-      "& h5": {
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "left",
-        fontWeight: "600",
-        fontSize: 30,
-        width: "calc(100% - 96px)",
+    btnText: {
+      background: "transparent",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      paddingLeft: "10px !important",
+      paddingRight: "15px !important",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff" },
+      "& span.MuiIcon-root": { fontSize: 20, marginRight: 3 },
+      [theme.breakpoints.up("md")]: {
+        //position: "absolute",
       },
-    },
-    tableContainer: {
-      "& div.MuiInput-underline:before": { borderBottom: "0 !important" },
-      "& div.MuiInput-underline:after": { borderBottom: "0 !important" },
-      "& div.MuiInput-underline": {
-        "& span.material-icons": {
-          width: 21,
-          height: 19,
-          fontSize: 27,
-          lineHeight: "23PX",
-          color: "rgba(0, 0, 0, 0.4)",
-        },
-        "& button": { display: "none" },
-      },
-    },
-    backdrop: {
-      zIndex: 111111,
-      color: "#fff",
     },
   })
 )
 
-export default function DeleteParticipant({ participant, ...props }) {
-  const [deleteConfirmationDialog, setDeleteConfirmationDialog] = useState(false)
+export default function DeleteParticipant({ participantIds, ...props }) {
+  const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const classes = useStyles()
+  const [confirmationDialog, setConfirmationDialog] = useState(0)
 
-  let deleteParticipant = async (participantId) => {
-    await LAMP.Participant.delete(participantId)
-    Service.delete("participants", [participantId])
+  let deleteParticipants = async (status) => {
+    if (status === "Yes") {
+      for (let participantId of participantIds) {
+        await LAMP.Participant.delete(participantId)
+      }
+      Service.delete("participants", participantIds)
+      enqueueSnackbar(t("Successfully deleted the selected participants."), {
+        variant: "success",
+      })
+    }
+    setConfirmationDialog(0)
   }
 
   return (
-    <Box>
-      <MenuItem onClick={() => setDeleteConfirmationDialog(true)}>Delete</MenuItem>
-
-      <Dialog
-        open={deleteConfirmationDialog}
-        onClose={() => setDeleteConfirmationDialog(false)}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+    <span>
+      <Fab
+        variant="extended"
+        size="small"
+        classes={{ root: classes.btnText }}
+        onClick={(event) => setConfirmationDialog(7)}
       >
-        <DialogTitle id="alert-dialog-title">{"Confirmation"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            {t("Are you sure you want to delete this Participant?")}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmationDialog(false)} color="primary">
-            No
-          </Button>
-          <Button
-            onClick={() => {
-              deleteParticipant(participant.id)
-            }}
-            color="primary"
-            autoFocus
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        <Icon>delete_outline</Icon> {t("Delete")}
+      </Fab>
+
+      <ConfirmationDialog
+        confirmationDialog={confirmationDialog}
+        open={confirmationDialog > 0 ? true : false}
+        onClose={() => setConfirmationDialog(0)}
+        confirmAction={deleteParticipants}
+      />
+    </span>
   )
 }
