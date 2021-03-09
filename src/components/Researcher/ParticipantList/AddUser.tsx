@@ -15,24 +15,18 @@ import {
   DialogContent,
   DialogActions,
   Select,
+  DialogProps,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
-
 import CloseIcon from "@material-ui/icons/Close"
-
 import QRCode from "qrcode.react"
-// Local Imports
-import LAMP, { Study } from "lamp-core"
-
+import LAMP from "lamp-core"
 import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-
+import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
-import StudyCreator from "./StudyCreator"
-import Header from "./Header"
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
   "#/?a=" +
@@ -256,13 +250,22 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddUser({ researcher, studies, ...props }) {
+export default function AddUser({
+  researcher,
+  studies,
+  addedParticipant,
+  ...props
+}: {
+  researcher: any
+  studies: any
+  addedParticipant: Function
+} & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [addUser, setAddUser] = useState(false)
 
   const handleChangeStudy = (event) => {
@@ -284,6 +287,11 @@ export default function AddUser({ researcher, studies, ...props }) {
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
           enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
         } else {
+          idData["parentID"] = selectedStudy
+          idData["parent"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
+          Service.addData("participants", [idData])
+          addedParticipant(idData)
+          Service.incrementCount("studies", selectedStudy, "participants_count")
           enqueueSnackbar(
             t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
               id: id,
@@ -327,74 +335,63 @@ export default function AddUser({ researcher, studies, ...props }) {
     }
   }
   return (
-    <Box>
-      <MenuItem
-        onClick={() => {
-          setAddUser(true)
-        }}
-      >
-        <Typography variant="h6">{t("New user")}</Typography>
-        <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
-      </MenuItem>
-      <Dialog
-        open={addUser}
-        onClose={() => setAddUser(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{ paper: classes.addNewDialog }}
-      >
-        <DialogTitle id="alert-dialog-slide-title">
-          <IconButton
-            aria-label="close"
-            className={classes.closeButton}
-            onClick={() => setAddUser(false)}
+    <Dialog
+      {...props}
+      scroll="paper"
+      aria-labelledby="alert-dialog-slide-title"
+      aria-describedby="alert-dialog-slide-description"
+      classes={{ paper: classes.addNewDialog }}
+    >
+      <DialogTitle id="alert-dialog-slide-title">
+        <IconButton
+          aria-label="close"
+          className={classes.closeButton}
+          onClick={() => setAddUser(false)}
+          disabled={!!studyBtnClicked ? true : false}
+        >
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+        <Box mt={2} mb={3}>
+          <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
+        </Box>
+
+        <Typography variant="caption">{t("Study")}</Typography>
+        <Select
+          labelId="demo-simple-select-outlined-label"
+          id="demo-simple-select-outlined"
+          value={selectedStudy}
+          onChange={handleChangeStudy}
+          className={classes.studyOption}
+        >
+          {studies.map((study) => (
+            <MenuItem key={study.id} value={study.id}>
+              {study.name}
+            </MenuItem>
+          ))}
+        </Select>
+
+        {!!showErrorMsg ? (
+          <Box mt={1}>
+            <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
+          </Box>
+        ) : (
+          ""
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Box textAlign="center" width={1} mt={3} mb={3}>
+          <Button
+            onClick={() => addParticipant()}
+            color="primary"
+            autoFocus
             disabled={!!studyBtnClicked ? true : false}
           >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-          <Box mt={2} mb={3}>
-            <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
-          </Box>
-
-          <Typography variant="caption">{t("Study")}</Typography>
-          <Select
-            labelId="demo-simple-select-outlined-label"
-            id="demo-simple-select-outlined"
-            value={selectedStudy}
-            onChange={handleChangeStudy}
-            className={classes.studyOption}
-          >
-            {studies.map((study) => (
-              <MenuItem key={study.id} value={study.id}>
-                {study.name}
-              </MenuItem>
-            ))}
-          </Select>
-
-          {!!showErrorMsg ? (
-            <Box mt={1}>
-              <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
-            </Box>
-          ) : (
-            ""
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={3} mb={3}>
-            <Button
-              onClick={() => addParticipant()}
-              color="primary"
-              autoFocus
-              disabled={!!studyBtnClicked ? true : false}
-            >
-              {t("Save")}
-            </Button>
-          </Box>
-        </DialogActions>
-      </Dialog>
-    </Box>
+            {t("Save")}
+          </Button>
+        </Box>
+      </DialogActions>
+    </Dialog>
   )
 }

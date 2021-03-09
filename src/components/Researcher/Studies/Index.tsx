@@ -32,6 +32,7 @@ import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as DeleteIcon } from "../../../icons/DeleteBlue.svg"
 import { ReactComponent as RenameIcon } from "../../../icons/RenameBlue.svg"
+import Header from "./Header"
 
 import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"
@@ -290,6 +291,7 @@ export default function StudiesList({ title, researcher, studies, ...props }) {
       {/* <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop> */}
+      <Header studies={studies} researcher={researcher} />
 
       {studies.map((study) => (
         <Box display="flex" key={study.id} className={classes.studyList}>

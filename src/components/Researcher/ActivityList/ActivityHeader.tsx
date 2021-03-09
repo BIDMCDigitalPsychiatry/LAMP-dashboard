@@ -1,9 +1,7 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Divider, Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
+import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import Jewels from "../../../icons/Jewels.svg"
 import { useDropzone } from "react-dropzone"
 
 function compress(file, width, height) {
@@ -33,18 +31,12 @@ function compress(file, width, height) {
     }
   })
 }
-export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, ...props }) {
+export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(
-    details?.photo
-      ? details?.photo
-      : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-        (!!activitySpecId && ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId))
-      ? Jewels
-      : null
-  )
+
+  const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
 

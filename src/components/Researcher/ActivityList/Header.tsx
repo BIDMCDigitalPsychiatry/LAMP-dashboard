@@ -1,13 +1,10 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Typography, InputBase, Icon, IconButton } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import SearchIcon from "@material-ui/icons/Search"
-import { spliceActivity, spliceCTActivity } from "../ActivityList/Index"
-import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
-import { saveAs } from "file-saver"
 import { useTranslation } from "react-i18next"
 import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
@@ -75,10 +72,24 @@ const useStyles = makeStyles((theme: Theme) =>
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
   })
 )
-export default function Header({ researcher, activities, studies, selectedActivities, ...props }) {
+export default function Header({
+  researcher,
+  activities,
+  studies,
+  selectedActivities,
+  searchData,
+  filterStudies,
+  addedActivity,
+  ...props
+}) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const [search, setSearch] = useState("")
+
+  useEffect(() => {
+    searchData(search)
+  }, [search])
 
   return (
     <Box>
@@ -88,7 +99,7 @@ export default function Header({ researcher, activities, studies, selectedActivi
         </Box>
 
         <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="activities" />
+          <StudyFilter researcher={researcher} studies={studies} type="activities" studyChange={filterStudies} />
         </Box>
         <Box>
           <div className={classes.search}>
@@ -102,12 +113,16 @@ export default function Header({ researcher, activities, studies, selectedActivi
                 input: classes.inputInput,
               }}
               inputProps={{ "aria-label": "search" }}
+              onChange={(e) => {
+                setSearch(e.target.value)
+              }}
+              value={search}
             />
           </div>
         </Box>
 
         <Box>
-          <AddActivity activities={activities} studies={studies} studyId={null} />
+          <AddActivity activities={activities} studies={studies} studyId={null} addedActivity={addedActivity} />
         </Box>
       </Box>
 

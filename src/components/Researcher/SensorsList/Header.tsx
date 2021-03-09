@@ -70,7 +70,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Header({ studies, researcher, selectedSensors, deleted, addedSensor, searchData, ...props }) {
+export default function Header({
+  studies,
+  researcher,
+  selectedSensors,
+  deleted,
+  addedSensor,
+  searchData,
+  filterStudies,
+  ...props
+}) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
 
@@ -93,7 +102,7 @@ export default function Header({ studies, researcher, selectedSensors, deleted, 
           <Typography variant="h5">Sensors</Typography>
         </Box>
         <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="sensors" />
+          <StudyFilter researcher={researcher} studies={studies} type="sensors" studyChange={filterStudies} />
         </Box>
         <Box>
           <div className={classes.search}>

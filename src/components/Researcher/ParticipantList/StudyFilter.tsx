@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function StudyFilter({ researcher, studies, type, ...props }) {
+export default function StudyFilter({ researcher, studies, type, studyChange, ...props }) {
   const [showFilter, setShowFilter] = useState(false)
   const classes = useStyles()
   const { t } = useTranslation()
@@ -62,9 +62,9 @@ export default function StudyFilter({ researcher, studies, type, ...props }) {
       ...dataArray.map((item) => ({
         [item.name]:
           type === "activities"
-            ? item.activities_count
+            ? item.activity_count
             : type === "sensors"
-            ? item.sensors_count
+            ? item.sensor_count
             : item.participants_count,
       }))
     )
@@ -91,6 +91,7 @@ export default function StudyFilter({ researcher, studies, type, ...props }) {
               showZeroBadges={false}
               badges={studiesCount}
               onChange={(x) => {
+                studyChange(x)
                 LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
                 setSelectedStudies(x)
               }}

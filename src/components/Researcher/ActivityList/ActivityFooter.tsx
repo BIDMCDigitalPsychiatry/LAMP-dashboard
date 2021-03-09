@@ -2,7 +2,7 @@ import React from "react"
 import { Grid, Tooltip, Icon, Fab } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 
-export default function ActivityFooter({ value, onSave, validate, data, disabled, ...props }) {
+export default function ActivityFooter({ value, onSave, validate, data, ...props }) {
   const { t } = useTranslation()
 
   return (
@@ -26,11 +26,7 @@ export default function ActivityFooter({ value, onSave, validate, data, disabled
                 }
               }}
               disabled={
-                !validate() ||
-                !disabled ||
-                !onSave ||
-                !data.text ||
-                (value.name.trim() === data.text.trim() && value.study_id === data.studyId)
+                !validate() || !onSave || (value.name.trim() === data.name.trim() && value.study_id === data.studyId)
               }
             >
               {t("Duplicate")}
@@ -51,7 +47,7 @@ export default function ActivityFooter({ value, onSave, validate, data, disabled
                 onSave(data, false /* overwrite */)
               }
             }}
-            disabled={!validate() || !disabled || !onSave || !data.text}
+            disabled={!validate() || !onSave || !data.name}
           >
             {t("Save")}
             <span style={{ width: 8 }} />

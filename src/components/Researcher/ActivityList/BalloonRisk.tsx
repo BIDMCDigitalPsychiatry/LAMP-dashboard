@@ -1,8 +1,6 @@
 import React from "react"
 import { Divider, Grid, Typography, TextField } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 
 export default function BalloonRisk({ settings, updateSettings, ...props }) {
   const { t } = useTranslation()

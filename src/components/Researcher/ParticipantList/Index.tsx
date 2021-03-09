@@ -127,6 +127,10 @@ export default function ParticipantList({
     })
   }
 
+  const addedParticipant = (data) => {
+    setParticipants((prevState) => [...prevState, data])
+  }
+
   const handleChange = (participant, checked) => {
     let selected = selectedParticipants
     if (checked) {
@@ -139,6 +143,29 @@ export default function ParticipantList({
     setSelectedParticipants(selected)
   }
 
+  const handleSearchData = (val) => {
+    if (val) {
+      let searchedParticipants = participants.filter((i) => i.name?.includes(val) || i.id?.includes(val))
+      setParticipants(searchedParticipants)
+    } else {
+      Service.getAll("participants").then((participants) => {
+        setParticipants(participants)
+      })
+    }
+  }
+
+  const filterStudies = (val) => {
+    if (val) {
+      Service.getDataByKey("participants", val, "parent").then((searchedParticipants) => {
+        setParticipants(searchedParticipants)
+      })
+    } else {
+      Service.getAll("participants").then((participants) => {
+        setParticipants(participants)
+      })
+    }
+  }
+
   return (
     <React.Fragment>
       {/* <Backdrop className={classes.backdrop} open={loading}>
@@ -149,6 +176,9 @@ export default function ParticipantList({
         researcher={researcher}
         refreshParticipants={refreshParticipants}
         selectedParticipants={selectedParticipants}
+        searchData={handleSearchData}
+        filterStudies={filterStudies}
+        addedParticipant={addedParticipant}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

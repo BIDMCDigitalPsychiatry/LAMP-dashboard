@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Checkbox,
   DialogProps,
 } from "@material-ui/core"
 
@@ -31,16 +32,17 @@ const useStyles = makeStyles((theme) => ({
   activityContent: {
     padding: "25px 50px 0",
   },
-  addNewDialog: { maxWidth: 350 },
+  addNewDialog: { maxWidth: 500 },
   closeButton: {
     position: "absolute",
     right: theme.spacing(1),
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
+  checkboxActive: { color: "#7599FF !important" },
 }))
 
-export default function StudyCreator({
+export default function PatientStudyCreator({
   studies,
   researcher,
   ...props
@@ -50,13 +52,17 @@ export default function StudyCreator({
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
-  const [duplicateCnt, setCount] = useState(0)
+  // const [duplicateCnt, setCount] = useState(0)
+  const [duplicateCnt, setDuplicateCnt] = useState(0)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
+  const [addStudy, setAddStudy] = useState(false)
+  const [duplicateStudyName, setDuplicateStudyName] = useState("")
+  const [createPatient, setCreatePatient] = useState(false)
 
   const validate = () => {
-    return (
-      duplicateCnt == 0 ||
+    return !(
+      duplicateCnt > 0 ||
       typeof studyName === "undefined" ||
       (typeof studyName !== "undefined" && studyName?.trim() === "")
     )
@@ -68,10 +74,12 @@ export default function StudyCreator({
       duplicateCount = studies.filter((study) => study.name?.trim().toLowerCase() === studyName?.trim().toLowerCase())
         .length
     }
-    setCount(duplicateCount)
+    setDuplicateCnt(duplicateCount)
   }, [studyName])
 
   const createStudy = async (studyName: string) => {
+    setAddStudy(false)
+    /*  
     let study = new Study()
     study.name = studyName
     LAMP.Study.create(researcher.id, study).then((res) => {
@@ -83,11 +91,13 @@ export default function StudyCreator({
         variant: "success",
       })
     })
+    */
   }
 
   return (
     <Dialog
       {...props}
+      onEnter={() => setStudyName("")}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
@@ -99,34 +109,74 @@ export default function StudyCreator({
           className={classes.closeButton}
           onClick={() => {
             setStudyName("")
+            setAddStudy(false)
           }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-        <TextField
-          error={!validate()}
-          autoFocus
-          fullWidth
-          variant="filled"
-          label={t("Name")}
-          defaultValue={studyName}
-          onChange={(e) => {
-            setStudyName(e.target.value)
-          }}
-          inputProps={{ maxLength: 80 }}
-          helperText={duplicateCnt > 0 ? t("Unique name required") : ""}
-        />
+        <Box>
+          <TextField
+            error={!validate()}
+            autoFocus
+            fullWidth
+            variant="outlined"
+            label={t("Name")}
+            defaultValue={studyName}
+            onChange={(e) => {
+              setStudyName(e.target.value)
+            }}
+            inputProps={{ maxLength: 80 }}
+            helperText={duplicateCnt > 0 ? t("Unique name required") : !validate() ? t("Please enter name.") : ""}
+          />
+        </Box>
+        <Box>
+          <TextField
+            select
+            autoFocus
+            fullWidth
+            variant="outlined"
+            label={t("Duplicate Study")}
+            defaultValue={duplicateStudyName}
+            onChange={(e) => {
+              setDuplicateStudyName(e.target.value)
+            }}
+            inputProps={{ maxLength: 80 }}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {studies.map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        <Box>
+          <Checkbox
+            checked={createPatient}
+            onChange={(event) => setCreatePatient(true)}
+            classes={{ checked: classes.checkboxActive }}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />{" "}
+          {t("Create a new patient under this study")}
+        </Box>
       </DialogContent>
+
       <DialogActions>
         <Box textAlign="center" width={1} mt={3} mb={3}>
           <Button
-            onClick={() => {
-              createStudy(studyName)
-            }}
+            /*onClick={() => {
+                setAddStudy(false)
+                createStudy(studyName)
+              }}
+              */
             color="primary"
             autoFocus
+            // disabled={!validate()}
             disabled={!validate()}
           >
             {t("Save")}

@@ -20,6 +20,8 @@ import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } fro
 import { useSnackbar } from "notistack"
 import JournalIcon from "../../../icons/Journal.svg"
 import { useTranslation } from "react-i18next"
+import ActivityHeader from "./ActivityHeader"
+import ActivityFooter from "./ActivityFooter"
 
 const theme = createMuiTheme({
   palette: {
@@ -109,53 +111,54 @@ export default function JournalCreator({
   studies?: any
   study?: any
 }) {
-  console.log(value)
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
-  const [text, setText] = useState(!!value ? value.name : undefined)
-  const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(details?.photo ?? JournalIcon)
-  const [disabled, setDisabled] = useState(true)
   const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const { t } = useTranslation()
-
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDropAccepted: useCallback((acceptedFiles) => {
-      compress(acceptedFiles[0], 64, 64).then(setPhoto)
-    }, []),
-    onDropRejected: useCallback((rejectedFiles) => {
-      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
-      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
-      }
-    }, []),
-    accept: "image/*",
-    maxSize: 2 * 1024 * 1024 /* 5MB */,
+  const [data, setData] = useState({
+    id: value?.id ?? undefined,
+    name: "",
+    spec: value?.spec ?? activitySpecId,
+    schedule: [],
+    description: "",
+    photo: null,
+    studyID: !!value ? value.study_id : study,
   })
 
   const validate = () => {
     let duplicates = []
-    if (typeof text !== "undefined" && text?.trim() !== "") {
+    if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
       duplicates = activities.filter(
         (x) =>
           (!!value
-            ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
+            ? x.name.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
+            : x.name.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
+
     return !(
-      typeof studyId == "undefined" ||
-      studyId === null ||
-      studyId === "" ||
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
       duplicates.length > 0 ||
-      typeof text === "undefined" ||
-      (typeof text !== "undefined" && text?.trim() === "")
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
     )
+  }
+
+  const handleChange = (data) => {
+    setData({
+      id: value?.id ?? undefined,
+      name: data.text,
+      spec: value?.spec ?? activitySpecId,
+      schedule: [],
+      description: data.description,
+      photo: data.photo,
+      studyID: data.studyId,
+    })
   }
 
   return (
@@ -165,181 +168,19 @@ export default function JournalCreator({
       </Backdrop>
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
-          <Grid container spacing={2}>
-            <Grid item xs md={2}>
-              <Tooltip
-                title={
-                  !photo
-                    ? t("Drag a photo or tap to select a photo.")
-                    : t("Drag a photo to replace the existing photo or tap to delete the photo.")
-                }
-              >
-                <Box
-                  {...getRootProps()}
-                  width={154}
-                  height={154}
-                  border={1}
-                  borderRadius={4}
-                  borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                  bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
-                  color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                  style={{
-                    background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
-                  }}
-                >
-                  <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
-                    {!photo && <input {...getInputProps()} />}
-                    <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
-                  </ButtonBase>
-                </Box>
-              </Tooltip>
-            </Grid>
-            <Grid item md={10}>
-              <Grid container spacing={2}>
-                <Grid item lg={4}>
-                  <TextField
-                    error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-                    id="filled-select-currency"
-                    select
-                    label={t("Study")}
-                    value={studyId}
-                    onChange={(e) => {
-                      setStudyId(e.target.value)
-                    }}
-                    helperText={
-                      typeof studyId == "undefined" || studyId === null || studyId === ""
-                        ? t("Please select the Study")
-                        : ""
-                    }
-                    variant="filled"
-                    disabled={!!value || !!study ? true : false}
-                  >
-                    {console.log(studies)}
-                    {studies.map((option) => {
-                      console.log(option, option.name)
-                    })}
-                    {!!studies &&
-                      studies.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {t(option.name)}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Grid>
-                <Grid item xs>
-                  <Box mb={3}>
-                    <TextField
-                      error={
-                        typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "")
-                          ? true
-                          : false
-                      }
-                      fullWidth
-                      variant="filled"
-                      label={t("Activity Title")}
-                      defaultValue={text}
-                      onChange={(event) => setText(event.target.value)}
-                      inputProps={{ maxLength: 80 }}
-                    />
-                  </Box>
-                </Grid>
-              </Grid>
-
-              <Box>
-                <TextField
-                  fullWidth
-                  multiline
-                  label={t("Activity Description")}
-                  variant="filled"
-                  rows={2}
-                  defaultValue={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  inputProps={{ maxLength: 2500 }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
+          <ActivityHeader
+            studies={studies}
+            value={value}
+            details={details}
+            activitySpecId={activitySpecId}
+            study={!!value ? value.study_id : study}
+            onChange={handleChange}
+            image={JournalIcon}
+          />
         </Container>
       </MuiThemeProvider>
 
-      <Grid
-        container
-        direction="column"
-        alignItems="flex-end"
-        spacing={1}
-        style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
-      >
-        {!!value && (
-          <Grid item>
-            <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
-              <Fab
-                color="primary"
-                aria-label="Duplicate"
-                variant="extended"
-                onClick={() => {
-                  if (validate()) {
-                    setLoading(true)
-                    onSave(
-                      {
-                        id: undefined,
-                        name: text,
-                        spec: value?.spec,
-                        schedule: [],
-                        description: description,
-                        photo: photo,
-                        studyID: studyId,
-                      },
-                      true /* duplicate */
-                    )
-                  }
-                }}
-                disabled={
-                  !validate() ||
-                  !disabled ||
-                  !onSave ||
-                  !text ||
-                  (value.name.trim() === text.trim() && value.study_id === studyId)
-                }
-              >
-                {t("Duplicate")}
-                <span style={{ width: 8 }} />
-                <Icon>file_copy</Icon>
-              </Fab>
-            </Tooltip>
-          </Grid>
-        )}
-        <Grid item>
-          <Tooltip title={t("Save this activity.")}>
-            <Fab
-              color="secondary"
-              aria-label="Save"
-              variant="extended"
-              onClick={() => {
-                if (validate()) {
-                  setLoading(true)
-                  onSave(
-                    {
-                      id: value?.id ?? undefined,
-                      name: text,
-                      spec: value?.spec ?? activitySpecId,
-                      schedule: [],
-                      description: description,
-                      photo: photo,
-                      studyID: studyId,
-                    },
-                    false /* overwrite */
-                  )
-                }
-              }}
-              disabled={!validate() || !disabled || !onSave || !text}
-            >
-              {t("Save")}
-              <span style={{ width: 8 }} />
-              <Icon>save</Icon>
-            </Fab>
-          </Tooltip>
-        </Grid>
-      </Grid>
+      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )
 }

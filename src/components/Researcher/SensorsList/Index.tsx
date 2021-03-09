@@ -359,9 +359,21 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
     }
   }
 
+  const filterStudies = (val) => {
+    if (val) {
+      Service.getDataByKey("sensors", val, "study_name").then((sensors) => {
+        setSensors(sensors)
+      })
+    } else {
+      Service.getAll("sensors").then((sensors) => {
+        setSensors(sensors)
+      })
+    }
+  }
+
   return (
     <React.Fragment>
-      {/*
+      {/* 
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
@@ -373,6 +385,7 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
         deleted={handleDeleted}
         addedSensor={addedSensor}
         searchData={handleSearchData}
+        filterStudies={filterStudies}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

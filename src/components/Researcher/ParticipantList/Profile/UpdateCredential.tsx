@@ -10,17 +10,13 @@ const useStyles = makeStyles((theme) =>
 )
 
 export default function UpdateCredential({ participant, allRoles, ext, ...props }) {
-  const [credential, setCredential] = useState(null)
-  const [mode, setMode] = useState(null)
   const [showCredentials, setShowCredentials] = useState(false)
-
   const classes = useStyles()
+
   return (
     <Box>
       <Link
         onClick={() => {
-          setMode(undefined)
-          setCredential(undefined)
           setShowCredentials(true)
         }}
         className={classes.linkBtn}
@@ -30,22 +26,7 @@ export default function UpdateCredential({ participant, allRoles, ext, ...props 
       </Link>
       <Dialog open={showCredentials} onClose={() => setShowCredentials(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          {!!mode ? (
-            <CredentialEditor
-              credential={credential}
-              auxData={allRoles[(credential || {}).access_key] || {}}
-              mode={mode}
-              onChange={(data) => {
-                ;(async () => {
-                  let type = ext.includes(data.emailAddress) ? 1 : 2
-                  await updateDetails(participant.id, data, mode, allRoles, type)
-                  //   onChangeAccounts()
-                })()
-              }}
-            />
-          ) : (
-            <CredentialManager id={participant.id} style={{ margin: 16 }} />
-          )}
+          <CredentialManager id={participant.id} style={{ margin: 16 }} />
         </DialogContent>
       </Dialog>
     </Box>

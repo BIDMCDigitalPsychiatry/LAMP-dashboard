@@ -453,7 +453,33 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
     setSelectedActivities(selected)
   }
 
-  const refreshActivities = () => {}
+  const addedActivity = (data) => {
+    setActivities((prevState) => [...prevState, data])
+  }
+
+  const handleSearchData = (val) => {
+    if (val) {
+      let searchedActivities = activities.filter((i) => i.name?.includes(val))
+      setActivities(searchedActivities)
+    } else {
+      Service.getAll("activities").then((activities) => {
+        setActivities(activities)
+      })
+    }
+  }
+
+  const filterStudies = (val) => {
+    if (val) {
+      Service.getDataByKey("activities", val, "study_name").then((activities) => {
+        setActivities(activities)
+      })
+    } else {
+      Service.getAll("activities").then((activities) => {
+        setActivities(activities)
+      })
+    }
+  }
+
   return (
     <React.Fragment>
       {/* <Backdrop className={classes.backdrop} open={loading}>
@@ -464,6 +490,9 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
         researcher={researcher}
         activities={activities}
         selectedActivities={selectedActivities}
+        searchData={handleSearchData}
+        filterStudies={filterStudies}
+        addedActivity={addedActivity}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
@@ -472,7 +501,6 @@ export default function ActivityList({ researcher, title, studies, ...props }) {
               <Grid item lg={6} xs={12}>
                 <ActivityItem
                   activity={activity}
-                  refreshActivities={refreshActivities}
                   researcher={researcher}
                   studies={studies}
                   activities={activities}

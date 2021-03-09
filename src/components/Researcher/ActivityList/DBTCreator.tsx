@@ -328,11 +328,8 @@ export default function GameCreator({
             }
           }}
         >
-          {/* <Link href='/clinician'> */}
           <Typography className={classes.buttonText}>{t("Save")}</Typography>
-          {/* </Link> */}
         </Button>
-        {/* </div> */}
 
         <Grid container spacing={0}>
           <Grid item xs={8}>

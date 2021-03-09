@@ -511,9 +511,7 @@ export default function SensorList({ researcher, title, ...props }) {
 
   useEffect(() => {
     LAMP.Study.allByResearcher(researcher.id).then(setStudies)
-
     LAMP.ActivitySpec.all().then((res) => {
-      console.log(res)
       setActivitySpecs(
         res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )

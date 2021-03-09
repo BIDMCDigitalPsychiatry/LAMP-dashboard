@@ -60,6 +60,7 @@ import ConfirmationDialog from "./ConfirmationDialog"
 import SensorRow from "./SensorRow"
 import ActivityRow from "./ActivityRow"
 import UpdateCredential from "./UpdateCredential"
+import addActivity from "../../ActivityList/Activity"
 
 const theme = createMuiTheme({
   overrides: {
@@ -363,21 +364,27 @@ export default function PatientProfile({
   const onChangeActivities = () => {
     ;(async () => {
       Service.getAll("activities").then((activities) => {
-        // console.log(typeof activities, activities)
-        // // activities.map((activity) => {
-        // //   console.log(activity)
-        // // })
-        // let data = (activities ?? []).filter((i) => i.study_id === participant.parentID)
-        // setActivities(data)
+        let data = (activities || []).filter((i) => i.study_id === participant.parentID)
+        setActivities(data)
       })
     })()
+  }
+
+  const addedActivity = (data) => {
+    addActivity(data)
+    setActivities((prevState) => [...prevState, data])
+  }
+
+  const addedSensor = (data) => {
+    // addActivity(data)
+    setSensors((prevState) => [...prevState, data])
   }
 
   const onChangeSensors = () => {
     ;(async () => {
       Service.getAll("sensors").then((sensors) => {
-        // let data = (sensors ?? []).filter((i) => i.study_id === participant.parentID)
-        // setSensors(data)
+        let data = (sensors || []).filter((i) => i.study_id === participant.parentID)
+        setSensors(data)
       })
     })()
   }
@@ -501,29 +508,6 @@ export default function PatientProfile({
     //   })
   }
 
-  // const updateSensor = async () => {
-  //   setLoading(true)
-  //   const result = await LAMP.Sensor.update(selectedSensor.id, {
-  //     name: sensorName,
-  //     spec: sensorSpec,
-  //   })
-
-  //   enqueueSnackbar(t("Successfully updated a sensor."), {
-  //     variant: "success",
-  //   })
-  //   setSelectedSensor(null)
-  //   onChangeSensors()
-  // }
-
-  // const deleteSensor = async (sensorId) => {
-  //   setLoading(true)
-  //   await LAMP.Sensor.delete(sensorId)
-  //   enqueueSnackbar(t("Successfully deleted the sensor."), {
-  //     variant: "success",
-  //   })
-  //   onChangeSensors()
-  // }
-
   const updateName = () => {
     LAMP.Type.setAttachment(participant.id, "me", "lamp.name", nickname ?? null)
     enqueueSnackbar(t("Successfully updated user profile."), {
@@ -546,6 +530,7 @@ export default function PatientProfile({
       enqueueSnackbar(t("Credential management failed."), { variant: "error" })
     }
   }
+
   const confirmAction = () => {
     switch (confirmationDialog) {
       case 1:
@@ -575,11 +560,8 @@ export default function PatientProfile({
     <div className={classes.root}>
       <Container className={classes.containerWidth}>
         <Button className={classes.headerButton} onClick={() => updateName()}>
-          {/* <Link href='/clinician'> */}
           <Typography className={classes.buttonText}>{t("Save")}</Typography>
-          {/* </Link> */}
         </Button>
-        {/* </div> */}
 
         <Grid container spacing={0}>
           <Box mb={4} width={1}>
@@ -695,7 +677,12 @@ export default function PatientProfile({
               {(activities ?? []).map((item, index) => {
                 return <ActivityRow activities={activities} activity={item} studies={studies} index={index} />
               })}
-              <AddActivity activities={activities} studies={studies} studyId={participant.parentID} />
+              <AddActivity
+                activities={activities}
+                studies={studies}
+                studyId={participant.parentID}
+                addedActivity={addedActivity}
+              />
             </Grid>
             <Grid item xs={10} sm={2} />
           </Grid>
@@ -718,7 +705,7 @@ export default function PatientProfile({
               {(sensors ?? []).map((item, index) => {
                 return <SensorRow studies={studies} sensor={item} index={index} />
               })}
-              <AddSensor studies={studies} />
+              <AddSensor studies={studies} addedSensor={addedSensor} />
             </Grid>
             <Grid item xs={10} sm={2} />
           </Grid>

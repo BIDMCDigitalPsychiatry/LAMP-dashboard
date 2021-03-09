@@ -28,7 +28,7 @@ const dbPromise = idb.openDB(DATABASE_NAME, 1, {
 })
 
 class DBService {
-  getAll(tablespace) {
+  getAll(tablespace: string) {
     return dbPromise
       .then((db) => {
         return db.transaction(tablespace).objectStore(tablespace).getAll()
@@ -38,7 +38,7 @@ class DBService {
       })
   }
 
-  update(tablespace, newVal, key, conditionKey) {
+  update(tablespace: string, newVal: any, key: string, conditionKey: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -61,7 +61,7 @@ class DBService {
       })
   }
 
-  updateMultipleKeys(tablespace, newVal, key, conditionKey) {
+  updateMultipleKeys(tablespace: string, newVal: any, keys: Array<any>, conditionKey: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -71,7 +71,7 @@ class DBService {
             newVal[tablespace].map((data) => {
               if (cursor.key === data[conditionKey]) {
                 let value = cursor.value
-                key.forEach(function (eachKey) {
+                keys.forEach(function (eachKey) {
                   value[eachKey] = data[eachKey]
                 })
                 cursor.update(value)
@@ -86,7 +86,7 @@ class DBService {
       })
   }
 
-  get(tablespace, key) {
+  get(tablespace: string, key: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -105,7 +105,29 @@ class DBService {
       })
   }
 
-  getData(tablespace, key) {
+  getDataByKey(tablespace: string, search: string, key: string) {
+    let results = []
+    return dbPromise
+      .then(function (db) {
+        var tx = db.transaction([tablespace], "readonly")
+        var store = tx.objectStore(tablespace)
+        return store.openCursor()
+      })
+      .then(function getValues(cursor) {
+        if (!cursor) {
+          return
+        }
+        if (search.includes(cursor.value[key])) {
+          results.push(cursor.value)
+        }
+        return cursor.continue().then(getValues)
+      })
+      .then(function () {
+        return results
+      })
+  }
+
+  getData(tablespace: string, key: string) {
     return dbPromise
       .then((db) => {
         return db.transaction([tablespace], "readonly").objectStore(tablespace).get(key)
@@ -115,7 +137,7 @@ class DBService {
       })
   }
 
-  addData(tablespace, data) {
+  addData(tablespace: string, data: any) {
     return dbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
@@ -128,7 +150,7 @@ class DBService {
       })
   }
 
-  addRow(tablespace, data) {
+  addRow(tablespace: string, data: any) {
     return dbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
@@ -139,7 +161,7 @@ class DBService {
       })
   }
 
-  delete(tablespace, keys) {
+  delete(tablespace: string, keys: any) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -148,6 +170,27 @@ class DBService {
           while (cursor) {
             if (keys.includes(cursor.key)) {
               cursor.delete()
+            }
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  incrementCount(tablespace: string, key: string, keyToUpdate: string) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            if (cursor.key === key) {
+              let value = cursor.value
+              value[keyToUpdate] = value[keyToUpdate] + 1
+              cursor.update(value)
             }
             cursor = await cursor.continue()
           }

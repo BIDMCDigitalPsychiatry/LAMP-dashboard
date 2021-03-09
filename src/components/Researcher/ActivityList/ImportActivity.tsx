@@ -25,17 +25,14 @@ import {
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
 import { ReactComponent as DeleteIcon } from "../../../icons/DeleteBlue.svg"
 import { ReactComponent as ExportIcon } from "../../../icons/Export.svg"
-// External Imports
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import CloudUploadIcon from "@material-ui/icons/CloudUpload"
-// Local Imports
 import LAMP, { Study } from "lamp-core"
-
 import { useTranslation } from "react-i18next"
 import {
   unspliceActivity,
@@ -48,45 +45,6 @@ import {
   saveCTestActivity,
   unspliceCTActivity,
 } from "../ActivityList/Index"
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiTableCell: {
-      root: {
-        borderBottom: "#fff solid 1px",
-        padding: 10,
-      },
-    },
-    MuiToolbar: {
-      root: {
-        maxWidth: 1055,
-        width: "80%",
-        margin: "0 auto",
-        background: "#fff !important",
-      },
-    },
-    MuiInput: {
-      root: {
-        border: 0,
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiIcon: {
-      root: { color: "rgba(0, 0, 0, 0.4)" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

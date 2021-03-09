@@ -312,14 +312,21 @@ export default function ScheduleActivity({ activity, ...props }) {
         <Icon>calendar_today</Icon>
       </Fab>
 
-      {!!showScheduler && (
-        <Box>
-          <IconButton onClick={() => setShowScheduler(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-          <ActivityScheduler activity={activity} onChange={(x) => updateSchedule({ ...activity, schedule: x })} />
-        </Box>
-      )}
+      <Dialog
+        open={showScheduler}
+        onClose={() => setShowScheduler(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>
+          <Box>
+            <IconButton onClick={() => setShowScheduler(false)}>
+              <Icon>close</Icon>
+            </IconButton>
+            <ActivityScheduler activity={activity} onChange={(x) => updateSchedule({ ...activity, schedule: x })} />
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Box>
   )
 }

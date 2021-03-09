@@ -1,6 +1,4 @@
-// Core Imports
 import React from "react"
-// Local Imports
 import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import TipCreator from "./TipCreator"
@@ -12,6 +10,7 @@ import SCImageCreator from "./SCImageCreator"
 import { saveGroupActivity, saveTipActivity, saveSurveyActivity, saveCTestActivity } from "../ActivityList/Index"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 const games = [
   "lamp.jewels_a",
@@ -22,6 +21,14 @@ const games = [
   "lamp.balloon_risk",
 ]
 
+export function addActivity(x, studies) {
+  Service.incrementCount("studies", x.studyID, "activity_count")
+  x["study_id"] = x.studyID
+  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+  delete x["studyID"]
+  Service.addData("activities", [x])
+}
+
 export default function Activity({
   allActivities,
   activity,
@@ -31,16 +38,18 @@ export default function Activity({
   details,
   activitySpecId,
   studyId,
+  addedActivity,
   ...props
 }: {
-  allActivities?: any
+  allActivities?: Array<JSON>
   activity?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   studies?: any
   details?: JSON
   activitySpecId?: string
   studyId?: string
+  addedActivity?: Function
 }) {
   const isTip = (activity || {}).spec === "lamp.tips" || activitySpecId === "lamp.tips"
   const isGroup = (activity || {}).spec === "lamp.group" || activitySpecId === "lamp.group"
@@ -53,7 +62,7 @@ export default function Activity({
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
 
-  // Create a new Activity object & survey descriptions if set.
+  // Create a new tip activity object & survey descriptions if set.
   const saveTipsActivity = async (x) => {
     let result = await saveTipActivity(x)
     if (!!result.error)
@@ -61,10 +70,10 @@ export default function Activity({
         variant: "error",
       })
     else {
+      updateDb(x)
       enqueueSnackbar(t("Successfully updated the Activity."), {
         variant: "success",
       })
-      // onChange()
     }
   }
 
@@ -75,29 +84,27 @@ export default function Activity({
       enqueueSnackbar(t("Failed to create a new survey Activity."), {
         variant: "error",
       })
-    else
+    else {
+      updateDb(x)
       enqueueSnackbar(t("Successfully created a new survey Activity."), {
         variant: "success",
       })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
+    }
   }
 
-  // Create a new Activity object that represents a group of other Activities.
+  // Create a new group activity object that represents a group of other Activities.
   const saveGroup = async (x) => {
     let newItem = await saveGroupActivity(x)
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new group Activity."), {
         variant: "error",
       })
-    else
+    else {
+      updateDb(x)
       enqueueSnackbar(t("Successfully created a new group Activity."), {
         variant: "success",
       })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
+    }
   }
 
   // Create a new Activity object that represents a cognitive test.
@@ -107,14 +114,18 @@ export default function Activity({
       enqueueSnackbar(t("Failed to create a new Activity."), {
         variant: "error",
       })
-    else
+    else {
+      updateDb(x)
       enqueueSnackbar(t("Successfully created a new Activity."), {
         variant: "success",
       })
-    // let selectedStudy = studies.filter((study) => study.id === x.studyID)[0]
-    // setStudiesCount({ ...studiesCount, [selectedStudy.name]: ++studiesCount[selectedStudy.name] })
-    // onChange()
+    }
   }
+  const updateDb = (x) => {
+    addActivity(x, studies)
+    addedActivity(x)
+  }
+
   return (
     <div>
       {isGroup && (

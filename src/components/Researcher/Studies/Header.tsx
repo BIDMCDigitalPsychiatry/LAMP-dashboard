@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react"
-import { Box, Popover, Fab, Typography, Icon, InputBase, MenuItem } from "@material-ui/core"
+import React, { useState } from "react"
+import { Box, Popover, Fab, Typography, Icon, InputBase } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import AddUser from "./AddUser"
-import StudyCreator from "./StudyCreator"
+
 import StudyFilter from "../ParticipantList/StudyFilter"
 import SearchIcon from "@material-ui/icons/Search"
-import DeleteParticipant from "./DeleteParticipant"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
-import AddButton from "./AddButton"
+import MultipleSelect from "../../MultipleSelect"
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -168,25 +166,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Header({
-  studies,
-  researcher,
-  refreshParticipants,
-  selectedParticipants,
-  searchData,
-  filterStudies,
-  addedParticipant,
-  ...props
-}) {
+export default function Header({ studies, researcher, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
-  const [search, setSearch] = useState("")
-  const [addStudy, setAddStudy] = useState(false)
-
-  useEffect(() => {
-    searchData(search)
-  }, [search])
+  const [selectedStudies, setSelectedStudies] = useState([])
+  const [studiesCount, setStudiesCount] = useState(null)
 
   const filteredStudyArray = () => {}
 
@@ -194,13 +179,8 @@ export default function Header({
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">Patients</Typography>
+          <Typography variant="h5">Studies</Typography>
         </Box>
-
-        <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="participants" studyChange={filterStudies} />
-        </Box>
-
         <Box>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -213,21 +193,40 @@ export default function Header({
                 input: classes.inputInput,
               }}
               inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                setSearch(e.target.value)
-              }}
-              value={search}
             />
           </div>
         </Box>
         <Box>
-          <AddButton researcher={researcher} studies={studies} addedParticipant={addedParticipant} />
+          <Fab
+            variant="extended"
+            color="primary"
+            classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
+            onClick={(event) => setPopover(event.currentTarget)}
+          >
+            <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+          </Fab>
         </Box>
+        <Popover
+          classes={{ root: classes.customPopover, paper: classes.customPaper }}
+          open={!!popover ? true : false}
+          anchorPosition={!!popover && popover.getBoundingClientRect()}
+          anchorReference="anchorPosition"
+          onClose={() => setPopover(null)}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <React.Fragment>AA</React.Fragment>
+        </Popover>
       </Box>
+
       <Box className={classes.optionsMain}>
-        <Box className={classes.optionsSub}>
-          <DeleteParticipant participantIds={selectedParticipants} />
-        </Box>
+        <Box className={classes.optionsSub}>BBBBBBB</Box>
       </Box>
     </Box>
   )

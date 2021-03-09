@@ -318,7 +318,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ActivityItem({
   activity,
-  refreshActivities,
   researcher,
   studies,
   activities,
@@ -369,7 +368,6 @@ export default function ActivityItem({
         <Box>
           <CardActions>
             <UpdateActivity activity={activity} activities={activities} studies={studies} />
-
             <ScheduleActivity activity={activity} />
           </CardActions>
         </Box>

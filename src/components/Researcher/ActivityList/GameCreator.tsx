@@ -134,6 +134,10 @@ export default function GameCreator({
   studies?: any
   study?: any
 }) {
+  const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
+  const [loading, setLoading] = React.useState(false)
+  const { t } = useTranslation()
   const defaultBallonCount = 15
   const defaultMean = 64.5
   const defaultSD = 37
@@ -141,23 +145,6 @@ export default function GameCreator({
   const defaultBubbleSpeed = [60, 80, 80]
   const defaultIntertrialDuration = 0.5
   const defaultBubbleDuration = 1.0
-  const { enqueueSnackbar } = useSnackbar()
-  const classes = useStyles()
-  const [text, setText] = useState(!!value ? value.name : "")
-  const [description, setDescription] = useState(details?.description ?? null)
-  const [photo, setPhoto] = useState(
-    details?.photo
-      ? details?.photo
-      : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-        (!!activitySpecId && ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId))
-      ? Jewels
-      : null
-  )
-
-  const [disabled, setDisabled] = useState(true)
-  const [loading, setLoading] = React.useState(false)
-  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-  const { t } = useTranslation()
   const [settings, setSettings] = useState(
     !!value
       ? value?.settings
@@ -196,15 +183,25 @@ export default function GameCreator({
         }
       : {}
   )
+  const [data, setData] = useState({
+    id: value?.id ?? undefined,
+    name: "",
+    spec: value?.spec ?? activitySpecId,
+    schedule: [],
+    description: "",
+    photo: null,
+    settings: settings,
+    studyID: !!value ? value.study_id : study,
+  })
 
   const validate = () => {
     let duplicates = []
-    if (typeof text !== "undefined" && text?.trim() !== "") {
+    if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
       duplicates = activities.filter(
         (x) =>
           (!!value
-            ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
+            ? x.name.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
+            : x.name.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
@@ -215,90 +212,101 @@ export default function GameCreator({
       ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
     ) {
       return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
         duplicates.length > 0 ||
-        settings.beginner_seconds > 300 ||
-        settings.beginner_seconds === 0 ||
-        settings.beginner_seconds === "" ||
-        settings.intermediate_seconds > 300 ||
-        settings.intermediate_seconds === 0 ||
-        settings.intermediate_seconds === "" ||
-        settings.advanced_seconds > 300 ||
-        settings.advanced_seconds === 0 ||
-        settings.advanced_seconds === "" ||
-        settings.expert_seconds > 300 ||
-        settings.expert_seconds === 0 ||
-        settings.expert_seconds === "" ||
-        settings.diamond_count > 25 ||
-        settings.diamond_count === 0 ||
-        settings.diamond_count === "" ||
-        settings.bonus_point_count === 0 ||
-        settings.bonus_point_count === "" ||
-        settings.shape_count > 4 ||
-        settings.shape_count === 0 ||
-        settings.shape_count === "" ||
-        typeof text === "undefined" ||
-        settings.beginner_seconds < 30 ||
-        settings.intermediate_seconds < 10 ||
-        settings.expert_seconds < 10 ||
-        settings.advanced_seconds < 10 ||
-        settings.diamond_count < 3 ||
-        settings.shape_count < 1 ||
-        (typeof text !== "undefined" && text?.trim() === "")
+        settings?.beginner_seconds > 300 ||
+        settings?.beginner_seconds === 0 ||
+        settings?.beginner_seconds === "" ||
+        settings?.intermediate_seconds > 300 ||
+        settings?.intermediate_seconds === 0 ||
+        settings?.intermediate_seconds === "" ||
+        settings?.advanced_seconds > 300 ||
+        settings?.advanced_seconds === 0 ||
+        settings?.advanced_seconds === "" ||
+        settings?.expert_seconds > 300 ||
+        settings?.expert_seconds === 0 ||
+        settings?.expert_seconds === "" ||
+        settings?.diamond_count > 25 ||
+        settings?.diamond_count === 0 ||
+        settings?.diamond_count === "" ||
+        settings?.bonus_point_count === 0 ||
+        settings?.bonus_point_count === "" ||
+        settings?.shape_count > 4 ||
+        settings?.shape_count === 0 ||
+        settings?.shape_count === "" ||
+        typeof data.name === "undefined" ||
+        settings?.beginner_seconds < 30 ||
+        settings?.intermediate_seconds < 10 ||
+        settings?.expert_seconds < 10 ||
+        settings?.advanced_seconds < 10 ||
+        settings?.diamond_count < 3 ||
+        settings?.shape_count < 1 ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if (
       (value?.spec && ["lamp.balloon_risk"].includes(value.spec)) ||
       ["lamp.balloon_risk"].includes(activitySpecId)
     ) {
       return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
         duplicates.length > 0 ||
-        settings.balloon_count === 0 ||
-        settings.balloon_count === "" ||
-        settings.breakpoint_mean === 0 ||
-        settings.breakpoint_mean === "" ||
-        settings.breakpoint_std === 0 ||
-        settings.breakpoint_std === ""
+        settings?.balloon_count === 0 ||
+        settings?.balloon_count === "" ||
+        settings?.breakpoint_mean === 0 ||
+        settings?.breakpoint_mean === "" ||
+        settings?.breakpoint_std === 0 ||
+        settings?.breakpoint_std === ""
       )
     } else if (
       (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
       ["lamp.pop_the_bubbles"].includes(activitySpecId)
     ) {
       return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
         duplicates.length > 0 ||
-        settings.bubble_count === 0 ||
-        settings.bubble_count === "" ||
-        settings.bubble_speed === 0 ||
-        settings.bubble_speed === "" ||
-        settings.intertrial_duration === 0 ||
-        settings.intertrial_duration === "" ||
-        settings.bubble_duration === 0 ||
-        settings.bubble_duration === ""
+        settings?.bubble_count === 0 ||
+        settings?.bubble_count === "" ||
+        settings?.bubble_speed === 0 ||
+        settings?.bubble_speed === "" ||
+        settings?.intertrial_duration === 0 ||
+        settings?.intertrial_duration === "" ||
+        settings?.bubble_duration === 0 ||
+        settings?.bubble_duration === ""
       )
     } else {
       return !(
-        typeof studyId == "undefined" ||
-        studyId === null ||
-        studyId === "" ||
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
         duplicates.length > 0 ||
-        typeof text === "undefined" ||
-        (typeof text !== "undefined" && text?.trim() === "")
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
   }
 
-  const handleChange = (data) => {
-    setText(data.text)
-    setDescription(data.description)
-    setPhoto(data.photo)
-    setStudyId(data.studyId)
+  const handleChange = (details) => {
+    setData({
+      id: value?.id ?? undefined,
+      name: details.text,
+      spec: value?.spec ?? activitySpecId,
+      schedule: [],
+      settings: settings,
+      description: details.description,
+      photo: details.photo,
+      studyID: details.studyId,
+    })
+  }
+
+  const updateSettings = (settingsData) => {
+    setData({ ...data, [settings]: settingsData })
+    setSettings(settingsData)
   }
 
   return (
@@ -313,44 +321,30 @@ export default function GameCreator({
             value={value}
             details={details}
             activitySpecId={activitySpecId}
-            study={study}
+            study={data.studyID}
             onChange={handleChange}
+            image={Jewels}
           />
 
           {((value?.spec && "lamp.balloon_risk" === value.spec) || "lamp.balloon_risk" === activitySpecId) && (
-            <BalloonRisk settings={settings} updateSettings={(data) => setSettings(data)} />
+            <BalloonRisk settings={settings} updateSettings={(data) => updateSettings(data)} />
           )}
 
           {((value?.spec && "lamp.pop_the_bubbles" === value.spec) || "lamp.pop_the_bubbles" === activitySpecId) && (
-            <PopTheBubbles settings={settings} updateSettings={(data) => setSettings(data)} />
+            <PopTheBubbles settings={settings} updateSettings={(data) => updateSettings(data)} />
           )}
 
           {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
-            <SpatialSpan settings={settings} updateSettings={(data) => setSettings(data)} />
+            <SpatialSpan settings={settings} updateSettings={(data) => updateSettings(data)} />
           )}
 
           {((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
             ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)) && (
-            <JewelsGame settings={settings} updateSettings={(data) => setSettings(data)} />
+            <JewelsGame settings={settings} updateSettings={(data) => updateSettings(data)} />
           )}
         </Container>
       </MuiThemeProvider>
-      <ActivityFooter
-        onSave={onSave}
-        validate={validate}
-        value={value}
-        data={{
-          id: value?.id ?? undefined,
-          name: text,
-          spec: value?.spec ?? activitySpecId,
-          schedule: [],
-          settings: settings,
-          description: description,
-          photo: photo,
-          studyID: studyId,
-        }}
-        disabled={disabled}
-      />
+      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )
 }

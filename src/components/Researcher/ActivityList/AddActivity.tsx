@@ -99,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddActivity({ activities, studies, studyId, ...props }) {
+export default function AddActivity({ activities, studies, studyId, addedActivity, ...props }) {
   const [activitySpecs, setActivitySpecs] = useState([])
   const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
@@ -132,7 +132,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
       <Fab
         variant="extended"
         color="primary"
-        classes={{ root: classes.btnBlue + " " + classes.popexpand }}
+        classes={{ root: classes.btnBlue + " " + (popover ? classes.popexpand : "") }}
         onClick={(event) => setPopover(event.currentTarget)}
       >
         <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
@@ -155,6 +155,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
         <React.Fragment>
           <MenuItem
             onClick={() => {
+              setPopover(null)
               setCreate(true)
               setShowActivityImport(true)
               setCreateMenu(false)
@@ -175,6 +176,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
           </MenuItem>
           <MenuItem
             onClick={() => {
+              setPopover(null)
               setCreate(true)
               setActivitySpecId("lamp.group")
               setCreateMenu(true)
@@ -185,6 +187,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
           <MenuItem
             divider
             onClick={() => {
+              setPopover(null)
               setCreate(true)
               setCreateMenu(true)
               setActivitySpecId("lamp.survey")
@@ -200,6 +203,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
               <MenuItem
                 key={x?.id}
                 onClick={() => {
+                  setPopover(null)
                   setCreateMenu(true)
                   setActivitySpecId(x.id)
                   setCreate(true)
@@ -229,6 +233,7 @@ export default function AddActivity({ activities, studies, studyId, ...props }) 
               studyId={studyId ?? undefined}
               activitySpecId={activitySpecId}
               studies={studies}
+              addedActivity={addedActivity}
             />
           )}
         </Box>
