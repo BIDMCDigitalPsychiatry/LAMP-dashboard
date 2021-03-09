@@ -5,7 +5,8 @@ import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui
 import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
-
+import { ErrorBoundary } from "react-error-boundary"
+import StackTrace from "stacktrace-js"
 // External Imports
 import DateFnsUtils from "@date-io/date-fns"
 
@@ -42,6 +43,47 @@ background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%
   let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
   return typeof src === "string" && src.length > 0
 }*/
+
+function ErrorFallback({ error }) {
+  const [trace, setTrace] = useState([])
+  useEffect(() => {
+    StackTrace.fromError(error).then(setTrace)
+  }, [])
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        border: "none",
+        zIndex: 2147483647,
+        padding: "0.5rem",
+        fontFamily: "Consolas, Menlo, monospace",
+        whiteSpace: "pre-wrap",
+        lineHeight: 1.5,
+        fontSize: "12px",
+        color: "rgb(232, 59, 70)",
+        background: "rgb(53, 53, 53)",
+      }}
+    >
+      <pre>
+        <code style={{ fontSize: "16px" }}>
+          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
+        </code>
+        <br />
+        <code style={{ color: "#fff" }}>
+          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
+        </code>
+        <br />
+        <code>
+          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
+        </code>
+      </pre>
+    </div>
+  )
+}
 
 function PageTitle({ children, ...props }) {
   useEffect(() => {
@@ -510,48 +552,50 @@ function AppRouter({ ...props }) {
 
 export default function App({ ...props }) {
   return (
-    <ThemeProvider
-      theme={createMuiTheme({
-        typography: {
-          fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
-        },
-        palette: {
-          primary: blue,
-          secondary: red,
-          background: {
-            default: "#fff",
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <ThemeProvider
+        theme={createMuiTheme({
+          typography: {
+            fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },
-        },
-        overrides: {
-          MuiBottomNavigationAction: {
-            label: {
-              letterSpacing: `0.1em`,
-              textTransform: "uppercase",
+          palette: {
+            primary: blue,
+            secondary: red,
+            background: {
+              default: "#fff",
             },
           },
-        },
-      })}
-    >
-      <CssBaseline />
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <SnackbarProvider>
-          <HashRouter>
-            <AppRouter {...props} />
-          </HashRouter>
-        </SnackbarProvider>
-      </MuiPickersUtilsProvider>
-      <span
-        style={{
-          position: "fixed",
-          bottom: 16,
-          left: 16,
-          fontSize: "8",
-          zIndex: -1,
-          opacity: 0.1,
-        }}
+          overrides: {
+            MuiBottomNavigationAction: {
+              label: {
+                letterSpacing: `0.1em`,
+                textTransform: "uppercase",
+              },
+            },
+          },
+        })}
       >
-        {process.env.REACT_APP_GIT_SHA}
-      </span>
-    </ThemeProvider>
+        <CssBaseline />
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <SnackbarProvider>
+            <HashRouter>
+              <AppRouter {...props} />
+            </HashRouter>
+          </SnackbarProvider>
+        </MuiPickersUtilsProvider>
+        <span
+          style={{
+            position: "fixed",
+            bottom: 16,
+            left: 16,
+            fontSize: "8",
+            zIndex: -1,
+            opacity: 0.1,
+          }}
+        >
+          {process.env.REACT_APP_GIT_SHA}
+        </span>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
