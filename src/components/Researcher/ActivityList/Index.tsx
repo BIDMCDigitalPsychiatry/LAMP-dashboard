@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Grid } from "@material-ui/core"
+import { Box, Grid, Backdrop, CircularProgress } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
@@ -422,69 +422,75 @@ export const availableAtiveSpecs = [
 
 export const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
-// export default function Activities({researcher, title, ...props}) {
-
-// }
-
 export default function ActivityList({ researcher, title, studies, ...props }) {
   const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const classes = useStyles()
-  const [selectedActivities, setSelectedActivities] = useState([])
+  const [selectedActivities, setSelectedActivities] = useState<any>([])
+  const [search, setSearch] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
 
   useEffect(() => {
-    console.log(studies)
-    ;(async () => {
-      Service.getAll("activities").then((activities) => {
-        console.log(activities)
-        setActivities(activities)
-      })
-    })()
+    Service.getAll("activities").then((activities) => {
+      console.log(activities)
+      setActivities(activities)
+    })
   }, [])
 
   const handleChange = (activity, checked) => {
-    let selected = selectedActivities
     if (checked) {
-      selected.push(activity)
+      setSelectedActivities((prevState) => [...prevState, activity])
     } else {
-      selected = selected.filter((item) => item.id != activity.id)
+      let selected = selectedActivities.filter((item) => item.id != activity.id)
+      setSelectedActivities(selected)
     }
-    console.log(selected)
-    setSelectedActivities(selected)
   }
 
   const addedActivity = (data) => {
     setActivities((prevState) => [...prevState, data])
   }
 
-  const handleSearchData = (val) => {
-    if (val) {
-      let searchedActivities = activities.filter((i) => i.name?.includes(val))
-      setActivities(searchedActivities)
-    } else {
-      Service.getAll("activities").then((activities) => {
-        setActivities(activities)
+  useEffect(() => {
+    searchActivities()
+  }, [selectedStudies])
+
+  useEffect(() => {
+    searchActivities()
+  }, [search])
+
+  const searchActivities = () => {
+    setLoading(true)
+    if (selectedStudies.length > 0) {
+      Service.getDataByKey("activities", selectedStudies, "study_name").then((activitiesData) => {
+        if (search) {
+          let newActivities = activitiesData.filter((i) => i.name?.includes(search))
+          setActivities(newActivities)
+        } else {
+          setActivities(activitiesData)
+        }
+        setLoading(false)
       })
+    } else if (!!search && search !== "") {
+      let newActivities = activities.filter((i) => i.name?.includes(search))
+      setActivities(newActivities)
+      setLoading(false)
     }
   }
 
-  const filterStudies = (val) => {
-    if (val) {
-      Service.getDataByKey("activities", val, "study_name").then((activities) => {
-        setActivities(activities)
-      })
-    } else {
-      Service.getAll("activities").then((activities) => {
-        setActivities(activities)
-      })
-    }
+  const filterStudies = (data) => {
+    setSelectedStudies(data)
+  }
+
+  const handleSearchData = (val) => {
+    setSearch(val)
   }
 
   return (
     <React.Fragment>
-      {/* <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
-      </Backdrop> */}
+      </Backdrop>
       <Header
         studies={studies}
         researcher={researcher}

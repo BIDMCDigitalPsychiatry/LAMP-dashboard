@@ -126,6 +126,7 @@ const useStyles = makeStyles((theme: Theme) =>
       textTransform: "capitalize",
       fontSize: "14px",
       color: "#7599FF",
+      marginLeft: 10,
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
@@ -300,7 +301,7 @@ export default function ScheduleActivity({ activity, ...props }) {
     setShowScheduler(false)
   }
   return (
-    <Box>
+    <span>
       <Fab
         size="small"
         color="primary"
@@ -327,6 +328,6 @@ export default function ScheduleActivity({ activity, ...props }) {
           </Box>
         </DialogContent>
       </Dialog>
-    </Box>
+    </span>
   )
 }

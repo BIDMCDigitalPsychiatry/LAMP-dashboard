@@ -291,7 +291,7 @@ export default function AddUser({
           idData["parent"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
           Service.addData("participants", [idData])
           addedParticipant(idData)
-          Service.incrementCount("studies", selectedStudy, "participants_count")
+          Service.updateCount("studies", selectedStudy, "participants_count")
           enqueueSnackbar(
             t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
               id: id,

@@ -1,20 +1,12 @@
-import React, { useState, useEffect } from "react"
-import { Box, Popover, Fab, Typography, Icon, InputBase, MenuItem } from "@material-ui/core"
-import LAMP from "lamp-core"
+import React, { useState } from "react"
+import { Box, Typography, InputBase } from "@material-ui/core"
 import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
-import { useTranslation } from "react-i18next"
-import AddUser from "./AddUser"
-import StudyCreator from "./StudyCreator"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import SearchIcon from "@material-ui/icons/Search"
 import DeleteParticipant from "./DeleteParticipant"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
 import AddButton from "./AddButton"
-
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
+import StudyFilterList from "../ParticipantList/StudyFilterList"
 
 const theme = createMuiTheme({
   palette: {
@@ -104,54 +96,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "20ch",
       },
     },
-    btnBlue: {
-      background: "#7599FF",
-      borderRadius: "40px",
-      minWidth: 100,
-      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
-      lineHeight: "38px",
-
-      cursor: "pointer",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "#fff",
-      "& svg": { marginRight: 8 },
-      "&:hover": { background: "#5680f9" },
-      [theme.breakpoints.up("md")]: {
-        position: "absolute",
-      },
-      [theme.breakpoints.down("sm")]: {
-        minWidth: "auto",
-      },
-    },
-    customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
-    customPaper: {
-      maxWidth: 380,
-      marginTop: 75,
-      marginLeft: 100,
-      borderRadius: 10,
-      padding: "10px 0",
-      "& h6": { fontSize: 16 },
-      "& li": {
-        display: "inline-block",
-        width: "100%",
-        padding: "15px 30px",
-        "&:hover": { backgroundColor: "#ECF4FF" },
-      },
-      "& *": { cursor: "pointer" },
-    },
-    popexpand: {
-      backgroundColor: "#fff",
-      color: "#618EF7",
-      zIndex: 11111,
-      "& path": { fill: "#618EF7" },
-      "&:hover": { backgroundColor: "#f3f3f3" },
-    },
-    addText: {
-      [theme.breakpoints.down("sm")]: {
-        display: "none",
-      },
-    },
     optionsMain: {
       background: "#ECF4FF",
       borderTop: "1px solid #C7C7C7",
@@ -171,7 +115,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Header({
   studies,
   researcher,
-  refreshParticipants,
   selectedParticipants,
   searchData,
   filterStudies,
@@ -179,16 +122,22 @@ export default function Header({
   ...props
 }) {
   const classes = useStyles()
-  const { t } = useTranslation()
-  const [popover, setPopover] = useState(null)
   const [search, setSearch] = useState("")
-  const [addStudy, setAddStudy] = useState(false)
+  const [showFilterStudies, setShowFilterStudies] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
 
-  useEffect(() => {
-    searchData(search)
-  }, [search])
+  const handleSearchData = (data) => {
+    searchData(data)
+  }
 
-  const filteredStudyArray = () => {}
+  const handleShowFilterStudies = (data) => {
+    setShowFilterStudies(data)
+  }
+
+  const filteredStudyArray = (val) => {
+    setSelectedStudies(val)
+    filterStudies(val)
+  }
 
   return (
     <Box>
@@ -198,7 +147,13 @@ export default function Header({
         </Box>
 
         <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="participants" studyChange={filterStudies} />
+          <StudyFilter
+            researcher={researcher}
+            studies={studies}
+            type="participants"
+            showFilterStudies={handleShowFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+          />
         </Box>
 
         <Box>
@@ -215,6 +170,7 @@ export default function Header({
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => {
                 setSearch(e.target.value)
+                handleSearchData(e.target.value)
               }}
               value={search}
             />
@@ -224,11 +180,26 @@ export default function Header({
           <AddButton researcher={researcher} studies={studies} addedParticipant={addedParticipant} />
         </Box>
       </Box>
-      <Box className={classes.optionsMain}>
-        <Box className={classes.optionsSub}>
-          <DeleteParticipant participantIds={selectedParticipants} />
+
+      {!!showFilterStudies && (
+        <Box>
+          <StudyFilterList
+            studies={studies}
+            researcher={researcher}
+            type="participants"
+            showFilterStudies={showFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+            selectedStudies={selectedStudies}
+          />
         </Box>
-      </Box>
+      )}
+      {selectedParticipants.length > 0 && (
+        <Box className={classes.optionsMain}>
+          <Box className={classes.optionsSub}>
+            <DeleteParticipant participants={selectedParticipants} />
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }

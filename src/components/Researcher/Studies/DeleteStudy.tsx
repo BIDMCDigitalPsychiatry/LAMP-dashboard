@@ -251,6 +251,17 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -280,18 +291,19 @@ export default function DeleteStudy({ study, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop> */}
 
-      <Box>
-        <IconButton
+      <Box display="flex" alignItems="center" pl={1}>
+        <Fab
+          size="small"
           color="primary"
           disabled={study.id > 1 ? true : false}
-          classes={{ disabled: classes.disabledButton }}
+          classes={{ root: classes.btnWhite, disabled: classes.disabledButton }}
           onClick={() => {
             setOpenDialogDeleteStudy(true)
             setStudyIdForDelete(study.id)
           }}
         >
-          <DeleteIcon fontSize="small" />
-        </IconButton>
+          <Icon>delete_outline</Icon>
+        </Fab>
       </Box>
 
       <Dialog

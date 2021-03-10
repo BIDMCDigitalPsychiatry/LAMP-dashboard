@@ -1,5 +1,4 @@
 import * as idb from "idb"
-
 const DATABASE_NAME = "LAMP-DB"
 
 const dbPromise = idb.openDB(DATABASE_NAME, 1, {
@@ -105,7 +104,7 @@ class DBService {
       })
   }
 
-  getDataByKey(tablespace: string, search: string, key: string) {
+  getDataByKey(tablespace: string, search: Array<string>, key: string) {
     let results = []
     return dbPromise
       .then(function (db) {
@@ -180,7 +179,7 @@ class DBService {
       })
   }
 
-  incrementCount(tablespace: string, key: string, keyToUpdate: string) {
+  updateCount(tablespace: string, key: string, keyToUpdate: string, count?: number, type?: number) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -189,7 +188,7 @@ class DBService {
           while (cursor) {
             if (cursor.key === key) {
               let value = cursor.value
-              value[keyToUpdate] = value[keyToUpdate] + 1
+              value[keyToUpdate] = !type ? value[keyToUpdate] + (count ?? 1) : value[keyToUpdate] + (count ?? 1)
               cursor.update(value)
             }
             cursor = await cursor.continue()

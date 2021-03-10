@@ -2,7 +2,6 @@ import { Service } from "../DBService/DBService"
 
 async function fetchResult(authString, id, type, modal) {
   const baseUrl = "https://lampv2.zcodemo.com:9093"
-  console.log(`${baseUrl}/${modal}/${id}/_lookup/${type}`, authString, id)
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
@@ -10,6 +9,21 @@ async function fetchResult(authString, id, type, modal) {
         "Content-Type": "application/json",
         Authorization: "Basic " + authString,
       },
+    })
+  ).json()
+  return result
+}
+
+export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
+  const baseUrl = "https://lampv2.zcodemo.com:9093"
+  let result = await (
+    await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
+      method: methodType,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Basic " + authString,
+      },
+      body: JSON.stringify(bodyData),
     })
   ).json()
   return result
@@ -61,7 +75,6 @@ export const saveDataToCache = (authString, id) => {
           saveSettings(settings, "name")
         })
       }
-
       fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
         saveSettings(sensors, "accelerometer")
         saveSettings(sensors, "analytics")
@@ -72,7 +85,6 @@ export const saveDataToCache = (authString, id) => {
       })
     })
   })
-
   fetchResult(authString, id, "activity", "researcher").then((result) => {
     saveStudyData(result, "activities")
     fetchResult(authString, id, "sensor", "researcher").then((result) => {

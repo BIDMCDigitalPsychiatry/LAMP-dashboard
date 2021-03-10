@@ -87,7 +87,7 @@ export default function UpdateActivity({ activity, activities, studies, ...props
   }
 
   return (
-    <Box>
+    <span>
       <Fab
         size="small"
         color="primary"
@@ -129,6 +129,6 @@ export default function UpdateActivity({ activity, activities, studies, ...props
           />
         </Box>
       </ResponsiveDialog>
-    </Box>
+    </span>
   )
 }

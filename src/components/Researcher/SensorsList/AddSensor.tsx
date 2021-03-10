@@ -1,39 +1,10 @@
 import React, { useState } from "react"
-import {
-  Box,
-  IconButton,
-  Button,
-  TextField,
-  Popover,
-  MenuItem,
-  Tooltip,
-  Grid,
-  Fab,
-  Icon,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  ButtonBase,
-} from "@material-ui/core"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
-
-import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
-
-import CloseIcon from "@material-ui/icons/Close"
-
-import QRCode from "qrcode.react"
-// Local Imports
+import { Box, Fab, Icon } from "@material-ui/core"
 import LAMP, { Study } from "lamp-core"
-
 import SnackMessage from "../../SnackMessage"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-
 import { useTranslation } from "react-i18next"
-
+import { Service } from "../../DBService/DBService"
 import SensorDialog from "./SensorDialog"
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -91,9 +62,7 @@ const useStyles = makeStyles((theme) =>
       color: "#fff",
       "& svg": { marginRight: 8 },
       "&:hover": { background: "#5680f9" },
-      [theme.breakpoints.up("md")]: {
-        position: "absolute",
-      },
+
       [theme.breakpoints.down("sm")]: {
         minWidth: "auto",
       },
@@ -300,6 +269,14 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
+export function addSensorItem(x, studies) {
+  Service.updateCount("studies", x.studyID, "sensor_count")
+  x["study_id"] = x.studyID
+  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+  delete x["studyID"]
+  Service.addData("sensors", [x])
+}
+
 export default function AddSensor({
   studies,
   updateDataSensor,
@@ -315,18 +292,14 @@ export default function AddSensor({
   const [sensorDialog, setSensorDialog] = useState(false)
 
   const addNewData = (data) => {
+    addSensorItem(data, studies)
     addedSensor(data)
     setSensorDialog(false)
   }
 
   return (
     <Box>
-      <Fab
-        variant="extended"
-        color="primary"
-        classes={{ root: classes.btnBlue + " " + classes.popexpand }}
-        onClick={() => setSensorDialog(true)}
-      >
+      <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
         <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
       </Fab>
       <SensorDialog studies={studies} onClose={() => setSensorDialog(false)} open={sensorDialog} newData={addNewData} />

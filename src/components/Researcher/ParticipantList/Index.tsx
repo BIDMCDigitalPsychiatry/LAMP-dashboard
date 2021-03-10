@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid } from "@material-ui/core"
+import { Box, Grid, Backdrop, CircularProgress } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -116,65 +116,74 @@ export default function ParticipantList({
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
+  const [search, setSearch] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
 
   useEffect(() => {
-    refreshParticipants()
-  }, [])
-
-  const refreshParticipants = () => {
     Service.getAll("participants").then((participants) => {
       setParticipants(participants)
     })
-  }
+  }, [])
 
   const addedParticipant = (data) => {
     setParticipants((prevState) => [...prevState, data])
   }
 
   const handleChange = (participant, checked) => {
-    let selected = selectedParticipants
     if (checked) {
-      selected.push(participant)
+      setSelectedParticipants((prevState) => [...prevState, participant])
     } else {
-      selected = selected.filter((item, index) => {
-        return selected.indexOf(item) !== index
+      let selected = selectedParticipants.filter((item, index) => {
+        return selectedParticipants.indexOf(item) !== index
       })
+      setSelectedParticipants(selected)
     }
-    setSelectedParticipants(selected)
+  }
+
+  useEffect(() => {
+    searchParticipants()
+  }, [selectedStudies])
+
+  useEffect(() => {
+    searchParticipants()
+  }, [search])
+
+  const searchParticipants = () => {
+    setLoading(true)
+    if (selectedStudies.length > 0) {
+      Service.getDataByKey("participants", selectedStudies, "parent").then((participantData) => {
+        if (search) {
+          let newParticipants = participantData.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+          setParticipants(newParticipants)
+        } else {
+          setParticipants(participantData)
+        }
+        setLoading(false)
+      })
+    } else if (!!search && search !== "") {
+      let newParticipants = participants.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+      setParticipants(newParticipants)
+      setLoading(false)
+    }
+  }
+
+  const filterStudies = (data) => {
+    setSelectedStudies(data)
   }
 
   const handleSearchData = (val) => {
-    if (val) {
-      let searchedParticipants = participants.filter((i) => i.name?.includes(val) || i.id?.includes(val))
-      setParticipants(searchedParticipants)
-    } else {
-      Service.getAll("participants").then((participants) => {
-        setParticipants(participants)
-      })
-    }
-  }
-
-  const filterStudies = (val) => {
-    if (val) {
-      Service.getDataByKey("participants", val, "parent").then((searchedParticipants) => {
-        setParticipants(searchedParticipants)
-      })
-    } else {
-      Service.getAll("participants").then((participants) => {
-        setParticipants(participants)
-      })
-    }
+    setSearch(val)
   }
 
   return (
     <React.Fragment>
-      {/* <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
-      </Backdrop> */}
+      </Backdrop>
       <Header
         studies={studies}
         researcher={researcher}
-        refreshParticipants={refreshParticipants}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
         filterStudies={filterStudies}
@@ -188,7 +197,6 @@ export default function ParticipantList({
                 <ParticipantListItem
                   participant={eachParticipant}
                   onParticipantSelect={onParticipantSelect}
-                  refreshParticipants={refreshParticipants}
                   studies={studies}
                   notificationColumn={notificationColumn}
                   handleSelectionChange={handleChange}

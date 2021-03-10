@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react"
-import { Box, Typography, InputBase, Icon, IconButton } from "@material-ui/core"
+import React, { useState } from "react"
+import { Box, Typography, InputBase } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import SearchIcon from "@material-ui/icons/Search"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
+import StudyFilterList from "../ParticipantList/StudyFilterList"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -83,13 +84,22 @@ export default function Header({
   ...props
 }) {
   const classes = useStyles()
-  const { enqueueSnackbar } = useSnackbar()
-  const { t } = useTranslation()
   const [search, setSearch] = useState("")
+  const [showFilterStudies, setShowFilterStudies] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
 
-  useEffect(() => {
-    searchData(search)
-  }, [search])
+  const handleSearchData = (data) => {
+    searchData(data)
+  }
+
+  const handleShowFilterStudies = (data) => {
+    setShowFilterStudies(data)
+  }
+
+  const filteredStudyArray = (val) => {
+    setSelectedStudies(val)
+    filterStudies(val)
+  }
 
   return (
     <Box>
@@ -99,7 +109,14 @@ export default function Header({
         </Box>
 
         <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="activities" studyChange={filterStudies} />
+          <StudyFilter
+            researcher={researcher}
+            studies={studies}
+            type="activities"
+            // studyChange={filterStudies}
+            showFilterStudies={handleShowFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+          />
         </Box>
         <Box>
           <div className={classes.search}>
@@ -115,6 +132,7 @@ export default function Header({
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => {
                 setSearch(e.target.value)
+                handleSearchData(e.target.value)
               }}
               value={search}
             />
@@ -126,12 +144,26 @@ export default function Header({
         </Box>
       </Box>
 
-      <Box className={classes.optionsMain}>
-        <Box className={classes.optionsSub}>
-          <ExportActivity activities={selectedActivities} />
-          <DeleteActivity activities={selectedActivities} />
+      {!!showFilterStudies && (
+        <Box>
+          <StudyFilterList
+            studies={studies}
+            researcher={researcher}
+            type="activities"
+            showFilterStudies={showFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+            selectedStudies={selectedStudies}
+          />
         </Box>
-      </Box>
+      )}
+      {selectedActivities.length > 0 && (
+        <Box className={classes.optionsMain}>
+          <Box className={classes.optionsSub}>
+            <ExportActivity activities={selectedActivities} />
+            <DeleteActivity activities={selectedActivities} />
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }

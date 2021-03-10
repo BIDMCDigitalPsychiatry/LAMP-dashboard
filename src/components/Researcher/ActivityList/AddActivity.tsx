@@ -46,9 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
       color: "#fff",
       "& svg": { marginRight: 8 },
       "&:hover": { background: "#5680f9" },
-      [theme.breakpoints.up("md")]: {
-        position: "absolute",
-      },
+
       [theme.breakpoints.down("sm")]: {
         minWidth: "auto",
       },

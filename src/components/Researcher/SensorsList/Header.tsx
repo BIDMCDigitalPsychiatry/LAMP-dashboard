@@ -5,6 +5,7 @@ import { Box, Typography, TextField, InputBase, Icon, IconButton } from "@materi
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import SearchIcon from "@material-ui/icons/Search"
 import DeleteSensor from "./DeleteSensor"
+import StudyFilterList from "../ParticipantList/StudyFilterList"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -82,10 +83,12 @@ export default function Header({
 }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
+  const [showFilterStudies, setShowFilterStudies] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
 
-  useEffect(() => {
-    searchData(search)
-  }, [search])
+  const handleSearchData = (data) => {
+    searchData(data)
+  }
 
   const handleDeleted = (val) => {
     deleted(val)
@@ -95,15 +98,32 @@ export default function Header({
     addedSensor(data)
   }
 
+  const filteredStudyArray = (val) => {
+    setSelectedStudies(val)
+    filterStudies(val)
+  }
+
+  const handleShowFilterStudies = (data) => {
+    setShowFilterStudies(data)
+  }
+
   return (
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">Sensors</Typography>
         </Box>
+
         <Box>
-          <StudyFilter researcher={researcher} studies={studies} type="sensors" studyChange={filterStudies} />
+          <StudyFilter
+            researcher={researcher}
+            studies={studies}
+            type="sensors"
+            showFilterStudies={handleShowFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+          />
         </Box>
+
         <Box>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -118,6 +138,7 @@ export default function Header({
               inputProps={{ "aria-label": "search" }}
               onChange={(e) => {
                 setSearch(e.target.value)
+                handleSearchData(e.target.value)
               }}
               value={search}
             />
@@ -127,6 +148,22 @@ export default function Header({
           <AddSensor studies={studies} addedSensor={addedDataSensor} />
         </Box>
       </Box>
+
+      {showFilterStudies ? (
+        <Box>
+          <StudyFilterList
+            studies={studies}
+            researcher={researcher}
+            type="sensors"
+            showFilterStudies={showFilterStudies}
+            filteredStudyArray={filteredStudyArray}
+            selectedStudies={selectedStudies}
+          />
+        </Box>
+      ) : (
+        ""
+      )}
+
       <Box className={classes.optionsMain}>
         <Box className={classes.optionsSub}>
           <DeleteSensor sensors={selectedSensors} deleted={handleDeleted} />

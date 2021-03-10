@@ -28,6 +28,7 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import MaterialTable, { MTableToolbar } from "material-table"
+import CreateIcon from "@material-ui/icons/Create"
 import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as DeleteIcon } from "../../../icons/DeleteBlue.svg"
@@ -210,7 +211,19 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       "&:hover": { background: "#5680f9" },
     },
-    studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    studyName: { minWidth: 200, alignItems: "center", display: "flex" },
+
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -245,17 +258,19 @@ export default function EditStudy({ study, ...props }) {
   }
 
   return (
-    <Box display="flex">
-      <Box flexGrow={1} className={classes.studyName}>
+    <Box display="flex" alignItems="center">
+      <Box flexGrow={1} pl={1}>
         {editStudy && study.id == editStudyName ? (
-          <EditStudyField
-            study={study.id}
-            studyName={study.name}
-            editData={editStudy}
-            editStudyName={editStudyName}
-            updateName={updateStudyName}
-            callbackModal={callbackModal}
-          />
+          <Box flexGrow={1} className={classes.studyName}>
+            <EditStudyField
+              study={study.id}
+              studyName={study.name}
+              editData={editStudy}
+              editStudyName={editStudyName}
+              updateName={updateStudyName}
+              callbackModal={callbackModal}
+            />
+          </Box>
         ) : aliasStudyName && editStudyName === study.id ? (
           t(aliasStudyName)
         ) : studyArray[study.id] ? (
@@ -265,16 +280,19 @@ export default function EditStudy({ study, ...props }) {
         )}
       </Box>
       <Box>
-        <IconButton
+        <Fab
+          size="small"
           color="primary"
+          // classes={{ root: classes.btnBlue + " " + classes.popexpand }}
+
           disabled={study.id > 1 ? true : false}
-          classes={{ disabled: classes.disabledButton }}
+          classes={{ root: classes.btnWhite, disabled: classes.disabledButton }}
           onClick={(event) => {
             editStudyField(study.id, event)
           }}
         >
-          <RenameIcon fontSize="small" />
-        </IconButton>
+          <CreateIcon />
+        </Fab>
       </Box>
     </Box>
   )

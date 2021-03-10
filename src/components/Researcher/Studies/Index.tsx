@@ -253,6 +253,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "#5680f9" },
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
+    studyMain: { background: "#F8F8F8", borderRadius: 4 },
   })
 )
 
@@ -292,13 +293,21 @@ export default function StudiesList({ title, researcher, studies, ...props }) {
         <CircularProgress color="inherit" />
       </Backdrop> */}
       <Header studies={studies} researcher={researcher} />
-
-      {studies.map((study) => (
-        <Box display="flex" key={study.id} className={classes.studyList}>
-          <EditStudy study={study} />
-          <DeleteStudy study={study} />
-        </Box>
-      ))}
+      <Box className={classes.tableContainer} py={4}>
+        <Grid container spacing={3}>
+          {studies.map((study) => (
+            <Grid item lg={6} xs={12}>
+              <Box display="flex" p={1} key={study.id} className={classes.studyMain}>
+                <Box flexGrow={1}>
+                  {" "}
+                  <EditStudy study={study} />
+                </Box>
+                <DeleteStudy study={study} />
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </React.Fragment>
   )
 }

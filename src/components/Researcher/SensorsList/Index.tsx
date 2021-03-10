@@ -300,18 +300,10 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
   const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
   const [updatedData, setUpdatedData] = useState({})
-  const [selectedSensors, setSelectedSensors] = useState([])
-
-  useEffect(() => {
-    ;(async () => {
-      Service.getAll("sensors").then((sensors) => {
-        setSensors(sensors)
-      })
-    })()
-  }, [])
+  const [selectedSensors, setSelectedSensors] = useState<any>([])
+  const [search, setSearch] = useState(null)
 
   const updatedSensor = (data) => {
-    // setLoading(true)
     if (data.fn_type === "update") {
       let dataSensors = [...sensors]
       let index = dataSensors.findIndex((obj) => obj.id === data.id)
@@ -324,7 +316,6 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
         return tasks
       })
     }
-    // setLoading(false)
   }
 
   const addedSensor = (data) => {
@@ -349,24 +340,29 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
   }
 
   const handleSearchData = (val) => {
+    setSearch(val)
     if (val) {
-      let newSensors = sensors.filter((i) => i.name.includes(val))
-      setSensors(newSensors)
+      Service.getDataByKey("sensors", selectedSensors, "study_name").then((sensors) => {
+        let newSensors = sensors.filter((i) => i.name.includes(val))
+        setSensors(newSensors)
+      })
     } else {
-      Service.getAll("sensors").then((sensors) => {
+      Service.getDataByKey("sensors", selectedSensors, "study_name").then((sensors) => {
         setSensors(sensors)
       })
     }
   }
 
   const filterStudies = (val) => {
+    setSelectedSensors(val)
     if (val) {
       Service.getDataByKey("sensors", val, "study_name").then((sensors) => {
-        setSensors(sensors)
-      })
-    } else {
-      Service.getAll("sensors").then((sensors) => {
-        setSensors(sensors)
+        if (search) {
+          let newSensors = sensors.filter((i) => i.name.includes(search))
+          setSensors(newSensors)
+        } else {
+          setSensors(sensors)
+        }
       })
     }
   }

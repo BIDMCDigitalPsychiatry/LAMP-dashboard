@@ -36,34 +36,29 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function StudyFilter({ researcher, studies, type, showFilterStudies, filteredStudyArray, ...props }) {
-  const [showFilter, setShowFilter] = useState(false)
+export default function StudyFilterList({
+  studies,
+  researcher,
+  type,
+  showFilterStudies,
+  filteredStudyArray,
+  selectedStudies,
+  ...props
+}) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [selectedStudies, setSelectedStudies] = useState([])
+  const [selStudies, setSelStudies]: any = useState([])
   const [studiesCount, setStudiesCount] = useState(null)
 
   useEffect(() => {
     let studiesData = filterStudyData(studies)
     setStudiesCount(studiesData)
-    ;(async () => {
-      let selectedStudies =
-        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
-        (studies ?? []).map((study) => {
-          return study.name
-        })
-      setSelectedStudies(selectedStudies)
-      filteredStudyArray(selectedStudies)
-    })()
+    setSelStudies(selectedStudies)
   }, [])
 
   useEffect(() => {
-    filteredStudyArray(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    showFilterStudies(showFilter)
-  }, [showFilter])
+    filteredStudyArray(selStudies)
+  }, [selStudies])
 
   const filterStudyData = (dataArray) => {
     return Object.assign(
@@ -81,16 +76,22 @@ export default function StudyFilter({ researcher, studies, type, showFilterStudi
 
   return (
     <Box>
-      <Fab
-        variant="extended"
-        className={classes.btnFilter + " " + (showFilter === true ? classes.tagFilteredBg : "")}
-        onClick={() => {
-          showFilter === true ? setShowFilter(false) : setShowFilter(true)
-        }}
-      >
-        <Filter /> <span className={classes.filterText}>{t("Filter results")}</span>{" "}
-        {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-      </Fab>
+      {showFilterStudies === true && (
+        <Box mt={1}>
+          {
+            <MultipleSelect
+              selected={selStudies}
+              items={(studies || []).map((x) => `${x.name}`)}
+              showZeroBadges={false}
+              badges={studiesCount}
+              onChange={(x) => {
+                LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
+                setSelStudies(x)
+              }}
+            />
+          }
+        </Box>
+      )}
     </Box>
   )
 }

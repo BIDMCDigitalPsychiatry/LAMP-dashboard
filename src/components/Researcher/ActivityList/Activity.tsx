@@ -22,7 +22,7 @@ const games = [
 ]
 
 export function addActivity(x, studies) {
-  Service.incrementCount("studies", x.studyID, "activity_count")
+  Service.updateCount("studies", x.studyID, "activity_count")
   x["study_id"] = x.studyID
   x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
   delete x["studyID"]

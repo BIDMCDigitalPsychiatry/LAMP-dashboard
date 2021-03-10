@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteParticipant({ participantIds, ...props }) {
+export default function DeleteParticipant({ participants, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -39,8 +39,12 @@ export default function DeleteParticipant({ participantIds, ...props }) {
 
   let deleteParticipants = async (status) => {
     if (status === "Yes") {
-      for (let participantId of participantIds) {
-        await LAMP.Participant.delete(participantId)
+      const participantIds = participants.map((p) => {
+        return p.id
+      })
+      for (let participant of participants) {
+        await LAMP.Participant.delete(participant.id)
+        Service.updateCount("studies", participant.parentID, "participants_count", 1, 1)
       }
       Service.delete("participants", participantIds)
       enqueueSnackbar(t("Successfully deleted the selected participants."), {

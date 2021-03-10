@@ -220,14 +220,10 @@ export default function Header({ studies, researcher, ...props }) {
             vertical: "top",
             horizontal: "right",
           }}
-        >
-          <React.Fragment>AA</React.Fragment>
-        </Popover>
+        ></Popover>
       </Box>
 
-      <Box className={classes.optionsMain}>
-        <Box className={classes.optionsSub}>BBBBBBB</Box>
-      </Box>
+      <Box className={classes.optionsMain}></Box>
     </Box>
   )
 }

@@ -1003,6 +1003,62 @@
     {
       "#type": "Activity",
       "#parent": "study1",
+      "id": "activity21",
+      "spec": "lamp.balloon_risk",
+      "name": "Jewels",
+      "settings": {
+        "beginner_seconds": 90,
+        "intermediate_seconds": 30,
+        "advanced_seconds": 25,
+        "expert_seconds": 15,
+        "diamond_count": 15,
+        "shape_count": 1,
+        "bonus_point_count": 50,
+        "x_changes_in_level_count": 1,
+        "x_diamond_count": 0,
+        "y_changes_in_level_count": 1,
+        "y_shape_count": 1
+      },
+      "schedule": [
+        {
+          "start_date": "2018-08-22T00:00:00.000Z",
+          "time": "2018-08-22T18:00:00.000Z",
+          "repeat_interval": "biweekly",
+          "custom_time": null
+        }
+      ]
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity21",
+      "spec": "lamp.jewels_a",
+      "name": "Jewels",
+      "settings": {
+        "beginner_seconds": 90,
+        "intermediate_seconds": 30,
+        "advanced_seconds": 25,
+        "expert_seconds": 15,
+        "diamond_count": 15,
+        "shape_count": 1,
+        "bonus_point_count": 50,
+        "x_changes_in_level_count": 1,
+        "x_diamond_count": 0,
+        "y_changes_in_level_count": 1,
+        "y_shape_count": 1
+      },
+      "schedule": [
+        {
+          "start_date": "2018-08-22T00:00:00.000Z",
+          "time": "2018-08-22T18:00:00.000Z",
+          "repeat_interval": "biweekly",
+          "custom_time": null
+        }
+      ]
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
       "id": "activity24",
       "spec": "lamp.spin_wheel",
       "name": "Spin Wheel",

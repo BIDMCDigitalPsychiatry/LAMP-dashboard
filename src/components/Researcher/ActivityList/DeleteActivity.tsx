@@ -51,6 +51,7 @@ export default function DeleteActivity({ activities, ...props }) {
         }
         console.dir("deleted tag " + JSON.stringify(tag))
         let raw = await LAMP.Activity.delete(activity.id)
+        Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
       }
       Service.delete("activities", activityIds)
       enqueueSnackbar(t("Successfully deleted the selected Activities."), {

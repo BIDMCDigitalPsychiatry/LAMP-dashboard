@@ -1,6 +1,6 @@
 // Core Imports
 import React from "react"
-import { Box, Typography } from "@material-ui/core"
+import { Box, Typography, Grid, Checkbox } from "@material-ui/core"
 import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
@@ -18,10 +18,13 @@ const useStyles = makeStyles((theme) =>
     },
     contentText: {
       color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
+
       fontSize: 14,
       marginLeft: 10,
     },
+    w45: { width: 45 },
+    w120: { width: 120 },
+    checkboxActive: { color: "#7599FF !important" },
   })
 )
 
@@ -30,12 +33,14 @@ export default function ActivityRow({
   index,
   studies,
   activities,
+  handleSelected,
   ...props
 }: {
   activity: any
   index: number
   studies: any
   activities: any
+  handleSelected: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -49,21 +54,46 @@ export default function ActivityRow({
     "lamp.dbt_diary_card": t("DBT Diary Card"),
     "lamp.scratch_image": t("Scratch image"),
   }
+  const [checked, setChecked] = React.useState(false)
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handleSelected(activity, event.target.checked)
+    console.log(event.target.checked)
+    setChecked(event.target.checked)
+  }
   return (
-    <div className={classes.rowContainer} style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}>
-      <Typography className={classes.contentText} style={{ flex: 1 }}>
-        {activity.name}
-      </Typography>
-      <Typography className={classes.contentText} style={{ flex: 1 }}>
-        {types[activity.spec] ?? t("Cognitive Test")}
-      </Typography>
-      <Typography className={classes.contentText} style={{ flex: 1 }}>
-        {(activity?.schedule ?? []).map((sc) => (
-          <Box>{sc.repeat_interval}</Box>
-        ))}
-      </Typography>
-      <UpdateActivity activity={activity} activities={activities} studies={studies} />
-      <ScheduleActivity activity={activity} />
-    </div>
+    <Box style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }} p={1}>
+      <Grid container alignItems="center">
+        <Grid item className={classes.w45}>
+          <Checkbox
+            checked={checked}
+            onChange={handleChange}
+            classes={{ checked: classes.checkboxActive }}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
+        </Grid>
+        <Grid item xs>
+          <Typography className={classes.contentText} style={{ flex: 1 }}>
+            {activity.name}
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Typography className={classes.contentText} style={{ flex: 1 }}>
+            {types[activity.spec] ?? t("Cognitive Test")}
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Typography className={classes.contentText} style={{ flex: 1 }}>
+            {(activity?.schedule ?? []).map((sc) => (
+              <Box>{sc.repeat_interval}</Box>
+            ))}
+          </Typography>
+        </Grid>
+        <Grid item className={classes.w120}>
+          <UpdateActivity activity={activity} activities={activities} studies={studies} />
+          <ScheduleActivity activity={activity} />
+        </Grid>
+      </Grid>
+    </Box>
   )
 }

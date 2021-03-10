@@ -84,19 +84,17 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function ParticipantListItem({
   participant,
   onParticipantSelect,
-  refreshParticipants,
   studies,
   notificationColumn,
   handleSelectionChange,
   ...props
 }) {
-  const [openMenu, setOpenMenu] = React.useState(null)
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
 
   const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
-    handleSelectionChange(participant.id, event.target.checked)
+    handleSelectionChange(participant, event.target.checked)
   }
 
   return (
