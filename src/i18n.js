@@ -15,7 +15,7 @@ i18n
       useSuspense: false,
     },
     keySeparator: false,
-    nsSeparator:false
+    nsSeparator: false,
   })
 
 export default i18n
