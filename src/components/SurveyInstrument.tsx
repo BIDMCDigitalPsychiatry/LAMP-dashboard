@@ -20,7 +20,7 @@ import {
   Grid,
   Drawer,
   Toolbar,
-  Slider,
+  // Slider,
   Menu,
   MenuItem,
   ListItemText,
@@ -44,6 +44,8 @@ import { useSnackbar } from "notistack"
 import Messages from "./Messages"
 import classes from "*.module.css"
 import { useTranslation } from "react-i18next"
+import { Slider } from "antd"
+import "./css/antd.css"
 
 const GreenCheckbox = withStyles({
   root: {
@@ -675,6 +677,8 @@ function RadioRating({ onChange, options, value, ...props }) {
 
 function Rating({ onChange, options, value, ...props }) {
   const classes = useStyles()
+  const [values, setValues] = useState(JSON.parse(JSON.stringify(options)))
+  const [reverse, setReverse] = useState(false)
   const getText = (val) => {
     let sliderValue =
       !!options[0].description && options[0].description.trim().length > 0 ? options[0].description : options[0].value
@@ -688,22 +692,32 @@ function Rating({ onChange, options, value, ...props }) {
 
   const { t } = useTranslation()
 
-  const [valueText, setValueText] = useState(
-    !!value
-      ? getText(value)
-      : !!options[0].description && options[0].description.trim().length > 0
-      ? options[0].description
-      : options[0].value
-  )
+  const [valueText, setValueText] = useState(null)
   const [sliderValue, setSliderValue] = useState(!!value ? value : parseInt(options[0].value))
 
   useEffect(() => {
-    onChange(sliderValue)
+    if (parseInt(options[options.length - 1].value) < parseInt(options[0].value)) {
+      values.sort((a, b) => parseInt(a.value) - parseInt(b.value))
+      setValues(values)
+      setReverse(parseInt(options[options.length - 1].value) > parseInt(options[0].value) ? false : true)
+    }
+    setValueText(
+      !!value
+        ? getText(value)
+        : !!options[0].description && options[0].description.trim().length > 0
+        ? options[0].description
+        : options[0].value
+    )
   }, [])
+
+  useEffect(() => {
+    onChange(sliderValue)
+  }, [sliderValue])
 
   const valuetext = (value: number) => {
     return `${options[value]}`
   }
+
   const getSliderValue = (val) => {
     let sliderValue =
       !!options[0].description && options[0].description.trim().length > 0 ? options[0].description : options[0].value
@@ -718,36 +732,30 @@ function Rating({ onChange, options, value, ...props }) {
     onChange(val)
     return sliderValue
   }
+
   return (
     <Box textAlign="center" mt={5}>
       <Slider
         defaultValue={sliderValue}
         value={sliderValue}
-        getAriaValueText={valuetext}
-        aria-labelledby="discrete-slider"
-        valueLabelDisplay="auto"
-        step={
-          parseInt(options[0].value) < 0 && parseInt(options[1].value) < 0
-            ? Math.abs(parseInt(options[0].value)) + parseInt(options[1].value)
-            : parseInt(options[0].value) < 0 && parseInt(options[1].value) > 0
-            ? Math.abs(parseInt(options[0].value)) - parseInt(options[1].value)
-            : parseInt(options[1].value) - parseInt(options[0].value)
-        }
-        marks={options}
-        min={parseInt(options[0].value)}
-        max={parseInt(options[options.length - 1].value)}
-        track={false}
-        classes={{
-          root: classes.slider,
-          rail: classes.centerBar,
-          mark: classes.customTrack,
-          thumb: classes.customThumb,
-          valueLabel: classes.countlabel,
-        }}
-        onChange={(evt, val) => {
+        reverse={reverse}
+        min={parseInt(values[0].value)}
+        max={parseInt(values[options.length - 1].value)}
+        // marks={options.map((option) => {return option.value})}
+        dots={true}
+        onChange={(val) => {
           getSliderValue(val)
         }}
       />
+      <Grid container className={classes.sliderValueLabel} direction="row" justify="space-between" alignItems="center">
+        {options.map((option) => (
+          <Grid item>
+            <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
+              {option.value}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
       <Grid container className={classes.sliderValueLabel} direction="row" justify="space-between" alignItems="center">
         <Grid item>
           <Typography variant="caption" className={classes.textCaption} display="block" gutterBottom>
@@ -880,7 +888,6 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
