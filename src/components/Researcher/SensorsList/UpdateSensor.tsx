@@ -64,9 +64,7 @@ const useStyles = makeStyles((theme: Theme) =>
     btnWhite: {
       background: "#fff",
       borderRadius: "40px",
-      minWidth: 100,
       boxShadow: "none",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "14px",
@@ -247,19 +245,23 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+export interface Sensors {
+  id?: string
+  study_id?: string
+}
 export default function UpdateSensor({
   studies,
   sensor,
   type,
-  updateDataSensor,
   updatedData,
+  studyId,
   ...props
 }: {
-  studies?: Array<any>
-  sensor?: any
-  type?: any
-  updateDataSensor?: any
-  updatedData?: any
+  studies?: Array<Object>
+  sensor?: Sensors
+  type?: string
+  updatedData?: Function
+  studyId?: string
 }) {
   const classes = useStyles()
   const [selectedItem, setSelectedItem] = useState(null)
@@ -284,8 +286,6 @@ export default function UpdateSensor({
   }
 
   const confirmAction = (val) => {
-    console.log(123, val, confirmationDialog)
-
     if (val === "Yes") {
       setSensorDialog(true)
     }
@@ -298,7 +298,7 @@ export default function UpdateSensor({
         size="small"
         color="primary"
         // classes={{ root: classes.btnBlue + " " + classes.popexpand }}
-        classes={{ root: classes.btnUpdate }}
+        classes={{ root: classes.btnWhite }}
         onClick={() => {
           setSelectedItem(sensor)
           // type === "profile" ? setConfirmationDialog(1) : setSensorDialog(true)
@@ -306,7 +306,7 @@ export default function UpdateSensor({
           setSensorDialog(true)
         }}
       >
-        {t("Update")}
+        <Icon>mode_edit</Icon>
       </Fab>
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
@@ -320,6 +320,8 @@ export default function UpdateSensor({
         studies={studies}
         open={sensorDialog}
         newData={updatedNewData}
+        type="edit"
+        studyId={studyId ?? null}
       />
     </Box>
   )

@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { Box, Fab, Icon } from "@material-ui/core"
 import LAMP, { Study } from "lamp-core"
-import SnackMessage from "../../SnackMessage"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
@@ -10,7 +9,6 @@ const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
   "#/?a=" +
   btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
 const theme = createMuiTheme({
   overrides: {
     MuiFilledInput: {
@@ -48,7 +46,6 @@ const useStyles = makeStyles((theme) =>
       zIndex: 111111,
       color: "#fff",
     },
-
     btnBlue: {
       background: "#7599FF",
       borderRadius: "40px",
@@ -62,7 +59,9 @@ const useStyles = makeStyles((theme) =>
       color: "#fff",
       "& svg": { marginRight: 8 },
       "&:hover": { background: "#5680f9" },
-
+      [theme.breakpoints.up("md")]: {
+        position: "absolute",
+      },
       [theme.breakpoints.down("sm")]: {
         minWidth: "auto",
       },
@@ -131,7 +130,6 @@ const useStyles = makeStyles((theme) =>
       zIndex: 1111,
       "&:hover": { background: "#5680f9" },
     },
-
     PopupButton: {
       marginTop: 35,
       width: 168,
@@ -236,7 +234,6 @@ const useStyles = makeStyles((theme) =>
     customPaper: {
       maxWidth: 380,
       maxHeight: 500,
-
       marginLeft: 100,
       borderRadius: 10,
       padding: "10px 0",
@@ -276,33 +273,39 @@ export function addSensorItem(x, studies) {
   delete x["studyID"]
   Service.addData("sensors", [x])
 }
-
 export default function AddSensor({
   studies,
-  updateDataSensor,
   addedSensor,
+  studyId,
+  setSensors,
   ...props
 }: {
-  studies?: Array<any>
-  updateDataSensor?: any
-  addedSensor?: any
+  studies?: Array<Object>
+  addedSensor?: Function
+  studyId?: string
+  setSensors?: Function
 }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
-
   const addNewData = (data) => {
-    addSensorItem(data, studies)
     addedSensor(data)
+    setSensors()
     setSensorDialog(false)
   }
-
   return (
     <Box>
       <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
         <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
       </Fab>
-      <SensorDialog studies={studies} onClose={() => setSensorDialog(false)} open={sensorDialog} newData={addNewData} />
+      <SensorDialog
+        studies={studies}
+        onClose={() => setSensorDialog(false)}
+        open={sensorDialog}
+        newData={addNewData}
+        type="add"
+        studyId={studyId ?? null}
+      />
     </Box>
   )
 }

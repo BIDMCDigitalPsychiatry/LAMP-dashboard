@@ -68,7 +68,6 @@ export default function EditStudyField({
     if (!(typeof aliasStudyName === "string" && aliasStudyName !== study)) {
       return
     }
-
     let studyname = new Study()
     studyname.name = aliasStudyName
     LAMP.Study.update(study, studyname)
@@ -122,7 +121,6 @@ export default function EditStudyField({
       updateName(aliasStudyName === "" ? studyName : aliasStudyName)
     }
   }
-
   return (
     <div>
       {editData && editStudyName === study && !editComplete ? (

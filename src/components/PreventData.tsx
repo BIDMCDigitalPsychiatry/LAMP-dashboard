@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
 function createData(dateVal: string, timeVal: string, value: number) {
   return { dateVal, timeVal, value }
 }
-
 function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }

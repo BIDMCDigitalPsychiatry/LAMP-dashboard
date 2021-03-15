@@ -29,7 +29,6 @@ export default function Passive({ participant, ...props }) {
     }
     setPassive(passive)
   }, [])
-
   return (
     <Tooltip title={dataQuality(passive, timeAgo, t, classes).title}>
       <Chip

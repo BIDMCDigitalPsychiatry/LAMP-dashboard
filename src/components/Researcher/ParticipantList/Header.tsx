@@ -117,26 +117,37 @@ export default function Header({
   researcher,
   selectedParticipants,
   searchData,
-  filterStudies,
+  setSelectedStudies,
   addedParticipant,
+  selectedStudies,
+  setParticipants,
   ...props
 }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [selectedStudies, setSelectedStudies] = useState([])
+  const [newAddedStudy, setNewAddedStudy] = useState(null)
+  const [newStudyObj, setNewStudyObj] = useState(null)
+  const [selDeletedIds, setSelDeletedIds] = useState([])
+  const [selDeletedStudy, setSelDeletedStudy] = useState([])
 
   const handleSearchData = (data) => {
     searchData(data)
   }
 
-  const handleShowFilterStudies = (data) => {
-    setShowFilterStudies(data)
+  const handleShowFilterStudies = (status) => {
+    setShowFilterStudies(status)
   }
 
   const filteredStudyArray = (val) => {
     setSelectedStudies(val)
-    filterStudies(val)
+    //filterStudies(val)
+  }
+
+  const handleNewStudy = (data) => {
+    if (data) {
+      setNewStudyObj(data)
+    }
   }
 
   return (
@@ -145,17 +156,9 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">Patients</Typography>
         </Box>
-
         <Box>
-          <StudyFilter
-            researcher={researcher}
-            studies={studies}
-            type="participants"
-            showFilterStudies={handleShowFilterStudies}
-            filteredStudyArray={filteredStudyArray}
-          />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>
-
         <Box>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
@@ -177,26 +180,38 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddButton researcher={researcher} studies={studies} addedParticipant={addedParticipant} />
+          <AddButton
+            researcher={researcher}
+            studies={studies}
+            addedParticipant={addedParticipant}
+            handleNewStudy={handleNewStudy}
+            setParticipants={setParticipants}
+          />
         </Box>
       </Box>
-
-      {!!showFilterStudies && (
+      {
+        //!!showFilterStudies && (
         <Box>
           <StudyFilterList
             studies={studies}
             researcher={researcher}
             type="participants"
             showFilterStudies={showFilterStudies}
-            filteredStudyArray={filteredStudyArray}
             selectedStudies={selectedStudies}
+            newAddedStudy={newAddedStudy}
+            setSelectedStudies={setSelectedStudies}
+            newStudyObj={newStudyObj}
+            selDeletedIds={selDeletedIds}
+            selDeletedStudy={selDeletedStudy}
           />
         </Box>
-      )}
+        //)
+      }
+
       {selectedParticipants.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
-            <DeleteParticipant participants={selectedParticipants} />
+            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
           </Box>
         </Box>
       )}

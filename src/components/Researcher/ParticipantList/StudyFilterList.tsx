@@ -2,63 +2,87 @@ import React, { useState, useEffect } from "react"
 import { Box, Fab } from "@material-ui/core"
 // Local Imports
 import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { ReactComponent as Filter } from "../../../icons/Filter.svg"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    tagFilteredBg: {
-      color: "#5784EE !important",
-      "& path": { fill: "#5784EE !important", fillOpacity: 1 },
-    },
-    btnFilter: {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: 14,
-      lineHeight: "38px",
-      cursor: "pointer",
-      textTransform: "capitalize",
-      boxShadow: "none",
-      background: "transparent",
-      margin: "0 15px",
-      paddingRight: 0,
-      "& svg": { marginRight: 10 },
-    },
-
-    filterText: {
-      [theme.breakpoints.down("sm")]: {
-        display: "none",
-      },
-    },
-  })
-)
+import { useSnackbar } from "notistack"
+import { Service } from "../../DBService/DBService"
 
 export default function StudyFilterList({
   studies,
   researcher,
   type,
   showFilterStudies,
-  filteredStudyArray,
+  newAddedStudy,
+  newStudyObj,
+  setSelectedStudies,
   selectedStudies,
+  selDeletedIds,
+  selDeletedStudy,
   ...props
 }) {
-  const classes = useStyles()
   const { t } = useTranslation()
-  const [selStudies, setSelStudies]: any = useState([])
   const [studiesCount, setStudiesCount] = useState(null)
-
+  const { enqueueSnackbar } = useSnackbar()
+  const [studyIds, setStudyIds] = useState([])
   useEffect(() => {
     let studiesData = filterStudyData(studies)
     setStudiesCount(studiesData)
-    setSelStudies(selectedStudies)
-  }, [])
+  }, [studies])
 
   useEffect(() => {
-    filteredStudyArray(selStudies)
-  }, [selStudies])
+    if (selDeletedIds.length > 0) {
+      let studiesData = filterStudyData(studies)
+      let studyIdCounts = {}
+      selectedStudies.forEach((x) => (studyIdCounts[x] = (studyIdCounts[x] || 0) + 1))
+      let a1 = {}
+      let newStudies = studiesData
+      let studyKeys = Object.keys(studyIdCounts)
+    }
+  }, [selDeletedIds])
+
+  useEffect(() => {
+    console.log(4000, selDeletedStudy)
+
+    if (selDeletedStudy.length > 0) {
+      let studyIdCounts = {}
+      selDeletedStudy.forEach((x) => (studyIdCounts[x] = (studyIdCounts[x] || 0) + 1))
+
+      console.log(901, studyIdCounts)
+
+      let studiesData = filterStudyData(studies)
+      let newStudies = studiesData
+      let studyKeys = Object.keys(studyIdCounts)
+      for (let [key, value] of Object.entries(studyIdCounts)) {
+        //console.log(733, key, value)
+
+        if (studyKeys.includes(key)) {
+          //newStudies[key] = studyIdCounts[key] < 0 ? 0 : studiesData[key] - studyIdCounts[key]
+          newStudies[key] = studyIdCounts[key] < 0 ? 0 : studiesData[key] - studyIdCounts[key]
+        }
+      }
+
+      console.log(734, newStudies)
+
+      setStudiesCount(newStudies)
+
+      console.log(735, studiesCount)
+    }
+  }, [selDeletedStudy])
+
+  useEffect(() => {
+    if (newAddedStudy !== null) {
+      let studiesData = filterStudyData(studies)
+      let newStudyData = studiesData
+      newStudyData[newAddedStudy.study_name] = newStudyData[newAddedStudy.study_name] + 1
+      setStudiesCount(studiesData)
+    }
+  }, [newAddedStudy])
+
+  useEffect(() => {
+    if (newStudyObj !== null) {
+      studies.push(newStudyObj)
+    }
+  }, [newStudyObj])
 
   const filterStudyData = (dataArray) => {
     return Object.assign(
@@ -80,13 +104,19 @@ export default function StudyFilterList({
         <Box mt={1}>
           {
             <MultipleSelect
-              selected={selStudies}
+              selected={selectedStudies}
               items={(studies || []).map((x) => `${x.name}`)}
               showZeroBadges={false}
               badges={studiesCount}
               onChange={(x) => {
-                LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
-                setSelStudies(x)
+                if (x.length > 0) {
+                  LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
+                  setSelectedStudies(x)
+                } else {
+                  enqueueSnackbar(t("Atleast 1 study should be selected."), {
+                    variant: "error",
+                  })
+                }
               }}
             />
           }

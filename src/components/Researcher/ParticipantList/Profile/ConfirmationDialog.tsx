@@ -20,7 +20,6 @@ export default function ConfirmationDialog({
   confirmationDialog: number
 } & DialogProps) {
   const { t } = useTranslation()
-
   return (
     <Dialog {...props} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
       <DialogTitle id="alert-dialog-title">{t("Confirmation")}</DialogTitle>

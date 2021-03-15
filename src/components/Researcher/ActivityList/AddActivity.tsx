@@ -19,7 +19,6 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import ImportActivity from "./ImportActivity"
 import Activity from "./Activity"
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {
@@ -39,14 +38,15 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 100,
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       lineHeight: "38px",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
       color: "#fff",
       "& svg": { marginRight: 8 },
       "&:hover": { background: "#5680f9" },
-
+      [theme.breakpoints.up("md")]: {
+        position: "absolute",
+      },
       [theme.breakpoints.down("sm")]: {
         minWidth: "auto",
       },
@@ -102,6 +102,7 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
   const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
   const [createDialogue, setCreate] = useState(false)
+
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
@@ -124,7 +125,6 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
       )
     })
   }, [])
-
   return (
     <Box pl={3}>
       <Fab
@@ -135,7 +135,6 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
       >
         <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
       </Fab>
-
       <Popover
         open={!!popover ? true : false}
         anchorPosition={!!popover && popover.getBoundingClientRect()}
@@ -232,6 +231,7 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
               activitySpecId={activitySpecId}
               studies={studies}
               addedActivity={addedActivity}
+              onClose={() => setCreate(false)}
             />
           )}
         </Box>

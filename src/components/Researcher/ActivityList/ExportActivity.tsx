@@ -5,7 +5,7 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
-import { spliceActivity, spliceCTActivity } from "../ActivityList/Index"
+import { spliceActivity, spliceCTActivity } from "../ActivityList/ActivityMethods"
 import { saveAs } from "file-saver"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -34,13 +34,11 @@ export default function ExportActivity({ activities, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
-
   const downloadActivities = async (activities) => {
     let data = []
     for (let x of activities) {
       delete x["study_id"]
       delete x["study_name"]
-
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any

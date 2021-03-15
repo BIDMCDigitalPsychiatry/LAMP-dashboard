@@ -25,7 +25,6 @@ const theme = createMuiTheme({
     },
   },
 })
-
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
 // and needs to be fixed or it will silently rollback.
 

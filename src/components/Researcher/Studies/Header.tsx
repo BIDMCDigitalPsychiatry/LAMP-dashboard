@@ -66,7 +66,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       borderRadius: 50,
       backgroundColor: "#F8F8F8",
-
       "&:hover": {
         backgroundColor: "#eee",
       },
@@ -108,7 +107,6 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 100,
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       lineHeight: "38px",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",

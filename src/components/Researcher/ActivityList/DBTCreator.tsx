@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
-
     buttonContainer: {
       width: 200,
       height: 50,

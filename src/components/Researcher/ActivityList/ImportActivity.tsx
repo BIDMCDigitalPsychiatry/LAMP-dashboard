@@ -44,8 +44,7 @@ import {
   saveSurveyActivity,
   saveCTestActivity,
   unspliceCTActivity,
-} from "../ActivityList/Index"
-
+} from "../ActivityList/ActivityMethods"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {
@@ -62,7 +61,6 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       padding: "25px 50px 0",
     },
-
     backdrop: {
       zIndex: 111111,
       color: "#fff",
@@ -91,7 +89,6 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       marginRight: 15,
       color: "#7599FF",
-
       // "&:hover": { background: "#f4f4f4" },
     },
     tableContainer: {
@@ -209,7 +206,6 @@ export default function ImportActivity({ studies, ...props }) {
   const [importFile, setImportFile] = useState<any>()
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
-
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
     const _importFile = [...importFile] // clone it so we can close the dialog first

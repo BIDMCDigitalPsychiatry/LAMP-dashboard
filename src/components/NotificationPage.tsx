@@ -101,7 +101,6 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [loading, setLoading] = useState(true)
   const [activityDetails, setActivityDetails] = useState(null)
   const { t } = useTranslation()
-
   useEffect(() => {
     ;(async () => {
       console.log(activityId)

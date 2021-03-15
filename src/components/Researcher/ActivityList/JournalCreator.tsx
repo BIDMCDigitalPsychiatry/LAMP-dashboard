@@ -124,7 +124,6 @@ export default function JournalCreator({
     photo: null,
     studyID: !!value ? value.study_id : study,
   })
-
   const validate = () => {
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {

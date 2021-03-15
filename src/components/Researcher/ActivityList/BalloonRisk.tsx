@@ -7,7 +7,6 @@ export default function BalloonRisk({ settings, updateSettings, ...props }) {
   const defaultBallonCount = 15
   const defaultMean = 64.5
   const defaultSD = 37
-
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>

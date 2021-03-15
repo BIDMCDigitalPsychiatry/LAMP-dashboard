@@ -59,7 +59,6 @@ const useStyles = makeStyles((theme) => ({
       padding: 0,
       "& span": { width: "auto", height: "auto" },
     },
-
     [theme.breakpoints.down("sm")]: {
       display: "none",
     },

@@ -31,6 +31,7 @@ import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import SensorListItem from "./SensorListItem"
 import { Service } from "../../DBService/DBService"
+import { sortData } from "../Dashboard"
 
 const theme = createMuiTheme({
   overrides: {
@@ -81,7 +82,6 @@ const useStyles = makeStyles((theme) =>
       zIndex: 111111,
       color: "#fff",
     },
-
     header: {
       "& h5": {
         fontSize: "30px",
@@ -102,7 +102,6 @@ const useStyles = makeStyles((theme) =>
         "& button": { display: "none" },
       },
     },
-
     buttonContainer: {
       width: 200,
       height: 50,
@@ -155,7 +154,6 @@ const useStyles = makeStyles((theme) =>
       zIndex: 1111,
       "&:hover": { background: "#5680f9" },
     },
-
     PopupButton: {
       marginTop: 35,
       width: 168,
@@ -292,16 +290,31 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-
-export default function SensorsList({ title, researcher, studies, ...props }) {
+export default function SensorsList({
+  title,
+  researcher,
+  studies,
+  selectedStudies,
+  setSelectedStudies,
+  ...props
+}: {
+  title?: string
+  researcher?: Object
+  studies: Array<Object>
+  selectedStudies: Array<any>
+  setSelectedStudies?: Function
+}) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
-  const [updatedData, setUpdatedData] = useState({})
   const [selectedSensors, setSelectedSensors] = useState<any>([])
   const [search, setSearch] = useState(null)
+  const [selectedIds, setSelectedIds] = useState([])
+  useEffect(() => {
+    setLoading(true)
+  }, [])
 
   const updatedSensor = (data) => {
     if (data.fn_type === "update") {
@@ -317,85 +330,94 @@ export default function SensorsList({ title, researcher, studies, ...props }) {
       })
     }
   }
-
   const addedSensor = (data) => {
-    setSensors((prevState) => [...prevState, data])
+    if (selectedStudies.includes(data.study_name)) {
+      setSensors((prevState) => [...prevState, data])
+    }
   }
 
-  const handleChange = (activity, checked) => {
-    let selected = selectedSensors
+  const handleChange = (sensorData, checked) => {
     if (checked) {
-      selected.push(activity)
+      setSelectedSensors((prevState) => [...prevState, sensorData])
     } else {
-      selected = selected.filter((item) => item.id != activity.id)
+      let selected = selectedSensors.filter((item) => item.id != sensorData.id)
+      setSelectedSensors(selected)
     }
-    setSelectedSensors(selected)
   }
 
   const handleDeleted = (val) => {
-    if (val) {
-      let newSensors = sensors.filter((i) => !selectedSensors.some((j) => j.id === i.id))
+    if (val.length > 0) {
+      let newSensors = sensors.filter((i) => !val.includes(i.id))
       setSensors(newSensors)
+    }
+  }
+
+  useEffect(() => {
+    searchFilterSensors()
+  }, [selectedStudies])
+
+  useEffect(() => {
+    searchFilterSensors()
+  }, [search])
+
+  const searchFilterSensors = () => {
+    setLoading(true)
+    if (selectedStudies.length > 0) {
+      Service.getDataByKey("sensors", selectedStudies, "study_name").then((sensors) => {
+        if (search) {
+          let newSensors = sensors.filter((i) => i.name.includes(search))
+          setSensors(sortData(newSensors, selectedStudies, "name"))
+        } else {
+          setSensors(sortData(sensors, selectedStudies, "name"))
+        }
+        setLoading(false)
+      })
+    } else if (!!search && search !== "") {
+      let newSensors = sensors.filter((i) => i.name.includes(search))
+      setSensors(sortData(newSensors, selectedStudies, "name"))
+      setLoading(false)
     }
   }
 
   const handleSearchData = (val) => {
     setSearch(val)
-    if (val) {
-      Service.getDataByKey("sensors", selectedSensors, "study_name").then((sensors) => {
-        let newSensors = sensors.filter((i) => i.name.includes(val))
-        setSensors(newSensors)
-      })
-    } else {
-      Service.getDataByKey("sensors", selectedSensors, "study_name").then((sensors) => {
-        setSensors(sensors)
-      })
-    }
-  }
-
-  const filterStudies = (val) => {
-    setSelectedSensors(val)
-    if (val) {
-      Service.getDataByKey("sensors", val, "study_name").then((sensors) => {
-        if (search) {
-          let newSensors = sensors.filter((i) => i.name.includes(search))
-          setSensors(newSensors)
-        } else {
-          setSensors(sensors)
-        }
-      })
-    }
   }
 
   return (
     <React.Fragment>
-      {/* 
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      */}
       <Header
         studies={studies}
         researcher={researcher}
         selectedSensors={selectedSensors}
-        deleted={handleDeleted}
+        newDeletedIds={handleDeleted}
         addedSensor={addedSensor}
         searchData={handleSearchData}
-        filterStudies={filterStudies}
+        setSelectedStudies={setSelectedStudies}
+        selectedStudies={selectedStudies}
+        setSensors={searchFilterSensors}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {(sensors ?? []).map((item, index) => (
+          {sensors !== null && sensors.length > 0 ? (
+            (sensors ?? []).map((item, index) => (
+              <Grid item lg={6} xs={12}>
+                <SensorListItem
+                  sensor={item}
+                  studies={studies}
+                  updatedSensor={updatedSensor}
+                  handleSelectionChange={handleChange}
+                  selectedSensors={selectedSensors}
+                />
+              </Grid>
+            ))
+          ) : (
             <Grid item lg={6} xs={12}>
-              <SensorListItem
-                sensor={item}
-                studies={studies}
-                updatedSensor={updatedSensor}
-                handleSelectionChange={handleChange}
-                selectedSensors={selectedSensors}
-              />
+              {t("No Records Found")}
             </Grid>
-          ))}
+          )}
         </Grid>
       </Box>
     </React.Fragment>

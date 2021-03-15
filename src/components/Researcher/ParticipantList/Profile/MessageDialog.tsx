@@ -36,7 +36,6 @@ export default function PatientProfile({ participant, ...props }: { participant:
   const classes = useStyles()
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const { t } = useTranslation()
-
   return (
     <Box>
       <Grid item>

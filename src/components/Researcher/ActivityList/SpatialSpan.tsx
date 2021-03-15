@@ -25,7 +25,6 @@ export default function SpatialSpan({ settings, updateSettings, ...props }) {
     var regex = /^[0-9,\b]+$/
     return regex.test(num)
   }
-
   return (
     <Box style={{ marginTop: 80 }}>
       <Typography variant="h6">{t("Order of tapping")}:</Typography>

@@ -126,7 +126,6 @@ export default withParentSize(function Sparkline({ ...props }) {
   const [rand] = useState(Math.random())
   const print = useMediaQuery("print")
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-
   const renderTooltip = ({ datum, series }) => (
     <List dense>
       <ListItem dense disabled divider={!!series?.[props.YAxisLabel ?? "Data"]}>
@@ -164,7 +163,6 @@ export default withParentSize(function Sparkline({ ...props }) {
       )}
     </List>
   )
-
   if (props.data.length === 1) {
     props.data[0].x = new Date(props.data[0].x).toLocaleString()
   }

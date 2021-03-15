@@ -125,11 +125,9 @@ export default function TipNotification({ ...props }) {
   const classes = useStyles()
   const [status, setStatus] = useState("Yes")
   const { t } = useTranslation()
-
   const handleClickStatus = (statusVal: string) => {
     setStatus(statusVal)
   }
-
   return (
     <Container maxWidth={false} className={classes.mainContainer}>
       <Box className={classes.header}>

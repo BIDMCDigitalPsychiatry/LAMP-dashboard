@@ -75,7 +75,6 @@ export default function NewGoal({ participant, ...props }) {
   const valueInput = useRef(null)
   const { t } = useTranslation()
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
   const getDateString = (date: Date) => {
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return monthname[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()

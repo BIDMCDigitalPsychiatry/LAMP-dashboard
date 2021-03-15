@@ -45,7 +45,6 @@ function compress(file, width, height) {
     }
   })
 }
-
 export function CredentialEditor({ credential, auxData, mode, onChange }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
@@ -60,7 +59,6 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
     setPhoto(auxData.photo)
     setRole(auxData.role)
   }, [auxData])
-
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)

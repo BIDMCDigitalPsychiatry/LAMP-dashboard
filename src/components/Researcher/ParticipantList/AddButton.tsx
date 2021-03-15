@@ -98,13 +98,29 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({ researcher, studies, addedParticipant, ...props }) {
+export default function AddButton({
+  researcher,
+  studies,
+  addedParticipant,
+  handleNewStudy,
+  setParticipants,
+  ...props
+}) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
+  // const [closePopUp, setClosePopUp] = useState(false)
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
+  const handleNewStudyData = (data) => {
+    handleNewStudy(data)
+    setParticipants()
+  }
+
+  const handleClosePopUp = () => {
+    setAddParticipantStudy(false)
+  }
 
   return (
     <Box pl={3}>
@@ -136,7 +152,9 @@ export default function AddButton({ researcher, studies, addedParticipant, ...pr
           <MenuItem
             onClick={() => {
               setPopover(null)
-              setAddStudy(true)
+              //setAddStudy(true)
+              setAddStudy(false)
+              setAddParticipantStudy(true)
             }}
           >
             <Typography variant="h6">{t("Add a new study")}</Typography>
@@ -162,7 +180,6 @@ export default function AddButton({ researcher, studies, addedParticipant, ...pr
           </MenuItem>
         </React.Fragment>
       </Popover>
-
       <StudyCreator studies={studies} researcher={researcher} open={addStudy} onClose={() => setAddStudy(false)} />
       <AddUser
         researcher={researcher}
@@ -170,12 +187,15 @@ export default function AddButton({ researcher, studies, addedParticipant, ...pr
         addedParticipant={addedParticipant}
         open={addUser}
         onClose={() => setAddUser(false)}
+        setParticipants={setParticipants}
       />
       <PatientStudyCreator
         studies={studies}
         researcher={researcher}
         onClose={() => setAddParticipantStudy(false)}
         open={addParticipantStudy}
+        handleNewStudy={handleNewStudyData}
+        closePopUp={handleClosePopUp}
       />
     </Box>
   )

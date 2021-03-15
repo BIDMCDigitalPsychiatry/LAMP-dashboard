@@ -50,7 +50,6 @@ class LocalizedUtils extends DateFnsUtils {
     return ["S", "M", "T", "W", "T", "F", "S"]
   }
 }
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -335,14 +334,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const games = [
-  "lamp.jewels_a",
-  "lamp.jewels_b",
-  "lamp.spatial_span",
-  "lamp.cats_and_dogs",
-  "lamp.pop_the_bubbles",
-  "lamp.balloon_risk",
-]
+const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()

@@ -254,11 +254,13 @@ export default function AddUser({
   researcher,
   studies,
   addedParticipant,
+  setParticipants,
   ...props
 }: {
   researcher: any
   studies: any
   addedParticipant: Function
+  setParticipants?: Function
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
@@ -284,13 +286,19 @@ export default function AddUser({
       for (let i = 0; i < newCount; i++) {
         let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
         let id = typeof idData === "object" ? idData.id : idData
+        let newParticipant = []
+        if (typeof idData === "object") {
+          newParticipant = idData
+        } else {
+          newParticipant["id"] = idData
+        }
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
           enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
         } else {
-          idData["parentID"] = selectedStudy
-          idData["parent"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
-          Service.addData("participants", [idData])
-          addedParticipant(idData)
+          newParticipant["study_id"] = selectedStudy
+          newParticipant["study_name"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
+          Service.addData("participants", [newParticipant])
+          addedParticipant(newParticipant)
           Service.updateCount("studies", selectedStudy, "participants_count")
           enqueueSnackbar(
             t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
@@ -331,8 +339,10 @@ export default function AddUser({
         }
         ids = [...ids, id]
       }
-      setAddUser(false)
+      setParticipants()
     }
+    setSelectedStudy("")
+    props.onClose as any
   }
   return (
     <Dialog
@@ -346,7 +356,7 @@ export default function AddUser({
         <IconButton
           aria-label="close"
           className={classes.closeButton}
-          onClick={() => setAddUser(false)}
+          onClick={props.onClose as any}
           disabled={!!studyBtnClicked ? true : false}
         >
           <CloseIcon />
@@ -356,7 +366,6 @@ export default function AddUser({
         <Box mt={2} mb={3}>
           <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
         </Box>
-
         <Typography variant="caption">{t("Study")}</Typography>
         <Select
           labelId="demo-simple-select-outlined-label"
@@ -371,7 +380,6 @@ export default function AddUser({
             </MenuItem>
           ))}
         </Select>
-
         {!!showErrorMsg ? (
           <Box mt={1}>
             <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>

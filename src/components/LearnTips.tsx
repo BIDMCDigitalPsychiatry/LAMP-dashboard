@@ -128,7 +128,6 @@ export default function LearnTips({ ...props }) {
   const [details, setDetails] = useState(null)
   const [images, setImages] = useState(null)
   const { t } = useTranslation()
-
   return (
     <Container>
       <Box pb={4}>

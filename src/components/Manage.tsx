@@ -148,7 +148,6 @@ const useStyles = makeStyles((theme: Theme) =>
         minHeight: 240,
       },
     },
-
     mainIcons: {
       width: 100,
       height: 100,
@@ -157,7 +156,6 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 150,
       },
     },
-
     thumbMain: { maxWidth: 255 },
     thumbContainer: {
       maxWidth: 1055,

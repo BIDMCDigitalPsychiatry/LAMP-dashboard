@@ -31,12 +31,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteActivity({ activities, ...props }) {
+export default function DeleteActivity({ activities, setActivities, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
-
   const confirmAction = async (status) => {
     if (status === "Yes") {
       let activityIds = activities.map((a) => {
@@ -54,6 +53,7 @@ export default function DeleteActivity({ activities, ...props }) {
         Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
       }
       Service.delete("activities", activityIds)
+      setActivities()
       enqueueSnackbar(t("Successfully deleted the selected Activities."), {
         variant: "success",
       })
@@ -71,7 +71,6 @@ export default function DeleteActivity({ activities, ...props }) {
       >
         <Icon>delete_outline</Icon> {t("Delete")}
       </Fab>
-
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
         open={confirmationDialog > 0 ? true : false}

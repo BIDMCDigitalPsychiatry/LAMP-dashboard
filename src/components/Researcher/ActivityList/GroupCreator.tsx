@@ -63,12 +63,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list)
   const [removed] = result.splice(startIndex, 1)
   result.splice(endIndex, 0, removed)
-
   return result
 }
 
@@ -185,7 +183,6 @@ export default function GroupCreator({
   studies: any
   study?: any
 }) {
-  console.log(activities)
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
@@ -322,7 +319,7 @@ export default function GroupCreator({
                 <Droppable droppableId="list">
                   {(provided) => (
                     <Box ref={provided.innerRef} {...provided.droppableProps}>
-                      {items.map((x, idx) => (
+                      {(items || []).map((x, idx) => (
                         <ActivitySelector
                           index={idx}
                           key={`${idx}.${x}`}
@@ -392,7 +389,7 @@ export default function GroupCreator({
                     name: text,
                     spec: "lamp.group",
                     schedule: [],
-                    settings: items.filter((i) => i !== null),
+                    settings: (items || []).filter((i) => i !== null),
                     studyID: studyId,
                     photo: photo,
                   },
@@ -401,8 +398,8 @@ export default function GroupCreator({
               }
               disabled={
                 !onSave ||
-                items.length === 0 ||
-                items.filter((i) => i === null).length > 0 ||
+                (items || []).length === 0 ||
+                (items || []).filter((i) => i === null).length > 0 ||
                 !text ||
                 !studyId ||
                 !text.trim().length

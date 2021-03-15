@@ -31,7 +31,6 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.background.paper,
     },
     singletile: { padding: "0 8px 15px 8px  !important", "& div": { borderRadius: 10 } },
-
     gridList: {
       width: "100%",
       height: "100%",
@@ -48,7 +47,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-
     hopeHEader: { background: "#FBF1EF", boxShadow: "none", borderBottom: "#fff solid 65px" },
     HopeHeadImage: { marginBottom: -80, marginLeft: "auto", marginRight: "auto" },
     hopeBoxContent: {

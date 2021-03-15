@@ -22,11 +22,9 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       borderRadius: 50,
       backgroundColor: "#F8F8F8",
-
       "&:hover": {
         backgroundColor: "#eee",
       },
-
       marginLeft: 0,
       width: "100%",
       [theme.breakpoints.up("lg")]: {
@@ -79,14 +77,19 @@ export default function Header({
   studies,
   selectedActivities,
   searchData,
-  filterStudies,
+  setSelectedStudies,
   addedActivity,
+  selectedStudies,
+  setActivities,
   ...props
 }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [selectedStudies, setSelectedStudies] = useState([])
+  const [newAddedStudy, setNewAddedStudy] = useState(null)
+  const [newStudyObj, setNewStudyObj] = useState(null)
+  const [selDeletedIds, setSelDeletedIds] = useState([])
+  const [selDeletedStudy, setSelDeletedStudy] = useState([])
 
   const handleSearchData = (data) => {
     searchData(data)
@@ -94,11 +97,6 @@ export default function Header({
 
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
-  }
-
-  const filteredStudyArray = (val) => {
-    setSelectedStudies(val)
-    filterStudies(val)
   }
 
   return (
@@ -109,14 +107,7 @@ export default function Header({
         </Box>
 
         <Box>
-          <StudyFilter
-            researcher={researcher}
-            studies={studies}
-            type="activities"
-            // studyChange={filterStudies}
-            showFilterStudies={handleShowFilterStudies}
-            filteredStudyArray={filteredStudyArray}
-          />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>
         <Box>
           <div className={classes.search}>
@@ -138,7 +129,6 @@ export default function Header({
             />
           </div>
         </Box>
-
         <Box>
           <AddActivity activities={activities} studies={studies} studyId={null} addedActivity={addedActivity} />
         </Box>
@@ -151,8 +141,12 @@ export default function Header({
             researcher={researcher}
             type="activities"
             showFilterStudies={showFilterStudies}
-            filteredStudyArray={filteredStudyArray}
             selectedStudies={selectedStudies}
+            newAddedStudy={newAddedStudy}
+            newStudyObj={newStudyObj}
+            setSelectedStudies={setSelectedStudies}
+            selDeletedIds={selDeletedIds}
+            selDeletedStudy={selDeletedStudy}
           />
         </Box>
       )}
@@ -160,7 +154,7 @@ export default function Header({
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <ExportActivity activities={selectedActivities} />
-            <DeleteActivity activities={selectedActivities} />
+            <DeleteActivity activities={selectedActivities} setActivities={setActivities} />
           </Box>
         </Box>
       )}

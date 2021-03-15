@@ -53,7 +53,6 @@ export default function StudyCreator({
   const [duplicateCnt, setCount] = useState(0)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
-
   const validate = () => {
     return (
       duplicateCnt == 0 ||

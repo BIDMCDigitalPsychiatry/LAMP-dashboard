@@ -29,7 +29,6 @@ export default function Credentials({ participant, ...props }) {
   const classes = useStyles()
   const [openPasswordReset, setOpenPasswordReset] = useState(null)
   const { t } = useTranslation()
-  console.log(participant.id)
   return (
     <Box>
       <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => setOpenPasswordReset(participant.id)}>

@@ -42,7 +42,6 @@ export default function Active({ participant, ...props }) {
     device: (logins || { data: {} }).data?.device_type || t("an unknown device"),
     userAgent: (logins || { data: {} }).data?.user_agent || t("unknown device model"),
   })
-
   const userAgentConcat = (userAgent) => {
     let appVersion = userAgent.hasOwnProperty("app_version") ? userAgent.app_version : ""
     let osVersion = userAgent.hasOwnProperty("os_version") ? userAgent.os_version : ""

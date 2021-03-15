@@ -43,7 +43,6 @@ export default function NotificationSettings({ participant, ...props }) {
       })
     } catch (error) {}
   }
-
   return (
     <Tooltip title={t("Notification")}>
       {setting === undefined || (!!setting && setting?.notification === true) || setting === "" ? (

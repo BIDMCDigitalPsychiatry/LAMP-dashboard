@@ -58,7 +58,6 @@ import { Vega } from "react-vega"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

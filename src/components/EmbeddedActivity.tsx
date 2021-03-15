@@ -35,7 +35,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
-
   useEffect(() => {
     activateEmbeddedActivity(activity)
   }, [])

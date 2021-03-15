@@ -6,13 +6,14 @@ import {
   Button,
   TextField,
   MenuItem,
-  Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Checkbox,
   DialogProps,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -21,6 +22,7 @@ import LAMP, { Study } from "lamp-core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
+import { fetchPostData, fetchResult } from "../SaveResearcherData"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -31,6 +33,10 @@ const useStyles = makeStyles((theme) => ({
   switchLabel: { color: "#4C66D6" },
   activityContent: {
     padding: "25px 50px 0",
+  },
+  backdrop: {
+    zIndex: 111111,
+    color: "#fff",
   },
   addNewDialog: { maxWidth: 500 },
   closeButton: {
@@ -45,20 +51,25 @@ const useStyles = makeStyles((theme) => ({
 export default function PatientStudyCreator({
   studies,
   researcher,
+  handleNewStudy,
+  closePopUp,
   ...props
 }: {
   studies: any
   researcher: any
+  handleNewStudy: Function
+  closePopUp: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
-  // const [duplicateCnt, setCount] = useState(0)
   const [duplicateCnt, setDuplicateCnt] = useState(0)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
   const [addStudy, setAddStudy] = useState(false)
-  const [duplicateStudyName, setDuplicateStudyName] = useState("")
+  const [duplicateStudyName, setDuplicateStudyName] = useState<any>("")
   const [createPatient, setCreatePatient] = useState(false)
+  const [studiedData, setStudiedData] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   const validate = () => {
     return !(
@@ -66,6 +77,12 @@ export default function PatientStudyCreator({
       typeof studyName === "undefined" ||
       (typeof studyName !== "undefined" && studyName?.trim() === "")
     )
+  }
+
+  const saveStudyData = (result, type) => {
+    for (let resultData of result) {
+      Service.addData(type, [resultData])
+    }
   }
 
   useEffect(() => {
@@ -78,38 +95,92 @@ export default function PatientStudyCreator({
   }, [studyName])
 
   const createStudy = async (studyName: string) => {
+    setLoading(true)
     setAddStudy(false)
-    /*  
-    let study = new Study()
-    study.name = studyName
-    LAMP.Study.create(researcher.id, study).then((res) => {
-      let result = JSON.parse(JSON.stringify(res))
-      Service.addData("studies", [
-        { id: result.data, name: studyName, participants_count: 0, activity_count: 0, sensor_count: 0 },
-      ])
-      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
-        variant: "success",
+    let auth = await LAMP.Auth
+    let authId = auth._me["id"]
+    let authUser = auth._auth
+    let authString = authUser.id + ":" + authUser.password
+    let bodyData = {
+      study_id: duplicateStudyName, //old study id
+      should_add_participant: createPatient ? createPatient : false,
+      name: studyName,
+    }
+
+    fetchPostData(authString, authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
+      let newStudyId = studyData.data
+      let uriStudyID = "?study_id=" + duplicateStudyName
+      let newUriStudyID = "?study_id=" + newStudyId
+      Service.getDataByKey("studies", duplicateStudyName, "id").then((studyAllData: any) => {
+        let newStudyData = {
+          id: studyData.data,
+          name: studyName,
+          participants_count: studyAllData.length > 0 ? studyAllData[0].participants_count : 0,
+          activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
+          sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
+        }
+
+        Service.addData("studies", [newStudyData])
+
+        fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
+          let filteredActivities = result.activities.filter(
+            (eachActivities) => eachActivities.study_id === duplicateStudyName
+          )
+          saveStudyData(filteredActivities, "activities")
+        })
+
+        fetchResult(authString, authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
+          let filteredSensors = resultData.sensors.filter((eachSensors) => {
+            return eachSensors.study_id === newStudyId
+          })
+          saveStudyData(filteredSensors, "sensors")
+        })
+        let updatedNewStudy = newStudyData
+        if (createPatient) {
+          fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
+            if (results.studies[0].participants.length > 0) {
+              let filteredParticipants = results.studies[0].participants.filter(
+                (eachParticipant) => eachParticipant.study_id === newStudyId
+              )
+              saveStudyData(filteredParticipants, "participants")
+            }
+            setLoading(false)
+          })
+          updatedNewStudy.participants_count = 1
+        } else {
+          setLoading(false)
+        }
+        closePopUp()
+        handleNewStudy(updatedNewStudy)
       })
     })
-    */
   }
 
   return (
     <Dialog
       {...props}
-      onEnter={() => setStudyName("")}
+      onEnter={() => {
+        setStudyName("")
+        setDuplicateStudyName("")
+        setCreatePatient(false)
+      }}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
       classes={{ paper: classes.addNewDialog }}
     >
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <DialogTitle id="alert-dialog-slide-title">
         <IconButton
           aria-label="close"
           className={classes.closeButton}
           onClick={() => {
+            closePopUp()
             setStudyName("")
-            setAddStudy(false)
+            setDuplicateStudyName("")
+            setCreatePatient(false)
           }}
         >
           <CloseIcon />
@@ -123,7 +194,7 @@ export default function PatientStudyCreator({
             fullWidth
             variant="outlined"
             label={t("Name")}
-            defaultValue={studyName}
+            value={studyName}
             onChange={(e) => {
               setStudyName(e.target.value)
             }}
@@ -138,7 +209,7 @@ export default function PatientStudyCreator({
             fullWidth
             variant="outlined"
             label={t("Duplicate Study")}
-            defaultValue={duplicateStudyName}
+            value={duplicateStudyName}
             onChange={(e) => {
               setDuplicateStudyName(e.target.value)
             }}
@@ -169,14 +240,11 @@ export default function PatientStudyCreator({
       <DialogActions>
         <Box textAlign="center" width={1} mt={3} mb={3}>
           <Button
-            /*onClick={() => {
-                setAddStudy(false)
-                createStudy(studyName)
-              }}
-              */
+            onClick={() => {
+              createStudy(studyName)
+            }}
             color="primary"
             autoFocus
-            // disabled={!validate()}
             disabled={!validate()}
           >
             {t("Save")}

@@ -17,6 +17,8 @@ import {
   Select,
   InputBase,
   DialogProps,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -46,7 +48,7 @@ const theme = createMuiTheme({
       root: {
         border: 0,
         backgroundColor: "#f4f4f4",
-        borderRadius: "10px !important",
+        borderRadius: "5px !important",
       },
       underline: {
         "&&&:before": {
@@ -247,7 +249,6 @@ const useStyles = makeStyles((theme) =>
     customPaper: {
       maxWidth: 380,
       maxHeight: 500,
-
       marginLeft: 100,
       borderRadius: 10,
       padding: "10px 0",
@@ -277,50 +278,81 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       marginTop: 30,
     },
+    disabled: {
+      color: "rgba(0, 0, 0, 0.26)",
+      boxShadow: "none",
+      backgroundColor: "rgba(0, 0, 0, 0.12)",
+    },
   })
 )
 
+export interface Sensors {
+  id?: string
+  study_id?: string
+  name?: string
+  spec?: string
+}
 export default function SensorDialog({
   sensor,
   studies,
   newData,
+  studyId,
+  type,
   ...props
 }: {
-  sensor?: any
+  sensor?: Sensors
   studies?: Array<any>
-  newData?: any
+  newData?: Function
+  studyId?: string
+  type?: string
 } & DialogProps) {
   const classes = useStyles()
-  const [selectedStudy, setSelectedStudy] = useState("")
-  const [showErrorMsg, setShowErrorMsg] = useState(false)
-  const [studyBtnClicked, setStudyBtnClicked] = useState(false)
+  const [selectedStudy, setSelectedStudy] = useState(studyId ?? null)
   const { enqueueSnackbar } = useSnackbar()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [selectedSensor, setSelectedSensor] = useState(null)
   const [sensorName, setSensorName] = useState("")
   const [sensorSpecs, setSensorSpecs] = useState(null)
   const [sensorSpec, setSensorSpec] = useState("")
   const [selectedStudyName, setSelectedStudyName] = useState("")
-
-  /*
-  const handleChangeStudy = (event) => {
-    setShowErrorMsg(false)
-    setSelectedStudy(event.target.value)
-  }
-  */
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     LAMP.SensorSpec.all().then((res) => setSensorSpecs(res))
   }, [])
 
   useEffect(() => {
+    if (type === "add") {
+      setSelectedSensor(null)
+      setSelectedStudy("")
+      setSensorName("")
+      setSensorSpec("")
+    }
+  }, [props.open])
+
+  useEffect(() => {
     setSelectedSensor(sensor)
-    setSelectedStudy(sensor ? sensor.study_id : "")
+    setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
     setSensorName(sensor ? sensor.name : "")
     setSensorSpec(sensor ? sensor.spec : "")
   }, [sensor])
 
+  const validate = () => {
+    return !(
+      typeof selectedStudy == "undefined" ||
+      selectedStudy === null ||
+      selectedStudy === "" ||
+      typeof sensorName == "undefined" ||
+      sensorName === null ||
+      sensorName === "" ||
+      typeof sensorSpec == "undefined" ||
+      sensorSpec === null ||
+      sensorSpec === ""
+    )
+  }
+
   const updateSensor = async () => {
+    setLoading(true)
     const result = await LAMP.Sensor.update(selectedSensor.id, {
       name: sensorName,
       spec: sensorSpec,
@@ -337,10 +369,11 @@ export default function SensorDialog({
       newData({ id: selectedSensor.id, name: sensorName, spec: sensorSpec, fn_type: "update" })
       setSelectedSensor(null)
       sensor = null
+      setLoading(false)
     })
   }
-
   const saveSensor = async () => {
+    setLoading(true)
     const result = await LAMP.Sensor.create(selectedStudy, {
       name: sensorName,
       spec: sensorSpec,
@@ -348,7 +381,13 @@ export default function SensorDialog({
       let result = JSON.parse(JSON.stringify(res))
       Service.getData("studies", selectedStudy).then((studiesObject) => {
         Service.addData("sensors", [
-          { id: result.data, name: sensorName, spec: sensorSpec, study_id: selectedStudy, study: selectedStudy },
+          {
+            id: result.data,
+            name: sensorName,
+            spec: sensorSpec,
+            study_id: selectedStudy,
+            study_name: selectedStudyName,
+          },
         ])
         Service.updateMultipleKeys(
           "studies",
@@ -372,15 +411,23 @@ export default function SensorDialog({
         study_name: selectedStudyName,
       })
       setSelectedSensor(null)
+      setSelectedStudy("")
+      setSensorName("")
+      setSensorSpec("")
+      setLoading(false)
     })
   }
 
   return (
     <Dialog {...props} classes={{ paper: classes.popWidth }} aria-labelledby="simple-dialog-title">
       <div>
+        <Backdrop className={classes.backdrop} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <Typography className={classes.dialogTitle}>{selectedSensor ? t("Update Sensor") : t("Add Sensor")}</Typography>
-        <Box mt={4}>
-          <MuiThemeProvider theme={theme}>
+
+        <MuiThemeProvider theme={theme}>
+          <Box mt={4}>
             <TextField
               error={
                 typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === "" ? true : false
@@ -389,6 +436,7 @@ export default function SensorDialog({
               select
               label={t("Study")}
               value={selectedStudy}
+              disabled={selectedSensor ? true : false}
               onChange={(e) => {
                 setSelectedStudy(e.target.value)
                 setSelectedStudyName(e.currentTarget.dataset.selectedStudyName)
@@ -406,14 +454,14 @@ export default function SensorDialog({
                 </MenuItem>
               ))}
             </TextField>
-          </MuiThemeProvider>
-        </Box>
+          </Box>
 
-        <div className={classes.inputContainer}>
-          <div className={classes.contentContainer}>
+          <Box mt={4}>
             <TextField
               error={typeof sensorName == "undefined" || sensorName === null || sensorName === "" ? true : false}
               value={sensorName}
+              variant="filled"
+              label="Name"
               onChange={(event) => setSensorName(event.target.value)}
               placeholder={t("Name")}
               helperText={
@@ -422,10 +470,8 @@ export default function SensorDialog({
                   : ""
               }
             />
-          </div>
-        </div>
-        <Box mt={4}>
-          <MuiThemeProvider theme={theme}>
+          </Box>
+          <Box mt={4}>
             <TextField
               error={typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === "" ? true : false}
               id="filled-select-currency"
@@ -449,10 +495,14 @@ export default function SensorDialog({
                   </MenuItem>
                 ))}
             </TextField>
-          </MuiThemeProvider>
-        </Box>
+          </Box>
+        </MuiThemeProvider>
         <Box textAlign="center" mt={2}>
-          <Button onClick={() => (selectedSensor ? updateSensor() : saveSensor())} className={classes.PopupButton}>
+          <Button
+            onClick={() => (selectedSensor ? updateSensor() : saveSensor())}
+            disabled={!validate()}
+            className={!validate() ? classes.disabled + " " + classes.PopupButton : classes.PopupButton}
+          >
             <Typography className={classes.buttonText}>{selectedSensor ? t("Update") : t("Add")}</Typography>
           </Button>
         </Box>

@@ -8,6 +8,8 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
 import { Service } from "../../DBService/DBService"
+import { sortData } from "../Dashboard"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -108,26 +110,25 @@ export default function ParticipantList({
   studies,
   title,
   onParticipantSelect,
-  showUnscheduled,
   researcher,
   notificationColumn,
+  selectedStudies,
+  setSelectedStudies,
   ...props
 }) {
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [search, setSearch] = useState(null)
+  const [newStudyItem, setNewStudyItem] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [selectedStudies, setSelectedStudies] = useState([])
-
-  useEffect(() => {
-    Service.getAll("participants").then((participants) => {
-      setParticipants(participants)
-    })
-  }, [])
+  const { t } = useTranslation()
 
   const addedParticipant = (data) => {
-    setParticipants((prevState) => [...prevState, data])
+    if (selectedStudies.includes(data.study_name)) {
+      setParticipants((prevState) => [...prevState, data])
+    }
+    setNewStudyItem(true)
   }
 
   const handleChange = (participant, checked) => {
@@ -152,30 +153,26 @@ export default function ParticipantList({
   const searchParticipants = () => {
     setLoading(true)
     if (selectedStudies.length > 0) {
-      Service.getDataByKey("participants", selectedStudies, "parent").then((participantData) => {
+      Service.getDataByKey("participants", selectedStudies, "study_name").then((participantData) => {
         if (search) {
           let newParticipants = participantData.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-          setParticipants(newParticipants)
+          setParticipants(sortData(newParticipants, selectedStudies, "id"))
         } else {
-          setParticipants(participantData)
+          setParticipants(sortData(participantData, selectedStudies, "id"))
         }
         setLoading(false)
       })
     } else if (!!search && search !== "") {
       let newParticipants = participants.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-      setParticipants(newParticipants)
+      setParticipants(sortData(newParticipants, studies, "id"))
       setLoading(false)
     }
-  }
-
-  const filterStudies = (data) => {
-    setSelectedStudies(data)
+    setLoading(false)
   }
 
   const handleSearchData = (val) => {
     setSearch(val)
   }
-
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -186,12 +183,15 @@ export default function ParticipantList({
         researcher={researcher}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
-        filterStudies={filterStudies}
         addedParticipant={addedParticipant}
+        selectedStudies={selectedStudies}
+        setSelectedStudies={setSelectedStudies}
+        setParticipants={searchParticipants}
+        newAddedStudy={newStudyItem}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!participants &&
+          {!!participants ? (
             participants.map((eachParticipant) => (
               <Grid item lg={6} xs={12}>
                 <ParticipantListItem
@@ -202,7 +202,10 @@ export default function ParticipantList({
                   handleSelectionChange={handleChange}
                 />
               </Grid>
-            ))}
+            ))
+          ) : (
+            <Box>{t("No records found")}</Box>
+          )}
         </Grid>
       </Box>
     </React.Fragment>

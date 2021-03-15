@@ -15,7 +15,6 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
-
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>

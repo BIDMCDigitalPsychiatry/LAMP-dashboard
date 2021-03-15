@@ -434,7 +434,6 @@ export default function TipCreator({
   const removeEventValue = (event) => {
     event.target.value = null
   }
-
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>

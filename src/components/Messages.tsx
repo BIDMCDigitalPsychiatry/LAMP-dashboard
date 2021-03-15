@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme) => ({
     padding: "12px 20px 17px 20px",
     textAlign: "justify",
     marginBottom: 20,
-
     "& span": {
       color: "rgba(0, 0, 0, 0.4)",
       fontSize: "12px",
@@ -40,7 +39,6 @@ const useStyles = makeStyles((theme) => ({
   innerMessage: {
     padding: "15px 20px 18px 20px",
     marginBottom: 20,
-
     "& span": {
       color: "rgba(0, 0, 0, 0.4)",
       fontSize: "12px",

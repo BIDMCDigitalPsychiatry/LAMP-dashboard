@@ -79,7 +79,6 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.4)",
       marginTop: 40,
     },
-
     buttonText: {
       fontWeight: "bold",
       fontSize: 16,

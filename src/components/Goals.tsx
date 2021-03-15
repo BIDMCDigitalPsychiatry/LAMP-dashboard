@@ -42,7 +42,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-
     cardlabel: {
       fontSize: 14,
 
@@ -54,7 +53,6 @@ const useStyles = makeStyles((theme: Theme) =>
         bottom: 30,
       },
     },
-
     header: {
       background: "#FFEFEC",
       padding: "25px 20px 10px",

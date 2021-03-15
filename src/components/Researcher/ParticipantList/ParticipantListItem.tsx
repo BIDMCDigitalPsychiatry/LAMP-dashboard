@@ -12,10 +12,8 @@ import {
   Box,
 } from "@material-ui/core"
 import PatientProfile from "./PatientProfile"
-
 // Local Imports
 import LAMP from "lamp-core"
-
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import MoreVertIcon from "@material-ui/icons/MoreVert"
 import ParticipantName from "./ParticipantName"
@@ -91,7 +89,6 @@ export default function ParticipantListItem({
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
-
   const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
     handleSelectionChange(participant, event.target.checked)
@@ -111,7 +108,7 @@ export default function ParticipantListItem({
         <Box flexGrow={1}>
           <CardHeader
             title={<ParticipantName participant={participant} />}
-            subheader={<Typography variant="overline">{participant.parent}</Typography>}
+            subheader={<Typography variant="overline">{participant.study_name}</Typography>}
             className={classes.participantHeader}
           />
           <CardContent className={classes.participantSub}>

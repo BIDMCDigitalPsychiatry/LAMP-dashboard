@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from "react"
 import { Box, Fab } from "@material-ui/core"
-// Local Imports
-import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { ReactComponent as Filter } from "../../../icons/Filter.svg"
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
-import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -27,7 +24,6 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
       "& svg": { marginRight: 10 },
     },
-
     filterText: {
       [theme.breakpoints.down("sm")]: {
         display: "none",
@@ -36,48 +32,20 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function StudyFilter({ researcher, studies, type, showFilterStudies, filteredStudyArray, ...props }) {
+export interface Researcher {
+  id?: string
+}
+export interface Studies {
+  name?: string
+}
+export default function StudyFilter({ setShowFilterStudies, ...props }) {
   const [showFilter, setShowFilter] = useState(false)
   const classes = useStyles()
   const { t } = useTranslation()
-  const [selectedStudies, setSelectedStudies] = useState([])
-  const [studiesCount, setStudiesCount] = useState(null)
 
   useEffect(() => {
-    let studiesData = filterStudyData(studies)
-    setStudiesCount(studiesData)
-    ;(async () => {
-      let selectedStudies =
-        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
-        (studies ?? []).map((study) => {
-          return study.name
-        })
-      setSelectedStudies(selectedStudies)
-      filteredStudyArray(selectedStudies)
-    })()
-  }, [])
-
-  useEffect(() => {
-    filteredStudyArray(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    showFilterStudies(showFilter)
+    setShowFilterStudies(showFilter)
   }, [showFilter])
-
-  const filterStudyData = (dataArray) => {
-    return Object.assign(
-      {},
-      ...dataArray.map((item) => ({
-        [item.name]:
-          type === "activities"
-            ? item.activity_count
-            : type === "sensors"
-            ? item.sensor_count
-            : item.participants_count,
-      }))
-    )
-  }
 
   return (
     <Box>

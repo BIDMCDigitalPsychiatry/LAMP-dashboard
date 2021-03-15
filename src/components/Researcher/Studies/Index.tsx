@@ -234,7 +234,6 @@ const useStyles = makeStyles((theme: Theme) =>
     activityContent: {
       padding: "25px 50px 0",
     },
-
     manageStudypop: {
       padding: "25px 25px 30px 35px",
     },

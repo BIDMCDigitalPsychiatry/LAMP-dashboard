@@ -84,7 +84,6 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 100,
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       lineHeight: "38px",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
@@ -128,7 +127,6 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 250,
     },
     switchLabel: { color: "#4C66D6" },
-
     dataQuality: {
       margin: "4px 0",
       backgroundColor: "#E9F8E7",

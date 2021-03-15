@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Box, Typography, TextField, MenuItem, Grid, Divider } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -12,31 +12,22 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
 const modes = [
   { name: "Beginner", value: 1 },
   { name: "Intermediate", value: 2 },
   { name: "Expert", value: 4 },
   { name: "Advanced", value: 3 },
 ]
-
 const variants = [
   { name: "Trails A", value: "trails_a" },
   { name: "Trails B", value: "trails_b" },
 ]
-
 export default function JewelsGame({ settings, updateSettings, ...props }) {
   const { t } = useTranslation()
-  const defaultBubbleCount = [60, 80, 80]
-  const defaultBubbleSpeed = [60, 80, 80]
-  const defaultIntertrialDuration = 0.5
-  const defaultBubbleDuration = 1.0
-  const classes = useStyles()
 
-  const numberCommaFormat = (num) => {
-    var regex = /^[0-9,\b]+$/
-    return regex.test(num)
-  }
+  useEffect(() => {
+    updateSettings({ ...settings, mode: modes[0].value, variant: variants[0].value })
+  }, [])
 
   return (
     <Grid container spacing={2}>

@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteParticipant({ participants, ...props }) {
+export default function DeleteParticipant({ participants, setParticipants, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -44,13 +44,14 @@ export default function DeleteParticipant({ participants, ...props }) {
       })
       for (let participant of participants) {
         await LAMP.Participant.delete(participant.id)
-        Service.updateCount("studies", participant.parentID, "participants_count", 1, 1)
+        Service.updateCount("studies", participant.study_id, "participants_count", 1, 1)
       }
       Service.delete("participants", participantIds)
       enqueueSnackbar(t("Successfully deleted the selected participants."), {
         variant: "success",
       })
     }
+    setParticipants()
     setConfirmationDialog(0)
   }
 
@@ -64,7 +65,6 @@ export default function DeleteParticipant({ participants, ...props }) {
       >
         <Icon>delete_outline</Icon> {t("Delete")}
       </Fab>
-
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
         open={confirmationDialog > 0 ? true : false}

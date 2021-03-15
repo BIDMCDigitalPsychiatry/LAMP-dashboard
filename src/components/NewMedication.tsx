@@ -78,7 +78,6 @@ export default function NewMedication({ participant, ...props }) {
   const doseNameInput = useRef(null)
   const doseValueInput = useRef(null)
   const { t } = useTranslation()
-
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
   const getDateString = (date: Date) => {

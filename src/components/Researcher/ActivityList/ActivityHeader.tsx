@@ -31,11 +31,12 @@ function compress(file, width, height) {
     }
   })
 }
+const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
+
 export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
-
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
@@ -129,7 +130,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 variant="filled"
                 label={t("Activity Title")}
                 defaultValue={text}
-                onChange={(event) => setText(event.target.value)}
+                onChange={(event) => setText(removeExtraSpace(event.target.value))}
                 inputProps={{ maxLength: 80 }}
               />
             </Box>
@@ -144,7 +145,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
             variant="filled"
             rows={2}
             defaultValue={description}
-            onChange={(event) => setDescription(event.target.value)}
+            onChange={(event) => setDescription(removeExtraSpace(event.target.value))}
             inputProps={{ maxLength: 2500 }}
           />
         </Box>

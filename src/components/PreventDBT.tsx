@@ -233,9 +233,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         categories.push(skill.category)
       })
     })
-
     setSkillData(skills)
-
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })

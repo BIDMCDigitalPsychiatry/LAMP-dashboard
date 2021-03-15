@@ -216,17 +216,29 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ActivityItem({
+export interface Sensors {
+  id?: string
+  study_id?: string
+  name?: string
+  spec?: string
+  study_name?: string
+}
+export default function SensorListItem({
   sensor,
   studies,
   updatedSensor,
   handleSelectionChange,
   selectedSensors,
   ...props
+}: {
+  sensor?: Sensors
+  studies?: Array<Object>
+  updatedSensor: Function
+  handleSelectionChange: Function
+  selectedSensors?: Array<Object>
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
-
   const handleChange = (sensor, event) => {
     setChecked(event.target.checked)
     handleSelectionChange(sensor, event.target.checked)
@@ -258,7 +270,8 @@ export default function ActivityItem({
               </Box>
             }
           />
-
+        </Box>
+        <Box>
           <CardActions>
             <UpdateSensor sensor={sensor} studies={studies} type="list" updatedData={updatedData} />
           </CardActions>

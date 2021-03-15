@@ -70,41 +70,59 @@ const useStyles = makeStyles((theme: Theme) =>
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
   })
 )
-
 export default function Header({
   studies,
   researcher,
   selectedSensors,
-  deleted,
+  newDeletedIds,
   addedSensor,
   searchData,
-  filterStudies,
+  setSelectedStudies,
+  selectedStudies,
+  selectedIds,
+  setSensors,
   ...props
+}: {
+  studies?: Array<Object>
+  researcher?: Object
+  selectedSensors?: Array<Object>
+  newDeletedIds?: Function
+  addedSensor?: Function
+  searchData?: Function
+  setSelectedStudies?: Function
+  selectedStudies: Array<string>
+  selectedIds?: Array<string>
+  setSensors?: Function
 }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [selectedStudies, setSelectedStudies] = useState([])
-
+  const [newAddedStudy, setNewAddedStudy] = useState(null)
+  const [newStudyObj, setNewStudyObj] = useState(null)
+  const [selDeletedIds, setSelDeletedIds] = useState([])
+  const [selDeletedStudy, setSelDeletedStudy] = useState([])
   const handleSearchData = (data) => {
     searchData(data)
   }
 
   const handleDeleted = (val) => {
-    deleted(val)
+    console.log(271, val)
+    setSelDeletedIds(val)
+    newDeletedIds(val)
   }
 
   const addedDataSensor = (data) => {
+    setNewAddedStudy(data)
     addedSensor(data)
-  }
-
-  const filteredStudyArray = (val) => {
-    setSelectedStudies(val)
-    filterStudies(val)
   }
 
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
+  }
+
+  const handleSelectedStudyArray = (data) => {
+    console.log(131, data)
+    setSelDeletedStudy(data)
   }
 
   return (
@@ -115,13 +133,7 @@ export default function Header({
         </Box>
 
         <Box>
-          <StudyFilter
-            researcher={researcher}
-            studies={studies}
-            type="sensors"
-            showFilterStudies={handleShowFilterStudies}
-            filteredStudyArray={filteredStudyArray}
-          />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>
 
         <Box>
@@ -145,30 +157,37 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddSensor studies={studies} addedSensor={addedDataSensor} />
+          <AddSensor studies={studies} addedSensor={addedDataSensor} setSensors={setSensors} />
         </Box>
       </Box>
-
-      {showFilterStudies ? (
+      {showFilterStudies && (
         <Box>
           <StudyFilterList
             studies={studies}
             researcher={researcher}
             type="sensors"
             showFilterStudies={showFilterStudies}
-            filteredStudyArray={filteredStudyArray}
             selectedStudies={selectedStudies}
+            newAddedStudy={newAddedStudy}
+            newStudyObj={newStudyObj}
+            setSelectedStudies={setSelectedStudies}
+            selDeletedIds={selDeletedIds}
+            selDeletedStudy={selDeletedStudy}
           />
         </Box>
-      ) : (
-        ""
       )}
-
-      <Box className={classes.optionsMain}>
-        <Box className={classes.optionsSub}>
-          <DeleteSensor sensors={selectedSensors} deleted={handleDeleted} />
+      {selectedSensors.length > 0 && (
+        <Box className={classes.optionsMain}>
+          <Box className={classes.optionsSub}>
+            <DeleteSensor
+              sensors={selectedSensors}
+              newDeletedIds={handleDeleted}
+              selectedStudyArray={handleSelectedStudyArray}
+              setSensors={setSensors}
+            />
+          </Box>
         </Box>
-      </Box>
+      )}
     </Box>
   )
 }

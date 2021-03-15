@@ -86,7 +86,6 @@ const useStyles = makeStyles((theme: Theme) =>
           height: 150,
         },
       },
-
       [theme.breakpoints.up("lg")]: {
         minHeight: 240,
       },
@@ -109,7 +108,6 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#E7F8F2",
       padding: "35px 40px 10px",
       textAlign: "center",
-
       "& h2": {
         fontSize: 25,
         fontWeight: 600,

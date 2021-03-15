@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Typography, Icon, IconButton } from "@material-ui/core"
+import { Box, Typography, Icon, IconButton, Checkbox, Grid } from "@material-ui/core"
 import { makeStyles, createStyles } from "@material-ui/core/styles"
 import { Service } from "../../../DBService/DBService"
 import ConfirmationDialog from "./ConfirmationDialog"
@@ -16,7 +16,6 @@ const useStyles = makeStyles((theme) =>
       zIndex: 111111,
       color: "#fff",
     },
-
     buttonContainer: {
       width: 200,
       height: 50,
@@ -124,7 +123,6 @@ const useStyles = makeStyles((theme) =>
     },
     contentText: {
       color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
       fontSize: 14,
       marginLeft: 10,
     },
@@ -204,20 +202,57 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       marginTop: 30,
     },
+    w45: { width: 45 },
+    w120: { width: 120, textAlign: "right" },
+    checkboxActive: { color: "#7599FF !important" },
   })
 )
-export default function SensorRow({ sensor, index, studies, ...props }: { sensor: any; index: number; studies: any }) {
+export default function SensorRow({
+  sensor,
+  index,
+  studies,
+  handleSelected,
+  studyId,
+  ...props
+}: {
+  sensor: any
+  index: number
+  studies: any
+  handleSelected: Function
+  studyId?: string
+}) {
   const classes = useStyles()
+  const [checked, setChecked] = React.useState(false)
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(event.target.checked)
+    handleSelected(sensor, event.target.checked)
+  }
 
   return (
-    <div className={classes.rowContainer} style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }}>
-      <Typography className={classes.contentText} style={{ flex: 1 }}>
-        {sensor.name}
-      </Typography>
-      <Typography className={classes.contentText} style={{ flex: 1 }}>
-        {sensor.spec?.replace("lamp.", "")}
-      </Typography>
-      <UpdateSensor sensor={sensor} studies={studies} type="profile" />
-    </div>
+    <Box style={{ backgroundColor: index % 2 == 0 ? "#ECF4FF" : "transparent" }} p={1}>
+      <Grid container alignItems="center">
+        <Grid item className={classes.w45}>
+          <Checkbox
+            checked={checked}
+            classes={{ checked: classes.checkboxActive }}
+            onChange={handleChange}
+            inputProps={{ "aria-label": "primary checkbox" }}
+          />
+        </Grid>
+        <Grid item xs>
+          <Typography className={classes.contentText} style={{ flex: 1 }}>
+            {sensor.name}
+          </Typography>
+        </Grid>
+        <Grid item xs>
+          <Typography className={classes.contentText} style={{ flex: 1 }}>
+            {sensor.spec?.replace("lamp.", "")}
+          </Typography>
+        </Grid>
+        <Grid item className={classes.w120}>
+          <UpdateSensor sensor={sensor} studies={studies} type="profile" studyId={studyId} />
+        </Grid>
+      </Grid>
+    </Box>
   )
 }

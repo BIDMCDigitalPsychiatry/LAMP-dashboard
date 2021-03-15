@@ -19,7 +19,6 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
   const defaultIntertrialDuration = 0.5
   const defaultBubbleDuration = 1.0
   const classes = useStyles()
-
   const numberCommaFormat = (num) => {
     var regex = /^[0-9,\b]+$/
     return regex.test(num)

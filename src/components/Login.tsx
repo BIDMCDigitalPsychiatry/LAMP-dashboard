@@ -29,6 +29,8 @@ import { Service } from "./DBService/DBService"
 import Participant from "./Participant"
 import { useWorker } from "@koale/useworker"
 import { saveDataToCache } from "./Researcher/SaveResearcherData"
+import { saveDemoData } from "./Researcher/SaveResearcherData"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
@@ -53,7 +55,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
       "& fieldset": { border: 0 },
     },
-
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
@@ -77,6 +78,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
   const [dataWorker] = useWorker(saveDataToCache)
+  const [demoWorker] = useWorker(saveDemoData)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -139,7 +141,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           })
         )
         ;(async () => {
-          await saveDataToCache(state.id + ":" + state.password, res.identity.id)
+          // !!mode ? demoWorker() : dataWorker(state.id + ":" + state.password, res.identity.id)
+          !!mode ? await saveDemoData() : await saveDataToCache(state.id + ":" + state.password, res.identity.id)
         })()
         setLoginClick(false)
         onComplete()

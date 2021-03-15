@@ -1,10 +1,8 @@
 import React from "react"
 import { Grid, Tooltip, Icon, Fab } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-
 export default function ActivityFooter({ value, onSave, validate, data, ...props }) {
   const { t } = useTranslation()
-
   return (
     <Grid
       container
@@ -26,7 +24,9 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
                 }
               }}
               disabled={
-                !validate() || !onSave || (value.name.trim() === data.name.trim() && value.study_id === data.studyId)
+                !validate() ||
+                !onSave ||
+                (value?.name?.trim() === data?.name?.trim() && value.study_id === data.studyID)
               }
             >
               {t("Duplicate")}
@@ -44,7 +44,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
             variant="extended"
             onClick={() => {
               if (validate()) {
-                onSave(data, false /* overwrite */)
+                onSave(data, false)
               }
             }}
             disabled={!validate() || !onSave || !data.name}

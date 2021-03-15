@@ -59,7 +59,6 @@ class DBService {
         // Do something?
       })
   }
-
   updateMultipleKeys(tablespace: string, newVal: any, keys: Array<any>, conditionKey: string) {
     return dbPromise
       .then((db) => {
@@ -84,7 +83,6 @@ class DBService {
         // Do something?
       })
   }
-
   get(tablespace: string, key: string) {
     return dbPromise
       .then((db) => {
@@ -194,6 +192,42 @@ class DBService {
             cursor = await cursor.continue()
           }
         })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  updateValues(tablespace: string, newVal: any, keys: Array<any>) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            newVal[tablespace].map((data) => {
+              let value = cursor.value
+              keys.forEach(function (eachKey) {
+                value[eachKey] = data[eachKey]
+              })
+              cursor.update(value)
+            })
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  deleteDB() {
+    return dbPromise
+      .then((db) => {
+        const stores = [...db.objectStoreNames]
+        stores.map((store) => {
+          db.transaction([store], "readwrite").objectStore(store).clear()
+        })
       })
       .catch((error) => {
         // Do something?

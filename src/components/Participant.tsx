@@ -158,7 +158,6 @@ export default function Participant({
 }) {
   const [activities, setActivities] = useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
-
   const getTab = () => {
     let tabNum
     switch (props.tabValue) {

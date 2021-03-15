@@ -82,7 +82,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function RatioButton({ checked, onChange, title, value, unable, smallSpace, color, ...props }) {
   const classes = useStyles()
-
   return (
     <Box display="flex" mx={3}>
       <div

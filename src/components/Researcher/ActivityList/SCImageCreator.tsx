@@ -167,7 +167,6 @@ export default function SCImageCreator({
     setData({ ...data, settings: { threshold: settingsData } })
     setSettings({ threshold: settingsData })
   }
-
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>

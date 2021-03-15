@@ -1,4 +1,3 @@
-// Core Imports
 import React, { useState, useEffect } from "react"
 import {
   Drawer,
@@ -11,7 +10,6 @@ import {
   useTheme,
   Icon,
 } from "@material-ui/core"
-
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
 import SensorsList from "./SensorsList/Index"
@@ -22,6 +20,7 @@ import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -106,27 +105,52 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+export const sortData = (data, studies, key) => {
+  let result = []
+  studies.map((study) => {
+    let filteredData = data.filter((d) => d.study_name === study)
+    filteredData.sort((a, b) => {
+      return a[key] > b[key] ? 1 : 1
+    })
+    result = result.concat(filteredData)
+  })
+  return result
+}
 export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
-  const [showUnscheduled, setShowUnscheduled] = useState(false)
   const [currentTab, setCurrentTab] = useState(-1)
-  const classes = useStyles()
-  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const { t } = useTranslation()
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
+  const [selectedStudies, setSelectedStudies] = useState([])
+
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const classes = useStyles()
+  const { t } = useTranslation()
 
   useEffect(() => {
     ;(async () => {
-      Service.getAll("studies").then((studies) => {
-        setStudies(studies)
+      let studies = await Service.getAll("studies")
+      setStudies(studies)
+      Service.getAll("researcher").then((data) => {
+        let researcherNotification = !!data ? data[0]?.notification ?? false : false
+        setNotification(researcherNotification)
       })
-      // Service.getAll("researcher").then((data) => {
-      //   let researcherNotification = data[0]?.notification ?? false
-      //   setNotification(researcherNotification)
-      // })
       setCurrentTab(0)
     })()
   }, [])
+
+  useEffect(() => {
+    filterStudies(studies)
+  }, [studies])
+
+  const filterStudies = async (studies) => {
+    let selected =
+      ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
+      (studies ?? []).map((study) => {
+        return study.name
+      })
+    selected.sort()
+    setSelectedStudies(selected)
+  }
 
   return (
     <Container maxWidth={false}>
@@ -196,15 +220,32 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
             {currentTab === 0 && (
               <ParticipantList
                 title={null}
-                showUnscheduled={showUnscheduled}
                 onParticipantSelect={onParticipantSelect}
                 researcher={researcher}
                 studies={studies}
                 notificationColumn={notificationColumn}
+                selectedStudies={selectedStudies}
+                setSelectedStudies={setSelectedStudies}
               />
             )}
-            {currentTab === 1 && <ActivityList title={null} researcher={researcher} studies={studies} />}
-            {currentTab === 2 && <SensorsList title={null} researcher={researcher} studies={studies} />}
+            {currentTab === 1 && (
+              <ActivityList
+                title={null}
+                researcher={researcher}
+                studies={studies}
+                selectedStudies={selectedStudies}
+                setSelectedStudies={setSelectedStudies}
+              />
+            )}
+            {currentTab === 2 && (
+              <SensorsList
+                title={null}
+                researcher={researcher}
+                studies={studies}
+                selectedStudies={selectedStudies}
+                setSelectedStudies={setSelectedStudies}
+              />
+            )}
             {currentTab === 3 && <StudiesList title={null} researcher={researcher} studies={studies} />}
           </ResponsivePaper>
         )}

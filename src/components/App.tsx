@@ -1,4 +1,3 @@
-// Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
@@ -7,14 +6,10 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
-// External Imports
 import DateFnsUtils from "@date-io/date-fns"
-
-// Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
 import Messages from "./Messages"
-
 import Root from "./Root"
 import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
@@ -23,26 +18,6 @@ import HopeBox from "./HopeBox"
 import TipNotification from "./TipNotification"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
-
-// import VegaGraph from "./VegaGraph"
-
-/* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
-/* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
-/* TODO: /participant/:participant_id/messaging -> messaging */
-
-/*
-// colors as a gradient:
-background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(101,206,191,1) 33%, rgba(255,119,91,1) 66%, rgba(134,182,255,1) 100%);
-// colors as a bar:
-background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%);
-*/
-
-//
-/*const srcLock = () => {
-  let query = window.location.hash.split("?") || []
-  let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
-  return typeof src === "string" && src.length > 0
-}*/
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -84,7 +59,6 @@ function ErrorFallback({ error }) {
     </div>
   )
 }
-
 function PageTitle({ children, ...props }) {
   useEffect(() => {
     document.title = `${typeof children === "string" ? children : ""}`
@@ -104,7 +78,6 @@ function AppRouter({ ...props }) {
       activeTab: newTab,
     }))
   }
-
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -593,7 +566,7 @@ export default function App({ ...props }) {
             opacity: 0.1,
           }}
         >
-          {process.env.REACT_APP_GIT_SHA}
+          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`}
         </span>
       </ThemeProvider>
     </ErrorBoundary>

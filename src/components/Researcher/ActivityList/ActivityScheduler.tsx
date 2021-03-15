@@ -1,24 +1,11 @@
-// Core Imports
 import React, { useState } from "react"
-import {
-  Box,
-  Button,
-  Menu,
-  MenuItem,
-  Divider,
-  ListItemSecondaryAction,
-  InputAdornment,
-  Tooltip,
-  IconButton,
-  Icon,
-  Typography,
-} from "@material-ui/core"
+import { Box, Button } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import MaterialTable from "material-table"
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
-
+import { updateSchedule } from "./ActivityMethods"
 const theme = createMuiTheme({
   overrides: {
     MuiTypography: {
@@ -26,10 +13,7 @@ const theme = createMuiTheme({
     },
   },
 })
-
-// FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
-// and needs to be fixed or it will silently rollback.
-
+// FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid and needs to be fixed or it will silently rollback.
 const manyDates = (items) =>
   items?.length > 0
     ? items
@@ -38,15 +22,28 @@ const manyDates = (items) =>
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
 
-export default function ActivityScheduler({ activity, onChange, ...props }) {
-  const schedules = activity?.schedule ?? []
+export default function ActivityScheduler({ activity, activities, setActivities, ...props }) {
+  const [schedule, setSchedule] = useState(activity?.schedule ?? [])
   const { t } = useTranslation()
-
+  const updateActivitySchedule = async (activity, x) => {
+    updateSchedule(activity, x)
+    let index = -1
+    const filteredActivity = activities.find((item, i) => {
+      if (item.id === activity.id) {
+        index = i
+        return i
+      }
+    })
+    filteredActivity["schedule"] = schedule
+    let data = activities
+    data[index] = filteredActivity
+    setActivities(data)
+  }
   return (
     <MuiThemeProvider theme={theme}>
       <MaterialTable
         title={t("Activity Schedule")}
-        data={schedules}
+        data={schedule}
         columns={[
           {
             title: t("Start date"),
@@ -128,17 +125,20 @@ export default function ActivityScheduler({ activity, onChange, ...props }) {
         ]}
         editable={{
           onRowAdd: async (newData) => {
-            onChange([...schedules, newData])
+            setSchedule([...schedule, newData])
+            updateActivitySchedule(activity, newData)
           },
           onRowUpdate: async (newData, oldData: any) => {
-            let x = Array.from(schedules) // clone
+            let x = Array.from(schedule) // clone
             x[oldData.tableData.id] = newData
-            onChange(x)
+            setSchedule(x)
+            updateActivitySchedule(activity, x)
           },
           onRowDelete: async (oldData: any) => {
-            let x = Array.from(schedules) // clone
+            let x = Array.from(schedule) // clone
             x.splice(oldData.tableData.id, 1)
-            onChange(x)
+            setSchedule(x)
+            updateActivitySchedule(activity, x)
           },
         }}
         localization={{

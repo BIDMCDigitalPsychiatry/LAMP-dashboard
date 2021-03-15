@@ -5,7 +5,6 @@ import { Box, Paper, useTheme, useMediaQuery } from "@material-ui/core"
 // Convert underscore case into human-readable strings.
 export const humanize = (str) => str.replace(/(^|_)(\w)/g, ($0, $1, $2) => ($1 && " ") + $2.toUpperCase())
 
-//
 export const ResponsiveMargin = React.forwardRef((props: any, ref) => {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   const print = useMediaQuery("print")
@@ -34,7 +33,6 @@ declare global {
     formatStyle(formatObj?: string): Intl.DateTimeFormatOptions
   }
 }
-
 // Stubbed code for .flat() which is an ES7 function...
 // eslint-disable-next-line
 Object.defineProperty(Array.prototype, "flat", {

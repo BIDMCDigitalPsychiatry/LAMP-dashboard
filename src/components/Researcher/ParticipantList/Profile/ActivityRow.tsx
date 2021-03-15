@@ -6,6 +6,7 @@ import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"
 import { useTranslation } from "react-i18next"
+import { updateSchedule } from "../../ActivityList/ActivityMethods"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -18,22 +19,21 @@ const useStyles = makeStyles((theme) =>
     },
     contentText: {
       color: "rgba(0, 0, 0, 0.75)",
-
       fontSize: 14,
       marginLeft: 10,
     },
     w45: { width: 45 },
-    w120: { width: 120 },
+    w120: { width: 120, textAlign: "right" },
     checkboxActive: { color: "#7599FF !important" },
   })
 )
-
 export default function ActivityRow({
   activity,
   index,
   studies,
   activities,
   handleSelected,
+  setActivities,
   ...props
 }: {
   activity: any
@@ -41,10 +41,10 @@ export default function ActivityRow({
   studies: any
   activities: any
   handleSelected: Function
+  setActivities: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-
   const types = {
     "lamp.survey": t("Survey"),
     "lamp.group": t("Group"),
@@ -55,10 +55,8 @@ export default function ActivityRow({
     "lamp.scratch_image": t("Scratch image"),
   }
   const [checked, setChecked] = React.useState(false)
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     handleSelected(activity, event.target.checked)
-    console.log(event.target.checked)
     setChecked(event.target.checked)
   }
   return (
@@ -91,7 +89,7 @@ export default function ActivityRow({
         </Grid>
         <Grid item className={classes.w120}>
           <UpdateActivity activity={activity} activities={activities} studies={studies} />
-          <ScheduleActivity activity={activity} />
+          <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
         </Grid>
       </Grid>
     </Box>

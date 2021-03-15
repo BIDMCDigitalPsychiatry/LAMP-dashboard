@@ -2,7 +2,6 @@
 import React, { useState } from "react"
 import { Box, Icon, IconButton, Tooltip, Typography, Divider } from "@material-ui/core"
 import { blue } from "@material-ui/core/colors"
-
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
@@ -27,7 +26,7 @@ export default function ActivityCard({
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
-  const [selectedActivity, setActivity] = useState(activity)
+  const selectedActivity = activity
 
   return (
     <React.Fragment>

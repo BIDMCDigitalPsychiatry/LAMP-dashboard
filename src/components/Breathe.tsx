@@ -33,7 +33,6 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import { useTranslation } from "react-i18next"
-
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -75,7 +74,6 @@ const useStyles = makeStyles((theme) => ({
     "75%": { opacity: 0 },
     "100%": { opacity: 0, display: "none" },
   },
-
   "@keyframes ExhaleText": {
     "0%": { opacity: 0 },
     "25%": { opacity: 0, display: "none" },

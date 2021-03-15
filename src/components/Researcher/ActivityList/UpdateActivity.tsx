@@ -1,13 +1,25 @@
 import React, { useState } from "react"
-import { Box, IconButton, Icon, AppBar, Toolbar, Divider, Fab, Typography } from "@material-ui/core"
+import {
+  Box,
+  IconButton,
+  Icon,
+  AppBar,
+  Toolbar,
+  Divider,
+  Fab,
+  Typography,
+  Backdrop,
+  CircularProgress,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import Activity from "./Activity"
-import { updateActivityData, spliceActivity } from "./Index"
+import { updateActivityData } from "./ActivityMethods"
 import { games } from "./Index"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,16 +45,18 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
+    },
   })
 )
-
 export default function UpdateActivity({ activity, activities, studies, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [gameDetails, setGameDetails] = useState(null)
   const [selectedActivity, setSelectedActivity] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
-
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
     let result = await updateActivityData(x, isDuplicated, selectedActivity)
@@ -50,27 +64,26 @@ export default function UpdateActivity({ activity, activities, studies, ...props
       enqueueSnackbar(t("Encountered an error: ") + result?.error, {
         variant: "error",
       })
-    else
+    else {
+      x["study_id"] = x.studyID
+      x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+      delete x["studyID"]
+      Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
       enqueueSnackbar(t("Successfully updated the Activity."), {
         variant: "success",
       })
+    }
     setSelectedActivity(undefined)
   }
-
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async (activity) => {
-    console.log(activity)
+    let data = await LAMP.Activity.view(activity.id)
+    activity["settings"] = data.settings
     if (activity.spec === "lamp.survey") {
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
-      let raw = activity
-      const activityData = spliceActivity({ raw, tag })
-      setSelectedActivity(activityData)
-    } else if (activity.spec === "lamp.dbt_diary_card") {
-      setSelectedActivity(activity)
-    } else if (activity.spec === "lamp.tips") {
-      setSelectedActivity(activity)
+      setGameDetails(tag)
     } else if (
       games.includes(activity.spec) ||
       activity.spec === "lamp.journal" ||
@@ -82,8 +95,8 @@ export default function UpdateActivity({ activity, activities, studies, ...props
         !!y.error ? undefined : y.data
       )[0]
       setGameDetails(tag)
-      setSelectedActivity(activity)
     }
+    setSelectedActivity(activity)
   }
 
   return (
@@ -91,13 +104,11 @@ export default function UpdateActivity({ activity, activities, studies, ...props
       <Fab
         size="small"
         color="primary"
-        // classes={{ root: classes.btnBlue + " " + classes.popexpand }}
         classes={{ root: classes.btnWhite }}
         onClick={(event) => modifyActivity(activity)}
       >
-        <Icon>update</Icon>
+        <Icon>mode_edit</Icon>
       </Fab>
-
       <ResponsiveDialog
         fullScreen
         transient={false}

@@ -18,7 +18,6 @@ export default function ParticipantName({ participant, ...props }) {
   const [editData, setEditData] = useState(false)
   const [editUserId, setEditUserId] = useState("")
   const [aliasName, setAliasName] = useState("")
-
   const editNameTextField = (id, event) => {
     setEditData(true)
     setEditUserId(id)

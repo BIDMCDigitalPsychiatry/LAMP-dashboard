@@ -20,10 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
 const SlideUp: any = React.forwardRef((props: any, ref) => <Slide direction="up" {...props} ref={ref} />)
-
-//
 export default function ResponsiveDialog({
   transient,
   animate,

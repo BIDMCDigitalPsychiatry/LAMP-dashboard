@@ -12,7 +12,6 @@ const useStyles = makeStyles((theme) =>
 export default function UpdateCredential({ participant, allRoles, ext, ...props }) {
   const [showCredentials, setShowCredentials] = useState(false)
   const classes = useStyles()
-
   return (
     <Box>
       <Link

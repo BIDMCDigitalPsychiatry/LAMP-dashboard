@@ -78,9 +78,7 @@ export default function WeekView({
   const dates = getDates().dates
   const months = getDates().months
   const years = getDates().years
-
   const [selectedDate, setSelectedDate] = useState(type === "feed" ? dates.indexOf(new Date().getDate()) : null)
-
   return (
     <Box
       style={{

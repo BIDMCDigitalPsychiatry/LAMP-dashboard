@@ -243,7 +243,7 @@ function _hideCognitiveTesting() {
 export function spliceActivity({ raw, tag }) {
   return {
     id: raw.id,
-    parentID: raw.parentID,
+    study_id: raw.study_id,
     spec: "lamp.survey",
     name: raw.name,
     description: tag?.description,
@@ -286,7 +286,7 @@ export function unspliceActivity(x) {
   return {
     raw: {
       id: x.id,
-      parentID: x.parentID,
+      study_id: x.study_id,
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
@@ -327,7 +327,7 @@ export function unspliceCTActivity(x) {
 export function spliceCTActivity({ raw, tag }) {
   return {
     id: raw.id,
-    parentID: raw.parentID,
+    study_id: raw.study_id,
     spec: raw.spec,
     name: raw.name,
     description: tag?.description,
@@ -407,7 +407,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         photo: x?.photo ?? "",
       })
     } else {
-      if (selectedActivity.parentID !== x.studyID) {
+      if (selectedActivity.study_id !== x.studyID) {
         // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
         // console.dir("deleted tag " + JSON.stringify(tag))
         // await LAMP.Activity.delete(x.id)
@@ -449,7 +449,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         id: x.id,
         name: x.name,
         icon: x.icon,
-        studyID: selectedActivity.parentID,
+        studyID: selectedActivity.study_id,
         spec: "lamp.tips",
         settings: selectedActivity.settings,
         schedule: selectedActivity.schedule,

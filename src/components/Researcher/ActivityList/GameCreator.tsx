@@ -185,7 +185,7 @@ export default function GameCreator({
   )
   const [data, setData] = useState({
     id: value?.id ?? undefined,
-    name: "",
+    name: value?.name ?? "",
     spec: value?.spec ?? activitySpecId,
     schedule: [],
     description: "",
@@ -193,7 +193,6 @@ export default function GameCreator({
     settings: settings,
     studyID: !!value ? value.study_id : study,
   })
-
   const validate = () => {
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
@@ -308,7 +307,6 @@ export default function GameCreator({
     setData({ ...data, [settings]: settingsData })
     setSettings(settingsData)
   }
-
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>

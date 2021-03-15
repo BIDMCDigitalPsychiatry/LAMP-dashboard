@@ -55,11 +55,9 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-
     input: {
       display: "none",
     },
-
     btnText: {
       color: "#333",
       fontSize: 14,
@@ -107,7 +105,6 @@ export default function BreatheCreator({
   studies?: any
   study?: any
 }) {
-  console.log(study)
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const [loading, setLoading] = React.useState(false)
