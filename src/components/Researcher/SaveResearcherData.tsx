@@ -1,9 +1,8 @@
 import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
-// async function fetchResult(authString, id, type, modal) {
+
 export const fetchResult = async (authString, id, type, modal) => {
-  //const baseUrl = "https://lampv2.zcodemo.com:9093" //"https://api-staging.lamp.digital"
-  const baseUrl = "https://api-staging.lamp.digital" //
+  const baseUrl = "https://api-staging.lamp.digital"
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
@@ -15,9 +14,9 @@ export const fetchResult = async (authString, id, type, modal) => {
   ).json()
   return result
 }
+
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
-  //const baseUrl = "https://lampv2.zcodemo.com:9093" // "https://api-staging.lamp.digital"
-  const baseUrl = "https://api-staging.lamp.digital" //
+  const baseUrl = "https://api-staging.lamp.digital"
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
@@ -30,6 +29,7 @@ export const fetchPostData = async (authString, id, type, modal, methodType, bod
   ).json()
   return result
 }
+
 const saveStudiesAndParticipants = (result) => {
   const studies = result.studies.map(({ id, name, participant_count }) => ({ id, name, participant_count }))
   let participants = []
@@ -39,9 +39,9 @@ const saveStudiesAndParticipants = (result) => {
   Service.addData("studies", studies)
   Service.addData("participants", participants)
 }
+
 export const saveStudyData = (result, type) => {
   Service.update("studies", result, type === "activities" ? "activity_count" : "sensor_count", "study_id")
-  console.log(result[type])
   Service.addData(type, result[type])
 }
 
@@ -96,11 +96,11 @@ export const saveDataToCache = (authString, id) => {
         })
       })
     })
-  })
-  fetchResult(authString, id, "activity", "researcher").then((result) => {
-    saveStudyData(result, "activities")
-    fetchResult(authString, id, "sensor", "researcher").then((result) => {
-      saveStudyData(result, "sensors")
+    fetchResult(authString, id, "activity", "researcher").then((result) => {
+      saveStudyData(result, "activities")
+      fetchResult(authString, id, "sensor", "researcher").then((result) => {
+        saveStudyData(result, "sensors")
+      })
     })
   })
 }

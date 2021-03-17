@@ -29,7 +29,6 @@ import {
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import Header from "./Header"
-import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
@@ -116,6 +115,9 @@ const useStyles = makeStyles((theme: Theme) =>
           color: "rgba(0, 0, 0, 0.4)",
         },
         "& button": { display: "none" },
+      },
+      [theme.breakpoints.down("sm")]: {
+        marginBottom: 80,
       },
     },
     studyCode: {
@@ -249,10 +251,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
     studyMain: { background: "#F8F8F8", borderRadius: 4 },
+    norecords: {
+      "& span": { marginRight: 5 },
+    },
   })
 )
 
-export default function StudiesList({ title, researcher, studies, ...props }) {
+export default function StudiesList({ title, researcher, studies, upatedDataStudy, deletedDataStudy, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -262,24 +267,38 @@ export default function StudiesList({ title, researcher, studies, ...props }) {
   const [aliasStudyName, setAliasStudyName] = useState("")
   const [studyArray, setStudyNameArray] = useState([])
   const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
+  const [search, setSearch] = useState(null)
+  const [allStudies, setAllStudies] = useState(studies)
+  const [updateCount, setUpdateCount] = useState(0)
 
-  const updateStudyName = (data) => {
-    setEditStudy(false)
-    setAliasStudyName(data)
-    let oldNameArray = Object.assign({}, studyArray)
-    oldNameArray[editStudyName] = data
-    setStudyNameArray(oldNameArray)
+  useEffect(() => {
+    setAllStudies(studies)
+  }, [studies])
+
+  useEffect(() => {
+    searchFilterStudies()
+  }, [search])
+
+  const searchFilterStudies = () => {
+    if (!!search && search !== "") {
+      let newStudies = studies.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+      setAllStudies(newStudies)
+      setLoading(false)
+    } else {
+      setAllStudies(studies)
+    }
   }
 
-  // Parent Component
-  const callbackModal = () => {
-    // refreshPage()
-    setOpenDialogManageStudies(false)
+  const handleUpdatedStudyObject = (data) => {
+    upatedDataStudy(data)
   }
 
-  const editStudyField = (selectedRows, event) => {
-    setEditStudy(true)
-    setEditStudyName(selectedRows)
+  const handleDeletedStudy = (data) => {
+    deletedDataStudy(data)
+  }
+
+  const handleSearchData = (val) => {
+    setSearch(val)
   }
 
   return (
@@ -287,20 +306,35 @@ export default function StudiesList({ title, researcher, studies, ...props }) {
       {/* <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop> */}
-      <Header studies={studies} researcher={researcher} />
+      <Header
+        studies={studies}
+        researcher={researcher}
+        searchData={handleSearchData}
+        setParticipants={searchFilterStudies}
+        setUpdateCount={setUpdateCount}
+      />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {studies.map((study) => (
-            <Grid item lg={6} xs={12}>
-              <Box display="flex" p={1} key={study.id} className={classes.studyMain}>
-                <Box flexGrow={1}>
-                  {" "}
-                  <EditStudy study={study} />
+          {allStudies !== null && allStudies.length > 0 ? (
+            allStudies.map((study) => (
+              <Grid item lg={6} xs={12} key={study.id}>
+                <Box display="flex" p={1} className={classes.studyMain}>
+                  <Box flexGrow={1}>
+                    {" "}
+                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} />
+                  </Box>
+                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} />
                 </Box>
-                <DeleteStudy study={study} />
+              </Grid>
+            ))
+          ) : (
+            <Grid item lg={6} xs={12}>
+              <Box display="flex" alignItems="center" className={classes.norecords}>
+                <Icon>info</Icon>
+                {t("No Records Found")}
               </Box>
             </Grid>
-          ))}
+          )}
         </Grid>
       </Box>
     </React.Fragment>

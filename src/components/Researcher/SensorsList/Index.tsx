@@ -96,6 +96,9 @@ const useStyles = makeStyles((theme) =>
         },
         "& button": { display: "none" },
       },
+      [theme.breakpoints.down("sm")]: {
+        marginBottom: 80,
+      },
     },
     buttonContainer: {
       width: 200,
@@ -302,33 +305,16 @@ export default function SensorsList({
   selectedStudies: Array<any>
   setSelectedStudies?: Function
 }) {
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
   const [selectedSensors, setSelectedSensors] = useState<any>([])
   const [search, setSearch] = useState(null)
-  const [selectedIds, setSelectedIds] = useState([])
+
   useEffect(() => {
     setLoading(true)
   }, [])
-
-  // const updatedSensor = (data) => {
-  //   if (data.fn_type === "update") {
-  //     let dataSensors = [...sensors]
-  //     let index = dataSensors.findIndex((obj) => obj.id === data.id)
-  //     dataSensors[index].name = data.name
-  //     dataSensors[index].spec = data.spec
-  //     setSensors(dataSensors)
-  //     searchFilterSensors()
-  //   } else {
-  //     setSensors((prevState) => {
-  //       const tasks = prevState.filter((eachSensor) => eachSensor.id !== data.id)
-  //       return tasks
-  //     })
-  //   }
-  // }
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -352,7 +338,7 @@ export default function SensorsList({
     if (selectedStudies.length > 0) {
       Service.getDataByKey("sensors", selectedStudies, "study_name").then((sensors) => {
         if (search) {
-          let newSensors = sensors.filter((i) => i.name.includes(search))
+          let newSensors = sensors.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
           setSensors(sortData(newSensors, selectedStudies, "name"))
         } else {
           setSensors(sortData(sensors, selectedStudies, "name"))
@@ -360,7 +346,9 @@ export default function SensorsList({
         setLoading(false)
       })
     } else if (!!search && search !== "") {
-      let newSensors = sensors.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+      let newSensors = sensors.filter(
+        (i) => i.name.toLowerCase()?.includes(search.toLowerCase()) || i.id?.includes(search.toLowerCase())
+      )
       setSensors(sortData(newSensors, studies, "id"))
       setLoading(false)
     }

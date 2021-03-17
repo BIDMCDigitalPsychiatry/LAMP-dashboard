@@ -236,7 +236,6 @@ function AppRouter({ ...props }) {
   }
 
   let getResearcher = (id) => {
-    console.log(id, storeRef)
     if (id === "me" && state.authType === "researcher" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }

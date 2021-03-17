@@ -326,7 +326,6 @@ export default function SurveyCreator({
   const [isOptionNull, setIsOptionNull] = useState(0)
 
   useEffect(() => {
-    console.log(value, questions)
     setData({ ...data, settings: questions })
     let optionsArray = []
     {

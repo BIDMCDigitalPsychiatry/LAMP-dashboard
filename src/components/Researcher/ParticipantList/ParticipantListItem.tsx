@@ -85,6 +85,7 @@ export default function ParticipantListItem({
   studies,
   notificationColumn,
   handleSelectionChange,
+  setUpdateCount,
   ...props
 }) {
   const classes = useStyles()
@@ -95,12 +96,9 @@ export default function ParticipantListItem({
     setChecked(event.target.checked)
     handleSelectionChange(participant, event.target.checked)
   }
-  useEffect(() => {
-    console.log(user)
-  }, [user])
 
   const updateParticipant = (nameVal: string) => {
-    console.log(nameVal)
+    setUpdateCount(1)
     setName({ ...user, name: nameVal })
   }
 
@@ -130,7 +128,12 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials participant={participant} />
-            <PatientProfile participant={participant} studies={studies} onClose={updateParticipant} />
+            <PatientProfile
+              participant={participant}
+              studies={studies}
+              onClose={updateParticipant}
+              setUpdateCount={setUpdateCount}
+            />
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}

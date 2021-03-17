@@ -105,11 +105,13 @@ export default function PatientProfile({
   participant,
   studies,
   onClose,
+  setUpdateCount,
   ...props
 }: {
   participant: any
   studies: any
   onClose: Function
+  setUpdateCount: Function
 }) {
   const [nickname, setNickname] = useState(participant.name)
   const [loading, setLoading] = React.useState(false)
@@ -173,9 +175,9 @@ export default function PatientProfile({
             </Grid>
           </Box>
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
-          <Activties participant={participant} studies={studies} />
+          <Activties participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
-          <Sensors participant={participant} studies={studies} />
+          <Sensors participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
 
           <div className={classes.buttonsContainer}>
             <Button className={classes.buttonContainer} onClick={() => updateName()}>

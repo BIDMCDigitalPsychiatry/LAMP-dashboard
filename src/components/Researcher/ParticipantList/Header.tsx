@@ -119,38 +119,23 @@ export default function Header({
   selectedParticipants,
   searchData,
   setSelectedStudies,
-  addedParticipant,
   selectedStudies,
+  setUpdateCount,
   setParticipants,
+  updateCount,
   ...props
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [newAddedStudy, setNewAddedStudy] = useState(null)
-  const [newStudyObj, setNewStudyObj] = useState(null)
-  const [selDeletedIds, setSelDeletedIds] = useState([])
-  const [selDeletedStudy, setSelDeletedStudy] = useState([])
+
   const handleSearchData = (data) => {
     searchData(data)
   }
 
   const handleShowFilterStudies = (status) => {
-    console.log(601, status)
     setShowFilterStudies(status)
-  }
-
-  const filteredStudyArray = (val) => {
-    setSelectedStudies(val)
-    //filterStudies(val)
-  }
-
-  const handleNewStudy = (data) => {
-    console.log(602, data)
-    if (data) {
-      setNewStudyObj(data)
-    }
   }
 
   return (
@@ -186,14 +171,12 @@ export default function Header({
           <AddButton
             researcher={researcher}
             studies={studies}
-            addedParticipant={addedParticipant}
-            handleNewStudy={handleNewStudy}
+            setUpdateCount={setUpdateCount}
             setParticipants={setParticipants}
           />
         </Box>
       </Box>
-      {
-        //!!showFilterStudies && (
+      {!!showFilterStudies && (
         <Box>
           <StudyFilterList
             studies={studies}
@@ -201,19 +184,19 @@ export default function Header({
             type="participants"
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
-            newAddedStudy={newAddedStudy}
             setSelectedStudies={setSelectedStudies}
-            newStudyObj={newStudyObj}
-            selDeletedIds={selDeletedIds}
-            selDeletedStudy={selDeletedStudy}
+            updateCount={updateCount}
           />
         </Box>
-        //)
-      }
+      )}
       {selectedParticipants.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
-            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
+            <DeleteParticipant
+              participants={selectedParticipants}
+              setParticipants={setParticipants}
+              setUpdateCount={setUpdateCount}
+            />
           </Box>
         </Box>
       )}

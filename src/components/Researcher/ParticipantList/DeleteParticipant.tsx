@@ -31,11 +31,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteParticipant({ participants, setParticipants, ...props }) {
+export default function DeleteParticipant({ participants, setParticipants, setUpdateCount, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
+
   let deleteParticipants = async (status) => {
     if (status === "Yes") {
       const participantIds = participants.map((p) => {
@@ -43,16 +44,19 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
       })
       for (let participant of participants) {
         await LAMP.Participant.delete(participant.id)
-        Service.updateCount("studies", participant.study_id, "participants_count", 1, 1)
+        await LAMP.Type.setAttachment(participant.id, "me", "lamp.name", null)
+        Service.updateCount("studies", participant.study_id, "participant_count", 1, 1)
       }
       Service.delete("participants", participantIds)
+      setUpdateCount(1)
+      setParticipants()
       enqueueSnackbar(t("Successfully deleted the selected participants."), {
         variant: "success",
       })
     }
-    setParticipants()
     setConfirmationDialog(0)
   }
+
   return (
     <span>
       <Fab

@@ -145,6 +145,7 @@ export default function SCImageCreator({
       data.studyID === null ||
       data.studyID === "" ||
       duplicates.length > 0 ||
+      settings.threshold > 90 ||
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "")
     )

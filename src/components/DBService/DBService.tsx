@@ -185,7 +185,7 @@ class DBService {
           while (cursor) {
             if (cursor.key === key) {
               let value = cursor.value
-              value[keyToUpdate] = !type ? value[keyToUpdate] + (count ?? 1) : value[keyToUpdate] + (count ?? 1)
+              value[keyToUpdate] = !!type ? value[keyToUpdate] - (count ?? 1) : value[keyToUpdate] + (count ?? 1)
               cursor.update(value)
             }
             cursor = await cursor.continue()

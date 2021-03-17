@@ -3,7 +3,6 @@ import React from "react"
 import { Typography, makeStyles, Box, Grid, colors, CardContent } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import Sparkline from "./Sparkline"
-import RadialDonutChart from "./RadialDonutChart"
 import ActivityCard from "./ActivityCard"
 import { useTranslation } from "react-i18next"
 
@@ -28,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 function createData(dateVal: string, timeVal: string, value: number) {
   return { dateVal, timeVal, value }
 }
+
 function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
@@ -78,8 +78,9 @@ export default function PreventData({
           style={{ marginTop: 16, marginBottom: 16, overflow: "visible", breakInside: "avoid" }}
         >
           {graphType === 1 ? (
-            <RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />
-          ) : graphType === 2 ? (
+            <div />
+          ) : /*<RadialDonutChart data={events} type={type} detailPage={true} width={370} height={350} />*/
+          graphType === 2 ? (
             <Sparkline
               minWidth={250}
               minHeight={450}

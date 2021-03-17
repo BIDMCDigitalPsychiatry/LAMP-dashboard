@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         "& button": { display: "none" },
       },
+      [theme.breakpoints.down("sm")]: {
+        marginBottom: 80,
+      },
     },
     norecords: {
       "& span": { marginRight: 5 },
@@ -51,9 +54,18 @@ export const availableAtiveSpecs = [
   "lamp.cats_and_dogs",
   "lamp.scratch_image",
   "lamp.dbt_diary_card",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
 ]
 
-export const games = ["lamp.jewels_a", "lamp.jewels_b", "lamp.spatial_span", "lamp.cats_and_dogs"]
+export const games = [
+  "lamp.jewels_a",
+  "lamp.jewels_b",
+  "lamp.spatial_span",
+  "lamp.cats_and_dogs",
+  "lamp.pop_the_bubbles",
+  "lamp.balloon_risk",
+]
 
 export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
   const [activities, setActivities] = useState(null)
@@ -62,6 +74,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   const [selectedActivities, setSelectedActivities] = useState<any>([])
   const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
+
   const handleChange = (activity, checked) => {
     if (checked) {
       setSelectedActivities((prevState) => [...prevState, activity])
@@ -84,7 +97,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
     if (selectedStudies.length > 0) {
       Service.getDataByKey("activities", selectedStudies, "study_name").then((activitiesData) => {
         if (search) {
-          let newActivities = activitiesData.filter((i) => i.name?.includes(search))
+          let newActivities = activitiesData.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
           setActivities(sortData(newActivities, selectedStudies, "name"))
         } else {
           setActivities(sortData(activitiesData, selectedStudies, "name"))
@@ -92,7 +105,9 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         setLoading(false)
       })
     } else if (!!search && search !== "") {
-      let newActivities = activities.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+      let newActivities = activities.filter(
+        (i) => i.name.toLowerCase()?.includes(search.toLowerCase()) || i.id?.includes(search.toLowerCase())
+      )
       setActivities(sortData(newActivities, studies, "id"))
       setLoading(false)
     }
@@ -120,9 +135,9 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!activities ? (
+          {!!activities && activities.length > 0 ? (
             activities.map((activity) => (
-              <Grid item lg={6} xs={12}>
+              <Grid item lg={6} xs={12} key={activity.id}>
                 <ActivityItem
                   activity={activity}
                   researcher={researcher}

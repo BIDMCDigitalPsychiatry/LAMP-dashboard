@@ -75,8 +75,8 @@ export default function Header({
   searchData,
   setSelectedStudies,
   selectedStudies,
-  selectedIds,
   setSensors,
+  setChangeCount,
   ...props
 }: {
   studies?: Array<Object>
@@ -85,36 +85,20 @@ export default function Header({
   searchData?: Function
   setSelectedStudies?: Function
   selectedStudies: Array<string>
-  selectedIds?: Array<string>
   setSensors?: Function
+  setChangeCount?: Function
 }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [newAddedStudy, setNewAddedStudy] = useState(null)
-  const [newStudyObj, setNewStudyObj] = useState(null)
-  const [selDeletedIds, setSelDeletedIds] = useState([])
-  const [selDeletedStudy, setSelDeletedStudy] = useState([])
+  const [updateCount, setUpdateCount] = useState(0)
+
   const handleSearchData = (data) => {
     searchData(data)
   }
 
-  const handleDeleted = (val) => {
-    setSelDeletedIds(val)
-    //newDeletedIds(val)
-  }
-
-  // const addedDataSensor = (data) => {
-  //   setNewAddedStudy(data)
-  //   addedSensor(data)
-  // }
-
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
-  }
-
-  const handleSelectedStudyArray = (data) => {
-    setSelDeletedStudy(data)
   }
 
   return (
@@ -149,7 +133,7 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddSensor studies={studies} setSensors={setSensors} />
+          <AddSensor studies={studies} setSensors={setSensors} setUpdateCount={setUpdateCount} />
         </Box>
       </Box>
       {showFilterStudies && (
@@ -160,23 +144,15 @@ export default function Header({
             type="sensors"
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
-            newAddedStudy={newAddedStudy}
-            newStudyObj={newStudyObj}
             setSelectedStudies={setSelectedStudies}
-            selDeletedIds={selDeletedIds}
-            selDeletedStudy={selDeletedStudy}
+            updateCount={updateCount}
           />
         </Box>
       )}
       {selectedSensors.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
-            <DeleteSensor
-              sensors={selectedSensors}
-              newDeletedIds={handleDeleted}
-              selectedStudyArray={handleSelectedStudyArray}
-              setSensors={setSensors}
-            />
+            <DeleteSensor sensors={selectedSensors} setSensors={setSensors} setUpdateCount={setUpdateCount} />
           </Box>
         </Box>
       )}

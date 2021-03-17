@@ -276,18 +276,21 @@ export default function AddSensor({
   studies,
   studyId,
   setSensors,
+  setUpdateCount,
   ...props
 }: {
   studies?: Array<Object>
   studyId?: string
   setSensors?: Function
+  setUpdateCount?: Function
 }) {
   const classes = useStyles()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
 
-  const addOrUpdateSensor = (sensor?: any) => {
+  const addOrUpdateSensor = () => {
     setSensorDialog(false)
+    setUpdateCount(3)
     setSensors()
   }
 

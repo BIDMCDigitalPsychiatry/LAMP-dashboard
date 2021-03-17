@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"
 import { Box, Fab } from "@material-ui/core"
 // Local Imports
-import LAMP from "lamp-core"
+import LAMP, { StudyService } from "lamp-core"
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
 import { useSnackbar } from "notistack"
+import { Service } from "../../DBService/DBService"
 
 export interface NewStudy {
   id?: string
@@ -22,91 +23,53 @@ export default function StudyFilterList({
   researcher,
   type,
   showFilterStudies,
-  newAddedStudy,
-  newStudyObj,
   setSelectedStudies,
   selectedStudies,
-  selDeletedIds,
-  selDeletedStudy,
+  updateCount,
   ...props
 }: {
   studies?: Array<any>
   researcher?: Researcher
   type?: string
   showFilterStudies?: Boolean
-  newAddedStudy?: NewStudy
-  newStudyObj?: any
   setSelectedStudies?: Function
   selectedStudies?: Array<string>
-  selDeletedIds?: Array<string>
-  selDeletedStudy?: Array<string>
+  updateCount?: number
 }) {
   const { t } = useTranslation()
   const [studiesCount, setStudiesCount] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
-  const [studyIds, setStudyIds] = useState([])
+  const [studs, setStuds] = useState(studies)
 
   useEffect(() => {
-    let studiesData = filterStudyData(studies)
+    refreshStudies()
+  }, [])
+
+  const refreshStudies = () => {
+    Service.getAll("studies").then((data) => {
+      setStuds(data || [])
+    })
+  }
+
+  useEffect(() => {
+    refreshStudies()
+  }, [updateCount])
+
+  useEffect(() => {
+    let studiesData = filterStudyData(studs)
     setStudiesCount(studiesData)
-  }, [studies])
-
-  useEffect(() => {
-    if (selDeletedStudy.length > 0) {
-      let studyIdCounts = {}
-      selDeletedStudy.forEach((x) => (studyIdCounts[x] = (studyIdCounts[x] || 0) + 1))
-      let studiesData = filterStudyData(studies)
-      let newStudies = studiesData
-      let studyKeys = Object.keys(studyIdCounts)
-      for (let [key, value] of Object.entries(studyIdCounts)) {
-        if (studyKeys.includes(key)) {
-          newStudies[key] = studyIdCounts[key] < 0 ? 0 : studiesData[key] - studyIdCounts[key]
-        }
-      }
-      setStudiesCount(newStudies)
-    }
-  }, [selDeletedStudy])
-
-  useEffect(() => {
-    if (newAddedStudy !== null) {
-      let studiesData = filterStudyData(studies)
-      let newStudyData = studiesData
-      newStudyData[newAddedStudy.study_name] = newStudyData[newAddedStudy.study_name] + 1
-      setStudiesCount(studiesData)
-    }
-  }, [newAddedStudy])
-  /*
-  useEffect(() => {
-    if (newStudyObj !== null) {
-      studies.push(newStudyObj)
-      let studiesData = filterStudyData(studies)
-      setStudiesCount(studiesData)
-    }
-  }, [newStudyObj])
-*/
-
-  useEffect(() => {
-    if (newStudyObj !== null) {
-      let studyIdArray = studies.map(function (obj) {
-        return obj.id
-      })
-      /*
-      if (!studyIdArray.includes(newStudyObj.id)) {
-        studies.push(newStudyObj)
-      }
-      */
-      studies.push(newStudyObj)
-      let studiesData = filterStudyData(studies)
-      setStudiesCount(studiesData)
-    }
-  }, [newStudyObj])
+  }, [studs])
 
   const filterStudyData = (dataArray) => {
     return Object.assign(
       {},
       ...dataArray.map((item) => ({
         [item.name]:
-          type === "activities" ? item.activity_count : type === "sensors" ? item.sensor_count : item.participant_count,
+          type === "activities" || updateCount === 2
+            ? item.activity_count
+            : type === "sensors" || updateCount === 3
+            ? item.sensor_count
+            : item.participant_count,
       }))
     )
   }
@@ -118,7 +81,7 @@ export default function StudyFilterList({
           {
             <MultipleSelect
               selected={selectedStudies}
-              items={(studies || []).map((x) => `${x.name}`)}
+              items={(studs || []).map((x) => `${x.name}`)}
               showZeroBadges={false}
               badges={studiesCount}
               onChange={(x) => {

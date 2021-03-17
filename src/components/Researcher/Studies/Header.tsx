@@ -1,13 +1,13 @@
 import React, { useState } from "react"
-import { Box, Popover, Fab, Typography, Icon, InputBase } from "@material-ui/core"
+import { Box, Popover, Fab, Typography, Icon, InputBase, MenuItem } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
-import StudyFilter from "../ParticipantList/StudyFilter"
 import SearchIcon from "@material-ui/icons/Search"
+import AddUser from "../ParticipantList/AddUser"
+import StudyCreator from "../ParticipantList/StudyCreator"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
-import MultipleSelect from "../../MultipleSelect"
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -164,14 +164,27 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Header({ studies, researcher, ...props }) {
+export default function Header({ studies, researcher, searchData, setUpdateCount, setParticipants, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
   const [selectedStudies, setSelectedStudies] = useState([])
   const [studiesCount, setStudiesCount] = useState(null)
+  const [search, setSearch] = useState("")
 
+  const [addStudy, setAddStudy] = useState(false)
+  const [addParticipantStudy, setAddParticipantStudy] = useState(false)
   const filteredStudyArray = () => {}
+  const handleNewStudyData = (data) => {
+    setUpdateCount(1)
+    setParticipants()
+  }
+
+  const handleClosePopUp = (data) => {
+    if (data === 1) {
+      setAddParticipantStudy(false)
+    }
+  }
 
   return (
     <Box>
@@ -191,6 +204,11 @@ export default function Header({ studies, researcher, ...props }) {
                 input: classes.inputInput,
               }}
               inputProps={{ "aria-label": "search" }}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                searchData(e.target.value)
+              }}
+              value={search}
             />
           </div>
         </Box>
@@ -218,7 +236,29 @@ export default function Header({ studies, researcher, ...props }) {
             vertical: "top",
             horizontal: "right",
           }}
-        ></Popover>
+        >
+          <React.Fragment>
+            <MenuItem
+              onClick={() => {
+                setPopover(null)
+                setAddStudy(false)
+                setAddParticipantStudy(true)
+              }}
+            >
+              <Typography variant="h6">{t("Add a new study")}</Typography>
+              <Typography variant="body2">{t("Create a new study.")}</Typography>
+            </MenuItem>
+          </React.Fragment>
+        </Popover>
+
+        <PatientStudyCreator
+          studies={studies}
+          researcher={researcher}
+          onClose={() => setAddParticipantStudy(false)}
+          open={addParticipantStudy}
+          handleNewStudy={handleNewStudyData}
+          closePopUp={handleClosePopUp}
+        />
       </Box>
     </Box>
   )

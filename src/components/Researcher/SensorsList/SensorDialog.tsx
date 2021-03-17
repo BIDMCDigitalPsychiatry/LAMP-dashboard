@@ -317,7 +317,6 @@ export default function SensorDialog({
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    console.log(sensor)
     LAMP.SensorSpec.all().then((res) => {
       setSensorSpecs(res)
       setSensorSpec(sensor ? sensor.spec : null)
@@ -397,6 +396,7 @@ export default function SensorDialog({
         enqueueSnackbar(t("Successfully created a sensor."), {
           variant: "success",
         })
+        setLoading(false)
         addOrUpdateSensor()
       })
     })

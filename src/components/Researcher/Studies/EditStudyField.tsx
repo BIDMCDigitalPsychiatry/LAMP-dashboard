@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
+import { Service } from "../../DBService/DBService"
 
 // TODO: should be called AliasField??
 // TODO: move tag responsibilities out of here when bugs are stabilized
@@ -47,7 +48,9 @@ export default function EditStudyField({
         res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null
       )
       .then((res) => {
-        if (!unmounted) setAliasStudyName((oldValue.current = res))
+        if (!unmounted) {
+          setAliasStudyName((oldValue.current = res))
+        }
       })
       .catch((err) =>
         enqueueSnackbar(
@@ -131,7 +134,10 @@ export default function EditStudyField({
           //disabled={editData && editStudyName === study ? false : true}
           label={t(studyName)}
           value={t(aliasStudyName) || ""}
-          onChange={(event) => setAliasStudyName(event.target.value)}
+          onChange={(event) => {
+            Service.update("studies", { studies: [{ id: study, name: event.target.value }] }, "name", "id")
+            setAliasStudyName(event.target.value)
+          }}
           onClick={(event) => event.stopPropagation()}
           onKeyUp={(event) => event.keyCode === 13 && setEditing(false)}
           onBlur={() => updateEditing()}

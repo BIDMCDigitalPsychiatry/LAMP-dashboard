@@ -27,6 +27,7 @@ export function spliceActivity({ raw, tag }) {
         })),
   }
 }
+
 // Un-splice an object into its raw Tips Activity object
 export function unspliceTipsActivity(x) {
   return {
@@ -104,14 +105,17 @@ export async function saveTipActivity(x) {
   let result
   if (!x.id && x.name) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
+    await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+      photo: x.icon,
+    })
   } else {
     result = (await LAMP.Activity.update(x.id, {
       settings: x.settings,
     })) as any
+    await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
+      photo: x.icon,
+    })
   }
-  await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
-    photo: x.icon,
-  })
   return result
 }
 
@@ -202,7 +206,6 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
     return result
   } else if (x.spec === "lamp.survey") {
     const { raw, tag } = unspliceActivity(x)
-    console.log(raw, tag)
     if (isDuplicated) {
       result = (await LAMP.Activity.create(x.studyID, raw)) as any
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.survey_description", tag)

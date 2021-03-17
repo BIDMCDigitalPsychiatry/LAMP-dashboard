@@ -97,7 +97,20 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddActivity({ activities, studies, studyId, setActivities, ...props }) {
+export default function AddActivity({
+  activities,
+  studies,
+  studyId,
+  setActivities,
+  setUpdateCount,
+  ...props
+}: {
+  activities?: any
+  studies?: any
+  studyId?: string
+  setActivities?: Function
+  setUpdateCount?: Function
+}) {
   const [activitySpecs, setActivitySpecs] = useState([])
   const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
@@ -117,7 +130,10 @@ export default function AddActivity({ activities, studies, studyId, setActivitie
     "lamp.jewels_a": t("Jewels A"),
     "lamp.jewels_b": t("Jewels B"),
     "lamp.spatial_span": t("Spatial Span"),
+    "lamp.pop_the_bubbles": t("Pop the bubbles"),
+    "lamp.balloon_risk": t("Balloon risk"),
   }
+
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
       setActivitySpecs(
@@ -233,6 +249,7 @@ export default function AddActivity({ activities, studies, studyId, setActivitie
               studies={studies}
               onClose={() => setCreate(false)}
               setActivities={setActivities}
+              setUpdateCount={setUpdateCount}
             />
           )}
         </Box>

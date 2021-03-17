@@ -43,12 +43,14 @@ export default function DeleteSensor({
   newDeletedIds,
   selectedStudyArray,
   setSensors,
+  setUpdateCount,
   ...props
 }: {
   sensors?: Array<Sensors>
   newDeletedIds?: Function
   selectedStudyArray?: Function
   setSensors?: Function
+  setUpdateCount?: Function
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
@@ -58,7 +60,6 @@ export default function DeleteSensor({
   const [loading, setLoading] = useState(false)
   const [confirmStatus, setConfirmStatus] = useState(false)
   const [deletedStudyIds, setDeletedStudyIds] = useState([])
-  const [deletedStudys, setDeletedStudys] = useState([])
 
   const confirmAction = async (status) => {
     setConfirmStatus(status === "Yes" ? true : false)
@@ -70,7 +71,6 @@ export default function DeleteSensor({
             if (!data.error) {
               setDeletedIds((prev) => [...prev, eachSensorIds.id])
               setDeletedStudyIds((prev) => [...prev, eachSensorIds.study_id])
-              setDeletedStudys((prev) => [...prev, eachSensorIds.study_name])
             }
           })
         }
@@ -98,6 +98,7 @@ export default function DeleteSensor({
             )
           })
         })
+        setUpdateCount(1)
       }
     }
   }, [deletedStudyIds])
@@ -109,18 +110,14 @@ export default function DeleteSensor({
         /*enqueueSnackbar(t("Successfully deleted the selected Sensors."), {
           variant: "success",
         })*/
+        setUpdateCount(3)
       } else {
         enqueueSnackbar(t("An error occured while deleting. Please try again."), {
           variant: "error",
         })
       }
-      newDeletedIds(deletedIds)
     }
   }, [deletedIds])
-
-  useEffect(() => {
-    selectedStudyArray(deletedStudys)
-  }, [deletedStudys])
 
   return (
     <span>

@@ -31,13 +31,19 @@ const useStyles = makeStyles((theme) => ({
   },
   switchLabel: { color: "#4C66D6" },
   activityContent: {
-    padding: "25px 50px 0",
+    padding: "25px 25px 0",
   },
   backdrop: {
     zIndex: 111111,
     color: "#fff",
   },
-  addNewDialog: { maxWidth: 350 },
+  addNewDialog: {
+    maxWidth: 350,
+    [theme.breakpoints.up("sm")]: {
+      maxWidth: "auto",
+      minWidth: 400,
+    },
+  },
   closeButton: {
     position: "absolute",
     right: theme.spacing(1),
@@ -45,20 +51,17 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.grey[500],
   },
 }))
-
 export default function StudyCreator({
   studies,
   researcher,
   handleNewStudy,
   closePopUp,
-  addedParticipant,
   ...props
 }: {
   studies: any
   researcher: any
   handleNewStudy: Function
   closePopUp: Function
-  addedParticipant: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
@@ -106,7 +109,6 @@ export default function StudyCreator({
         newParticipant["study_id"] = selectedStudy
         newParticipant["study_name"] = studyName
         Service.addData("participants", [newParticipant])
-        addedParticipant(newParticipant)
         Service.updateCount("studies", selectedStudy, "participants_count")
         enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
           variant: "success",
@@ -119,7 +121,6 @@ export default function StudyCreator({
       setLoading(false)
     })
   }
-
   return (
     <Dialog
       {...props}
@@ -141,6 +142,7 @@ export default function StudyCreator({
           className={classes.closeButton}
           onClick={() => {
             setStudyName("")
+            closePopUp(2)
           }}
         >
           <CloseIcon />
@@ -162,7 +164,7 @@ export default function StudyCreator({
         />
       </DialogContent>
       <DialogActions>
-        <Box textAlign="right" width={1} mt={3} mb={3}>
+        <Box textAlign="right" width={1} mt={3} mb={3} mx={3}>
           <Button
             color="primary"
             onClick={() => {

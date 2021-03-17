@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         "& button": { display: "none" },
       },
+      [theme.breakpoints.down("sm")]: {
+        marginBottom: 80,
+      },
     },
     backdrop: {
       zIndex: 111111,
@@ -123,27 +126,16 @@ export default function ParticipantList({
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [search, setSearch] = useState(null)
-  const [newStudyItem, setNewStudyItem] = useState(false)
   const [loading, setLoading] = useState(false)
-  const { t } = useTranslation()
+  const [updateCount, setUpdateCount] = useState(0)
 
-  const addedParticipant = (data) => {
-    console.log(5501, data)
-    console.log(5502, participants)
-    console.log(5503, studies)
-    if (selectedStudies.includes(data.study_name)) {
-      setParticipants((prevState) => [...prevState, data])
-    }
-    setNewStudyItem(true)
-  }
+  const { t } = useTranslation()
 
   const handleChange = (participant, checked) => {
     if (checked) {
       setSelectedParticipants((prevState) => [...prevState, participant])
     } else {
-      let selected = selectedParticipants.filter((item, index) => {
-        return selectedParticipants.indexOf(item) !== index
-      })
+      let selected = selectedParticipants.filter((item) => item.id != participant.id)
       setSelectedParticipants(selected)
     }
   }
@@ -179,6 +171,7 @@ export default function ParticipantList({
   const handleSearchData = (val) => {
     setSearch(val)
   }
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -189,23 +182,24 @@ export default function ParticipantList({
         researcher={researcher}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
-        addedParticipant={addedParticipant}
         selectedStudies={selectedStudies}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        newAddedStudy={newStudyItem}
+        setUpdateCount={setUpdateCount}
+        updateCount={updateCount}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {!!participants ? (
+          {!!participants && participants.length > 0 ? (
             participants.map((eachParticipant) => (
-              <Grid item lg={6} xs={12}>
+              <Grid item lg={6} xs={12} key={eachParticipant.id}>
                 <ParticipantListItem
                   participant={eachParticipant}
                   onParticipantSelect={onParticipantSelect}
                   studies={studies}
                   notificationColumn={notificationColumn}
                   handleSelectionChange={handleChange}
+                  setUpdateCount={setUpdateCount}
                 />
               </Grid>
             ))

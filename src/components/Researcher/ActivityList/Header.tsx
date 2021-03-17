@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Typography, InputBase } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
@@ -85,13 +85,14 @@ export default function Header({
   const classes = useStyles()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [newAddedStudy, setNewAddedStudy] = useState(null)
-  const [newStudyObj, setNewStudyObj] = useState(null)
-  const [selDeletedIds, setSelDeletedIds] = useState([])
-  const [selDeletedStudy, setSelDeletedStudy] = useState([])
+  const [updateCount, updateStudyCount] = useState(0)
 
   const handleSearchData = (data) => {
     searchData(data)
+  }
+
+  const setUpdateCount = (type: number) => {
+    updateStudyCount(type)
   }
 
   const handleShowFilterStudies = (data) => {
@@ -129,31 +130,35 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddActivity activities={activities} studies={studies} studyId={null} setActivities={setActivities} />
-        </Box>
-      </Box>
-
-      {!!showFilterStudies && (
-        <Box>
-          <StudyFilterList
+          <AddActivity
+            activities={activities}
             studies={studies}
-            researcher={researcher}
-            type="activities"
-            showFilterStudies={showFilterStudies}
-            selectedStudies={selectedStudies}
-            newAddedStudy={newAddedStudy}
-            newStudyObj={newStudyObj}
-            setSelectedStudies={setSelectedStudies}
-            selDeletedIds={selDeletedIds}
-            selDeletedStudy={selDeletedStudy}
+            studyId={null}
+            setUpdateCount={setUpdateCount}
+            setActivities={setActivities}
           />
         </Box>
-      )}
+      </Box>
+      <Box>
+        <StudyFilterList
+          studies={studies}
+          researcher={researcher}
+          type="activities"
+          showFilterStudies={showFilterStudies}
+          selectedStudies={selectedStudies}
+          setSelectedStudies={setSelectedStudies}
+          updateCount={updateCount}
+        />
+      </Box>
       {selectedActivities.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <ExportActivity activities={selectedActivities} />
-            <DeleteActivity activities={selectedActivities} setActivities={setActivities} />
+            <DeleteActivity
+              activities={selectedActivities}
+              setActivities={setActivities}
+              setUpdateCount={setUpdateCount}
+            />
           </Box>
         </Box>
       )}

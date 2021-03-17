@@ -76,6 +76,7 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
   },
 }))
+
 function CanvasElement({ setCanvas, ...props }) {
   return <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
 }
@@ -102,6 +103,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
   const [loading, setLoading] = useState(true)
   const [savedX, setSavedx] = useState([])
   const [savedY, setSavedY] = useState([])
+
   let brush = new Image()
   let cover = new Image()
   brush.width = 150

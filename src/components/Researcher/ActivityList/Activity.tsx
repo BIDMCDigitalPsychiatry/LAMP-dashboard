@@ -49,6 +49,7 @@ export default function Activity({
   studyId,
   onClose,
   setActivities,
+  setUpdateCount,
   ...props
 }: {
   allActivities?: Array<JSON>
@@ -61,6 +62,7 @@ export default function Activity({
   studyId?: string
   onClose?: Function
   setActivities?: Function
+  setUpdateCount?: Function
 }) {
   const [loading, setLoading] = useState(false)
   const isTip = (activity || {}).spec === "lamp.tips" || activitySpecId === "lamp.tips"
@@ -125,10 +127,10 @@ export default function Activity({
       onClose()
     }
   }
+
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     setLoading(true)
-    console.log(x)
     let newItem = await saveCTestActivity(x)
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new Activity."), {
@@ -146,6 +148,7 @@ export default function Activity({
 
   const updateDb = (x) => {
     addActivity(x, studies)
+    setUpdateCount(2)
     setActivities()
     setLoading(false)
   }

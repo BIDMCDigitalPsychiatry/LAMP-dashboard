@@ -121,12 +121,17 @@ export default function BreatheCreator({
   )
   const [data, setData] = useState({
     id: value?.id ?? undefined,
-    name: "",
+    name: value?.name ?? "",
     spec: value?.spec ?? activitySpecId,
     schedule: [],
     description: "",
     photo: null,
-    settings: !!value ? value?.settings : { threshold: 80 },
+    settings: !!value
+      ? value?.settings
+      : {
+          audio: null,
+          audio_name: null,
+        },
     studyID: !!value ? value.study_id : study,
   })
   const validate = () => {
@@ -213,7 +218,7 @@ export default function BreatheCreator({
   }
 
   useEffect(() => {
-    setData({ ...data, [settings]: settings })
+    setData({ ...data, settings: settings })
   }, [settings])
 
   const updateSettings = (settingsData) => {

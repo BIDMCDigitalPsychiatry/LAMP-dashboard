@@ -133,7 +133,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
+  const [changeStudyCount, setChangeCount] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [updatedData, setUpdatedData] = useState(null)
+  const [deletedData, setDeletedData] = useState(null)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -154,6 +157,11 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     })
   }
 
+  const getAllStudies = async () => {
+    let studies = await Service.getAll("studies")
+    setStudies(studies)
+  }
+
   useEffect(() => {
     setCurrentTab(0)
   }, [])
@@ -161,6 +169,14 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   useEffect(() => {
     filterStudies(studies)
   }, [studies])
+
+  useEffect(() => {
+    getAllStudies()
+  }, [updatedData])
+
+  useEffect(() => {
+    getAllStudies()
+  }, [deletedData])
 
   const filterStudies = async (studies) => {
     let selected =
@@ -170,6 +186,14 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
       })
     selected.sort()
     setSelectedStudies(selected)
+  }
+
+  const upatedDataStudy = (data) => {
+    setUpdatedData(data)
+  }
+
+  const deletedDataStudy = (data) => {
+    setDeletedData(data)
   }
 
   return (
@@ -266,7 +290,15 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 setSelectedStudies={setSelectedStudies}
               />
             )}
-            {currentTab === 3 && <StudiesList title={null} researcher={researcher} studies={studies} />}
+            {currentTab === 3 && (
+              <StudiesList
+                title={null}
+                researcher={researcher}
+                studies={studies}
+                upatedDataStudy={upatedDataStudy}
+                deletedDataStudy={deletedDataStudy}
+              />
+            )}
           </ResponsivePaper>
         )}
       </Container>

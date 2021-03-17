@@ -39,7 +39,13 @@ const useStyles = makeStyles((theme) => ({
     zIndex: 111111,
     color: "#fff",
   },
-  addNewDialog: { maxWidth: 500 },
+  addNewDialog: {
+    maxWidth: 500,
+    [theme.breakpoints.up("sm")]: {
+      maxWidth: "auto",
+      minWidth: 400,
+    },
+  },
   closeButton: {
     position: "absolute",
     right: theme.spacing(1),
@@ -110,33 +116,52 @@ export default function PatientStudyCreator({
 
     fetchPostData(authString, authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
       let newStudyId = studyData.data
-      let uriStudyID = "?study_id=" + duplicateStudyName
       let newUriStudyID = "?study_id=" + newStudyId
-      Service.getDataByKey("studies", duplicateStudyName, "id").then((studyAllData: any) => {
-        let newStudyData = {
-          id: studyData.data,
-          name: studyName,
-          participants_count: studyAllData.length > 0 ? studyAllData[0].participants_count : 0,
-          activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
-          sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
-        }
 
-        Service.addData("studies", [newStudyData])
+      if (duplicateStudyName) {
+        Service.getDataByKey("studies", duplicateStudyName, "id").then((studyAllData: any) => {
+          let newStudyData = {
+            id: studyData.data,
+            name: studyName,
+            participants_count: studyAllData.length > 0 ? studyAllData[0].participants_count : 0,
+            activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
+            sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
+          }
 
-        fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
-          let filteredActivities = result.activities.filter(
-            (eachActivities) => eachActivities.study_id === duplicateStudyName
-          )
-          saveStudyData(filteredActivities, "activities")
-        })
+          Service.addData("studies", [newStudyData])
 
-        fetchResult(authString, authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
-          let filteredSensors = resultData.sensors.filter((eachSensors) => {
-            return eachSensors.study_id === newStudyId
+          fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
+            let filteredActivities = result.activities.filter(
+              (eachActivities) => eachActivities.study_id === duplicateStudyName
+            )
+            saveStudyData(filteredActivities, "activities")
           })
-          saveStudyData(filteredSensors, "sensors")
+
+          fetchResult(authString, authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
+            let filteredSensors = resultData.sensors.filter((eachSensors) => {
+              return eachSensors.study_id === newStudyId
+            })
+            saveStudyData(filteredSensors, "sensors")
+          })
+          let updatedNewStudy = newStudyData
+          if (createPatient) {
+            fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
+              if (results.studies[0].participants.length > 0) {
+                let filteredParticipants = results.studies[0].participants.filter(
+                  (eachParticipant) => eachParticipant.study_id === newStudyId
+                )
+                saveStudyData(filteredParticipants, "participants")
+              }
+              setLoading(false)
+            })
+            updatedNewStudy.participants_count = 1
+          } else {
+            setLoading(false)
+          }
+          closePopUp(1)
+          handleNewStudy(updatedNewStudy)
         })
-        let updatedNewStudy = newStudyData
+      } else {
         if (createPatient) {
           fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
             if (results.studies[0].participants.length > 0) {
@@ -146,14 +171,10 @@ export default function PatientStudyCreator({
               saveStudyData(filteredParticipants, "participants")
             }
             setLoading(false)
+            closePopUp(1)
           })
-          updatedNewStudy.participants_count = 1
-        } else {
-          setLoading(false)
         }
-        closePopUp(1)
-        handleNewStudy(updatedNewStudy)
-      })
+      }
     })
   }
 
@@ -227,7 +248,6 @@ export default function PatientStudyCreator({
             ))}
           </TextField>
         </Box>
-
         <Box ml={-1}>
           <Checkbox
             checked={createPatient}

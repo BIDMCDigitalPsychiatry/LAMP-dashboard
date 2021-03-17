@@ -97,14 +97,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({
-  researcher,
-  studies,
-  addedParticipant,
-  handleNewStudy,
-  setParticipants,
-  ...props
-}) {
+export default function AddButton({ researcher, studies, setUpdateCount, setParticipants, ...props }) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
@@ -113,7 +106,7 @@ export default function AddButton({
   // const [closePopUp, setClosePopUp] = useState(false)
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
   const handleNewStudyData = (data) => {
-    handleNewStudy(data)
+    setUpdateCount(1)
     setParticipants()
   }
 
@@ -191,13 +184,11 @@ export default function AddButton({
         open={addStudy}
         onClose={() => setAddStudy(false)}
         handleNewStudy={handleNewStudyData}
-        addedParticipant={addedParticipant}
         closePopUp={handleClosePopUp}
       />
       <AddUser
         researcher={researcher}
         studies={studies}
-        addedParticipant={addedParticipant}
         open={addUser}
         onClose={() => setAddUser(false)}
         handleNewStudy={handleNewStudyData}

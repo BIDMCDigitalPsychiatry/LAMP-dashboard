@@ -37,11 +37,13 @@ export default function PatientProfile({
   participant,
   studies,
   onClose,
+  setUpdateCount,
   ...props
 }: {
   participant: any
   studies: any
   onClose: Function
+  setUpdateCount: Function
 }) {
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
@@ -78,6 +80,7 @@ export default function PatientProfile({
               onClose(name)
             }}
             studies={studies}
+            setUpdateCount={setUpdateCount}
           />
         </Box>
       </ResponsiveDialog>

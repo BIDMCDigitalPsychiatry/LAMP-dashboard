@@ -41,7 +41,16 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-export default function PatientProfile({ participant, studies, ...props }: { participant: any; studies: any }) {
+export default function PatientProfile({
+  participant,
+  studies,
+  setUpdateCount,
+  ...props
+}: {
+  participant: any
+  studies: any
+  setUpdateCount: Function
+}) {
   const classes = useStyles()
   const [activities, setActivities] = useState([])
   const { t } = useTranslation()
@@ -89,12 +98,17 @@ export default function PatientProfile({ participant, studies, ...props }: { par
             studies={studies}
             studyId={participant.study_id}
             setActivities={onChangeActivities}
+            setUpdateCount={setUpdateCount}
           />
         </Box>
       </Box>
       {selectedActivities.length > 0 && (
         <Box className={classes.optionsMain}>
-          <DeleteActivity activities={selectedActivities} setActivities={onChangeActivities} />
+          <DeleteActivity
+            activities={selectedActivities}
+            setActivities={onChangeActivities}
+            setUpdateCount={setUpdateCount}
+          />
         </Box>
       )}
       <Grid container spacing={0}>

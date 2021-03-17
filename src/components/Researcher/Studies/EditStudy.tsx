@@ -225,7 +225,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function EditStudy({ study, ...props }) {
+export default function EditStudy({ study, upatedDataStudy, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -242,6 +242,7 @@ export default function EditStudy({ study, ...props }) {
     let oldNameArray = Object.assign({}, studyArray)
     oldNameArray[editStudyName] = data
     setStudyNameArray(oldNameArray)
+    upatedDataStudy(oldNameArray)
   }
 
   // Parent Component
