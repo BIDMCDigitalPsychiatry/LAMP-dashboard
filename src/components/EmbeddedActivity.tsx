@@ -15,14 +15,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 const demoActivities = {
-  "Balloon Risk": "balloonrisk",
   "lamp.spatial_span": "boxgame",
   "lamp.cats_and_dogs": "catsndogs",
   "Dot Touch": "dottouch",
   "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
-  "Pop The Bubbles": "popthebubbles",
   "lamp.dbt_diary_card": "dbtdiarycard",
+  "lamp.balloon_risk": "balloonrisk",
+  "lamp.pop_the_bubbles": "popthebubbles",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
