@@ -42,19 +42,18 @@ export default function Sensors({ participant, studies, ...props }: { participan
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const [selectedSensors, setSelectedSensors] = useState([])
-
-  const addedSensor = (data) => {
-    // addSensorItem(data, studies)
-    setSensors((prevState) => [...prevState, data])
-  }
+  // const addedSensor = (data) => {
+  //   // addSensorItem(data, studies)
+  //   setSensors((prevState) => [...prevState, data])
+  // }
 
   const onChangeSensors = () => {
     ;(async () => {
-      Service.getAll("sensors").then((sensors) => {
-        let data = (sensors || []).filter((i) => i.study_id === participant.study_id)
-        setSensors(sortData(data, [studies.filter((study) => study.id === participant.study_id)[0]?.name], "id"))
+      Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
+        setSensors(sortData(sensors, [participant.study_name], "id"))
       })
     })()
+    setSelectedSensors([])
   }
 
   useEffect(() => {
@@ -88,12 +87,22 @@ export default function Sensors({ participant, studies, ...props }: { participan
           </Typography>
         </Box>
         <Box className={classes.secAdd}>
-          <AddSensor studies={studies} addedSensor={addedSensor} studyId={participant.study_id} />
+          <AddSensor
+            studies={studies}
+            //  addedSensor={addedSensor}
+            studyId={participant.study_id}
+            setSensors={onChangeSensors}
+          />
         </Box>
       </Box>
       {selectedSensors.length > 0 && (
         <Box className={classes.optionsMain}>
-          <DeleteSensor sensors={selectedSensors} newDeletedIds={deleteSensors} setSensors={onChangeSensors} />
+          <DeleteSensor
+            sensors={selectedSensors}
+            selectedStudyArray={() => {}}
+            newDeletedIds={deleteSensors}
+            setSensors={onChangeSensors}
+          />
         </Box>
       )}
 
@@ -127,6 +136,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
                 index={index}
                 studyId={participant.study_id}
                 handleSelected={handleSensorSelected}
+                setSensors={onChangeSensors}
               />
             )
           })}

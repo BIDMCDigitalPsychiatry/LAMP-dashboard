@@ -213,6 +213,7 @@ export default function SensorRow({
   studies,
   handleSelected,
   studyId,
+  setSensors,
   ...props
 }: {
   sensor: any
@@ -220,6 +221,7 @@ export default function SensorRow({
   studies: any
   handleSelected: Function
   studyId?: string
+  setSensors?: Function
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
@@ -250,7 +252,7 @@ export default function SensorRow({
           </Typography>
         </Grid>
         <Grid item className={classes.w120}>
-          <UpdateSensor sensor={sensor} studies={studies} type="profile" studyId={studyId} />
+          <UpdateSensor sensor={sensor} studies={studies} type="profile" studyId={studyId} setSensors={setSensors} />
         </Grid>
       </Grid>
     </Box>

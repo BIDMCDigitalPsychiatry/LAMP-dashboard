@@ -1,9 +1,9 @@
 import { Service } from "../DBService/DBService"
 import demo_db from "../../demo_db.json"
-
 // async function fetchResult(authString, id, type, modal) {
 export const fetchResult = async (authString, id, type, modal) => {
-  const baseUrl = "https://api-staging.lamp.digital"
+  //const baseUrl = "https://lampv2.zcodemo.com:9093" //"https://api-staging.lamp.digital"
+  const baseUrl = "https://api-staging.lamp.digital" //
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
@@ -16,7 +16,8 @@ export const fetchResult = async (authString, id, type, modal) => {
   return result
 }
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
-  const baseUrl = "https://api-staging.lamp.digital"
+  //const baseUrl = "https://lampv2.zcodemo.com:9093" // "https://api-staging.lamp.digital"
+  const baseUrl = "https://api-staging.lamp.digital" //
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
@@ -30,29 +31,17 @@ export const fetchPostData = async (authString, id, type, modal, methodType, bod
   return result
 }
 const saveStudiesAndParticipants = (result) => {
-  const studies = result.studies.map(({ id, name, participants_count }) => ({ id, name, participants_count }))
+  const studies = result.studies.map(({ id, name, participant_count }) => ({ id, name, participant_count }))
   let participants = []
   result.studies.map((study) => {
-    let each = study.participants
-    if (each.length > 0) {
-      participants = participants.concat([
-        Object.assign(
-          {},
-          ...each.map((item) => ({
-            study_name: study.name,
-            study_id: study.id,
-            id: item.id,
-          }))
-        ),
-      ])
-    }
+    participants = participants.concat(study.participants)
   })
   Service.addData("studies", studies)
   Service.addData("participants", participants)
 }
-
 export const saveStudyData = (result, type) => {
   Service.update("studies", result, type === "activities" ? "activity_count" : "sensor_count", "study_id")
+  console.log(result[type])
   Service.addData(type, result[type])
 }
 
@@ -78,7 +67,7 @@ export const saveDemoData = () => {
         { participants_count: 1, sensor_count: demo_db.Sensor.length, activity_count: demo_db.Activity.length },
       ],
     },
-    ["sensor_count", "activity_count", "participants_count"]
+    ["sensor_count", "activity_count", "participant_count"]
   )
 }
 

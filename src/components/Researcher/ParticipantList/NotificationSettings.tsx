@@ -13,7 +13,20 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "#E9F8E7",
     color: "#FFF",
   },
-  switchLabel: { color: "#4C66D6" },
+  switchLabel: { color: "#4C66D6", marginRight: 0 },
+  switchChecked: { color: "#7599FF !important" },
+  switchBase: {
+    "&$checked": {
+      color: "#7599FF",
+    },
+    "&$checked + $track": {
+      color: "#333",
+      background: "#7599FF",
+    },
+  },
+  checked: {},
+  track: {},
+  m0: { margin: 0 },
 }))
 
 export default function NotificationSettings({ participant, ...props }) {
@@ -47,16 +60,22 @@ export default function NotificationSettings({ participant, ...props }) {
     <Tooltip title={t("Notification")}>
       {setting === undefined || (!!setting && setting?.notification === true) || setting === "" ? (
         <FormControlLabel
+          className={classes.m0}
           control={
             <Switch
               checked={true}
+              classes={{
+                root: classes.switchLabel,
+                switchBase: classes.switchBase,
+                track: classes.track,
+                checked: classes.checked,
+              }}
               onChange={(event) => {
                 saveIndividualUserSettings(participant.id, event.target.checked)
               }}
             />
           }
           label=""
-          className={classes.switchLabel}
         />
       ) : (
         <FormControlLabel

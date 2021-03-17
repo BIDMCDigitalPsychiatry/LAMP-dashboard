@@ -104,12 +104,12 @@ export default function JournalCreator({
 }: {
   activities?: any
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   activitySpecId?: string
   details?: any
   studies?: any
-  study?: any
+  study?: string
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()

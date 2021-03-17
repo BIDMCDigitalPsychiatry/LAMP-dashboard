@@ -78,7 +78,6 @@ export default function Header({
   selectedActivities,
   searchData,
   setSelectedStudies,
-  addedActivity,
   selectedStudies,
   setActivities,
   ...props
@@ -130,7 +129,7 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddActivity activities={activities} studies={studies} studyId={null} addedActivity={addedActivity} />
+          <AddActivity activities={activities} studies={studies} studyId={null} setActivities={setActivities} />
         </Box>
       </Box>
 

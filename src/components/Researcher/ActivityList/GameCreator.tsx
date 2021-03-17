@@ -1,22 +1,6 @@
 // Core Imports
-import React, { useState, useCallback } from "react"
-import { useDropzone } from "react-dropzone"
-
-import {
-  Box,
-  Tooltip,
-  Typography,
-  Grid,
-  Fab,
-  Divider,
-  MenuItem,
-  Icon,
-  TextField,
-  ButtonBase,
-  Container,
-  Backdrop,
-  CircularProgress,
-} from "@material-ui/core"
+import React, { useState } from "react"
+import { Grid, Container, Backdrop, CircularProgress } from "@material-ui/core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
@@ -65,52 +49,6 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-    unableContainer: {
-      width: 24,
-      height: 24,
-      border: "3px solid #BFBFBF",
-      borderRadius: 12,
-      boxSizing: "border-box",
-      marginRight: 17,
-      opacity: 0.4,
-    },
-    unableCheck: {
-      fontSize: 14,
-      color: "rgba(0, 0, 0, 0.4)",
-      flex: 1,
-      opacity: 0.4,
-    },
-    uncheckContainer: {
-      width: 24,
-      height: 24,
-      border: "3px solid #C6C6C6",
-      borderRadius: 12,
-      boxSizing: "border-box",
-      arginRight: 17,
-    },
-    checkedContainer: {
-      width: 24,
-      height: 24,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#2F9D7E",
-      borderRadius: 12,
-      marginRight: 17,
-    },
-    titleChecked: {
-      fontSize: 14,
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: "bold",
-      flex: 1,
-    },
-    titleUncheck: {
-      fontSize: 14,
-      color: "rgba(0, 0, 0, 0.4)",
-      flex: 1,
-    },
-    mL14: {
-      marginLeft: "14px",
-    },
   })
 )
 
@@ -127,12 +65,12 @@ export default function GameCreator({
 }: {
   activities?: any
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   activitySpecId?: string
   details?: any
   studies?: any
-  study?: any
+  study?: string
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -289,7 +227,6 @@ export default function GameCreator({
       )
     }
   }
-
   const handleChange = (details) => {
     setData({
       id: value?.id ?? undefined,
@@ -304,9 +241,10 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    setData({ ...data, [settings]: settingsData })
+    setData({ ...data, settings: settingsData })
     setSettings(settingsData)
   }
+
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -321,7 +259,12 @@ export default function GameCreator({
             activitySpecId={activitySpecId}
             study={data.studyID}
             onChange={handleChange}
-            image={Jewels}
+            image={
+              (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
+              ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
+                ? Jewels
+                : null
+            }
           />
 
           {((value?.spec && "lamp.balloon_risk" === value.spec) || "lamp.balloon_risk" === activitySpecId) && (

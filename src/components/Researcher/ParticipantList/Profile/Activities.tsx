@@ -46,14 +46,16 @@ export default function PatientProfile({ participant, studies, ...props }: { par
   const [activities, setActivities] = useState([])
   const { t } = useTranslation()
   const [selectedActivities, setSelectedActivities] = useState([])
+
   const onChangeActivities = () => {
     ;(async () => {
-      Service.getAll("activities").then((activities) => {
-        let data = (activities || []).filter((i) => i.study_id === participant.study_id)
-        setActivities(sortData(data, [studies.filter((study) => study.id === participant.study_id)[0]?.name], "id"))
+      Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
+        setActivities(sortData(activities, [participant.study_name], "id"))
       })
     })()
+    setSelectedActivities([])
   }
+
   const addedActivity = (data) => {
     addActivity(data)
     setActivities((prevState) => [...prevState, data])
@@ -86,7 +88,7 @@ export default function PatientProfile({ participant, studies, ...props }: { par
             activities={activities}
             studies={studies}
             studyId={participant.study_id}
-            addedActivity={addedActivity}
+            setActivities={onChangeActivities}
           />
         </Box>
       </Box>
@@ -98,7 +100,7 @@ export default function PatientProfile({ participant, studies, ...props }: { par
       <Grid container spacing={0}>
         <Grid item xs={12} sm={12}>
           <Box p={1}>
-            {activities.length > 0 ? (
+            {(activities ?? []).length > 0 ? (
               <Grid container>
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
@@ -130,7 +132,7 @@ export default function PatientProfile({ participant, studies, ...props }: { par
                 studies={studies}
                 index={index}
                 handleSelected={handleActivitySelected}
-                setActivities={setActivities}
+                setActivities={onChangeActivities}
               />
             )
           })}

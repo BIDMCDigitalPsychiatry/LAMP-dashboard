@@ -253,36 +253,25 @@ export default function UpdateSensor({
   studies,
   sensor,
   type,
-  updatedData,
   studyId,
+  setSensors,
   ...props
 }: {
   studies?: Array<Object>
   sensor?: Sensors
   type?: string
-  updatedData?: Function
   studyId?: string
+  setSensors?: Function
 }) {
   const classes = useStyles()
-  const [selectedItem, setSelectedItem] = useState(null)
   const [confirmationDialog, setConfirmationDialog] = React.useState(0)
   const [sensorDialog, setSensorDialog] = useState(false)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
 
-  const updatedNewData = (data) => {
-    updatedData(data)
+  const addOrUpdateSensor = (sensor?: any) => {
     setSensorDialog(false)
-    setSelectedItem(null)
-  }
-
-  const deleteSensor = async (sensorId) => {
-    await LAMP.Sensor.delete(sensorId)
-    Service.delete("sensors", [sensorId])
-    enqueueSnackbar(t("Successfully deleted the sensor."), {
-      variant: "success",
-    })
-    updatedData({ id: sensorId, fn_type: "delete" })
+    setSensors()
   }
 
   const confirmAction = (val) => {
@@ -300,7 +289,6 @@ export default function UpdateSensor({
         // classes={{ root: classes.btnBlue + " " + classes.popexpand }}
         classes={{ root: classes.btnWhite }}
         onClick={() => {
-          setSelectedItem(sensor)
           // type === "profile" ? setConfirmationDialog(1) : setSensorDialog(true)
           //setConfirmationDialog(1)
           setSensorDialog(true)
@@ -315,13 +303,14 @@ export default function UpdateSensor({
         confirmAction={confirmAction}
       />
       <SensorDialog
-        sensor={selectedItem}
+        sensor={sensor}
         onClose={() => setSensorDialog(false)}
         studies={studies}
         open={sensorDialog}
-        newData={updatedNewData}
+        //newData={updatedNewData}
         type="edit"
         studyId={studyId ?? null}
+        addOrUpdateSensor={addOrUpdateSensor}
       />
     </Box>
   )

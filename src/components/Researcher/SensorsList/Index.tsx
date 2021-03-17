@@ -20,13 +20,8 @@ import {
   ButtonBase,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import MaterialTable, { MTableToolbar } from "material-table"
-import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, withStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-import { ReactComponent as DeleteIcon } from "../icons/DeleteBlue.svg"
-import { ReactComponent as RenameIcon } from "../icons/RenameBlue.svg"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
-import AddSensor from "./AddSensor"
+
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import SensorListItem from "./SensorListItem"
@@ -288,6 +283,9 @@ const useStyles = makeStyles((theme) =>
       color: "rgba(0, 0, 0, 0.75)",
       marginTop: 30,
     },
+    norecords: {
+      "& span": { marginRight: 5 },
+    },
   })
 )
 export default function SensorsList({
@@ -316,25 +314,21 @@ export default function SensorsList({
     setLoading(true)
   }, [])
 
-  const updatedSensor = (data) => {
-    if (data.fn_type === "update") {
-      let dataSensors = [...sensors]
-      let index = dataSensors.findIndex((obj) => obj.id === data.id)
-      dataSensors[index].name = data.name
-      dataSensors[index].spec = data.spec
-      setSensors(dataSensors)
-    } else {
-      setSensors((prevState) => {
-        const tasks = prevState.filter((eachSensor) => eachSensor.id !== data.id)
-        return tasks
-      })
-    }
-  }
-  const addedSensor = (data) => {
-    if (selectedStudies.includes(data.study_name)) {
-      setSensors((prevState) => [...prevState, data])
-    }
-  }
+  // const updatedSensor = (data) => {
+  //   if (data.fn_type === "update") {
+  //     let dataSensors = [...sensors]
+  //     let index = dataSensors.findIndex((obj) => obj.id === data.id)
+  //     dataSensors[index].name = data.name
+  //     dataSensors[index].spec = data.spec
+  //     setSensors(dataSensors)
+  //     searchFilterSensors()
+  //   } else {
+  //     setSensors((prevState) => {
+  //       const tasks = prevState.filter((eachSensor) => eachSensor.id !== data.id)
+  //       return tasks
+  //     })
+  //   }
+  // }
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -342,13 +336,6 @@ export default function SensorsList({
     } else {
       let selected = selectedSensors.filter((item) => item.id != sensorData.id)
       setSelectedSensors(selected)
-    }
-  }
-
-  const handleDeleted = (val) => {
-    if (val.length > 0) {
-      let newSensors = sensors.filter((i) => !val.includes(i.id))
-      setSensors(newSensors)
     }
   }
 
@@ -373,10 +360,11 @@ export default function SensorsList({
         setLoading(false)
       })
     } else if (!!search && search !== "") {
-      let newSensors = sensors.filter((i) => i.name.includes(search))
-      setSensors(sortData(newSensors, selectedStudies, "name"))
+      let newSensors = sensors.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+      setSensors(sortData(newSensors, studies, "id"))
       setLoading(false)
     }
+    setSelectedSensors([])
   }
 
   const handleSearchData = (val) => {
@@ -392,8 +380,6 @@ export default function SensorsList({
         studies={studies}
         researcher={researcher}
         selectedSensors={selectedSensors}
-        newDeletedIds={handleDeleted}
-        addedSensor={addedSensor}
         searchData={handleSearchData}
         setSelectedStudies={setSelectedStudies}
         selectedStudies={selectedStudies}
@@ -403,19 +389,22 @@ export default function SensorsList({
         <Grid container spacing={3}>
           {sensors !== null && sensors.length > 0 ? (
             (sensors ?? []).map((item, index) => (
-              <Grid item lg={6} xs={12}>
+              <Grid item lg={6} xs={12} key={item.id}>
                 <SensorListItem
                   sensor={item}
                   studies={studies}
-                  updatedSensor={updatedSensor}
                   handleSelectionChange={handleChange}
                   selectedSensors={selectedSensors}
+                  setSensors={searchFilterSensors}
                 />
               </Grid>
             ))
           ) : (
             <Grid item lg={6} xs={12}>
-              {t("No Records Found")}
+              <Box display="flex" alignItems="center" className={classes.norecords}>
+                <Icon>info</Icon>
+                {t("No Records Found")}
+              </Box>
             </Grid>
           )}
         </Grid>

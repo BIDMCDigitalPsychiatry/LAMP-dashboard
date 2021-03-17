@@ -36,7 +36,6 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
   const { t } = useTranslation()
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
-
   let deleteParticipants = async (status) => {
     if (status === "Yes") {
       const participantIds = participants.map((p) => {
@@ -54,7 +53,6 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
     setParticipants()
     setConfirmationDialog(0)
   }
-
   return (
     <span>
       <Fab

@@ -27,17 +27,13 @@ import {
   FormControlLabel,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import MaterialTable, { MTableToolbar } from "material-table"
-import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-import { ReactComponent as DeleteIcon } from "../../../icons/DeleteBlue.svg"
-import { ReactComponent as RenameIcon } from "../../../icons/RenameBlue.svg"
 import Header from "./Header"
-
 import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
+
 const theme = createMuiTheme({
   palette: {
     secondary: {

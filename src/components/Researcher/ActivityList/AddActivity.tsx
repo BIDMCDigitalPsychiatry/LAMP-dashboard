@@ -97,7 +97,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddActivity({ activities, studies, studyId, addedActivity, ...props }) {
+export default function AddActivity({ activities, studies, studyId, setActivities, ...props }) {
   const [activitySpecs, setActivitySpecs] = useState([])
   const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
@@ -138,6 +138,7 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
       <Popover
         open={!!popover ? true : false}
         anchorPosition={!!popover && popover.getBoundingClientRect()}
+        anchorReference="anchorPosition"
         classes={{ root: classes.customPopover, paper: classes.customPaper }}
         onClose={() => setPopover(null)}
         anchorOrigin={{
@@ -230,8 +231,8 @@ export default function AddActivity({ activities, studies, studyId, addedActivit
               studyId={studyId ?? undefined}
               activitySpecId={activitySpecId}
               studies={studies}
-              addedActivity={addedActivity}
               onClose={() => setCreate(false)}
+              setActivities={setActivities}
             />
           )}
         </Box>

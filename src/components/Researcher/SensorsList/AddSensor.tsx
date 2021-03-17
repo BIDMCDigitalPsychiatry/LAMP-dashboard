@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Box, Fab, Icon } from "@material-ui/core"
 import LAMP, { Study } from "lamp-core"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import SensorDialog from "./SensorDialog"
@@ -265,7 +265,6 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-
 export function addSensorItem(x, studies) {
   Service.updateCount("studies", x.studyID, "sensor_count")
   x["study_id"] = x.studyID
@@ -275,24 +274,23 @@ export function addSensorItem(x, studies) {
 }
 export default function AddSensor({
   studies,
-  addedSensor,
   studyId,
   setSensors,
   ...props
 }: {
   studies?: Array<Object>
-  addedSensor?: Function
   studyId?: string
   setSensors?: Function
 }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
-  const addNewData = (data) => {
-    addedSensor(data)
-    setSensors()
+
+  const addOrUpdateSensor = (sensor?: any) => {
     setSensorDialog(false)
+    setSensors()
   }
+
   return (
     <Box>
       <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
@@ -302,9 +300,9 @@ export default function AddSensor({
         studies={studies}
         onClose={() => setSensorDialog(false)}
         open={sensorDialog}
-        newData={addNewData}
         type="add"
         studyId={studyId ?? null}
+        addOrUpdateSensor={addOrUpdateSensor}
       />
     </Box>
   )

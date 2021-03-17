@@ -18,6 +18,7 @@ import {
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
+import { Service } from "./DBService/DBService"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
@@ -25,7 +26,6 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import { Service } from "./DBService/DBService"
 import Participant from "./Participant"
 import { useWorker } from "@koale/useworker"
 import { saveDataToCache } from "./Researcher/SaveResearcherData"
@@ -86,7 +86,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
-
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -140,10 +139,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
-        ;(async () => {
-          // !!mode ? demoWorker() : dataWorker(state.id + ":" + state.password, res.identity.id)
-          !!mode ? await saveDemoData() : await saveDataToCache(state.id + ":" + state.password, res.identity.id)
-        })()
+        Service.deleteDB()
         setLoginClick(false)
         onComplete()
       })

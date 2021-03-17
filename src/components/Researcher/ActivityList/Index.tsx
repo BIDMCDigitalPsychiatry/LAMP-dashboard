@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Backdrop, CircularProgress } from "@material-ui/core"
+import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Service } from "../../DBService/DBService"
 import LAMP from "lamp-core"
@@ -27,6 +27,9 @@ const useStyles = makeStyles((theme: Theme) =>
         },
         "& button": { display: "none" },
       },
+    },
+    norecords: {
+      "& span": { marginRight: 5 },
     },
   })
 )
@@ -68,10 +71,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
     }
   }
 
-  const addedActivity = (data) => {
-    setActivities((prevState) => [...prevState, data])
-  }
-
   useEffect(() => {
     searchActivities()
   }, [selectedStudies])
@@ -93,11 +92,11 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         setLoading(false)
       })
     } else if (!!search && search !== "") {
-      let newActivities = activities.filter((i) => i.name?.includes(search))
-      setActivities(sortData(newActivities, studies, "name"))
+      let newActivities = activities.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+      setActivities(sortData(newActivities, studies, "id"))
       setLoading(false)
     }
-    setLoading(false)
+    setSelectedActivities([])
   }
 
   const handleSearchData = (val) => {
@@ -115,7 +114,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         activities={activities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
-        addedActivity={addedActivity}
         selectedStudies={selectedStudies}
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
@@ -132,12 +130,16 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                   activities={activities}
                   handleSelectionChange={handleChange}
                   selectedActivities={selectedActivities}
-                  setActivities={setActivities}
+                  setActivities={searchActivities}
+                  updateActivities={setActivities}
                 />
               </Grid>
             ))
           ) : (
-            <Box>{t("No records found")}</Box>
+            <Box display="flex" alignItems="center" className={classes.norecords}>
+              <Icon>info</Icon>
+              {t("No Records Found")}
+            </Box>
           )}
         </Grid>
       </Box>

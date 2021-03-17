@@ -206,12 +206,12 @@ export default function GameCreator({
 }: {
   activities?: any
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   activitySpecId?: string
   details?: any
   studies?: any
-  study?: any
+  study?: string
 }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(value ?? null)

@@ -26,7 +26,11 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
   const { t } = useTranslation()
 
   useEffect(() => {
-    updateSettings({ ...settings, mode: modes[0].value, variant: variants[0].value })
+    updateSettings({
+      ...settings,
+      mode: settings.mode ?? modes[0].value,
+      variant: settings.variant ?? variants[0].value,
+    })
   }, [])
 
   return (

@@ -101,7 +101,6 @@ class DBService {
         // Do something?
       })
   }
-
   getDataByKey(tablespace: string, search: Array<string>, key: string) {
     let results = []
     return dbPromise

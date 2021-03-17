@@ -21,24 +21,30 @@ const manyDates = (items) =>
         .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
-
 export default function ActivityScheduler({ activity, activities, setActivities, ...props }) {
   const [schedule, setSchedule] = useState(activity?.schedule ?? [])
   const { t } = useTranslation()
-  const updateActivitySchedule = async (activity, x) => {
-    updateSchedule(activity, x)
+
+  const updateActivitySchedule = async (activity, x, type) => {
     let index = -1
     const filteredActivity = activities.find((item, i) => {
       if (item.id === activity.id) {
         index = i
-        return i
+        return item
       }
     })
-    filteredActivity["schedule"] = schedule
+    if (type === "add") {
+      filteredActivity["schedule"] = filteredActivity["schedule"].concat(x)
+    } else if (type == "edit" || type === "delete") {
+      filteredActivity["schedule"] = x
+    }
+    setSchedule(filteredActivity["schedule"])
+    updateSchedule(filteredActivity)
     let data = activities
     data[index] = filteredActivity
     setActivities(data)
   }
+
   return (
     <MuiThemeProvider theme={theme}>
       <MaterialTable
@@ -126,19 +132,19 @@ export default function ActivityScheduler({ activity, activities, setActivities,
         editable={{
           onRowAdd: async (newData) => {
             setSchedule([...schedule, newData])
-            updateActivitySchedule(activity, newData)
+            updateActivitySchedule(activity, newData, "add")
           },
           onRowUpdate: async (newData, oldData: any) => {
             let x = Array.from(schedule) // clone
             x[oldData.tableData.id] = newData
             setSchedule(x)
-            updateActivitySchedule(activity, x)
+            updateActivitySchedule(activity, x, "edit")
           },
           onRowDelete: async (oldData: any) => {
             let x = Array.from(schedule) // clone
             x.splice(oldData.tableData.id, 1)
             setSchedule(x)
-            updateActivitySchedule(activity, x)
+            updateActivitySchedule(activity, x, "delete")
           },
         }}
         localization={{

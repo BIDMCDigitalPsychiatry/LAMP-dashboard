@@ -6,8 +6,6 @@ import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"
 import { useTranslation } from "react-i18next"
-import { updateSchedule } from "../../ActivityList/ActivityMethods"
-
 const useStyles = makeStyles((theme) =>
   createStyles({
     rowContainer: {
@@ -88,7 +86,7 @@ export default function ActivityRow({
           </Typography>
         </Grid>
         <Grid item className={classes.w120}>
-          <UpdateActivity activity={activity} activities={activities} studies={studies} />
+          <UpdateActivity activity={activity} activities={activities} studies={studies} setActivities={setActivities} />
           <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
         </Grid>
       </Grid>

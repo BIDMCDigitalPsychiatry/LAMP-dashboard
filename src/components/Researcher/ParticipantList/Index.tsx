@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Backdrop, CircularProgress } from "@material-ui/core"
+import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -30,6 +30,9 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: 111111,
       color: "#fff",
+    },
+    norecords: {
+      "& span": { marginRight: 5 },
     },
   })
 )
@@ -125,6 +128,9 @@ export default function ParticipantList({
   const { t } = useTranslation()
 
   const addedParticipant = (data) => {
+    console.log(5501, data)
+    console.log(5502, participants)
+    console.log(5503, studies)
     if (selectedStudies.includes(data.study_name)) {
       setParticipants((prevState) => [...prevState, data])
     }
@@ -167,7 +173,7 @@ export default function ParticipantList({
       setParticipants(sortData(newParticipants, studies, "id"))
       setLoading(false)
     }
-    setLoading(false)
+    setSelectedParticipants([])
   }
 
   const handleSearchData = (val) => {
@@ -204,7 +210,10 @@ export default function ParticipantList({
               </Grid>
             ))
           ) : (
-            <Box>{t("No records found")}</Box>
+            <Box display="flex" alignItems="center" className={classes.norecords}>
+              <Icon>info</Icon>
+              {t("No Records Found")}
+            </Box>
           )}
         </Grid>
       </Box>

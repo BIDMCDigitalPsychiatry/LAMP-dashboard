@@ -98,12 +98,12 @@ export default function BreatheCreator({
 }: {
   activities?: any
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   activitySpecId?: string
   details?: any
   studies?: any
-  study?: any
+  study?: string
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -129,7 +129,6 @@ export default function BreatheCreator({
     settings: !!value ? value?.settings : { threshold: 80 },
     studyID: !!value ? value.study_id : study,
   })
-
   const validate = () => {
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {

@@ -69,7 +69,6 @@ const reorder = (list, startIndex, endIndex) => {
   result.splice(endIndex, 0, removed)
   return result
 }
-
 function ActivitySelector({ activities, selected, onSave, onDelete, index, ...props }) {
   const [_selected, setSelected] = useState(!!selected ? activities.filter((x) => x?.id === selected)[0] ?? null : null)
   const [anchorEl, setAnchorEl] = useState<Element>()
@@ -179,9 +178,9 @@ export default function GroupCreator({
   activities?: any[]
   value?: any
   details?: any
-  onSave?: any
+  onSave?: Function
   studies: any
-  study?: any
+  study?: string
 }) {
   const classes = useStyles()
   const [text, setText] = useState(!!value ? value.name : undefined)

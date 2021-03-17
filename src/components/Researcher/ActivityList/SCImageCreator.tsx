@@ -104,12 +104,12 @@ export default function SCImageCreator({
 }: {
   activities?: any
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   activitySpecId?: string
   details?: any
   studies?: any
-  study?: any
+  study?: string
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
@@ -208,7 +208,7 @@ export default function SCImageCreator({
                     min: 30,
                   }}
                   onChange={(e) => updateSettings(Number(e.target.value))}
-                  helperText={settings.threshold > 100 ? t("Maximum value is number", { number: 90 }) : ""}
+                  helperText={settings.threshold > 90 ? t("Maximum value is number", { number: 90 }) : ""}
                 />
               </Box>
             </Grid>

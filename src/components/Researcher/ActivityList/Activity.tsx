@@ -14,6 +14,7 @@ import {
   saveTipActivity,
   saveSurveyActivity,
   saveCTestActivity,
+  addActivity,
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -37,14 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export function addActivity(x, studies) {
-  Service.updateCount("studies", x.studyID, "activity_count")
-  x["study_id"] = x.studyID
-  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
-  delete x["studyID"]
-  Service.addData("activities", [x])
-}
-
 export default function Activity({
   allActivities,
   activity,
@@ -54,8 +47,8 @@ export default function Activity({
   details,
   activitySpecId,
   studyId,
-  addedActivity,
   onClose,
+  setActivities,
   ...props
 }: {
   allActivities?: Array<JSON>
@@ -66,8 +59,8 @@ export default function Activity({
   details?: JSON
   activitySpecId?: string
   studyId?: string
-  addedActivity?: Function
   onClose?: Function
+  setActivities?: Function
 }) {
   const [loading, setLoading] = useState(false)
   const isTip = (activity || {}).spec === "lamp.tips" || activitySpecId === "lamp.tips"
@@ -135,6 +128,7 @@ export default function Activity({
   // Create a new Activity object that represents a cognitive test.
   const saveCTest = async (x) => {
     setLoading(true)
+    console.log(x)
     let newItem = await saveCTestActivity(x)
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new Activity."), {
@@ -152,7 +146,7 @@ export default function Activity({
 
   const updateDb = (x) => {
     addActivity(x, studies)
-    addedActivity(x)
+    setActivities()
     setLoading(false)
   }
 

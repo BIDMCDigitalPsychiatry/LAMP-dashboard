@@ -12,6 +12,8 @@ import {
   DialogContent,
   DialogActions,
   DialogProps,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -31,6 +33,10 @@ const useStyles = makeStyles((theme) => ({
   activityContent: {
     padding: "25px 50px 0",
   },
+  backdrop: {
+    zIndex: 111111,
+    color: "#fff",
+  },
   addNewDialog: { maxWidth: 350 },
   closeButton: {
     position: "absolute",
@@ -43,19 +49,26 @@ const useStyles = makeStyles((theme) => ({
 export default function StudyCreator({
   studies,
   researcher,
+  handleNewStudy,
+  closePopUp,
+  addedParticipant,
   ...props
 }: {
   studies: any
   researcher: any
+  handleNewStudy: Function
+  closePopUp: Function
+  addedParticipant: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
   const [duplicateCnt, setCount] = useState(0)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
+  const [loading, setLoading] = useState(false)
   const validate = () => {
-    return (
-      duplicateCnt == 0 ||
+    return !(
+      duplicateCnt > 0 ||
       typeof studyName === "undefined" ||
       (typeof studyName !== "undefined" && studyName?.trim() === "")
     )
@@ -71,28 +84,58 @@ export default function StudyCreator({
   }, [studyName])
 
   const createStudy = async (studyName: string) => {
+    setLoading(true)
     let study = new Study()
     study.name = studyName
-    LAMP.Study.create(researcher.id, study).then((res) => {
+    LAMP.Study.create(researcher.id, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
-      Service.addData("studies", [
-        { id: result.data, name: studyName, participants_count: 0, activity_count: 0, sensor_count: 0 },
-      ])
-      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
-        variant: "success",
-      })
+      let studiesData = { id: result.data, name: studyName, participant_count: 0, activity_count: 0, sensor_count: 0 }
+      Service.addData("studies", [studiesData])
+      let selectedStudy = result.data
+      let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
+      let id = typeof idData === "object" ? idData.id : idData
+      let newParticipant = []
+      if (typeof idData === "object") {
+        newParticipant = idData
+      } else {
+        newParticipant["id"] = idData
+      }
+      if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
+        enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
+      } else {
+        newParticipant["study_id"] = selectedStudy
+        newParticipant["study_name"] = studyName
+        Service.addData("participants", [newParticipant])
+        addedParticipant(newParticipant)
+        Service.updateCount("studies", selectedStudy, "participants_count")
+        enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+          variant: "success",
+        })
+      }
+      studiesData.participant_count = 1
+      handleNewStudy(studiesData)
+      closePopUp(2)
+      setStudyName("")
+      setLoading(false)
     })
   }
 
   return (
     <Dialog
       {...props}
+      onEnter={() => {
+        setStudyName("")
+      }}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
       classes={{ paper: classes.addNewDialog }}
     >
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <DialogTitle id="alert-dialog-slide-title">
+        <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
@@ -108,18 +151,26 @@ export default function StudyCreator({
           error={!validate()}
           autoFocus
           fullWidth
-          variant="filled"
+          variant="outlined"
           label={t("Name")}
-          defaultValue={studyName}
+          value={studyName}
           onChange={(e) => {
             setStudyName(e.target.value)
           }}
           inputProps={{ maxLength: 80 }}
-          helperText={duplicateCnt > 0 ? t("Unique name required") : ""}
+          helperText={duplicateCnt > 0 ? t("Unique name required") : !validate() ? t("Please enter name.") : ""}
         />
       </DialogContent>
       <DialogActions>
-        <Box textAlign="center" width={1} mt={3} mb={3}>
+        <Box textAlign="right" width={1} mt={3} mb={3}>
+          <Button
+            color="primary"
+            onClick={() => {
+              closePopUp(2)
+            }}
+          >
+            {t("Cancel")}
+          </Button>
           <Button
             onClick={() => {
               createStudy(studyName)

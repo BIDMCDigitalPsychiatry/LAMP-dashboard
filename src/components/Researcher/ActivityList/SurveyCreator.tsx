@@ -291,7 +291,6 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
     </Step>
   )
 }
-
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 export default function SurveyCreator({
   value,
@@ -303,10 +302,10 @@ export default function SurveyCreator({
   ...props
 }: {
   value?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   studies?: any
-  study?: any
+  study?: string
   details?: any
 }) {
   const classes = useStyles()
@@ -318,8 +317,8 @@ export default function SurveyCreator({
     name: !!value ? value.name : undefined,
     spec: "lamp.survey",
     schedule: [],
-    description: !!details ? details?.description : undefined,
-    photo: !!details ? details?.photo : null,
+    description: !!value ? value?.description : undefined,
+    photo: !!value ? value?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
   })
@@ -327,6 +326,7 @@ export default function SurveyCreator({
   const [isOptionNull, setIsOptionNull] = useState(0)
 
   useEffect(() => {
+    console.log(value, questions)
     setData({ ...data, settings: questions })
     let optionsArray = []
     {
@@ -383,7 +383,7 @@ export default function SurveyCreator({
             <ActivityHeader
               studies={studies}
               value={value}
-              details={value}
+              details={details}
               activitySpecId={null}
               study={data.studyID}
               onChange={handleChange}

@@ -5,8 +5,18 @@ import LAMP from "lamp-core"
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
 import { useSnackbar } from "notistack"
-import { Service } from "../../DBService/DBService"
 
+export interface NewStudy {
+  id?: string
+  study_name?: string
+}
+export interface Study {
+  id?: string
+  name?: string
+}
+export interface Researcher {
+  id?: string
+}
 export default function StudyFilterList({
   studies,
   researcher,
@@ -19,53 +29,41 @@ export default function StudyFilterList({
   selDeletedIds,
   selDeletedStudy,
   ...props
+}: {
+  studies?: Array<any>
+  researcher?: Researcher
+  type?: string
+  showFilterStudies?: Boolean
+  newAddedStudy?: NewStudy
+  newStudyObj?: any
+  setSelectedStudies?: Function
+  selectedStudies?: Array<string>
+  selDeletedIds?: Array<string>
+  selDeletedStudy?: Array<string>
 }) {
   const { t } = useTranslation()
   const [studiesCount, setStudiesCount] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyIds, setStudyIds] = useState([])
+
   useEffect(() => {
     let studiesData = filterStudyData(studies)
     setStudiesCount(studiesData)
   }, [studies])
 
   useEffect(() => {
-    if (selDeletedIds.length > 0) {
-      let studiesData = filterStudyData(studies)
-      let studyIdCounts = {}
-      selectedStudies.forEach((x) => (studyIdCounts[x] = (studyIdCounts[x] || 0) + 1))
-      let a1 = {}
-      let newStudies = studiesData
-      let studyKeys = Object.keys(studyIdCounts)
-    }
-  }, [selDeletedIds])
-
-  useEffect(() => {
-    console.log(4000, selDeletedStudy)
-
     if (selDeletedStudy.length > 0) {
       let studyIdCounts = {}
       selDeletedStudy.forEach((x) => (studyIdCounts[x] = (studyIdCounts[x] || 0) + 1))
-
-      console.log(901, studyIdCounts)
-
       let studiesData = filterStudyData(studies)
       let newStudies = studiesData
       let studyKeys = Object.keys(studyIdCounts)
       for (let [key, value] of Object.entries(studyIdCounts)) {
-        //console.log(733, key, value)
-
         if (studyKeys.includes(key)) {
-          //newStudies[key] = studyIdCounts[key] < 0 ? 0 : studiesData[key] - studyIdCounts[key]
           newStudies[key] = studyIdCounts[key] < 0 ? 0 : studiesData[key] - studyIdCounts[key]
         }
       }
-
-      console.log(734, newStudies)
-
       setStudiesCount(newStudies)
-
-      console.log(735, studiesCount)
     }
   }, [selDeletedStudy])
 
@@ -77,10 +75,29 @@ export default function StudyFilterList({
       setStudiesCount(studiesData)
     }
   }, [newAddedStudy])
-
+  /*
   useEffect(() => {
     if (newStudyObj !== null) {
       studies.push(newStudyObj)
+      let studiesData = filterStudyData(studies)
+      setStudiesCount(studiesData)
+    }
+  }, [newStudyObj])
+*/
+
+  useEffect(() => {
+    if (newStudyObj !== null) {
+      let studyIdArray = studies.map(function (obj) {
+        return obj.id
+      })
+      /*
+      if (!studyIdArray.includes(newStudyObj.id)) {
+        studies.push(newStudyObj)
+      }
+      */
+      studies.push(newStudyObj)
+      let studiesData = filterStudyData(studies)
+      setStudiesCount(studiesData)
     }
   }, [newStudyObj])
 
@@ -89,11 +106,7 @@ export default function StudyFilterList({
       {},
       ...dataArray.map((item) => ({
         [item.name]:
-          type === "activities"
-            ? item.activity_count
-            : type === "sensors"
-            ? item.sensor_count
-            : item.participants_count,
+          type === "activities" ? item.activity_count : type === "sensors" ? item.sensor_count : item.participant_count,
       }))
     )
   }

@@ -17,10 +17,13 @@ import StudiesList from "./Studies/Index"
 import { ResponsivePaper } from "../Utils"
 import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
+import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
+import { ReactComponent as Studies } from "../../icons/Study.svg"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
+import useInterval from "../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -116,26 +119,43 @@ export const sortData = (data, studies, key) => {
   })
   return result
 }
+
+export interface Study {
+  id?: string
+  name?: string
+  participant_count?: number
+  activity_count?: number
+  sensor_count?: number
+}
+
 export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
-
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const classes = useStyles()
   const { t } = useTranslation()
 
+  useInterval(
+    () => {
+      getDBStudies()
+    },
+    studies !== null && (studies || []).length > 0 ? null : 1000,
+    true
+  )
+
+  const getDBStudies = async () => {
+    let studies = await Service.getAll("studies")
+    setStudies(studies)
+    Service.getAll("researcher").then((data) => {
+      let researcherNotification = !!data ? data[0]?.notification ?? false : false
+      setNotification(researcherNotification)
+    })
+  }
+
   useEffect(() => {
-    ;(async () => {
-      let studies = await Service.getAll("studies")
-      setStudies(studies)
-      Service.getAll("researcher").then((data) => {
-        let researcherNotification = !!data ? data[0]?.notification ?? false : false
-        setNotification(researcherNotification)
-      })
-      setCurrentTab(0)
-    })()
+    setCurrentTab(0)
   }, [])
 
   useEffect(() => {
@@ -200,7 +220,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   onClick={(event) => setCurrentTab(2)}
                 >
                   <ListItemIcon className={classes.menuIcon}>
-                    <Icon>sensors</Icon>
+                    <Sensors />
                   </ListItemIcon>
                   <ListItemText primary={t("Sensors")} />
                 </ListItem>
@@ -211,7 +231,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   onClick={(event) => setCurrentTab(3)}
                 >
                   <ListItemIcon className={classes.menuIcon}>
-                    <Icon>ballot</Icon>
+                    <Studies />
                   </ListItemIcon>
                   <ListItemText primary={t("Studies")} />
                 </ListItem>

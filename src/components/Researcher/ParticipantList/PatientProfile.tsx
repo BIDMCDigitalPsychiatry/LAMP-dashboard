@@ -33,7 +33,16 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
-export default function PatientProfile({ participant, studies, ...props }: { participant: any; studies: any }) {
+export default function PatientProfile({
+  participant,
+  studies,
+  onClose,
+  ...props
+}: {
+  participant: any
+  studies: any
+  onClose: Function
+}) {
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
   const { t } = useTranslation()
@@ -62,7 +71,14 @@ export default function PatientProfile({ participant, studies, ...props }: { par
         </AppBar>
         <Divider />
         <Box py={8} px={4}>
-          <PatientProfilePage participant={participant} onClose={() => setProfileDialog(false)} studies={studies} />
+          <PatientProfilePage
+            participant={participant}
+            onClose={(name) => {
+              setProfileDialog(false)
+              onClose(name)
+            }}
+            studies={studies}
+          />
         </Box>
       </ResponsiveDialog>
     </Box>

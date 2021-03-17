@@ -19,7 +19,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "relative",
       borderRadius: 50,
       backgroundColor: "#F8F8F8",
-
       "&:hover": {
         backgroundColor: "#eee",
       },
@@ -58,7 +57,6 @@ const useStyles = makeStyles((theme: Theme) =>
     optionsMain: {
       background: "#ECF4FF",
       borderTop: "1px solid #C7C7C7",
-
       marginTop: 20,
       width: "99.4vw",
       position: "relative",
@@ -74,8 +72,6 @@ export default function Header({
   studies,
   researcher,
   selectedSensors,
-  newDeletedIds,
-  addedSensor,
   searchData,
   setSelectedStudies,
   selectedStudies,
@@ -86,8 +82,6 @@ export default function Header({
   studies?: Array<Object>
   researcher?: Object
   selectedSensors?: Array<Object>
-  newDeletedIds?: Function
-  addedSensor?: Function
   searchData?: Function
   setSelectedStudies?: Function
   selectedStudies: Array<string>
@@ -106,22 +100,20 @@ export default function Header({
   }
 
   const handleDeleted = (val) => {
-    console.log(271, val)
     setSelDeletedIds(val)
-    newDeletedIds(val)
+    //newDeletedIds(val)
   }
 
-  const addedDataSensor = (data) => {
-    setNewAddedStudy(data)
-    addedSensor(data)
-  }
+  // const addedDataSensor = (data) => {
+  //   setNewAddedStudy(data)
+  //   addedSensor(data)
+  // }
 
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
   }
 
   const handleSelectedStudyArray = (data) => {
-    console.log(131, data)
     setSelDeletedStudy(data)
   }
 
@@ -157,7 +149,7 @@ export default function Header({
           </div>
         </Box>
         <Box>
-          <AddSensor studies={studies} addedSensor={addedDataSensor} setSensors={setSensors} />
+          <AddSensor studies={studies} setSensors={setSensors} />
         </Box>
       </Box>
       {showFilterStudies && (

@@ -17,7 +17,7 @@ import ResponsiveDialog from "../../ResponsiveDialog"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import Activity from "./Activity"
-import { updateActivityData } from "./ActivityMethods"
+import { updateActivityData, addActivity, spliceActivity } from "./ActivityMethods"
 import { games } from "./Index"
 import { Service } from "../../DBService/DBService"
 
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function UpdateActivity({ activity, activities, studies, ...props }) {
+export default function UpdateActivity({ activity, activities, studies, setActivities, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [gameDetails, setGameDetails] = useState(null)
@@ -65,24 +65,34 @@ export default function UpdateActivity({ activity, activities, studies, ...props
         variant: "error",
       })
     else {
-      x["study_id"] = x.studyID
-      x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
-      delete x["studyID"]
-      Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
-      enqueueSnackbar(t("Successfully updated the Activity."), {
-        variant: "success",
-      })
+      if (isDuplicated) {
+        x["id"] = result.data
+        addActivity(x, studies)
+        enqueueSnackbar(t("Successfully duplicated the Activity."), {
+          variant: "success",
+        })
+      } else {
+        x["study_id"] = x.studyID
+        x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+        delete x["studyID"]
+        Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
+        enqueueSnackbar(t("Successfully updated the Activity."), {
+          variant: "success",
+        })
+      }
+      setActivities()
     }
     setSelectedActivity(undefined)
   }
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async (activity) => {
     let data = await LAMP.Activity.view(activity.id)
-    activity["settings"] = data.settings
+    activity.settings = data.settings
     if (activity.spec === "lamp.survey") {
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
+      activity = spliceActivity({ raw: activity, tag: tag })
       setGameDetails(tag)
     } else if (
       games.includes(activity.spec) ||
@@ -98,7 +108,6 @@ export default function UpdateActivity({ activity, activities, studies, ...props
     }
     setSelectedActivity(activity)
   }
-
   return (
     <span>
       <Fab

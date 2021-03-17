@@ -295,47 +295,43 @@ export interface Sensors {
 export default function SensorDialog({
   sensor,
   studies,
-  newData,
   studyId,
   type,
+  addOrUpdateSensor,
   ...props
 }: {
   sensor?: Sensors
   studies?: Array<any>
-  newData?: Function
   studyId?: string
   type?: string
+  addOrUpdateSensor?: Function
 } & DialogProps) {
   const classes = useStyles()
-  const [selectedStudy, setSelectedStudy] = useState(studyId ?? null)
+  const [selectedStudy, setSelectedStudy] = useState(sensor ? sensor.study_id : studyId ?? "")
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
-  const [selectedSensor, setSelectedSensor] = useState(null)
-  const [sensorName, setSensorName] = useState("")
+  const [selectedSensor, setSelectedSensor] = useState(sensor ?? null)
+  const [sensorName, setSensorName] = useState(sensor ? sensor.name : "")
   const [sensorSpecs, setSensorSpecs] = useState(null)
-  const [sensorSpec, setSensorSpec] = useState("")
-  const [selectedStudyName, setSelectedStudyName] = useState("")
+  const [sensorSpec, setSensorSpec] = useState(sensor ? sensor.spec : null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    LAMP.SensorSpec.all().then((res) => setSensorSpecs(res))
+    console.log(sensor)
+    LAMP.SensorSpec.all().then((res) => {
+      setSensorSpecs(res)
+      setSensorSpec(sensor ? sensor.spec : null)
+    })
   }, [])
 
   useEffect(() => {
     if (type === "add") {
       setSelectedSensor(null)
-      setSelectedStudy("")
+      setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
       setSensorName("")
       setSensorSpec("")
     }
   }, [props.open])
-
-  useEffect(() => {
-    setSelectedSensor(sensor)
-    setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
-    setSensorName(sensor ? sensor.name : "")
-    setSensorSpec(sensor ? sensor.spec : "")
-  }, [sensor])
 
   const validate = () => {
     return !(
@@ -366,12 +362,11 @@ export default function SensorDialog({
       enqueueSnackbar(t("Successfully updated a sensor."), {
         variant: "success",
       })
-      newData({ id: selectedSensor.id, name: sensorName, spec: sensorSpec, fn_type: "update" })
-      setSelectedSensor(null)
-      sensor = null
       setLoading(false)
+      addOrUpdateSensor()
     })
   }
+
   const saveSensor = async () => {
     setLoading(true)
     const result = await LAMP.Sensor.create(selectedStudy, {
@@ -386,7 +381,7 @@ export default function SensorDialog({
             name: sensorName,
             spec: sensorSpec,
             study_id: selectedStudy,
-            study_name: selectedStudyName,
+            study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
           },
         ])
         Service.updateMultipleKeys(
@@ -399,22 +394,11 @@ export default function SensorDialog({
           ["sensor_count"],
           "id"
         )
+        enqueueSnackbar(t("Successfully created a sensor."), {
+          variant: "success",
+        })
+        addOrUpdateSensor()
       })
-      enqueueSnackbar(t("Successfully created a sensor."), {
-        variant: "success",
-      })
-      newData({
-        id: result.data,
-        name: sensorName,
-        spec: sensorSpec,
-        study_id: selectedStudy,
-        study_name: selectedStudyName,
-      })
-      setSelectedSensor(null)
-      setSelectedStudy("")
-      setSensorName("")
-      setSensorSpec("")
-      setLoading(false)
     })
   }
 
@@ -436,10 +420,9 @@ export default function SensorDialog({
               select
               label={t("Study")}
               value={selectedStudy}
-              disabled={selectedSensor ? true : false}
+              disabled={!!studyId ? true : false}
               onChange={(e) => {
                 setSelectedStudy(e.target.value)
-                setSelectedStudyName(e.currentTarget.dataset.selectedStudyName)
               }}
               helperText={
                 typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""

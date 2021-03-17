@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 100,
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       lineHeight: "38px",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
@@ -118,8 +117,14 @@ export default function AddButton({
     setParticipants()
   }
 
-  const handleClosePopUp = () => {
-    setAddParticipantStudy(false)
+  const handleClosePopUp = (data) => {
+    if (data === 1) {
+      setAddParticipantStudy(false)
+    } else if (data === 2) {
+      setAddStudy(false)
+    } else {
+      setAddUser(false)
+    }
   }
 
   return (
@@ -180,14 +185,24 @@ export default function AddButton({
           </MenuItem>
         </React.Fragment>
       </Popover>
-      <StudyCreator studies={studies} researcher={researcher} open={addStudy} onClose={() => setAddStudy(false)} />
+      <StudyCreator
+        studies={studies}
+        researcher={researcher}
+        open={addStudy}
+        onClose={() => setAddStudy(false)}
+        handleNewStudy={handleNewStudyData}
+        addedParticipant={addedParticipant}
+        closePopUp={handleClosePopUp}
+      />
       <AddUser
         researcher={researcher}
         studies={studies}
         addedParticipant={addedParticipant}
         open={addUser}
         onClose={() => setAddUser(false)}
+        handleNewStudy={handleNewStudyData}
         setParticipants={setParticipants}
+        closePopUp={handleClosePopUp}
       />
       <PatientStudyCreator
         studies={studies}

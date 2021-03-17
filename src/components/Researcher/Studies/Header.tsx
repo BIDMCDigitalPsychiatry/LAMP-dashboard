@@ -220,8 +220,6 @@ export default function Header({ studies, researcher, ...props }) {
           }}
         ></Popover>
       </Box>
-
-      <Box className={classes.optionsMain}></Box>
     </Box>
   )
 }

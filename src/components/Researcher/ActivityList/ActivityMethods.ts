@@ -27,7 +27,6 @@ export function spliceActivity({ raw, tag }) {
         })),
   }
 }
-
 // Un-splice an object into its raw Tips Activity object
 export function unspliceTipsActivity(x) {
   return {
@@ -130,7 +129,6 @@ export async function saveCTestActivity(x) {
 export async function saveSurveyActivity(x) {
   // FIXME: ensure this is a lamp.survey only!
   const { raw, tag } = unspliceActivity(x)
-  //return false;
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
   return newItem
@@ -156,9 +154,9 @@ export async function saveGroupActivity(x) {
   return newItem
 }
 
-export const updateSchedule = async (activity, x) => {
-  let result = await LAMP.Activity.update(activity.id, { schedule: x })
-  Service.update("activities", { activities: [{ schedule: x, id: activity.id }] }, "schedule", "id")
+export const updateSchedule = async (activity) => {
+  let result = await LAMP.Activity.update(activity.id, { schedule: activity.schedule })
+  Service.update("activities", { activities: [{ schedule: activity.schedule, id: activity.id }] }, "schedule", "id")
 }
 // Commit an update to an Activity object (ONLY DESCRIPTIONS).
 export async function updateActivityData(x, isDuplicated, selectedActivity) {
@@ -171,6 +169,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
       })
+      return result
     } else {
       if (selectedActivity.study_id !== x.studyID) {
         // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
@@ -187,6 +186,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
           description: x.description,
           photo: x.photo,
         })
+        return result
       }
     }
   } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
@@ -199,14 +199,18 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       description: x.description,
       photo: x.photo,
     })
+    return result
   } else if (x.spec === "lamp.survey") {
     const { raw, tag } = unspliceActivity(x)
+    console.log(raw, tag)
     if (isDuplicated) {
-      /* duplicate */ let result = (await LAMP.Activity.create(x.studyID, raw)) as any
+      result = (await LAMP.Activity.create(x.studyID, raw)) as any
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.survey_description", tag)
+      return result
     } else {
       result = (await LAMP.Activity.update(selectedActivity.id, raw)) as any
       await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
+      return result
     }
   } else if (x.spec === "lamp.tips") {
     if (x.id === undefined) {
@@ -220,6 +224,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         schedule: selectedActivity.schedule,
       }
       result = await saveTipActivity(tipObj)
+      return result
     } else {
       let obj = {
         settings: x.settings,
@@ -228,7 +233,15 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
       })
+      return result
     }
   }
-  return result
+}
+
+export function addActivity(x, studies) {
+  Service.updateCount("studies", x.studyID, "activity_count")
+  x["study_id"] = x.studyID
+  x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
+  delete x["studyID"]
+  Service.addData("activities", [x])
 }

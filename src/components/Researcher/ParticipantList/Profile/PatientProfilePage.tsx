@@ -8,6 +8,7 @@ import UpdateCredential from "./UpdateCredential"
 import MessageDialog from "./MessageDialog"
 import Activties from "./Activities"
 import Sensors from "./Sensors"
+import { Service } from "../../../DBService/DBService"
 
 const theme = createMuiTheme({
   overrides: {
@@ -138,7 +139,8 @@ export default function PatientProfile({
     enqueueSnackbar(t("Successfully updated user profile."), {
       variant: "success",
     })
-    onClose()
+    Service.update("participants", { participants: [{ name: nickname ?? null, id: participant.id }] }, "name", "id")
+    onClose(nickname ?? "")
   }
 
   return (
@@ -179,7 +181,7 @@ export default function PatientProfile({
             <Button className={classes.buttonContainer} onClick={() => updateName()}>
               <Typography className={classes.buttonText}>{t("Save")}</Typography>
             </Button>
-            <Button className={classes.backContainer} onClick={() => onClose()}>
+            <Button className={classes.backContainer} onClick={() => onClose(nickname ?? "")}>
               <Typography className={classes.backText}>{t("Cancel")}</Typography>
             </Button>
           </div>

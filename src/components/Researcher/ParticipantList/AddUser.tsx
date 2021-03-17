@@ -249,18 +249,21 @@ const useStyles = makeStyles((theme: Theme) =>
     studyName: { maxWidth: 200, minWidth: 200, alignItems: "center", display: "flex" },
   })
 )
-
 export default function AddUser({
   researcher,
   studies,
   addedParticipant,
   setParticipants,
+  handleNewStudy,
+  closePopUp,
   ...props
 }: {
   researcher: any
   studies: any
   addedParticipant: Function
   setParticipants?: Function
+  handleNewStudy: Function
+  closePopUp: Function
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
@@ -299,7 +302,11 @@ export default function AddUser({
           newParticipant["study_name"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
           Service.addData("participants", [newParticipant])
           addedParticipant(newParticipant)
-          Service.updateCount("studies", selectedStudy, "participants_count")
+          Service.updateCount("studies", selectedStudy, "participant_count")
+          Service.getData("studies", selectedStudy).then((studiesObject) => {
+            //console.log(2451, studiesObject)
+            handleNewStudy(studiesObject)
+          })
           enqueueSnackbar(
             t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
               id: id,
@@ -342,17 +349,22 @@ export default function AddUser({
       setParticipants()
     }
     setSelectedStudy("")
+    closePopUp(3)
     props.onClose as any
   }
   return (
     <Dialog
       {...props}
+      onEnter={() => {
+        setSelectedStudy("")
+      }}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"
       classes={{ paper: classes.addNewDialog }}
     >
       <DialogTitle id="alert-dialog-slide-title">
+        <Typography variant="h6">{t("Create a new user.")}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
@@ -366,20 +378,21 @@ export default function AddUser({
         <Box mt={2} mb={3}>
           <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
         </Box>
-        <Typography variant="caption">{t("Study")}</Typography>
-        <Select
-          labelId="demo-simple-select-outlined-label"
-          id="demo-simple-select-outlined"
+        <TextField
+          select
+          autoFocus
+          fullWidth
+          variant="outlined"
+          label={t("Study")}
           value={selectedStudy}
           onChange={handleChangeStudy}
-          className={classes.studyOption}
         >
           {studies.map((study) => (
             <MenuItem key={study.id} value={study.id}>
               {study.name}
             </MenuItem>
           ))}
-        </Select>
+        </TextField>
         {!!showErrorMsg ? (
           <Box mt={1}>
             <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
@@ -389,7 +402,15 @@ export default function AddUser({
         )}
       </DialogContent>
       <DialogActions>
-        <Box textAlign="center" width={1} mt={3} mb={3}>
+        <Box textAlign="right" width={1} mt={3} mb={3}>
+          <Button
+            color="primary"
+            onClick={() => {
+              closePopUp(3)
+            }}
+          >
+            {t("Cancel")}
+          </Button>
           <Button
             onClick={() => addParticipant()}
             color="primary"

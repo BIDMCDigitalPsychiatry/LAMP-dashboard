@@ -40,6 +40,7 @@ export default function ActivityItem({
   handleSelectionChange,
   selectedActivities,
   setActivities,
+  updateActivities,
   ...props
 }) {
   const classes = useStyles()
@@ -74,8 +75,13 @@ export default function ActivityItem({
         </Box>
         <Box>
           <CardActions>
-            <UpdateActivity activity={activity} activities={activities} studies={studies} />
-            <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
+            <UpdateActivity
+              activity={activity}
+              activities={activities}
+              studies={studies}
+              setActivities={setActivities}
+            />
+            <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} />
           </CardActions>
         </Box>
       </Box>

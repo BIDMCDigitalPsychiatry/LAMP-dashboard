@@ -49,7 +49,6 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
       studyId,
     })
   }, [text, description, photo, studyId])
-
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)
@@ -111,7 +110,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the study") : ""
               }
               variant="filled"
-              disabled={!!value || !!study ? true : false}
+              disabled={!!value ? true : false}
             >
               {studies.map((option) => (
                 <MenuItem key={option.id} value={option.id}>

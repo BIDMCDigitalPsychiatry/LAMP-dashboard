@@ -15,14 +15,12 @@ export default function EditUserField({
   editData,
   editUserId,
   updateName,
-  onUpdate,
   ...props
 }: {
   participant?: any
   editData?: any
-  editUserId?: any
-  updateName?: any
-  onUpdate?: any
+  editUserId?: string
+  updateName?: Function
 }) {
   const inputRef = useRef<any>()
   const oldValue = useRef<string>()

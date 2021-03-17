@@ -7,6 +7,7 @@ import DeleteParticipant from "./DeleteParticipant"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
 import AddButton from "./AddButton"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
+import { useTranslation } from "react-i18next"
 
 const theme = createMuiTheme({
   palette: {
@@ -124,18 +125,19 @@ export default function Header({
   ...props
 }) {
   const classes = useStyles()
+  const { t } = useTranslation()
   const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [newAddedStudy, setNewAddedStudy] = useState(null)
   const [newStudyObj, setNewStudyObj] = useState(null)
   const [selDeletedIds, setSelDeletedIds] = useState([])
   const [selDeletedStudy, setSelDeletedStudy] = useState([])
-
   const handleSearchData = (data) => {
     searchData(data)
   }
 
   const handleShowFilterStudies = (status) => {
+    console.log(601, status)
     setShowFilterStudies(status)
   }
 
@@ -145,6 +147,7 @@ export default function Header({
   }
 
   const handleNewStudy = (data) => {
+    console.log(602, data)
     if (data) {
       setNewStudyObj(data)
     }
@@ -154,7 +157,7 @@ export default function Header({
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">Patients</Typography>
+          <Typography variant="h5">{t("Users")}</Typography>
         </Box>
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
@@ -207,7 +210,6 @@ export default function Header({
         </Box>
         //)
       }
-
       {selectedParticipants.length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>

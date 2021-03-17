@@ -89,9 +89,19 @@ export default function ParticipantListItem({
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
+  const [user, setName] = useState(participant)
+
   const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
     handleSelectionChange(participant, event.target.checked)
+  }
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+
+  const updateParticipant = (nameVal: string) => {
+    console.log(nameVal)
+    setName({ ...user, name: nameVal })
   }
 
   return (
@@ -107,7 +117,7 @@ export default function ParticipantListItem({
         </Box>
         <Box flexGrow={1}>
           <CardHeader
-            title={<ParticipantName participant={participant} />}
+            title={<ParticipantName participant={user} />}
             subheader={<Typography variant="overline">{participant.study_name}</Typography>}
             className={classes.participantHeader}
           />
@@ -118,8 +128,9 @@ export default function ParticipantListItem({
         </Box>
         <Box>
           <CardActions>
+            {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials participant={participant} />
-            <PatientProfile participant={participant} studies={studies} />
+            <PatientProfile participant={participant} studies={studies} onClose={updateParticipant} />
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}
@@ -132,7 +143,6 @@ export default function ParticipantListItem({
           </CardActions>
         </Box>
       </Box>
-      {notificationColumn && <NotificationSettings participant={participant} />}
     </Card>
   )
 }

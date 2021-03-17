@@ -226,26 +226,23 @@ export interface Sensors {
 export default function SensorListItem({
   sensor,
   studies,
-  updatedSensor,
   handleSelectionChange,
   selectedSensors,
+  setSensors,
   ...props
 }: {
   sensor?: Sensors
   studies?: Array<Object>
-  updatedSensor: Function
   handleSelectionChange: Function
   selectedSensors?: Array<Object>
+  setSensors?: Function
 }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
+
   const handleChange = (sensor, event) => {
     setChecked(event.target.checked)
     handleSelectionChange(sensor, event.target.checked)
-  }
-
-  const updatedData = (data) => {
-    updatedSensor(data)
   }
 
   return (
@@ -273,7 +270,7 @@ export default function SensorListItem({
         </Box>
         <Box>
           <CardActions>
-            <UpdateSensor sensor={sensor} studies={studies} type="list" updatedData={updatedData} />
+            <UpdateSensor sensor={sensor} studies={studies} type="list" setSensors={setSensors} />
           </CardActions>
         </Box>
       </Box>

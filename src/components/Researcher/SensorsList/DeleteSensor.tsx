@@ -66,22 +66,13 @@ export default function DeleteSensor({
       setLoading(true)
       if (sensors.length > 0) {
         for (let eachSensorIds of sensors) {
-          /*  // WORKING  */
           await LAMP.Sensor.delete(eachSensorIds.id).then((data: any) => {
-            console.log(200, data, eachSensorIds)
-
             if (!data.error) {
               setDeletedIds((prev) => [...prev, eachSensorIds.id])
               setDeletedStudyIds((prev) => [...prev, eachSensorIds.study_id])
               setDeletedStudys((prev) => [...prev, eachSensorIds.study_name])
             }
           })
-
-          /*
-          setDeletedIds((prev) => [...prev, eachSensorIds.id])
-          setDeletedStudyIds((prev) => [...prev, eachSensorIds.study_id])
-          setDeletedStudys((prev) => [...prev, eachSensorIds.study_name])
-          */
         }
       }
     }
@@ -91,7 +82,6 @@ export default function DeleteSensor({
   }
 
   useEffect(() => {
-    //// WORKING
     if (confirmStatus) {
       if (deletedStudyIds.length > 0) {
         let idCounts = {}
@@ -110,14 +100,6 @@ export default function DeleteSensor({
         })
       }
     }
-
-    /*
-    if (confirmStatus) {
-      if (deletedStudyIds.length > 0) {
-        let idCounts = {}
-        deletedStudyIds.forEach((x) => (idCounts[x] = (idCounts[x] || 0) + 1))
-      }
-    }*/
   }, [deletedStudyIds])
 
   useEffect(() => {
@@ -132,38 +114,13 @@ export default function DeleteSensor({
           variant: "error",
         })
       }
-
-      console.log(202, deletedIds, deletedStudys)
-
       newDeletedIds(deletedIds)
-      //selectedStudyArray(deletedStudys)
     }
-    //setLoading(false)
   }, [deletedIds])
 
   useEffect(() => {
-    console.log(203, deletedStudys)
     selectedStudyArray(deletedStudys)
   }, [deletedStudys])
-
-  /*
-  useEffect(() => {
-    if (deletedIds.length > 0) {
-       // WORKING
-      Service.delete("sensors", deletedIds)
-      
-      enqueueSnackbar(t("Successfully deleted the selected Sensors."), {
-        variant: "success",
-      })
-    }  else {
-      enqueueSnackbar(t("2  An error occured while deleting. Please try again."), {
-        variant: "error",
-      })
-    }
-    newDeletedIds(deletedIds)
-    setLoading(false)
-  }, [deletedIds])
-*/
 
   return (
     <span>

@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import { Grid, Tooltip, Icon, Fab } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 export default function ActivityFooter({ value, onSave, validate, data, ...props }) {
   const { t } = useTranslation()
+
   return (
     <Grid
       container

@@ -14,6 +14,7 @@ import {
   DialogProps,
   Backdrop,
   CircularProgress,
+  Typography,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -32,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
   switchLabel: { color: "#4C66D6" },
   activityContent: {
-    padding: "25px 50px 0",
+    padding: "15px 25px 0",
   },
   backdrop: {
     zIndex: 111111,
@@ -150,7 +151,7 @@ export default function PatientStudyCreator({
         } else {
           setLoading(false)
         }
-        closePopUp()
+        closePopUp(1)
         handleNewStudy(updatedNewStudy)
       })
     })
@@ -173,11 +174,12 @@ export default function PatientStudyCreator({
         <CircularProgress color="inherit" />
       </Backdrop>
       <DialogTitle id="alert-dialog-slide-title">
+        <Typography variant="h6">{t("Create a new study.")}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}
           onClick={() => {
-            closePopUp()
+            closePopUp(1)
             setStudyName("")
             setDuplicateStudyName("")
             setCreatePatient(false)
@@ -187,7 +189,7 @@ export default function PatientStudyCreator({
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-        <Box>
+        <Box mb={2}>
           <TextField
             error={!validate()}
             autoFocus
@@ -226,7 +228,7 @@ export default function PatientStudyCreator({
           </TextField>
         </Box>
 
-        <Box>
+        <Box ml={-1}>
           <Checkbox
             checked={createPatient}
             onChange={(event) => setCreatePatient(true)}
@@ -238,7 +240,16 @@ export default function PatientStudyCreator({
       </DialogContent>
 
       <DialogActions>
-        <Box textAlign="center" width={1} mt={3} mb={3}>
+        <Box textAlign="right" width={1} mt={1} mb={3} mx={3}>
+          <Button
+            color="primary"
+            onClick={() => {
+              closePopUp(1)
+              setCreatePatient(false)
+            }}
+          >
+            {t("Cancel")}
+          </Button>
           <Button
             onClick={() => {
               createStudy(studyName)
@@ -247,7 +258,7 @@ export default function PatientStudyCreator({
             autoFocus
             disabled={!validate()}
           >
-            {t("Save")}
+            {t("Confirm")}
           </Button>
         </Box>
       </DialogActions>

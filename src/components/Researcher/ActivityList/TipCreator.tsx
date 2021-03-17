@@ -144,11 +144,11 @@ export default function TipCreator({
   ...props
 }: {
   activities?: any
-  onSave?: any
-  onCancel?: any
+  onSave?: Function
+  onCancel?: Function
   studies?: any
   allActivities?: any
-  study?: any
+  study?: string
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
