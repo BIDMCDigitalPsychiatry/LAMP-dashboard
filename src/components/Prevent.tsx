@@ -564,6 +564,10 @@ export const strategies = {
     ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
+  "lamp.breathe": (slices, activity, scopedItem) =>
+    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
