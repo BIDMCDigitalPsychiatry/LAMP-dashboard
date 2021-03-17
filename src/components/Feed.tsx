@@ -50,7 +50,6 @@ class LocalizedUtils extends DateFnsUtils {
     return ["S", "M", "T", "W", "T", "F", "S"]
   }
 }
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

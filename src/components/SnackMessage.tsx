@@ -40,7 +40,6 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
   const { closeSnackbar } = useSnackbar()
   const [expanded, setExpanded] = useState(false)
   const { t } = useTranslation()
-
   const handleExpandClick = () => {
     setExpanded(!expanded)
   }
@@ -48,7 +47,6 @@ const SnackMessage = React.forwardRef((props: { id?: string; message?: string; c
   const handleDismiss = () => {
     closeSnackbar(props.id)
   }
-
   return (
     <Card className={classes.card} ref={ref}>
       <CardActions classes={{ root: classes.actionRoot }}>

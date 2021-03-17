@@ -18,6 +18,7 @@ import {
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
+import { Service } from "./DBService/DBService"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
@@ -25,6 +26,10 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
+import Participant from "./Participant"
+import { useWorker } from "@koale/useworker"
+import { saveDataToCache } from "./Researcher/SaveResearcherData"
+import { saveDemoData } from "./Researcher/SaveResearcherData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,7 +55,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
       "& fieldset": { border: 0 },
     },
-
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
@@ -73,6 +77,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
+  const [dataWorker] = useWorker(saveDataToCache)
+  const [demoWorker] = useWorker(saveDemoData)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -80,7 +86,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
-
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -134,6 +139,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
+        Service.deleteDB()
         setLoginClick(false)
         onComplete()
       })

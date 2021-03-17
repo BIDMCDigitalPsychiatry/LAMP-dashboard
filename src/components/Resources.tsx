@@ -31,11 +31,9 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: theme.typography.fontWeightRegular,
   },
 }))
-
 export default function Resources({ ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-
   return (
     <Grid container direction="row">
       <Box p={4} my={4} width="100%">

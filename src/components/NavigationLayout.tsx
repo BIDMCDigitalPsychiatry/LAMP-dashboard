@@ -136,7 +136,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
-
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,

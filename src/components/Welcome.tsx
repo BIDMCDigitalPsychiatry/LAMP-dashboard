@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import { Typography, Fab, Box, Slide, Container, Icon, Card, Grid } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-
 export default function Welcome({ activities, onClose, ...props }) {
   const [checked, setChecked] = useState(0)
   const { t } = useTranslation()
-
   return (
     <Container maxWidth="md">
       <Slide direction="left" in={checked === 0} mountOnEnter unmountOnExit>

@@ -32,7 +32,6 @@ import locale_lang from "../locale_map.json"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
-
 const theme = createMuiTheme({
   palette: {
     secondary: {
@@ -126,7 +125,6 @@ const useStyles = makeStyles((theme: Theme) =>
       minWidth: 100,
       boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
       lineHeight: "38px",
-
       cursor: "pointer",
       textTransform: "capitalize",
       fontSize: "16px",
@@ -233,7 +231,6 @@ function Researchers({ history, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t, i18n } = useTranslation()
   const classes = useStyles()
-
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -365,13 +362,9 @@ export default function Root({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
 
   const getSelectedLanguage = () => {
-    const lang = Object.keys(locale_lang)
-      .filter((key) => navigator.language.includes(key))
-      .reduce((obj, key) => {
-        return key
-      }, {})
-
-    return i18n.language ? i18n.language : lang ? lang : "en"
+    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
+    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
+    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
   useEffect(() => {

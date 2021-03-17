@@ -10,6 +10,7 @@ import LAMP, {
 import ActivityCard from "./ActivityCard"
 import MultipleSelect from "./MultipleSelect"
 import Sparkline from "./Sparkline"
+// import MultiPieChart from "./MultiPieChart"
 import { useTranslation } from "react-i18next"
 
 // TODO: all SensorEvents?
@@ -417,7 +418,7 @@ export default function ParticipantData({
               {t("Environmental Context")}
             </Typography>
             <Divider />
-            {/*<MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />*/}
+            {/* <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} /> */}
           </Card>
         )}
         {((selectedSensors || []).includes("Step Count") || !!printView) && (

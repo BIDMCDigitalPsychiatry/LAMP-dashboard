@@ -93,7 +93,6 @@ async function getEvents(participantId: string, activityId: string) {
   }
   return steak > 0 ? steak : 1
 }
-
 export default function GroupActivity({ participant, activity, ...props }) {
   const classes = useStyles()
   const [currentActivity, setCurrentActivity] = useState(null)

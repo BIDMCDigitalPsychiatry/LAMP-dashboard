@@ -39,12 +39,11 @@ import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@material-ui/icons/CheckBox"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
-import { spliceActivity } from "./ActivityList"
+import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import Messages from "./Messages"
 import classes from "*.module.css"
 import { useTranslation } from "react-i18next"
-
 const GreenCheckbox = withStyles({
   root: {
     color: "#2F9D7E",
@@ -201,7 +200,6 @@ const useStyles = makeStyles((theme) => ({
       width: "82%",
     },
   },
-
   btnBack: {
     borderRadius: "40px",
     minWidth: "160px",
@@ -216,11 +214,9 @@ const useStyles = makeStyles((theme) => ({
       marginTop: 30,
     },
   },
-
   ampm: {
     padding: "10px",
   },
-
   questionTrack: {
     fontSize: "14px",
     color: "#2F9D7E",
@@ -335,7 +331,6 @@ const useStyles = makeStyles((theme) => ({
   mrgBtm: { marginBottom: 15 },
   countlabel: { left: "calc(-50% - -8px)" },
 }))
-
 // Splice together all selected activities & their tags.
 async function getSplicedSurveys(activities) {
   let res = await Promise.all(activities.map((x) => LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")))

@@ -45,7 +45,6 @@ function compress(file, width, height) {
     }
   })
 }
-
 export function CredentialEditor({ credential, auxData, mode, onChange }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
@@ -55,12 +54,11 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
   const [password, setPassword] = useState("")
   const [showLink, setShowLink] = useState(false)
   const { t } = useTranslation()
-  console.log(credential)
+
   useEffect(() => {
     setPhoto(auxData.photo)
     setRole(auxData.role)
   }, [auxData])
-
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)
@@ -259,7 +257,6 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
 }
 
 export async function updateDetails(id, data, mode, allRoles, type) {
-  console.log(data)
   try {
     if (mode === "reset-password" && !!data.password) {
       if (
@@ -285,7 +282,6 @@ export async function updateDetails(id, data, mode, allRoles, type) {
       )
         return -4
       let attachmentName = type === 1 ? "lamp.dashboard.credential_roles.external" : "lamp.dashboard.credential_roles"
-      console.log(attachmentName)
       await LAMP.Type.setAttachment(id, "me", attachmentName, {
         ...allRoles,
         [data.emailAddress]:

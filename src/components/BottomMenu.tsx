@@ -92,7 +92,6 @@ const useStyles = makeStyles((theme: Theme) =>
     navigationLabel: {
       textTransform: "capitalize",
       fontSize: "12px !important",
-
       letterSpacing: 0,
       color: "rgba(0, 0, 0, 0.4)",
       width: "100%",
@@ -103,7 +102,6 @@ const useStyles = makeStyles((theme: Theme) =>
           backgroundColor: "#F8F8F8",
           border: 0,
         },
-
         "& a": {
           [theme.breakpoints.down("sm")]: {
             flex: 1,
@@ -319,7 +317,6 @@ export default function BottomMenu({ ...props }) {
       tabVal === 4 && typeof tabValues[4] === "undefined" ? true : false,
     ])
   }
-
   useEffect(() => {
     localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(tabValues))
   }, [tabValues])

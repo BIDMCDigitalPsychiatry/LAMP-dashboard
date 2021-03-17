@@ -20,7 +20,6 @@ const demoActivities = {
   "Dot Touch": "dottouch",
   "lamp.jewels_a": "jewelspro",
   "lamp.jewels_b": "jewelspro",
-  "Pop The Bubbles": "popthebubbles",
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
@@ -36,7 +35,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
-
   useEffect(() => {
     activateEmbeddedActivity(activity)
   }, [])
@@ -88,11 +86,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
     setSaved(false)
-    setSettings({
-      ...settings,
-      settings: activity.settings,
-      configuration: { language: i18n.language },
-    })
+    setSettings({ ...settings, settings: activity.settings, configuration: { language: i18n.language } })
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]

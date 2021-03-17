@@ -1,4 +1,3 @@
-// Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
@@ -7,17 +6,12 @@ import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
-
-// External Imports
 import DateFnsUtils from "@date-io/date-fns"
-
-// Local Imports
 import LAMP from "lamp-core"
 import Login from "./Login"
 import Messages from "./Messages"
-
 import Root from "./Root"
-import Researcher from "./Researcher"
+import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
@@ -25,26 +19,46 @@ import TipNotification from "./TipNotification"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 
-// import VegaGraph from "./VegaGraph"
-
-/* TODO: /researcher/:researcher_id/activity/:activity_id -> editor ui */
-/* TODO: /participant/:participant_id/activity/:activity_id -> activity ui */
-/* TODO: /participant/:participant_id/messaging -> messaging */
-
-/*
-// colors as a gradient:
-background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(101,206,191,1) 33%, rgba(255,119,91,1) 66%, rgba(134,182,255,1) 100%);
-// colors as a bar:
-background: linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%);
-*/
-
-//
-/*const srcLock = () => {
-  let query = window.location.hash.split("?") || []
-  let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
-  return typeof src === "string" && src.length > 0
-}*/
-
+function ErrorFallback({ error }) {
+  const [trace, setTrace] = useState([])
+  useEffect(() => {
+    StackTrace.fromError(error).then(setTrace)
+  }, [])
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        border: "none",
+        zIndex: 2147483647,
+        padding: "0.5rem",
+        fontFamily: "Consolas, Menlo, monospace",
+        whiteSpace: "pre-wrap",
+        lineHeight: 1.5,
+        fontSize: "12px",
+        color: "rgb(232, 59, 70)",
+        background: "rgb(53, 53, 53)",
+      }}
+    >
+      <pre>
+        <code style={{ fontSize: "16px" }}>
+          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
+        </code>
+        <br />
+        <code style={{ color: "#fff" }}>
+          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
+        </code>
+        <br />
+        <code>
+          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
+        </code>
+      </pre>
+    </div>
+  )
+}
 function PageTitle({ children, ...props }) {
   useEffect(() => {
     document.title = `${typeof children === "string" ? children : ""}`
@@ -64,7 +78,6 @@ function AppRouter({ ...props }) {
       activeTab: newTab,
     }))
   }
-
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -232,12 +245,12 @@ function AppRouter({ ...props }) {
     if (!!store.researchers[id]) {
       return store.researchers[id]
     } else if (!storeRef.current.includes(id)) {
-      LAMP.Researcher.view(id).then((x) =>
+      LAMP.Researcher.view(id).then((x) => {
         setStore({
           researchers: { ...store.researchers, [id]: x },
           participants: store.participants,
         })
-      )
+      })
       storeRef.current = [...storeRef.current, id]
     }
     return null
@@ -313,7 +326,6 @@ function AppRouter({ ...props }) {
               activeTab="Messages"
               sameLineTitle={true}
             >
-              {/* <Messages goBack={props.history.goBack} /> */}
               <Messages
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
@@ -507,47 +519,6 @@ function AppRouter({ ...props }) {
         }
       />
     </Switch>
-  )
-}
-
-function ErrorFallback({ error }) {
-  const [trace, setTrace] = useState([])
-  useEffect(() => {
-    StackTrace.fromError(error).then(setTrace)
-  }, [])
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        border: "none",
-        zIndex: 2147483647,
-        padding: "0.5rem",
-        fontFamily: "Consolas, Menlo, monospace",
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.5,
-        fontSize: "12px",
-        color: "rgb(232, 59, 70)",
-        background: "rgb(53, 53, 53)",
-      }}
-    >
-      <pre>
-        <code style={{ fontSize: "16px" }}>
-          {error.message.match(/^\w*:/) || !error.name ? error.message : error.name + ": " + error.message}
-        </code>
-        <br />
-        <code style={{ color: "#fff" }}>
-          {trace.length > 0 ? trace.map((x) => x.toString()).join("\n") : "Generating stacktrace..."}
-        </code>
-        <br />
-        <code>
-          mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
-        </code>
-      </pre>
-    </div>
   )
 }
 

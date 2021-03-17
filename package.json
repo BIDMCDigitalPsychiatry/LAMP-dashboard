@@ -19,16 +19,19 @@
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
     "chromatic": "^5.5.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "http-server": "^0.12.3",
     "husky": "^4.2.5",
     "lint-staged": "^10.1.3",
     "prettier": "2.0.4",
-    "react-scripts": "^3.4.3",
+    "react-scripts": "^4.0.3",
     "typescript": "3.8"
   },
   "dependencies": {
     "@date-io/date-fns": "^1.3.11",
     "@icons/material": "^0.4.1",
+    "@koale/useworker": "^3.4.0",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.2.1",
     "@material-ui/lab": "^4.0.0-alpha.48",
@@ -41,6 +44,7 @@
     "file-saver": "^1.3.8",
     "i18next": "^19.8.3",
     "i18next-http-backend": "^1.0.21",
+    "idb": "^6.0.0",
     "immer": "^8.0.1",
     "javascript-time-ago": "^2.0.4",
     "jquery": "^3.5.1",
@@ -106,11 +110,7 @@
       "@typescript-eslint"
     ],
     "extends": [
-      "react-app",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "prettier/@typescript-eslint"
+      "plugin:prettier/recommended"
     ],
     "overrides": [
       {
