@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 export const sortData = (data, studies, key) => {
   let result = []
   studies.map((study) => {
@@ -137,6 +138,8 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [updatedData, setUpdatedData] = useState(null)
   const [deletedData, setDeletedData] = useState(null)
+  const [addedData, setAddedData] = useState(null)
+  const [search, setSearch] = useState(null)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -176,16 +179,33 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
 
   useEffect(() => {
     getAllStudies()
+  }, [addedData])
+
+  useEffect(() => {
+    if (deletedData !== null) {
+      let newStudies = studies.filter((item) => {
+        if (search) {
+          return item.name.toLowerCase()?.includes(search.toLowerCase()) && item.id !== deletedData
+        } else {
+          return item.id !== deletedData
+        }
+      })
+      setStudies(newStudies)
+    } else {
+      getAllStudies()
+    }
   }, [deletedData])
 
   const filterStudies = async (studies) => {
-    let selected =
-      ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
-      (studies ?? []).map((study) => {
-        return study.name
-      })
-    selected.sort()
-    setSelectedStudies(selected)
+    if (studies !== null && (studies || []).length > 0) {
+      let selected =
+        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
+        (studies ?? []).map((study) => {
+          return study.name
+        })
+      selected.sort()
+      setSelectedStudies(selected)
+    }
   }
 
   const upatedDataStudy = (data) => {
@@ -194,6 +214,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
 
   const deletedDataStudy = (data) => {
     setDeletedData(data)
+  }
+
+  const handleSearchData = (data) => {
+    setSearch(data)
   }
 
   return (
@@ -270,6 +294,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                addedDataStudy={setAddedData}
               />
             )}
             {currentTab === 1 && (
@@ -297,6 +322,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 upatedDataStudy={upatedDataStudy}
                 deletedDataStudy={deletedDataStudy}
+                searchData={handleSearchData}
               />
             )}
           </ResponsivePaper>

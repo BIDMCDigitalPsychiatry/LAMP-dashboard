@@ -32,6 +32,7 @@ import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
+import { Service } from "../../DBService/DBService"
 
 const theme = createMuiTheme({
   palette: {
@@ -257,7 +258,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function StudiesList({ title, researcher, studies, upatedDataStudy, deletedDataStudy, ...props }) {
+export default function StudiesList({
+  title,
+  researcher,
+  studies,
+  upatedDataStudy,
+  deletedDataStudy,
+  searchData,
+  ...props
+}) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -275,19 +284,25 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
     setAllStudies(studies)
   }, [studies])
 
-  useEffect(() => {
-    searchFilterStudies()
-  }, [search])
+  const getAllStudies = async () => {
+    let studies = await Service.getAll("studies")
+    setAllStudies(studies)
+  }
 
-  const searchFilterStudies = () => {
+  const searchFilterStudies = async () => {
     if (!!search && search !== "") {
-      let newStudies = studies.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+      let studiesList: any = await Service.getAll("studies")
+      let newStudies = studiesList.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
       setAllStudies(newStudies)
       setLoading(false)
     } else {
-      setAllStudies(studies)
+      getAllStudies()
     }
   }
+
+  useEffect(() => {
+    searchFilterStudies()
+  }, [search])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)
@@ -295,6 +310,7 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
 
   const handleDeletedStudy = (data) => {
     deletedDataStudy(data)
+    searchData(search)
   }
 
   const handleSearchData = (val) => {

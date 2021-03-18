@@ -26,17 +26,24 @@ export default function Active({ participant, ...props }) {
   const timeAgo = getTimeAgo(i18n.language)
 
   useEffect(() => {
+    let isCancelled = false
     Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      let res = data[0]?.analytics
-      setLogins(!!res && res.length > 0 ? res[0] : null)
-      let passive = {
-        gps: !!data[0]?.gps && data[0].gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
-        accel: !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
+      if (!isCancelled) {
+        let res = data[0]?.analytics
+        setLogins(!!res && res.length > 0 ? res[0] : null)
+        let passive = {
+          gps: !!data[0]?.gps && data[0].gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
+          accel:
+            !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
+        }
+        setPassive(passive)
+        let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
+        setActive(active)
       }
-      setPassive(passive)
-      let active = !!data[0]?.active && data[0]?.active.length > 0 ? data[0]?.active[0] : []
-      setActive(active)
     })
+    return () => {
+      isCancelled = true
+    }
   }, [])
 
   const dateInfo = (id) => ({

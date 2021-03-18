@@ -26,10 +26,6 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import Participant from "./Participant"
-import { useWorker } from "@koale/useworker"
-import { saveDataToCache } from "./Researcher/SaveResearcherData"
-import { saveDemoData } from "./Researcher/SaveResearcherData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,8 +73,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
-  const [dataWorker] = useWorker(saveDataToCache)
-  const [demoWorker] = useWorker(saveDemoData)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -123,25 +117,27 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
       .then((res) => {
-        if (res.authType === "participant") {
-          LAMP.SensorEvent.create(res.identity.id, {
-            timestamp: Date.now(),
-            sensor: "lamp.analytics",
-            data: {
-              device_type: "Dashboard",
-              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-            },
-          } as any).then((res) => console.dir(res))
-        }
-        localStorage.setItem(
-          "LAMP_user_" + res.identity.id,
-          JSON.stringify({
-            language: selectedLanguage,
-          })
-        )
-        Service.deleteDB()
-        setLoginClick(false)
-        onComplete()
+        ;(async () => {
+          await Service.deleteDB()
+          if (res.authType === "participant") {
+            LAMP.SensorEvent.create(res.identity.id, {
+              timestamp: Date.now(),
+              sensor: "lamp.analytics",
+              data: {
+                device_type: "Dashboard",
+                user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+              },
+            } as any).then((res) => console.dir(res))
+          }
+          localStorage.setItem(
+            "LAMP_user_" + res.identity.id,
+            JSON.stringify({
+              language: selectedLanguage,
+            })
+          )
+          setLoginClick(false)
+          onComplete()
+        })()
       })
       .catch((err) => {
         console.warn("error with auth request", err)

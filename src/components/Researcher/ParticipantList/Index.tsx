@@ -10,6 +10,7 @@ import Header from "./Header"
 import { Service } from "../../DBService/DBService"
 import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
+import Pagination from "../../PaginatedElement"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -123,12 +124,13 @@ export default function ParticipantList({
   ...props
 }) {
   const classes = useStyles()
-  const [participants, setParticipants] = useState(null)
+  const [participants, setParticipants] = useState([])
   const [selectedParticipants, setSelectedParticipants] = useState([])
-  const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
   const [updateCount, setUpdateCount] = useState(0)
-
+  const [paginatedParticipants, setPaginatedParticipants] = useState([])
+  const [newStudy, setNewStudy] = useState(null)
+  const [search, setSearch] = useState("")
   const { t } = useTranslation()
 
   const handleChange = (participant, checked) => {
@@ -142,34 +144,49 @@ export default function ParticipantList({
 
   useEffect(() => {
     searchParticipants()
-  }, [selectedStudies])
+  }, [search])
 
   useEffect(() => {
     searchParticipants()
-  }, [search])
+  }, [selectedStudies])
 
   const searchParticipants = () => {
     setLoading(true)
+    selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
     if (selectedStudies.length > 0) {
-      Service.getDataByKey("participants", selectedStudies, "study_name").then((participantData) => {
-        if (search) {
-          let newParticipants = participantData.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-          setParticipants(sortData(newParticipants, selectedStudies, "id"))
-        } else {
-          setParticipants(sortData(participantData, selectedStudies, "id"))
-        }
-        setLoading(false)
+      let result = participants
+      selectedStudies.map((study) => {
+        Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
+          if ((participantData || []).length > 0) {
+            if (!!search && search.trim().length > 0) {
+              result = result.concat(participantData)
+              let newParticipants = result.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+              setParticipants(sortData(newParticipants, selectedStudies, "id"))
+            } else {
+              result = result.concat(participantData)
+              setParticipants(sortData(result, selectedStudies, "id"))
+            }
+          }
+          setLoading(false)
+        })
       })
-    } else if (!!search && search !== "") {
-      let newParticipants = participants.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-      setParticipants(sortData(newParticipants, studies, "id"))
-      setLoading(false)
     }
     setSelectedParticipants([])
   }
 
-  const handleSearchData = (val) => {
+  const handleSearchData = (val: string) => {
     setSearch(val)
+  }
+
+  useEffect(() => {
+    setPaginatedParticipants(participants.slice(0, 50))
+  }, [participants])
+
+  const handleChangePage = (page: number, rowCount: number) => {
+    setPaginatedParticipants(
+      participants.slice((Number(page) - 1) * rowCount, (Number(page) - 1) * rowCount + rowCount)
+    )
+    setLoading(false)
   }
 
   return (
@@ -185,24 +202,26 @@ export default function ParticipantList({
         selectedStudies={selectedStudies}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        setUpdateCount={setUpdateCount}
-        updateCount={updateCount}
+        newStudyObj={setNewStudy}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
           {!!participants && participants.length > 0 ? (
-            participants.map((eachParticipant) => (
-              <Grid item lg={6} xs={12} key={eachParticipant.id}>
-                <ParticipantListItem
-                  participant={eachParticipant}
-                  onParticipantSelect={onParticipantSelect}
-                  studies={studies}
-                  notificationColumn={notificationColumn}
-                  handleSelectionChange={handleChange}
-                  setUpdateCount={setUpdateCount}
-                />
-              </Grid>
-            ))
+            <Grid container spacing={3}>
+              {paginatedParticipants.map((eachParticipant) => (
+                <Grid item lg={6} xs={12} key={eachParticipant.id}>
+                  <ParticipantListItem
+                    participant={eachParticipant}
+                    onParticipantSelect={onParticipantSelect}
+                    studies={studies}
+                    notificationColumn={notificationColumn}
+                    handleSelectionChange={handleChange}
+                    setUpdateCount={setUpdateCount}
+                  />
+                </Grid>
+              ))}
+              <Pagination data={participants} updatePage={handleChangePage} />
+            </Grid>
           ) : (
             <Box display="flex" alignItems="center" className={classes.norecords}>
               <Icon>info</Icon>

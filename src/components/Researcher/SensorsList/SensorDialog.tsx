@@ -374,15 +374,15 @@ export default function SensorDialog({
     }).then((res) => {
       let result = JSON.parse(JSON.stringify(res))
       Service.getData("studies", selectedStudy).then((studiesObject) => {
-        Service.addData("sensors", [
-          {
-            id: result.data,
-            name: sensorName,
-            spec: sensorSpec,
-            study_id: selectedStudy,
-            study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
-          },
-        ])
+        let sensorObj = {
+          id: result.data,
+          name: sensorName,
+          spec: sensorSpec,
+          study_id: selectedStudy,
+          study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
+        }
+        Service.addData("sensors", [sensorObj])
+        //console.log(160, sensorObj)
         Service.updateMultipleKeys(
           "studies",
           {

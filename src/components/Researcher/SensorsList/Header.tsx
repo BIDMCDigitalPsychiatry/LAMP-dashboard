@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import AddSensor from "./AddSensor"
-import { Box, Typography, TextField, InputBase, Icon, IconButton } from "@material-ui/core"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
-import SearchIcon from "@material-ui/icons/Search"
+import { Box, Typography } from "@material-ui/core"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import DeleteSensor from "./DeleteSensor"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
+import SearchBox from "../SearchBox"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -13,45 +14,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": {
         fontSize: "30px",
         fontWeight: "bold",
-      },
-    },
-    search: {
-      position: "relative",
-      borderRadius: 50,
-      backgroundColor: "#F8F8F8",
-      "&:hover": {
-        backgroundColor: "#eee",
-      },
-      marginRight: theme.spacing(2),
-      marginLeft: 0,
-      width: "100%",
-      [theme.breakpoints.up("lg")]: {
-        width: "450px",
-      },
-      [theme.breakpoints.down("md")]: {
-        width: "300px",
-      },
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: "100%",
-      position: "absolute",
-      pointerEvents: "none",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    inputRoot: {
-      color: "inherit",
-    },
-    inputInput: {
-      padding: "15px 10px",
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("lg")]: {
-        width: "20ch",
       },
     },
     optionsMain: {
@@ -89,13 +51,9 @@ export default function Header({
   setChangeCount?: Function
 }) {
   const classes = useStyles()
-  const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, setUpdateCount] = useState(0)
-
-  const handleSearchData = (data) => {
-    searchData(data)
-  }
+  const { t } = useTranslation()
 
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
@@ -105,33 +63,12 @@ export default function Header({
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">Sensors</Typography>
+          <Typography variant="h5">{t("Sensors")}</Typography>
         </Box>
-
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>
-
-        <Box>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                handleSearchData(e.target.value)
-              }}
-              value={search}
-            />
-          </div>
-        </Box>
+        <SearchBox searchData={searchData} />
         <Box>
           <AddSensor studies={studies} setSensors={setSensors} setUpdateCount={setUpdateCount} />
         </Box>
@@ -146,6 +83,7 @@ export default function Header({
             selectedStudies={selectedStudies}
             setSelectedStudies={setSelectedStudies}
             updateCount={updateCount}
+            setUpdateCount={setUpdateCount}
           />
         </Box>
       )}

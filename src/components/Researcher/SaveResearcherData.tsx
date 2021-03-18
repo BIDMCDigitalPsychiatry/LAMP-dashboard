@@ -50,7 +50,6 @@ const saveSettings = (newVal, key) => {
 }
 
 export const saveDemoData = () => {
-  Service.deleteDB()
   Service.addData("participants", demo_db.Participant)
   Service.addData("studies", demo_db.Study)
   Service.addData("activities", demo_db.Activity)
@@ -72,35 +71,38 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
-  Service.deleteDB()
-  fetchResult(authString, id, "participant", "researcher").then((result) => {
-    saveStudiesAndParticipants(result)
-    Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
-    result.studies.map((study) => {
-      if (result.unityhealth_settings) {
-        fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {
-          saveSettings(settings, "name")
-          saveSettings(settings, "unity_settings")
+  Service.getAll("studies").then((data) => {
+    if ((data || []).length == 0) {
+      fetchResult(authString, id, "participant", "researcher").then((result) => {
+        saveStudiesAndParticipants(result)
+        Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
+        result.studies.map((study) => {
+          if (result.unityhealth_settings) {
+            fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {
+              saveSettings(settings, "name")
+              saveSettings(settings, "unity_settings")
+            })
+          } else {
+            fetchResult(authString, study.id, "participant/mode/4", "study").then((settings) => {
+              saveSettings(settings, "name")
+            })
+          }
+          fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
+            saveSettings(sensors, "accelerometer")
+            saveSettings(sensors, "analytics")
+            saveSettings(sensors, "gps")
+            fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
+              saveSettings(events, "active")
+            })
+          })
         })
-      } else {
-        fetchResult(authString, study.id, "participant/mode/4", "study").then((settings) => {
-          saveSettings(settings, "name")
-        })
-      }
-      fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
-        saveSettings(sensors, "accelerometer")
-        saveSettings(sensors, "analytics")
-        saveSettings(sensors, "gps")
-        fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
-          saveSettings(events, "active")
+        fetchResult(authString, id, "activity", "researcher").then((result) => {
+          saveStudyData(result, "activities")
+          fetchResult(authString, id, "sensor", "researcher").then((result) => {
+            saveStudyData(result, "sensors")
+          })
         })
       })
-    })
-    fetchResult(authString, id, "activity", "researcher").then((result) => {
-      saveStudyData(result, "activities")
-      fetchResult(authString, id, "sensor", "researcher").then((result) => {
-        saveStudyData(result, "sensors")
-      })
-    })
+    }
   })
 }

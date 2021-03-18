@@ -47,7 +47,7 @@ export default function DeleteParticipant({ participants, setParticipants, setUp
         await LAMP.Type.setAttachment(participant.id, "me", "lamp.name", null)
         Service.updateCount("studies", participant.study_id, "participant_count", 1, 1)
       }
-      Service.delete("participants", participantIds)
+      await Service.delete("participants", participantIds)
       setUpdateCount(1)
       setParticipants()
       enqueueSnackbar(t("Successfully deleted the selected participants."), {

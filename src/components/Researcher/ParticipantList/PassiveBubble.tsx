@@ -24,14 +24,22 @@ export default function Passive({ participant, ...props }) {
   const timeAgo = getTimeAgo(i18n.language)
 
   useEffect(() => {
+    let isCancelled = false
     Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      let passive = {
-        gps: !!data[0]?.gps && data[0]?.gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
-        accel: !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
+      if (!isCancelled) {
+        let passive = {
+          gps: !!data[0]?.gps && data[0]?.gps.length > 0 ? data[0]?.gps.slice(-1)[0] : [],
+          accel:
+            !!data[0]?.accelerometer && data[0]?.accelerometer.length > 0 ? data[0]?.accelerometer.slice(-1)[0] : [],
+        }
+        setPassive(passive)
       }
-      setPassive(passive)
     })
+    return () => {
+      isCancelled = true
+    }
   }, [])
+
   return (
     <Tooltip title={dataQuality(passive, timeAgo, t, classes).title}>
       <Chip

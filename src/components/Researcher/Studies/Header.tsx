@@ -198,7 +198,7 @@ export default function Header({ studies, researcher, searchData, setUpdateCount
               <SearchIcon />
             </div>
             <InputBase
-              placeholder="Search…"
+              placeholder={t("Search")}
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,

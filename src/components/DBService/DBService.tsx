@@ -45,6 +45,9 @@ class DBService {
           let cursor = await store.openCursor()
           while (cursor) {
             newVal[tablespace].map((data) => {
+              if (tablespace === "activities") {
+                console.log(data, cursor.key, conditionKey, key)
+              }
               if (cursor.key === data[conditionKey]) {
                 let value = cursor.value
                 value[key] = data[key]
@@ -165,6 +168,25 @@ class DBService {
           let cursor = await store.openCursor()
           while (cursor) {
             if (keys.includes(cursor.key)) {
+              cursor.delete()
+            }
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
+  deleteByKey(tablespace: string, keys: any, conditionKey: string) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            if (keys.includes(cursor.value[conditionKey])) {
               cursor.delete()
             }
             cursor = await cursor.continue()

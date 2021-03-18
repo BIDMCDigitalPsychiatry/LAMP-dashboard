@@ -121,6 +121,7 @@ export default function StudyCreator({
       setLoading(false)
     })
   }
+
   return (
     <Dialog
       {...props}

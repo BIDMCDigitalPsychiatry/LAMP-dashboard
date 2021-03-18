@@ -117,22 +117,19 @@ export default function PatientStudyCreator({
     fetchPostData(authString, authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
       let newStudyId = studyData.data
       let newUriStudyID = "?study_id=" + newStudyId
-
       if (duplicateStudyName) {
         Service.getDataByKey("studies", duplicateStudyName, "id").then((studyAllData: any) => {
           let newStudyData = {
             id: studyData.data,
             name: studyName,
-            participants_count: studyAllData.length > 0 ? studyAllData[0].participants_count : 0,
+            participant_count: studyAllData.length > 0 ? studyAllData[0].participant_count : 0,
             activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
             sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
           }
-
           Service.addData("studies", [newStudyData])
-
           fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
             let filteredActivities = result.activities.filter(
-              (eachActivities) => eachActivities.study_id === duplicateStudyName
+              (eachActivities) => eachActivities.study_id === newStudyId
             )
             saveStudyData(filteredActivities, "activities")
           })
@@ -154,7 +151,7 @@ export default function PatientStudyCreator({
               }
               setLoading(false)
             })
-            updatedNewStudy.participants_count = 1
+            updatedNewStudy.participant_count = 1
           } else {
             setLoading(false)
           }
@@ -162,6 +159,13 @@ export default function PatientStudyCreator({
           handleNewStudy(updatedNewStudy)
         })
       } else {
+        let newStudyData = {
+          id: studyData.data,
+          name: studyName,
+          participant_count: 0,
+          activity_count: 0,
+          sensor_count: 0,
+        }
         if (createPatient) {
           fetchResult(authString, authId, "participant" + newUriStudyID, "researcher").then((results) => {
             if (results.studies[0].participants.length > 0) {
@@ -170,9 +174,17 @@ export default function PatientStudyCreator({
               )
               saveStudyData(filteredParticipants, "participants")
             }
+            newStudyData.participant_count = 1
             setLoading(false)
+            Service.addData("studies", [newStudyData])
+            handleNewStudy(newStudyData)
             closePopUp(1)
           })
+        } else {
+          setLoading(false)
+          Service.addData("studies", [newStudyData])
+          handleNewStudy(newStudyData)
+          closePopUp(1)
         }
       }
     })
@@ -251,14 +263,15 @@ export default function PatientStudyCreator({
         <Box ml={-1}>
           <Checkbox
             checked={createPatient}
-            onChange={(event) => setCreatePatient(true)}
+            onChange={(event) => {
+              setCreatePatient(event.target.checked)
+            }}
             classes={{ checked: classes.checkboxActive }}
             inputProps={{ "aria-label": "primary checkbox" }}
           />{" "}
           {t("Create a new patient under this study")}
         </Box>
       </DialogContent>
-
       <DialogActions>
         <Box textAlign="right" width={1} mt={1} mb={3} mx={3}>
           <Button
