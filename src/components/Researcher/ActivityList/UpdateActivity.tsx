@@ -51,6 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 export default function UpdateActivity({ activity, activities, studies, setActivities, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -65,7 +66,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
         variant: "error",
       })
     else {
-      if (isDuplicated) {
+      if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
         addActivity(x, studies)
         enqueueSnackbar(t("Successfully duplicated the Activity."), {

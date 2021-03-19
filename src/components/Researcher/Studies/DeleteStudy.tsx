@@ -269,12 +269,21 @@ export default function DeleteStudy({ study, deletedStudy, ...props }) {
   const [openDialogDeleteStudy, setOpenDialogDeleteStudy] = useState(false)
   const [studyIdDelete, setStudyIdForDelete] = useState("")
 
-  const deleteStudy = (studyId: string) => {
+  const deleteStudy = async (studyId: string) => {
     setOpenDialogDeleteStudy(false)
-    LAMP.Study.delete(studyId)
-    Service.delete("studies", [studyId])
-    deletedStudy(studyId)
-    enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
+    await LAMP.Study.delete(studyId)
+      .then((res) => {
+        Service.delete("studies", [studyId])
+        Service.deleteByKey("participants", [studyId], "study_id")
+        Service.deleteByKey("activities", [studyId], "study_id")
+        Service.deleteByKey("sensors", [studyId], "study_id")
+        deletedStudy(studyId)
+        enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
+      })
+      .catch((error) => {
+        deletedStudy("")
+        enqueueSnackbar(t("An error occured while deleting. Please try again."), { variant: "error" })
+      })
   }
 
   const handleCloseDeleteStudy = () => {

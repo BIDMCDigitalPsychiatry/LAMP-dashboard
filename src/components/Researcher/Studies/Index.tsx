@@ -32,6 +32,7 @@ import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
+import { Service } from "../../DBService/DBService"
 
 const theme = createMuiTheme({
   palette: {
@@ -257,7 +258,16 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function StudiesList({ title, researcher, studies, upatedDataStudy, deletedDataStudy, ...props }) {
+export default function StudiesList({
+  title,
+  researcher,
+  studies,
+  upatedDataStudy,
+  deletedDataStudy,
+  searchData,
+  newAdddeStudy,
+  ...props
+}) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -270,24 +280,41 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
   const [search, setSearch] = useState(null)
   const [allStudies, setAllStudies] = useState(studies)
   const [updateCount, setUpdateCount] = useState(0)
-
+  const [newStudy, setNewStudy] = useState(null)
+  const [studiesData, setStudiesData] = useState(studies)
+  useEffect(() => {
+    refreshStudies()
+    newAdddeStudy(newStudy)
+  }, [newStudy])
   useEffect(() => {
     setAllStudies(studies)
   }, [studies])
 
-  useEffect(() => {
-    searchFilterStudies()
-  }, [search])
+  const refreshStudies = () => {
+    Service.getAll("studies").then((data) => {
+      setStudiesData(data || [])
+    })
+  }
 
-  const searchFilterStudies = () => {
+  const getAllStudies = async () => {
+    let studies = await Service.getAll("studies")
+    setAllStudies(studies)
+  }
+
+  const searchFilterStudies = async () => {
     if (!!search && search !== "") {
-      let newStudies = studies.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+      let studiesList: any = await Service.getAll("studies")
+      let newStudies = studiesList.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
       setAllStudies(newStudies)
       setLoading(false)
     } else {
-      setAllStudies(studies)
+      getAllStudies()
     }
   }
+
+  useEffect(() => {
+    searchFilterStudies()
+  }, [search])
 
   const handleUpdatedStudyObject = (data) => {
     upatedDataStudy(data)
@@ -295,6 +322,7 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
 
   const handleDeletedStudy = (data) => {
     deletedDataStudy(data)
+    searchData(search)
   }
 
   const handleSearchData = (val) => {
@@ -307,11 +335,13 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
         <CircularProgress color="inherit" />
       </Backdrop> */}
       <Header
-        studies={studies}
+        //studies={studies}
+        studies={studiesData}
         researcher={researcher}
         searchData={handleSearchData}
         setParticipants={searchFilterStudies}
         setUpdateCount={setUpdateCount}
+        newStudyObj={setNewStudy}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
@@ -321,7 +351,7 @@ export default function StudiesList({ title, researcher, studies, upatedDataStud
                 <Box display="flex" p={1} className={classes.studyMain}>
                   <Box flexGrow={1}>
                     {" "}
-                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} />
+                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} allStudies={allStudies} />
                   </Box>
                   <DeleteStudy study={study} deletedStudy={handleDeletedStudy} />
                 </Box>

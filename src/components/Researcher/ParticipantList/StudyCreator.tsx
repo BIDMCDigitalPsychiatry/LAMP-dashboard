@@ -92,7 +92,7 @@ export default function StudyCreator({
     study.name = studyName
     LAMP.Study.create(researcher.id, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
-      let studiesData = { id: result.data, name: studyName, participant_count: 0, activity_count: 0, sensor_count: 0 }
+      let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
       Service.addData("studies", [studiesData])
       let selectedStudy = result.data
       let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
@@ -121,6 +121,7 @@ export default function StudyCreator({
       setLoading(false)
     })
   }
+
   return (
     <Dialog
       {...props}

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import ActivityItem from "./ActivityItem"
 import Header from "./Header"
 import { sortData } from "../Dashboard"
+import Pagination from "../../PaginatedElement"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -37,11 +38,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _hideCognitiveTesting() {
-  return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
-}
-// TODO: Blogs/Tips/AppHelp
-
 export const availableAtiveSpecs = [
   "lamp.group",
   "lamp.suvey",
@@ -57,7 +53,6 @@ export const availableAtiveSpecs = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-
 export const games = [
   "lamp.jewels_a",
   "lamp.jewels_b",
@@ -66,14 +61,16 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-
 export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
-  const [activities, setActivities] = useState(null)
+  const [activities, setActivities] = useState([])
   const { t } = useTranslation()
   const classes = useStyles()
   const [selectedActivities, setSelectedActivities] = useState<any>([])
   const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [paginatedActivities, setPaginatedActivities] = useState([])
+  const [studiesData, setStudiesData] = useState(studies)
+  const [selected, setSelected] = useState(selectedStudies)
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -85,37 +82,59 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   }
 
   useEffect(() => {
-    searchActivities()
+    refreshStudies()
+  }, [])
+
+  const refreshStudies = () => {
+    Service.getAll("studies").then((data) => {
+      setStudiesData(data || [])
+    })
+  }
+
+  useEffect(() => {
+    setSelected(selectedStudies)
+    if (selectedStudies.length > 0) {
+      searchActivities()
+    }
   }, [selectedStudies])
 
   useEffect(() => {
-    searchActivities()
+    if (search !== null) searchActivities()
   }, [search])
 
   const searchActivities = () => {
-    setLoading(true)
-    if (selectedStudies.length > 0) {
-      Service.getDataByKey("activities", selectedStudies, "study_name").then((activitiesData) => {
-        if (search) {
-          let newActivities = activitiesData.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
-          setActivities(sortData(newActivities, selectedStudies, "name"))
-        } else {
-          setActivities(sortData(activitiesData, selectedStudies, "name"))
-        }
-        setLoading(false)
+    selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedStudies.length > 0 && !loading) {
+      let result = []
+      setLoading(true)
+      selectedStudies.map((study) => {
+        Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
+          if ((activitiesData || []).length > 0) {
+            if (!!search && search.trim().length > 0) {
+              result = result.concat(activitiesData)
+              result = result.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+              setActivities(sortData(result, selectedStudies, "name"))
+            } else {
+              result = result.concat(activitiesData)
+              setActivities(sortData(result, selectedStudies, "name"))
+            }
+            setPaginatedActivities(result.slice(0, 50))
+          }
+          setLoading(false)
+        })
       })
-    } else if (!!search && search !== "") {
-      let newActivities = activities.filter(
-        (i) => i.name.toLowerCase()?.includes(search.toLowerCase()) || i.id?.includes(search.toLowerCase())
-      )
-      setActivities(sortData(newActivities, studies, "id"))
+    } else {
       setLoading(false)
     }
     setSelectedActivities([])
   }
-
   const handleSearchData = (val) => {
     setSearch(val)
+  }
+  const handleChangePage = (page: number, rowCount: number) => {
+    setLoading(true)
+    setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
+    setLoading(false)
   }
 
   return (
@@ -124,32 +143,35 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
-        studies={studies}
+        studies={studiesData}
         researcher={researcher}
         activities={activities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
-        selectedStudies={selectedStudies}
+        selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
           {!!activities && activities.length > 0 ? (
-            activities.map((activity) => (
-              <Grid item lg={6} xs={12} key={activity.id}>
-                <ActivityItem
-                  activity={activity}
-                  researcher={researcher}
-                  studies={studies}
-                  activities={activities}
-                  handleSelectionChange={handleChange}
-                  selectedActivities={selectedActivities}
-                  setActivities={searchActivities}
-                  updateActivities={setActivities}
-                />
-              </Grid>
-            ))
+            <Grid container spacing={3}>
+              {paginatedActivities.map((activity) => (
+                <Grid item lg={6} xs={12} key={activity.id}>
+                  <ActivityItem
+                    activity={activity}
+                    researcher={researcher}
+                    studies={studiesData}
+                    activities={activities}
+                    handleSelectionChange={handleChange}
+                    selectedActivities={selectedActivities}
+                    setActivities={searchActivities}
+                    updateActivities={setActivities}
+                  />
+                </Grid>
+              ))}
+              <Pagination data={activities} updatePage={handleChangePage} />
+            </Grid>
           ) : (
             <Box display="flex" alignItems="center" className={classes.norecords}>
               <Icon>info</Icon>

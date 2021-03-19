@@ -298,6 +298,7 @@ export default function SensorDialog({
   studyId,
   type,
   addOrUpdateSensor,
+  allSensors,
   ...props
 }: {
   sensor?: Sensors
@@ -305,6 +306,7 @@ export default function SensorDialog({
   studyId?: string
   type?: string
   addOrUpdateSensor?: Function
+  allSensors?: Array<any>
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState(sensor ? sensor.study_id : studyId ?? "")
@@ -315,6 +317,9 @@ export default function SensorDialog({
   const [sensorSpecs, setSensorSpecs] = useState(null)
   const [sensorSpec, setSensorSpec] = useState(sensor ? sensor.spec : null)
   const [loading, setLoading] = useState(false)
+  const [duplicateCnt, setDuplicateCnt] = useState(0)
+  const [oldSensorName, setOldSensorName] = useState(sensor ? sensor.name : "")
+  const [allSensorData, setAllSensorData] = useState([])
 
   useEffect(() => {
     LAMP.SensorSpec.all().then((res) => {
@@ -324,16 +329,63 @@ export default function SensorDialog({
   }, [])
 
   useEffect(() => {
+    setAllSensorData(allSensors)
+  }, [allSensors])
+
+  useEffect(() => {
     if (type === "add") {
       setSelectedSensor(null)
       setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
       setSensorName("")
       setSensorSpec("")
+    } else {
+      setSelectedStudy(sensor ? sensor.study_id : studyId ?? "")
+      setSelectedSensor(sensor ?? null)
+      setSensorName(sensor ? sensor.name : "")
+      setSensorSpec(sensor ? sensor.spec : null)
     }
   }, [props.open])
 
+  useEffect(() => {
+    let duplicateCount = 0
+    if (!(typeof sensorName === "undefined" || (typeof sensorName !== "undefined" && sensorName?.trim() === ""))) {
+      if (allSensorData) {
+        selectedSensor
+          ? (duplicateCount = allSensorData.filter((sensorData) => {
+              if (sensorData.name !== oldSensorName) {
+                return (
+                  sensorData.study_id === selectedStudy &&
+                  sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
+                )
+              }
+            }).length)
+          : (duplicateCount = allSensorData.filter(
+              (sensorData) =>
+                sensorData.study_id === selectedStudy &&
+                sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
+            ).length)
+      }
+      setDuplicateCnt(duplicateCount)
+    }
+  }, [sensorName])
+
+  useEffect(() => {
+    let duplicateCount = 0
+    if (!(typeof sensorName === "undefined" || (typeof sensorName !== "undefined" && sensorName?.trim() === ""))) {
+      if (allSensors) {
+        duplicateCount = allSensors.filter(
+          (sensorData) =>
+            sensorData.study_id === selectedStudy &&
+            sensorData.name?.trim().toLowerCase() === sensorName?.trim().toLowerCase()
+        ).length
+      }
+      setDuplicateCnt(duplicateCount)
+    }
+  }, [selectedStudy])
+
   const validate = () => {
     return !(
+      duplicateCnt > 0 ||
       typeof selectedStudy == "undefined" ||
       selectedStudy === null ||
       selectedStudy === "" ||
@@ -374,15 +426,14 @@ export default function SensorDialog({
     }).then((res) => {
       let result = JSON.parse(JSON.stringify(res))
       Service.getData("studies", selectedStudy).then((studiesObject) => {
-        Service.addData("sensors", [
-          {
-            id: result.data,
-            name: sensorName,
-            spec: sensorSpec,
-            study_id: selectedStudy,
-            study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
-          },
-        ])
+        let sensorObj = {
+          id: result.data,
+          name: sensorName,
+          spec: sensorSpec,
+          study_id: selectedStudy,
+          study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
+        }
+        Service.addData("sensors", [sensorObj])
         Service.updateMultipleKeys(
           "studies",
           {
@@ -420,7 +471,8 @@ export default function SensorDialog({
               select
               label={t("Study")}
               value={selectedStudy}
-              disabled={!!studyId ? true : false}
+              //disabled={!!studyId ? true : false}
+              disabled={!!sensor ? true : false}
               onChange={(e) => {
                 setSelectedStudy(e.target.value)
               }}
@@ -441,14 +493,20 @@ export default function SensorDialog({
 
           <Box mt={4}>
             <TextField
-              error={typeof sensorName == "undefined" || sensorName === null || sensorName === "" ? true : false}
+              error={
+                duplicateCnt > 0 || typeof sensorName == "undefined" || sensorName === null || sensorName === ""
+                  ? true
+                  : false
+              }
               value={sensorName}
               variant="filled"
               label="Name"
               onChange={(event) => setSensorName(event.target.value)}
               placeholder={t("Name")}
               helperText={
-                typeof sensorName == "undefined" || sensorName === null || sensorName === ""
+                duplicateCnt > 0
+                  ? t("Unique name required")
+                  : typeof sensorName == "undefined" || sensorName === null || sensorName === ""
                   ? t("Please enter Name")
                   : ""
               }

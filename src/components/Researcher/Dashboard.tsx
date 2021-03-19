@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 export const sortData = (data, studies, key) => {
   let result = []
   studies.map((study) => {
@@ -119,7 +120,6 @@ export const sortData = (data, studies, key) => {
   })
   return result
 }
-
 export interface Study {
   id?: string
   name?: string
@@ -127,16 +127,16 @@ export interface Study {
   activity_count?: number
   sensor_count?: number
 }
-
 export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
-  const [changeStudyCount, setChangeCount] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [updatedData, setUpdatedData] = useState(null)
   const [deletedData, setDeletedData] = useState(null)
+  const [newStudy, setNewStudy] = useState(null)
+  const [search, setSearch] = useState(null)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -144,48 +144,67 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     () => {
       getDBStudies()
     },
-    studies !== null && (studies || []).length > 0 ? null : 1000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
+  useEffect(() => {
+    getAllStudies()
+  }, [newStudy])
+
   const getDBStudies = async () => {
-    let studies = await Service.getAll("studies")
-    setStudies(studies)
-    Service.getAll("researcher").then((data) => {
-      let researcherNotification = !!data ? data[0]?.notification ?? false : false
-      setNotification(researcherNotification)
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      setCurrentTab(0)
+      Service.getAll("researcher").then((data) => {
+        let researcherNotification = !!data ? data[0]?.notification ?? false : false
+        setNotification(researcherNotification)
+      })
     })
   }
 
   const getAllStudies = async () => {
-    let studies = await Service.getAll("studies")
-    setStudies(studies)
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      filterStudies(studies)
+    })
   }
 
   useEffect(() => {
-    setCurrentTab(0)
-  }, [])
-
-  useEffect(() => {
-    filterStudies(studies)
+    if (studies !== null && (studies || []).length > 0) {
+      filterStudies(studies)
+    }
   }, [studies])
 
   useEffect(() => {
-    getAllStudies()
+    if (updatedData !== null) getAllStudies()
   }, [updatedData])
 
   useEffect(() => {
-    getAllStudies()
+    if (deletedData !== null) {
+      let newStudies = studies.filter((item) => {
+        if (search) {
+          return item.name.toLowerCase()?.includes(search.toLowerCase()) && item.id !== deletedData
+        } else {
+          return item.id !== deletedData
+        }
+      })
+      setStudies(newStudies)
+    } else {
+      getAllStudies()
+    }
   }, [deletedData])
 
   const filterStudies = async (studies) => {
-    let selected =
-      ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
-      (studies ?? []).map((study) => {
-        return study.name
-      })
-    selected.sort()
-    setSelectedStudies(selected)
+    if (studies !== null && (studies || []).length > 0) {
+      let selected =
+        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
+        (studies ?? []).map((study) => {
+          return study.name
+        })
+      selected.sort()
+      setSelectedStudies(selected)
+    }
   }
 
   const upatedDataStudy = (data) => {
@@ -194,6 +213,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
 
   const deletedDataStudy = (data) => {
     setDeletedData(data)
+  }
+
+  const handleSearchData = (data) => {
+    setSearch(data)
   }
 
   return (
@@ -270,6 +293,8 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                getAllStudies={getAllStudies}
+                newAdddeStudy={setNewStudy}
               />
             )}
             {currentTab === 1 && (
@@ -297,6 +322,8 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 upatedDataStudy={upatedDataStudy}
                 deletedDataStudy={deletedDataStudy}
+                searchData={handleSearchData}
+                newAdddeStudy={setNewStudy}
               />
             )}
           </ResponsivePaper>

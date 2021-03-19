@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react"
-import { Box, Typography, InputBase } from "@material-ui/core"
+import React, { useState } from "react"
+import { Box, Typography } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import SearchIcon from "@material-ui/icons/Search"
-import { useSnackbar } from "notistack"
-import { useTranslation } from "react-i18next"
 import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
+import SearchBox from "../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -16,44 +14,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": {
         fontSize: "30px",
         fontWeight: "bold",
-      },
-    },
-    search: {
-      position: "relative",
-      borderRadius: 50,
-      backgroundColor: "#F8F8F8",
-      "&:hover": {
-        backgroundColor: "#eee",
-      },
-      marginLeft: 0,
-      width: "100%",
-      [theme.breakpoints.up("lg")]: {
-        width: "450px",
-      },
-      [theme.breakpoints.down("md")]: {
-        width: "300px",
-      },
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: "100%",
-      position: "absolute",
-      pointerEvents: "none",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    inputRoot: {
-      color: "inherit",
-    },
-    inputInput: {
-      padding: "15px 10px",
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("lg")]: {
-        width: "20ch",
       },
     },
     optionsMain: {
@@ -83,14 +43,8 @@ export default function Header({
   ...props
 }) {
   const classes = useStyles()
-  const [search, setSearch] = useState("")
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, updateStudyCount] = useState(0)
-
-  const handleSearchData = (data) => {
-    searchData(data)
-  }
-
   const setUpdateCount = (type: number) => {
     updateStudyCount(type)
   }
@@ -109,26 +63,7 @@ export default function Header({
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>
-        <Box>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder="Search…"
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                handleSearchData(e.target.value)
-              }}
-              value={search}
-            />
-          </div>
-        </Box>
+        <SearchBox searchData={searchData} />
         <Box>
           <AddActivity
             activities={activities}
@@ -148,6 +83,7 @@ export default function Header({
           selectedStudies={selectedStudies}
           setSelectedStudies={setSelectedStudies}
           updateCount={updateCount}
+          setUpdateCount={setUpdateCount}
         />
       </Box>
       {selectedActivities.length > 0 && (

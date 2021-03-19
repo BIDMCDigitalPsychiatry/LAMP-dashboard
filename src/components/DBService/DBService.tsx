@@ -176,6 +176,25 @@ class DBService {
       })
   }
 
+  deleteByKey(tablespace: string, keys: any, conditionKey: string) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            if (keys.includes(cursor.value[conditionKey])) {
+              cursor.delete()
+            }
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
   updateCount(tablespace: string, key: string, keyToUpdate: string, count?: number, type?: number) {
     return dbPromise
       .then((db) => {

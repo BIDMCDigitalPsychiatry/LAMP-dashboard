@@ -96,9 +96,9 @@ export default function DeleteSensor({
               ["sensor_count"],
               "id"
             )
+            setUpdateCount(3)
           })
         })
-        setUpdateCount(1)
       }
     }
   }, [deletedStudyIds])
@@ -110,7 +110,7 @@ export default function DeleteSensor({
         /*enqueueSnackbar(t("Successfully deleted the selected Sensors."), {
           variant: "success",
         })*/
-        setUpdateCount(3)
+        //////setUpdateCount(3)
       } else {
         enqueueSnackbar(t("An error occured while deleting. Please try again."), {
           variant: "error",

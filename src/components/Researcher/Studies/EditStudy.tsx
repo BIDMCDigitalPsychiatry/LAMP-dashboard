@@ -225,7 +225,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function EditStudy({ study, upatedDataStudy, ...props }) {
+export default function EditStudy({ study, upatedDataStudy, allStudies, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -235,7 +235,6 @@ export default function EditStudy({ study, upatedDataStudy, ...props }) {
   const [aliasStudyName, setAliasStudyName] = useState("")
   const [studyArray, setStudyNameArray] = useState([])
   const [openDialogStudies, setOpenDialogManageStudies] = useState(false)
-
   const updateStudyName = (data) => {
     setEditStudy(false)
     setAliasStudyName(data)
@@ -244,7 +243,6 @@ export default function EditStudy({ study, upatedDataStudy, ...props }) {
     setStudyNameArray(oldNameArray)
     upatedDataStudy(oldNameArray)
   }
-
   // Parent Component
   const callbackModal = () => {
     // refreshPage()
@@ -268,6 +266,7 @@ export default function EditStudy({ study, upatedDataStudy, ...props }) {
               editStudyName={editStudyName}
               updateName={updateStudyName}
               callbackModal={callbackModal}
+              allStudies={allStudies}
             />
           </Box>
         ) : aliasStudyName && editStudyName === study.id ? (

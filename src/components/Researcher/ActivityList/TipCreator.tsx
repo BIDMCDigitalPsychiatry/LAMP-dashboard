@@ -179,7 +179,6 @@ export default function TipCreator({
     settings: [{ title: "", text: "", image: "" }],
     studyID: "",
   }
-
   useEffect(() => {
     let id = deletedIds
     if (id !== "") {

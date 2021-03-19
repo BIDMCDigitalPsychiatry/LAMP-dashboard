@@ -26,6 +26,7 @@ export default function StudyFilterList({
   setSelectedStudies,
   selectedStudies,
   updateCount,
+  setUpdateCount,
   ...props
 }: {
   studies?: Array<any>
@@ -35,6 +36,7 @@ export default function StudyFilterList({
   setSelectedStudies?: Function
   selectedStudies?: Array<string>
   updateCount?: number
+  setUpdateCount?: Function
 }) {
   const { t } = useTranslation()
   const [studiesCount, setStudiesCount] = useState(null)
@@ -45,14 +47,23 @@ export default function StudyFilterList({
     refreshStudies()
   }, [])
 
+  useEffect(() => {
+    refreshStudies()
+  }, [studies])
+
   const refreshStudies = () => {
     Service.getAll("studies").then((data) => {
       setStuds(data || [])
     })
+    setUpdateCount(0)
   }
 
   useEffect(() => {
+    let isMounted = true
     refreshStudies()
+    return () => {
+      isMounted = false
+    }
   }, [updateCount])
 
   useEffect(() => {

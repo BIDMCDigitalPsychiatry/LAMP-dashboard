@@ -19,6 +19,7 @@ export default function EditStudyField({
   updateName,
   onUpdate,
   callbackModal,
+  allStudies,
   ...props
 }: {
   study?: any
@@ -28,6 +29,7 @@ export default function EditStudyField({
   updateName?: any
   onUpdate?: any
   callbackModal?: any
+  allStudies?: any
 }) {
   const inputRef = useRef<any>()
   const oldValue = useRef<string>()
@@ -102,6 +104,7 @@ export default function EditStudyField({
           { variant: "error" }
         )
       ) //}
+    Service.update("studies", { studies: [{ id: study, name: aliasStudyName }] }, "name", "id")
   }, [editing])
 
   useEffect(() => {
@@ -124,6 +127,31 @@ export default function EditStudyField({
       updateName(aliasStudyName === "" ? studyName : aliasStudyName)
     }
   }
+  const validate = (val) => {
+    let studyDuplicateCount = allStudies.filter(
+      (studyItem) => studyItem.name?.trim().toLowerCase() === val?.trim().toLowerCase() && studyItem.id !== study
+    ).length
+    let status = true
+    if (studyDuplicateCount > 0) {
+      enqueueSnackbar(
+        t("Failed to change participantId's alias: Study name already exist", {
+          participantId: study,
+        }),
+        { variant: "error" }
+      )
+      status = false
+    } else if (val?.trim().length === 0) {
+      enqueueSnackbar(
+        t("Failed to change participantId's alias: Study name required", {
+          participantId: study,
+        }),
+        { variant: "error" }
+      )
+      status = false
+    }
+    return status
+  }
+
   return (
     <div>
       {editData && editStudyName === study && !editComplete ? (
@@ -135,12 +163,13 @@ export default function EditStudyField({
           label={t(studyName)}
           value={t(aliasStudyName) || ""}
           onChange={(event) => {
-            Service.update("studies", { studies: [{ id: study, name: event.target.value }] }, "name", "id")
             setAliasStudyName(event.target.value)
           }}
           onClick={(event) => event.stopPropagation()}
           onKeyUp={(event) => event.keyCode === 13 && setEditing(false)}
-          onBlur={() => updateEditing()}
+          onBlur={() => {
+            if (validate(aliasStudyName)) updateEditing()
+          }}
           InputLabelProps={{ style: { color: "#000" } }}
           InputProps={{
             style: { color: "#000" },
@@ -150,7 +179,9 @@ export default function EditStudyField({
                   <IconButton
                     edge="end"
                     aria-label="save edit"
-                    onClick={() => updateEditing()}
+                    onClick={() => {
+                      if (validate(aliasStudyName)) updateEditing()
+                    }}
                     onMouseDown={(event) => event.preventDefault()}
                   >
                     <Icon fontSize="small">{editing ? "check" : ""}</Icon>

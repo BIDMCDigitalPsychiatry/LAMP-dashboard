@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
@@ -10,6 +10,8 @@ import Header from "./Header"
 import { Service } from "../../DBService/DBService"
 import { sortData } from "../Dashboard"
 import { useTranslation } from "react-i18next"
+import Pagination from "../../PaginatedElement"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,16 +122,40 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
+  getAllStudies,
   ...props
 }) {
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
-  const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
   const [updateCount, setUpdateCount] = useState(0)
-
+  const [selected, setSelected] = useState(selectedStudies)
+  const [paginatedParticipants, setPaginatedParticipants] = useState([])
+  const [newStudy, setNewStudy] = useState(null)
+  const [search, setSearch] = useState(null)
+  const [studiesData, setStudiesData] = useState(studies)
   const { t } = useTranslation()
+  useInterval(
+    () => {
+      getAllStudies()
+    },
+    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
+    true
+  )
+  useEffect(() => {
+    setSelected(selectedStudies)
+    if (selectedStudies.length > 0) {
+      searchParticipants()
+    }
+  }, [selectedStudies])
+  useEffect(() => {
+    setStudiesData(studies)
+  }, [studies])
+
+  useEffect(() => {
+    getAllStudies()
+  }, [newStudy])
 
   const handleChange = (participant, checked) => {
     if (checked) {
@@ -141,68 +167,78 @@ export default function ParticipantList({
   }
 
   useEffect(() => {
-    searchParticipants()
-  }, [selectedStudies])
-
-  useEffect(() => {
-    searchParticipants()
+    if (search !== null) {
+      searchParticipants()
+    }
   }, [search])
 
   const searchParticipants = () => {
-    setLoading(true)
-    if (selectedStudies.length > 0) {
-      Service.getDataByKey("participants", selectedStudies, "study_name").then((participantData) => {
-        if (search) {
-          let newParticipants = participantData.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-          setParticipants(sortData(newParticipants, selectedStudies, "id"))
-        } else {
-          setParticipants(sortData(participantData, selectedStudies, "id"))
-        }
-        setLoading(false)
+    const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+    if (selectedData.length > 0 && !loading) {
+      let result = []
+      setLoading(true)
+      selectedData.map((study) => {
+        Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
+          if ((participantData || []).length > 0) {
+            if (!!search && search.trim().length > 0) {
+              result = result.concat(participantData)
+              result = result.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+              setParticipants(sortData(result, selectedData, "id"))
+            } else {
+              result = result.concat(participantData)
+              setParticipants(sortData(result, selectedData, "id"))
+            }
+            setPaginatedParticipants(result.slice(0, 50))
+          }
+          setLoading(false)
+        })
       })
-    } else if (!!search && search !== "") {
-      let newParticipants = participants.filter((i) => i.name?.includes(search) || i.id?.includes(search))
-      setParticipants(sortData(newParticipants, studies, "id"))
-      setLoading(false)
     }
     setSelectedParticipants([])
   }
 
-  const handleSearchData = (val) => {
+  const handleSearchData = (val: string) => {
     setSearch(val)
   }
 
+  const handleChangePage = (page: number, rowCount: number) => {
+    setLoading(true)
+    setPaginatedParticipants(participants.slice(page * rowCount, page * rowCount + rowCount))
+    setLoading(false)
+  }
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
-        studies={studies}
+        studies={studiesData}
         researcher={researcher}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
-        selectedStudies={selectedStudies}
+        selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        setUpdateCount={setUpdateCount}
-        updateCount={updateCount}
+        newStudyObj={setNewStudy}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
           {!!participants && participants.length > 0 ? (
-            participants.map((eachParticipant) => (
-              <Grid item lg={6} xs={12} key={eachParticipant.id}>
-                <ParticipantListItem
-                  participant={eachParticipant}
-                  onParticipantSelect={onParticipantSelect}
-                  studies={studies}
-                  notificationColumn={notificationColumn}
-                  handleSelectionChange={handleChange}
-                  setUpdateCount={setUpdateCount}
-                />
-              </Grid>
-            ))
+            <Grid container spacing={3}>
+              {paginatedParticipants.map((eachParticipant, index) => (
+                <Grid item lg={6} xs={12} key={index + eachParticipant.id + eachParticipant.study_id}>
+                  <ParticipantListItem
+                    participant={eachParticipant}
+                    onParticipantSelect={onParticipantSelect}
+                    studies={studiesData}
+                    notificationColumn={notificationColumn}
+                    handleSelectionChange={handleChange}
+                    setUpdateCount={setUpdateCount}
+                  />
+                </Grid>
+              ))}
+              <Pagination data={participants} updatePage={handleChangePage} />
+            </Grid>
           ) : (
             <Box display="flex" alignItems="center" className={classes.norecords}>
               <Icon>info</Icon>

@@ -26,10 +26,6 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import Participant from "./Participant"
-import { useWorker } from "@koale/useworker"
-import { saveDataToCache } from "./Researcher/SaveResearcherData"
-import { saveDemoData } from "./Researcher/SaveResearcherData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -77,8 +73,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
-  const [dataWorker] = useWorker(saveDataToCache)
-  const [demoWorker] = useWorker(saveDemoData)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -96,7 +90,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       }
     }
   }, [])
-
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -139,7 +132,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
-        Service.deleteDB()
+        ;(async () => {
+          await Service.deleteDB()
+        })()
         setLoginClick(false)
         onComplete()
       })
