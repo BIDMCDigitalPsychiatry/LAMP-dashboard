@@ -1,58 +1,10 @@
 import React, { useState } from "react"
 import { Box, Popover, Fab, Typography, Icon, InputBase, MenuItem } from "@material-ui/core"
 import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-
 import SearchIcon from "@material-ui/icons/Search"
-import AddUser from "../ParticipantList/AddUser"
-import StudyCreator from "../ParticipantList/StudyCreator"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
-
-const _qrLink = (credID, password) =>
-  window.location.href.split("#")[0] +
-  "#/?a=" +
-  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiTableCell: {
-      root: {
-        borderBottom: "#fff solid 1px",
-        padding: 10,
-      },
-    },
-    MuiToolbar: {
-      root: {
-        maxWidth: 1055,
-        width: "80%",
-        margin: "0 auto",
-        background: "#fff !important",
-      },
-    },
-    MuiInput: {
-      root: {
-        border: 0,
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiIcon: {
-      root: { color: "rgba(0, 0, 0, 0.4)" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -148,23 +100,18 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
-    optionsMain: {
-      background: "#ECF4FF",
-      borderTop: "1px solid #C7C7C7",
-
-      marginTop: 20,
-      width: "99.4vw",
-      position: "relative",
-      left: "50%",
-      right: "50%",
-      marginLeft: "-50vw",
-      marginRight: "-50vw",
-    },
-    optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
   })
 )
 
-export default function Header({ studies, researcher, searchData, setUpdateCount, setParticipants, ...props }) {
+export default function Header({
+  studies,
+  researcher,
+  searchData,
+  setUpdateCount,
+  setParticipants,
+  newStudyObj,
+  ...props
+}) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
@@ -178,6 +125,7 @@ export default function Header({ studies, researcher, searchData, setUpdateCount
   const handleNewStudyData = (data) => {
     setUpdateCount(1)
     setParticipants()
+    newStudyObj(data)
   }
 
   const handleClosePopUp = (data) => {

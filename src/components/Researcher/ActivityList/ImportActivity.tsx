@@ -206,10 +206,10 @@ export default function ImportActivity({ studies, ...props }) {
   const [importFile, setImportFile] = useState<any>()
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
     const _importFile = [...importFile] // clone it so we can close the dialog first
-
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")

@@ -43,6 +43,7 @@ export default function SensorsList({
   studies,
   selectedStudies,
   setSelectedStudies,
+  getDBStudies,
   ...props
 }: {
   title?: string
@@ -50,15 +51,16 @@ export default function SensorsList({
   studies: Array<any>
   selectedStudies: Array<any>
   setSelectedStudies?: Function
+  getDBStudies?: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [sensors, setSensors] = useState([])
   const [selectedSensors, setSelectedSensors] = useState<any>([])
   const [search, setSearch] = useState(null)
   const [paginatedSensors, setPaginatedSensors] = useState([])
-
+  const [selected, setSelected] = useState(selectedStudies)
   const handleChange = (sensorData, checked) => {
     if (checked) {
       setSelectedSensors((prevState) => [...prevState, sensorData])
@@ -67,49 +69,55 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
-
   useEffect(() => {
     if (selectedStudies.length > 0) searchFilterSensors()
+  }, [studies])
+
+  useEffect(() => {
+    setSelected(selectedStudies)
+    if (selectedStudies.length > 0) {
+      searchFilterSensors()
+    }
   }, [selectedStudies])
 
   useEffect(() => {
-    searchFilterSensors()
+    if (search !== null) searchFilterSensors()
   }, [search])
 
   const searchFilterSensors = () => {
-    setLoading(true)
     selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedStudies.length > 0) {
+    if (selectedStudies.length > 0 && !loading) {
       let result = []
+      setLoading(true)
       selectedStudies.map((study) => {
         Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
           if ((sensorData || []).length > 0) {
             if (!!search && search.trim().length > 0) {
               result = result.concat(sensorData)
-              let newSensors = result.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
-              setSensors(sortData(newSensors, selectedStudies, "name"))
+              result = result.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+              setSensors(sortData(result, selectedStudies, "name"))
             } else {
               result = result.concat(sensorData)
               setSensors(sortData(result, selectedStudies, "name"))
             }
+            setPaginatedSensors(result.slice(0, 50))
           }
           setLoading(false)
         })
       })
+    } else {
+      setLoading(false)
     }
     setSelectedSensors([])
   }
-
-  useEffect(() => {
-    setPaginatedSensors(sensors.slice(0, 50))
-  }, [sensors])
 
   const handleSearchData = (val) => {
     setSearch(val)
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
-    setPaginatedSensors(sensors.slice((Number(page) - 1) * rowCount, (Number(page) - 1) * rowCount + rowCount))
+    setLoading(true)
+    setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }
 
@@ -124,7 +132,7 @@ export default function SensorsList({
         selectedSensors={selectedSensors}
         searchData={handleSearchData}
         setSelectedStudies={setSelectedStudies}
-        selectedStudies={selectedStudies}
+        selectedStudies={selected}
         setSensors={searchFilterSensors}
       />
       <Box className={classes.tableContainer} py={4}>

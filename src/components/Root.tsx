@@ -19,9 +19,6 @@ import {
 
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../icons/plus.svg"
-
-// Local Imports
 import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
@@ -29,6 +26,7 @@ import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../icons/Researcher.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import locale_lang from "../locale_map.json"
+import { Service } from "./DBService/DBService"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
@@ -238,6 +236,7 @@ function Researchers({ history, ...props }) {
   }
 
   useEffect(() => {
+    Service.deleteDB()
     if (LAMP.Auth._type !== "admin") return
     LAMP.Researcher.all().then(setResearchers)
   }, [])

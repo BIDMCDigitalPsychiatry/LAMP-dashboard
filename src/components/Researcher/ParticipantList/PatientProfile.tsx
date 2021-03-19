@@ -48,7 +48,6 @@ export default function PatientProfile({
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
   const { t } = useTranslation()
-
   return (
     <Box>
       <Fab

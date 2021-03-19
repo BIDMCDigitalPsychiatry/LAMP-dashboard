@@ -39,10 +39,8 @@ export default function Header({
   searchData,
   setSelectedStudies,
   selectedStudies,
-  //setUpdateCount,
   setParticipants,
   newStudyObj,
-  //updateCount,
   ...props
 }) {
   const classes = useStyles()

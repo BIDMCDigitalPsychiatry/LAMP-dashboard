@@ -45,7 +45,6 @@ export default function Header({
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, updateStudyCount] = useState(0)
-
   const setUpdateCount = (type: number) => {
     updateStudyCount(type)
   }

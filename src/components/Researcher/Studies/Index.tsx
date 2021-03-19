@@ -265,6 +265,7 @@ export default function StudiesList({
   upatedDataStudy,
   deletedDataStudy,
   searchData,
+  newAdddeStudy,
   ...props
 }) {
   const { enqueueSnackbar } = useSnackbar()
@@ -279,10 +280,21 @@ export default function StudiesList({
   const [search, setSearch] = useState(null)
   const [allStudies, setAllStudies] = useState(studies)
   const [updateCount, setUpdateCount] = useState(0)
-
+  const [newStudy, setNewStudy] = useState(null)
+  const [studiesData, setStudiesData] = useState(studies)
+  useEffect(() => {
+    refreshStudies()
+    newAdddeStudy(newStudy)
+  }, [newStudy])
   useEffect(() => {
     setAllStudies(studies)
   }, [studies])
+
+  const refreshStudies = () => {
+    Service.getAll("studies").then((data) => {
+      setStudiesData(data || [])
+    })
+  }
 
   const getAllStudies = async () => {
     let studies = await Service.getAll("studies")
@@ -323,11 +335,13 @@ export default function StudiesList({
         <CircularProgress color="inherit" />
       </Backdrop> */}
       <Header
-        studies={studies}
+        //studies={studies}
+        studies={studiesData}
         researcher={researcher}
         searchData={handleSearchData}
         setParticipants={searchFilterStudies}
         setUpdateCount={setUpdateCount}
+        newStudyObj={setNewStudy}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
@@ -337,7 +351,7 @@ export default function StudiesList({
                 <Box display="flex" p={1} className={classes.studyMain}>
                   <Box flexGrow={1}>
                     {" "}
-                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} />
+                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} allStudies={allStudies} />
                   </Box>
                   <DeleteStudy study={study} deletedStudy={handleDeletedStudy} />
                 </Box>

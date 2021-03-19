@@ -223,7 +223,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         icon: x.icon,
         studyID: selectedActivity.study_id,
         spec: "lamp.tips",
-        settings: selectedActivity.settings,
+        settings: x.settings,
         schedule: selectedActivity.schedule,
       }
       result = await saveTipActivity(tipObj)

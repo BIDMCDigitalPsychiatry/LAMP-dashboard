@@ -53,7 +53,6 @@ export const availableAtiveSpecs = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-
 export const games = [
   "lamp.jewels_a",
   "lamp.jewels_b",
@@ -62,7 +61,6 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-
 export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
   const [activities, setActivities] = useState([])
   const { t } = useTranslation()
@@ -71,6 +69,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
   const [paginatedActivities, setPaginatedActivities] = useState([])
+  const [studiesData, setStudiesData] = useState(studies)
+  const [selected, setSelected] = useState(selectedStudies)
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -82,47 +82,58 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   }
 
   useEffect(() => {
-    if (selectedStudies.length > 0) searchActivities()
+    refreshStudies()
+  }, [])
+
+  const refreshStudies = () => {
+    Service.getAll("studies").then((data) => {
+      setStudiesData(data || [])
+    })
+  }
+
+  useEffect(() => {
+    setSelected(selectedStudies)
+    if (selectedStudies.length > 0) {
+      searchActivities()
+    }
   }, [selectedStudies])
 
   useEffect(() => {
-    searchActivities()
+    if (search !== null) searchActivities()
   }, [search])
 
   const searchActivities = () => {
-    setLoading(true)
     selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedStudies.length > 0) {
+    if (selectedStudies.length > 0 && !loading) {
       let result = []
+      setLoading(true)
       selectedStudies.map((study) => {
         Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
           if ((activitiesData || []).length > 0) {
             if (!!search && search.trim().length > 0) {
               result = result.concat(activitiesData)
-              let newActivities = result.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
-              setActivities(sortData(newActivities, selectedStudies, "name"))
+              result = result.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+              setActivities(sortData(result, selectedStudies, "name"))
             } else {
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
+            setPaginatedActivities(result.slice(0, 50))
           }
           setLoading(false)
         })
       })
+    } else {
+      setLoading(false)
     }
     setSelectedActivities([])
   }
-
   const handleSearchData = (val) => {
     setSearch(val)
   }
-
-  useEffect(() => {
-    setPaginatedActivities(activities.slice(0, 50))
-  }, [activities])
-
   const handleChangePage = (page: number, rowCount: number) => {
-    setPaginatedActivities(activities.slice((Number(page) - 1) * rowCount, (Number(page) - 1) * rowCount + rowCount))
+    setLoading(true)
+    setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }
 
@@ -132,12 +143,12 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
-        studies={studies}
+        studies={studiesData}
         researcher={researcher}
         activities={activities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
-        selectedStudies={selectedStudies}
+        selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
       />
@@ -150,7 +161,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                   <ActivityItem
                     activity={activity}
                     researcher={researcher}
-                    studies={studies}
+                    studies={studiesData}
                     activities={activities}
                     handleSelectionChange={handleChange}
                     selectedActivities={selectedActivities}

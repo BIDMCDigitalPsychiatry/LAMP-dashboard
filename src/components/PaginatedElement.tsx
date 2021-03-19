@@ -5,10 +5,6 @@ export default function Pagination({ data, updatePage, ...props }: { data: Array
   const [page, setPage] = useState(0)
   const [rowCount, setRowCount] = useState(50)
 
-  useEffect(() => {
-    setPage(1)
-  }, [data])
-
   const handleRowChange = (event) => {
     setRowCount(event.target.value)
   }

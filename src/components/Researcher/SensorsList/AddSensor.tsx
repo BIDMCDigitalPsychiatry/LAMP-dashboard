@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Fab, Icon } from "@material-ui/core"
 import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
@@ -288,6 +288,20 @@ export default function AddSensor({
   const { t } = useTranslation()
   const [sensorDialog, setSensorDialog] = useState(false)
 
+  const [allSensors, setAllSensors] = useState<Array<Object>>([])
+
+  useEffect(() => {
+    Service.getAll("sensors").then((sensorObj: any) => {
+      setAllSensors(sensorObj)
+    })
+  }, [])
+
+  useEffect(() => {
+    Service.getAll("sensors").then((sensorObj: any) => {
+      setAllSensors(sensorObj)
+    })
+  }, [sensorDialog])
+
   const addOrUpdateSensor = () => {
     setSensorDialog(false)
     setUpdateCount(3)
@@ -306,6 +320,7 @@ export default function AddSensor({
         type="add"
         studyId={studyId ?? null}
         addOrUpdateSensor={addOrUpdateSensor}
+        allSensors={allSensors}
       />
     </Box>
   )

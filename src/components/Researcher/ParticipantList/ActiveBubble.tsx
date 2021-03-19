@@ -24,7 +24,6 @@ export default function Active({ participant, ...props }) {
   const [passive, setPassive] = useState(null)
   const { t, i18n } = useTranslation()
   const timeAgo = getTimeAgo(i18n.language)
-
   useEffect(() => {
     let isCancelled = false
     Service.getDataByKey("participants", [participant.id], "id").then((data) => {
@@ -45,7 +44,6 @@ export default function Active({ participant, ...props }) {
       isCancelled = true
     }
   }, [])
-
   const dateInfo = (id) => ({
     relative: active?.timestamp ?? 0,
     absolute: new Date(parseInt((logins || {}).timestamp)).toLocaleString("en-US", Date.formatStyle("medium")),

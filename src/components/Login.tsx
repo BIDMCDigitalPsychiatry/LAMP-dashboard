@@ -90,7 +90,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       }
     }
   }, [])
-
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -117,27 +116,27 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
     })
       .then((res) => {
+        if (res.authType === "participant") {
+          LAMP.SensorEvent.create(res.identity.id, {
+            timestamp: Date.now(),
+            sensor: "lamp.analytics",
+            data: {
+              device_type: "Dashboard",
+              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+            },
+          } as any).then((res) => console.dir(res))
+        }
+        localStorage.setItem(
+          "LAMP_user_" + res.identity.id,
+          JSON.stringify({
+            language: selectedLanguage,
+          })
+        )
         ;(async () => {
           await Service.deleteDB()
-          if (res.authType === "participant") {
-            LAMP.SensorEvent.create(res.identity.id, {
-              timestamp: Date.now(),
-              sensor: "lamp.analytics",
-              data: {
-                device_type: "Dashboard",
-                user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-              },
-            } as any).then((res) => console.dir(res))
-          }
-          localStorage.setItem(
-            "LAMP_user_" + res.identity.id,
-            JSON.stringify({
-              language: selectedLanguage,
-            })
-          )
-          setLoginClick(false)
-          onComplete()
         })()
+        setLoginClick(false)
+        onComplete()
       })
       .catch((err) => {
         console.warn("error with auth request", err)

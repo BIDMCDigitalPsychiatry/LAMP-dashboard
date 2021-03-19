@@ -113,19 +113,20 @@ export default function PatientStudyCreator({
       should_add_participant: createPatient ? createPatient : false,
       name: studyName,
     }
-
     fetchPostData(authString, authId, "study/clone", "researcher", "POST", bodyData).then((studyData) => {
       let newStudyId = studyData.data
       let newUriStudyID = "?study_id=" + newStudyId
       if (duplicateStudyName) {
         Service.getDataByKey("studies", duplicateStudyName, "id").then((studyAllData: any) => {
+          console.log(2209, studyAllData)
           let newStudyData = {
             id: studyData.data,
             name: studyName,
-            participant_count: studyAllData.length > 0 ? studyAllData[0].participant_count : 0,
+            participant_count: 0,
             activity_count: studyAllData.length > 0 ? studyAllData[0].activity_count : 0,
             sensor_count: studyAllData.length > 0 ? studyAllData[0].sensor_count : 0,
           }
+          console.log(2210, newStudyData)
           Service.addData("studies", [newStudyData])
           fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
             let filteredActivities = result.activities.filter(

@@ -44,7 +44,6 @@ export const saveStudyData = (result, type) => {
   Service.update("studies", result, type === "activities" ? "activity_count" : "sensor_count", "study_id")
   Service.addData(type, result[type])
 }
-
 const saveSettings = (newVal, key) => {
   Service.update("participants", newVal, key, "id")
 }
@@ -71,8 +70,8 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
-  Service.getAll("studies").then((data) => {
-    if ((data || []).length == 0) {
+  Service.getAll("researcher").then((data) => {
+    if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
         saveStudiesAndParticipants(result)
         Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])

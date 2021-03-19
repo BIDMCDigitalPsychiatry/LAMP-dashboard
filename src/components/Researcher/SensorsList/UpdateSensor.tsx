@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
@@ -269,6 +269,16 @@ export default function UpdateSensor({
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
 
+  const [allSensors, setAllSensors] = useState<Array<Object>>([])
+
+  useEffect(() => {
+    Service.getAll("sensors").then((sensorObj) => {
+      if (sensorObj) {
+        setAllSensors(sensorObj)
+      }
+    })
+  }, [])
+
   const addOrUpdateSensor = (sensor?: any) => {
     setSensorDialog(false)
     setSensors()
@@ -307,10 +317,10 @@ export default function UpdateSensor({
         onClose={() => setSensorDialog(false)}
         studies={studies}
         open={sensorDialog}
-        //newData={updatedNewData}
         type="edit"
         studyId={studyId ?? null}
         addOrUpdateSensor={addOrUpdateSensor}
+        allSensors={allSensors}
       />
     </Box>
   )

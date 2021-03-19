@@ -47,6 +47,10 @@ export default function StudyFilterList({
     refreshStudies()
   }, [])
 
+  useEffect(() => {
+    refreshStudies()
+  }, [studies])
+
   const refreshStudies = () => {
     Service.getAll("studies").then((data) => {
       setStuds(data || [])
