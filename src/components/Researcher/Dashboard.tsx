@@ -205,9 +205,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
               return study.name
             })
           : filtered
-      console.log(selected, studies, filtered)
-      // selected = selected.filter((o) => studies.some(({ name }) => o === name))
-      // console.log(selected)
       selected.sort()
       setSelectedStudies(selected)
     }

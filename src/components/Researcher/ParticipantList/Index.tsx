@@ -174,7 +174,6 @@ export default function ParticipantList({
 
   const searchParticipants = () => {
     const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
-    console.log(selectedData)
     if (selectedData.length > 0 && !loading) {
       let result = []
       setLoading(true)
@@ -230,7 +229,7 @@ export default function ParticipantList({
           {!!participants && participants.length > 0 ? (
             <Grid container spacing={3}>
               {paginatedParticipants.map((eachParticipant, index) => (
-                <Grid item lg={6} xs={12} key={index + eachParticipant.id + eachParticipant.study_id}>
+                <Grid item lg={6} xs={12} key={eachParticipant.id}>
                   <ParticipantListItem
                     participant={eachParticipant}
                     onParticipantSelect={onParticipantSelect}

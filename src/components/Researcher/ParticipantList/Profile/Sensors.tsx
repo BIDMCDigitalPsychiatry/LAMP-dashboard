@@ -138,18 +138,20 @@ export default function Sensors({
               "No Sensors"
             )}
           </Box>
-          {(sensors ?? []).map((item, index) => {
-            return (
-              <SensorRow
-                studies={studies}
-                sensor={item}
-                index={index}
-                studyId={participant.study_id}
-                handleSelected={handleSensorSelected}
-                setSensors={onChangeSensors}
-              />
-            )
-          })}
+          <Grid container spacing={3}>
+            {(sensors ?? []).map((item, index) => (
+              <Grid item lg={6} xs={12} key={item.id}>
+                <SensorRow
+                  studies={studies}
+                  sensor={item}
+                  index={index}
+                  studyId={participant.study_id}
+                  handleSelected={handleSensorSelected}
+                  setSensors={onChangeSensors}
+                />
+              </Grid>
+            ))}
+          </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />
       </Grid>
