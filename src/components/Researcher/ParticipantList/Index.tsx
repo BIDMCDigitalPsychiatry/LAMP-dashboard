@@ -189,6 +189,9 @@ export default function ParticipantList({
               setParticipants(sortData(result, selectedData, "id"))
             }
             setPaginatedParticipants(result.slice(0, 50))
+          } else {
+            console.log("sdf")
+            if (result.length === 0) setParticipants([])
           }
           setLoading(false)
         })
@@ -226,7 +229,7 @@ export default function ParticipantList({
           {!!participants && participants.length > 0 ? (
             <Grid container spacing={3}>
               {paginatedParticipants.map((eachParticipant, index) => (
-                <Grid item lg={6} xs={12} key={index + eachParticipant.id + eachParticipant.study_id}>
+                <Grid item lg={6} xs={12} key={eachParticipant.id}>
                   <ParticipantListItem
                     participant={eachParticipant}
                     onParticipantSelect={onParticipantSelect}

@@ -138,6 +138,20 @@ export default function PatientProfile({
               "No activities"
             )}
           </Box>
+          <Grid container spacing={3}>
+            {(activities ?? []).map((item, index) => (
+              <Grid item lg={6} xs={12} key={item.id}>
+                <ActivityRow
+                  activities={activities}
+                  activity={item}
+                  studies={studies}
+                  index={index}
+                  handleSelected={handleActivitySelected}
+                  setActivities={onChangeActivities}
+                />
+              </Grid>
+            ))}
+          </Grid>
           {(activities ?? []).map((item, index) => {
             return (
               <ActivityRow
