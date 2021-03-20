@@ -197,11 +197,17 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
-      let selected =
-        ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ??
-        (studies ?? []).map((study) => {
-          return study.name
-        })
+      let selected = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? []
+      let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
+      selected =
+        selected.length === 0 || filtered.length === 0
+          ? (studies ?? []).map((study) => {
+              return study.name
+            })
+          : filtered
+      console.log(selected, studies, filtered)
+      // selected = selected.filter((o) => studies.some(({ name }) => o === name))
+      // console.log(selected)
       selected.sort()
       setSelectedStudies(selected)
     }

@@ -56,7 +56,7 @@ export default function SensorsList({
   const classes = useStyles()
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
-  const [sensors, setSensors] = useState([])
+  const [sensors, setSensors] = useState(null)
   const [selectedSensors, setSelectedSensors] = useState<any>([])
   const [search, setSearch] = useState(null)
   const [paginatedSensors, setPaginatedSensors] = useState([])
@@ -101,6 +101,8 @@ export default function SensorsList({
               setSensors(sortData(result, selectedStudies, "name"))
             }
             setPaginatedSensors(result.slice(0, 50))
+          } else {
+            if (result.length === 0) setSensors([])
           }
           setLoading(false)
         })
@@ -123,7 +125,7 @@ export default function SensorsList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading || sensors === null}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header

@@ -62,7 +62,7 @@ export const games = [
   "lamp.balloon_risk",
 ]
 export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
-  const [activities, setActivities] = useState([])
+  const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const classes = useStyles()
   const [selectedActivities, setSelectedActivities] = useState<any>([])
@@ -119,6 +119,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
               setActivities(sortData(result, selectedStudies, "name"))
             }
             setPaginatedActivities(result.slice(0, 50))
+          } else {
+            if (result.length === 0) setActivities([])
           }
           setLoading(false)
         })
@@ -139,7 +141,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading || activities === null}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header

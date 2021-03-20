@@ -174,6 +174,7 @@ export default function ParticipantList({
 
   const searchParticipants = () => {
     const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+    console.log(selectedData)
     if (selectedData.length > 0 && !loading) {
       let result = []
       setLoading(true)
@@ -189,6 +190,9 @@ export default function ParticipantList({
               setParticipants(sortData(result, selectedData, "id"))
             }
             setPaginatedParticipants(result.slice(0, 50))
+          } else {
+            console.log("sdf")
+            if (result.length === 0) setParticipants([])
           }
           setLoading(false)
         })
