@@ -8,6 +8,7 @@ import ActivityRow from "./ActivityRow"
 import addActivity from "../../ActivityList/Activity"
 import DeleteActivity from "../../ActivityList/DeleteActivity"
 import { sortData } from "../../Dashboard"
+import Pagination from "../../../PaginatedElement"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -55,11 +56,14 @@ export default function PatientProfile({
   const [activities, setActivities] = useState([])
   const { t } = useTranslation()
   const [selectedActivities, setSelectedActivities] = useState([])
+  const [paginatedActivities, setPaginatedActivities] = useState([])
 
   const onChangeActivities = () => {
     ;(async () => {
       Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
-        setActivities(sortData(activities, [participant.study_name], "id"))
+        let result = sortData(activities, [participant.study_name], "id")
+        setActivities(result)
+        setPaginatedActivities(result.slice(0, 50))
       })
     })()
     setSelectedActivities([])
@@ -82,6 +86,10 @@ export default function PatientProfile({
       selected = selected.filter((item) => item.id != activity.id)
       setSelectedActivities(selected)
     }
+  }
+
+  const handleChangePage = (page: number, rowCount: number) => {
+    setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -139,8 +147,8 @@ export default function PatientProfile({
             )}
           </Box>
           <Grid container spacing={3}>
-            {(activities ?? []).map((item, index) => (
-              <Grid item lg={6} xs={12} key={item.id}>
+            {(paginatedActivities ?? []).map((item, index) => (
+              <Grid item xs={12} sm={12} key={item.id}>
                 <ActivityRow
                   activities={activities}
                   activity={item}
@@ -151,19 +159,8 @@ export default function PatientProfile({
                 />
               </Grid>
             ))}
+            <Pagination data={activities} updatePage={handleChangePage} defaultCount={10} />
           </Grid>
-          {(activities ?? []).map((item, index) => {
-            return (
-              <ActivityRow
-                activities={activities}
-                activity={item}
-                studies={studies}
-                index={index}
-                handleSelected={handleActivitySelected}
-                setActivities={onChangeActivities}
-              />
-            )
-          })}
         </Grid>
         <Grid item xs={10} sm={2} />
       </Grid>

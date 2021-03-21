@@ -127,14 +127,14 @@ export default function PatientStudyCreator({
           }
           Service.addData("studies", [newStudyData])
           fetchResult(authString, authId, "activity" + newUriStudyID, "researcher").then((result) => {
-            let filteredActivities = result.activities.filter(
+            let filteredActivities = (result?.activities || []).filter(
               (eachActivities) => eachActivities.study_id === newStudyId
             )
             saveStudyData(filteredActivities, "activities")
           })
 
           fetchResult(authString, authId, "sensor" + newUriStudyID, "researcher").then((resultData) => {
-            let filteredSensors = resultData.sensors.filter((eachSensors) => {
+            let filteredSensors = (resultData?.sensors || []).filter((eachSensors) => {
               return eachSensors.study_id === newStudyId
             })
             saveStudyData(filteredSensors, "sensors")

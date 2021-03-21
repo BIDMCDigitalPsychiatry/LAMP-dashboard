@@ -272,12 +272,20 @@ export default function UpdateSensor({
   const [allSensors, setAllSensors] = useState<Array<Object>>([])
 
   useEffect(() => {
+    getAllStudies()
+  }, [])
+
+  useEffect(() => {
+    getAllStudies()
+  }, [sensorDialog])
+
+  const getAllStudies = () => {
     Service.getAll("sensors").then((sensorObj) => {
       if (sensorObj) {
         setAllSensors(sensorObj)
       }
     })
-  }, [])
+  }
 
   const addOrUpdateSensor = (sensor?: any) => {
     setSensorDialog(false)
