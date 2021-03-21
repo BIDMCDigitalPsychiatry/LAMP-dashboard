@@ -149,12 +149,13 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   )
 
   useEffect(() => {
-    getAllStudies()
+    if (!!newStudy) getAllStudies()
   }, [newStudy])
 
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(studies)
+      filterStudies(studies)
       setCurrentTab(0)
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
@@ -169,12 +170,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
       filterStudies(studies)
     })
   }
-
-  useEffect(() => {
-    if (studies !== null && (studies || []).length > 0) {
-      filterStudies(studies)
-    }
-  }, [studies])
 
   useEffect(() => {
     if (updatedData !== null) getAllStudies()

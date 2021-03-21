@@ -63,7 +63,7 @@ export default function PatientProfile({
       Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
         let result = sortData(activities, [participant.study_name], "id")
         setActivities(result)
-        setPaginatedActivities(result.slice(0, 50))
+        setPaginatedActivities(result.slice(0, 10))
       })
     })()
     setSelectedActivities([])
