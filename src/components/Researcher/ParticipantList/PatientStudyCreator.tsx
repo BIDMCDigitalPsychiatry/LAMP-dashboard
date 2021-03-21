@@ -77,6 +77,7 @@ export default function PatientStudyCreator({
   const [createPatient, setCreatePatient] = useState(false)
   const [studiedData, setStudiedData] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [demoStudyCount, setDemoStudyCount] = useState(0)
 
   const validate = () => {
     return !(
@@ -100,6 +101,115 @@ export default function PatientStudyCreator({
     }
     setDuplicateCnt(duplicateCount)
   }, [studyName])
+
+  const createNewStudy = (studyName) => {
+    let lampAuthId = LAMP.Auth._auth.id
+    if (LAMP.Auth._type === "researcher" && lampAuthId === "researcher@demo.lamp.digital") {
+      createDemoStudy(studyName)
+    } else {
+      createStudy(studyName)
+    }
+  }
+
+  const createDemoStudy = (studyName) => {
+    let shouldAddParticipant = createPatient ? createPatient : false
+    Service.getAll("studies").then((allStudies: any) => {
+      let studiesCount = allStudies.length
+      let newStudyObj: any = {}
+      if (duplicateStudyName) {
+        Service.getData("studies", duplicateStudyName).then((studyData) => {
+          if (studyData) {
+            newStudyObj = {
+              id: "study" + parseInt(studiesCount + 1),
+              name: studyName,
+              participant_count: 0,
+              activity_count: studyData.activity_count,
+              sensor_count: studyData.sensor_count,
+              "#parent": "researcher1",
+              "#type": "Study",
+            }
+          } else {
+            newStudyObj = {
+              id: "study" + parseInt(studiesCount + 1),
+              name: studyName,
+              participant_count: 0,
+              activity_count: 0,
+              sensor_count: 0,
+              "#parent": "researcher1",
+              "#type": "Study",
+            }
+          }
+          Service.addData("studies", [newStudyObj])
+          Service.getDataByKey("activities", [duplicateStudyName], "study_id").then((activityData) => {
+            let newActivities = activityData
+            let activityCount = parseInt(newStudyObj.activity_count + 1)
+            let ac = 0
+            newActivities.map((p) => {
+              let newActivityCount = activityCount + ac
+              p["#parent"] = newStudyObj.id
+              p["id"] = "activity" + newActivityCount
+              p["study_id"] = newStudyObj.id
+              p["study_name"] = studyName
+              ac++
+              return p
+            })
+            Service.addData("activities", newActivities)
+          })
+
+          Service.getDataByKey("sensors", [duplicateStudyName], "study_id").then((sensorsData) => {
+            let newSensors = sensorsData
+            let sensorCount = parseInt(newStudyObj.sensor_count + 1)
+            let sc = 0
+            newSensors.map((p) => {
+              let newSensorsCount = sensorCount + sc
+              p["#parent"] = newStudyObj.id
+              p["id"] = "sensor" + newSensorsCount
+              p["study_id"] = newStudyObj.id
+              p["study_name"] = studyName
+              sc++
+              return p
+            })
+            Service.addData("sensors", newSensors)
+
+            if (shouldAddParticipant) {
+              Service.updateCount("studies", newStudyObj.id, "participant_count")
+              let newParticipant: any = {}
+              newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+              newParticipant.study_id = newStudyObj.id
+              newParticipant.study_name = studyName
+              Service.addData("participants", [newParticipant])
+            }
+          })
+          setLoading(false)
+          handleNewStudy(newStudyObj)
+          closePopUp(1)
+        })
+      } else {
+        newStudyObj = {
+          id: "study" + parseInt(studiesCount + 1),
+          name: studyName,
+          participant_count: 0,
+          activity_count: 0,
+          sensor_count: 0,
+          "#parent": "researcher1",
+          "#type": "Study",
+        }
+        if (shouldAddParticipant) {
+          Service.updateCount("studies", newStudyObj.id, "participant_count")
+          let newParticipant: any = {}
+          newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+          newParticipant.study_id = newStudyObj.id
+          newParticipant.study_name = studyName
+          Service.addData("participants", [newParticipant])
+          newStudyObj.participant_count = 1
+        }
+        Service.addData("studies", [newStudyObj])
+        setLoading(false)
+        handleNewStudy(newStudyObj)
+        closePopUp(1)
+      }
+    })
+  }
 
   const createStudy = async (studyName: string) => {
     setLoading(true)
@@ -284,7 +394,7 @@ export default function PatientStudyCreator({
           </Button>
           <Button
             onClick={() => {
-              createStudy(studyName)
+              createNewStudy(studyName)
             }}
             color="primary"
             autoFocus

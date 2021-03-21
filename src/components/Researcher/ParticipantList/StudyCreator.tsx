@@ -97,7 +97,7 @@ export default function StudyCreator({
       let selectedStudy = result.data
       let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
       let id = typeof idData === "object" ? idData.id : idData
-      let newParticipant = []
+      let newParticipant: any = {}
       if (typeof idData === "object") {
         newParticipant = idData
       } else {
@@ -106,8 +106,8 @@ export default function StudyCreator({
       if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
         enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
       } else {
-        newParticipant["study_id"] = selectedStudy
-        newParticipant["study_name"] = studyName
+        newParticipant.study_id = selectedStudy
+        newParticipant.study_name = studyName
         Service.addData("participants", [newParticipant])
         Service.updateCount("studies", selectedStudy, "participants_count")
         enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
@@ -116,6 +116,42 @@ export default function StudyCreator({
       }
       studiesData.participant_count = 1
       handleNewStudy(studiesData)
+      closePopUp(2)
+      setStudyName("")
+      setLoading(false)
+    })
+  }
+
+  const createNewStudy = (studyName) => {
+    let lampAuthId = LAMP.Auth._auth.id
+    if (LAMP.Auth._type === "researcher" && lampAuthId === "researcher@demo.lamp.digital") {
+      createDemoStudy(studyName)
+    } else {
+      createStudy(studyName)
+    }
+  }
+
+  const createDemoStudy = async (studyName: string) => {
+    setLoading(true)
+    Service.getAll("studies").then((allStudies: any) => {
+      let studiesCount = allStudies.length
+      let newStudyObj = {
+        "#parent": "researcher1",
+        "#type": "Study",
+        id: "study" + parseInt(studiesCount + 1),
+        name: studyName,
+        participant_count: 1,
+        sensor_count: 0,
+        activity_count: 0,
+      }
+      Service.addData("studies", [newStudyObj])
+
+      let newParticipant: any = {}
+      newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+      newParticipant.study_id = newStudyObj.id
+      newParticipant.study_name = studyName
+      Service.addData("participants", [newParticipant])
+      handleNewStudy(newStudyObj)
       closePopUp(2)
       setStudyName("")
       setLoading(false)
@@ -176,7 +212,7 @@ export default function StudyCreator({
           </Button>
           <Button
             onClick={() => {
-              createStudy(studyName)
+              createNewStudy(studyName)
             }}
             color="primary"
             autoFocus

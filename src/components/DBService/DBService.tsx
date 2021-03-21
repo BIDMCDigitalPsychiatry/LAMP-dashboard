@@ -45,9 +45,6 @@ class DBService {
           let cursor = await store.openCursor()
           while (cursor) {
             newVal[tablespace].map((data) => {
-              if (tablespace === "activities") {
-                console.log(data, cursor.key, conditionKey, key)
-              }
               if (cursor.key === data[conditionKey]) {
                 let value = cursor.value
                 value[key] = data[key]
