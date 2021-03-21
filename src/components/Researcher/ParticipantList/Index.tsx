@@ -136,6 +136,7 @@ export default function ParticipantList({
   const [search, setSearch] = useState(null)
   const [studiesData, setStudiesData] = useState(studies)
   const { t } = useTranslation()
+
   useInterval(
     () => {
       getAllStudies()
@@ -149,6 +150,7 @@ export default function ParticipantList({
       searchParticipants()
     }
   }, [selectedStudies])
+
   useEffect(() => {
     setStudiesData(studies)
   }, [studies])
