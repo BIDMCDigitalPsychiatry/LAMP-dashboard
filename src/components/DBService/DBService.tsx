@@ -14,14 +14,17 @@ const dbPromise = idb.openDB(DATABASE_NAME, 1, {
     if (!upgradeDb.objectStoreNames.contains("participants")) {
       const participants = upgradeDb.createObjectStore("participants", { keyPath: "id" })
       participants.createIndex("id", "id", { unique: true })
+      participants.createIndex("study_name", "study_name")
     }
     if (!upgradeDb.objectStoreNames.contains("activities")) {
       const activities = upgradeDb.createObjectStore("activities", { keyPath: "id" })
       activities.createIndex("id", "id")
+      activities.createIndex("study_name", "study_name")
     }
     if (!upgradeDb.objectStoreNames.contains("sensors")) {
       const sensors = upgradeDb.createObjectStore("sensors", { keyPath: "id" })
       sensors.createIndex("id", "id")
+      sensors.createIndex("study_name", "study_name")
     }
   },
 })
