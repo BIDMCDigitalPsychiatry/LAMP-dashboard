@@ -143,7 +143,7 @@ export default function Sensors({
             )}
           </Box>
           <Grid container spacing={3}>
-            {(sensors ?? []).map((item, index) => (
+            {(paginatedSensors ?? []).map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <SensorRow
                   studies={studies}
