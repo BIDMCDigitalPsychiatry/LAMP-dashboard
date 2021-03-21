@@ -61,9 +61,7 @@ export const saveDemoData = () => {
   Service.updateValues(
     "studies",
     {
-      studies: [
-        { participants_count: 1, sensor_count: demo_db.Sensor.length, activity_count: demo_db.Activity.length },
-      ],
+      studies: [{ participant_count: 1, sensor_count: demo_db.Sensor.length, activity_count: demo_db.Activity.length }],
     },
     ["sensor_count", "activity_count", "participant_count"]
   )

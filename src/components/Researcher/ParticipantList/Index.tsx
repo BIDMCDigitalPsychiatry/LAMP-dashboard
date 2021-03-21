@@ -188,9 +188,8 @@ export default function ParticipantList({
               result = result.concat(participantData)
               setParticipants(sortData(result, selectedData, "id"))
             }
-            setPaginatedParticipants(result.slice(0, 50))
+            setPaginatedParticipants(result.slice(0, 40))
           } else {
-            console.log("sdf")
             if (result.length === 0) setParticipants([])
           }
           setLoading(false)
@@ -240,7 +239,7 @@ export default function ParticipantList({
                   />
                 </Grid>
               ))}
-              <Pagination data={participants} updatePage={handleChangePage} />
+              <Pagination data={participants} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
             <Box display="flex" alignItems="center" className={classes.norecords}>

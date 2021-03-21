@@ -8,6 +8,7 @@ import { Service } from "../../../DBService/DBService"
 import SensorRow from "./SensorRow"
 import DeleteSensor from "../../SensorsList/DeleteSensor"
 import { sortData } from "../../Dashboard"
+import Pagination from "../../../PaginatedElement"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -51,15 +52,14 @@ export default function Sensors({
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const [selectedSensors, setSelectedSensors] = useState([])
-  // const addedSensor = (data) => {
-  //   // addSensorItem(data, studies)
-  //   setSensors((prevState) => [...prevState, data])
-  // }
+  const [paginatedSensors, setPaginatedSensors] = useState([])
 
   const onChangeSensors = () => {
     ;(async () => {
       Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
-        setSensors(sortData(sensors, [participant.study_name], "id"))
+        let result = sortData(sensors, [participant.study_name], "id")
+        setSensors(result)
+        setPaginatedSensors(result.slice(0, 10))
       })
     })()
     setSelectedSensors([])
@@ -85,6 +85,10 @@ export default function Sensors({
       selected = selected.filter((item) => item.id != sensor.id)
       setSelectedSensors(selected)
     }
+  }
+
+  const handleChangePage = (page: number, rowCount: number) => {
+    setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
@@ -139,8 +143,8 @@ export default function Sensors({
             )}
           </Box>
           <Grid container spacing={3}>
-            {(sensors ?? []).map((item, index) => (
-              <Grid item lg={6} xs={12} key={item.id}>
+            {(paginatedSensors ?? []).map((item, index) => (
+              <Grid item xs={12} sm={12} key={item.id}>
                 <SensorRow
                   studies={studies}
                   sensor={item}
@@ -151,6 +155,7 @@ export default function Sensors({
                 />
               </Grid>
             ))}
+            <Pagination data={sensors} updatePage={handleChangePage} defaultCount={10} />
           </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />

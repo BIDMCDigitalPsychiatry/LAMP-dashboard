@@ -391,7 +391,7 @@ export default function SensorDialog({
       selectedStudy === "" ||
       typeof sensorName == "undefined" ||
       sensorName === null ||
-      sensorName === "" ||
+      sensorName.trim() === "" ||
       typeof sensorSpec == "undefined" ||
       sensorSpec === null ||
       sensorSpec === ""
@@ -401,12 +401,12 @@ export default function SensorDialog({
   const updateSensor = async () => {
     setLoading(true)
     const result = await LAMP.Sensor.update(selectedSensor.id, {
-      name: sensorName,
+      name: sensorName.trim(),
       spec: sensorSpec,
     }).then((res) => {
       Service.updateMultipleKeys(
         "sensors",
-        { sensors: [{ id: selectedSensor.id, name: sensorName, spec: sensorSpec }] },
+        { sensors: [{ id: selectedSensor.id, name: sensorName.trim(), spec: sensorSpec }] },
         ["name", "spec"],
         "id"
       )
@@ -421,14 +421,14 @@ export default function SensorDialog({
   const saveSensor = async () => {
     setLoading(true)
     const result = await LAMP.Sensor.create(selectedStudy, {
-      name: sensorName,
+      name: sensorName.trim(),
       spec: sensorSpec,
     }).then((res) => {
       let result = JSON.parse(JSON.stringify(res))
       Service.getData("studies", selectedStudy).then((studiesObject) => {
         let sensorObj = {
           id: result.data,
-          name: sensorName,
+          name: sensorName.trim(),
           spec: sensorSpec,
           study_id: selectedStudy,
           study_name: studies.filter((study) => study.id === selectedStudy)[0]?.name,
@@ -494,7 +494,7 @@ export default function SensorDialog({
           <Box mt={4}>
             <TextField
               error={
-                duplicateCnt > 0 || typeof sensorName == "undefined" || sensorName === null || sensorName === ""
+                duplicateCnt > 0 || typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
                   ? true
                   : false
               }
@@ -506,7 +506,7 @@ export default function SensorDialog({
               helperText={
                 duplicateCnt > 0
                   ? t("Unique name required")
-                  : typeof sensorName == "undefined" || sensorName === null || sensorName === ""
+                  : typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
                   ? t("Please enter Name")
                   : ""
               }

@@ -299,6 +299,7 @@ export default function SurveyCreator({
   studies,
   study,
   details,
+  activities,
   ...props
 }: {
   value?: any
@@ -307,11 +308,14 @@ export default function SurveyCreator({
   studies?: any
   study?: string
   details?: any
+  activities?: any
 }) {
   const classes = useStyles()
   const [activeStep, setActiveStep] = useState(0)
   const [questions, setQuestions] = useState(!!value ? value.settings : [])
   const { t } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: !!value ? value.name : undefined,
@@ -327,38 +331,6 @@ export default function SurveyCreator({
 
   useEffect(() => {
     setData({ ...data, settings: questions })
-    let optionsArray = []
-    {
-      questions.map((x, idx) =>
-        questions[idx].text == undefined ||
-        questions[idx].text == "" ||
-        questions[idx].text == null ||
-        !questions[idx].text.trim().length
-          ? optionsArray.push(idx)
-          : questions[idx].options != null
-          ? questions[idx].options.length == 0
-            ? optionsArray.push(idx)
-            : questions[idx].type == "list" ||
-              questions[idx].type == "multiselect" ||
-              questions[idx].type == "slider" ||
-              questions[idx].type == "rating"
-            ? questions[idx].options.map((x, id) =>
-                questions[idx].options[id].value == "" ||
-                questions[idx].options[id].value == null ||
-                questions[idx].options[id].value == undefined ||
-                !questions[idx].options[id].value.trim().length
-                  ? optionsArray.push(id)
-                  : ""
-              )
-            : ""
-          : ""
-      )
-    }
-    if (optionsArray.length > 0) {
-      setIsOptionNull(1)
-    } else {
-      setIsOptionNull(0)
-    }
   }, [questions])
 
   const handleChange = (details) => {
@@ -372,6 +344,68 @@ export default function SurveyCreator({
       photo: details.photo,
       studyID: details.studyId,
     })
+  }
+
+  const validate = () => {
+    let duplicates = []
+    if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
+      duplicates = activities.filter(
+        (x) =>
+          (!!value
+            ? x.name.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
+            : x.name.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
+      )
+      if (duplicates.length > 0) {
+        enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
+      }
+    }
+    if (!!questions && questions.length > 0) {
+      let optionsArray = []
+      {
+        questions.map((x, idx) =>
+          questions[idx].type == "list" ||
+          questions[idx].type == "multiselect" ||
+          questions[idx].type == "slider" ||
+          questions[idx].type == "rating"
+            ? questions[idx].options === null || (!!questions[idx].options && questions[idx].options.length === 0)
+              ? optionsArray.push(1)
+              : (questions[idx].options || []).map((x, id) =>
+                  questions[idx].options[id].value == "" ||
+                  questions[idx].options[id].value == null ||
+                  questions[idx].options[id].value == undefined ||
+                  !questions[idx].options[id].value.trim().length
+                    ? optionsArray.push(id)
+                    : optionsArray.push(0)
+                )
+            : optionsArray.push(0)
+        )
+      }
+      if (optionsArray.filter((val) => val !== 0).length > 0) {
+        setIsOptionNull(0)
+      } else {
+        setIsOptionNull(1)
+      }
+    }
+    if (questions.length === 0) {
+      enqueueSnackbar(t("At least one question required."), { variant: "error" })
+    }
+    if (
+      questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
+      isOptionNull === 0
+    ) {
+      enqueueSnackbar(t("At least one option required for list/slider/rating/multiselect type questions."), {
+        variant: "error",
+      })
+    }
+    return !(
+      duplicates.length > 0 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+      isOptionNull == 0 ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      questions.length === 0
+    )
   }
 
   return (
@@ -436,14 +470,7 @@ export default function SurveyCreator({
           </Grid>
         </Container>
       </MuiThemeProvider>
-      <ActivityFooter
-        onSave={onSave}
-        validate={() => {
-          return true
-        }}
-        value={value}
-        data={data}
-      />
+      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </div>
   )
 }

@@ -14,13 +14,13 @@ import {
   Menu,
   MenuItem,
   Container,
-  ButtonBase,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import { useDropzone } from "react-dropzone"
-import { useSnackbar } from "notistack"
+import { availableActivitySpecs } from "./Index"
+import ActivityHeader from "./ActivityHeader"
+import ActivityFooter from "./ActivityFooter"
 
 const theme = createMuiTheme({
   palette: {
@@ -123,49 +123,6 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
   )
 }
 
-function compress(file, width, height) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    const fileName = file.name
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
-    reader.onerror = (error) => reject(error)
-    if (extension !== "svg") {
-      reader.onload = (event) => {
-        const img = new Image()
-        img.src = event.target.result as string
-        img.onload = () => {
-          const elem = document.createElement("canvas")
-          elem.width = width
-          elem.height = height
-          const ctx = elem.getContext("2d")
-          ctx.drawImage(img, 0, 0, width, height)
-          resolve(ctx.canvas.toDataURL())
-        }
-      }
-    } else {
-      reader.onload = (event) => {
-        resolve(reader.result)
-      }
-    }
-  })
-}
-const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
-
-const availableAtiveSpecs = [
-  "lamp.group",
-  "lamp.suvey",
-  "lamp.journal",
-  "lamp.jewels_a",
-  "lamp.jewels_b",
-  "lamp.breathe",
-  "lamp.spatial_span",
-  "lamp.tips",
-  "lamp.cats_and_dogs",
-  "lamp.scratch_image",
-  "lamp.dbt_diary_card",
-]
-
 export default function GroupCreator({
   activities,
   value,
@@ -183,129 +140,82 @@ export default function GroupCreator({
   study?: string
 }) {
   const classes = useStyles()
-  const [text, setText] = useState(!!value ? value.name : undefined)
   const [items, setItems] = useState(!!value ? value.settings : [])
-  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [studyActivities, setStudyActivities] = useState(
     !!value || !!study
       ? activities.filter(
           (x) =>
             x.spec !== "lamp.group" &&
             (!!study ? x.study_id === study : x.study_id === value.study_id) &&
-            availableAtiveSpecs.includes(x.spec)
+            availableActivitySpecs.includes(x.spec)
         )
       : []
   )
   const { t } = useTranslation()
-  const [photo, setPhoto] = useState(details?.photo ?? null)
-  const { enqueueSnackbar } = useSnackbar()
-
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
-    onDropAccepted: useCallback((acceptedFiles) => {
-      compress(acceptedFiles[0], 64, 64).then(setPhoto)
-    }, []),
-    onDropRejected: useCallback((rejectedFiles) => {
-      if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
-      } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
-      }
-    }, []),
-    accept: "image/*",
-    maxSize: 2 * 1024 * 1024 /* 5MB */,
+  const [data, setData] = useState({
+    id: value?.id ?? undefined,
+    name: !!value ? value.name : undefined,
+    spec: "lamp.group",
+    schedule: [],
+    description: !!details ? details?.description : undefined,
+    photo: !!details ? details?.photo : null,
+    settings: !!value ? value.settings : [],
+    studyID: !!value ? value.study_id : study,
   })
+
+  useEffect(() => {
+    setData({ ...data, settings: items })
+  }, [items])
+
+  const handleChange = (details) => {
+    if (!!details.studyId) {
+      setStudyActivities(
+        activities.filter(
+          (x) => x.spec !== "lamp.group" && x.study_id === details.studyId && availableActivitySpecs.includes(x.spec)
+        )
+      )
+    }
+    setData({
+      id: value?.id ?? undefined,
+      name: details.text ?? "",
+      spec: "lamp.group",
+      schedule: [],
+      settings: (items || []).filter((i) => i !== null),
+      description: details.description,
+      photo: details.photo,
+      studyID: details.studyId,
+    })
+  }
 
   const onDragEnd = (result) => {
     if (!result.destination || result.destination.index === result.source.index) return
     setItems(reorder(items, result.source.index, result.destination.index))
   }
 
+  const validate = () => {
+    return !(
+      !onSave ||
+      (items || []).length === 0 ||
+      (items || []).filter((i) => i === null).length > 0 ||
+      !data.name ||
+      !data.studyID ||
+      !data.name.trim().length
+    )
+  }
   return (
     <div>
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h6">
-                {!!value ? t("Modify an existing group.") : t("Create a new group.")}
-              </Typography>
-            </Grid>
-            <Grid item xs md={2}>
-              <Tooltip
-                title={
-                  !photo
-                    ? "Drag a photo or tap to select a photo."
-                    : "Drag a photo to replace the existing photo or tap to delete the photo."
-                }
-              >
-                <Box
-                  {...getRootProps()}
-                  width={154}
-                  height={154}
-                  border={1}
-                  borderRadius={4}
-                  borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                  bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
-                  color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-                  style={{
-                    background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
-                  }}
-                >
-                  <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
-                    {!photo && <input {...getInputProps()} />}
-                    <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
-                  </ButtonBase>
-                </Box>
-              </Tooltip>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Box mb={2}>
-                <TextField
-                  error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
-                  id="filled-select-currency"
-                  select
-                  label={t("Study")}
-                  value={studyId}
-                  onChange={(e) => {
-                    setStudyActivities(
-                      activities.filter((x) => x.spec !== "lamp.group" && x.study_id === e.target.value)
-                    )
-                    setStudyId(e.target.value)
-                  }}
-                  helperText={
-                    typeof studyId == "undefined" || studyId === null || studyId === ""
-                      ? t("Please select the Study")
-                      : ""
-                  }
-                  variant="filled"
-                  disabled={!!value || !!study ? true : false}
-                >
-                  {studies.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Box>
-              <Box>
-                <TextField
-                  fullWidth
-                  variant="filled"
-                  label={t("Group Title")}
-                  defaultValue={text}
-                  onChange={(event) => setText(removeExtraSpace(event.target.value))}
-                  error={
-                    typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false
-                  }
-                  helperText={
-                    typeof text == "undefined" || text === null || text === "" || !text.trim().length
-                      ? t("Please enter Group Title")
-                      : ""
-                  }
-                  inputProps={{ style: { textTransform: "capitalize" } }}
-                />
-              </Box>
-            </Grid>
+            <ActivityHeader
+              studies={studies}
+              value={value}
+              details={details}
+              activitySpecId={null}
+              study={data.studyID}
+              onChange={handleChange}
+              image={null}
+            />
 
             <Box width={1}>
               <Divider />
@@ -349,7 +259,7 @@ export default function GroupCreator({
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={!studyId || studyActivities.length === 0}
+                  disabled={!data.studyID || studyActivities.length === 0}
                   onClick={() => setItems((items) => [...items, null])}
                 >
                   <Icon>add_circle</Icon>
@@ -359,7 +269,7 @@ export default function GroupCreator({
                   size="small"
                   color="primary"
                   onClick={() => setItems((items) => [...items, null])}
-                  disabled={!studyId || studyActivities.length === 0}
+                  disabled={!data.studyID || studyActivities.length === 0}
                 >
                   {t("Add Activity")}
                 </Button>
@@ -368,49 +278,7 @@ export default function GroupCreator({
           </Grid>
         </Container>
       </MuiThemeProvider>
-      <Grid
-        container
-        direction="column"
-        alignItems="flex-end"
-        spacing={1}
-        style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
-      >
-        <Grid item>
-          <Tooltip title={t("Save this activity group.")}>
-            <Fab
-              color="secondary"
-              aria-label="Save"
-              variant="extended"
-              onClick={() =>
-                onSave(
-                  {
-                    id: undefined,
-                    name: text,
-                    spec: "lamp.group",
-                    schedule: [],
-                    settings: (items || []).filter((i) => i !== null),
-                    studyID: studyId,
-                    photo: photo,
-                  },
-                  false /* overwrite */
-                )
-              }
-              disabled={
-                !onSave ||
-                (items || []).length === 0 ||
-                (items || []).filter((i) => i === null).length > 0 ||
-                !text ||
-                !studyId ||
-                !text.trim().length
-              }
-            >
-              {t("Save")}
-              <span style={{ width: 8 }} />
-              <Icon>save</Icon>
-            </Fab>
-          </Tooltip>
-        </Grid>
-      </Grid>
+      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </div>
   )
 }

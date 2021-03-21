@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import { availableAtiveSpecs } from "./Index"
+import { availableActivitySpecs } from "./Index"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import ImportActivity from "./ImportActivity"
@@ -137,7 +137,7 @@ export default function AddActivity({
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
       setActivitySpecs(
-        res.filter((x: any) => availableAtiveSpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
+        res.filter((x: any) => availableActivitySpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
     })
   }, [])

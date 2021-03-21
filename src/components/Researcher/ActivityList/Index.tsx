@@ -38,9 +38,9 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export const availableAtiveSpecs = [
+export const availableActivitySpecs = [
   "lamp.group",
-  "lamp.suvey",
+  "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",
@@ -118,7 +118,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedActivities(result.slice(0, 50))
+            setPaginatedActivities(result.slice(0, 40))
           } else {
             if (result.length === 0) setActivities([])
           }
@@ -172,7 +172,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                   />
                 </Grid>
               ))}
-              <Pagination data={activities} updatePage={handleChangePage} />
+              <Pagination data={activities} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
             <Box display="flex" alignItems="center" className={classes.norecords}>

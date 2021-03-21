@@ -100,7 +100,7 @@ export default function SensorsList({
               result = result.concat(sensorData)
               setSensors(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedSensors(result.slice(0, 50))
+            setPaginatedSensors(result.slice(0, 40))
           } else {
             if (result.length === 0) setSensors([])
           }
@@ -152,7 +152,7 @@ export default function SensorsList({
                   />
                 </Grid>
               ))}
-              <Pagination data={sensors} updatePage={handleChangePage} />
+              <Pagination data={sensors} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
             <Grid item lg={6} xs={12}>

@@ -18,7 +18,6 @@ import {
 } from "../ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { Service } from "../../DBService/DBService"
 
 const games = [
   "lamp.jewels_a",
@@ -171,6 +170,7 @@ export default function Activity({
           onSave={activitySpecId ? saveGroup : updateActivity}
           studies={studies}
           study={studyId ?? activity?.study_id ?? null}
+          details={details ?? null}
         />
       )}
       {isTip && (
@@ -185,6 +185,7 @@ export default function Activity({
       {isSurvey && (
         <SurveyCreator
           value={activity ?? null}
+          activities={allActivities}
           studies={studies}
           onSave={activitySpecId ? saveActivity : updateActivity}
           study={studyId ?? activity?.study_id ?? null}

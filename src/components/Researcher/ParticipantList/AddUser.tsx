@@ -84,6 +84,7 @@ export default function AddUser({
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
+  const [loading, setLoading] = useState(false)
   const { t } = useTranslation()
   const validate = () => {
     return !(
@@ -96,18 +97,19 @@ export default function AddUser({
     setSelectedStudy(event.target.value)
   }
 
-  let addParticipant = async () => {
+  let createStudy = async () => {
     if (selectedStudy === "") {
       setShowErrorMsg(true)
       return false
     } else {
+      setLoading(true)
       setStudyBtnClicked(true)
       let newCount = 1
       let ids = []
       for (let i = 0; i < newCount; i++) {
         let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
         let id = typeof idData === "object" ? idData.id : idData
-        let newParticipant = []
+        let newParticipant: any = {}
         if (typeof idData === "object") {
           newParticipant = idData
         } else {
@@ -116,8 +118,8 @@ export default function AddUser({
         if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
           enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
         } else {
-          newParticipant["study_id"] = selectedStudy
-          newParticipant["study_name"] = studies.filter((study) => study.id === selectedStudy)[0]?.name
+          newParticipant.study_id = selectedStudy
+          newParticipant.study_name = studies.filter((study) => study.id === selectedStudy)[0]?.name
           Service.addData("participants", [newParticipant])
           Service.updateCount("studies", selectedStudy, "participant_count")
           Service.getData("studies", selectedStudy).then((studiesObject) => {
@@ -162,12 +164,87 @@ export default function AddUser({
         }
         ids = [...ids, id]
       }
+      setLoading(false)
       setParticipants()
     }
     setSelectedStudy("")
     closePopUp(3)
     props.onClose as any
   }
+
+  const createNewStudy = () => {
+    let lampAuthId = LAMP.Auth._auth.id
+    if (LAMP.Auth._type === "researcher" && lampAuthId === "researcher@demo.lamp.digital") {
+      createDemoStudy()
+    } else {
+      createStudy()
+    }
+  }
+
+  const createDemoStudy = () => {
+    if (selectedStudy === "") {
+      setShowErrorMsg(true)
+      return false
+    } else {
+      let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
+      setLoading(true)
+      setStudyBtnClicked(true)
+      let newParticipant: any = {}
+      newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+      newParticipant.study_id = selectedStudy
+      newParticipant.study_name = studyName
+      Service.addData("participants", [newParticipant])
+      Service.updateCount("studies", selectedStudy, "participant_count")
+      Service.getData("studies", selectedStudy).then((studiesObject) => {
+        handleNewStudy(studiesObject)
+      })
+      let id = newParticipant.id
+      enqueueSnackbar(
+        t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
+          id: id,
+        }),
+        {
+          variant: "success",
+          persist: true,
+          content: (key: string, message: string) => (
+            <SnackMessage id={key} message={message}>
+              <TextField
+                variant="outlined"
+                size="small"
+                label={t("Temporary email address")}
+                value={`${id}@lamp.com`}
+              />
+              <Box style={{ height: 16 }} />
+              <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
+              <Grid item>
+                <TextField
+                  fullWidth
+                  label={t("One-time login link")}
+                  style={{ marginTop: 16 }}
+                  variant="outlined"
+                  value={_qrLink(`${id}@lamp.com`, id)}
+                  onChange={(event) => {}}
+                />
+                <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
+                  <Grid container justify="center" style={{ padding: 16 }}>
+                    <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
+                  </Grid>
+                </Tooltip>
+              </Grid>
+            </SnackMessage>
+          ),
+        }
+      )
+      closePopUp(3)
+      setSelectedStudy("")
+      setLoading(false)
+      setParticipants()
+    }
+    setSelectedStudy("")
+    closePopUp(3)
+    props.onClose as any
+  }
+
   return (
     <Dialog
       {...props}
@@ -228,7 +305,10 @@ export default function AddUser({
             {t("Cancel")}
           </Button>
           <Button
-            onClick={() => addParticipant()}
+            //onClick={() => addParticipant()}
+            onClick={() => {
+              createNewStudy()
+            }}
             color="primary"
             autoFocus
             //disabled={!!studyBtnClicked ? true : false}

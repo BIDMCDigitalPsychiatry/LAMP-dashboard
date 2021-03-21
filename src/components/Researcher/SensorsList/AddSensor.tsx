@@ -291,16 +291,18 @@ export default function AddSensor({
   const [allSensors, setAllSensors] = useState<Array<Object>>([])
 
   useEffect(() => {
-    Service.getAll("sensors").then((sensorObj: any) => {
-      setAllSensors(sensorObj)
-    })
+    getAllStudies()
   }, [])
 
   useEffect(() => {
+    getAllStudies()
+  }, [sensorDialog])
+
+  const getAllStudies = () => {
     Service.getAll("sensors").then((sensorObj: any) => {
       setAllSensors(sensorObj)
     })
-  }, [sensorDialog])
+  }
 
   const addOrUpdateSensor = () => {
     setSensorDialog(false)
