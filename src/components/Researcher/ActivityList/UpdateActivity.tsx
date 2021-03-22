@@ -50,9 +50,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
-    const lampAuthId = LAMP.Auth._auth.id
-    let result =
-      lampAuthId !== "researcher@demo.lamp.digital" ? await updateActivityData(x, isDuplicated, selectedActivity) : {}
+    let result = await updateActivityData(x, isDuplicated, selectedActivity)
     if (!!result.error)
       enqueueSnackbar(t("Encountered an error: ") + result?.error, {
         variant: "error",
