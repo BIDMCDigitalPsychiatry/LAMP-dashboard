@@ -53,13 +53,15 @@ export default function Sensors({
   const { t } = useTranslation()
   const [selectedSensors, setSelectedSensors] = useState([])
   const [paginatedSensors, setPaginatedSensors] = useState([])
+  const [rowCount, setRowCount] = useState(10)
+  const [page, setPage] = useState(0)
 
   const onChangeSensors = () => {
     ;(async () => {
       Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
         let result = sortData(sensors, [participant.study_name], "id")
         setSensors(result)
-        setPaginatedSensors(result.slice(0, 10))
+        setPaginatedSensors(result.slice(page, rowCount))
       })
     })()
     setSelectedSensors([])
@@ -88,6 +90,8 @@ export default function Sensors({
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
+    setRowCount(rowCount)
+    setPage(page)
     setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
   }
 

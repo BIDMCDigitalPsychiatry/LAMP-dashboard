@@ -1,16 +1,5 @@
 import React, { useState } from "react"
-import {
-  Box,
-  IconButton,
-  Icon,
-  AppBar,
-  Toolbar,
-  Divider,
-  Fab,
-  Typography,
-  Backdrop,
-  CircularProgress,
-} from "@material-ui/core"
+import { Box, IconButton, Icon, AppBar, Toolbar, Divider, Fab, Typography } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import ResponsiveDialog from "../../ResponsiveDialog"
@@ -58,9 +47,12 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   const [gameDetails, setGameDetails] = useState(null)
   const [selectedActivity, setSelectedActivity] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
+
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
-    let result = await updateActivityData(x, isDuplicated, selectedActivity)
+    const lampAuthId = LAMP.Auth._auth.id
+    let result =
+      lampAuthId !== "researcher@demo.lamp.digital" ? await updateActivityData(x, isDuplicated, selectedActivity) : {}
     if (!!result.error)
       enqueueSnackbar(t("Encountered an error: ") + result?.error, {
         variant: "error",
@@ -86,9 +78,12 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
     setSelectedActivity(undefined)
   }
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
-  const modifyActivity = async (activity) => {
-    let data = await LAMP.Activity.view(activity.id)
-    activity.settings = data.settings
+  const modifyActivity = async () => {
+    const lampAuthId = LAMP.Auth._auth.id
+    if (lampAuthId !== "researcher@demo.lamp.digital") {
+      let data = await LAMP.Activity.view(activity.id)
+      activity.settings = data.settings
+    }
     if (activity.spec === "lamp.survey") {
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
         !!y.error ? undefined : y.data
@@ -111,12 +106,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   }
   return (
     <span>
-      <Fab
-        size="small"
-        color="primary"
-        classes={{ root: classes.btnWhite }}
-        onClick={(event) => modifyActivity(activity)}
-      >
+      <Fab size="small" color="primary" classes={{ root: classes.btnWhite }} onClick={(event) => modifyActivity()}>
         <Icon>mode_edit</Icon>
       </Fab>
       <ResponsiveDialog

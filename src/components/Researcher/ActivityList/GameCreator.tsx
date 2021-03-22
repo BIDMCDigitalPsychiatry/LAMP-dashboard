@@ -127,8 +127,8 @@ export default function GameCreator({
     spec: value?.spec ?? activitySpecId,
     schedule: [],
     description: "",
-    photo: null,
-    settings: settings,
+    photo: details?.photo ?? null,
+    settings: settings ?? [],
     studyID: !!value ? value.study_id : study,
   })
   const validate = () => {
@@ -196,7 +196,9 @@ export default function GameCreator({
         settings?.breakpoint_mean === 0 ||
         settings?.breakpoint_mean === "" ||
         settings?.breakpoint_std === 0 ||
-        settings?.breakpoint_std === ""
+        settings?.breakpoint_std === "" ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if (
       (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
@@ -214,7 +216,9 @@ export default function GameCreator({
         settings?.intertrial_duration === 0 ||
         settings?.intertrial_duration === "" ||
         settings?.bubble_duration === 0 ||
-        settings?.bubble_duration === ""
+        settings?.bubble_duration === "" ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else {
       return !(

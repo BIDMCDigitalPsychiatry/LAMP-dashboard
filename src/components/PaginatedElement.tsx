@@ -30,6 +30,7 @@ export default function Pagination({
 
   useEffect(() => {
     setPage(0)
+    console.log(rowCount)
     updatePage(0, rowCount)
   }, [rowCount])
 

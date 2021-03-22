@@ -135,7 +135,8 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
       <Popover
         classes={{ root: classes.customPopover, paper: classes.customPaper }}
         open={!!popover ? true : false}
-        anchorPosition={!!popover && popover.getBoundingClientRect()}
+        //anchorPosition={!!popover && popover.getBoundingClientRect()}
+        anchorPosition={popover ? popover.getBoundingClientRect() : null}
         anchorReference="anchorPosition"
         onClose={() => setPopover(null)}
         anchorOrigin={{

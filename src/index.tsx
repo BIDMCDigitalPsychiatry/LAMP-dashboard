@@ -38,9 +38,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
     -ms-user-select: text;
     user-select: text;
     cursor: text;
-}
-#vg-tooltip-element {
-    z-index: 2000;
 }`
 
 // IE9+ CustomEvent polyfill.
@@ -54,7 +51,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
   }
   ;(window.CustomEvent as any) = CustomEvent
 })()
-
 // Initialize the demo DB for "Try It" mode.
 LAMP.initializeDemoDB(demo_db)
 

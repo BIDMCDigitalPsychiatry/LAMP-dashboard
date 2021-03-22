@@ -49,6 +49,7 @@ const saveSettings = (newVal, key) => {
 }
 
 export const saveDemoData = () => {
+  Service.deleteDB()
   Service.addData("participants", demo_db.Participant)
   Service.addData("studies", demo_db.Study)
   Service.addData("activities", demo_db.Activity)

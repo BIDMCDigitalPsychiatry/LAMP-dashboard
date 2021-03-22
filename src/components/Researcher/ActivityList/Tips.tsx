@@ -26,6 +26,8 @@ import DeleteIcon from "@material-ui/icons/Delete"
 import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import TipHeader from "./TipHeader"
+import ActivityFooter from "./ActivityFooter"
 
 const theme = createMuiTheme({
   palette: {
@@ -125,30 +127,27 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function urlValidator(url) {
-  var re = /^(http[s]?:\/\/){0,1}(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}/
-  if (!re.test(url)) {
-    return false
-  } else {
-    return true
-  }
-}
-
-export default function TipCreator({
+export default function Tips({
+  value,
   activities,
   onSave,
   onCancel,
   studies,
   allActivities,
   study,
+  activitySpecId,
+  details,
   ...props
 }: {
+  value?: any
   activities?: any
   onSave?: Function
   onCancel?: Function
   studies?: any
   allActivities?: any
   study?: string
+  activitySpecId?: string
+  details?: Object
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -170,6 +169,18 @@ export default function TipCreator({
   const [focusedTextfield, setFocusedTextfield] = useState(null)
   const defaultSettingsArray = [{ title: "", text: "", image: "" }]
   const { t } = useTranslation()
+
+  const [data, setData] = useState({
+    id: value?.id ?? undefined,
+    name: "",
+    spec: value?.spec ?? activitySpecId,
+    icon: "",
+    schedule: [],
+    //description: "",
+    settings: [{ title: "", text: "", image: "" }],
+    studyID: !!value ? value.study_id : study,
+  })
+
   const defaultSelectedCategory = {
     id: undefined,
     name: "",
@@ -179,6 +190,7 @@ export default function TipCreator({
     settings: [{ title: "", text: "", image: "" }],
     studyID: "",
   }
+
   useEffect(() => {
     let id = deletedIds
     if (id !== "") {
@@ -225,7 +237,8 @@ export default function TipCreator({
       setLoading(true)
       if (studyId) {
         setSelectedCategory(defaultSelectedCategory)
-        let tipsCategoryData = allActivities.filter((activity) => activity.spec === "lamp.tips")
+        let activityData = await LAMP.Activity.allByStudy(studyId)
+        let tipsCategoryData = activityData.filter((activity) => activity.spec === "lamp.tips")
         setCategoryArray(tipsCategoryData)
       }
       if (!!activities) {
@@ -432,6 +445,20 @@ export default function TipCreator({
   const removeEventValue = (event) => {
     event.target.value = null
   }
+
+  const handleChange = (data) => {
+    setData({
+      id: value?.id ?? undefined,
+      name: data.text,
+      spec: value?.spec ?? activitySpecId,
+      icon: data.photo,
+      schedule: [],
+      //settings: [{ title: "", text: "", image: "" }],
+      settings: [],
+      studyID: data.studyId,
+    })
+  }
+
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -439,6 +466,17 @@ export default function TipCreator({
       </Backdrop>
       <MuiThemeProvider theme={theme}>
         <Container className={classes.containerWidth}>
+          <TipHeader
+            studies={studies}
+            value={value}
+            details={details}
+            activitySpecId={activitySpecId}
+            study={!!value ? value.study_id : study}
+            onChange={handleChange}
+            image=""
+            //image={JournalIcon}
+          />
+          {/*
           <Grid container spacing={2}>
             <Grid item xs sm={4} md={3} lg={2}>
               <Tooltip title={!categoryImage ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
@@ -742,6 +780,8 @@ export default function TipCreator({
                 </Grid>
               ))
             : ""}
+
+        */}
         </Container>
       </MuiThemeProvider>
       <Grid

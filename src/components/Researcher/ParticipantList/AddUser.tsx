@@ -256,7 +256,7 @@ export default function AddUser({
       aria-describedby="alert-dialog-slide-description"
       classes={{ paper: classes.addNewDialog }}
     >
-      <DialogTitle id="alert-dialog-slide-title">
+      <DialogTitle id="alert-dialog-slide-title" disableTypography>
         <Typography variant="h6">{t("Create a new user.")}</Typography>
         <IconButton
           aria-label="close"

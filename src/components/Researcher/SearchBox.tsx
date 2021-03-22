@@ -44,12 +44,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 export default function Header({ searchData, ...props }: { searchData: Function }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
+
   useEffect(() => {
     searchData(search)
   }, [search])
+
   return (
     <Box>
       <div className={classes.search}>

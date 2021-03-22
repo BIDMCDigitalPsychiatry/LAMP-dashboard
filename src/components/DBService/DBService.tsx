@@ -1,28 +1,88 @@
 import * as idb from "idb"
 const DATABASE_NAME = "LAMP-DB"
+import { DBSchema } from "idb"
 
-const dbPromise = idb.openDB(DATABASE_NAME, 1, {
-  upgrade(upgradeDb) {
-    if (!upgradeDb.objectStoreNames.contains("researcher")) {
-      const researcher = upgradeDb.createObjectStore("researcher", { keyPath: "id" })
+interface LampDB extends DBSchema {
+  researcher: {
+    key: string
+    value: {
+      name: string
+      notification: boolean
+    }
+    indexes: { id: string }
+  }
+  studies: {
+    key: string
+    value: {
+      id: string
+      name: string
+      participant_count: number
+      activity_count: number
+      sensor_count: number
+    }
+    indexes: { id: string }
+  }
+  participants: {
+    key: string
+    value: {
+      id: string
+      name: string
+      gps: Array<JSON>
+      accelerometer: Array<JSON>
+      active: Array<JSON>
+      analytics: Array<JSON>
+      study_id: string
+      study_name: string
+    }
+    indexes: { study_name: string; id: string }
+  }
+  activities: {
+    key: string
+    value: {
+      id: string
+      name: string
+      spec: string
+      study_id: string
+      study_name: string
+      schedule: Array<JSON>
+      settings?: Array<JSON>
+    }
+    indexes: { study_name: string; id: string }
+  }
+  sensors: {
+    key: string
+    value: {
+      id: string
+      name: string
+      study_id: string
+      study_name: string
+    }
+    indexes: { study_name: string; id: string }
+  }
+}
+
+const dbPromise = idb.openDB<LampDB>(DATABASE_NAME, 1, {
+  upgrade(lampDb) {
+    if (!lampDb.objectStoreNames.contains("researcher")) {
+      const researcher = lampDb.createObjectStore("researcher", { keyPath: "id" })
       researcher.createIndex("id", "id", { unique: true })
     }
-    if (!upgradeDb.objectStoreNames.contains("studies")) {
-      const studies = upgradeDb.createObjectStore("studies", { keyPath: "id" })
+    if (!lampDb.objectStoreNames.contains("studies")) {
+      const studies = lampDb.createObjectStore("studies", { keyPath: "id" })
       studies.createIndex("id", "id", { unique: true })
     }
-    if (!upgradeDb.objectStoreNames.contains("participants")) {
-      const participants = upgradeDb.createObjectStore("participants", { keyPath: "id" })
+    if (!lampDb.objectStoreNames.contains("participants")) {
+      const participants = lampDb.createObjectStore("participants", { keyPath: "id" })
       participants.createIndex("id", "id", { unique: true })
       participants.createIndex("study_name", "study_name")
     }
-    if (!upgradeDb.objectStoreNames.contains("activities")) {
-      const activities = upgradeDb.createObjectStore("activities", { keyPath: "id" })
+    if (!lampDb.objectStoreNames.contains("activities")) {
+      const activities = lampDb.createObjectStore("activities", { keyPath: "id" })
       activities.createIndex("id", "id")
       activities.createIndex("study_name", "study_name")
     }
-    if (!upgradeDb.objectStoreNames.contains("sensors")) {
-      const sensors = upgradeDb.createObjectStore("sensors", { keyPath: "id" })
+    if (!lampDb.objectStoreNames.contains("sensors")) {
+      const sensors = lampDb.createObjectStore("sensors", { keyPath: "id" })
       sensors.createIndex("id", "id")
       sensors.createIndex("study_name", "study_name")
     }
@@ -30,7 +90,7 @@ const dbPromise = idb.openDB(DATABASE_NAME, 1, {
 })
 
 class DBService {
-  getAll(tablespace: string) {
+  getAll(tablespace: any) {
     return dbPromise
       .then((db) => {
         return db.transaction(tablespace).objectStore(tablespace).getAll()
@@ -40,7 +100,7 @@ class DBService {
       })
   }
 
-  update(tablespace: string, newVal: any, key: string, conditionKey: string) {
+  update(tablespace: any, newVal: any, key: string, conditionKey: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -62,7 +122,7 @@ class DBService {
         // Do something?
       })
   }
-  updateMultipleKeys(tablespace: string, newVal: any, keys: Array<any>, conditionKey: string) {
+  updateMultipleKeys(tablespace: any, newVal: any, keys: Array<any>, conditionKey: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -86,7 +146,7 @@ class DBService {
         // Do something?
       })
   }
-  get(tablespace: string, key: string) {
+  get(tablespace: any, key: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -104,7 +164,7 @@ class DBService {
         // Do something?
       })
   }
-  getDataByKey(tablespace: string, search: Array<string>, key: string) {
+  getDataByKey(tablespace: any, search: Array<string>, key: string) {
     let results = []
     return dbPromise
       .then(function (db) {
@@ -126,7 +186,7 @@ class DBService {
       })
   }
 
-  getData(tablespace: string, key: string) {
+  getData(tablespace: any, key: string) {
     return dbPromise
       .then((db) => {
         return db.transaction([tablespace], "readonly").objectStore(tablespace).get(key)
@@ -136,7 +196,7 @@ class DBService {
       })
   }
 
-  addData(tablespace: string, data: any) {
+  addData(tablespace: any, data: any) {
     return dbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
@@ -149,7 +209,7 @@ class DBService {
       })
   }
 
-  addRow(tablespace: string, data: any) {
+  addRow(tablespace: any, data: any) {
     return dbPromise
       .then((db) => {
         let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
@@ -160,7 +220,7 @@ class DBService {
       })
   }
 
-  delete(tablespace: string, keys: any) {
+  delete(tablespace: any, keys: any) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -179,7 +239,7 @@ class DBService {
       })
   }
 
-  deleteByKey(tablespace: string, keys: any, conditionKey: string) {
+  deleteByKey(tablespace: any, keys: any, conditionKey: string) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -198,7 +258,7 @@ class DBService {
       })
   }
 
-  updateCount(tablespace: string, key: string, keyToUpdate: string, count?: number, type?: number) {
+  updateCount(tablespace: any, key: string, keyToUpdate: string, count?: number, type?: number) {
     return dbPromise
       .then((db) => {
         ;(async () => {
@@ -219,7 +279,7 @@ class DBService {
       })
   }
 
-  updateValues(tablespace: string, newVal: any, keys: Array<any>) {
+  updateValues(tablespace: any, newVal: any, keys: Array<any>) {
     return dbPromise
       .then((db) => {
         ;(async () => {

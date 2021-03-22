@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme: Theme) =>
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
-      maxHeight: 600,
+      maxHeight: 400,
       marginTop: 75,
       marginLeft: 100,
       borderRadius: 10,
@@ -153,7 +153,8 @@ export default function AddActivity({
       </Fab>
       <Popover
         open={!!popover ? true : false}
-        anchorPosition={!!popover && popover.getBoundingClientRect()}
+        //anchorPosition={!!popover && popover.getBoundingClientRect()}
+        anchorPosition={popover ? popover.getBoundingClientRect() : null}
         anchorReference="anchorPosition"
         classes={{ root: classes.customPopover, paper: classes.customPaper }}
         onClose={() => setPopover(null)}

@@ -33,7 +33,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.bubble_count === 0 || settings.bubble_count === "" || !numberCommaFormat(settings.bubble_count)
+            settings?.bubble_count === 0 || settings?.bubble_count === "" || !numberCommaFormat(settings?.bubble_count)
               ? true
               : false
           }
@@ -50,7 +50,9 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, bubble_count: e.target.value.split(",").map((x) => +x) })}
           helperText={
-            settings.balloon_count === 0 || settings.balloon_count === "" || !numberCommaFormat(settings.bubble_count)
+            settings?.balloon_count === 0 ||
+            settings?.balloon_count === "" ||
+            !numberCommaFormat(settings?.bubble_count)
               ? t("Please enter Bubble Count with comma seperated.")
               : ""
           }
@@ -62,7 +64,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.bubble_speed === 0 || settings.bubble_speed === "" || !numberCommaFormat(settings.bubble_speed)
+            settings?.bubble_speed === 0 || settings?.bubble_speed === "" || !numberCommaFormat(settings?.bubble_speed)
               ? true
               : false
           }
@@ -79,7 +81,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, bubble_speed: e.target.value.split(",").map((x) => +x) })}
           helperText={
-            settings.bubble_speed === 0 || settings.bubble_speed === "" || !numberCommaFormat(settings.bubble_speed)
+            settings?.bubble_speed === 0 || settings?.bubble_speed === "" || !numberCommaFormat(settings?.bubble_speed)
               ? t("Please enter Bubble Speed with comma seperated.")
               : ""
           }
@@ -90,7 +92,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={settings.intertrial_duration === 0 || settings.intertrial_duration === "" ? true : false}
+          error={settings?.intertrial_duration === 0 || settings?.intertrial_duration === "" ? true : false}
           type="text"
           variant="filled"
           id="intertrial_duration"
@@ -104,7 +106,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, intertrial_duration: Number(e.target.value) })}
           helperText={
-            settings.intertrial_duration === 0 || settings.intertrial_duration === ""
+            settings?.intertrial_duration === 0 || settings?.intertrial_duration === ""
               ? t("Please enter Intertrial Duration.")
               : ""
           }
@@ -112,7 +114,7 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={settings.bubble_duration === 0 || settings.bubble_duration === "" ? true : false}
+          error={settings?.bubble_duration === 0 || settings?.bubble_duration === "" ? true : false}
           type="text"
           variant="filled"
           id="bubble_duration"
@@ -126,7 +128,9 @@ export default function PopTheBubbles({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, bubble_duration: Number(e.target.value) })}
           helperText={
-            settings.bubble_duration === 0 || settings.bubble_duration === "" ? t("Please enter Bubble Duration.") : ""
+            settings?.bubble_duration === 0 || settings?.bubble_duration === ""
+              ? t("Please enter Bubble Duration.")
+              : ""
           }
         />
       </Grid>
