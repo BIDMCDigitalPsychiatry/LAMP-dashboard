@@ -122,6 +122,9 @@ export default function PatientStudyCreator({
     LAMP.Study.create(researcher.id, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
       if (!!result.error) {
+        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
+          variant: "error",
+        })
       } else {
         Service.getData("studies", duplicateStudyName).then((studyData) => {
           let studyId = result.data
