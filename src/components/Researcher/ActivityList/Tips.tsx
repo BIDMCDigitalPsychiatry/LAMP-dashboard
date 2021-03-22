@@ -830,7 +830,7 @@ export default function Tips({
                     }}
                     disabled={!category || !studyId ? true : false}
                   >
-                    <AddIcon /> {t("Add")}
+                    <Icon>add</Icon> {t("Add")}
                   </Fab>
                 </Grid>
               </Grid>
@@ -952,7 +952,7 @@ export default function Tips({
                                 setClickDeleteId(idx)
                               }}
                             >
-                              <DeleteIcon /> {t("Delete")}
+                              <Icon>delete</Icon> {t("Delete")}
                             </Fab>
                           </Tooltip>
                         </Box>
