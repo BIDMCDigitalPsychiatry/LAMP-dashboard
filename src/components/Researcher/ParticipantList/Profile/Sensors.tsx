@@ -146,7 +146,7 @@ export default function Sensors({
               "No Sensors"
             )}
           </Box>
-          <Grid container spacing={3}>
+          <Grid container>
             {(paginatedSensors ?? []).map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <SensorRow

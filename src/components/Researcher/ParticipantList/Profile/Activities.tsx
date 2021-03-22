@@ -150,7 +150,7 @@ export default function PatientProfile({
               "No activities"
             )}
           </Box>
-          <Grid container spacing={3}>
+          <Grid container>
             {(paginatedActivities ?? []).map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <ActivityRow
