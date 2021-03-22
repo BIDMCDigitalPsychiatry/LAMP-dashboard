@@ -535,5 +535,20 @@
 	"Please enter Bubble Count with comma seperated.": "Please enter Bubble Count with comma seperated.",
 	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated.",
 	"Please enter Intertrial Duration.": "Please enter Intertrial Duration.",
-	"Please enter Bubble Duration.": "Please enter Bubble Duration."
+	"Please enter Bubble Duration.": "Please enter Bubble Duration.",
+	"Add a new patient and study.": "Add a new patient and study.",
+	"Create a patient under their own study.": "Create a patient under their own study.",
+	"Study Name": "Study Name",
+	"Duplicate Study": "Duplicate Study",
+	"Existing Study Name": "Existing Study Name",
+	"Create a new patient under this study": "Create a new patient under this study",
+	"An error occured while deleting. Please try again.": "An error occured while deleting. Please try again.",
+	"No Records Found": "No Records Found",
+	"Confirm": "Confirm",
+	"Users": "Users",
+	"Add a patient": "Add a patient",
+	"Create a new user.": "Create a new user.",
+	"Are you sure you want to delete this study?": "Are you sure you want to delete this study?",
+	"Unique study name required": "Unique study name required",
+	"Please enter study name.": "Please enter study name."
 }
