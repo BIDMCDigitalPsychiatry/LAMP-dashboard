@@ -45,6 +45,7 @@ export default function Header({
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, updateStudyCount] = useState(0)
+
   const setUpdateCount = (type: number) => {
     updateStudyCount(type)
   }
@@ -59,7 +60,6 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">Activities</Typography>
         </Box>
-
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
         </Box>

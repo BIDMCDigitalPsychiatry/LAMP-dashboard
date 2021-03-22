@@ -142,34 +142,38 @@ export default function PatientStudyCreator({
           Service.addData("studies", [newStudyObj])
           Service.getDataByKey("activities", [duplicateStudyName], "study_id").then((activityData) => {
             let newActivities = activityData
-            let activityCount = parseInt(newStudyObj.activity_count + 1)
-            let ac = 0
-            newActivities.map((p) => {
-              let newActivityCount = activityCount + ac
-              p["#parent"] = newStudyObj.id
-              p["id"] = "activity" + newActivityCount
-              p["study_id"] = newStudyObj.id
-              p["study_name"] = studyName
-              ac++
-              return p
+            Service.getAll("activities").then((allActivities: any) => {
+              let activityCount = allActivities.length
+              let ac = 1
+              newActivities.map((p) => {
+                let newActivityCount = parseInt(activityCount + ac)
+                p["#parent"] = newStudyObj.id
+                p["id"] = "activity" + newActivityCount
+                p["study_id"] = newStudyObj.id
+                p["study_name"] = studyName
+                ac++
+                return p
+              })
+              Service.addData("activities", newActivities)
             })
-            Service.addData("activities", newActivities)
           })
 
           Service.getDataByKey("sensors", [duplicateStudyName], "study_id").then((sensorsData) => {
             let newSensors = sensorsData
-            let sensorCount = parseInt(newStudyObj.sensor_count + 1)
-            let sc = 0
-            newSensors.map((p) => {
-              let newSensorsCount = sensorCount + sc
-              p["#parent"] = newStudyObj.id
-              p["id"] = "sensor" + newSensorsCount
-              p["study_id"] = newStudyObj.id
-              p["study_name"] = studyName
-              sc++
-              return p
+            Service.getAll("sensors").then((allSensors: any) => {
+              let sensorsCount = allSensors.length
+              let sc = 1
+              newSensors.map((p) => {
+                let newSensorsCount = parseInt(sensorsCount + sc)
+                p["#parent"] = newStudyObj.id
+                p["id"] = "sensor" + newSensorsCount
+                p["study_id"] = newStudyObj.id
+                p["study_name"] = studyName
+                sc++
+                return p
+              })
+              Service.addData("sensors", newSensors)
             })
-            Service.addData("sensors", newSensors)
 
             if (shouldAddParticipant) {
               Service.updateCount("studies", newStudyObj.id, "participant_count")
@@ -315,7 +319,7 @@ export default function PatientStudyCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <DialogTitle id="alert-dialog-slide-title">
+      <DialogTitle id="alert-dialog-slide-title" disableTypography>
         <Typography variant="h6">{t("Create a new study.")}</Typography>
         <IconButton
           aria-label="close"

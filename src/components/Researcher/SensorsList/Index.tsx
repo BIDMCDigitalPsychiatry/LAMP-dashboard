@@ -58,9 +58,12 @@ export default function SensorsList({
   const [loading, setLoading] = useState(false)
   const [sensors, setSensors] = useState(null)
   const [selectedSensors, setSelectedSensors] = useState<any>([])
-  const [search, setSearch] = useState(null)
   const [paginatedSensors, setPaginatedSensors] = useState([])
   const [selected, setSelected] = useState(selectedStudies)
+  const [rowCount, setRowCount] = useState(40)
+  const [page, setPage] = useState(0)
+  const [search, setSearch] = useState(null)
+
   const handleChange = (sensorData, checked) => {
     if (checked) {
       setSelectedSensors((prevState) => [...prevState, sensorData])
@@ -80,11 +83,8 @@ export default function SensorsList({
     }
   }, [selectedStudies])
 
-  useEffect(() => {
-    if (search !== null) searchFilterSensors()
-  }, [search])
-
-  const searchFilterSensors = () => {
+  const searchFilterSensors = (searchVal?: string) => {
+    const searchTxt = searchVal ?? search
     selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
     if (selectedStudies.length > 0 && !loading) {
       let result = []
@@ -92,15 +92,15 @@ export default function SensorsList({
       selectedStudies.map((study) => {
         Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
           if ((sensorData || []).length > 0) {
-            if (!!search && search.trim().length > 0) {
+            if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(sensorData)
-              result = result.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+              result = result.filter((i) => i.name.toLowerCase().includes(searchTxt.toLowerCase()))
               setSensors(sortData(result, selectedStudies, "name"))
             } else {
               result = result.concat(sensorData)
               setSensors(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedSensors(result.slice(0, 40))
+            setPaginatedSensors(result.slice(page, rowCount))
           } else {
             if (result.length === 0) setSensors([])
           }
@@ -113,12 +113,15 @@ export default function SensorsList({
     setSelectedSensors([])
   }
 
-  const handleSearchData = (val) => {
+  const handleSearchData = (val: string) => {
     setSearch(val)
+    searchFilterSensors(val)
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
+    setRowCount(rowCount)
+    setPage(page)
     setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }

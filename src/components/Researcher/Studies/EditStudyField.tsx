@@ -1,15 +1,9 @@
-// Core Imports
 import React, { useState, useEffect, useRef } from "react"
 import { Icon, IconButton, TextField, Tooltip, InputAdornment } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-
-// Local Imports
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
-
-// TODO: should be called AliasField??
-// TODO: move tag responsibilities out of here when bugs are stabilized
 
 export default function EditStudyField({
   study,
@@ -159,7 +153,6 @@ export default function EditStudyField({
           inputRef={inputRef}
           variant="outlined"
           margin="dense"
-          //disabled={editData && editStudyName === study ? false : true}
           label={t(studyName)}
           value={t(aliasStudyName) || ""}
           onChange={(event) => {

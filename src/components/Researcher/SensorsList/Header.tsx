@@ -54,6 +54,7 @@ export default function Header({
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, setUpdateCount] = useState(0)
   const { t } = useTranslation()
+
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
   }

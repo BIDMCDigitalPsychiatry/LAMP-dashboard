@@ -8,7 +8,6 @@ import {
   Container,
   useMediaQuery,
   useTheme,
-  Icon,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -24,6 +23,8 @@ import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
+// import { Researcher } from "../DBService/Types/Researcher"
+// import { Study } from "../DBService/Types/Study"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -120,13 +121,13 @@ export const sortData = (data, studies, key) => {
   })
   return result
 }
-export interface Study {
-  id?: string
-  name?: string
-  participant_count?: number
-  activity_count?: number
-  sensor_count?: number
-}
+// export interface Study {
+//   id?: string
+//   name?: string
+//   participant_count?: number
+//   activity_count?: number
+//   sensor_count?: number
+// }
 export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
@@ -152,25 +153,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     if (!!newStudy) getAllStudies()
   }, [newStudy])
 
-  const getDBStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
-      setCurrentTab(0)
-      Service.getAll("researcher").then((data) => {
-        let researcherNotification = !!data ? data[0]?.notification ?? false : false
-        setNotification(researcherNotification)
-      })
-    })
-  }
-
-  const getAllStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
-    })
-  }
-
   useEffect(() => {
     if (updatedData !== null) getAllStudies()
   }, [updatedData])
@@ -189,6 +171,25 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
       getAllStudies()
     }
   }, [deletedData])
+
+  const getDBStudies = async () => {
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      filterStudies(studies)
+      setCurrentTab(0)
+      Service.getAll("researcher").then((data) => {
+        let researcherNotification = !!data ? data[0]?.notification ?? false : false
+        setNotification(researcherNotification)
+      })
+    })
+  }
+
+  const getAllStudies = async () => {
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      filterStudies(studies)
+    })
+  }
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
@@ -216,7 +217,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   const handleSearchData = (data) => {
     setSearch(data)
   }
-
   return (
     <Container maxWidth={false}>
       <Container

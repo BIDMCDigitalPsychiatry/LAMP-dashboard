@@ -359,6 +359,16 @@ export default function SurveyCreator({
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
       }
     }
+    return !(
+      duplicates.length > 0 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+      data.studyID === null ||
+      data.studyID === ""
+    )
+  }
+
+  const checkAndSave = (data, isDuplicate) => {
     if (!!questions && questions.length > 0) {
       let optionsArray = []
       {
@@ -388,24 +398,16 @@ export default function SurveyCreator({
     }
     if (questions.length === 0) {
       enqueueSnackbar(t("At least one question required."), { variant: "error" })
-    }
-    if (
+    } else if (
       questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
       isOptionNull === 0
     ) {
       enqueueSnackbar(t("At least one option required for list/slider/rating/multiselect type questions."), {
         variant: "error",
       })
+    } else {
+      onSave(data, isDuplicate)
     }
-    return !(
-      duplicates.length > 0 ||
-      typeof data.name === "undefined" ||
-      (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-      isOptionNull == 0 ||
-      data.studyID === null ||
-      data.studyID === "" ||
-      questions.length === 0
-    )
   }
 
   return (
@@ -455,8 +457,8 @@ export default function SurveyCreator({
                     size="small"
                     color="primary"
                     onClick={() => {
-                      setQuestions((questions) => [...questions, {}])
-                      setActiveStep(questions.length)
+                      setQuestions((questions) => (!!questions ? [...questions, {}] : []))
+                      setActiveStep(!!questions ? questions.length : 0)
                     }}
                   >
                     <Icon fontSize="small">add_circle</Icon>
@@ -470,7 +472,7 @@ export default function SurveyCreator({
           </Grid>
         </Container>
       </MuiThemeProvider>
-      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
+      <ActivityFooter onSave={checkAndSave} validate={validate} value={value} data={data} />
     </div>
   )
 }

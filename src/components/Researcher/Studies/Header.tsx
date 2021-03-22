@@ -1,10 +1,9 @@
 import React, { useState } from "react"
-import { Box, Popover, Fab, Typography, Icon, InputBase, MenuItem } from "@material-ui/core"
-import LAMP from "lamp-core"
+import { Box, Popover, Fab, Typography, Icon, MenuItem } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import SearchIcon from "@material-ui/icons/Search"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
+import SearchBox from "../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -12,45 +11,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": {
         fontSize: "30px",
         fontWeight: "bold",
-      },
-    },
-    search: {
-      position: "relative",
-      borderRadius: 50,
-      backgroundColor: "#F8F8F8",
-      "&:hover": {
-        backgroundColor: "#eee",
-      },
-      marginRight: theme.spacing(2),
-      marginLeft: 0,
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-        width: "450px",
-      },
-      [theme.breakpoints.down("md")]: {
-        width: "300px",
-      },
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 2),
-      height: "100%",
-      position: "absolute",
-      pointerEvents: "none",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    inputRoot: {
-      color: "inherit",
-    },
-    inputInput: {
-      padding: "15px 10px",
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("md")]: {
-        width: "20ch",
       },
     },
     btnBlue: {
@@ -115,13 +75,8 @@ export default function Header({
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
-  const [selectedStudies, setSelectedStudies] = useState([])
-  const [studiesCount, setStudiesCount] = useState(null)
-  const [search, setSearch] = useState("")
-
-  const [addStudy, setAddStudy] = useState(false)
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
-  const filteredStudyArray = () => {}
+
   const handleNewStudyData = (data) => {
     setUpdateCount(1)
     setParticipants()
@@ -141,24 +96,7 @@ export default function Header({
           <Typography variant="h5">Studies</Typography>
         </Box>
         <Box>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
-            </div>
-            <InputBase
-              placeholder={t("Search")}
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
-              }}
-              inputProps={{ "aria-label": "search" }}
-              onChange={(e) => {
-                setSearch(e.target.value)
-                searchData(e.target.value)
-              }}
-              value={search}
-            />
-          </div>
+          <SearchBox searchData={searchData} />
         </Box>
         <Box>
           <Fab
@@ -189,7 +127,6 @@ export default function Header({
             <MenuItem
               onClick={() => {
                 setPopover(null)
-                setAddStudy(false)
                 setAddParticipantStudy(true)
               }}
             >

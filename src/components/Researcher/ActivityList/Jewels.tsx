@@ -28,8 +28,8 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
   useEffect(() => {
     updateSettings({
       ...settings,
-      mode: settings.mode ?? modes[0].value,
-      variant: settings.variant ?? variants[0].value,
+      mode: settings?.mode ?? modes[0].value,
+      variant: settings?.variant ?? variants[0].value,
     })
   }, [])
 
@@ -37,7 +37,9 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
     <Grid container spacing={2}>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={typeof settings.mode == "undefined" || settings.mode === null || settings.mode === "" ? true : false}
+          error={
+            typeof settings?.mode == "undefined" || settings?.mode === null || settings?.mode === "" ? true : false
+          }
           select
           label={t("Mode")}
           value={settings?.mode ?? 1}
@@ -45,7 +47,7 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             updateSettings({ ...settings, mode: Number(e.target.value) })
           }}
           helperText={
-            typeof settings.mode == "undefined" || settings.mode === null || settings.mode === ""
+            typeof settings?.mode == "undefined" || settings?.mode === null || settings?.mode === ""
               ? t("Please select the mode")
               : ""
           }
@@ -61,7 +63,7 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            typeof settings.variant == "undefined" || settings.variant === null || settings.variant === ""
+            typeof settings?.variant == "undefined" || settings?.variant === null || settings?.variant === ""
               ? true
               : false
           }
@@ -72,7 +74,7 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             updateSettings({ ...settings, variant: e.target.value })
           }}
           helperText={
-            typeof settings.variant == "undefined" || settings.variant === null || settings.variant === ""
+            typeof settings?.variant == "undefined" || settings?.variant === null || settings?.variant === ""
               ? t("Please select the variant")
               : ""
           }
@@ -92,10 +94,10 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.beginner_seconds < 30 ||
-            settings.beginner_seconds > 300 ||
-            settings.beginner_seconds === 0 ||
-            settings.beginner_seconds === ""
+            settings?.beginner_seconds < 30 ||
+            settings?.beginner_seconds > 300 ||
+            settings?.beginner_seconds === 0 ||
+            settings?.beginner_seconds === ""
               ? true
               : false
           }
@@ -112,16 +114,16 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 30,
           }}
           onChange={(e) => updateSettings({ ...settings, beginner_seconds: Number(e.target.value) })}
-          helperText={settings.beginner_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
+          helperText={settings?.beginner_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.intermediate_seconds < 10 ||
-            settings.intermediate_seconds > 300 ||
-            settings.intermediate_seconds === 0 ||
-            settings.intermediate_seconds === ""
+            settings?.intermediate_seconds < 10 ||
+            settings?.intermediate_seconds > 300 ||
+            settings?.intermediate_seconds === 0 ||
+            settings?.intermediate_seconds === ""
               ? true
               : false
           }
@@ -138,16 +140,16 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 10,
           }}
           onChange={(e) => updateSettings({ ...settings, intermediate_seconds: Number(e.target.value) })}
-          helperText={settings.intermediate_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
+          helperText={settings?.intermediate_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.expert_seconds < 10 ||
-            settings.expert_seconds > 300 ||
-            settings.expert_seconds === 0 ||
-            settings.expert_seconds === ""
+            settings?.expert_seconds < 10 ||
+            settings?.expert_seconds > 300 ||
+            settings?.expert_seconds === 0 ||
+            settings?.expert_seconds === ""
               ? true
               : false
           }
@@ -164,16 +166,16 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 10,
           }}
           onChange={(e) => updateSettings({ ...settings, expert_seconds: Number(e.target.value) })}
-          helperText={settings.expert_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
+          helperText={settings?.expert_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.advanced_seconds > 300 ||
-            settings.advanced_seconds < 10 ||
-            settings.advanced_seconds === 0 ||
-            settings.advanced_seconds === ""
+            settings?.advanced_seconds > 300 ||
+            settings?.advanced_seconds < 10 ||
+            settings?.advanced_seconds === 0 ||
+            settings?.advanced_seconds === ""
               ? true
               : false
           }
@@ -190,7 +192,7 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 10,
           }}
           onChange={(e) => updateSettings({ ...settings, advanced_seconds: Number(e.target.value) })}
-          helperText={settings.advanced_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
+          helperText={settings?.advanced_seconds > 300 ? t("Maximum value is number", { number: 300 }) : ""}
         />
       </Grid>
       <Grid item xs={12}>
@@ -200,10 +202,10 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.diamond_count < 3 ||
-            settings.diamond_count > 25 ||
-            settings.diamond_count === 0 ||
-            settings.diamond_count === ""
+            settings?.diamond_count < 3 ||
+            settings?.diamond_count > 25 ||
+            settings?.diamond_count === 0 ||
+            settings?.diamond_count === ""
               ? true
               : false
           }
@@ -220,12 +222,12 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 3,
           }}
           onChange={(e) => updateSettings({ ...settings, diamond_count: Number(e.target.value) })}
-          helperText={settings.diamond_count > 25 ? t("Maximum value is number", { number: 25 }) : ""}
+          helperText={settings?.diamond_count > 25 ? t("Maximum value is number", { number: 25 }) : ""}
         />
       </Grid>
       <Grid item lg={6} md={6} sm={6} xs={12}>
         <TextField
-          error={settings.bonus_point_count === 0 || settings.bonus_point_count === "" ? true : false}
+          error={settings?.bonus_point_count === 0 || settings?.bonus_point_count === "" ? true : false}
           type="number"
           id="bonus_point_count"
           label={t("Bonus points for next level")}
@@ -239,16 +241,16 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
             min: 0,
           }}
           onChange={(e) => updateSettings({ ...settings, bonus_point_count: Number(e.target.value) })}
-          helperText={settings.bonus_point_count > 500 ? t("Maximum value is number", { number: 500 }) : ""}
+          helperText={settings?.bonus_point_count > 500 ? t("Maximum value is number", { number: 500 }) : ""}
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
           error={
-            settings.shape_count < 1 ||
-            settings.shape_count > 4 ||
-            settings.shape_count === 0 ||
-            settings.shape_count === ""
+            settings?.shape_count < 1 ||
+            settings?.shape_count > 4 ||
+            settings?.shape_count === 0 ||
+            settings?.shape_count === ""
               ? true
               : false
           }
@@ -265,7 +267,7 @@ export default function JewelsGame({ settings, updateSettings, ...props }) {
           }}
           defaultValue={settings?.shape_count ?? 1}
           onChange={(e) => updateSettings({ ...settings, shape_count: Number(e.target.value) })}
-          helperText={settings.shape_count > 4 ? t("Maximum value is number", { number: 4 }) : ""}
+          helperText={settings?.shape_count > 4 ? t("Maximum value is number", { number: 4 }) : ""}
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>

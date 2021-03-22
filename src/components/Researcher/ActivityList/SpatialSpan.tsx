@@ -36,7 +36,7 @@ export default function SpatialSpan({ settings, updateSettings, ...props }) {
             unable={false}
             color="#618EF7"
             value="Forward"
-            checked={!settings.reverse_tapping ? true : false}
+            checked={!settings?.reverse_tapping ? true : false}
             onChange={() => updateSettings({ ...settings, reverse_tapping: false })}
             labelPlacement="right"
           />
@@ -48,7 +48,7 @@ export default function SpatialSpan({ settings, updateSettings, ...props }) {
             color="#618EF7"
             value="Backward"
             unable={false}
-            checked={settings.reverse_tapping ? true : false}
+            checked={settings?.reverse_tapping ? true : false}
             onChange={() => updateSettings({ ...settings, reverse_tapping: true })}
             labelPlacement="right"
           />

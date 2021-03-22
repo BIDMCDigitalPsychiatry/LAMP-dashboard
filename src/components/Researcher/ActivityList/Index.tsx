@@ -66,11 +66,14 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   const { t } = useTranslation()
   const classes = useStyles()
   const [selectedActivities, setSelectedActivities] = useState<any>([])
-  const [search, setSearch] = useState(null)
   const [loading, setLoading] = useState(false)
   const [paginatedActivities, setPaginatedActivities] = useState([])
   const [studiesData, setStudiesData] = useState(studies)
   const [selected, setSelected] = useState(selectedStudies)
+  const [allActivities, setAllActivities] = useState(null)
+  const [rowCount, setRowCount] = useState(40)
+  const [page, setPage] = useState(0)
+  const [search, setSearch] = useState(null)
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -83,6 +86,9 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   useEffect(() => {
     refreshStudies()
+    Service.getAll("activities").then((data) => {
+      setAllActivities(data || [])
+    })
   }, [])
 
   const refreshStudies = () => {
@@ -98,11 +104,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
     }
   }, [selectedStudies])
 
-  useEffect(() => {
-    if (search !== null) searchActivities()
-  }, [search])
-
-  const searchActivities = () => {
+  const searchActivities = (searchVal?: string) => {
+    const searchTxt = searchVal ?? search
     selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
     if (selectedStudies.length > 0 && !loading) {
       let result = []
@@ -110,15 +113,17 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
       selectedStudies.map((study) => {
         Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
           if ((activitiesData || []).length > 0) {
-            if (!!search && search.trim().length > 0) {
+            console.log(activitiesData)
+            if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(activitiesData)
-              result = result.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+              result = result.filter((i) => i.name.toLowerCase()?.includes(searchTxt.toLowerCase()))
               setActivities(sortData(result, selectedStudies, "name"))
             } else {
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedActivities(result.slice(0, 40))
+            console.log(result)
+            setPaginatedActivities(result.slice(page, rowCount))
           } else {
             if (result.length === 0) setActivities([])
           }
@@ -130,11 +135,16 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
     }
     setSelectedActivities([])
   }
-  const handleSearchData = (val) => {
+
+  const handleSearchData = (val: string) => {
     setSearch(val)
+    searchActivities(val)
   }
+
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
+    setRowCount(rowCount)
+    setPage(page)
     setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }
@@ -164,7 +174,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                     activity={activity}
                     researcher={researcher}
                     studies={studiesData}
-                    activities={activities}
+                    activities={allActivities}
                     handleSelectionChange={handleChange}
                     selectedActivities={selectedActivities}
                     setActivities={searchActivities}

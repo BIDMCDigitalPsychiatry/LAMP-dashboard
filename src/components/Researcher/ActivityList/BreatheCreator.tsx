@@ -252,7 +252,7 @@ export default function BreatheCreator({
                 <TextField
                   error={
                     (settings?.audio_url?.trim() ?? "") === "" ||
-                    ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings.audio_url))
+                    ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings?.audio_url ?? null))
                       ? true
                       : false
                   }
@@ -283,15 +283,15 @@ export default function BreatheCreator({
               <Grid container direction="row" justify="flex-start" alignItems="center">
                 <Grid>
                   {!!settings?.audio && (
-                    <audio controls src={settings.audio}>
+                    <audio controls src={settings?.audio ?? null}>
                       {t("Your browser does not support the")}
                       <code>{t("audio")}</code> {t("element.")}
                     </audio>
                   )}
                 </Grid>
-                {settings.audio_name && settings.audio_name}
+                {!!settings?.audio_name ?? null}
                 <Grid>
-                  {settings.audio && (
+                  {settings?.audio && (
                     <Fab
                       className={classes.iconBtn}
                       aria-label="Remove-Audio"

@@ -145,7 +145,6 @@ export default function StudyCreator({
         activity_count: 0,
       }
       Service.addData("studies", [newStudyObj])
-
       let newParticipant: any = {}
       newParticipant.id = "U" + Math.random().toString().substring(2, 11)
       newParticipant.study_id = newStudyObj.id
@@ -172,7 +171,7 @@ export default function StudyCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <DialogTitle id="alert-dialog-slide-title">
+      <DialogTitle id="alert-dialog-slide-title" disableTypography>
         <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
         <IconButton
           aria-label="close"

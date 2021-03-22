@@ -15,7 +15,7 @@ export default function BalloonRisk({ settings, updateSettings, ...props }) {
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={settings.balloon_count === 0 || settings.balloon_count === "" ? true : false}
+          error={settings?.balloon_count === 0 || settings?.balloon_count === "" ? true : false}
           type="number"
           variant="filled"
           id="balloon_count"
@@ -29,13 +29,13 @@ export default function BalloonRisk({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, balloon_count: Number(e.target.value) })}
           helperText={
-            settings.balloon_count === 0 || settings.balloon_count === "" ? t("Please enter balloon count.") : ""
+            settings?.balloon_count === 0 || settings?.balloon_count === "" ? t("Please enter balloon count.") : ""
           }
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={settings.breakpoint_mean === 0 || settings.breakpoint_mean === "" ? true : false}
+          error={settings?.breakpoint_mean === 0 || settings?.breakpoint_mean === "" ? true : false}
           type="number"
           variant="filled"
           id="breakpoint_mean"
@@ -49,13 +49,15 @@ export default function BalloonRisk({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, breakpoint_mean: Number(e.target.value) })}
           helperText={
-            settings.breakpoint_mean === 0 || settings.breakpoint_mean === "" ? t("Please enter breakpoint mean.") : ""
+            settings?.breakpoint_mean === 0 || settings?.breakpoint_mean === ""
+              ? t("Please enter breakpoint mean.")
+              : ""
           }
         />
       </Grid>
       <Grid item lg={3} md={6} sm={6}>
         <TextField
-          error={settings.breakpoint_std === 0 || settings.breakpoint_std === "" ? true : false}
+          error={settings?.breakpoint_std === 0 || settings?.breakpoint_std === "" ? true : false}
           type="number"
           variant="filled"
           id="breakpoint_std"
@@ -69,7 +71,7 @@ export default function BalloonRisk({ settings, updateSettings, ...props }) {
           }}
           onChange={(e) => updateSettings({ ...settings, breakpoint_std: Number(e.target.value) })}
           helperText={
-            settings.breakpoint_std === 0 || settings.breakpoint_std === ""
+            settings?.breakpoint_std === 0 || settings?.breakpoint_std === ""
               ? t("Please enter breakpoint standard deviation.")
               : ""
           }

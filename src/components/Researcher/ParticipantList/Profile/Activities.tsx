@@ -57,13 +57,19 @@ export default function PatientProfile({
   const { t } = useTranslation()
   const [selectedActivities, setSelectedActivities] = useState([])
   const [paginatedActivities, setPaginatedActivities] = useState([])
+  const [rowCount, setRowCount] = useState(10)
+  const [page, setPage] = useState(0)
+
+  useEffect(() => {
+    onChangeActivities()
+  }, [])
 
   const onChangeActivities = () => {
     ;(async () => {
       Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
         let result = sortData(activities, [participant.study_name], "id")
         setActivities(result)
-        setPaginatedActivities(result.slice(0, 10))
+        setPaginatedActivities(result.slice(page, rowCount))
       })
     })()
     setSelectedActivities([])
@@ -73,10 +79,6 @@ export default function PatientProfile({
     addActivity(data)
     setActivities((prevState) => [...prevState, data])
   }
-
-  useEffect(() => {
-    onChangeActivities()
-  }, [])
 
   const handleActivitySelected = (activity, checked) => {
     if (!!checked) {
@@ -89,6 +91,8 @@ export default function PatientProfile({
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
+    setRowCount(rowCount)
+    setPage(page)
     setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
   }
 
@@ -146,7 +150,7 @@ export default function PatientProfile({
               "No activities"
             )}
           </Box>
-          <Grid container spacing={3}>
+          <Grid container>
             {(paginatedActivities ?? []).map((item, index) => (
               <Grid item xs={12} sm={12} key={item.id}>
                 <ActivityRow

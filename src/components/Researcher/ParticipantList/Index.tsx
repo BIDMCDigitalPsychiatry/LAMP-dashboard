@@ -133,8 +133,11 @@ export default function ParticipantList({
   const [selected, setSelected] = useState(selectedStudies)
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
   const [newStudy, setNewStudy] = useState(null)
-  const [search, setSearch] = useState(null)
   const [studiesData, setStudiesData] = useState(studies)
+  const [rowCount, setRowCount] = useState(40)
+  const [page, setPage] = useState(0)
+  const [search, setSearch] = useState(null)
+
   const { t } = useTranslation()
 
   useInterval(
@@ -168,13 +171,8 @@ export default function ParticipantList({
     }
   }
 
-  useEffect(() => {
-    if (search !== null) {
-      searchParticipants()
-    }
-  }, [search])
-
-  const searchParticipants = () => {
+  const searchParticipants = (searchVal?: string) => {
+    let searchTxt = searchVal ?? search
     const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
     if (selectedData.length > 0 && !loading) {
       let result = []
@@ -182,15 +180,15 @@ export default function ParticipantList({
       selectedData.map((study) => {
         Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
           if ((participantData || []).length > 0) {
-            if (!!search && search.trim().length > 0) {
+            if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(participantData)
-              result = result.filter((i) => i.name?.includes(search) || i.id?.includes(search))
+              result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
               setParticipants(sortData(result, selectedData, "id"))
             } else {
               result = result.concat(participantData)
               setParticipants(sortData(result, selectedData, "id"))
             }
-            setPaginatedParticipants(result.slice(0, 40))
+            setPaginatedParticipants(result.slice(page, rowCount))
           } else {
             if (result.length === 0) setParticipants([])
           }
@@ -203,13 +201,17 @@ export default function ParticipantList({
 
   const handleSearchData = (val: string) => {
     setSearch(val)
+    searchParticipants(val)
   }
 
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
+    setRowCount(rowCount)
+    setPage(page)
     setPaginatedParticipants(participants.slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }
+
   return (
     <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading || participants === null}>

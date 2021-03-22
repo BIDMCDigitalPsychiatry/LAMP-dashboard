@@ -107,10 +107,6 @@ export default function DeleteSensor({
     if (confirmStatus) {
       if (deletedIds.length > 0) {
         Service.delete("sensors", deletedIds)
-        /*enqueueSnackbar(t("Successfully deleted the selected Sensors."), {
-          variant: "success",
-        })*/
-        //////setUpdateCount(3)
       } else {
         enqueueSnackbar(t("An error occured while deleting. Please try again."), {
           variant: "error",
