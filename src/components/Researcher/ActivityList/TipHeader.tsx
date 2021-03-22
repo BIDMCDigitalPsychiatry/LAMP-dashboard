@@ -1,9 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
+import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Checkbox } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
+import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { Service } from "../../DBService/DBService"
+import LAMP from "lamp-core"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -32,9 +34,89 @@ function compress(file, width, height) {
     }
   })
 }
+
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 
-export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    containerWidth: { maxWidth: 1055 },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
+    activityContent: {
+      padding: "25px 50px 0",
+    },
+    btnText: {
+      color: "#333",
+      fontSize: 14,
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      boxShadow: "none",
+      border: "#7599FF solid 1px",
+      background: "transparent",
+      margin: "15px 0",
+      "& svg": { marginRight: 5, color: "#7599FF" },
+    },
+    btnTextAdd: {
+      color: "#333",
+      fontSize: 14,
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      boxShadow: "none",
+      border: "#7599FF solid 1px",
+      background: "transparent",
+      "& svg": { marginRight: 5, color: "#7599FF" },
+    },
+    colorRed: {
+      color: "#FF0000",
+    },
+    inputFile: {
+      display: "none",
+    },
+    uploadFile: {
+      position: "absolute",
+      "& input": {
+        height: 154,
+        position: "absolute",
+        top: 0,
+        padding: 0,
+        opacity: 0,
+        zIndex: 111,
+      },
+    },
+    gridTitle: { margin: "50px 0 35px", paddingBottom: 15, borderBottom: "#ddd solid 1px" },
+    btnBlue: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+      lineHeight: "38px",
+
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "#fff",
+      "& svg": { marginRight: 8 },
+      "&:hover": { background: "#5680f9" },
+    },
+  })
+)
+
+export default function TipsHeader({
+  studies,
+  value,
+  details,
+  activitySpecId,
+  study,
+  onChange,
+  image,
+  tipsArrayValue,
+  ...props
+}) {
+  const classes = useStyles()
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
@@ -42,8 +124,25 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [categoryArray, setCategoryArray] = useState([])
+  const [newTipText, setNewTipText] = useState("")
   const [category, setCategory] = useState("")
+  const [categoryImage, setCategoryImage] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
+  const [duplicateTipText, setDuplicateTipText] = useState("")
+  const [isDuplicate, setIsDuplicate] = useState(false)
+  const [selectedCategory, setSelectedCategory]: any = useState({})
+  const defaultSettingsArray = [{ title: "", text: "", image: "" }]
 
+  const defaultSelectedCategory = {
+    id: undefined,
+    name: "",
+    spec: "lamp.tips",
+    icon: "",
+    schedule: [],
+    settings: [{ title: "", text: "", image: "" }],
+    studyID: "",
+  }
   useEffect(() => {
     if (activitySpecId === "lamp.tips") {
       // getAllTips
@@ -60,14 +159,44 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
     }
   }, [studyId])
 
-  /*
   useEffect(() => {
-    if (category === "lamp.tips") {
-      // getAllTips
-      console.log(1002, study, studies, studyId)
-    }
+    setLoading(true)
+    ;(async () => {
+      if (category && category !== "add_new") {
+        let existsData = categoryArray.find((o) => o.id === category)
+        console.log(4000, existsData)
+        if (Object.keys(existsData).length > 0) {
+          if (existsData.id) {
+            let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.activity_details")
+            if (iconsData.hasOwnProperty("data")) {
+              setCategoryImage(iconsData.data.icon)
+            }
+          }
+          /*
+          if (!activities) {
+            let mergedSettings = existsData.settings.concat(defaultSettingsArray)
+            existsData.settings = mergedSettings
+          }
+          */
+          if (!value) {
+            let mergedSettings = existsData.settings.concat(defaultSettingsArray)
+            existsData.settings = mergedSettings
+            console.log(4001, existsData)
+          }
+          setSelectedCategory(existsData)
+          tipsArrayValue(existsData)
+          setTipsDataArray(existsData.settings)
+        }
+      } else {
+        console.log(4002, defaultSettingsArray)
+        setTipsDataArray(defaultSettingsArray)
+        tipsArrayValue(defaultSettingsArray)
+        //tipsArrayValue({ title: "", text: "", image: "" })
+        setSelectedCategory(defaultSelectedCategory)
+      }
+      setLoading(false)
+    })()
   }, [category])
-*/
 
   const getAllTips = (studyId = "") => {
     if (studyId) {
@@ -76,23 +205,129 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
         console.log(1001, tipActivities)
         setCategoryArray(tipActivities)
       })
-    } else {
+    } /*else {
       Service.getAll("activities").then((activitiesObject: any) => {
         let tipActivities = activitiesObject.filter((x) => x.spec === activitySpecId)
         console.log(1004, tipActivities)
         setCategoryArray(tipActivities)
       })
+    }*/
+  }
+
+  const getBase64 = (file, cb, type = "") => {
+    let reader = new FileReader()
+    reader.readAsDataURL(file)
+    if (type === "photo") {
+      const fileName = file.name
+      const extension = fileName.split(".").reverse()[0].toLowerCase()
+      const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
+      if (extension !== "svg") {
+        let width = 300
+        let height = 300
+        reader.onload = (event) => {
+          let img = new Image()
+          img.src = event.target.result as string
+          img.onload = () => {
+            let elem = document.createElement("canvas")
+            elem.width = width
+            elem.height = height
+            let ctx = elem.getContext("2d")
+            ctx.drawImage(img, 0, 0, width, height)
+            cb(ctx.canvas.toDataURL())
+          }
+        }
+      } else {
+        reader.onloadend = () => {
+          cb(reader.result)
+        }
+      }
+    } else {
+      reader.onloadend = () => {
+        cb(reader.result)
+      }
+    }
+    reader.onerror = function (error) {
+      enqueueSnackbar(t("An error occured while uploading. Please try again."), {
+        variant: "error",
+      })
+    }
+  }
+
+  const uploadImageFile = (event, type = "new", id = "") => {
+    const file = event.target.files[0]
+    const fileName = event.target.files[0].name
+    const fileSize = event.target.files[0].size / 1024 / 1024
+    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
+    if (fileFormats.includes(extension) && fileSize <= 4) {
+      setLoading(true)
+      let tipsData: any
+      if (type === "photo") {
+        file &&
+          getBase64(
+            file,
+            (result: any) => {
+              setCategoryImage(result)
+              setLoading(false)
+            },
+            "photo"
+          )
+      } else {
+        tipsData = tipsDataArray
+        file &&
+          getBase64(file, (result: any) => {
+            tipsData[id].image = result
+            setTipsDataArray([...tipsData])
+            setLoading(false)
+          })
+      }
+    } else {
+      enqueueSnackbar(t("Images should be in the format jpeg/png/bmp/gif/svg and the size should not exceed 4 MB."), {
+        variant: "error",
+      })
     }
   }
 
   useEffect(() => {
-    onChange({
-      text,
-      photo,
-      description,
-      studyId,
-    })
-  }, [text, description, photo, studyId])
+    ;(async () => {
+      setLoading(true)
+      //if (studyId) {
+      if (study) {
+        setSelectedCategory(defaultSelectedCategory)
+        //let activityData = await LAMP.Activity.allByStudy(studyId)
+        let activityData = await LAMP.Activity.allByStudy(study)
+        let tipsCategoryData = activityData.filter((activity) => activity.spec === "lamp.tips")
+        setCategoryArray(tipsCategoryData)
+      }
+      /*
+      if (!!activities) {
+        let activitiesData = JSON.parse(JSON.stringify(activities))
+        setCategory(activitiesData.id)
+        if (Object.keys(activitiesData.settings).length > 0) {
+          setSelectedCategory(activitiesData)
+          setTipsDataArray(activitiesData.settings)
+        }
+        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
+        if (iconsData.hasOwnProperty("data")) {
+          setCategoryImage(iconsData.data.photo)
+        }
+      }
+      */
+      if (!!value) {
+        let activitiesData = JSON.parse(JSON.stringify(value))
+        setCategory(activitiesData.id)
+        if (Object.keys(activitiesData.settings).length > 0) {
+          setSelectedCategory(activitiesData)
+          setTipsDataArray(activitiesData.settings)
+        }
+        let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
+        if (iconsData.hasOwnProperty("data")) {
+          setCategoryImage(iconsData.data.photo)
+        }
+      }
+      setLoading(false)
+    })()
+  }, [studyId])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -111,6 +346,46 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
   return (
     <Grid container spacing={2}>
       <Grid item xs md={2}>
+        <Tooltip title={!categoryImage ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
+          <Box
+            width={154}
+            height={154}
+            border={1}
+            borderRadius={4}
+            borderColor="text.secondary"
+            color="text.secondary"
+            style={{
+              background: !!categoryImage ? `url(${categoryImage}) center center/cover no-repeat` : undefined,
+              position: "relative",
+            }}
+          >
+            {!categoryImage ? (
+              <label htmlFor="upload-image">
+                <TextField
+                  variant="filled"
+                  name="upload-image"
+                  className={classes.uploadFile}
+                  type="file"
+                  onChange={(event) => uploadImageFile(event, "photo")}
+                />
+              </label>
+            ) : (
+              ""
+            )}
+            <ButtonBase
+              style={{ width: "100%", height: "100%" }}
+              onClick={(e) => {
+                setCategoryImage("")
+              }}
+            >
+              <Icon fontSize="large">
+                {categoryImage === "" || categoryImage === undefined ? "add_a_photo" : "delete_forever"}
+              </Icon>
+            </ButtonBase>
+          </Box>
+        </Tooltip>
+
+        {/*
         <Tooltip
           title={
             !photo
@@ -137,6 +412,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
             </ButtonBase>
           </Box>
         </Tooltip>
+        */}
       </Grid>
       <Grid item md={10}>
         <Grid container spacing={2}>
@@ -163,69 +439,99 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
               ))}
             </TextField>
           </Grid>
-          {activitySpecId !== "lamp.tips" ? (
-            <Grid item xs>
-              <Box mb={3}>
-                <TextField
-                  error={
-                    typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false
-                  }
-                  fullWidth
-                  variant="filled"
-                  label={t("Activity Title")}
-                  defaultValue={text}
-                  onChange={(event) => setText(removeExtraSpace(event.target.value))}
-                  inputProps={{ maxLength: 80 }}
-                />
-              </Box>
-            </Grid>
+          <Grid item xs>
+            <Box mb={3}>
+              <TextField
+                error={typeof category == "undefined" || category === null || category === "" ? true : false}
+                id="filled-select-currency"
+                select
+                label={t("Tip")}
+                value={category || ""}
+                onChange={(event) => {
+                  setCategory(event.target.value)
+                }}
+                helperText={
+                  typeof category == "undefined" || category === null || category === ""
+                    ? t("Please select the tip")
+                    : ""
+                }
+                variant="filled"
+                //disabled={!!activities ? true : false}
+              >
+                <MenuItem value="add_new" key="add_new">
+                  {t("Add New")}
+                </MenuItem>
+                {categoryArray.map((x, idx) => (
+                  <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
+                ))}
+              </TextField>
+            </Box>
+          </Grid>
+        </Grid>
+        <Grid item xs sm={6} md={6} lg={4}>
+          {category === "add_new" ? (
+            <TextField
+              error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
+              fullWidth
+              variant="filled"
+              label={t("New Tip")}
+              defaultValue={newTipText}
+              onChange={(event) => setNewTipText(event.target.value)}
+              helperText={
+                category == "add_new" && (newTipText === null || newTipText === "") ? t("Please add new tip") : ""
+              }
+            />
           ) : (
-            <Grid item xs>
-              <Box mb={3}>
-                <TextField
-                  //error={typeof category == "undefined" || category === null || category === "" ? true : false}
-                  id="filled-select-currency"
-                  select
-                  label={t("Tip")}
-                  //value={category || ""}
-                  /*onChange={(event) => {
-                      setCategory(event.target.value)
-                    }}
-                    helperText={
-                      typeof category == "undefined" || category === null || category === ""
-                        ? t("Please select the tip")
-                        : ""
-                    }*/
-                  variant="filled"
-                  //disabled={!!activities ? true : false}
-                >
-                  <MenuItem value="add_new" key="add_new">
-                    {t("Add New")}
-                  </MenuItem>
-                  {categoryArray.map((x, idx) => (
-                    <MenuItem value={`${x.id}`} key={`${x.id}`}>{`${x.name}`}</MenuItem>
-                  ))}
-                </TextField>
-              </Box>
-            </Grid>
+            ""
           )}
         </Grid>
-        {activitySpecId !== "lamp.tips" ? (
-          <Box>
-            <TextField
-              fullWidth
-              multiline
-              label={t("Activity Description")}
-              variant="filled"
-              rows={2}
-              defaultValue={description}
-              onChange={(event) => setDescription(removeExtraSpace(event.target.value))}
-              inputProps={{ maxLength: 2500 }}
-            />
-          </Box>
+        {!!value ? (
+          <Grid container spacing={2}>
+            <Grid item xs sm={6} md={6} lg={4}>
+              <Box mt={2}>
+                <Checkbox
+                  onChange={(event) => setIsDuplicate(event.target.checked)}
+                  color="primary"
+                  inputProps={{ "aria-label": "secondary checkbox" }}
+                />{" "}
+                {t("Duplicate")}
+              </Box>
+            </Grid>
+
+            <Grid item xs sm={6} md={6} lg={4}>
+              {isDuplicate ? (
+                <Box mb={3}>
+                  <TextField
+                    fullWidth
+                    error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
+                    variant="filled"
+                    label={t("Tip")}
+                    className="Tips"
+                    value={duplicateTipText}
+                    onChange={(event) => setDuplicateTipText(event.target.value)}
+                    helperText={
+                      isDuplicate && (duplicateTipText === null || duplicateTipText === "")
+                        ? t("Please add new tip")
+                        : ""
+                    }
+                  />
+                </Box>
+              ) : (
+                ""
+              )}
+            </Grid>
+          </Grid>
         ) : (
           ""
         )}
+        {/* JSON.stringify(category) +
+          " *** " +
+          JSON.stringify(value) +
+          " +++ " +
+          JSON.stringify(details) +
+          " === " +
+        JSON.stringify(study)   */}
+        ***** {JSON.stringify(selectedCategory)} +++++
       </Grid>
     </Grid>
   )

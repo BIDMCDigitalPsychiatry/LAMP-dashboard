@@ -228,6 +228,8 @@ export default function Tips({
       }
       setLoading(false)
     })()
+
+    console.log(2005, selectedCategory)
   }, [category])
 
   useEffect(() => {
@@ -421,6 +423,23 @@ export default function Tips({
     if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
       validationData = selectedCategory.settings.some((item) => item.title === "" || item.text === "")
     }
+
+    console.log(2001, validationData, selectedCategory)
+
+    console.log(
+      2002,
+      !(
+        typeof studyId == "undefined" ||
+        studyId === null ||
+        studyId === "" ||
+        typeof category == "undefined" ||
+        category === null ||
+        category === "" ||
+        (category == "add_new" && (newTipText === null || newTipText === "")) ||
+        validationData
+      )
+    )
+
     return !(
       typeof studyId == "undefined" ||
       studyId === null ||
@@ -457,6 +476,12 @@ export default function Tips({
     })
   }
 
+  const handleTipsArray = (data) => {
+    console.log(2020, data)
+    //setTipsDataArray(data)
+    setSelectedCategory(data)
+  }
+
   return (
     <Grid container direction="column" spacing={2} {...props}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -473,6 +498,8 @@ export default function Tips({
             onChange={handleChange}
             image=""
             //image={JournalIcon}
+            //tipsArrayValue={tipsArrayValue}
+            tipsArrayValue={handleTipsArray}
           />
           {/*
           <Grid container spacing={2}>
@@ -780,8 +807,167 @@ export default function Tips({
             : ""}
 
         */}
+          --- {JSON.stringify(selectedCategory)} ===
+          {console.log(
+            820,
+            Object.values(selectedCategory),
+            Object.keys(selectedCategory),
+            Object.keys(selectedCategory).length
+          )}
+          {category !== "add_new" ? (
+            Object.keys(selectedCategory).length > 0 ? (
+              <Grid container direction="row" justify="space-between" alignItems="center" className={classes.gridTitle}>
+                <Grid item>
+                  <Typography variant="h6">{t("Tip Details")}</Typography>
+                </Grid>
+                <Grid item>
+                  <Fab
+                    className={classes.btnBlue}
+                    aria-label="Add"
+                    variant="extended"
+                    onClick={() => {
+                      setAddRow(true)
+                    }}
+                    disabled={!category || !studyId ? true : false}
+                  >
+                    <AddIcon /> {t("Add")}
+                  </Fab>
+                </Grid>
+              </Grid>
+            ) : (
+              ""
+            )
+          ) : (
+            ""
+          )}
+          {Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0
+            ? selectedCategory.settings.map((x, idx) => (
+                <Grid container spacing={2} key={idx}>
+                  <Grid item xs sm={4} md={3} lg={2}>
+                    <Tooltip title={!x.image ? t("Tap to select a photo.") : t("Tap to delete the photo.")}>
+                      <Box
+                        width={154}
+                        height={154}
+                        border={1}
+                        borderRadius={4}
+                        borderColor="text.secondary"
+                        color="text.secondary"
+                        style={{
+                          background: !!x.image ? `url(${x.image}) center center/cover no-repeat` : undefined,
+                          position: "relative",
+                        }}
+                      >
+                        {x.image === "" || x.image === undefined ? (
+                          <label htmlFor="upload-image">
+                            <TextField
+                              name="upload-image"
+                              variant="filled"
+                              className={classes.uploadFile}
+                              type="file"
+                              onClick={(event) => removeEventValue(event)}
+                              onChange={(event) => handleTipsData(event, "image", idx)}
+                            />
+                          </label>
+                        ) : (
+                          ""
+                        )}
+                        <ButtonBase
+                          style={{ width: "100%", height: "100%" }}
+                          onClick={(e) => {
+                            removeImage(idx)
+                          }}
+                        >
+                          <Icon fontSize="large">
+                            {x.image === "" || x.image === undefined ? "add_a_photo" : "delete_forever"}
+                          </Icon>
+                        </ButtonBase>
+                      </Box>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item sm={8} md={9} lg={10}>
+                    <Grid container spacing={2}>
+                      <Grid item lg={6} md={6} sm={6} xs={12}>
+                        <Box>
+                          <TextField
+                            error={
+                              typeof x.title === "undefined" ||
+                              (typeof x.title !== "undefined" && x.title?.trim() === "")
+                                ? true
+                                : false
+                            }
+                            autoFocus={focusedTextfield === "tipsTitle_" + idx ? true : false}
+                            fullWidth
+                            variant="filled"
+                            label={t("Tips Title")}
+                            value={x.title}
+                            id={"tipsTitle_" + idx}
+                            className="tipsTitle"
+                            onChange={(e) => {
+                              handleTipsData(e, "title", idx)
+                            }}
+                            helperText={
+                              typeof x.title === "undefined" ||
+                              (typeof x.title !== "undefined" && x.title?.trim() === "")
+                                ? t("Please enter Tips Title")
+                                : ""
+                            }
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Box>
+                          <TextField
+                            error={
+                              typeof x.text === "undefined" || (typeof x.text !== "undefined" && x.text?.trim() === "")
+                                ? true
+                                : false
+                            }
+                            fullWidth
+                            variant="filled"
+                            label={t("Tips Description")}
+                            rows={4}
+                            rowsMax={15}
+                            value={x.text}
+                            onChange={(e) => {
+                              handleTipsData(e, "text", idx)
+                            }}
+                            multiline
+                            helperText={
+                              typeof x.text === "undefined" || (typeof x.text !== "undefined" && x.text?.trim() === "")
+                                ? t("Please enter Tips Description")
+                                : ""
+                            }
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid item lg={3} md={6} sm={6}>
+                        <Box>
+                          <Tooltip title={t("Delete")}>
+                            <Fab
+                              className={classes.btnText}
+                              aria-label="Delete"
+                              variant="extended"
+                              onClick={() => {
+                                setOpenDialog(true)
+                                setClickDeleteId(idx)
+                              }}
+                            >
+                              <DeleteIcon /> {t("Delete")}
+                            </Fab>
+                          </Tooltip>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Divider />
+                  </Grid>
+                </Grid>
+              ))
+            : ""}
         </Container>
       </MuiThemeProvider>
+
       <Grid
         container
         direction="column"
@@ -814,6 +1000,7 @@ export default function Tips({
         ) : (
           ""
         )}
+
         <Grid item>
           <Tooltip title={t("Save this activity.")}>
             <span>
@@ -824,6 +1011,7 @@ export default function Tips({
                 onClick={() => {
                   if (validate()) handleSaveTips()
                 }}
+                //disabled={!validate()}
                 disabled={!validate()}
               >
                 {t("Save")}

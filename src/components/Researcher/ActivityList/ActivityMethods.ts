@@ -175,7 +175,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       })
       return result
     } else {
-      if (selectedActivity.study_id !== x.studyID) {
+      if (selectedActivity?.study_id !== x.studyID) {
         // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
         // console.dir("deleted tag " + JSON.stringify(tag))
         // await LAMP.Activity.delete(x.id)
@@ -186,7 +186,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         // })
       } else {
         result = (await LAMP.Activity.update(x.id, { name: x.name, settings: x.settings ?? [] })) as any
-        await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+        await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
           description: x.description,
           photo: x.photo,
         })
@@ -194,12 +194,12 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       }
     }
   } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
-    result = (await LAMP.Activity.update(selectedActivity.id, {
+    result = (await LAMP.Activity.update(selectedActivity?.id, {
       name: x.name,
       settings: x.settings,
     })) as any
 
-    await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+    await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
       description: x.description,
       photo: x.photo,
     })
@@ -211,8 +211,8 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.survey_description", tag)
       return result
     } else {
-      result = (await LAMP.Activity.update(selectedActivity.id, raw)) as any
-      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.survey_description", tag)
+      result = (await LAMP.Activity.update(selectedActivity?.id, raw)) as any
+      await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.survey_description", tag)
       return result
     }
   } else if (x.spec === "lamp.tips") {
@@ -221,10 +221,10 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         id: x.id,
         name: x.name,
         icon: x.icon,
-        studyID: selectedActivity.study_id,
+        studyID: selectedActivity?.study_id,
         spec: "lamp.tips",
         settings: x.settings,
-        schedule: selectedActivity.schedule,
+        schedule: selectedActivity?.schedule,
       }
       result = await saveTipActivity(tipObj)
       return result
@@ -232,8 +232,8 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       let obj = {
         settings: x.settings,
       }
-      result = (await LAMP.Activity.update(selectedActivity.id, obj)) as any
-      await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
+      result = (await LAMP.Activity.update(selectedActivity?.id, obj)) as any
+      await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
       })
       return result
