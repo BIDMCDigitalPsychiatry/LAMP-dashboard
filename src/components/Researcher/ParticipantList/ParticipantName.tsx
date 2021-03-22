@@ -1,8 +1,8 @@
 import React, { useState } from "react"
-import { Box, IconButton, Grid } from "@material-ui/core"
-import CreateIcon from "@material-ui/icons/Create"
+import { Box, Icon, IconButton, Grid } from "@material-ui/core"
 import EditUserField from "./EditUserField"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     editBtn: {
@@ -47,7 +47,7 @@ export default function ParticipantName({ participant, ...props }) {
       </Box>
       <Box flexGrow={1}>
         <IconButton className={classes.editBtn} size="small" onClick={(e) => editNameTextField(participant.id, e)}>
-          <CreateIcon />
+          <Icon>create</Icon>
         </IconButton>
       </Box>
     </Box>

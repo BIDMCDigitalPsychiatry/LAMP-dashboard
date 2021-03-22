@@ -35,8 +35,6 @@ import {
   InputBase,
 } from "@material-ui/core"
 import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
-import CheckBoxIcon from "@material-ui/icons/CheckBox"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
@@ -824,8 +822,8 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
               }}
               // icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
               // checkedIcon={<Icon fontSize="large">check_box</Icon>}
-              icon={<CheckBoxOutlineBlankIcon fontSize="large" />}
-              checkedIcon={<CheckBoxIcon fontSize="large" />}
+              icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
+              checkedIcon={<Icon fontSize="large">check_box</Icon>}
             />
           }
           label={

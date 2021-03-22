@@ -29,7 +29,6 @@ import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } fro
 // External Imports
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
 

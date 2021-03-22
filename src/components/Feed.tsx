@@ -3,6 +3,7 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 
 import {
   Card,
+  Icon,
   Step,
   Stepper,
   StepLabel,
@@ -23,10 +24,7 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 
-import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
-import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
 import InfoIcon from "../icons/Info.svg"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
@@ -378,8 +376,8 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
           )
           return view
         }}
-        leftArrowIcon={<LeftArrow />}
-        rightArrowIcon={<RightArrow />}
+        leftArrowIcon={<Icon>chevron_left</Icon>}
+        rightArrowIcon={<Icon>chevron_right</Icon>}
       />
     </MuiPickersUtilsProvider>
   )
@@ -866,7 +864,8 @@ export default function Feed({
               ""
             ) : (
               <Box display="flex" className={classes.blankMsg} ml={1}>
-                <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
+                <Icon>info</Icon>
+                <p>There are no scheduled activities available.</p>
               </Box>
             )
           ) : (

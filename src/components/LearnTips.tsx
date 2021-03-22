@@ -2,7 +2,6 @@
 import React, { useState } from "react"
 import { Typography, makeStyles, Box, Grid, IconButton, Container, AppBar, Toolbar, Icon } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
-import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import TipNotification from "./TipNotification"
 import { useTranslation } from "react-i18next"
 
@@ -151,7 +150,7 @@ export default function LearnTips({ ...props }) {
                             <Typography variant="h6">{t(detail.title)}</Typography>
                           </Grid>
                           <Grid item xs justify="center" className={classes.rightArrow}>
-                            <ChevronRightIcon />
+                            <Icon>chevron_right</Icon>
                           </Grid>
                         </Grid>
                       </div>

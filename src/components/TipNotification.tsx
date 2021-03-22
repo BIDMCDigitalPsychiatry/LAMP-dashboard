@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import {
+  Icon,
   Typography,
   makeStyles,
   createStyles,
@@ -12,8 +13,6 @@ import {
   Container,
 } from "@material-ui/core"
 
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import ReactMarkdown from "react-markdown"
@@ -162,14 +161,14 @@ export default function TipNotification({ ...props }) {
                 onClick={() => handleClickStatus("Yes")}
                 className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <ThumbsUp />
+                <Icon>thumbs_up</Icon>
                 <label>{t("Yes")}</label>
               </IconButton>
               <IconButton
                 onClick={() => handleClickStatus("No")}
                 className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <ThumbsDown />
+                <Icon>thumbs_down</Icon>
                 <label>{t("No")}</label>
               </IconButton>
             </Box>

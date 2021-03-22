@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
+  Icon,
   Dialog,
   DialogContent,
   Drawer,
@@ -23,7 +24,6 @@ import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as Researcher } from "../icons/Researcher.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
@@ -406,7 +406,7 @@ export default function Root({ ...props }) {
                 onClick={(event) => setCurrentTab(0)}
               >
                 <ListItemIcon className={classes.menuIcon}>
-                  <Researcher />
+                  <Icon style={{ fontSize: "2rem" }}>group</Icon>
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>

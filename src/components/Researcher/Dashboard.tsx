@@ -206,17 +206,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     }
   }
 
-  const upatedDataStudy = (data) => {
-    setUpdatedData(data)
-  }
-
-  const deletedDataStudy = (data) => {
-    setDeletedData(data)
-  }
-
-  const handleSearchData = (data) => {
-    setSearch(data)
-  }
   return (
     <Container maxWidth={false}>
       <Container
@@ -318,9 +307,9 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 title={null}
                 researcher={researcher}
                 studies={studies}
-                upatedDataStudy={upatedDataStudy}
-                deletedDataStudy={deletedDataStudy}
-                searchData={handleSearchData}
+                upatedDataStudy={(data) => setUpdatedData(data)}
+                deletedDataStudy={(data) => setDeletedData(data)}
+                searchData={(data) => setSearch(data)}
                 newAdddeStudy={setNewStudy}
               />
             )}

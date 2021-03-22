@@ -1,14 +1,11 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import { Typography, makeStyles, Box, Grid, Container, useMediaQuery, useTheme } from "@material-ui/core"
+import { Typography, makeStyles, Box, Grid, Container, useMediaQuery, useTheme, Icon } from "@material-ui/core"
 import WeekView from "./WeekView"
 import LAMP from "lamp-core"
 import { DatePicker } from "@material-ui/pickers"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
-import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
-import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
-import { scaleTypeSupportDataType } from "vega-lite/build/src/scale"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -340,8 +337,8 @@ export default function Journals({ participant, selectedEvents, ...props }) {
                 )
                 return view
               }}
-              leftArrowIcon={<LeftArrow />}
-              rightArrowIcon={<RightArrow />}
+              leftArrowIcon={<Icon>chevron_left</Icon>}
+              rightArrowIcon={<Icon>chevron_right</Icon>}
             />
           </MuiPickersUtilsProvider>
         </Grid>

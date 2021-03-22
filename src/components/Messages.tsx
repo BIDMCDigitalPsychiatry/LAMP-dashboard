@@ -18,7 +18,6 @@ import {
 import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
 import TextareaAutosize from "@material-ui/core/TextareaAutosize"
 
@@ -275,7 +274,9 @@ export default function Messages({
               <Icon>send</Icon>
             </IconButton>
           </Box>
-          <AddCircleOutlineIcon style={{ display: !addMsg ? "block" : "none" }} onClick={() => setAddMsg(true)} />
+          <Icon style={{ display: !addMsg ? "block" : "none" }} onClick={() => setAddMsg(true)}>
+            add_circle_outline
+          </Icon>
         </Box>
       </Box>
     )

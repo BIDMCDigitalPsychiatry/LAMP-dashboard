@@ -1,7 +1,6 @@
 import React, { useState } from "react"
-import { Box, Fab } from "@material-ui/core"
+import { Box, Fab, Icon } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import CreateIcon from "@material-ui/icons/Create"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"
@@ -88,7 +87,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, ...props
             editStudyField(study.id, event)
           }}
         >
-          <CreateIcon />
+          <Icon>create</Icon>
         </Fab>
       </Box>
     </Box>

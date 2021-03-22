@@ -7,9 +7,9 @@ import { ReactComponent as Saved } from "../icons/Saved.svg"
 import {
   Typography,
   AppBar,
+  Icon,
   Toolbar,
   IconButton,
-  Icon,
   Box,
   ButtonBase,
   Link,
@@ -18,7 +18,6 @@ import {
   Button,
 } from "@material-ui/core"
 
-import CloseIcon from "@material-ui/icons/Close"
 import ImageUploader from "react-images-upload"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -187,7 +186,7 @@ export default function HopeBoxSelect({ ...props }) {
         <Box display="flex" justifyContent="flex-end">
           <Box>
             <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenPreview(false)}>
-              <CloseIcon />
+              <Icon>close</Icon>
             </IconButton>
           </Box>
         </Box>

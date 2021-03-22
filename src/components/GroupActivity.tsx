@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import {
   makeStyles,
   Dialog,
+  Icon,
   DialogActions,
   DialogContent,
   Button,
@@ -16,7 +17,6 @@ import {
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import JournalEntries from "./JournalEntries"
@@ -292,7 +292,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
               setOpenComplete(false)
             }}
           >
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent>

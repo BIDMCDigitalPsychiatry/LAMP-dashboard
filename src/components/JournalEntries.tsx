@@ -18,7 +18,6 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
 import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
@@ -229,7 +228,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
               <Box display="flex" justifyContent="flex-end">
                 <Box>
                   <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Fab } from "@material-ui/core"
+import { Box, Fab, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { ReactComponent as Filter } from "../../../icons/Filter.svg"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -56,8 +53,9 @@ export default function StudyFilter({ setShowFilterStudies, ...props }) {
           showFilter === true ? setShowFilter(false) : setShowFilter(true)
         }}
       >
-        <Filter /> <span className={classes.filterText}>{t("Filter results")}</span>{" "}
-        {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+        <Icon>filter_alt</Icon>
+        <span className={classes.filterText}>{t("Filter results")}</span>{" "}
+        {showFilter === true ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
       </Fab>
     </Box>
   )

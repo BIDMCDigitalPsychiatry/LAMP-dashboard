@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
+  Icon,
   Typography,
   Grid,
   Fab,
@@ -10,8 +11,6 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AudiotrackIcon from "@material-ui/icons/Audiotrack"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import BreatheIcon from "../../../icons/Breathe.svg"
@@ -276,7 +275,7 @@ export default function BreatheCreator({
                 />
 
                 <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
-                  <AudiotrackIcon /> {t("Upload audio")}
+                  <Icon>audiotrack</Icon> {t("Upload audio")}
                 </Fab>
               </label>
 
@@ -298,7 +297,7 @@ export default function BreatheCreator({
                       variant="extended"
                       onClick={() => updateSettings({ ...settings, audio: null, audio_name: null })}
                     >
-                      <DeleteIcon />
+                      <Icon>delete</Icon>
                     </Fab>
                   )}
                 </Grid>

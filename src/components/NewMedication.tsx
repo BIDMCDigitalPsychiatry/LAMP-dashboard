@@ -28,11 +28,7 @@ import {
   InputBase,
 } from "@material-ui/core"
 import { DatePicker, TimePicker } from "@material-ui/pickers"
-import CloseIcon from "@material-ui/icons/Close"
 import classnames from "classnames"
-import { ReactComponent as SearchIcon } from "../icons/Search.svg"
-import { KeyboardTimePicker, KeyboardDatePicker } from "@material-ui/pickers"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP from "lamp-core"
 import Autocomplete from "@material-ui/lab/Autocomplete"
 import { useSnackbar } from "notistack"
@@ -292,7 +288,7 @@ export default function NewMedication({ participant, ...props }) {
         <Grid container direction="row" justify="center" alignItems="flex-start">
           <Grid item lg={4} sm={10} xs={12}>
             <Box display="flex" className={classes.medicationHeader}>
-              <Box flexShrink={1}>{<SearchIcon />}</Box>
+              <Box flexShrink={1}>{<Icon>search</Icon>}</Box>
               <Box width="100%" pl={2}>
                 <Autocomplete
                   id="free-solo-demo"
@@ -397,7 +393,7 @@ export default function NewMedication({ participant, ...props }) {
                 <Box display="flex" justifyContent="center" mb={5}>
                   <Box>
                     <ButtonBase className={classes.iconButton} onClick={() => openAddDosageDialog()}>
-                      <AddCircleOutlineIcon /> {t("Add dosage")}
+                      <Icon>add_circle_outline</Icon> {t("Add dosage")}
                     </ButtonBase>
                   </Box>
                 </Box>
@@ -509,7 +505,7 @@ export default function NewMedication({ participant, ...props }) {
               <Box display="flex" justifyContent="flex-end">
                 <Box>
                   <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>
@@ -546,7 +542,7 @@ export default function NewMedication({ participant, ...props }) {
                     className={classes.closeButton}
                     onClick={() => setOpenAddDosage(false)}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>

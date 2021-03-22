@@ -4,6 +4,7 @@ import {
   Container,
   Typography,
   Grid,
+  Icon,
   Card,
   Box,
   Dialog,
@@ -17,14 +18,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
 import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import LAMP from "lamp-core"
-import CloseIcon from "@material-ui/icons/Close"
-import { ReactComponent as AssessMood } from "../icons/AssessMood.svg"
-import { ReactComponent as AssessAnxiety } from "../icons/AssessAnxiety.svg"
-import { ReactComponent as AssessNutrition } from "../icons/AssessNutrition.svg"
-import { ReactComponent as AssessUsability } from "../icons/AssessUsability.svg"
-import { ReactComponent as AssessSocial } from "../icons/AssessSocial.svg"
-import { ReactComponent as AssessSleep } from "../icons/AssessSleep.svg"
-import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import classnames from "classnames"
 import Link from "@material-ui/core/Link"
 import { useSnackbar } from "notistack"
@@ -33,7 +26,6 @@ import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 import GroupActivity from "./GroupActivity"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 const theme = createMuiTheme({
   overrides: {
@@ -342,7 +334,8 @@ export default function Survey({
           ]
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no Survey activities available.</p>
+            <Icon>info</Icon>
+            <p>There are no Survey activities available.</p>
           </Box>
         )}
       </Grid>
@@ -361,7 +354,7 @@ export default function Survey({
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <div className={classes.header}>
             <Box

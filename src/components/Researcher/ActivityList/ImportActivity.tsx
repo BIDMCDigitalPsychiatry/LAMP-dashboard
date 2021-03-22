@@ -26,12 +26,8 @@ import {
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
-import { ReactComponent as DeleteIcon } from "../../../icons/DeleteBlue.svg"
-import { ReactComponent as ExportIcon } from "../../../icons/Export.svg"
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import {

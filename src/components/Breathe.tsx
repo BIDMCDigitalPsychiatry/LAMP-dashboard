@@ -25,8 +25,6 @@ import LAMP from "lamp-core"
 
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import Link from "@material-ui/core/Link"
 import classnames from "classnames"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
@@ -438,14 +436,14 @@ export default function Breathe({ participant, activity, ...props }) {
                   onClick={() => handleClickStatus("Yes")}
                   className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                 >
-                  <ThumbsUp />
+                  <Icon>thumbs_up</Icon>
                   <label>{t("Yes")}</label>
                 </IconButton>
                 <IconButton
                   onClick={() => handleClickStatus("No")}
                   className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                 >
-                  <ThumbsDown />
+                  <Icon>thumbs_down</Icon>
                   <label>{t("No")}</label>
                 </IconButton>
               </Box>

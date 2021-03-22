@@ -22,9 +22,6 @@ import {
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import { ReactComponent as AddIcon } from "../../../icons/plus.svg"
-
-import CloseIcon from "@material-ui/icons/Close"
 
 import QRCode from "qrcode.react"
 // Local Imports

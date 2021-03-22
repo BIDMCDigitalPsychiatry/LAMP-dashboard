@@ -38,7 +38,6 @@ import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
 import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -340,7 +339,7 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <UserIcon /> {title} <ArrowDropDownIcon />
+                    <UserIcon /> {title} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}

@@ -15,7 +15,6 @@ import PatientProfile from "./PatientProfile"
 // Local Imports
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import MoreVertIcon from "@material-ui/icons/MoreVert"
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"
 import Active from "./ActiveBubble"

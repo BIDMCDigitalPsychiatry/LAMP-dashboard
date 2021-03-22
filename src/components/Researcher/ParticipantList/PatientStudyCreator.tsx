@@ -4,6 +4,7 @@ import {
   Box,
   IconButton,
   Button,
+  Icon,
   TextField,
   MenuItem,
   Dialog,
@@ -18,7 +19,6 @@ import {
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import CloseIcon from "@material-ui/icons/Close"
 import LAMP, { Study } from "lamp-core"
 import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
@@ -331,7 +331,7 @@ export default function PatientStudyCreator({
             setCreatePatient(false)
           }}
         >
-          <CloseIcon />
+          <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>

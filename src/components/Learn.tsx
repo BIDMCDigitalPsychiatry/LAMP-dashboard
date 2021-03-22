@@ -18,7 +18,6 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import CloseIcon from "@material-ui/icons/Close"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Participant as ParticipantObj } from "lamp-core"
@@ -311,7 +310,7 @@ export default function Learn({
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <div className={classes.header}>
             <Box mt={2} mb={1}>

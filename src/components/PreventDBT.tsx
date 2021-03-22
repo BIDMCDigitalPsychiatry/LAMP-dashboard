@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Box, Typography, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core"
+import { Box, Icon, Typography, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core"
 import { Vega } from "react-vega"
 import NativeSelect from "@material-ui/core/NativeSelect"
 import { useTranslation } from "react-i18next"
@@ -9,7 +9,6 @@ import { effective } from "./charts/effective_chart"
 import { ineffective } from "./charts/ineffective_chart"
 import { actions } from "./charts/actions_chart"
 import { selfcare } from "./charts/selfcare_chart"
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -474,7 +473,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   {Object.keys(skillData).map((key) => (
                     <Accordion>
                       <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
+                        expandIcon={<Icon>expand_more</Icon>}
                         aria-controls="panel1a-content"
                         id="panel1a-header"
                       >
