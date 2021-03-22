@@ -23,7 +23,6 @@ import {
   Popover,
   Select,
 } from "@material-ui/core"
-import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 
