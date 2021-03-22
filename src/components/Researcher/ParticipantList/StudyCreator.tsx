@@ -196,7 +196,9 @@ export default function StudyCreator({
             setStudyName(e.target.value)
           }}
           inputProps={{ maxLength: 80 }}
-          helperText={duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""}
+          helperText={
+            duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""
+          }
         />
       </DialogContent>
       <DialogActions>
