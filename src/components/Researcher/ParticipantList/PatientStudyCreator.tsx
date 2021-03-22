@@ -341,13 +341,13 @@ export default function PatientStudyCreator({
             autoFocus
             fullWidth
             variant="outlined"
-            label={t("Name")}
+            label={t("Study Name")}
             value={studyName}
             onChange={(e) => {
               setStudyName(e.target.value)
             }}
             inputProps={{ maxLength: 80 }}
-            helperText={duplicateCnt > 0 ? t("Unique name required") : !validate() ? t("Please enter name.") : ""}
+            helperText={duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""}
           />
         </Box>
         <Box>
