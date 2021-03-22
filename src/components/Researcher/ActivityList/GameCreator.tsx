@@ -5,12 +5,128 @@ import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } fro
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
-import BalloonRisk from "./BalloonRisk"
-import PopTheBubbles from "./PopTheBubbles"
-import SpatialSpan from "./SpatialSpan"
 import JewelsGame from "./Jewels"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
+import DynamicForm from "../../shared/DynamicForm"
+
+const schemaList: any = {
+  "lamp.balloon_risk": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["balloon_count", "breakpoint_mean", "breakpoint_std"],
+        properties: {
+          balloon_count: {
+            title: "Balloon Count",
+            description: "The number of balloons to display.",
+            type: "number",
+            default: 15,
+            minimum: 1,
+          },
+          breakpoint_mean: {
+            title: "Breakpoint Mean",
+            description: "The mean of the breakpoint for balloon risk.",
+            type: "number",
+            default: 64.5,
+            minimum: 1,
+          },
+          breakpoint_std: {
+            title: "Breakpoint Standard Deviation",
+            description: "The standard deviation of the breakpoint for balloon risk.",
+            type: "number",
+            default: 37,
+            minimum: 1,
+          },
+        },
+      },
+    },
+  },
+  "lamp.pop_the_bubbles": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["bubble_count", "bubble_speed", "intertrial_duration", "bubble_duration"],
+        properties: {
+          bubble_count: {
+            title: "Bubble Count",
+            description: "Multiple bubble counts per level.",
+            type: "array",
+            minItems: 3,
+            maxItems: 3,
+            items: {
+              title: "Level Count",
+              type: "number",
+              minimum: 1,
+              default: 80,
+            },
+            "ui:options": {
+              addable: false,
+              removable: false,
+              orderable: false,
+            },
+          },
+          bubble_speed: {
+            title: "Bubble Speed",
+            description: "Multiple bubble speeds per level.",
+            type: "array",
+            minItems: 3,
+            maxItems: 3,
+            items: {
+              title: "Level Speed",
+              type: "number",
+              minimum: 1,
+              default: 80,
+            },
+            "ui:options": {
+              addable: false,
+              removable: false,
+              orderable: false,
+            },
+          },
+          intertrial_duration: {
+            title: "Intertrial Duration",
+            description: "The duration between bubbles.",
+            type: "number",
+            minimum: 0,
+            default: 0.5,
+          },
+          bubble_duration: {
+            title: "Bubble Duration",
+            description: "The duration the bubble appears on screen.",
+            type: "number",
+            minimum: 1,
+            default: 1.0,
+          },
+        },
+      },
+    },
+  },
+  "lamp.spatial_span": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["reverse_tapping"],
+        properties: {
+          reverse_tapping: {
+            title: "Tap Order",
+            description: "Whether taps are going forwards or backwards.",
+            type: "boolean",
+            enumNames: ["Backwards", "Forwards"],
+            default: true,
+            "ui:widget": "radio",
+          },
+        },
+      },
+    },
+  },
+}
 
 const theme = createMuiTheme({
   palette: {
@@ -272,15 +388,27 @@ export default function GameCreator({
           />
 
           {((value?.spec && "lamp.balloon_risk" === value.spec) || "lamp.balloon_risk" === activitySpecId) && (
-            <BalloonRisk settings={settings} updateSettings={(data) => updateSettings(data)} />
+            <DynamicForm
+              schema={schemaList["lamp.balloon_risk"]}
+              data={settings}
+              onChange={(x) => updateSettings({ ...settings, ...x })}
+            />
           )}
 
           {((value?.spec && "lamp.pop_the_bubbles" === value.spec) || "lamp.pop_the_bubbles" === activitySpecId) && (
-            <PopTheBubbles settings={settings} updateSettings={(data) => updateSettings(data)} />
+            <DynamicForm
+              schema={schemaList["lamp.pop_the_bubbles"]}
+              data={settings}
+              onChange={(x) => updateSettings({ ...settings, ...x })}
+            />
           )}
 
           {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
-            <SpatialSpan settings={settings} updateSettings={(data) => updateSettings(data)} />
+            <DynamicForm
+              schema={schemaList["lamp.spatial_span"]}
+              data={settings}
+              onChange={(x) => console.dir({ ...settings, ...x })}
+            />
           )}
 
           {((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
