@@ -152,7 +152,15 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
           <MenuItem
             onClick={() => {
               setPopover(null)
-              //setAddStudy(true)
+              setAddUser(true)
+            }}
+          >
+            <Typography variant="h6">{t("Add a patient")}</Typography>
+            <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setPopover(null)
               setAddStudy(false)
               setAddParticipantStudy(true)
             }}
@@ -168,15 +176,6 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
           >
             <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
             <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setAddUser(true)
-            }}
-          >
-            <Typography variant="h6">{t("New user")}</Typography>
-            <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
           </MenuItem>
         </React.Fragment>
       </Popover>

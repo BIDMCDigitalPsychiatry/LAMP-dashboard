@@ -396,7 +396,7 @@ export default function SurveyCreator({
         setIsOptionNull(1)
       }
     }
-    if (questions.length === 0) {
+    if (questions.length === 0 || questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length === 0) {
       enqueueSnackbar(t("At least one question required."), { variant: "error" })
     } else if (
       questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
