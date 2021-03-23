@@ -95,12 +95,14 @@ function _extract(schema) {
   return {
     ...Object.fromEntries(Object.entries(schema).filter(([k, v]) => k.startsWith("ui:"))),
     ...(!!schema.properties ? Object.fromEntries(Object.entries(schema.properties).map(([k, v]) => [k, _extract(v)])) : {}),
-    ...(!!schema.items ? Object.fromEntries(Object.entries(schema.items).map(([k, v]) => [k, _extract(v)])) : {}),
+    ...(!!schema.items?.properties ? {
+      items: Object.fromEntries(Object.entries(schema.items.properties).map(([k, v]) => [k, _extract(v)])),
+    } : {}),
   }
 }
 
 // Add support for the "examples" array for the property as an auto-complete menu.
-function AutocompleteTextField(props) {
+function AutocompleteTextWidget(props) {
   if (!Array.isArray(props.schema.examples)) {
     return <Widgets.TextWidget {...props} />
   }
@@ -127,7 +129,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         formData={initialData}
         onChange={(x) => onChange(x.formData)}
         ObjectFieldTemplate={ObjectFieldTemplate}
-        widgets={{ TextWidget: AutocompleteTextField }}
+        widgets={{ TextWidget: AutocompleteTextWidget }}
       />
     </MuiThemeProvider>
   )

@@ -141,6 +141,32 @@ const schemaList: any = {
             default: true,
             "ui:widget": "radio",
           },
+          tips: {
+            title: "Tips",
+            type: "array",
+            items: {
+              type: "object",
+              required: ["title", "content"],
+              minItems: 1,
+              properties: {
+                title: {
+                  title: "Tip Title",
+                  type: "string",
+                  minLength: 1,
+                },
+                content: {
+                  title: "Tip Content",
+                  description: "The tip content supports extended GitHub-flavored Markdown formatting.",
+                  type: "string",
+                  minLength: 1,
+                  "ui:widget": "textarea",
+                  "ui:options": {
+                    rows: 15,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -583,12 +609,12 @@ const schemaList: any = {
               required: ["name", "unit"],
               properties: {
                 name: {
-                  title: "Name",
+                  title: "Behavior Name",
                   type: "string",
                   minLength: 1,
                 },
                 unit: {
-                  title: "Units",
+                  title: "Measure of Action",
                   type: "string",
                   minLength: 1,
                   examples: ["Times", "Hours", "Minutes"],
@@ -604,6 +630,88 @@ const schemaList: any = {
               title: "Emotion",
               type: "string",
               minLength: 1,
+            },
+          },
+        },
+      },
+    },
+  },
+  "lamp.cats_and_dogs": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+      },
+    },
+  },
+  "lamp.cats_and_dogs_new": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+      },
+    },
+  },
+  "lamp.journal": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+      },
+    },
+  },
+  "lamp.scratch_card": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["threshold"],
+        properties: {
+          threshold: {
+            title: "Threshold",
+            description: "The scratch threshold percentage.",
+            type: "number",
+            minimum: 1,
+            maximum: 100,
+            default: 80,
+          },
+        },
+      },
+    },
+  },
+  "lamp.tips": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+      },
+    },
+  },
+  "lamp.breathe": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        properties: {
+          audio_url: {
+            title: "Remote Audio URL",
+            description: "Do not provide an audio URL AND upload audio below.",
+            type: "string",
+            format: "url",
+          },
+          audio: {
+            title: "Upload Audio",
+            description: "Do not upload audio AND provide an audio URL above.",
+            type: "string",
+            format: "data-url",
+            "ui:options": {
+              accept: [".mp3", ".ogg", ".wav"],
             },
           },
         },
