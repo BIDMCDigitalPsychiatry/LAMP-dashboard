@@ -1,6 +1,7 @@
 import React from "react"
-import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
-import Form from "@rjsf/material-ui"
+import { Grid, Button, Icon, TextField, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
+import { Autocomplete } from "@material-ui/lab"
+import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
@@ -98,6 +99,21 @@ function _extract(schema) {
   }
 }
 
+// Add support for the "examples" array for the property as an auto-complete menu.
+function AutocompleteTextField(props) {
+  if (!Array.isArray(props.schema.examples)) {
+    return <Widgets.TextWidget {...props} />
+  }
+  return (
+    <Autocomplete
+      freeSolo
+      options={props.schema.examples ?? []}
+      renderInput={(params) => <Widgets.TextWidget {...params} {...props} />}
+      {...(props.uiSchema ?? {})}
+    />
+  )
+}
+
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
@@ -111,6 +127,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         formData={initialData}
         onChange={(x) => onChange(x.formData)}
         ObjectFieldTemplate={ObjectFieldTemplate}
+        widgets={{ TextWidget: AutocompleteTextField }}
       />
     </MuiThemeProvider>
   )

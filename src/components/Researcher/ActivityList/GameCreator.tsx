@@ -556,6 +556,60 @@ const schemaList: any = {
       },
     },
   },
+  "lamp.dbt_diary_card": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["life_worth_living_goal", "target_behaviors", "emotions"],
+        properties: {
+          life_worth_living_goal: {
+            title: "Life Worth Living Goal",
+            description: "300 characters max.",
+            type: "string",
+            default: "",
+            "ui:widget": "textarea",
+            "ui:options": {
+              rows: 10,
+            },
+          },
+          target_behaviors: {
+            title: "Target Behaviors",
+            description: "Both good and bad behaviors.",
+            type: "array",
+            items: {
+              type: "object",
+              required: ["name", "unit"],
+              properties: {
+                name: {
+                  title: "Name",
+                  type: "string",
+                  minLength: 1,
+                },
+                unit: {
+                  title: "Units",
+                  type: "string",
+                  minLength: 1,
+                  examples: ["test", "hello", "world"],
+                },
+              },
+            },
+          },
+          emotions: {
+            title: "Emotions",
+            description: "Both good and bad emotions.",
+            type: "array",
+            items: {
+              title: "Emotion",
+              type: "string",
+              minLength: 1,
+            },
+          },
+        },
+      },
+    },
+  },
 }
 
 const useStyles = makeStyles((theme: Theme) =>
