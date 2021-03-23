@@ -1,7 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Grid, Container, Backdrop, CircularProgress } from "@material-ui/core"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { Grid, Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
@@ -494,36 +493,6 @@ const schemaList: any = {
   },
 }
 
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
@@ -736,32 +705,30 @@ export default function GameCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <ActivityHeader
-            studies={studies}
-            value={value}
-            details={details}
-            activitySpecId={activitySpecId}
-            study={data.studyID}
-            onChange={handleChange}
-            image={
-              (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-              ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
-                ? Jewels
-                : null
-            }
+      <Container className={classes.containerWidth}>
+        <ActivityHeader
+          studies={studies}
+          value={value}
+          details={details}
+          activitySpecId={activitySpecId}
+          study={data.studyID}
+          onChange={handleChange}
+          image={
+            (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
+            ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
+              ? Jewels
+              : null
+          }
+        />
+        {((value?.spec && Object.keys(schemaList).includes(value.spec)) ||
+          Object.keys(schemaList).includes(activitySpecId)) && (
+          <DynamicForm
+            schema={schemaList[activitySpecId]}
+            data={settings}
+            onChange={(x) => updateSettings({ ...settings, ...x })}
           />
-          {((value?.spec && Object.keys(schemaList).includes(value.spec)) ||
-            Object.keys(schemaList).includes(activitySpecId)) && (
-            <DynamicForm
-              schema={schemaList[activitySpecId]}
-              data={settings}
-              onChange={(x) => updateSettings({ ...settings, ...x })}
-            />
-          )}
-        </Container>
-      </MuiThemeProvider>
+        )}
+      </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )

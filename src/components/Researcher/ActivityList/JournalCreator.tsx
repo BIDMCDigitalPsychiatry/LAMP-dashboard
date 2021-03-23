@@ -14,44 +14,16 @@ import {
   Container,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { useDropzone } from "react-dropzone"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import JournalIcon from "../../../icons/Journal.svg"
 import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
-
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -165,20 +137,17 @@ export default function JournalCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <ActivityHeader
-            studies={studies}
-            value={value}
-            details={details}
-            activitySpecId={activitySpecId}
-            study={!!value ? value.study_id : study}
-            onChange={handleChange}
-            image={JournalIcon}
-          />
-        </Container>
-      </MuiThemeProvider>
-
+      <Container className={classes.containerWidth}>
+        <ActivityHeader
+          studies={studies}
+          value={value}
+          details={details}
+          activitySpecId={activitySpecId}
+          study={!!value ? value.study_id : study}
+          onChange={handleChange}
+          image={JournalIcon}
+        />
+      </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )

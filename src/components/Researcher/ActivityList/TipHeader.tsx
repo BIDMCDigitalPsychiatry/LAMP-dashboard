@@ -3,7 +3,7 @@ import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Checkbox } f
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Service } from "../../DBService/DBService"
 import LAMP from "lamp-core"
 

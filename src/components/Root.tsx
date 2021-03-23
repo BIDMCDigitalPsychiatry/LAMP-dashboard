@@ -16,6 +16,9 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  Theme,
+  makeStyles,
+  createStyles,
 } from "@material-ui/core"
 
 import MaterialTable, { MTableToolbar } from "material-table"
@@ -24,51 +27,12 @@ import LAMP from "lamp-core"
 import { CredentialManager } from "./CredentialManager"
 import { ResponsivePaper } from "./Utils"
 import { useTranslation } from "react-i18next"
-import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // initial load = not working
 // TODO: <EditField researcher={x} />
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiTableCell: {
-      root: {
-        borderBottom: "#fff solid 1px",
-        padding: 10,
-      },
-    },
-    MuiToolbar: {
-      root: {
-        maxWidth: 1055,
-        width: "80%",
-        margin: "0 auto",
-        background: "#fff !important",
-      },
-    },
-    MuiInput: {
-      root: {
-        border: 0,
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiIcon: {
-      root: { color: "rgba(0, 0, 0, 0.4)" },
-    },
-  },
-})
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     researcherMenu: {
@@ -253,94 +217,92 @@ function Researchers({ history, ...props }) {
 
   return (
     <React.Fragment>
-      <MuiThemeProvider theme={theme}>
-        <Box className={classes.tableContainer}>
-          <MaterialTable
-            title={t("Researchers")}
-            data={researchers}
-            columns={[{ title: t("Name"), field: "name" }]}
-            onRowClick={(event, rowData, togglePanel) =>
-              history.push(`/researcher/${researchers[rowData.tableData.id].id}`)
-            }
-            editable={{
-              onRowAdd: async (newData) => {
-                if (((await LAMP.Researcher.create(newData)) as any).error === undefined)
-                  enqueueSnackbar(t("Successfully created a new Researcher."), {
-                    variant: "success",
-                  })
-                else
-                  enqueueSnackbar(t("Failed to create a new Researcher."), {
-                    variant: "error",
-                  })
-                setResearchers(await LAMP.Researcher.all())
+      <Box className={classes.tableContainer}>
+        <MaterialTable
+          title={t("Researchers")}
+          data={researchers}
+          columns={[{ title: t("Name"), field: "name" }]}
+          onRowClick={(event, rowData, togglePanel) =>
+            history.push(`/researcher/${researchers[rowData.tableData.id].id}`)
+          }
+          editable={{
+            onRowAdd: async (newData) => {
+              if (((await LAMP.Researcher.create(newData)) as any).error === undefined)
+                enqueueSnackbar(t("Successfully created a new Researcher."), {
+                  variant: "success",
+                })
+              else
+                enqueueSnackbar(t("Failed to create a new Researcher."), {
+                  variant: "error",
+                })
+              setResearchers(await LAMP.Researcher.all())
+            },
+            onRowUpdate: async (newData, oldData) => {
+              if (((await LAMP.Researcher.update(oldData.id, newData)) as any).error === undefined)
+                enqueueSnackbar(t("Successfully updated the Researcher."), {
+                  variant: "success",
+                })
+              else
+                enqueueSnackbar(t("Failed to update the Researcher."), {
+                  variant: "error",
+                })
+              setResearchers(await LAMP.Researcher.all())
+            },
+            onRowDelete: async (oldData) => {
+              if (((await LAMP.Researcher.delete(oldData.id)) as any).error === undefined)
+                enqueueSnackbar(t("Successfully deleted the Researcher."), {
+                  variant: "success",
+                })
+              else
+                enqueueSnackbar(t("Failed to delete the Researcher."), {
+                  variant: "error",
+                })
+              setResearchers(await LAMP.Researcher.all())
+            },
+          }}
+          actions={[
+            {
+              icon: "vpn_key",
+              tooltip: t("Manage Credentials"),
+              onClick: (event, rowData) => setPasswordChange(rowData.id),
+            },
+          ]}
+          localization={{
+            header: {
+              actions: t("Actions"),
+            },
+            body: {
+              emptyDataSourceMessage: t("No Researchers. Add Researchers by clicking the [+] button above."),
+              editRow: {
+                deleteText: t("Are you sure you want to delete this Researcher?"),
               },
-              onRowUpdate: async (newData, oldData) => {
-                if (((await LAMP.Researcher.update(oldData.id, newData)) as any).error === undefined)
-                  enqueueSnackbar(t("Successfully updated the Researcher."), {
-                    variant: "success",
-                  })
-                else
-                  enqueueSnackbar(t("Failed to update the Researcher."), {
-                    variant: "error",
-                  })
-                setResearchers(await LAMP.Researcher.all())
-              },
-              onRowDelete: async (oldData) => {
-                if (((await LAMP.Researcher.delete(oldData.id)) as any).error === undefined)
-                  enqueueSnackbar(t("Successfully deleted the Researcher."), {
-                    variant: "success",
-                  })
-                else
-                  enqueueSnackbar(t("Failed to delete the Researcher."), {
-                    variant: "error",
-                  })
-                setResearchers(await LAMP.Researcher.all())
-              },
-            }}
-            actions={[
-              {
-                icon: "vpn_key",
-                tooltip: t("Manage Credentials"),
-                onClick: (event, rowData) => setPasswordChange(rowData.id),
-              },
-            ]}
-            localization={{
-              header: {
-                actions: t("Actions"),
-              },
-              body: {
-                emptyDataSourceMessage: t("No Researchers. Add Researchers by clicking the [+] button above."),
-                editRow: {
-                  deleteText: t("Are you sure you want to delete this Researcher?"),
-                },
-              },
-            }}
-            options={{
-              addRowPosition: "first",
-              actionsColumnIndex: -1,
-              paging: false,
-              search: false,
-              headerStyle: {
-                fontWeight: 700,
-                textTransform: "uppercase",
-              },
-              rowStyle: (rowData) => ({
-                backgroundColor: rowData.tableData.id % 2 === 0 ? "#FFF" : "#F8F8F8",
-              }),
-            }}
-            components={{
-              Container: (props) => <Box {...props} />,
-              Toolbar: (props) => (
-                <div className={classes.tableOuter}>
-                  <MTableToolbar {...props} />
+            },
+          }}
+          options={{
+            addRowPosition: "first",
+            actionsColumnIndex: -1,
+            paging: false,
+            search: false,
+            headerStyle: {
+              fontWeight: 700,
+              textTransform: "uppercase",
+            },
+            rowStyle: (rowData) => ({
+              backgroundColor: rowData.tableData.id % 2 === 0 ? "#FFF" : "#F8F8F8",
+            }),
+          }}
+          components={{
+            Container: (props) => <Box {...props} />,
+            Toolbar: (props) => (
+              <div className={classes.tableOuter}>
+                <MTableToolbar {...props} />
 
-                  <Box borderTop={1} borderColor="grey.400" mt={3}></Box>
-                </div>
-              ),
-            }}
-          />
-        </Box>
-      </MuiThemeProvider>
+                <Box borderTop={1} borderColor="grey.400" mt={3}></Box>
+              </div>
+            ),
+          }}
+        />
+      </Box>
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(undefined)}>
         <DialogContent style={{ marginBottom: 12 }}>
           <CredentialManager id={passwordChange} />

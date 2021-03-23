@@ -22,9 +22,11 @@ import {
   Typography,
   Popover,
   Select,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 
 // External Imports
 import { saveAs } from "file-saver"
@@ -33,46 +35,6 @@ import { useDropzone } from "react-dropzone"
 import LAMP, { Study } from "lamp-core"
 
 import { useTranslation } from "react-i18next"
-
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiTableCell: {
-      root: {
-        borderBottom: "#fff solid 1px",
-        padding: 10,
-      },
-    },
-    MuiToolbar: {
-      root: {
-        maxWidth: 1055,
-        width: "80%",
-        margin: "0 auto",
-        background: "#fff !important",
-      },
-    },
-    MuiInput: {
-      root: {
-        border: 0,
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiIcon: {
-      root: { color: "rgba(0, 0, 0, 0.4)" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -523,18 +485,16 @@ export default function SensorList({ researcher, title, ...props }) {
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <MuiThemeProvider theme={theme}>
-        <Box className={classes.tableContainer}>
-          {/* {activities.map((activity) => (
-            <ActivityItem
-              activity={activity}
-              refreshActivities={refreshActivities}
-              researcher={researcher}
-              studies={studies}
-            />
-          ))} */}
-        </Box>
-      </MuiThemeProvider>
+      <Box className={classes.tableContainer}>
+        {/* {activities.map((activity) => (
+          <ActivityItem
+            activity={activity}
+            refreshActivities={refreshActivities}
+            researcher={researcher}
+            studies={studies}
+          />
+        ))} */}
+      </Box>
     </React.Fragment>
   )
 }

@@ -126,6 +126,8 @@ const useStyles = makeStyles((theme: Theme) =>
     appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
     toolbarResearcher: {
       minHeight: 50,
+      width: "100%",
+      background: "#7599FF",
       "& h5": {
         padding: "55px 0 25px",
         [theme.breakpoints.down("sm")]: {
@@ -367,7 +369,6 @@ export default function NavigationLayout({
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
                     </MenuItem>
-                    <Divider />
                     <MenuItem
                       dense
                       onClick={() => {

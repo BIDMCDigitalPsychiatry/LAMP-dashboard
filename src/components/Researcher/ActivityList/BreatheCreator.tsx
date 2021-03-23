@@ -10,43 +10,16 @@ import {
   Container,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import BreatheIcon from "../../../icons/Breathe.svg"
 import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
@@ -229,83 +202,81 @@ export default function BreatheCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <ActivityHeader
-            studies={studies}
-            value={value}
-            details={details}
-            activitySpecId={activitySpecId}
-            study={study}
-            onChange={handleChange}
-            image={BreatheIcon}
-          />
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Divider />
-              <Typography variant="h6">{t("Settings")}</Typography>
-            </Grid>
+      <Container className={classes.containerWidth}>
+        <ActivityHeader
+          studies={studies}
+          value={value}
+          details={details}
+          activitySpecId={activitySpecId}
+          study={study}
+          onChange={handleChange}
+          image={BreatheIcon}
+        />
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
             <Divider />
-            <Grid item xs={12} spacing={2}>
-              <Box mb={3}>
-                <TextField
-                  error={
-                    (settings?.audio_url?.trim() ?? "") === "" ||
-                    ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings?.audio_url ?? null))
-                      ? true
-                      : false
-                  }
-                  fullWidth
-                  variant="filled"
-                  label={t("Audio URL")}
-                  defaultValue={settings?.audio_url ?? ""}
-                  onChange={(event) => updateSettings({ ...settings, audio_url: event.target.value })}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs>
-              <label htmlFor="upload-audio">
-                <TextField
-                  className={classes.input}
-                  id="upload-audio"
-                  name="upload-audio"
-                  type="file"
-                  onClick={(event) => handleRemoveExistingEvent(event)}
-                  onChange={(event) => setAudioFileChange(event)}
-                />
+            <Typography variant="h6">{t("Settings")}</Typography>
+          </Grid>
+          <Divider />
+          <Grid item xs={12} spacing={2}>
+            <Box mb={3}>
+              <TextField
+                error={
+                  (settings?.audio_url?.trim() ?? "") === "" ||
+                  ((settings?.audio_url?.trim() ?? "") !== "" && !validURL(settings?.audio_url ?? null))
+                    ? true
+                    : false
+                }
+                fullWidth
+                variant="filled"
+                label={t("Audio URL")}
+                defaultValue={settings?.audio_url ?? ""}
+                onChange={(event) => updateSettings({ ...settings, audio_url: event.target.value })}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs>
+            <label htmlFor="upload-audio">
+              <TextField
+                className={classes.input}
+                id="upload-audio"
+                name="upload-audio"
+                type="file"
+                onClick={(event) => handleRemoveExistingEvent(event)}
+                onChange={(event) => setAudioFileChange(event)}
+              />
 
-                <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
-                  <Icon>audiotrack</Icon> {t("Upload audio")}
-                </Fab>
-              </label>
+              <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
+                <Icon>audiotrack</Icon> {t("Upload audio")}
+              </Fab>
+            </label>
 
-              <Grid container direction="row" justify="flex-start" alignItems="center">
-                <Grid>
-                  {!!settings?.audio && (
-                    <audio controls src={settings?.audio ?? null}>
-                      {t("Your browser does not support the")}
-                      <code>{t("audio")}</code> {t("element.")}
-                    </audio>
-                  )}
-                </Grid>
-                {!!settings?.audio_name ?? null}
-                <Grid>
-                  {settings?.audio && (
-                    <Fab
-                      className={classes.iconBtn}
-                      aria-label="Remove-Audio"
-                      variant="extended"
-                      onClick={() => updateSettings({ ...settings, audio: null, audio_name: null })}
-                    >
-                      <Icon>delete</Icon>
-                    </Fab>
-                  )}
-                </Grid>
+            <Grid container direction="row" justify="flex-start" alignItems="center">
+              <Grid>
+                {!!settings?.audio && (
+                  <audio controls src={settings?.audio ?? null}>
+                    {t("Your browser does not support the")}
+                    <code>{t("audio")}</code> {t("element.")}
+                  </audio>
+                )}
+              </Grid>
+              {!!settings?.audio_name ?? null}
+              <Grid>
+                {settings?.audio && (
+                  <Fab
+                    className={classes.iconBtn}
+                    aria-label="Remove-Audio"
+                    variant="extended"
+                    onClick={() => updateSettings({ ...settings, audio: null, audio_name: null })}
+                  >
+                    <Icon>delete</Icon>
+                  </Fab>
+                )}
               </Grid>
             </Grid>
           </Grid>
-        </Container>
-      </MuiThemeProvider>
+        </Grid>
+      </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )

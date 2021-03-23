@@ -19,6 +19,10 @@ import {
   DialogProps,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  withStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
@@ -28,7 +32,6 @@ import QRCode from "qrcode.react"
 import LAMP, { Study } from "lamp-core"
 
 import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, withStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
@@ -38,32 +41,6 @@ const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
   "#/?a=" +
   btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
-const theme = createMuiTheme({
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-        borderRadius: "5px !important",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
 
 const CssTextField = withStyles({
   root: {
@@ -292,84 +269,78 @@ export default function SensorDialog({
           <CircularProgress color="inherit" />
         </Backdrop>
         <Typography className={classes.dialogTitle}>{selectedSensor ? t("Update Sensor") : t("Add Sensor")}</Typography>
-
-        <MuiThemeProvider theme={theme}>
-          <Box mt={4}>
-            <TextField
-              error={
-                typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === "" ? true : false
-              }
-              id="filled-select-currency"
-              select
-              label={t("Study")}
-              value={selectedStudy}
-              //disabled={!!studyId ? true : false}
-              disabled={!!sensor ? true : false}
-              onChange={(e) => {
-                setSelectedStudy(e.target.value)
-              }}
-              helperText={
-                typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
-                  ? t("Please select the Study")
-                  : ""
-              }
-              variant="filled"
-            >
-              {studies.map((option) => (
-                <MenuItem key={option.id} value={option.id} data-selected-study-name={t(option.name)}>
-                  {t(option.name)}
+        <Box mt={4}>
+          <TextField
+            error={typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""}
+            id="filled-select-currency"
+            select
+            label={t("Study")}
+            value={selectedStudy}
+            //disabled={!!studyId ? true : false}
+            disabled={!!sensor ? true : false}
+            onChange={(e) => {
+              setSelectedStudy(e.target.value)
+            }}
+            helperText={
+              typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
+                ? t("Please select the Study")
+                : ""
+            }
+            variant="filled"
+          >
+            {studies.map((option) => (
+              <MenuItem key={option.id} value={option.id} data-selected-study-name={t(option.name)}>
+                {t(option.name)}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+        <Box mt={4}>
+          <TextField
+            error={
+              duplicateCnt > 0 || typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
+                ? true
+                : false
+            }
+            value={sensorName}
+            variant="filled"
+            label="Name"
+            onChange={(event) => setSensorName(event.target.value)}
+            placeholder={t("Name")}
+            helperText={
+              duplicateCnt > 0
+                ? t("Unique name required")
+                : typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
+                ? t("Please enter Name")
+                : ""
+            }
+          />
+        </Box>
+        <Box mt={4}>
+          <TextField
+            error={typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === "" ? true : false}
+            id="filled-select-currency"
+            select
+            label={t("Sensor spec")}
+            value={sensorSpec}
+            onChange={(e) => {
+              setSensorSpec(e.target.value)
+            }}
+            helperText={
+              typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === ""
+                ? t("Please select the sensor spec")
+                : ""
+            }
+            variant="filled"
+          >
+            {!!sensorSpecs &&
+              sensorSpecs.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {t(option.id.replace("lamp.", ""))}
                 </MenuItem>
               ))}
-            </TextField>
-          </Box>
-
-          <Box mt={4}>
-            <TextField
-              error={
-                duplicateCnt > 0 || typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
-                  ? true
-                  : false
-              }
-              value={sensorName}
-              variant="filled"
-              label="Name"
-              onChange={(event) => setSensorName(event.target.value)}
-              placeholder={t("Name")}
-              helperText={
-                duplicateCnt > 0
-                  ? t("Unique name required")
-                  : typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
-                  ? t("Please enter Name")
-                  : ""
-              }
-            />
-          </Box>
-          <Box mt={4}>
-            <TextField
-              error={typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === "" ? true : false}
-              id="filled-select-currency"
-              select
-              label={t("Sensor spec")}
-              value={sensorSpec}
-              onChange={(e) => {
-                setSensorSpec(e.target.value)
-              }}
-              helperText={
-                typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === ""
-                  ? t("Please select the sensor spec")
-                  : ""
-              }
-              variant="filled"
-            >
-              {!!sensorSpecs &&
-                sensorSpecs.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>
-                    {t(option.id.replace("lamp.", ""))}
-                  </MenuItem>
-                ))}
-            </TextField>
-          </Box>
-        </MuiThemeProvider>
+          </TextField>
+        </Box>
         <Box textAlign="center" mt={2}>
           <Button
             onClick={() => (selectedSensor ? updateSensor() : saveSensor())}

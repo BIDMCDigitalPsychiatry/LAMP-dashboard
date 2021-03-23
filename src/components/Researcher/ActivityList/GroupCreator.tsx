@@ -14,46 +14,16 @@ import {
   Menu,
   MenuItem,
   Container,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { availableActivitySpecs } from "./Index"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-    MuiStepper: {
-      root: { paddingLeft: 8 },
-    },
-  },
-})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
@@ -204,80 +174,78 @@ export default function GroupCreator({
   }
   return (
     <div>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <Grid container spacing={2}>
-            <ActivityHeader
-              studies={studies}
-              value={value}
-              details={details}
-              activitySpecId={null}
-              study={data.studyID}
-              onChange={handleChange}
-              image={null}
-            />
+      <Container className={classes.containerWidth}>
+        <Grid container spacing={2}>
+          <ActivityHeader
+            studies={studies}
+            value={value}
+            details={details}
+            activitySpecId={null}
+            study={data.studyID}
+            onChange={handleChange}
+            image={null}
+          />
 
-            <Box width={1}>
-              <Divider />
-            </Box>
-            <Grid item xs={12}>
-              <Typography variant="h6">{t("Configure activities and options.")}</Typography>
-            </Grid>
-            <Grid item>
-              <DragDropContext onDragEnd={onDragEnd}>
-                <Droppable droppableId="list">
-                  {(provided) => (
-                    <Box ref={provided.innerRef} {...provided.droppableProps}>
-                      {(items || []).map((x, idx) => (
-                        <ActivitySelector
-                          index={idx}
-                          key={`${idx}.${x}`}
-                          activities={studyActivities}
-                          selected={x}
-                          onSave={(x) =>
-                            setItems((it) => {
-                              let y = [...it]
-                              y[idx] = x
-                              return y
-                            })
-                          }
-                          onDelete={() =>
-                            setItems((it) => {
-                              let x = [...it]
-                              x.splice(idx, 1)
-                              return x
-                            })
-                          }
-                        />
-                      ))}
-                      {provided.placeholder}
-                    </Box>
-                  )}
-                </Droppable>
-              </DragDropContext>
-              <ButtonGroup>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={!data.studyID || studyActivities.length === 0}
-                  onClick={() => setItems((items) => [...items, null])}
-                >
-                  <Icon>add_circle</Icon>
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => setItems((items) => [...items, null])}
-                  disabled={!data.studyID || studyActivities.length === 0}
-                >
-                  {t("Add Activity")}
-                </Button>
-              </ButtonGroup>
-            </Grid>
+          <Box width={1}>
+            <Divider />
+          </Box>
+          <Grid item xs={12}>
+            <Typography variant="h6">{t("Configure activities and options.")}</Typography>
           </Grid>
-        </Container>
-      </MuiThemeProvider>
+          <Grid item>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="list">
+                {(provided) => (
+                  <Box ref={provided.innerRef} {...provided.droppableProps}>
+                    {(items || []).map((x, idx) => (
+                      <ActivitySelector
+                        index={idx}
+                        key={`${idx}.${x}`}
+                        activities={studyActivities}
+                        selected={x}
+                        onSave={(x) =>
+                          setItems((it) => {
+                            let y = [...it]
+                            y[idx] = x
+                            return y
+                          })
+                        }
+                        onDelete={() =>
+                          setItems((it) => {
+                            let x = [...it]
+                            x.splice(idx, 1)
+                            return x
+                          })
+                        }
+                      />
+                    ))}
+                    {provided.placeholder}
+                  </Box>
+                )}
+              </Droppable>
+            </DragDropContext>
+            <ButtonGroup>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!data.studyID || studyActivities.length === 0}
+                onClick={() => setItems((items) => [...items, null])}
+              >
+                <Icon>add_circle</Icon>
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="primary"
+                onClick={() => setItems((items) => [...items, null])}
+                disabled={!data.studyID || studyActivities.length === 0}
+              >
+                {t("Add Activity")}
+              </Button>
+            </ButtonGroup>
+          </Grid>
+        </Grid>
+      </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </div>
   )

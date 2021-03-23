@@ -169,6 +169,7 @@ export default function AddActivity({
       >
         <React.Fragment>
           <MenuItem
+            divider
             onClick={() => {
               setPopover(null)
               setCreate(true)
@@ -185,7 +186,6 @@ export default function AddActivity({
               </Grid>
             </Grid>
           </MenuItem>
-          <Divider />
           <MenuItem disabled divider>
             <b>{t("Create a new...")}</b>
           </MenuItem>

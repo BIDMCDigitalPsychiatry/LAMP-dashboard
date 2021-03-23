@@ -390,19 +390,17 @@ export default function Survey({
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
-              <MuiThemeProvider theme={theme}>
-                <React.Fragment>
-                  <DatePicker
-                    className={classes.calendatInput}
-                    autoOk
-                    format="MMMM d, yyyy "
-                    minDate={formattedDate}
-                    disableFuture
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                  />
-                </React.Fragment>
-              </MuiThemeProvider>
+              <React.Fragment>
+                <DatePicker
+                  className={classes.calendatInput}
+                  autoOk
+                  format="MMMM d, yyyy "
+                  minDate={formattedDate}
+                  disableFuture
+                  value={selectedDate}
+                  onChange={handleDateChange}
+                />
+              </React.Fragment>
             </Box> 
           )}*/}
         </DialogContent>

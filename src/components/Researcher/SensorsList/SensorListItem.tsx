@@ -1,8 +1,6 @@
 import React from "react"
 import { Box, Typography, Card, CardHeader, Menu, CardActions, CardContent, Grow } from "@material-ui/core"
-import { useSnackbar } from "notistack"
-import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import UpdateSensor from "./UpdateSensor"
 import Checkbox from "@material-ui/core/Checkbox"
 

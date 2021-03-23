@@ -14,44 +14,15 @@ import {
   Container,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
-import { useDropzone } from "react-dropzone"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
-
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -173,50 +144,47 @@ export default function SCImageCreator({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <ActivityHeader
-            studies={studies}
-            value={value}
-            details={details}
-            activitySpecId={activitySpecId}
-            study={study}
-            onChange={handleChange}
-            image={ScratchCard}
-          />
-          <Grid container spacing={2}>
-            <Grid item lg={4}>
-              <Box>
-                <TextField
-                  fullWidth
-                  label={t("Threshold")}
-                  error={
-                    settings.threshold < 30 ||
-                    settings.threshold > 90 ||
-                    settings.threshold === 0 ||
-                    settings.threshold === ""
-                      ? true
-                      : false
-                  }
-                  type="number"
-                  variant="filled"
-                  defaultValue={settings?.threshold ?? 80}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                  inputProps={{
-                    max: 90,
-                    min: 30,
-                  }}
-                  onChange={(e) => updateSettings(Number(e.target.value))}
-                  helperText={settings.threshold > 90 ? t("Maximum value is number", { number: 90 }) : ""}
-                />
-              </Box>
-            </Grid>
+      <Container className={classes.containerWidth}>
+        <ActivityHeader
+          studies={studies}
+          value={value}
+          details={details}
+          activitySpecId={activitySpecId}
+          study={study}
+          onChange={handleChange}
+          image={ScratchCard}
+        />
+        <Grid container spacing={2}>
+          <Grid item lg={4}>
+            <Box>
+              <TextField
+                fullWidth
+                label={t("Threshold")}
+                error={
+                  settings.threshold < 30 ||
+                  settings.threshold > 90 ||
+                  settings.threshold === 0 ||
+                  settings.threshold === ""
+                    ? true
+                    : false
+                }
+                type="number"
+                variant="filled"
+                defaultValue={settings?.threshold ?? 80}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                inputProps={{
+                  max: 90,
+                  min: 30,
+                }}
+                onChange={(e) => updateSettings(Number(e.target.value))}
+                helperText={settings.threshold > 90 ? t("Maximum value is number", { number: 90 }) : ""}
+              />
+            </Box>
           </Grid>
-        </Container>
-      </MuiThemeProvider>
-
+        </Grid>
+      </Container>
       <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
     </Grid>
   )
