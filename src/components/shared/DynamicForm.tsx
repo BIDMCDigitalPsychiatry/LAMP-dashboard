@@ -88,6 +88,7 @@ const formTheme = createMuiTheme({
 
 // This function recursively extracts all "ui:"-prefixed properties within the JSONSchema.
 // These are passed to the JSONSchemaForm as a single nested uiSchema object.
+// TODO: Does not resolve dependencies, oneOf, allOf, anyOf, etc. internal props.
 function _extract(schema) {
   /* prettier-ignore */
   return {
@@ -98,7 +99,8 @@ function _extract(schema) {
 }
 
 // A wrapper Form component to add support for things not available out of the box in RJSF.
-export default function DynamicForm({ schema, data, onChange, ...props }) {
+// NOTE: Do not keep resetting the value of `initialData`! Only set this once.
+export default function DynamicForm({ schema, initialData, onChange, ...props }) {
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form
@@ -106,7 +108,7 @@ export default function DynamicForm({ schema, data, onChange, ...props }) {
         children={true}
         schema={schema}
         uiSchema={_extract(schema)}
-        formData={data}
+        formData={initialData}
         onChange={(x) => onChange(x.formData)}
         ObjectFieldTemplate={ObjectFieldTemplate}
       />

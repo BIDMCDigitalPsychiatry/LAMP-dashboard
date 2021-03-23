@@ -455,38 +455,103 @@ const schemaList: any = {
       },
     },
   },
-  "lamp.test": {
-    title: "A list of tasks",
-    type: "object",
-    required: ["title"],
-    properties: {
-      title: {
-        type: "string",
-        title: "Task list title",
+  "lamp.survey": {
+    title: "Survey Questions",
+    description: "Configure questions, parameters, and options.",
+    type: "array",
+    items: {
+      title: "Question",
+      description: "Configure a question.",
+      type: "object",
+      required: ["title", "type"],
+      properties: {
+        title: {
+          type: "string",
+          title: "Question Text",
+          minLength: 1,
+          default: "",
+        },
+        description: {
+          type: "string",
+          title: "Question Description",
+          default: "",
+        },
+        type: {
+          type: "string",
+          title: "Question Type",
+          enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating"],
+          enumNames: ["Text", "Boolean", "List", "Multi-Select", "Slider", "Short Answer", "Rating"],
+          default: "text",
+        },
       },
-      tasks: {
-        type: "array",
-        title: "Tasks",
-        items: {
-          type: "object",
-          required: ["title"],
-          properties: {
-            title: {
-              type: "string",
-              title: "Title",
-              description: "A sample title",
+      dependencies: {
+        type: {
+          oneOf: [
+            {
+              properties: {
+                type: {
+                  enum: ["text", "boolean", "short_answer"],
+                },
+              },
             },
-            details: {
-              type: "string",
-              title: "Task details",
-              description: "Enter the task details",
+            {
+              properties: {
+                type: {
+                  enum: ["list", "multiselect"],
+                },
+                options: {
+                  type: "array",
+                  title: "Response Options",
+                  minItems: 1,
+                  items: {
+                    type: "object",
+                    properties: {
+                      value: {
+                        title: "Option Text",
+                        type: "string",
+                        minLength: 1,
+                        default: "",
+                      },
+                      description: {
+                        title: "Option Description",
+                        type: "string",
+                        default: "",
+                      },
+                    },
+                  },
+                },
+              },
+              required: ["options"],
             },
-            done: {
-              type: "boolean",
-              title: "Done?",
-              default: false,
+            {
+              properties: {
+                type: {
+                  enum: ["slider", "rating"],
+                },
+                options: {
+                  type: "array",
+                  title: "Response Options",
+                  minItems: 1,
+                  items: {
+                    type: "object",
+                    properties: {
+                      value: {
+                        title: "Option Text (Numerical)",
+                        type: "number",
+                        default: 0,
+                      },
+                      description: {
+                        title: "Option Description",
+                        type: "string",
+                        default: "",
+                      },
+                    },
+                  },
+                },
+              },
+              required: ["options"],
             },
-          },
+          ],
         },
       },
     },
@@ -724,7 +789,7 @@ export default function GameCreator({
           Object.keys(schemaList).includes(activitySpecId)) && (
           <DynamicForm
             schema={schemaList[activitySpecId]}
-            data={settings}
+            initialData={settings}
             onChange={(x) => updateSettings({ ...settings, ...x })}
           />
         )}
