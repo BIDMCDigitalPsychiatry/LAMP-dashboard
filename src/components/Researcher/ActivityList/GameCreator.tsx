@@ -591,7 +591,7 @@ const schemaList: any = {
                   title: "Units",
                   type: "string",
                   minLength: 1,
-                  examples: ["test", "hello", "world"],
+                  examples: ["Times", "Hours", "Minutes"],
                 },
               },
             },
