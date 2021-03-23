@@ -5,7 +5,6 @@ import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } fro
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
-import JewelsGame from "./Jewels"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
@@ -25,6 +24,9 @@ const schemaList: any = {
             type: "number",
             default: 15,
             minimum: 1,
+            "ui:grid": {
+              xs: 4,
+            },
           },
           breakpoint_mean: {
             title: "Breakpoint Mean",
@@ -32,6 +34,9 @@ const schemaList: any = {
             type: "number",
             default: 64.5,
             minimum: 1,
+            "ui:grid": {
+              xs: 4,
+            },
           },
           breakpoint_std: {
             title: "Breakpoint Standard Deviation",
@@ -39,6 +44,9 @@ const schemaList: any = {
             type: "number",
             default: 37,
             minimum: 1,
+            "ui:grid": {
+              xs: 4,
+            },
           },
         },
       },
@@ -69,6 +77,9 @@ const schemaList: any = {
               removable: false,
               orderable: false,
             },
+            "ui:grid": {
+              xs: 6,
+            },
           },
           bubble_speed: {
             title: "Bubble Speed",
@@ -87,6 +98,9 @@ const schemaList: any = {
               removable: false,
               orderable: false,
             },
+            "ui:grid": {
+              xs: 6,
+            },
           },
           intertrial_duration: {
             title: "Intertrial Duration",
@@ -94,6 +108,9 @@ const schemaList: any = {
             type: "number",
             minimum: 0,
             default: 0.5,
+            "ui:grid": {
+              xs: 6,
+            },
           },
           bubble_duration: {
             title: "Bubble Duration",
@@ -101,6 +118,9 @@ const schemaList: any = {
             type: "number",
             minimum: 1,
             default: 1.0,
+            "ui:grid": {
+              xs: 6,
+            },
           },
         },
       },
@@ -121,6 +141,352 @@ const schemaList: any = {
             enumNames: ["Backwards", "Forwards"],
             default: true,
             "ui:widget": "radio",
+          },
+        },
+      },
+    },
+  },
+  "lamp.jewels_a": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["mode", "variant"],
+        properties: {
+          mode: {
+            title: "Mode",
+            description: "The mode of the jewels game.",
+            type: "number",
+            enum: [1, 2, 3, 4],
+            enumNames: ["Beginner", "Intermediate", "Advanced", "Expert"],
+            default: 1,
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          variant: {
+            title: "Variant",
+            description: "The variant of the Jewels game (A or B).",
+            type: "string",
+            enum: ["jewels_a", "jewels_b"],
+            enumNames: ["Trails A", "Trails B"],
+            default: "jewels_b",
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          beginner_seconds: {
+            title: "Beginner Duration",
+            description: "The duration of a Jewels session on Beginner mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 90,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          intermediate_seconds: {
+            title: "Intermediate Duration",
+            description: "The duration of a Jewels session on Intermediate mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 30,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          advanced_seconds: {
+            title: "Advanced Duration",
+            description: "The duration of a Jewels session on Advanced mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 25,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          expert_seconds: {
+            title: "Expert Duration",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 15,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          diamond_count: {
+            title: "Initial Diamond Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 3,
+            maximum: 25,
+            default: 15,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          shape_count: {
+            title: "Initial Shape Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 3,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          bonus_point_count: {
+            title: "Bonus Points for Next Level",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 500,
+            default: 50,
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          x_changes_in_level_count: {
+            title: "X Changes in Level Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          x_diamond_count: {
+            title: "X Diamond Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 4,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          y_changes_in_level_count: {
+            title: "X Changes in Level Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 2,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          y_shape_count: {
+            title: "Y Shape Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 4,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+        },
+      },
+    },
+  },
+  "lamp.jewels_b": {
+    type: "object",
+    properties: {
+      settings: {
+        title: "Activity Settings",
+        type: "object",
+        required: ["mode", "variant"],
+        properties: {
+          mode: {
+            title: "Mode",
+            description: "The mode of the jewels game.",
+            type: "number",
+            enum: [1, 2, 3, 4],
+            enumNames: ["Beginner", "Intermediate", "Advanced", "Expert"],
+            default: 1,
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          variant: {
+            title: "Variant",
+            description: "The variant of the Jewels game (A or B).",
+            type: "string",
+            enum: ["jewels_a", "jewels_b"],
+            enumNames: ["Trails A", "Trails B"],
+            default: "jewels_b",
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          beginner_seconds: {
+            title: "Beginner Duration",
+            description: "The duration of a Jewels session on Beginner mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 90,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          intermediate_seconds: {
+            title: "Intermediate Duration",
+            description: "The duration of a Jewels session on Intermediate mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 30,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          advanced_seconds: {
+            title: "Advanced Duration",
+            description: "The duration of a Jewels session on Advanced mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 25,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          expert_seconds: {
+            title: "Expert Duration",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 300,
+            default: 15,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          diamond_count: {
+            title: "Initial Diamond Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 3,
+            maximum: 25,
+            default: 15,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          shape_count: {
+            title: "Initial Shape Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 1,
+            maximum: 3,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          bonus_point_count: {
+            title: "Bonus Points for Next Level",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 500,
+            default: 50,
+            "ui:grid": {
+              xs: 6,
+            },
+          },
+          x_changes_in_level_count: {
+            title: "X Changes in Level Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          x_diamond_count: {
+            title: "X Diamond Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 4,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          y_changes_in_level_count: {
+            title: "X Changes in Level Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 25,
+            default: 2,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+          y_shape_count: {
+            title: "Y Shape Count",
+            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            type: "number",
+            minimum: 0,
+            maximum: 4,
+            default: 1,
+            "ui:grid": {
+              xs: 3,
+            },
+          },
+        },
+      },
+    },
+  },
+  "lamp.test": {
+    title: "A list of tasks",
+    type: "object",
+    required: ["title"],
+    properties: {
+      title: {
+        type: "string",
+        title: "Task list title",
+      },
+      tasks: {
+        type: "array",
+        title: "Tasks",
+        items: {
+          type: "object",
+          required: ["title"],
+          properties: {
+            title: {
+              type: "string",
+              title: "Title",
+              description: "A sample title",
+            },
+            details: {
+              type: "string",
+              title: "Task details",
+              description: "Enter the task details",
+            },
+            done: {
+              type: "boolean",
+              title: "Done?",
+              default: false,
+            },
           },
         },
       },
@@ -386,34 +752,13 @@ export default function GameCreator({
                 : null
             }
           />
-
-          {((value?.spec && "lamp.balloon_risk" === value.spec) || "lamp.balloon_risk" === activitySpecId) && (
+          {((value?.spec && Object.keys(schemaList).includes(value.spec)) ||
+            Object.keys(schemaList).includes(activitySpecId)) && (
             <DynamicForm
-              schema={schemaList["lamp.balloon_risk"]}
+              schema={schemaList[activitySpecId]}
               data={settings}
               onChange={(x) => updateSettings({ ...settings, ...x })}
             />
-          )}
-
-          {((value?.spec && "lamp.pop_the_bubbles" === value.spec) || "lamp.pop_the_bubbles" === activitySpecId) && (
-            <DynamicForm
-              schema={schemaList["lamp.pop_the_bubbles"]}
-              data={settings}
-              onChange={(x) => updateSettings({ ...settings, ...x })}
-            />
-          )}
-
-          {((value?.spec && "lamp.spatial_span" === value.spec) || "lamp.spatial_span" === activitySpecId) && (
-            <DynamicForm
-              schema={schemaList["lamp.spatial_span"]}
-              data={settings}
-              onChange={(x) => console.dir({ ...settings, ...x })}
-            />
-          )}
-
-          {((value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-            ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)) && (
-            <JewelsGame settings={settings} updateSettings={(data) => updateSettings(data)} />
           )}
         </Container>
       </MuiThemeProvider>

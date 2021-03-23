@@ -1,7 +1,64 @@
 import React from "react"
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core"
+import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
 import Form from "@rjsf/material-ui"
+import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 
+// By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
+// "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
+// Supported container props: alignContent, alignItems, direction, justify, spacing, wrap
+// Supported item props: lg, md, sm, xs, xl
+// TODO: Does not support adding dividers or padding before/after the children items yet.
+const ObjectFieldTemplate = ({
+  DescriptionField,
+  description,
+  TitleField,
+  title,
+  properties,
+  required,
+  disabled,
+  readonly,
+  uiSchema,
+  idSchema,
+  schema,
+  formData,
+  onAddClick,
+}: ObjectFieldTemplateProps) => {
+  return (
+    <>
+      {(uiSchema["ui:title"] || title) && <TitleField id={`${idSchema.$id}-title`} title={title} required={required} />}
+      {description && <DescriptionField id={`${idSchema.$id}-description`} description={description} />}
+      <Grid container={true} spacing={2} style={{ marginTop: 10 }} {...(uiSchema?.["ui:grid"] ?? {})}>
+        {properties.map((element: any, index: number) => (
+          <Grid
+            item={true}
+            xs={12}
+            key={index}
+            style={{ marginBottom: "10px" }}
+            {...(element.content.props.uiSchema?.["ui:grid"] ?? {})}
+          >
+            {element.content}
+          </Grid>
+        ))}
+        {utils.canExpand(schema, uiSchema, formData) && (
+          <Grid container justify="flex-end">
+            <Grid item={true}>
+              <Button
+                className="object-property-expand"
+                color="secondary"
+                onClick={onAddClick(schema)}
+                disabled={disabled || readonly}
+              >
+                <Icon>add</Icon> Add Item
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+      </Grid>
+    </>
+  )
+}
+
+// By default, the React-JSONSchema-Form does not link correctly to the main UI theme, so declare it here.
 const formTheme = createMuiTheme({
   props: {
     MuiTextField: {
@@ -9,6 +66,22 @@ const formTheme = createMuiTheme({
     },
     MuiPaper: {
       variant: "outlined",
+    },
+  },
+  overrides: {
+    MuiFilledInput: {
+      root: {
+        border: 0,
+        backgroundColor: "#f4f4f4",
+      },
+      underline: {
+        "&&&:before": {
+          borderBottom: "none",
+        },
+        "&&:after": {
+          borderBottom: "none",
+        },
+      },
     },
   },
 })
@@ -24,6 +97,7 @@ function _extract(schema) {
   }
 }
 
+// A wrapper Form component to add support for things not available out of the box in RJSF.
 export default function DynamicForm({ schema, data, onChange, ...props }) {
   return (
     <MuiThemeProvider theme={formTheme}>
@@ -34,6 +108,7 @@ export default function DynamicForm({ schema, data, onChange, ...props }) {
         uiSchema={_extract(schema)}
         formData={data}
         onChange={(x) => onChange(x.formData)}
+        ObjectFieldTemplate={ObjectFieldTemplate}
       />
     </MuiThemeProvider>
   )
