@@ -1,9 +1,7 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Backdrop, CircularProgress } from "@material-ui/core"
+import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>

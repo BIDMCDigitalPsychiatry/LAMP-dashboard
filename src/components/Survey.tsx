@@ -13,13 +13,15 @@ import {
   DialogActions,
   IconButton,
   ButtonBase,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import LAMP from "lamp-core"
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { DatePicker } from "@material-ui/pickers"
@@ -27,27 +29,6 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 import GroupActivity from "./GroupActivity"
 
-const theme = createMuiTheme({
-  overrides: {
-    MuiInput: {
-      root: { width: "100%" },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiToolbar: {
-      root: { backgroundColor: "#38C396 !important" },
-    },
-    MuiButtonBase: {
-      root: {},
-    },
-  },
-})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {

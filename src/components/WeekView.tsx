@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Paper, Grid, Box, useMediaQuery, useTheme } from "@material-ui/core"
+import { Paper, Grid, Box, useMediaQuery, useTheme, makeStyles, Theme, createStyles } from "@material-ui/core"
 import classnames from "classnames"
 
 const useStyles = makeStyles((theme: Theme) =>

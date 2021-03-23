@@ -1,9 +1,20 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Checkbox } from "@material-ui/core"
+import {
+  Grid,
+  ButtonBase,
+  Icon,
+  TextField,
+  Tooltip,
+  Box,
+  MenuItem,
+  Checkbox,
+  makeStyles,
+  Theme,
+  createStyles,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { Service } from "../../DBService/DBService"
 import LAMP from "lamp-core"
 

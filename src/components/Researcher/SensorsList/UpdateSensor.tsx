@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
 import { Service } from "../../DBService/DBService"
-import { Box, Icon, Fab } from "@material-ui/core"
+import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

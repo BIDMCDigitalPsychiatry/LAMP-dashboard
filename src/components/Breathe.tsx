@@ -19,18 +19,19 @@ import {
   Grid,
   Fab,
   Checkbox,
+  CheckboxProps,
+  CircularProgress,
+  Link,
 } from "@material-ui/core"
-import { CheckboxProps } from "@material-ui/core/Checkbox"
 import LAMP from "lamp-core"
 
 // Local Imports
 import { ReactComponent as Lotus } from "../icons/Lotus.svg"
-import Link from "@material-ui/core/Link"
 import classnames from "classnames"
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import CircularProgress from "@material-ui/core/CircularProgress"
 import { useTranslation } from "react-i18next"
+
 const BorderLinearProgress = withStyles((theme: Theme) =>
   createStyles({
     root: {

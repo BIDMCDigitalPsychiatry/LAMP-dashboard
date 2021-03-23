@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { Backdrop, CircularProgress } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import TipCreator from "./TipCreator"

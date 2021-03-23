@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Fab, Icon } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Fab, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>

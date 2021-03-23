@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { Icon, Fab, Backdrop, CircularProgress } from "@material-ui/core"
+import { Icon, Fab, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 

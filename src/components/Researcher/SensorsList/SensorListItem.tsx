@@ -1,8 +1,19 @@
 import React from "react"
-import { Box, Typography, Card, CardHeader, Menu, CardActions, CardContent, Grow } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import {
+  Box,
+  Typography,
+  Card,
+  CardHeader,
+  Menu,
+  CardActions,
+  CardContent,
+  Grow,
+  makeStyles,
+  Theme,
+  createStyles,
+  Checkbox,
+} from "@material-ui/core"
 import UpdateSensor from "./UpdateSensor"
-import Checkbox from "@material-ui/core/Checkbox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

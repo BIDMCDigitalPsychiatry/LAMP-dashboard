@@ -1,6 +1,5 @@
 import React from "react"
-import { Box, Chip, Tooltip } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 const useStyles = makeStyles((theme: Theme) =>

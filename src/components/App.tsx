@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
-import { blue, red } from "@material-ui/core/colors"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
@@ -531,7 +530,7 @@ export default function App({ ...props }) {
             fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },
           palette: {
-            primary: blue,
+            primary: colors.blue,
             secondary: {
               main: "#333",
             },

@@ -13,9 +13,11 @@ import {
   DialogContent,
   IconButton,
   Typography,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 // Local Imports
 
 import LAMP, { Participant as ParticipantObj } from "lamp-core"

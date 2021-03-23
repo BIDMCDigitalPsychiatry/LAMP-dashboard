@@ -1,7 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Typography, Icon, IconButton, Checkbox, Grid } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Box, Typography, Icon, IconButton, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
 import { Service } from "../../../DBService/DBService"
 import ConfirmationDialog from "./ConfirmationDialog"
 import UpdateSensor from "../../SensorsList/UpdateSensor"

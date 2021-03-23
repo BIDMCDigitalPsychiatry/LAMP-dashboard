@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { Service } from "../../DBService/DBService"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"

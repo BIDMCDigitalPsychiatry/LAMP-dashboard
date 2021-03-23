@@ -14,13 +14,16 @@ import {
   DialogContent,
   DialogActions,
   DialogProps,
+  makeStyles,
+  Theme,
+  createStyles,
+  createMuiTheme,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
 import QRCode from "qrcode.react"
 import LAMP from "lamp-core"
 import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 

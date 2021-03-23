@@ -16,11 +16,11 @@ import {
   Backdrop,
   CircularProgress,
   Typography,
+  makeStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
-import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import { fetchPostData, fetchResult } from "../SaveResearcherData"

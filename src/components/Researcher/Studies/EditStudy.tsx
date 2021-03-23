@@ -1,7 +1,6 @@
 import React, { useState } from "react"
-import { Box, Fab, Icon } from "@material-ui/core"
+import { Box, Fab, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import EditStudyField from "./EditStudyField"
 import { useTranslation } from "react-i18next"
 

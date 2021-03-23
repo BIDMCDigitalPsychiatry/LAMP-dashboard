@@ -1,7 +1,6 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Icon, IconButton, Tooltip, Typography, Divider } from "@material-ui/core"
-import { blue } from "@material-ui/core/colors"
+import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@material-ui/core"
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
@@ -109,7 +108,7 @@ export default function ActivityCard({
             <Sparkline
               minWidth={48}
               minHeight={48}
-              color={blue[500]}
+              color={colors.blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
                 y: strategies[activity.spec]
@@ -152,7 +151,7 @@ export default function ActivityCard({
           minHeight={350}
           XAxisLabel={t("Time")}
           YAxisLabel={t("Score")}
-          color={blue[500]}
+          color={colors.blue[500]}
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),

@@ -1,8 +1,18 @@
 import React, { useState } from "react"
-import { Box, Icon, Button, Fab, Dialog, DialogContent, DialogActions } from "@material-ui/core"
+import {
+  Box,
+  Icon,
+  Button,
+  Fab,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  makeStyles,
+  Theme,
+  createStyles,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 

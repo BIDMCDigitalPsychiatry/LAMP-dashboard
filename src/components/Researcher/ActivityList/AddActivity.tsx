@@ -11,11 +11,13 @@ import {
   Fab,
   Typography,
   Popover,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { availableActivitySpecs } from "./Index"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import ImportActivity from "./ImportActivity"
 import Activity from "./Activity"

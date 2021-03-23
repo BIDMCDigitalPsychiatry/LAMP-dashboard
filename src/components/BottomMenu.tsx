@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
 import {
   Box,
   Icon,
@@ -10,13 +9,17 @@ import {
   IconButton,
   Typography,
   ClickAwayListener,
+  makeStyles,
+  Theme,
+  createStyles,
+  withStyles,
+  Tooltip,
 } from "@material-ui/core"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
-import Tooltip from "@material-ui/core/Tooltip"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 

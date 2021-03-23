@@ -14,6 +14,7 @@ import {
   makeStyles,
   createStyles,
   Link,
+  Theme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
@@ -24,7 +25,6 @@ import { Service } from "./DBService/DBService"
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
-import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>

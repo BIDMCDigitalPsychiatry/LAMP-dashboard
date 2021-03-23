@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-
 import {
   Card,
   Icon,
@@ -20,7 +18,10 @@ import {
   DialogActions,
   DialogContent,
   Button,
-} from "@material-ui/core/"
+  makeStyles,
+  Theme,
+  createStyles,
+} from "@material-ui/core"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 

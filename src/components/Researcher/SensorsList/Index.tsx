@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Icon, Backdrop, CircularProgress } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Grid, Icon, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import SensorListItem from "./SensorListItem"

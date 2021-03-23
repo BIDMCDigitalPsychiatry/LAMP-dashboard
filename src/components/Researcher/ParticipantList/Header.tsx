@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { Box, Typography } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"

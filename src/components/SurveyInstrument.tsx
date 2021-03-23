@@ -33,8 +33,9 @@ import {
   Backdrop,
   CircularProgress,
   InputBase,
+  Checkbox,
+  CheckboxProps,
 } from "@material-ui/core"
-import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"

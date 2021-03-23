@@ -17,14 +17,15 @@ import {
   DialogActions,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
 } from "@material-ui/core"
-import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LearnTips from "./LearnTips"
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 

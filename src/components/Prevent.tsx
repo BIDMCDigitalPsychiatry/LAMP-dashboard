@@ -18,11 +18,13 @@ import {
   Link,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,

@@ -22,10 +22,12 @@ import {
   Typography,
   Popover,
   Select,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import LAMP, { Study } from "lamp-core"

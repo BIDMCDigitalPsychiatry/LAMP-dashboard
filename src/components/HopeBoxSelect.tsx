@@ -1,7 +1,4 @@
 import React, { useState } from "react"
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
-import GridList from "@material-ui/core/GridList"
-import GridListTile from "@material-ui/core/GridListTile"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
 import { ReactComponent as Saved } from "../icons/Saved.svg"
 import {
@@ -16,6 +13,11 @@ import {
   Dialog,
   DialogContent,
   Button,
+  Theme,
+  createStyles,
+  makeStyles,
+  GridList,
+  GridListTile,
 } from "@material-ui/core"
 
 import ImageUploader from "react-images-upload"

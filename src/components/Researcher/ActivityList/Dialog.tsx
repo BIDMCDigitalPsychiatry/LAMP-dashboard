@@ -1,12 +1,17 @@
 import React from "react"
-import { Box, TextField } from "@material-ui/core"
-import { makeStyles, withStyles, createStyles } from "@material-ui/core/styles"
-import InputBase from "@material-ui/core/InputBase"
-import Dialog from "@material-ui/core/Dialog"
-import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
+import {
+  Box,
+  TextField,
+  makeStyles,
+  withStyles,
+  createStyles,
+  Button,
+  InputBase,
+  Dialog,
+  Typography,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import Autocomplete from "@material-ui/lab/Autocomplete"
+import { Autocomplete } from "@material-ui/lab"
 
 const CssTextField = withStyles({
   root: {

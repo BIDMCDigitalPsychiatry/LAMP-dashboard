@@ -8,6 +8,9 @@ import {
   Container,
   useMediaQuery,
   useTheme,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -18,7 +21,6 @@ import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"

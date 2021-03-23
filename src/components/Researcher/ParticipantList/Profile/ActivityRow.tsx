@@ -1,7 +1,6 @@
 // Core Imports
 import React from "react"
-import { Box, Typography, Grid, Checkbox } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Box, Typography, Grid, Checkbox, makeStyles, createStyles } from "@material-ui/core"
 import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
 import ScheduleActivity from "../../ActivityList/ScheduleActivity"

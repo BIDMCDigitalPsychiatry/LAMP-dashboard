@@ -1,6 +1,5 @@
 import React, { useState } from "react"
-import { Link, Icon, Box, Dialog, DialogContent } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Link, Icon, Box, Dialog, DialogContent, makeStyles, createStyles } from "@material-ui/core"
 import { CredentialManager, CredentialEditor, updateDetails } from "../../../CredentialManager"
 
 const useStyles = makeStyles((theme) =>

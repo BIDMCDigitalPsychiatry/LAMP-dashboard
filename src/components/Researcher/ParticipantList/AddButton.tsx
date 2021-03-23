@@ -11,10 +11,12 @@ import {
   Fab,
   Typography,
   Popover,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import AddUser from "./AddUser"
 import StudyCreator from "./StudyCreator"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"

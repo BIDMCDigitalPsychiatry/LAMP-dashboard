@@ -1,6 +1,5 @@
 import React from "react"
-import { Box, Grid, Tooltip, Fab, Dialog } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Box, Grid, Tooltip, Fab, Dialog, makeStyles, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Message } from "../../../../icons/Message.svg"
 import Messages from "../../../Messages"

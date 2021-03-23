@@ -1,9 +1,20 @@
 import React, { useState } from "react"
-import { Box, IconButton, Icon, AppBar, Toolbar, Divider, Fab, Typography } from "@material-ui/core"
+import {
+  Box,
+  IconButton,
+  Icon,
+  AppBar,
+  Toolbar,
+  Divider,
+  Fab,
+  Typography,
+  makeStyles,
+  Theme,
+  createStyles,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import ResponsiveDialog from "../../ResponsiveDialog"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import Activity from "./Activity"
 import { updateActivityData, addActivity, spliceActivity } from "./ActivityMethods"

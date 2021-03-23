@@ -16,8 +16,11 @@ import {
   Tooltip,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
 } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import JournalImg from "../icons/Journal.svg"
@@ -31,7 +34,6 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"

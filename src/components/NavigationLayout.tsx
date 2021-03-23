@@ -24,6 +24,9 @@ import {
   Popover,
   Divider,
   Fab,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 
 // Local Imports
@@ -31,7 +34,6 @@ import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
 import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"

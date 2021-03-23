@@ -14,12 +14,12 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
+  TextareaAutosize,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import useInterval from "./useInterval"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import TextareaAutosize from "@material-ui/core/TextareaAutosize"
 
 const useStyles = makeStyles((theme) => ({
   conversationStyle: {
