@@ -1,10 +1,7 @@
 import React, { useEffect } from "react"
-import { Box, Typography, Card, CardHeader, CardActions } from "@material-ui/core"
+import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import ScheduleActivity from "./ScheduleActivity"
-import UpdateActivity from "./UpdateActivity"
-import Checkbox from "@material-ui/core/Checkbox"
-import { updateSchedule } from "./ActivityMethods"
+import Credentials from "../Credentials"
 import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,9 +27,20 @@ const useStyles = makeStyles((theme: Theme) =>
       "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
     },
     checkboxActive: { color: "#7599FF !important" },
+    btnWhite: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
-export default function ResearcherRow({ researcher, ...props }) {
+export default function ResearcherRow({ history, researcher, ...props }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
 
@@ -45,26 +53,53 @@ export default function ResearcherRow({ researcher, ...props }) {
     <Card className={classes.cardMain}>
       <Box display="flex" p={1}>
         <Box flexGrow={1}>
-          {/* <CardHeader
+          <CardHeader
             className={classes.activityHeader}
-            title={activity.name}
-            subheader={
-              <Box>
-                <Typography variant="subtitle1">{activity.spec?.replace("lamp.", "")}</Typography>
-                <Typography variant="body2">{activity.study_name}</Typography>
-              </Box>
-            }
-          /> */}
+            title={researcher.name}
+            // subheader={
+            //   <Box>
+            //     <Typography variant="subtitle1">{activity.spec?.replace("lamp.", "")}</Typography>
+            //     <Typography variant="body2">{activity.study_name}</Typography>
+            //   </Box>
+            // }
+          />
         </Box>
         <Box>
           <CardActions>
-            {/* <UpdateActivity
-              activity={activity}
-              activities={activities}
+            <Credentials user={researcher} />
+            {/* <PatientProfile
+              participant={participant}
               studies={studies}
-              setActivities={setActivities}
-            />
-            <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} /> */}
+              onClose={updateParticipant}
+              setUpdateCount={setUpdateCount}
+            /> */}
+            <Fab
+              size="small"
+              classes={{ root: classes.btnWhite }}
+              onClick={() => {
+                //onParticipantSelect(participant.id)
+              }}
+            >
+              <Icon>edit</Icon>
+            </Fab>
+            <Fab
+              size="small"
+              classes={{ root: classes.btnWhite }}
+              onClick={() => {
+                //onParticipantSelect(participant.id)
+              }}
+            >
+              <Icon>delete</Icon>
+            </Fab>
+            <Fab
+              size="small"
+              classes={{ root: classes.btnWhite }}
+              onClick={() => {
+                history.push(`/researcher/${researcher.id}`)
+              }}
+            >
+              <Icon>arrow_forward</Icon>
+            </Fab>
           </CardActions>
         </Box>
       </Box>

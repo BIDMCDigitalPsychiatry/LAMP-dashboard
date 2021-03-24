@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Box, MenuItem, Fab, Icon, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core"
-import { CredentialManager } from "../../CredentialManager"
-import ResponsiveDialog from "../../ResponsiveDialog"
+import { CredentialManager } from "./CredentialManager"
+import ResponsiveDialog from "./ResponsiveDialog"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -24,13 +24,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Credentials({ participant, ...props }) {
+export default function Credentials({ user, ...props }) {
   const classes = useStyles()
   const [openPasswordReset, setOpenPasswordReset] = useState(null)
   const { t } = useTranslation()
   return (
     <Box>
-      <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => setOpenPasswordReset(participant.id)}>
+      <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => setOpenPasswordReset(user.id)}>
         <Icon>vpn_key</Icon>
       </Fab>
       <ResponsiveDialog transient open={!!openPasswordReset} onClose={() => setOpenPasswordReset(undefined)}>

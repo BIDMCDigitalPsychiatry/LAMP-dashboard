@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Dialog, DialogContent, Grid } from "@material-ui/core"
+import { Box, Dialog, DialogContent, Grid, Icon } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
@@ -201,6 +201,9 @@ const useStyles = makeStyles((theme: Theme) =>
         cursor: "pointer !important",
       },
     },
+    norecords: {
+      "& span": { marginRight: 5 },
+    },
   })
 )
 export default function Researchers({ history, researchers, ...props }) {
@@ -233,37 +236,41 @@ export default function Researchers({ history, researchers, ...props }) {
     i18n.changeLanguage(language)
   }, [])
 
+  const handleChangePage = (page: number, rowCount: number) => {
+    setPaginatedResearchers(researchers.slice(page, rowCount))
+  }
+
   return (
     <React.Fragment>
-      <MuiThemeProvider theme={theme}>
-        <Box className={classes.tableContainer}>
-          <Grid container spacing={3}>
-            {researchers.length > 0 ? (
-              <Grid container spacing={3}>
-                {(paginatedResearchers ?? []).map((item, index) => (
-                  <Grid item lg={6} xs={12} key={item.id}>
-                    <ResearcherRow
-                      researcher={item}
-                      // studies={studies}
-                      // handleSelectionChange={handleChange}
-                      // selectedSensors={selectedSensors}
-                      // setSensors={searchFilterSensors}
-                    />
-                  </Grid>
-                ))}
-                <Pagination data={researchers} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
-              </Grid>
-            ) : (
-              <Grid item lg={6} xs={12}>
-                <Box display="flex" alignItems="center" className={classes.norecords}>
-                  <Icon>info</Icon>
-                  {t("No Records Found")}
-                </Box>
-              </Grid>
-            )}
-          </Grid>
+      <Box className={classes.tableContainer}>
+        <Grid container spacing={3}>
+          {researchers.length > 0 ? (
+            <Grid container spacing={3}>
+              {(paginatedResearchers ?? []).map((item, index) => (
+                <Grid item lg={6} xs={12} key={item.id}>
+                  <ResearcherRow
+                    researcher={item}
+                    history={history}
+                    // studies={studies}
+                    // handleSelectionChange={handleChange}
+                    // selectedSensors={selectedSensors}
+                    // setSensors={searchFilterSensors}
+                  />
+                </Grid>
+              ))}
+              <Pagination data={researchers} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+            </Grid>
+          ) : (
+            <Grid item lg={6} xs={12}>
+              <Box display="flex" alignItems="center" className={classes.norecords}>
+                <Icon>info</Icon>
+                {t("No Records Found")}
+              </Box>
+            </Grid>
+          )}
+        </Grid>
 
-          {/* <MaterialTable
+        {/* <MaterialTable
             title={t("Researchers")}
             data={researchers}
             columns={[{ title: t("Name"), field: "name" }]}
@@ -347,13 +354,7 @@ export default function Researchers({ history, researchers, ...props }) {
               ),
             }}
           /> */}
-        </Box>
-      </MuiThemeProvider>
-      <Dialog open={!!passwordChange} onClose={() => setPasswordChange(undefined)}>
-        <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={passwordChange} />
-        </DialogContent>
-      </Dialog>
+      </Box>
     </React.Fragment>
   )
 }
