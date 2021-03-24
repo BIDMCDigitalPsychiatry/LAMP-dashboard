@@ -5,7 +5,7 @@ import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
 import { useTranslation } from "react-i18next"
-import SearchBox from "../SearchBox"
+import SearchBox from "../../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

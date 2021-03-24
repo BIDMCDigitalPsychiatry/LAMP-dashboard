@@ -242,6 +242,7 @@ export default function Researchers({ history, researchers, ...props }) {
 
   return (
     <React.Fragment>
+      <Header researchers={researchers} searchData={(data) => setSearch(data)} />
       <Box className={classes.tableContainer}>
         <Grid container spacing={3}>
           {researchers.length > 0 ? (
