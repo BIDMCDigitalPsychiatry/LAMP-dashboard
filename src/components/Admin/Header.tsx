@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles, Fab } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
 import SearchBox from "../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -57,14 +57,8 @@ export default function Header({ researchers, searchData, ...props }) {
         </Box>
         <SearchBox searchData={searchData} />
         <Box>
-          <Fab
-            size="small"
-            classes={{ root: classes.btnWhite }}
-            onClick={() => {
-              history.push(`/researcher/${researcher.id}`)
-            }}
-          >
-            <Icon>arrow_forward</Icon>
+          <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => {}}>
+            <Icon>add</Icon>
           </Fab>
         </Box>
       </Box>

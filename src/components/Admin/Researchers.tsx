@@ -9,6 +9,7 @@ import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } fro
 import locale_lang from "../../locale_map.json"
 import Pagination from "../PaginatedElement"
 import ResearcherRow from "./ResearcherRow"
+import Header from "./Header"
 
 const theme = createMuiTheme({
   palette: {

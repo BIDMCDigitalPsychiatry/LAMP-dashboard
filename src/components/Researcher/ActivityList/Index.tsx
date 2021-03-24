@@ -112,7 +112,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
       selectedStudies.map((study) => {
         Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
           if ((activitiesData || []).length > 0) {
-            console.log(activitiesData)
             if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(activitiesData)
               result = result.filter((i) => i.name.toLowerCase()?.includes(searchTxt.toLowerCase()))
@@ -121,7 +120,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
-            console.log(result)
             setPaginatedActivities(result.slice(page, rowCount))
           } else {
             if (result.length === 0) setActivities([])
