@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
+import { blue, red } from "@material-ui/core/colors"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
@@ -9,7 +10,7 @@ import DateFnsUtils from "@date-io/date-fns"
 import LAMP from "lamp-core"
 import Login from "./Login"
 import Messages from "./Messages"
-import Root from "./Root"
+import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
@@ -530,10 +531,8 @@ export default function App({ ...props }) {
             fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },
           palette: {
-            primary: colors.blue,
-            secondary: {
-              main: "#333",
-            },
+            primary: blue,
+            secondary: red,
             background: {
               default: "#fff",
             },
@@ -544,38 +543,6 @@ export default function App({ ...props }) {
                 letterSpacing: `0.1em`,
                 textTransform: "uppercase",
               },
-            },
-            MuiFilledInput: {
-              root: {
-                border: 0,
-                backgroundColor: "#f4f4f4",
-              },
-              underline: {
-                "&&&:before": {
-                  borderBottom: "none",
-                },
-                "&&:after": {
-                  borderBottom: "none",
-                },
-              },
-            },
-            MuiTextField: {
-              root: { width: "100%" },
-            },
-            MuiTableCell: {
-              root: {
-                borderBottom: "#fff solid 1px",
-                padding: 10,
-              },
-            },
-            MuiTypography: {
-              h6: { fontSize: 16, fontWeight: 600 },
-            },
-            MuiDivider: {
-              root: { margin: "25px 0" },
-            },
-            MuiStepper: {
-              root: { paddingLeft: 8 },
             },
           },
         })}
