@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme } from "@material-ui/core"
-import { blue, red } from "@material-ui/core/colors"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
@@ -531,8 +530,10 @@ export default function App({ ...props }) {
             fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },
           palette: {
-            primary: blue,
-            secondary: red,
+            primary: colors.blue,
+            secondary: {
+              main: "#333",
+            },
             background: {
               default: "#fff",
             },
@@ -543,6 +544,38 @@ export default function App({ ...props }) {
                 letterSpacing: `0.1em`,
                 textTransform: "uppercase",
               },
+            },
+            MuiFilledInput: {
+              root: {
+                border: 0,
+                backgroundColor: "#f4f4f4",
+              },
+              underline: {
+                "&&&:before": {
+                  borderBottom: "none",
+                },
+                "&&:after": {
+                  borderBottom: "none",
+                },
+              },
+            },
+            MuiTextField: {
+              root: { width: "100%" },
+            },
+            MuiTableCell: {
+              root: {
+                borderBottom: "#fff solid 1px",
+                padding: 10,
+              },
+            },
+            MuiTypography: {
+              h6: { fontSize: 16, fontWeight: 600 },
+            },
+            MuiDivider: {
+              root: { margin: "25px 0" },
+            },
+            MuiStepper: {
+              root: { paddingLeft: 8 },
             },
           },
         })}

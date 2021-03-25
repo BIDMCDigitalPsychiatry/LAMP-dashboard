@@ -20,6 +20,7 @@ import Activity from "./Activity"
 import { updateActivityData, addActivity, spliceActivity } from "./ActivityMethods"
 import { games } from "./Index"
 import { Service } from "../../DBService/DBService"
+import ConfirmationDialog from "../../ConfirmationDialog"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,12 +53,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function UpdateActivity({ activity, activities, studies, setActivities, ...props }) {
+export default function UpdateActivity({ activity, activities, studies, setActivities, profile, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [gameDetails, setGameDetails] = useState(null)
   const [selectedActivity, setSelectedActivity] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
+  const [confirmationDialog, setConfirmationDialog] = useState(0)
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
@@ -111,13 +113,40 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       )[0]
       setGameDetails(tag)
     }
+    setConfirmationDialog(0)
     setSelectedActivity(activity)
   }
+
+  const confirmAction = (status: string) => {
+    if (status === "Yes") {
+      modifyActivity()
+    }
+    setConfirmationDialog(0)
+  }
+
   return (
     <span>
-      <Fab size="small" color="primary" classes={{ root: classes.btnWhite }} onClick={(event) => modifyActivity()}>
+      <Fab
+        size="small"
+        color="primary"
+        classes={{ root: classes.btnWhite }}
+        onClick={(event) => {
+          !!profile ? setConfirmationDialog(3) : modifyActivity()
+        }}
+      >
         <Icon>mode_edit</Icon>
       </Fab>
+      <ConfirmationDialog
+        confirmationDialog={confirmationDialog}
+        open={confirmationDialog > 0 ? true : false}
+        onClose={() => setConfirmationDialog(0)}
+        confirmAction={confirmAction}
+        confirmationMsg={
+          !!profile
+            ? "Changes done to this activity will reflect for all the participants under the study. Are you sure you want to proceed?."
+            : ""
+        }
+      />
       <ResponsiveDialog
         fullScreen
         transient={false}

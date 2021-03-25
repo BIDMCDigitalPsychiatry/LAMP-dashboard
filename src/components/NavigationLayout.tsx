@@ -32,7 +32,6 @@ import {
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as Message } from "../icons/Message.svg"
 import { ReactComponent as User } from "../icons/User.svg"
 import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -465,7 +464,7 @@ export default function NavigationLayout({
                           setOpenMessages(true)
                         }}
                       >
-                        <Message />
+                        <Icon>comment</Icon>
                       </Badge>
                     </Tooltip>
                   ) : (

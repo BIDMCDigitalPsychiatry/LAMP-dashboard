@@ -3,7 +3,8 @@ import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
 import LAMP from "lamp-core"
-
+import DeleteResearcher from "./DeleteResearcher"
+import AddUpdateResearcher from "./AddUpdateResearcher"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     tableContainer: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme: Theme) =>
         "& button": { display: "none" },
       },
     },
-    activityHeader: { padding: "12px 5px" },
+    activityHeader: { padding: "20px 5px 20px 15px" },
     cardMain: {
       boxShadow: "none !important ",
       background: "#F8F8F8",
@@ -40,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function ResearcherRow({ history, researcher, ...props }) {
+export default function ResearcherRow({ history, researcher, refreshResearchers, ...props }) {
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
 
@@ -51,8 +52,8 @@ export default function ResearcherRow({ history, researcher, ...props }) {
 
   return (
     <Card className={classes.cardMain}>
-      <Box display="flex" p={1}>
-        <Box flexGrow={1}>
+      <Box display="flex" alignItems="center">
+        <Box flexGrow={1} py={1}>
           <CardHeader
             className={classes.activityHeader}
             title={researcher.name}
@@ -73,24 +74,8 @@ export default function ResearcherRow({ history, researcher, ...props }) {
               onClose={updateParticipant}
               setUpdateCount={setUpdateCount}
             /> */}
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                //onParticipantSelect(participant.id)
-              }}
-            >
-              <Icon>edit</Icon>
-            </Fab>
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                //onParticipantSelect(participant.id)
-              }}
-            >
-              <Icon>delete</Icon>
-            </Fab>
+            <AddUpdateResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+            <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}

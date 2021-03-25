@@ -1,10 +1,15 @@
 import React, { useState } from "react"
 import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
 import SearchBox from "../SearchBox"
+import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
+import { useTranslation } from "react-i18next"
+import AddUpdateResearcher from "./AddUpdateResearcher"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     header: {
+      position: "relative",
       "& h5": {
         fontSize: "30px",
         fontWeight: "bold",
@@ -36,32 +41,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Header({ researchers, searchData, ...props }) {
+export default function Header({ researchers, searchData, refreshResearchers, ...props }) {
   const classes = useStyles()
-  const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [updateCount, updateStudyCount] = useState(0)
-
-  const setUpdateCount = (type: number) => {
-    updateStudyCount(type)
-  }
-
-  const handleShowFilterStudies = (data) => {
-    setShowFilterStudies(data)
-  }
+  const { t, i18n } = useTranslation()
 
   return (
-    <Box>
-      <Box display="flex" className={classes.header}>
-        <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">Researchers</Typography>
-        </Box>
-        <SearchBox searchData={searchData} />
-        <Box>
-          <Fab size="small" classes={{ root: classes.btnWhite }} onClick={() => {}}>
-            <Icon>add</Icon>
-          </Fab>
-        </Box>
+    <Box display="flex" alignItems="center" className={classes.header}>
+      <Box flexGrow={1}>
+        <Typography variant="h5">{t("Researchers")}</Typography>
       </Box>
+      <SearchBox searchData={searchData} />
+      <AddUpdateResearcher refreshResearchers={refreshResearchers} />
     </Box>
   )
 }

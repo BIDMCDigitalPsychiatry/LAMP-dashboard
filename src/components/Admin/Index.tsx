@@ -114,7 +114,6 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function Root({ ...props }) {
-  const [researchers, setResearchers] = useState([])
   const { t, i18n } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -129,7 +128,6 @@ export default function Root({ ...props }) {
   useEffect(() => {
     if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
-    LAMP.Researcher.all().then(setResearchers)
   }, [])
 
   useEffect(() => {
@@ -173,7 +171,7 @@ export default function Root({ ...props }) {
               </ListItem>
             </List>
           </Drawer>
-          {currentTab === 0 && <Researchers history={props.history} researchers={researchers} />}
+          {currentTab === 0 && <Researchers history={props.history} />}
         </ResponsivePaper>
       </Container>
     </Container>

@@ -1,8 +1,9 @@
 import React, { useState } from "react"
-import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Backdrop, CircularProgress } from "@material-ui/core"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
-import TipCreator from "./TipCreator"
+import Tips from "./Tips"
 import GameCreator from "./GameCreator"
 import JournalCreator from "./JournalCreator"
 import BreatheCreator from "./BreatheCreator"
@@ -173,9 +174,9 @@ export default function Activity({
         />
       )}
       {isTip && (
-        <TipCreator
+        <Tips
           activities={activity}
-          onSave={activitySpecId ? saveTipsActivity : updateActivity}
+          onSave={activity && activity.id ? updateActivity : saveTipsActivity}
           studies={studies}
           allActivities={allActivities}
           study={studyId ?? activity?.study_id ?? null}

@@ -119,6 +119,7 @@ export default function PatientProfile({
             activities={selectedActivities}
             setActivities={onChangeActivities}
             setUpdateCount={setUpdateCount}
+            profile={true}
           />
         </Box>
       )}

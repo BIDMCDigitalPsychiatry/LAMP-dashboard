@@ -65,18 +65,20 @@ export default function ScheduleActivity({ activity, activities, setActivities, 
         <Icon>calendar_today</Icon>
       </Fab>
       <Dialog
+        fullWidth
+        maxWidth="md"
         open={showScheduler}
         onClose={() => setShowScheduler(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogContent>
-          <Box>
+          <Box textAlign="right">
             <IconButton onClick={() => setShowScheduler(false)}>
               <Icon>close</Icon>
             </IconButton>
-            <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
           </Box>
+          <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
         </DialogContent>
       </Dialog>
     </span>

@@ -141,32 +141,6 @@ const schemaList: any = {
             default: true,
             "ui:widget": "radio",
           },
-          tips: {
-            title: "Tips",
-            type: "array",
-            items: {
-              type: "object",
-              required: ["title", "content"],
-              minItems: 1,
-              properties: {
-                title: {
-                  title: "Tip Title",
-                  type: "string",
-                  minLength: 1,
-                },
-                content: {
-                  title: "Tip Content",
-                  description: "The tip content supports extended GitHub-flavored Markdown formatting.",
-                  type: "string",
-                  minLength: 1,
-                  "ui:widget": "textarea",
-                  "ui:options": {
-                    rows: 15,
-                  },
-                },
-              },
-            },
-          },
         },
       },
     },

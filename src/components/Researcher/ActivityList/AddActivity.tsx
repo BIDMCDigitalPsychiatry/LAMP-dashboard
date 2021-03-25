@@ -96,6 +96,9 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
+    dividerMain: {
+      margin: 0,
+    },
   })
 )
 
@@ -241,16 +244,29 @@ export default function AddActivity({
             <Typography variant="h5">{t("Create a new activity")}</Typography>
           </Toolbar>
         </AppBar>
-        <Divider />
+        <Divider className={classes.dividerMain} />
         <Box py={8} px={4}>
-          {!!showActivityImport && <ImportActivity studies={studies} activitieas={activities} />}
+          {!!showActivityImport && (
+            <ImportActivity
+              studies={studies}
+              activitieas={activities}
+              setActivities={setActivities}
+              onClose={() => {
+                setShowActivityImport(false)
+                setCreate(false)
+              }}
+            />
+          )}
           {!!createMenu && (
             <Activity
               allActivities={activities}
               studyId={studyId ?? undefined}
               activitySpecId={activitySpecId}
               studies={studies}
-              onClose={() => setCreate(false)}
+              onClose={() => {
+                setCreateMenu(false)
+                setCreate(false)
+              }}
               setActivities={setActivities}
               setUpdateCount={setUpdateCount}
             />

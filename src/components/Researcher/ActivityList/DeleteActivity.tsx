@@ -4,7 +4,7 @@ import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import ResponsiveDialog from "../../ResponsiveDialog"
-import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
+import ConfirmationDialog from "../../ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -34,11 +34,13 @@ export default function DeleteActivity({
   activities,
   setActivities,
   setUpdateCount,
+  profile,
   ...props
 }: {
   activities: any
   setActivities?: Function
   setUpdateCount?: Function
+  profile?: boolean
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
@@ -85,6 +87,11 @@ export default function DeleteActivity({
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
+        confirmationMsg={
+          !!profile
+            ? "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?."
+            : "Are you sure you want to delete this activity(s)?."
+        }
       />
     </span>
   )

@@ -222,6 +222,7 @@ export default function Breathe({ participant, activity, ...props }) {
   const videoLoaded = () => {
     setIsLoading(false)
     setStarted(!started)
+    setTime(new Date().getTime())
     setProgressUpdate()
   }
   const setProgressUpdate = () => {

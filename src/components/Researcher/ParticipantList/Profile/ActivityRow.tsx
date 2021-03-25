@@ -85,7 +85,13 @@ export default function ActivityRow({
           </Typography>
         </Grid>
         <Grid item className={classes.w120}>
-          <UpdateActivity activity={activity} activities={activities} studies={studies} setActivities={setActivities} />
+          <UpdateActivity
+            activity={activity}
+            activities={activities}
+            studies={studies}
+            setActivities={setActivities}
+            profile={true}
+          />
           <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
         </Grid>
       </Grid>
