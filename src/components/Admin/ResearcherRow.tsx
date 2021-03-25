@@ -45,36 +45,16 @@ export default function ResearcherRow({ history, researcher, refreshResearchers,
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
 
-  // const handleChange = (activity, event: React.ChangeEvent<HTMLInputElement>) => {
-  //   setChecked(event.target.checked)
-  //   handleSelectionChange(activity, event.target.checked)
-  // }
-
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" alignItems="center">
         <Box flexGrow={1} py={1}>
-          <CardHeader
-            className={classes.activityHeader}
-            title={researcher.name}
-            // subheader={
-            //   <Box>
-            //     <Typography variant="subtitle1">{activity.spec?.replace("lamp.", "")}</Typography>
-            //     <Typography variant="body2">{activity.study_name}</Typography>
-            //   </Box>
-            // }
-          />
+          <CardHeader className={classes.activityHeader} title={researcher.name} />
         </Box>
         <Box>
           <CardActions>
             <Credentials user={researcher} />
-            {/* <PatientProfile
-              participant={participant}
-              studies={studies}
-              onClose={updateParticipant}
-              setUpdateCount={setUpdateCount}
-            /> */}
-            <AddUpdateResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+            s <AddUpdateResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <Fab
               size="small"
