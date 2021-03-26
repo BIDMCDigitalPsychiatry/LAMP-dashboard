@@ -18,8 +18,6 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
@@ -74,7 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
       border: "#7599FF solid 1px",
       background: "transparent",
       margin: "15px 0",
-      "& svg": { marginRight: 5, color: "#7599FF" },
+      "& span.material-icons": { marginRight: 5, color: "#7599FF" },
     },
     btnTextAdd: {
       color: "#333",
@@ -343,7 +341,7 @@ export default function TipDetails({
                   }}
                   disabled={!category || !studyId ? true : false}
                 >
-                  <AddIcon /> {t("Add")}
+                  <Icon>add</Icon> {t("Add")}
                 </Fab>
               </Grid>
             </Grid>
@@ -465,7 +463,7 @@ export default function TipDetails({
                                   setClickDeleteId(idx)
                                 }}
                               >
-                                <DeleteIcon /> {t("Delete")}
+                                <Icon>delete</Icon> {t("Delete")}
                               </Fab>
                             </Tooltip>
                           </Box>

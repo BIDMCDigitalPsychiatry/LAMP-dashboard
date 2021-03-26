@@ -320,8 +320,8 @@ export default function ImportActivity({ studies, setActivities, onClose, ...pro
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       ) {
-        setImportFile(obj)
         setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
+        setImportFile(obj)
       } else {
         enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
       }
@@ -404,7 +404,7 @@ export default function ImportActivity({ studies, setActivities, onClose, ...pro
               <Box>{activity.name}</Box>
             </Box>
           ))}
-          <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} />
+          <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
         </DialogContent>
         <DialogActions>
           <Box p={2} pt={1}>

@@ -51,7 +51,7 @@ export default function Header({ researchers, searchData, refreshResearchers, ..
         <Typography variant="h5">{t("Researchers")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      <AddUpdateResearcher refreshResearchers={refreshResearchers} />
+      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} />
     </Box>
   )
 }

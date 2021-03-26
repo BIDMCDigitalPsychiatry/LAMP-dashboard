@@ -147,7 +147,7 @@ export default function AddActivity({
     })
   }, [])
   return (
-    <Box pl={3}>
+    <Box>
       <Fab
         variant="extended"
         color="primary"

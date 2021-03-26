@@ -120,7 +120,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedActivities(result.slice(page, rowCount))
+            setPaginatedActivities(result.slice(0, rowCount))
+            setPage(0)
           } else {
             if (result.length === 0) setActivities([])
           }

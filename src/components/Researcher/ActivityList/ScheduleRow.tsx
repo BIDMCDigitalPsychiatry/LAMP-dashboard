@@ -9,10 +9,20 @@ import {
   Button,
   FormControl,
   FormHelperText,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    datePicker: {
+      "& div": { paddingRight: 0, maxWidth: 175 },
+    },
+  })
+)
 
 const manyDates = (items) =>
   items?.length > 0
@@ -32,6 +42,7 @@ export default function ScheduleRow({
   index: number
   updateActivitySchedule: Function
 }) {
+  const classes = useStyles()
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
   const { t } = useTranslation()
   const [data, setData] = useState(scheduleRow)
@@ -57,7 +68,7 @@ export default function ScheduleRow({
           <span>{new Date(data.start_date).toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
         ) : (
           <KeyboardDatePicker
-            style={{ maxWidth: 175 }}
+            className={classes.datePicker}
             size="small"
             autoOk
             animateYearScrolling
@@ -77,7 +88,7 @@ export default function ScheduleRow({
           <span>{new Date(data.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
         ) : (
           <KeyboardTimePicker
-            style={{ maxWidth: 175 }}
+            className={classes.datePicker}
             size="small"
             autoOk
             variant="inline"
@@ -152,7 +163,9 @@ export default function ScheduleRow({
             <Icon>delete</Icon>
           </IconButton>
         ) : (
-          <IconButton onClick={() => setEdit(false)}>
+          <IconButton
+            onClick={() => (!!scheduleRow.start_date ? setEdit(false) : updateActivitySchedule(null, index, "delete"))}
+          >
             <Icon>close</Icon>
           </IconButton>
         )}

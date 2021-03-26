@@ -73,10 +73,12 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function AddUpdateResearcher({
   researcher,
+  researchers,
   refreshResearchers,
   ...props
 }: {
   researcher?: any
+  researchers?: any
   refreshResearchers?: Function
 }) {
   const classes = useStyles()
@@ -86,25 +88,35 @@ export default function AddUpdateResearcher({
   const [name, setName] = useState(!!researcher ? researcher.name : "")
 
   const addResearcher = async () => {
-    const researcherObj = new Researcher()
-    researcherObj.name = name
-    if (
+    let duplicates = researchers.filter((x) =>
       !!researcher
-        ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any).error === undefined
-        : ((await LAMP.Researcher.create(researcherObj)) as any).error === undefined
-    ) {
-      enqueueSnackbar(
-        !!researcher ? t("Successfully updated a new Researcher.") : t("Successfully created a new Researcher."),
-        {
-          variant: "success",
-        }
-      )
-      refreshResearchers()
-      setOpen(false)
-    } else
-      enqueueSnackbar(t("Failed to create a new Researcher."), {
-        variant: "error",
-      })
+        ? x.name.toLowerCase() === name?.trim().toLowerCase() && x.id !== researcher?.id
+        : x.name.toLowerCase() === name?.trim().toLowerCase()
+    )
+    if (duplicates.length > 0) {
+      enqueueSnackbar("Researcher with same name already exist.", { variant: "error" })
+    } else {
+      const researcherObj = new Researcher()
+      researcherObj.name = name
+      if (
+        !!researcher
+          ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any).error === undefined
+          : ((await LAMP.Researcher.create(researcherObj)) as any).error === undefined
+      ) {
+        enqueueSnackbar(
+          !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
+          {
+            variant: "success",
+          }
+        )
+        refreshResearchers()
+        setName("")
+        setOpen(false)
+      } else
+        enqueueSnackbar(t("Failed to create a new researcher."), {
+          variant: "error",
+        })
+    }
   }
 
   return (
@@ -128,13 +140,18 @@ export default function AddUpdateResearcher({
             fullWidth
             onChange={(event) => setName(event.target.value)}
             value={name}
+            helperText={typeof name == "undefined" || name === null || name.trim() === "" ? t("Please enter name") : ""}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => addResearcher()} color="primary">
+          <Button
+            onClick={() => addResearcher()}
+            color="primary"
+            disabled={typeof name == "undefined" || name === null || name.trim() === "" ? true : false}
+          >
             {!!researcher ? t("Update") : t("Add")}
           </Button>
         </DialogActions>

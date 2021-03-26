@@ -187,7 +187,8 @@ export default function ParticipantList({
               result = result.concat(participantData)
               setParticipants(sortData(result, selectedData, "id"))
             }
-            setPaginatedParticipants(result.slice(page, rowCount))
+            setPaginatedParticipants(result.slice(0, rowCount))
+            setPage(0)
           } else {
             if (result.length === 0) setParticipants([])
           }

@@ -339,7 +339,7 @@ export default function PatientStudyCreator({
             autoFocus
             fullWidth
             variant="outlined"
-            label={t("Duplicate Study")}
+            label={t("Duplicate from")}
             value={duplicateStudyName}
             onChange={(e) => {
               setDuplicateStudyName(e.target.value)

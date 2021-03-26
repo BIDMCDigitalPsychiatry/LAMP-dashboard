@@ -172,7 +172,7 @@ export default function Researchers({ history, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
-  const [rowCount, setRowCount] = useState(10)
+  const [rowCount, setRowCount] = useState(20)
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
   const classes = useStyles()
@@ -189,16 +189,19 @@ export default function Researchers({ history, ...props }) {
 
   const refreshResearchers = () => {
     LAMP.Researcher.all().then((data) => {
+      if (search.trim().length > 0) {
+        data = data.filter((researcher) => researcher.name.includes(search))
+        setPaginatedResearchers(data.slice(0, rowCount))
+      } else {
+        setPaginatedResearchers(data.slice(0, rowCount))
+      }
+      setPage(0)
       setResearchers(data)
-      setPaginatedResearchers(data.slice(page, rowCount))
     })
   }
 
   useEffect(() => {
-    if (search.trim().length > 0) {
-      let data = researchers.filter((researcher) => researcher.name.includes(search))
-      setPaginatedResearchers(data.slice(page, rowCount))
-    }
+    refreshResearchers()
   }, [search])
 
   useEffect(() => {
@@ -214,7 +217,12 @@ export default function Researchers({ history, ...props }) {
   const handleChangePage = (page: number, rowCount: number) => {
     setPage(page)
     setRowCount(rowCount)
-    setPaginatedResearchers(researchers.slice(page, rowCount))
+    if (search.trim().length > 0) {
+      let data = researchers.filter((researcher) => researcher.name.includes(search))
+      setPaginatedResearchers(data.slice(page, rowCount))
+    } else {
+      setPaginatedResearchers(researchers.slice(page, rowCount))
+    }
   }
 
   return (
@@ -230,10 +238,20 @@ export default function Researchers({ history, ...props }) {
             <Grid container spacing={3}>
               {(paginatedResearchers ?? []).map((item, index) => (
                 <Grid item lg={6} xs={12} key={item.id}>
-                  <ResearcherRow researcher={item} history={history} refreshResearchers={refreshResearchers} />
+                  <ResearcherRow
+                    researcher={item}
+                    history={history}
+                    refreshResearchers={refreshResearchers}
+                    researchers={researchers}
+                  />
                 </Grid>
               ))}
-              <Pagination data={researchers} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+              <Pagination
+                data={researchers}
+                updatePage={handleChangePage}
+                defaultCount={20}
+                rowPerPage={[20, 40, 60, 80]}
+              />
             </Grid>
           ) : (
             <Grid item lg={6} xs={12}>

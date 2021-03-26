@@ -41,9 +41,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function ResearcherRow({ history, researcher, refreshResearchers, ...props }) {
+
+export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, ...props }) {
   const classes = useStyles()
-  const [checked, setChecked] = React.useState(false)
 
   return (
     <Card className={classes.cardMain}>
@@ -54,7 +54,11 @@ export default function ResearcherRow({ history, researcher, refreshResearchers,
         <Box>
           <CardActions>
             <Credentials user={researcher} />
-            s <AddUpdateResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+            <AddUpdateResearcher
+              researcher={researcher}
+              refreshResearchers={refreshResearchers}
+              researchers={researchers}
+            />
             <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <Fab
               size="small"

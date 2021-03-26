@@ -5,10 +5,7 @@ import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import Tips from "./Tips"
 import GameCreator from "./GameCreator"
-import JournalCreator from "./JournalCreator"
-import BreatheCreator from "./BreatheCreator"
 import DBTCreator from "./DBTCreator"
-import SCImageCreator from "./SCImageCreator"
 import {
   saveGroupActivity,
   saveTipActivity,
@@ -192,35 +189,13 @@ export default function Activity({
           details={details ?? null}
         />
       )}
-      {isGames && (
+      {(isGames || isSCImage || isJournal || isBreathe) && (
         <GameCreator
           activities={allActivities}
           value={activity ?? null}
           details={details ?? null}
           onSave={activitySpecId ? saveCTest : updateActivity}
           studies={studies}
-          activitySpecId={activitySpecId ?? activity.spec}
-          study={studyId ?? activity?.study_id ?? null}
-        />
-      )}
-      {isJournal && (
-        <JournalCreator
-          studies={studies}
-          value={activity ?? null}
-          activities={allActivities}
-          details={details ?? null}
-          onSave={activitySpecId ? saveCTest : updateActivity}
-          activitySpecId={activitySpecId ?? activity.spec}
-          study={studyId ?? activity?.study_id ?? null}
-        />
-      )}
-      {isBreathe && (
-        <BreatheCreator
-          onSave={activitySpecId ? saveCTest : updateActivity}
-          studies={studies}
-          value={activity ?? null}
-          details={details}
-          activities={allActivities}
           activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}
         />
@@ -233,17 +208,6 @@ export default function Activity({
           activities={allActivities}
           onCancel={onCancel}
           studies={studies}
-          activitySpecId={activitySpecId ?? activity.spec}
-          study={studyId ?? activity?.study_id ?? null}
-        />
-      )}
-      {isSCImage && (
-        <SCImageCreator
-          onSave={activitySpecId ? saveCTest : updateActivity}
-          studies={studies}
-          value={activity ?? null}
-          details={details}
-          activities={allActivities}
           activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}
         />

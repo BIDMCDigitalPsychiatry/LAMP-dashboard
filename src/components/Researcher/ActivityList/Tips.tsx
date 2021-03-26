@@ -17,7 +17,6 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import TipDetails from "./TipDetails"
