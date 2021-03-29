@@ -90,11 +90,8 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   }
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async () => {
-    const lampAuthId = LAMP.Auth._auth.id
-    if (lampAuthId !== "researcher@demo.lamp.digital") {
-      let data = await LAMP.Activity.view(activity.id)
-      activity.settings = data.settings
-    }
+    let data = await LAMP.Activity.view(activity.id)
+    activity.settings = data.settings
     if (activity.spec === "lamp.survey") {
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
         !!y.error ? undefined : y.data

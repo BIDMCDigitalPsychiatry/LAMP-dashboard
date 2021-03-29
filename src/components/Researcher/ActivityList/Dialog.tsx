@@ -174,7 +174,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
             <CssTextField
               value={target}
               onChange={(event) => setTarget(event.target.value)}
-              inputProps={{ disableunderline: "true" }}
+              inputProps={{ disableunderline: "true", maxLength: 120 }}
               placeholder={t("Behavior name")}
             />
           </div>
@@ -234,7 +234,7 @@ export function EmotionDialog({ ...props }) {
             <CssTextField
               value={emotion}
               onChange={(event) => setEmotion(event.target.value)}
-              inputProps={{ disableunderline: "true" }}
+              inputProps={{ disableunderline: "true", maxLength: 120 }}
               placeholder={t("Emotion name")}
             />
           </div>

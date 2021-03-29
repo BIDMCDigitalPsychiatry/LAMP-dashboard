@@ -38,6 +38,8 @@ const theme = createMuiTheme({
 export default function ActivityFooter({ value, onSave, validate, data, ...props }) {
   const { t } = useTranslation()
   const classes = useStyles()
+  const [saveClicked, setSaveClicked] = useState(false)
+  const [duplicateClicked, setDuplicateClicked] = useState(false)
 
   return (
     <Grid
@@ -57,10 +59,12 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
                 variant="extended"
                 onClick={() => {
                   if (validate()) {
+                    setDuplicateClicked(true)
                     onSave(data, true /* duplicate */)
                   }
                 }}
                 disabled={
+                  duplicateClicked ||
                   !validate() ||
                   !onSave ||
                   (value?.name?.trim() === data?.name?.trim() && value.study_id === data.studyID)
@@ -82,10 +86,11 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
             variant="extended"
             onClick={() => {
               if (validate()) {
+                setSaveClicked(true)
                 onSave(data, false)
               }
             }}
-            disabled={!validate() || !onSave || !data.name}
+            disabled={saveClicked || !validate() || !onSave || !data.name}
           >
             {t("Save")}
             <span style={{ width: 8 }} />

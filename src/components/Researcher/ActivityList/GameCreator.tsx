@@ -101,6 +101,7 @@ export default function GameCreator({
     studyID: !!value ? value.study_id : study,
   })
   const validate = () => {
+    console.log(data.settings)
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
       duplicates = activities.filter(
@@ -122,33 +123,40 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.beginner_seconds > 300 ||
-        settings?.beginner_seconds === 0 ||
-        settings?.beginner_seconds === "" ||
-        settings?.intermediate_seconds > 300 ||
-        settings?.intermediate_seconds === 0 ||
-        settings?.intermediate_seconds === "" ||
-        settings?.advanced_seconds > 300 ||
-        settings?.advanced_seconds === 0 ||
-        settings?.advanced_seconds === "" ||
-        settings?.expert_seconds > 300 ||
-        settings?.expert_seconds === 0 ||
-        settings?.expert_seconds === "" ||
-        settings?.diamond_count > 25 ||
-        settings?.diamond_count === 0 ||
-        settings?.diamond_count === "" ||
-        settings?.bonus_point_count === 0 ||
-        settings?.bonus_point_count === "" ||
-        settings?.shape_count > 4 ||
-        settings?.shape_count === 0 ||
-        settings?.shape_count === "" ||
+        data.settings?.beginner_seconds > 300 ||
+        data.settings?.beginner_seconds === 0 ||
+        data.settings?.beginner_seconds === "" ||
+        typeof data.settings?.beginner_seconds == "undefined" ||
+        data.settings?.intermediate_seconds > 300 ||
+        data.settings?.intermediate_seconds === 0 ||
+        data.settings?.intermediate_seconds === "" ||
+        typeof data.settings?.intermediate_seconds == "undefined" ||
+        data.settings?.advanced_seconds > 300 ||
+        data.settings?.advanced_seconds === 0 ||
+        data.settings?.advanced_seconds === "" ||
+        typeof data.settings?.advanced_seconds == "undefined" ||
+        data.settings?.expert_seconds > 300 ||
+        data.settings?.expert_seconds === 0 ||
+        data.settings?.expert_seconds === "" ||
+        typeof data.settings?.expert_seconds == "undefined" ||
+        data.settings?.diamond_count > 25 ||
+        data.settings?.diamond_count === 0 ||
+        data.settings?.diamond_count === "" ||
+        data.settings?.bonus_point_count === 0 ||
+        data.settings?.bonus_point_count === "" ||
+        data.settings?.shape_count > 4 ||
+        data.settings?.shape_count === 0 ||
+        data.settings?.shape_count === "" ||
+        typeof data.settings?.shape_count === "undefined" ||
+        typeof data.settings?.bonus_point_count === "undefined" ||
+        typeof data.settings?.diamond_count === "undefined" ||
         typeof data.name === "undefined" ||
-        settings?.beginner_seconds < 30 ||
-        settings?.intermediate_seconds < 10 ||
-        settings?.expert_seconds < 10 ||
-        settings?.advanced_seconds < 10 ||
-        settings?.diamond_count < 3 ||
-        settings?.shape_count < 1 ||
+        data.settings?.beginner_seconds < 30 ||
+        data.settings?.intermediate_seconds < 10 ||
+        data.settings?.expert_seconds < 10 ||
+        data.settings?.advanced_seconds < 10 ||
+        data.settings?.diamond_count < 3 ||
+        data.settings?.shape_count < 1 ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if (
@@ -160,12 +168,15 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.balloon_count === 0 ||
-        settings?.balloon_count === "" ||
-        settings?.breakpoint_mean === 0 ||
-        settings?.breakpoint_mean === "" ||
-        settings?.breakpoint_std === 0 ||
-        settings?.breakpoint_std === "" ||
+        data.settings?.balloon_count === 0 ||
+        data.settings?.balloon_count === "" ||
+        data.settings?.breakpoint_mean === 0 ||
+        data.settings?.breakpoint_mean === "" ||
+        data.settings?.breakpoint_std === 0 ||
+        data.settings?.breakpoint_std === "" ||
+        typeof data.settings?.breakpoint_std === "undefined" ||
+        typeof data.settings?.balloon_count === "undefined" ||
+        typeof data.settings?.breakpoint_mean === "undefined" ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -178,14 +189,18 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.bubble_count === 0 ||
-        settings?.bubble_count === "" ||
-        settings?.bubble_speed === 0 ||
-        settings?.bubble_speed === "" ||
-        settings?.intertrial_duration === 0 ||
-        settings?.intertrial_duration === "" ||
-        settings?.bubble_duration === 0 ||
-        settings?.bubble_duration === "" ||
+        data.settings?.bubble_count === 0 ||
+        data.settings?.bubble_count === "" ||
+        data.settings?.bubble_speed === 0 ||
+        data.settings?.bubble_speed === "" ||
+        data.settings?.intertrial_duration === 0 ||
+        data.settings?.intertrial_duration === "" ||
+        data.settings?.bubble_duration === 0 ||
+        data.settings?.bubble_duration === "" ||
+        typeof data.settings?.bubble_duration === "undefined" ||
+        typeof data.settings?.intertrial_duration === "undefined" ||
+        data.settings?.bubble_count.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+        data.settings?.bubble_speed.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -195,7 +210,7 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings.threshold > 90 ||
+        data.settings.threshold > 90 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -224,8 +239,8 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    setData({ ...data, settings: settingsData })
     setSettings(settingsData)
+    setData({ ...data, settings: settingsData.settings })
   }
 
   return (
@@ -253,7 +268,9 @@ export default function GameCreator({
           <DynamicForm
             schema={schemaList[activitySpecId]}
             initialData={settings}
-            onChange={(x) => updateSettings({ ...settings, ...x })}
+            onChange={(x) => {
+              updateSettings(x)
+            }}
           />
         )}
       </Container>

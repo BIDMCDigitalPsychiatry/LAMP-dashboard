@@ -129,7 +129,9 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         schema={schema}
         uiSchema={_extract(schema)}
         formData={initialData}
-        onChange={(x) => onChange(x.formData)}
+        onChange={(x) => {
+          onChange(x.formData)
+        }}
         ObjectFieldTemplate={ObjectFieldTemplate}
         widgets={{ TextWidget: AutocompleteTextWidget }}
       />

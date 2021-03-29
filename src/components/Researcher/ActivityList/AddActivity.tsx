@@ -198,6 +198,7 @@ export default function AddActivity({
             onClick={() => {
               setPopover(null)
               setCreate(true)
+              setShowActivityImport(false)
               setActivitySpecId("lamp.group")
               setCreateMenu(true)
             }}
@@ -210,6 +211,7 @@ export default function AddActivity({
               setPopover(null)
               setCreate(true)
               setCreateMenu(true)
+              setShowActivityImport(false)
               setActivitySpecId("lamp.survey")
             }}
           >
@@ -226,6 +228,7 @@ export default function AddActivity({
                   setPopover(null)
                   setCreateMenu(true)
                   setActivitySpecId(x.id)
+                  setShowActivityImport(false)
                   setCreate(true)
                 }}
               >
@@ -235,7 +238,17 @@ export default function AddActivity({
           ]}
         </React.Fragment>
       </Popover>
-      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={() => setCreate(false)}>
+      <ResponsiveDialog
+        fullScreen
+        transient={false}
+        animate
+        open={!!createDialogue}
+        onClose={() => {
+          setShowActivityImport(false)
+          setCreateMenu(false)
+          setCreate(false)
+        }}
+      >
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton onClick={() => setCreate(false)} color="default" aria-label="Menu">

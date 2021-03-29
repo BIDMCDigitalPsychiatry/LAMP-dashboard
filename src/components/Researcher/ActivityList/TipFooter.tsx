@@ -1,6 +1,41 @@
 import React, { useState, useEffect } from "react"
-import { Grid, Tooltip, Icon, Fab } from "@material-ui/core"
+import {
+  Grid,
+  Tooltip,
+  Icon,
+  Fab,
+  makeStyles,
+  Theme,
+  createStyles,
+  createMuiTheme,
+  ThemeProvider,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
+import red from "@material-ui/core/colors/red"
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    btnBlue: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      minWidth: 100,
+      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
+      lineHeight: "38px",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "#fff",
+      "&:hover": { background: "#5680f9" },
+    },
+  })
+)
+
+const theme = createMuiTheme({
+  palette: {
+    secondary: {
+      main: red[500],
+    },
+  },
+})
 
 export default function TipFooter({
   activities,
@@ -12,6 +47,7 @@ export default function TipFooter({
   ...props
 }) {
   const { t } = useTranslation()
+  const classes = useStyles()
 
   return (
     <Grid
@@ -24,7 +60,7 @@ export default function TipFooter({
       {!!activities ? (
         <Grid item>
           <Tooltip title={t("Duplicate this activity.")}>
-            <span>
+            <ThemeProvider theme={theme}>
               <Fab
                 color="secondary"
                 aria-label="Duplicate"
@@ -40,7 +76,7 @@ export default function TipFooter({
                 <span style={{ width: 8 }} />
                 <Icon>save</Icon>
               </Fab>
-            </span>
+            </ThemeProvider>
           </Tooltip>
         </Grid>
       ) : (
@@ -50,7 +86,7 @@ export default function TipFooter({
         <Tooltip title={t("Save this activity.")}>
           <span>
             <Fab
-              color="secondary"
+              className={classes.btnBlue}
               aria-label="Save"
               variant="extended"
               onClick={() => {

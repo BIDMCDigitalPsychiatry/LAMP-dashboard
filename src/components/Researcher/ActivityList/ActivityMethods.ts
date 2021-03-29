@@ -144,7 +144,17 @@ export const schemaList: any = {
       settings: {
         title: "Activity Settings",
         type: "object",
-        required: ["mode", "variant"],
+        required: [
+          "mode",
+          "variant",
+          "beginner_seconds",
+          "intermediate_seconds",
+          "advanced_seconds",
+          "expert_seconds",
+          "diamond_count",
+          "shape_count",
+          "bonus_point_count",
+        ],
         properties: {
           mode: {
             title: "Mode",
@@ -163,7 +173,7 @@ export const schemaList: any = {
             type: "string",
             enum: ["jewels_a", "jewels_b"],
             enumNames: ["Trails A", "Trails B"],
-            default: "jewels_b",
+            default: "jewels_a",
             "ui:grid": {
               xs: 6,
             },
@@ -214,7 +224,7 @@ export const schemaList: any = {
           },
           diamond_count: {
             title: "Initial Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "The number of diamonds in Jewels game.",
             type: "number",
             minimum: 3,
             maximum: 25,
@@ -225,7 +235,7 @@ export const schemaList: any = {
           },
           shape_count: {
             title: "Initial Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "The number of shapes in Jewels game",
             type: "number",
             minimum: 1,
             maximum: 3,
@@ -236,7 +246,7 @@ export const schemaList: any = {
           },
           bonus_point_count: {
             title: "Bonus Points for Next Level",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 500,
@@ -247,7 +257,7 @@ export const schemaList: any = {
           },
           x_changes_in_level_count: {
             title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -258,7 +268,7 @@ export const schemaList: any = {
           },
           x_diamond_count: {
             title: "X Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -269,7 +279,7 @@ export const schemaList: any = {
           },
           y_changes_in_level_count: {
             title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -280,7 +290,7 @@ export const schemaList: any = {
           },
           y_shape_count: {
             title: "Y Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 4,
@@ -299,7 +309,17 @@ export const schemaList: any = {
       settings: {
         title: "Activity Settings",
         type: "object",
-        required: ["mode", "variant"],
+        required: [
+          "mode",
+          "variant",
+          "beginner_seconds",
+          "intermediate_seconds",
+          "advanced_seconds",
+          "expert_seconds",
+          "diamond_count",
+          "shape_count",
+          "bonus_point_count",
+        ],
         properties: {
           mode: {
             title: "Mode",
@@ -369,7 +389,7 @@ export const schemaList: any = {
           },
           diamond_count: {
             title: "Initial Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "The number diamonds in Jewels game",
             type: "number",
             minimum: 3,
             maximum: 25,
@@ -380,7 +400,7 @@ export const schemaList: any = {
           },
           shape_count: {
             title: "Initial Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "The number of shapes in Jewels game",
             type: "number",
             minimum: 1,
             maximum: 3,
@@ -391,7 +411,7 @@ export const schemaList: any = {
           },
           bonus_point_count: {
             title: "Bonus Points for Next Level",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 500,
@@ -402,7 +422,7 @@ export const schemaList: any = {
           },
           x_changes_in_level_count: {
             title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -413,7 +433,7 @@ export const schemaList: any = {
           },
           x_diamond_count: {
             title: "X Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -424,7 +444,7 @@ export const schemaList: any = {
           },
           y_changes_in_level_count: {
             title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 25,
@@ -435,7 +455,7 @@ export const schemaList: any = {
           },
           y_shape_count: {
             title: "Y Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
+            description: "",
             type: "number",
             minimum: 0,
             maximum: 4,

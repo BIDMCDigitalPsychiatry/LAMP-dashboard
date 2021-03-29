@@ -32,14 +32,12 @@ import {
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as User } from "../icons/User.svg"
 import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

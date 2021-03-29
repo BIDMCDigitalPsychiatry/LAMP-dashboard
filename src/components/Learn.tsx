@@ -27,7 +27,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import LearnTips from "./LearnTips"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -294,7 +293,7 @@ export default function Learn({
           ))
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no Learn activities available.</p>
+            <Icon>info</Icon> <p>There are no Learn activities available.</p>
           </Box>
         )}
       </Grid>
