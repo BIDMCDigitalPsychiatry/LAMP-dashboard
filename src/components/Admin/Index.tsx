@@ -11,7 +11,6 @@ import {
   useTheme,
 } from "@material-ui/core"
 
-import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
