@@ -5,6 +5,7 @@ import {
   useTheme,
   useMediaQuery,
   Slide,
+  Icon,
   Backdrop,
   CircularProgress,
   Dialog,
@@ -12,11 +13,12 @@ import {
   DialogContent,
   IconButton,
   Typography,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 // Local Imports
-import CloseIcon from "@material-ui/icons/Close"
 
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
@@ -436,7 +438,7 @@ export default function Participant({
       >
         <DialogTitle>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent>

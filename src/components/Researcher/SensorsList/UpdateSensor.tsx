@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
-import ConfirmationDialog from "../ParticipantList/Profile/ConfirmationDialog"
+import ConfirmationDialog from "../../ConfirmationDialog"
 import SensorDialog from "./SensorDialog"
 import { Service } from "../../DBService/DBService"
-import { Box, Icon, Fab } from "@material-ui/core"
+import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -33,6 +32,7 @@ export default function UpdateSensor({
   type,
   studyId,
   setSensors,
+  profile,
   ...props
 }: {
   studies?: Array<Object>
@@ -40,6 +40,7 @@ export default function UpdateSensor({
   type?: string
   studyId?: string
   setSensors?: Function
+  profile?: boolean
 }) {
   const classes = useStyles()
   const [confirmationDialog, setConfirmationDialog] = React.useState(0)
@@ -84,7 +85,7 @@ export default function UpdateSensor({
         color="primary"
         classes={{ root: classes.btnWhite }}
         onClick={() => {
-          setSensorDialog(true)
+          !!profile ? setConfirmationDialog(1) : setSensorDialog(true)
         }}
       >
         <Icon>mode_edit</Icon>
@@ -94,6 +95,11 @@ export default function UpdateSensor({
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
+        confirmationMsg={
+          !!profile
+            ? "Changes done to this sensor will reflect for all the participants under the study. Are you sure you want proceed?."
+            : null
+        }
       />
       <SensorDialog
         sensor={sensor}

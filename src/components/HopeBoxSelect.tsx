@@ -1,24 +1,25 @@
 import React, { useState } from "react"
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
-import GridList from "@material-ui/core/GridList"
-import GridListTile from "@material-ui/core/GridListTile"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
 import { ReactComponent as Saved } from "../icons/Saved.svg"
 import {
   Typography,
   AppBar,
+  Icon,
   Toolbar,
   IconButton,
-  Icon,
   Box,
   ButtonBase,
   Link,
   Dialog,
   DialogContent,
   Button,
+  Theme,
+  createStyles,
+  makeStyles,
+  GridList,
+  GridListTile,
 } from "@material-ui/core"
 
-import CloseIcon from "@material-ui/icons/Close"
 import ImageUploader from "react-images-upload"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -187,7 +188,7 @@ export default function HopeBoxSelect({ ...props }) {
         <Box display="flex" justifyContent="flex-end">
           <Box>
             <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenPreview(false)}>
-              <CloseIcon />
+              <Icon>close</Icon>
             </IconButton>
           </Box>
         </Box>

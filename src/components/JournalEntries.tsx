@@ -18,9 +18,6 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import CloseIcon from "@material-ui/icons/Close"
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
@@ -195,14 +192,14 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                       onClick={() => handleClickStatus("good")}
                       className={status === "good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
-                      <ThumbsUp />
+                      <Icon>thumb_up_off_alt</Icon>
                       <label>{t("Good")}</label>
                     </IconButton>
                     <IconButton
                       onClick={() => handleClickStatus("bad")}
                       className={status === "bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
-                      <ThumbsDown />
+                      <Icon>thumb_down_off_alt</Icon>
                       <label>{t("Bad")}</label>
                     </IconButton>
                   </Box>
@@ -229,7 +226,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
               <Box display="flex" justifyContent="flex-end">
                 <Box>
                   <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>

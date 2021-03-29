@@ -4,6 +4,7 @@ import {
   Box,
   IconButton,
   Button,
+  Icon,
   TextField,
   MenuItem,
   Dialog,
@@ -15,12 +16,11 @@ import {
   Backdrop,
   CircularProgress,
   Typography,
+  makeStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import CloseIcon from "@material-ui/icons/Close"
 import LAMP, { Study } from "lamp-core"
-import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import { fetchPostData, fetchResult } from "../SaveResearcherData"
@@ -312,7 +312,7 @@ export default function PatientStudyCreator({
             setCreatePatient(false)
           }}
         >
-          <CloseIcon />
+          <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
@@ -339,7 +339,7 @@ export default function PatientStudyCreator({
             autoFocus
             fullWidth
             variant="outlined"
-            label={t("Duplicate Study")}
+            label={t("Duplicate from")}
             value={duplicateStudyName}
             onChange={(e) => {
               setDuplicateStudyName(e.target.value)

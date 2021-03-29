@@ -4,6 +4,7 @@ import {
   Container,
   Typography,
   Grid,
+  Icon,
   Card,
   Box,
   Dialog,
@@ -15,10 +16,12 @@ import {
   Tooltip,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
 } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import JournalImg from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
@@ -26,13 +29,11 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 import ScratchImage from "./ScratchImage"
 import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"
@@ -281,7 +282,8 @@ export default function Manage({ participant, activities, ...props }) {
           ))
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no Manage activities available.</p>
+            <Icon>info</Icon>
+            <p>There are no Manage activities available.</p>
           </Box>
         )}
       </Grid>
@@ -407,7 +409,7 @@ export default function Manage({ participant, activities, ...props }) {
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <div className={classType}>
             <Box mt={2} mb={1}>

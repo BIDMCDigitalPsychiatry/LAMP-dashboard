@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Icon, Grid } from "@material-ui/core"
+import { Box, Icon, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"

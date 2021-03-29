@@ -26,8 +26,10 @@ import {
   MenuItem,
   Container,
   ButtonBase,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 import { id } from "vega"
@@ -35,38 +37,6 @@ import { useSnackbar } from "notistack"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 
-const theme = createMuiTheme({
-  palette: {
-    secondary: {
-      main: "#333",
-    },
-  },
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-    MuiStepper: {
-      root: { paddingLeft: 8 },
-    },
-  },
-})
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     containerWidth: { maxWidth: 1055 },
@@ -412,66 +382,64 @@ export default function SurveyCreator({
 
   return (
     <div>
-      <MuiThemeProvider theme={theme}>
-        <Container className={classes.containerWidth}>
-          <Grid container spacing={2}>
-            <ActivityHeader
-              studies={studies}
-              value={value}
-              details={details}
-              activitySpecId={null}
-              study={data.studyID}
-              onChange={handleChange}
-              image={null}
-            />
-            <Grid item sm={12}>
-              <Divider />
-              <Typography variant="h6">{t("Configure questions, parameters, and options.")}</Typography>
-            </Grid>
-            <Grid item>
-              <Stepper nonLinear activeStep={activeStep} orientation="vertical">
-                {questions?.map((x, idx) => (
-                  <QuestionCreator
-                    key={`${x.text}-${idx}`}
-                    question={x}
-                    onChange={(change) =>
-                      setQuestions((questions) =>
-                        Object.assign(
-                          [...questions],
-                          {
-                            [idx]: change,
-                          } /*, setQuestionField(!questions[idx].text || questions[idx].text == undefined || questions[idx].text == null || questions[idx].text=='' || !questions[idx].text.trim().length)*/
-                        )
-                      )
-                    }
-                    onDelete={() => {
-                      setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
-                      setActiveStep((prev) => prev - 1)
-                    }}
-                    isSelected={activeStep !== idx}
-                    setSelected={() => setActiveStep(idx)}
-                  />
-                ))}
-                <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
-                  <Fab
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      setQuestions((questions) => (!!questions ? [...questions, {}] : []))
-                      setActiveStep(!!questions ? questions.length : 0)
-                    }}
-                  >
-                    <Icon fontSize="small">add_circle</Icon>
-                  </Fab>
-                  <Grid item>
-                    <Typography variant="subtitle2">{t("Add Question")}</Typography>
-                  </Grid>
-                </Grid>
-              </Stepper>
-            </Grid>
+      <Container className={classes.containerWidth}>
+        <Grid container spacing={2}>
+          <ActivityHeader
+            studies={studies}
+            value={value}
+            details={details}
+            activitySpecId={null}
+            study={data.studyID}
+            onChange={handleChange}
+            image={null}
+          />
+          <Grid item sm={12}>
+            <Divider />
+            <Typography variant="h6">{t("Configure questions, parameters, and options.")}</Typography>
           </Grid>
-        </Container>
-      </MuiThemeProvider>
+          <Grid item>
+            <Stepper nonLinear activeStep={activeStep} orientation="vertical">
+              {questions?.map((x, idx) => (
+                <QuestionCreator
+                  key={`${x.text}-${idx}`}
+                  question={x}
+                  onChange={(change) =>
+                    setQuestions((questions) =>
+                      Object.assign(
+                        [...questions],
+                        {
+                          [idx]: change,
+                        } /*, setQuestionField(!questions[idx].text || questions[idx].text == undefined || questions[idx].text == null || questions[idx].text=='' || !questions[idx].text.trim().length)*/
+                      )
+                    )
+                  }
+                  onDelete={() => {
+                    setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
+                    setActiveStep((prev) => prev - 1)
+                  }}
+                  isSelected={activeStep !== idx}
+                  setSelected={() => setActiveStep(idx)}
+                />
+              ))}
+              <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
+                <Fab
+                  size="small"
+                  color="primary"
+                  onClick={() => {
+                    setQuestions((questions) => (!!questions ? [...questions, {}] : []))
+                    setActiveStep(!!questions ? questions.length : 0)
+                  }}
+                >
+                  <Icon fontSize="small">add_circle</Icon>
+                </Fab>
+                <Grid item>
+                  <Typography variant="subtitle2">{t("Add Question")}</Typography>
+                </Grid>
+              </Grid>
+            </Stepper>
+          </Grid>
+        </Grid>
+      </Container>
       <ActivityFooter onSave={checkAndSave} validate={validate} value={value} data={data} />
     </div>
   )

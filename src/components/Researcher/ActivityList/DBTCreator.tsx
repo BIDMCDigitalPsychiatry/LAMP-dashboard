@@ -11,12 +11,12 @@ import {
   ButtonBase,
   InputBase,
   Container,
+  makeStyles,
+  createStyles,
+  withStyles,
 } from "@material-ui/core"
-import { makeStyles, createStyles, withStyles } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { TargetDialog, EmotionDialog } from "./Dialog"
-import Close from "@material-ui/icons/Close"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
 
 const CssTextField = withStyles({
@@ -412,14 +412,14 @@ export default function GameCreator({
                         {t(item.measure)}
                       </Typography>
                       <ButtonBase onClick={() => removeTarget("effective", index)} className={classes.deleteButton}>
-                        <Close />
+                        <Icon>close</Icon>
                       </ButtonBase>
                     </div>
                   )
                 })}
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
                   <div onClick={() => openTargetDialog("effective")} className={classes.addButton}>
-                    <AddCircleOutline />
+                    <Icon>add_circle_outline</Icon>
                   </div>
                   <Typography onClick={() => openTargetDialog("effective")} className={classes.addButtonTitle}>
                     {t("Add item")}
@@ -443,14 +443,14 @@ export default function GameCreator({
                         {t(item.measure)}
                       </Typography>
                       <ButtonBase onClick={() => removeTarget("ineffective", index)} className={classes.deleteButton}>
-                        <Close />
+                        <Icon>close</Icon>
                       </ButtonBase>
                     </div>
                   )
                 })}
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 49, marginTop: 15 }}>
                   <div onClick={() => openTargetDialog("ineffective")} className={classes.addButton}>
-                    <AddCircleOutline />
+                    <Icon>add_circle_outline</Icon>
                   </div>
                   <Typography onClick={() => openTargetDialog("ineffective")} className={classes.addButtonTitle}>
                     {t("Add item")}
@@ -478,14 +478,14 @@ export default function GameCreator({
                         {item.emotion}
                       </Typography>
                       <ButtonBase onClick={() => removeEmotion(index)} className={classes.deleteButton}>
-                        <Close />
+                        <Icon>close</Icon>
                       </ButtonBase>
                     </div>
                   )
                 })}
                 <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
                   <div onClick={openEmotionDialog} className={classes.addButton}>
-                    <AddCircleOutline />
+                    <Icon>add_circle_outline</Icon>
                   </div>
                   <Typography onClick={openEmotionDialog} className={classes.addButtonTitle}>
                     {t("Add item")}

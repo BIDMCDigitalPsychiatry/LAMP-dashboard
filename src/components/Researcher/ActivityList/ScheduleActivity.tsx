@@ -1,8 +1,18 @@
 import React, { useState } from "react"
-import { Box, IconButton, Icon, Fab, Dialog, DialogContent } from "@material-ui/core"
+import {
+  Box,
+  IconButton,
+  Icon,
+  Fab,
+  Dialog,
+  DialogContent,
+  makeStyles,
+  Theme,
+  createStyles,
+  createMuiTheme,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
 const useStyles = makeStyles((theme: Theme) =>
@@ -55,18 +65,20 @@ export default function ScheduleActivity({ activity, activities, setActivities, 
         <Icon>calendar_today</Icon>
       </Fab>
       <Dialog
+        fullWidth
+        maxWidth="md"
         open={showScheduler}
         onClose={() => setShowScheduler(false)}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogContent>
-          <Box>
+          <Box textAlign="right">
             <IconButton onClick={() => setShowScheduler(false)}>
               <Icon>close</Icon>
             </IconButton>
-            <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
           </Box>
+          <ActivityScheduler activity={activity} setActivities={setActivities} activities={activities} />
         </DialogContent>
       </Dialog>
     </span>

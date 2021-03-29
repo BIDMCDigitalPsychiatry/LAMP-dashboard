@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react"
-import { Box, Typography, Grid, Button, TextField, Container, Backdrop, CircularProgress } from "@material-ui/core"
-import { makeStyles, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
+import {
+  Box,
+  Typography,
+  Grid,
+  Button,
+  TextField,
+  Container,
+  Backdrop,
+  CircularProgress,
+  makeStyles,
+  createStyles,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
@@ -9,32 +19,6 @@ import MessageDialog from "./MessageDialog"
 import Activties from "./Activities"
 import Sensors from "./Sensors"
 import { Service } from "../../../DBService/DBService"
-
-const theme = createMuiTheme({
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-        borderRadius: "10px !important",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-    MuiDivider: {
-      root: { margin: "25px 0" },
-    },
-  },
-})
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -157,16 +141,14 @@ export default function PatientProfile({
             <Grid container direction="row" justify="space-between" alignItems="center">
               <Grid item lg={6}>
                 <Box>
-                  <MuiThemeProvider theme={theme}>
-                    <TextField
-                      fullWidth
-                      label={t("Nickname(optional)")}
-                      variant="filled"
-                      value={nickname}
-                      onChange={(event) => setNickname(event.target.value)}
-                      inputProps={{ maxLength: 2500 }}
-                    />
-                  </MuiThemeProvider>
+                  <TextField
+                    fullWidth
+                    label={t("Nickname(optional)")}
+                    variant="filled"
+                    value={nickname}
+                    onChange={(event) => setNickname(event.target.value)}
+                    inputProps={{ maxLength: 2500 }}
+                  />
                 </Box>
               </Grid>
               <Grid item>

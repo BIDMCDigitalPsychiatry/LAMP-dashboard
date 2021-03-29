@@ -1,12 +1,12 @@
 import React, { useState } from "react"
-import { Box, Icon, Fab } from "@material-ui/core"
+import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import { spliceActivity, spliceCTActivity } from "../ActivityList/ActivityMethods"
 import { saveAs } from "file-saver"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     btnText: {
@@ -39,6 +39,8 @@ export default function ExportActivity({ activities, ...props }) {
     for (let x of activities) {
       delete x["study_id"]
       delete x["study_name"]
+      let activityData = await LAMP.Activity.view(x.id)
+      x.settings = activityData.settings
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any

@@ -1,12 +1,11 @@
 import React, { useState } from "react"
-import { Box, Typography } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import AddActivity from "./AddActivity"
 import StudyFilter from "../ParticipantList/StudyFilter"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
-import SearchBox from "../SearchBox"
+import SearchBox from "../../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

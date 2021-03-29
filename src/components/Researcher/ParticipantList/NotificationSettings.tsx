@@ -1,9 +1,8 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Tooltip, Switch, FormControlLabel } from "@material-ui/core"
+import { Tooltip, Switch, FormControlLabel, makeStyles } from "@material-ui/core"
 
 import LAMP from "lamp-core"
-import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 

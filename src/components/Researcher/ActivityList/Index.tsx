@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { Service } from "../../DBService/DBService"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
@@ -113,7 +112,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
       selectedStudies.map((study) => {
         Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
           if ((activitiesData || []).length > 0) {
-            console.log(activitiesData)
             if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(activitiesData)
               result = result.filter((i) => i.name.toLowerCase()?.includes(searchTxt.toLowerCase()))
@@ -122,8 +120,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
               result = result.concat(activitiesData)
               setActivities(sortData(result, selectedStudies, "name"))
             }
-            console.log(result)
-            setPaginatedActivities(result.slice(page, rowCount))
+            setPaginatedActivities(result.slice(0, rowCount))
+            setPage(0)
           } else {
             if (result.length === 0) setActivities([])
           }

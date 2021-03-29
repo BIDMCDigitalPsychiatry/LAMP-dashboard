@@ -24,22 +24,20 @@ import {
   Popover,
   Divider,
   Fab,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as Message } from "../icons/Message.svg"
-import { ReactComponent as User } from "../icons/User.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import { ReactComponent as UserIcon } from "../icons/User.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -127,6 +125,8 @@ const useStyles = makeStyles((theme: Theme) =>
     appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
     toolbarResearcher: {
       minHeight: 50,
+      width: "100%",
+      background: "transparent",
       "& h5": {
         padding: "55px 0 25px",
         [theme.breakpoints.down("sm")]: {
@@ -167,8 +167,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
       "&:hover": { background: "transparent" },
       "&:active": { background: "transparent", boxShadow: "none" },
-      "& svg": { marginRight: 10 },
-      "& path": { fill: "#fff", fillOpacity: "1" },
+      "& span": { marginRight: 10 },
     },
     logResearcherToolbar: {
       background: "#7599FF",
@@ -340,7 +339,10 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <UserIcon /> {title} <ArrowDropDownIcon />
+                    <span className="material-icons-outlined MuiIcon-root" aria-hidden="true">
+                      account_circle_outlined
+                    </span>
+                    {title} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}
@@ -368,7 +370,6 @@ export default function NavigationLayout({
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
                     </MenuItem>
-                    <Divider />
                     <MenuItem
                       dense
                       onClick={() => {
@@ -463,7 +464,7 @@ export default function NavigationLayout({
                           setOpenMessages(true)
                         }}
                       >
-                        <Message />
+                        <Icon>comment</Icon>
                       </Badge>
                     </Tooltip>
                   ) : (
@@ -480,7 +481,8 @@ export default function NavigationLayout({
                     onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                     color="default"
                   >
-                    <User />
+                    {/* <User /> */}
+                    <Icon>account_circle</Icon>
                   </IconButton>
                 </Tooltip>
                 <Menu

@@ -14,17 +14,8 @@ import {
   Typography,
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
-import MaterialTable from "material-table"
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
-const theme = createMuiTheme({
-  overrides: {
-    MuiTypography: {
-      h6: { fontSize: 16, fontWeight: 600 },
-    },
-  },
-})
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
 // and needs to be fixed or it will silently rollback.
 

@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Avatar, Menu, Tooltip, ButtonBase } from "@material-ui/core"
-import { isFragment } from "react-is"
 import clsx from "clsx"
 import { Box, makeStyles, createStyles } from "@material-ui/core"
 
@@ -209,14 +208,14 @@ const AvatarMesh = React.forwardRef(function AvatarMesh(
   const classes = useStyles({ diameter, avatarWidth })
 
   const children = React.Children.toArray(childrenProp).filter((child) => {
-    if (isFragment(child)) {
+    /*if (isFragment(child)) {
       console.error(
         [
           "Material-UI: the AvatarMesh component doesn't accept a Fragment as a child.",
           "Consider providing an array instead.",
         ].join("\n")
       )
-    }
+    }*/
     return React.isValidElement(child)
   })
 

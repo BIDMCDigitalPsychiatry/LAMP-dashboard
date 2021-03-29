@@ -17,17 +17,16 @@ import {
   DialogActions,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
 } from "@material-ui/core"
-import CloseIcon from "@material-ui/icons/Close"
-import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import { Participant as ParticipantObj } from "lamp-core"
+import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import LearnTips from "./LearnTips"
 import classnames from "classnames"
-import Link from "@material-ui/core/Link"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -294,7 +293,7 @@ export default function Learn({
           ))
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
-            <EmptyManageIcon /> <p>There are no Learn activities available.</p>
+            <Icon>info</Icon> <p>There are no Learn activities available.</p>
           </Box>
         )}
       </Grid>
@@ -311,7 +310,7 @@ export default function Learn({
       >
         <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <div className={classes.header}>
             <Box mt={2} mb={1}>

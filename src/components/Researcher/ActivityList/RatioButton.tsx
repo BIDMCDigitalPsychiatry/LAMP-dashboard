@@ -1,28 +1,6 @@
 // Core Imports
-import React, { useState, useCallback } from "react"
-import { useDropzone } from "react-dropzone"
-
-import {
-  Box,
-  Tooltip,
-  Typography,
-  Grid,
-  Fab,
-  Divider,
-  MenuItem,
-  Icon,
-  TextField,
-  ButtonBase,
-  Container,
-  Backdrop,
-  CircularProgress,
-} from "@material-ui/core"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import { useSnackbar } from "notistack"
-import Jewels from "../../../icons/Jewels.svg"
-import { useTranslation } from "react-i18next"
-import BalloonRisk from "./BalloonRisk"
-import PopTheBubbles from "./PopTheBubbles"
+import React from "react"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

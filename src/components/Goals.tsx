@@ -11,9 +11,11 @@ import {
   AppBar,
   Toolbar,
   Icon,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"

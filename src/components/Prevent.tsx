@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   Card,
+  Icon,
   Box,
   Dialog,
   DialogTitle,
@@ -13,24 +14,23 @@ import {
   DialogActions,
   AppBar,
   Toolbar,
-  Icon,
   ButtonBase,
   Link,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
-import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
@@ -920,7 +920,7 @@ export default function Prevent({
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(0)}>
-                <AddCircleOutlineIcon className={classes.addicon} />
+                <Icon className={classes.addicon}>add_circle_outline</Icon>
               </IconButton>
             </Grid>
           </Grid>
@@ -1071,7 +1071,7 @@ export default function Prevent({
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(1)}>
-                <AddCircleOutlineIcon className={classes.addicon} />
+                <Icon className={classes.addicon}>add_circle_outline</Icon>
               </IconButton>
             </Grid>
           </Grid>
@@ -1283,7 +1283,7 @@ export default function Prevent({
         <DialogTitle id="alert-dialog-slide-title">
           {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <Box mt={2}>
             <Typography>{t("Choose the data you want to see in your dashboard.")}</Typography>

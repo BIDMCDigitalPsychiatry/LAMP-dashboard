@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Typography, TextField, InputBase } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import SearchIcon from "@material-ui/icons/Search"
+import { Box, Typography, TextField, InputBase, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     search: {
@@ -57,7 +56,7 @@ export default function Header({ searchData, ...props }: { searchData: Function 
     <Box>
       <div className={classes.search}>
         <div className={classes.searchIcon}>
-          <SearchIcon />
+          <Icon>search</Icon>
         </div>
         <InputBase
           placeholder="Search…"

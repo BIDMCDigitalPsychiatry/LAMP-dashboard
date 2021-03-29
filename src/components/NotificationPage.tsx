@@ -7,6 +7,7 @@ import {
   DialogContent,
   Button,
   Box,
+  Icon,
   DialogTitle,
   IconButton,
   Typography,
@@ -16,7 +17,6 @@ import {
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import JournalEntries from "./JournalEntries"
@@ -227,7 +227,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
       >
         <DialogTitle>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent>

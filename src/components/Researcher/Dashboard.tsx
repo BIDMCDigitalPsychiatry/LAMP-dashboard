@@ -8,6 +8,9 @@ import {
   Container,
   useMediaQuery,
   useTheme,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -18,7 +21,6 @@ import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
@@ -206,17 +208,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     }
   }
 
-  const upatedDataStudy = (data) => {
-    setUpdatedData(data)
-  }
-
-  const deletedDataStudy = (data) => {
-    setDeletedData(data)
-  }
-
-  const handleSearchData = (data) => {
-    setSearch(data)
-  }
   return (
     <Container maxWidth={false}>
       <Container
@@ -318,9 +309,9 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 title={null}
                 researcher={researcher}
                 studies={studies}
-                upatedDataStudy={upatedDataStudy}
-                deletedDataStudy={deletedDataStudy}
-                searchData={handleSearchData}
+                upatedDataStudy={(data) => setUpdatedData(data)}
+                deletedDataStudy={(data) => setDeletedData(data)}
+                searchData={(data) => setSearch(data)}
                 newAdddeStudy={setNewStudy}
               />
             )}

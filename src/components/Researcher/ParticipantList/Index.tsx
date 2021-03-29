@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react"
-import { Box, Grid, Backdrop, CircularProgress, Icon } from "@material-ui/core"
+import { Box, Grid, Backdrop, CircularProgress, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
 import es from "javascript-time-ago/locale/es"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import ParticipantListItem from "./ParticipantListItem"
 import Header from "./Header"
 import { Service } from "../../DBService/DBService"
@@ -188,7 +187,8 @@ export default function ParticipantList({
               result = result.concat(participantData)
               setParticipants(sortData(result, selectedData, "id"))
             }
-            setPaginatedParticipants(result.slice(page, rowCount))
+            setPaginatedParticipants(result.slice(0, rowCount))
+            setPage(0)
           } else {
             if (result.length === 0) setParticipants([])
           }

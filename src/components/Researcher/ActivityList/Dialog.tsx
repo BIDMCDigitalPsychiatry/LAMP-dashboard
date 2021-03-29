@@ -1,34 +1,18 @@
 import React from "react"
-import { Box, TextField } from "@material-ui/core"
-import { makeStyles, withStyles, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import InputBase from "@material-ui/core/InputBase"
-import Dialog from "@material-ui/core/Dialog"
-import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
+import {
+  Box,
+  TextField,
+  makeStyles,
+  withStyles,
+  createStyles,
+  Button,
+  InputBase,
+  Dialog,
+  Typography,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import Autocomplete from "@material-ui/lab/Autocomplete"
+import { Autocomplete } from "@material-ui/lab"
 
-const theme = createMuiTheme({
-  overrides: {
-    MuiFilledInput: {
-      root: {
-        border: 0,
-        backgroundColor: "#f4f4f4",
-      },
-      underline: {
-        "&&&:before": {
-          borderBottom: "none",
-        },
-        "&&:after": {
-          borderBottom: "none",
-        },
-      },
-    },
-    MuiTextField: {
-      root: { width: "100%" },
-    },
-  },
-})
 const CssTextField = withStyles({
   root: {
     "label + &": {},
@@ -190,28 +174,26 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
             <CssTextField
               value={target}
               onChange={(event) => setTarget(event.target.value)}
-              inputProps={{ disableunderline: "true" }}
+              inputProps={{ disableunderline: "true", maxLength: 120 }}
               placeholder={t("Behavior name")}
             />
           </div>
         </div>
         <Typography className={classes.measureTitle}>{t("Measure of action:")}</Typography>
         <Box display="flex" justifyContent="center" mt={2}>
-          <MuiThemeProvider theme={theme}>
-            <Autocomplete
-              className={classes.autoComplete}
-              options={options}
-              onChange={(event: any, newValue: string | null) => {
-                setMeasure(newValue)
-              }}
-              value={measure}
-              inputValue={t(measure)}
-              onInputChange={(event, newInputValue) => {
-                setMeasure(newInputValue)
-              }}
-              renderInput={(params) => <TextField {...params} label={t("Measure")} variant="filled" />}
-            />
-          </MuiThemeProvider>
+          <Autocomplete
+            className={classes.autoComplete}
+            options={options}
+            onChange={(event: any, newValue: string | null) => {
+              setMeasure(newValue)
+            }}
+            value={measure}
+            inputValue={t(measure)}
+            onInputChange={(event, newInputValue) => {
+              setMeasure(newInputValue)
+            }}
+            renderInput={(params) => <TextField {...params} label={t("Measure")} variant="filled" />}
+          />
         </Box>
         <Box textAlign="center" mt={2}>
           <Button
@@ -252,7 +234,7 @@ export function EmotionDialog({ ...props }) {
             <CssTextField
               value={emotion}
               onChange={(event) => setEmotion(event.target.value)}
-              inputProps={{ disableunderline: "true" }}
+              inputProps={{ disableunderline: "true", maxLength: 120 }}
               placeholder={t("Emotion name")}
             />
           </div>

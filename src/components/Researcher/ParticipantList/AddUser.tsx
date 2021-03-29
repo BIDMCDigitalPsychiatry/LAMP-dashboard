@@ -7,20 +7,23 @@ import {
   MenuItem,
   Tooltip,
   Grid,
+  Icon,
   Typography,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   DialogProps,
+  makeStyles,
+  Theme,
+  createStyles,
+  createMuiTheme,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import CloseIcon from "@material-ui/icons/Close"
 import QRCode from "qrcode.react"
 import LAMP from "lamp-core"
 import SnackMessage from "../../SnackMessage"
-import { makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 
@@ -264,7 +267,7 @@ export default function AddUser({
           onClick={props.onClose as any}
           disabled={!!studyBtnClicked ? true : false}
         >
-          <CloseIcon />
+          <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react"
 import {
   Box,
+  Icon,
   IconButton,
   Button,
   TextField,
@@ -14,12 +15,11 @@ import {
   DialogProps,
   Backdrop,
   CircularProgress,
+  makeStyles,
 } from "@material-ui/core"
 
 import { useSnackbar } from "notistack"
-import CloseIcon from "@material-ui/icons/Close"
 import LAMP, { Study } from "lamp-core"
-import { makeStyles } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 
@@ -181,7 +181,7 @@ export default function StudyCreator({
             closePopUp(2)
           }}
         >
-          <CloseIcon />
+          <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>

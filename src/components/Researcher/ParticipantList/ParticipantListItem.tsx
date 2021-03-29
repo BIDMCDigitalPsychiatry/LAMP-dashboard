@@ -10,20 +10,21 @@ import {
   CardActions,
   CardContent,
   Box,
+  makeStyles,
+  Theme,
+  createStyles,
+  Checkbox,
 } from "@material-ui/core"
 import PatientProfile from "./PatientProfile"
 // Local Imports
 import LAMP from "lamp-core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import MoreVertIcon from "@material-ui/icons/MoreVert"
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"
 import Active from "./ActiveBubble"
 import NotificationSettings from "./NotificationSettings"
 import DeleteParticipant from "./DeleteParticipant"
-import Credentials from "./Credentials"
+import Credentials from "../../Credentials"
 import { Service } from "../../DBService/DBService"
-import Checkbox from "@material-ui/core/Checkbox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -127,7 +128,7 @@ export default function ParticipantListItem({
         <Box>
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
-            <Credentials participant={participant} />
+            <Credentials user={participant} />
             <PatientProfile
               participant={participant}
               studies={studies}

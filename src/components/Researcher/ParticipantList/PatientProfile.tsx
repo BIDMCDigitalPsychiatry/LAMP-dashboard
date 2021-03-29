@@ -1,7 +1,17 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Typography, Fab, AppBar, Toolbar, Icon, IconButton, Divider } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import {
+  Box,
+  Typography,
+  Fab,
+  AppBar,
+  Toolbar,
+  Icon,
+  IconButton,
+  Divider,
+  makeStyles,
+  createStyles,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import PatientProfilePage from "./Profile/PatientProfilePage"

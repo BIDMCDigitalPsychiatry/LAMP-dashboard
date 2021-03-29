@@ -1,8 +1,6 @@
 import React from "react"
-import { Box, Grid, Tooltip, Fab, Dialog } from "@material-ui/core"
-import { makeStyles, createStyles } from "@material-ui/core/styles"
+import { Box, Grid, Tooltip, Fab, Dialog, makeStyles, createStyles, Icon } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { ReactComponent as Message } from "../../../../icons/Message.svg"
 import Messages from "../../../Messages"
 
 const useStyles = makeStyles((theme) =>
@@ -41,7 +39,7 @@ export default function PatientProfile({ participant, ...props }: { participant:
       <Grid item>
         <Tooltip title={t("Message")} placement="left">
           <Fab className={classes.profileMessage} style={{ position: "fixed" }} onClick={() => setDialogOpen(true)}>
-            <Message />
+            <Icon>comment</Icon>
           </Fab>
         </Tooltip>
       </Grid>

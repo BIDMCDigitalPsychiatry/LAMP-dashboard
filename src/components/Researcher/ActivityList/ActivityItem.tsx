@@ -1,9 +1,17 @@
 import React, { useEffect } from "react"
-import { Box, Typography, Card, CardHeader, CardActions } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import {
+  Box,
+  Typography,
+  Card,
+  CardHeader,
+  CardActions,
+  makeStyles,
+  Theme,
+  createStyles,
+  Checkbox,
+} from "@material-ui/core"
 import ScheduleActivity from "./ScheduleActivity"
 import UpdateActivity from "./UpdateActivity"
-import Checkbox from "@material-ui/core/Checkbox"
 import { updateSchedule } from "./ActivityMethods"
 import LAMP from "lamp-core"
 
@@ -81,6 +89,7 @@ export default function ActivityItem({
               activities={activities}
               studies={studies}
               setActivities={setActivities}
+              profile={0}
             />
             <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} />
           </CardActions>

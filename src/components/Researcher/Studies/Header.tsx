@@ -1,9 +1,8 @@
 import React, { useState } from "react"
-import { Box, Popover, Fab, Typography, Icon, MenuItem } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Popover, Fab, Typography, Icon, MenuItem, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import PatientStudyCreator from "../ParticipantList/PatientStudyCreator"
-import SearchBox from "../SearchBox"
+import SearchBox from "../../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
