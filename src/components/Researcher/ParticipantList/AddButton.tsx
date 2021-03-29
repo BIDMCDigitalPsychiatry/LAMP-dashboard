@@ -124,7 +124,7 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
   }
 
   return (
-    <Box pl={3}>
+    <Box>
       <Fab
         variant="extended"
         color="primary"

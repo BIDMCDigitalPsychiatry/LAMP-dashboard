@@ -39,6 +39,8 @@ export default function ExportActivity({ activities, ...props }) {
     for (let x of activities) {
       delete x["study_id"]
       delete x["study_name"]
+      let activityData = await LAMP.Activity.view(x.id)
+      x.settings = activityData.settings
       if (x.spec === "lamp.survey") {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.survey_description")) as any

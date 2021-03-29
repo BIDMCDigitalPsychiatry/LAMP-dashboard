@@ -99,7 +99,8 @@ export default function SensorsList({
               result = result.concat(sensorData)
               setSensors(sortData(result, selectedStudies, "name"))
             }
-            setPaginatedSensors(result.slice(page, rowCount))
+            setPaginatedSensors(result.slice(0, rowCount))
+            setPage(0)
           } else {
             if (result.length === 0) setSensors([])
           }

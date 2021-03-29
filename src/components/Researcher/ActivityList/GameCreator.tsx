@@ -7,718 +7,7 @@ import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
-
-const schemaList: any = {
-  "lamp.balloon_risk": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["balloon_count", "breakpoint_mean", "breakpoint_std"],
-        properties: {
-          balloon_count: {
-            title: "Balloon Count",
-            description: "The number of balloons to display.",
-            type: "number",
-            default: 15,
-            minimum: 1,
-            "ui:grid": {
-              xs: 4,
-            },
-          },
-          breakpoint_mean: {
-            title: "Breakpoint Mean",
-            description: "The mean of the breakpoint for balloon risk.",
-            type: "number",
-            default: 64.5,
-            minimum: 1,
-            "ui:grid": {
-              xs: 4,
-            },
-          },
-          breakpoint_std: {
-            title: "Breakpoint Standard Deviation",
-            description: "The standard deviation of the breakpoint for balloon risk.",
-            type: "number",
-            default: 37,
-            minimum: 1,
-            "ui:grid": {
-              xs: 4,
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.pop_the_bubbles": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["bubble_count", "bubble_speed", "intertrial_duration", "bubble_duration"],
-        properties: {
-          bubble_count: {
-            title: "Bubble Count",
-            description: "Multiple bubble counts per level.",
-            type: "array",
-            minItems: 3,
-            maxItems: 3,
-            items: {
-              title: "Level Count",
-              type: "number",
-              minimum: 1,
-              default: 80,
-            },
-            "ui:options": {
-              addable: false,
-              removable: false,
-              orderable: false,
-            },
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          bubble_speed: {
-            title: "Bubble Speed",
-            description: "Multiple bubble speeds per level.",
-            type: "array",
-            minItems: 3,
-            maxItems: 3,
-            items: {
-              title: "Level Speed",
-              type: "number",
-              minimum: 1,
-              default: 80,
-            },
-            "ui:options": {
-              addable: false,
-              removable: false,
-              orderable: false,
-            },
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          intertrial_duration: {
-            title: "Intertrial Duration",
-            description: "The duration between bubbles.",
-            type: "number",
-            minimum: 0,
-            default: 0.5,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          bubble_duration: {
-            title: "Bubble Duration",
-            description: "The duration the bubble appears on screen.",
-            type: "number",
-            minimum: 1,
-            default: 1.0,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.spatial_span": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["reverse_tapping"],
-        properties: {
-          reverse_tapping: {
-            title: "Tap Order",
-            description: "Whether taps are going forwards or backwards.",
-            type: "boolean",
-            enumNames: ["Backwards", "Forwards"],
-            default: true,
-            "ui:widget": "radio",
-          },
-          tips: {
-            title: "Tips",
-            type: "array",
-            items: {
-              type: "object",
-              required: ["title", "content"],
-              minItems: 1,
-              properties: {
-                title: {
-                  title: "Tip Title",
-                  type: "string",
-                  minLength: 1,
-                },
-                content: {
-                  title: "Tip Content",
-                  description: "The tip content supports extended GitHub-flavored Markdown formatting.",
-                  type: "string",
-                  minLength: 1,
-                  "ui:widget": "textarea",
-                  "ui:options": {
-                    rows: 15,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.jewels_a": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["mode", "variant"],
-        properties: {
-          mode: {
-            title: "Mode",
-            description: "The mode of the jewels game.",
-            type: "number",
-            enum: [1, 2, 3, 4],
-            enumNames: ["Beginner", "Intermediate", "Advanced", "Expert"],
-            default: 1,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          variant: {
-            title: "Variant",
-            description: "The variant of the Jewels game (A or B).",
-            type: "string",
-            enum: ["jewels_a", "jewels_b"],
-            enumNames: ["Trails A", "Trails B"],
-            default: "jewels_b",
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          beginner_seconds: {
-            title: "Beginner Duration",
-            description: "The duration of a Jewels session on Beginner mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 90,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          intermediate_seconds: {
-            title: "Intermediate Duration",
-            description: "The duration of a Jewels session on Intermediate mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 30,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          advanced_seconds: {
-            title: "Advanced Duration",
-            description: "The duration of a Jewels session on Advanced mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 25,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          expert_seconds: {
-            title: "Expert Duration",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 15,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          diamond_count: {
-            title: "Initial Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 3,
-            maximum: 25,
-            default: 15,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          shape_count: {
-            title: "Initial Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 3,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          bonus_point_count: {
-            title: "Bonus Points for Next Level",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 500,
-            default: 50,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          x_changes_in_level_count: {
-            title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          x_diamond_count: {
-            title: "X Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 4,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          y_changes_in_level_count: {
-            title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 2,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          y_shape_count: {
-            title: "Y Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 4,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.jewels_b": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["mode", "variant"],
-        properties: {
-          mode: {
-            title: "Mode",
-            description: "The mode of the jewels game.",
-            type: "number",
-            enum: [1, 2, 3, 4],
-            enumNames: ["Beginner", "Intermediate", "Advanced", "Expert"],
-            default: 1,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          variant: {
-            title: "Variant",
-            description: "The variant of the Jewels game (A or B).",
-            type: "string",
-            enum: ["jewels_a", "jewels_b"],
-            enumNames: ["Trails A", "Trails B"],
-            default: "jewels_b",
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          beginner_seconds: {
-            title: "Beginner Duration",
-            description: "The duration of a Jewels session on Beginner mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 90,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          intermediate_seconds: {
-            title: "Intermediate Duration",
-            description: "The duration of a Jewels session on Intermediate mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 30,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          advanced_seconds: {
-            title: "Advanced Duration",
-            description: "The duration of a Jewels session on Advanced mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 25,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          expert_seconds: {
-            title: "Expert Duration",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 300,
-            default: 15,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          diamond_count: {
-            title: "Initial Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 3,
-            maximum: 25,
-            default: 15,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          shape_count: {
-            title: "Initial Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 1,
-            maximum: 3,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          bonus_point_count: {
-            title: "Bonus Points for Next Level",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 500,
-            default: 50,
-            "ui:grid": {
-              xs: 6,
-            },
-          },
-          x_changes_in_level_count: {
-            title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          x_diamond_count: {
-            title: "X Diamond Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 4,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          y_changes_in_level_count: {
-            title: "X Changes in Level Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 25,
-            default: 2,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-          y_shape_count: {
-            title: "Y Shape Count",
-            description: "The duration of a Jewels session on Expert mode (in seconds).",
-            type: "number",
-            minimum: 0,
-            maximum: 4,
-            default: 1,
-            "ui:grid": {
-              xs: 3,
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.survey": {
-    title: "Survey Questions",
-    description: "Configure questions, parameters, and options.",
-    type: "array",
-    items: {
-      title: "Question",
-      description: "Configure a question.",
-      type: "object",
-      required: ["title", "type"],
-      properties: {
-        title: {
-          type: "string",
-          title: "Question Text",
-          minLength: 1,
-          default: "",
-        },
-        description: {
-          type: "string",
-          title: "Question Description",
-          default: "",
-        },
-        type: {
-          type: "string",
-          title: "Question Type",
-          enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating"],
-          enumNames: ["Text", "Boolean", "List", "Multi-Select", "Slider", "Short Answer", "Rating"],
-          default: "text",
-        },
-      },
-      dependencies: {
-        type: {
-          oneOf: [
-            {
-              properties: {
-                type: {
-                  enum: ["text", "boolean", "short_answer"],
-                },
-              },
-            },
-            {
-              properties: {
-                type: {
-                  enum: ["list", "multiselect"],
-                },
-                options: {
-                  type: "array",
-                  title: "Response Options",
-                  minItems: 1,
-                  items: {
-                    type: "object",
-                    properties: {
-                      value: {
-                        title: "Option Text",
-                        type: "string",
-                        minLength: 1,
-                        default: "",
-                      },
-                      description: {
-                        title: "Option Description",
-                        type: "string",
-                        default: "",
-                      },
-                    },
-                  },
-                },
-              },
-              required: ["options"],
-            },
-            {
-              properties: {
-                type: {
-                  enum: ["slider", "rating"],
-                },
-                options: {
-                  type: "array",
-                  title: "Response Options",
-                  minItems: 1,
-                  items: {
-                    type: "object",
-                    properties: {
-                      value: {
-                        title: "Option Text (Numerical)",
-                        type: "number",
-                        default: 0,
-                      },
-                      description: {
-                        title: "Option Description",
-                        type: "string",
-                        default: "",
-                      },
-                    },
-                  },
-                },
-              },
-              required: ["options"],
-            },
-          ],
-        },
-      },
-    },
-  },
-  "lamp.dbt_diary_card": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["life_worth_living_goal", "target_behaviors", "emotions"],
-        properties: {
-          life_worth_living_goal: {
-            title: "Life Worth Living Goal",
-            description: "300 characters max.",
-            type: "string",
-            default: "",
-            "ui:widget": "textarea",
-            "ui:options": {
-              rows: 10,
-            },
-          },
-          target_behaviors: {
-            title: "Target Behaviors",
-            description: "Both good and bad behaviors.",
-            type: "array",
-            items: {
-              type: "object",
-              required: ["name", "unit"],
-              properties: {
-                name: {
-                  title: "Behavior Name",
-                  type: "string",
-                  minLength: 1,
-                },
-                unit: {
-                  title: "Measure of Action",
-                  type: "string",
-                  minLength: 1,
-                  examples: ["Times", "Hours", "Minutes"],
-                },
-              },
-            },
-          },
-          emotions: {
-            title: "Emotions",
-            description: "Both good and bad emotions.",
-            type: "array",
-            items: {
-              title: "Emotion",
-              type: "string",
-              minLength: 1,
-            },
-          },
-        },
-      },
-    },
-  },
-  "lamp.cats_and_dogs": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-      },
-    },
-  },
-  "lamp.cats_and_dogs_new": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-      },
-    },
-  },
-  "lamp.journal": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-      },
-    },
-  },
-  "lamp.scratch_card": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        required: ["threshold"],
-        properties: {
-          threshold: {
-            title: "Threshold",
-            description: "The scratch threshold percentage.",
-            type: "number",
-            minimum: 1,
-            maximum: 100,
-            default: 80,
-          },
-        },
-      },
-    },
-  },
-  "lamp.tips": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-      },
-    },
-  },
-  "lamp.breathe": {
-    type: "object",
-    properties: {
-      settings: {
-        title: "Activity Settings",
-        type: "object",
-        properties: {
-          audio_url: {
-            title: "Remote Audio URL",
-            description: "Do not provide an audio URL AND upload audio below.",
-            type: "string",
-            format: "url",
-          },
-          audio: {
-            title: "Upload Audio",
-            description: "Do not upload audio AND provide an audio URL above.",
-            type: "string",
-            format: "data-url",
-            "ui:options": {
-              accept: [".mp3", ".ogg", ".wav"],
-            },
-          },
-        },
-      },
-    },
-  },
-}
+import { schemaList } from "./ActivityMethods"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -797,6 +86,8 @@ export default function GameCreator({
           intertrial_duration: defaultIntertrialDuration,
           bubble_duration: defaultBubbleDuration,
         }
+      : ["lamp.scratch_image"].includes(activitySpecId)
+      ? { threshold: 80 }
       : {}
   )
   const [data, setData] = useState({
@@ -810,6 +101,7 @@ export default function GameCreator({
     studyID: !!value ? value.study_id : study,
   })
   const validate = () => {
+    console.log(data.settings)
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
       duplicates = activities.filter(
@@ -831,33 +123,40 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.beginner_seconds > 300 ||
-        settings?.beginner_seconds === 0 ||
-        settings?.beginner_seconds === "" ||
-        settings?.intermediate_seconds > 300 ||
-        settings?.intermediate_seconds === 0 ||
-        settings?.intermediate_seconds === "" ||
-        settings?.advanced_seconds > 300 ||
-        settings?.advanced_seconds === 0 ||
-        settings?.advanced_seconds === "" ||
-        settings?.expert_seconds > 300 ||
-        settings?.expert_seconds === 0 ||
-        settings?.expert_seconds === "" ||
-        settings?.diamond_count > 25 ||
-        settings?.diamond_count === 0 ||
-        settings?.diamond_count === "" ||
-        settings?.bonus_point_count === 0 ||
-        settings?.bonus_point_count === "" ||
-        settings?.shape_count > 4 ||
-        settings?.shape_count === 0 ||
-        settings?.shape_count === "" ||
+        data.settings?.beginner_seconds > 300 ||
+        data.settings?.beginner_seconds === 0 ||
+        data.settings?.beginner_seconds === "" ||
+        typeof data.settings?.beginner_seconds == "undefined" ||
+        data.settings?.intermediate_seconds > 300 ||
+        data.settings?.intermediate_seconds === 0 ||
+        data.settings?.intermediate_seconds === "" ||
+        typeof data.settings?.intermediate_seconds == "undefined" ||
+        data.settings?.advanced_seconds > 300 ||
+        data.settings?.advanced_seconds === 0 ||
+        data.settings?.advanced_seconds === "" ||
+        typeof data.settings?.advanced_seconds == "undefined" ||
+        data.settings?.expert_seconds > 300 ||
+        data.settings?.expert_seconds === 0 ||
+        data.settings?.expert_seconds === "" ||
+        typeof data.settings?.expert_seconds == "undefined" ||
+        data.settings?.diamond_count > 25 ||
+        data.settings?.diamond_count === 0 ||
+        data.settings?.diamond_count === "" ||
+        data.settings?.bonus_point_count === 0 ||
+        data.settings?.bonus_point_count === "" ||
+        data.settings?.shape_count > 4 ||
+        data.settings?.shape_count === 0 ||
+        data.settings?.shape_count === "" ||
+        typeof data.settings?.shape_count === "undefined" ||
+        typeof data.settings?.bonus_point_count === "undefined" ||
+        typeof data.settings?.diamond_count === "undefined" ||
         typeof data.name === "undefined" ||
-        settings?.beginner_seconds < 30 ||
-        settings?.intermediate_seconds < 10 ||
-        settings?.expert_seconds < 10 ||
-        settings?.advanced_seconds < 10 ||
-        settings?.diamond_count < 3 ||
-        settings?.shape_count < 1 ||
+        data.settings?.beginner_seconds < 30 ||
+        data.settings?.intermediate_seconds < 10 ||
+        data.settings?.expert_seconds < 10 ||
+        data.settings?.advanced_seconds < 10 ||
+        data.settings?.diamond_count < 3 ||
+        data.settings?.shape_count < 1 ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if (
@@ -869,12 +168,15 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.balloon_count === 0 ||
-        settings?.balloon_count === "" ||
-        settings?.breakpoint_mean === 0 ||
-        settings?.breakpoint_mean === "" ||
-        settings?.breakpoint_std === 0 ||
-        settings?.breakpoint_std === "" ||
+        data.settings?.balloon_count === 0 ||
+        data.settings?.balloon_count === "" ||
+        data.settings?.breakpoint_mean === 0 ||
+        data.settings?.breakpoint_mean === "" ||
+        data.settings?.breakpoint_std === 0 ||
+        data.settings?.breakpoint_std === "" ||
+        typeof data.settings?.breakpoint_std === "undefined" ||
+        typeof data.settings?.balloon_count === "undefined" ||
+        typeof data.settings?.breakpoint_mean === "undefined" ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -887,14 +189,28 @@ export default function GameCreator({
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
-        settings?.bubble_count === 0 ||
-        settings?.bubble_count === "" ||
-        settings?.bubble_speed === 0 ||
-        settings?.bubble_speed === "" ||
-        settings?.intertrial_duration === 0 ||
-        settings?.intertrial_duration === "" ||
-        settings?.bubble_duration === 0 ||
-        settings?.bubble_duration === "" ||
+        data.settings?.bubble_count === 0 ||
+        data.settings?.bubble_count === "" ||
+        data.settings?.bubble_speed === 0 ||
+        data.settings?.bubble_speed === "" ||
+        data.settings?.intertrial_duration === 0 ||
+        data.settings?.intertrial_duration === "" ||
+        data.settings?.bubble_duration === 0 ||
+        data.settings?.bubble_duration === "" ||
+        typeof data.settings?.bubble_duration === "undefined" ||
+        typeof data.settings?.intertrial_duration === "undefined" ||
+        data.settings?.bubble_count.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+        data.settings?.bubble_speed.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
+      )
+    } else if (["lamp.scratch_image"].includes(activitySpecId)) {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        data.settings.threshold > 90 ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
@@ -923,8 +239,8 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    setData({ ...data, settings: settingsData })
     setSettings(settingsData)
+    setData({ ...data, settings: settingsData.settings })
   }
 
   return (
@@ -952,7 +268,9 @@ export default function GameCreator({
           <DynamicForm
             schema={schemaList[activitySpecId]}
             initialData={settings}
-            onChange={(x) => updateSettings({ ...settings, ...x })}
+            onChange={(x) => {
+              updateSettings(x)
+            }}
           />
         )}
       </Container>

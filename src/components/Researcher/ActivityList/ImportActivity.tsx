@@ -7,6 +7,7 @@ import {
   DialogActions,
   DialogContent,
   MenuItem,
+  DialogTitle,
   AppBar,
   Toolbar,
   Icon,
@@ -25,24 +26,24 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  FormControl,
+  InputLabel,
 } from "@material-ui/core"
-import MaterialTable, { MTableToolbar } from "material-table"
 import { useSnackbar } from "notistack"
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import {
-  unspliceActivity,
-  unspliceTipsActivity,
-  spliceActivity,
-  updateActivityData,
   saveGroupActivity,
   saveTipActivity,
   saveSurveyActivity,
   saveCTestActivity,
   unspliceCTActivity,
+  addActivity,
 } from "../ActivityList/ActivityMethods"
+import Pagination from "../../PaginatedElement"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {
@@ -195,15 +196,28 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: 14,
       },
     },
+    formControl: {
+      minWidth: "100%",
+    },
+    importList: { padding: "15px", background: "#f4f4f4", borderBottom: "#fff solid 2px" },
   })
 )
 
-export default function ImportActivity({ studies, ...props }) {
+export default function ImportActivity({ studies, setActivities, onClose, ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
+  const [page, setPage] = useState(0)
+  const [rowCount, setRowCount] = useState(5)
+  const [paginatedImported, setPaginatedImported] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+
+  const handleChangePage = (page: number, rowCount: number) => {
+    setRowCount(rowCount)
+    setPage(page)
+    setPaginatedImported(importFile.slice(page * rowCount, page * rowCount + rowCount))
+  }
 
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
@@ -221,15 +235,23 @@ export default function ImportActivity({ studies, ...props }) {
     }
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
-      const { raw, tag } = unspliceActivity(x)
       try {
-        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
-          ...raw,
+        let newItem = await saveSurveyActivity({
+          ...x,
           id: undefined,
-          study_id: undefined,
+          studyID: selectedStudy,
           tableData: undefined,
-        } as any)) as any).data
-        await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.survey_description", tag)
+        })
+        if (!!newItem.data) {
+          addActivity(
+            {
+              ...x,
+              id: newItem.data,
+              studyID: selectedStudy,
+            },
+            studies
+          )
+        }
       } catch (e) {
         enqueueSnackbar(t("Couldn't import one of the selected survey Activities."), { variant: "error" })
       }
@@ -237,13 +259,22 @@ export default function ImportActivity({ studies, ...props }) {
 
     // CTests only.
     for (let x of _importFile.filter((x) => !["lamp.group", "lamp.survey"].includes(x.spec))) {
-      const { raw, tag } = unspliceCTActivity(x)
       try {
-        allIDs[raw.id] = ((await LAMP.Activity.create(selectedStudy, {
-          ...raw,
+        let newItem = await saveCTestActivity({
+          ...x,
           id: undefined,
-        })) as any).data
-        await LAMP.Type.setAttachment(allIDs[raw.id], "me", "lamp.dashboard.activity_details", tag)
+          studyID: selectedStudy,
+        })
+        if (!!newItem.data) {
+          addActivity(
+            {
+              ...x,
+              id: newItem.data,
+              studyID: selectedStudy,
+            },
+            studies
+          )
+        }
       } catch (e) {
         enqueueSnackbar(t("Couldn't import one of the selected Activities."), { variant: "error" })
       }
@@ -252,17 +283,29 @@ export default function ImportActivity({ studies, ...props }) {
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
     for (let x of _importFile.filter((x) => ["lamp.group"].includes(x.spec))) {
       try {
-        await LAMP.Activity.create(selectedStudy, {
+        let newItem = await saveGroupActivity({
           ...x,
           id: undefined,
           tableData: undefined,
+          studyID: selectedStudy,
           settings: x.settings.map((y) => allIDs[y]),
         })
+        if (!!newItem.data) {
+          addActivity(
+            {
+              ...x,
+              id: newItem.data,
+              studyID: selectedStudy,
+            },
+            studies
+          )
+        }
       } catch (e) {
         enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
       }
     }
-
+    onClose()
+    setActivities()
     enqueueSnackbar(t("The selected Activities were successfully imported."), {
       variant: "success",
     })
@@ -276,9 +319,12 @@ export default function ImportActivity({ studies, ...props }) {
       if (
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
-      )
+      ) {
+        setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
-      else enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
+      } else {
+        enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
+      }
     }
     acceptedFiles.forEach((file) => reader.readAsText(file))
   }, [])
@@ -288,17 +334,35 @@ export default function ImportActivity({ studies, ...props }) {
     accept: "application/json,.json",
     maxSize: 5 * 1024 * 1024 /* 5MB */,
   })
-
   return (
     <Container>
-      <Box mt={2} mb={3}>
-        <Typography variant="body2">{t("Choose the Study you want to import activities.")}</Typography>
+      <Box mt={2} mb={2}>
+        <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
       </Box>
+      <Grid item lg={4} md={6} xs={12}>
+        <FormControl variant="filled" className={classes.formControl}>
+          <InputLabel id="demo-simple-select-filled-label">{t("Study")}</InputLabel>
+          <Select
+            labelId="demo-simple-select-filled-label"
+            id="demo-simple-select-filled"
+            value={selectedStudy}
+            onChange={(event) => {
+              setSelectedStudy(event.target.value)
+            }}
+          >
+            {studies.map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
 
-      <Typography variant="caption">{t("Study")}</Typography>
+      {/* <Typography variant="caption">{t("Study")}</Typography>
       <Select
-        labelId="demo-simple-select-outlined-label"
-        id="demo-simple-select-outlined"
+        labelId="demo-simple-select-filled-label"
+        id="demo-simple-select-filled"
         value={selectedStudy}
         onChange={(event) => {
           setSelectedStudy(event.target.value)
@@ -310,7 +374,7 @@ export default function ImportActivity({ studies, ...props }) {
             {study.name}
           </MenuItem>
         ))}
-      </Select>
+      </Select> */}
 
       {typeof selectedStudy === "undefined" ||
       (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
@@ -322,7 +386,7 @@ export default function ImportActivity({ studies, ...props }) {
       )}
       <Box
         {...getRootProps()}
-        p={4}
+        py={3}
         bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
         color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
         className={classes.dragDrop}
@@ -333,27 +397,31 @@ export default function ImportActivity({ studies, ...props }) {
       </Box>
 
       <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
-        <MaterialTable
-          title="Continue importing?"
-          data={importFile || []}
-          columns={[{ title: "Activity Name", field: "name" }]}
-          options={{ search: false, selection: false }}
-          components={{ Container: (props) => <Box {...props} /> }}
-        />
+        <DialogTitle>{t("Continue importing?")}</DialogTitle>
+        <DialogContent dividers={false}>
+          {(paginatedImported || []).map((activity) => (
+            <Box className={classes.importList}>
+              <Box>{activity.name}</Box>
+            </Box>
+          ))}
+          <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
+        </DialogContent>
         <DialogActions>
-          <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-            {t("Cancel")}
-          </Button>
-          <Button
-            onClick={() => {
-              importActivities(selectedStudy, importFile)
-              setImportFile(undefined)
-            }}
-            color="primary"
-            autoFocus
-          >
-            {t("Import")}
-          </Button>
+          <Box p={2} pt={1}>
+            <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
+              {t("Cancel")}
+            </Button>
+            <Button
+              onClick={() => {
+                importActivities(selectedStudy, importFile)
+                setImportFile(undefined)
+              }}
+              color="primary"
+              autoFocus
+            >
+              {t("Import")}
+            </Button>
+          </Box>
         </DialogActions>
       </Dialog>
     </Container>

@@ -23,7 +23,7 @@ import Passive from "./PassiveBubble"
 import Active from "./ActiveBubble"
 import NotificationSettings from "./NotificationSettings"
 import DeleteParticipant from "./DeleteParticipant"
-import Credentials from "./Credentials"
+import Credentials from "../../Credentials"
 import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -128,7 +128,7 @@ export default function ParticipantListItem({
         <Box>
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
-            <Credentials participant={participant} />
+            <Credentials user={participant} />
             <PatientProfile
               participant={participant}
               studies={studies}

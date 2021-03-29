@@ -28,6 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+
 const theme = createMuiTheme({
   palette: {
     secondary: {
@@ -35,11 +36,18 @@ const theme = createMuiTheme({
     },
   },
 })
-export default function ActivityFooter({ value, onSave, validate, data, ...props }) {
+
+export default function TipFooter({
+  activities,
+  isError,
+  isDuplicate,
+  duplicateTipText,
+  validate,
+  handleType,
+  ...props
+}) {
   const { t } = useTranslation()
   const classes = useStyles()
-  const [saveClicked, setSaveClicked] = useState(false)
-  const [duplicateClicked, setDuplicateClicked] = useState(false)
 
   return (
     <Grid
@@ -49,53 +57,48 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
       spacing={1}
       style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
     >
-      {!!value && (
+      {!!activities ? (
         <Grid item>
-          <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
+          <Tooltip title={t("Duplicate this activity.")}>
             <ThemeProvider theme={theme}>
               <Fab
                 color="secondary"
                 aria-label="Duplicate"
                 variant="extended"
                 onClick={() => {
-                  if (validate()) {
-                    setDuplicateClicked(true)
-                    onSave(data, true /* duplicate */)
-                  }
+                  if (validate()) handleType(1)
                 }}
                 disabled={
-                  duplicateClicked ||
-                  !validate() ||
-                  !onSave ||
-                  (value?.name?.trim() === data?.name?.trim() && value.study_id === data.studyID)
+                  !isError || (activities && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""
                 }
               >
                 {t("Duplicate")}
                 <span style={{ width: 8 }} />
-                <Icon>file_copy</Icon>
+                <Icon>save</Icon>
               </Fab>
             </ThemeProvider>
           </Tooltip>
         </Grid>
+      ) : (
+        ""
       )}
       <Grid item>
         <Tooltip title={t("Save this activity.")}>
-          <Fab
-            className={classes.btnBlue}
-            aria-label="Save"
-            variant="extended"
-            onClick={() => {
-              if (validate()) {
-                setSaveClicked(true)
-                onSave(data, false)
-              }
-            }}
-            disabled={saveClicked || !validate() || !onSave || !data.name}
-          >
-            {t("Save")}
-            <span style={{ width: 8 }} />
-            <Icon>save</Icon>
-          </Fab>
+          <span>
+            <Fab
+              className={classes.btnBlue}
+              aria-label="Save"
+              variant="extended"
+              onClick={() => {
+                if (validate()) handleType(2)
+              }}
+              disabled={!isError}
+            >
+              {t("Save")}
+              <span style={{ width: 8 }} />
+              <Icon>save</Icon>
+            </Fab>
+          </span>
         </Tooltip>
       </Grid>
     </Grid>

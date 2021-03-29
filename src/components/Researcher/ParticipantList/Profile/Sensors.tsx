@@ -119,6 +119,7 @@ export default function Sensors({
             newDeletedIds={deleteSensors}
             setSensors={onChangeSensors}
             setUpdateCount={setUpdateCount}
+            profile={true}
           />
         </Box>
       )}

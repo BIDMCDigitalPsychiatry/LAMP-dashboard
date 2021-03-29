@@ -96,6 +96,9 @@ const useStyles = makeStyles((theme: Theme) =>
         display: "none",
       },
     },
+    dividerMain: {
+      margin: 0,
+    },
   })
 )
 
@@ -144,7 +147,7 @@ export default function AddActivity({
     })
   }, [])
   return (
-    <Box pl={3}>
+    <Box>
       <Fab
         variant="extended"
         color="primary"
@@ -195,6 +198,7 @@ export default function AddActivity({
             onClick={() => {
               setPopover(null)
               setCreate(true)
+              setShowActivityImport(false)
               setActivitySpecId("lamp.group")
               setCreateMenu(true)
             }}
@@ -207,6 +211,7 @@ export default function AddActivity({
               setPopover(null)
               setCreate(true)
               setCreateMenu(true)
+              setShowActivityImport(false)
               setActivitySpecId("lamp.survey")
             }}
           >
@@ -223,6 +228,7 @@ export default function AddActivity({
                   setPopover(null)
                   setCreateMenu(true)
                   setActivitySpecId(x.id)
+                  setShowActivityImport(false)
                   setCreate(true)
                 }}
               >
@@ -232,7 +238,17 @@ export default function AddActivity({
           ]}
         </React.Fragment>
       </Popover>
-      <ResponsiveDialog fullScreen transient={false} animate open={!!createDialogue} onClose={() => setCreate(false)}>
+      <ResponsiveDialog
+        fullScreen
+        transient={false}
+        animate
+        open={!!createDialogue}
+        onClose={() => {
+          setShowActivityImport(false)
+          setCreateMenu(false)
+          setCreate(false)
+        }}
+      >
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
             <IconButton onClick={() => setCreate(false)} color="default" aria-label="Menu">
@@ -241,16 +257,29 @@ export default function AddActivity({
             <Typography variant="h5">{t("Create a new activity")}</Typography>
           </Toolbar>
         </AppBar>
-        <Divider />
+        <Divider className={classes.dividerMain} />
         <Box py={8} px={4}>
-          {!!showActivityImport && <ImportActivity studies={studies} activitieas={activities} />}
+          {!!showActivityImport && (
+            <ImportActivity
+              studies={studies}
+              activitieas={activities}
+              setActivities={setActivities}
+              onClose={() => {
+                setShowActivityImport(false)
+                setCreate(false)
+              }}
+            />
+          )}
           {!!createMenu && (
             <Activity
               allActivities={activities}
               studyId={studyId ?? undefined}
               activitySpecId={activitySpecId}
               studies={studies}
-              onClose={() => setCreate(false)}
+              onClose={() => {
+                setCreateMenu(false)
+                setCreate(false)
+              }}
               setActivities={setActivities}
               setUpdateCount={setUpdateCount}
             />

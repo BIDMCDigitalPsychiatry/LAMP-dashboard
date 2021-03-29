@@ -37,7 +37,7 @@ export default function Pagination({
     <Grid item xs={12}>
       <TablePagination
         component="div"
-        count={data.length}
+        count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}
         onChangePage={handleChangePage}

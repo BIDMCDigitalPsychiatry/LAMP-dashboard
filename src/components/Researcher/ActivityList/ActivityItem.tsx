@@ -89,6 +89,7 @@ export default function ActivityItem({
               activities={activities}
               studies={studies}
               setActivities={setActivities}
+              profile={0}
             />
             <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} />
           </CardActions>

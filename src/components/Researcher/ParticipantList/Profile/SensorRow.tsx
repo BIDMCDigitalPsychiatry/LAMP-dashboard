@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react"
 import { Box, Typography, Icon, IconButton, Checkbox, Grid, makeStyles, createStyles } from "@material-ui/core"
 import { Service } from "../../../DBService/DBService"
-import ConfirmationDialog from "./ConfirmationDialog"
 import UpdateSensor from "../../SensorsList/UpdateSensor"
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -251,7 +250,14 @@ export default function SensorRow({
           </Typography>
         </Grid>
         <Grid item className={classes.w120}>
-          <UpdateSensor sensor={sensor} studies={studies} type="profile" studyId={studyId} setSensors={setSensors} />
+          <UpdateSensor
+            sensor={sensor}
+            studies={studies}
+            type="profile"
+            studyId={studyId}
+            setSensors={setSensors}
+            profile={true}
+          />
         </Grid>
       </Grid>
     </Box>

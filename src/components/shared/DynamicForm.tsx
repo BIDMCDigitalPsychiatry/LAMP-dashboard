@@ -26,7 +26,9 @@ const ObjectFieldTemplate = ({
 }: ObjectFieldTemplateProps) => {
   return (
     <>
-      {(uiSchema["ui:title"] || title) && <TitleField id={`${idSchema.$id}-title`} title={title} required={required} />}
+      {!!properties && properties.length > 0 && (uiSchema["ui:title"] || title) && (
+        <TitleField id={`${idSchema.$id}-title`} title={title} required={required} />
+      )}
       {description && <DescriptionField id={`${idSchema.$id}-description`} description={description} />}
       <Grid container={true} spacing={2} style={{ marginTop: 10 }} {...(uiSchema?.["ui:grid"] ?? {})}>
         {properties.map((element: any, index: number) => (
@@ -127,7 +129,9 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
         schema={schema}
         uiSchema={_extract(schema)}
         formData={initialData}
-        onChange={(x) => onChange(x.formData)}
+        onChange={(x) => {
+          onChange(x.formData)
+        }}
         ObjectFieldTemplate={ObjectFieldTemplate}
         widgets={{ TextWidget: AutocompleteTextWidget }}
       />

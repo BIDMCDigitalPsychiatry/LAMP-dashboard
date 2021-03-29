@@ -5,7 +5,7 @@ import StudyFilter from "../ParticipantList/StudyFilter"
 import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
-import SearchBox from "../SearchBox"
+import SearchBox from "../../SearchBox"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
