@@ -171,9 +171,9 @@ export const schemaList: any = {
             title: "Variant",
             description: "The variant of the Jewels game (A or B).",
             type: "string",
-            enum: ["jewels_a", "jewels_b"],
+            enum: ["trails_a", "trails_b"],
             enumNames: ["Trails A", "Trails B"],
-            default: "jewels_a",
+            default: "trails_a",
             "ui:grid": {
               xs: 6,
             },
@@ -336,9 +336,9 @@ export const schemaList: any = {
             title: "Variant",
             description: "The variant of the Jewels game (A or B).",
             type: "string",
-            enum: ["jewels_a", "jewels_b"],
+            enum: ["trails_a", "trails_b"],
             enumNames: ["Trails A", "Trails B"],
-            default: "jewels_b",
+            default: "trails_b",
             "ui:grid": {
               xs: 6,
             },

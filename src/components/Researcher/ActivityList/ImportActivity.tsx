@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import {
   Box,
   Button,
@@ -8,17 +8,7 @@ import {
   DialogContent,
   MenuItem,
   DialogTitle,
-  AppBar,
-  Toolbar,
-  Icon,
-  IconButton,
-  Divider,
-  Backdrop,
-  CircularProgress,
-  Chip,
-  Tooltip,
   Grid,
-  Fab,
   Container,
   Typography,
   Popover,
@@ -30,19 +20,12 @@ import {
   InputLabel,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
-import {
-  saveGroupActivity,
-  saveTipActivity,
-  saveSurveyActivity,
-  saveCTestActivity,
-  unspliceCTActivity,
-  addActivity,
-} from "../ActivityList/ActivityMethods"
+import { saveGroupActivity, saveSurveyActivity, saveCTestActivity, addActivity } from "../ActivityList/ActivityMethods"
 import Pagination from "../../PaginatedElement"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -203,7 +186,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ImportActivity({ studies, setActivities, onClose, ...props }) {
+export default function ImportActivity({ studies, setActivities, onClose, setUpdateCount, ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -304,8 +287,9 @@ export default function ImportActivity({ studies, setActivities, onClose, ...pro
         enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
       }
     }
-    onClose()
+    setUpdateCount(2)
     setActivities()
+    onClose()
     enqueueSnackbar(t("The selected Activities were successfully imported."), {
       variant: "success",
     })

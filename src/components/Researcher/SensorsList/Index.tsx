@@ -93,7 +93,7 @@ export default function SensorsList({
           if ((sensorData || []).length > 0) {
             if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(sensorData)
-              result = result.filter((i) => i.name.toLowerCase().includes(searchTxt.toLowerCase()))
+              result = result.filter((i) => i.name?.toLowerCase().includes(searchTxt?.toLowerCase()))
               setSensors(sortData(result, selectedStudies, "name"))
             } else {
               result = result.concat(sensorData)

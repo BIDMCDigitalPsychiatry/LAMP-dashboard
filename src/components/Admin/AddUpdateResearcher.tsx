@@ -90,8 +90,8 @@ export default function AddUpdateResearcher({
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
       !!researcher
-        ? x.name.toLowerCase() === name?.trim().toLowerCase() && x.id !== researcher?.id
-        : x.name.toLowerCase() === name?.trim().toLowerCase()
+        ? x.name?.toLowerCase() === name?.trim().toLowerCase() && x.id !== researcher?.id
+        : x.name?.toLowerCase() === name?.trim().toLowerCase()
     )
     if (duplicates.length > 0) {
       enqueueSnackbar("Researcher with same name already exist.", { variant: "error" })

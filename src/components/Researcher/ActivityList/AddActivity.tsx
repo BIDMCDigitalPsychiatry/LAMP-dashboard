@@ -268,6 +268,7 @@ export default function AddActivity({
                 setShowActivityImport(false)
                 setCreate(false)
               }}
+              setUpdateCount={setUpdateCount}
             />
           )}
           {!!createMenu && (
