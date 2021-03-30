@@ -170,7 +170,7 @@ function compress(file, width, height) {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     const fileName = file.name
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const extension = fileName.split(".").reverse()[0]?.toLowerCase()
     reader.onerror = (error) => reject(error)
     if (extension !== "svg") {
       reader.onload = (event) => {
@@ -288,8 +288,8 @@ export default function GameCreator({
       duplicates = activities.filter(
         (x) =>
           (!!value
-            ? x.name.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
+            ? x.name?.toLowerCase() === text?.trim().toLowerCase() && x.id !== value?.id
+            : x.name?.toLowerCase() === text?.trim().toLowerCase()) && studyId === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })

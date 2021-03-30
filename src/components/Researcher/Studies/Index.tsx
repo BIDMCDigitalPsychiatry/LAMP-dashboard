@@ -79,7 +79,7 @@ export default function StudiesList({
   const searchFilterStudies = async () => {
     if (!!search && search !== "") {
       let studiesList: any = await Service.getAll("studies")
-      let newStudies = studiesList.filter((i) => i.name.toLowerCase()?.includes(search.toLowerCase()))
+      let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
       setAllStudies(newStudies)
     } else {
       getAllStudies()

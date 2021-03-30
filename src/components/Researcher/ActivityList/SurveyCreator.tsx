@@ -322,8 +322,8 @@ export default function SurveyCreator({
       duplicates = activities.filter(
         (x) =>
           (!!value
-            ? x.name.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
+            ? x.name?.toLowerCase() === data?.name?.trim().toLowerCase() && x.id !== value?.id
+            : x.name?.toLowerCase() === data?.name?.trim().toLowerCase()) && data.studyID === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar(t("Activity with same name already exist."), { variant: "error" })
@@ -334,43 +334,55 @@ export default function SurveyCreator({
       typeof data.name === "undefined" ||
       (typeof data.name !== "undefined" && data.name?.trim() === "") ||
       data.studyID === null ||
-      data.studyID === ""
+      data.studyID === "" ||
+      !validateQuestions()
     )
   }
 
-  const checkAndSave = (data, isDuplicate) => {
+  const validateQuestions = () => {
+    let status = 0
     if (!!questions && questions.length > 0) {
       let optionsArray = []
       {
         questions.map((x, idx) =>
-          questions[idx].type == "list" ||
-          questions[idx].type == "multiselect" ||
-          questions[idx].type == "slider" ||
-          questions[idx].type == "rating"
+          questions[idx].type === "list" ||
+          questions[idx].type === "multiselect" ||
+          questions[idx].type === "slider" ||
+          questions[idx].type === "rating"
             ? questions[idx].options === null || (!!questions[idx].options && questions[idx].options.length === 0)
               ? optionsArray.push(1)
-              : (questions[idx].options || []).map((x, id) =>
-                  questions[idx].options[id].value == "" ||
-                  questions[idx].options[id].value == null ||
-                  questions[idx].options[id].value == undefined ||
-                  !questions[idx].options[id].value.trim().length
-                    ? optionsArray.push(id)
-                    : optionsArray.push(0)
-                )
+              : (questions[idx].options || []).filter((i) => !!i && i?.value?.trim().length > 0).length > 0
+              ? optionsArray.push(0)
+              : optionsArray.push(1)
             : optionsArray.push(0)
         )
       }
       if (optionsArray.filter((val) => val !== 0).length > 0) {
-        setIsOptionNull(0)
-      } else {
         setIsOptionNull(1)
+        status = 1
+        return false
+      } else {
+        status = 0
+        setIsOptionNull(0)
       }
     }
+    if (questions.length === 0 || questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length === 0) {
+      return false
+    } else if (
+      questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
+      status === 1
+    ) {
+      return false
+    }
+    return true
+  }
+
+  const checkAndSave = (data, isDuplicate) => {
     if (questions.length === 0 || questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length === 0) {
       enqueueSnackbar(t("At least one question required."), { variant: "error" })
     } else if (
       questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
-      isOptionNull === 0
+      isOptionNull === 1
     ) {
       enqueueSnackbar(t("At least one option required for list/slider/rating/multiselect type questions."), {
         variant: "error",

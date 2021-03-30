@@ -23,7 +23,7 @@ function compress(file, width, height) {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     const fileName = file.name
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const extension = fileName.split(".").reverse()[0]?.toLowerCase()
     reader.onerror = (error) => reject(error)
     if (extension !== "svg") {
       reader.onload = (event) => {
@@ -230,7 +230,7 @@ export default function TipsHeader({
     reader.readAsDataURL(file)
     if (type === "photo") {
       const fileName = file.name
-      const extension = fileName.split(".").reverse()[0].toLowerCase()
+      const extension = fileName.split(".").reverse()[0]?.toLowerCase()
       const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
       if (extension !== "svg") {
         let width = 300
@@ -268,7 +268,7 @@ export default function TipsHeader({
     const file = event.target.files[0]
     const fileName = event.target.files[0].name
     const fileSize = event.target.files[0].size / 1024 / 1024
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const extension = fileName.split(".").reverse()[0]?.toLowerCase()
     const fileFormats = ["jpeg", "jpg", "png", "bmp", "gif", "svg"]
     if (fileFormats.includes(extension) && fileSize <= 4) {
       setLoading(true)

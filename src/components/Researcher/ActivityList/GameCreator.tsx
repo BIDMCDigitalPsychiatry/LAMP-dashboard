@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Grid, Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
@@ -50,46 +50,44 @@ export default function GameCreator({
   const defaultBubbleSpeed = [60, 80, 80]
   const defaultIntertrialDuration = 0.5
   const defaultBubbleDuration = 1.0
-  const [settings, setSettings] = useState(
-    !!value
-      ? value?.settings
-      : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
-        ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
-      ? {
-          mode: 1,
-          variant:
-            activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a")
-              ? "trails_a"
-              : "trails_b",
-          beginner_seconds: 90,
-          intermediate_seconds: 30,
-          advanced_seconds: 25,
-          expert_seconds: 15,
-          diamond_count: 15,
-          shape_count: (value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1,
-          bonus_point_count: 50,
-          x_changes_in_level_count: 1,
-          x_diamond_count: 0,
-          y_changes_in_level_count: 1,
-          y_shape_count: 1,
-        }
-      : ["lamp.balloon_risk"].includes(activitySpecId)
-      ? {
-          balloon_count: defaultBallonCount,
-          breakpoint_mean: defaultMean,
-          breakpoint_std: defaultSD,
-        }
-      : ["lamp.pop_the_bubbles"].includes(activitySpecId)
-      ? {
-          bubble_count: defaultBubbleCount,
-          bubble_speed: defaultBubbleSpeed,
-          intertrial_duration: defaultIntertrialDuration,
-          bubble_duration: defaultBubbleDuration,
-        }
-      : ["lamp.scratch_image"].includes(activitySpecId)
-      ? { threshold: 80 }
-      : {}
-  )
+  const settings = !!value
+    ? value?.settings
+    : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value?.spec)) ||
+      ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
+    ? {
+        mode: 1,
+        variant:
+          activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a")
+            ? "trails_a"
+            : "trails_b",
+        beginner_seconds: 90,
+        intermediate_seconds: 30,
+        advanced_seconds: 25,
+        expert_seconds: 15,
+        diamond_count: 15,
+        shape_count: (value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1,
+        bonus_point_count: 50,
+        x_changes_in_level_count: 1,
+        x_diamond_count: 0,
+        y_changes_in_level_count: 1,
+        y_shape_count: 1,
+      }
+    : ["lamp.balloon_risk"].includes(activitySpecId)
+    ? {
+        balloon_count: defaultBallonCount,
+        breakpoint_mean: defaultMean,
+        breakpoint_std: defaultSD,
+      }
+    : ["lamp.pop_the_bubbles"].includes(activitySpecId)
+    ? {
+        bubble_count: defaultBubbleCount,
+        bubble_speed: defaultBubbleSpeed,
+        intertrial_duration: defaultIntertrialDuration,
+        bubble_duration: defaultBubbleDuration,
+      }
+    : ["lamp.scratch_image"].includes(activitySpecId)
+    ? { threshold: 80 }
+    : {}
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
@@ -97,18 +95,18 @@ export default function GameCreator({
     schedule: [],
     description: "",
     photo: details?.photo ?? null,
-    settings: settings ?? [],
+    settings: !!value ? value.settings : settings,
     studyID: !!value ? value.study_id : study,
   })
+
   const validate = () => {
-    console.log(data.settings)
     let duplicates = []
     if (typeof data.name !== "undefined" && data.name?.trim() !== "") {
       duplicates = activities.filter(
         (x) =>
           (!!value
-            ? x.name.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
-            : x.name.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
+            ? x.name?.toLowerCase() === data.name?.trim().toLowerCase() && x.id !== value?.id
+            : x.name?.toLowerCase() === data.name?.trim().toLowerCase()) && data.studyID === x.study_id
       )
       if (duplicates.length > 0) {
         enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
@@ -231,7 +229,7 @@ export default function GameCreator({
       name: details.text,
       spec: value?.spec ?? activitySpecId,
       schedule: [],
-      settings: settings,
+      settings: data.settings,
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
@@ -239,8 +237,7 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    setSettings(settingsData)
-    setData({ ...data, settings: settingsData.settings })
+    setData({ ...data, settings: settingsData?.settings })
   }
 
   return (
@@ -254,7 +251,7 @@ export default function GameCreator({
           value={value}
           details={details}
           activitySpecId={activitySpecId}
-          study={data.studyID}
+          study={data?.studyID ?? ""}
           onChange={handleChange}
           image={
             (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
@@ -267,14 +264,14 @@ export default function GameCreator({
           Object.keys(schemaList).includes(activitySpecId)) && (
           <DynamicForm
             schema={schemaList[activitySpecId]}
-            initialData={settings}
+            initialData={data}
             onChange={(x) => {
               updateSettings(x)
             }}
           />
         )}
       </Container>
-      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data} />
+      <ActivityFooter onSave={onSave} validate={validate} value={value} data={data ?? []} />
     </Grid>
   )
 }

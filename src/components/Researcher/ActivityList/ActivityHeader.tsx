@@ -9,7 +9,7 @@ function compress(file, width, height) {
     const reader = new FileReader()
     reader.readAsDataURL(file)
     const fileName = file.name
-    const extension = fileName.split(".").reverse()[0].toLowerCase()
+    const extension = fileName.split(".").reverse()[0]?.toLowerCase()
     reader.onerror = (error) => reject(error)
     if (extension !== "svg") {
       reader.onload = (event) => {

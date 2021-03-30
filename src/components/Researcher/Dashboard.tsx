@@ -162,10 +162,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   useEffect(() => {
     if (deletedData !== null) {
       let newStudies = studies.filter((item) => {
-        if (search) {
-          return item.name.toLowerCase()?.includes(search.toLowerCase()) && item.id !== deletedData
+        if (!!search) {
+          return item?.name?.toLowerCase()?.includes(search?.toLowerCase()) && item.id !== deletedData
         } else {
-          return item.id !== deletedData
+          return item?.id !== deletedData
         }
       })
       setStudies(newStudies)
