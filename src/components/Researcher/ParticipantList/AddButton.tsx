@@ -163,8 +163,7 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
           <MenuItem
             onClick={() => {
               setPopover(null)
-              setAddStudy(false)
-              setAddParticipantStudy(true)
+              setAddStudy(true)
             }}
           >
             <Typography variant="h6">{t("Add a new study")}</Typography>
@@ -173,7 +172,8 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
           <MenuItem
             onClick={() => {
               setPopover(null)
-              setAddStudy(true)
+              setAddStudy(false)
+              setAddParticipantStudy(true)
             }}
           >
             <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
