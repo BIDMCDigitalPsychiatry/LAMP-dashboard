@@ -204,6 +204,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
 
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
+    let status = true
     const _importFile = [...importFile] // clone it so we can close the dialog first
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
@@ -236,7 +237,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
           )
         }
       } catch (e) {
-        enqueueSnackbar(t("Couldn't import one of the selected survey Activities."), { variant: "error" })
+        status = false
       }
     }
 
@@ -259,7 +260,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
           )
         }
       } catch (e) {
-        enqueueSnackbar(t("Couldn't import one of the selected Activities."), { variant: "error" })
+        status = false
       }
     }
 
@@ -284,15 +285,19 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
           )
         }
       } catch (e) {
-        enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
+        status = false
       }
     }
-    setUpdateCount(2)
-    setActivities()
+    if (status) {
+      setUpdateCount(2)
+      setActivities()
+      enqueueSnackbar(t("The selected Activities were successfully imported."), {
+        variant: "success",
+      })
+    } else {
+      enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
+    }
     onClose()
-    enqueueSnackbar(t("The selected Activities were successfully imported."), {
-      variant: "success",
-    })
   }
   const onDrop = useCallback((acceptedFiles) => {
     const reader = new FileReader()
