@@ -8,6 +8,8 @@ import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
 import { schemaList } from "./ActivityMethods"
+import ScratchCard from "../../../icons/ScratchCard.svg"
+import JournalIcon from "../../../icons/Journal.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,52 +44,7 @@ export default function GameCreator({
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const [loading, setLoading] = React.useState(false)
-  const { t } = useTranslation()
-  const defaultBallonCount = 15
-  const defaultMean = 64.5
-  const defaultSD = 37
-  const defaultBubbleCount = [60, 80, 80]
-  const defaultBubbleSpeed = [60, 80, 80]
-  const defaultIntertrialDuration = 0.5
-  const defaultBubbleDuration = 1.0
-  const settings = !!value
-    ? value?.settings
-    : (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value?.spec)) ||
-      ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
-    ? {
-        mode: 1,
-        variant:
-          activitySpecId === "lamp.jewels_a" || (value?.spec && value?.spec === "lamp.jewels_a")
-            ? "trails_a"
-            : "trails_b",
-        beginner_seconds: 90,
-        intermediate_seconds: 30,
-        advanced_seconds: 25,
-        expert_seconds: 15,
-        diamond_count: 15,
-        shape_count: (value?.spec && "lamp.jewels_b" === value.spec) || "lamp.jewels_b" == activitySpecId ? 2 : 1,
-        bonus_point_count: 50,
-        x_changes_in_level_count: 1,
-        x_diamond_count: 0,
-        y_changes_in_level_count: 1,
-        y_shape_count: 1,
-      }
-    : ["lamp.balloon_risk"].includes(activitySpecId)
-    ? {
-        balloon_count: defaultBallonCount,
-        breakpoint_mean: defaultMean,
-        breakpoint_std: defaultSD,
-      }
-    : ["lamp.pop_the_bubbles"].includes(activitySpecId)
-    ? {
-        bubble_count: defaultBubbleCount,
-        bubble_speed: defaultBubbleSpeed,
-        intertrial_duration: defaultIntertrialDuration,
-        bubble_duration: defaultBubbleDuration,
-      }
-    : ["lamp.scratch_image"].includes(activitySpecId)
-    ? { threshold: 80 }
-    : {}
+
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
@@ -95,7 +52,7 @@ export default function GameCreator({
     schedule: [],
     description: "",
     photo: details?.photo ?? null,
-    settings: !!value ? value.settings : settings,
+    settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
   })
 
@@ -257,6 +214,10 @@ export default function GameCreator({
             (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
             ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
               ? Jewels
+              : (value?.spec && "lamp.scratch_image" === value.spec) || "lamp.scratch_image" === activitySpecId
+              ? ScratchCard
+              : (value?.spec && "lamp.journal" === value.spec) || "lamp.journal" === activitySpecId
+              ? JournalIcon
               : null
           }
         />
