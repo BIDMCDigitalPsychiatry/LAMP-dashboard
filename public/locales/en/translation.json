@@ -550,5 +550,6 @@
 	"Please enter Bubble Count with comma seperated.": "Please enter Bubble Count with comma seperated.",
 	"Please enter Intertrial Duration.": "Please enter Intertrial Duration.",
 	"Please enter Bubble Duration.": "Please enter Bubble Duration.",
-	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated."
+	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated.",
+	"Study name and patient name will be same.": "Group name and user name will be same."
 }

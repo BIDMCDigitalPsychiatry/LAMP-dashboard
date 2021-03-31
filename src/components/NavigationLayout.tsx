@@ -234,8 +234,8 @@ export default function NavigationLayout({
       if (sensorData === null) {
         ;(async () => {
           let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
-          data = (data || []).filter((d) => d.data.page === "conversations")
-          setSensorData(data ? data[0] : [])
+          data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+          setSensorData(!!data ? data[0] : [])
         })()
       }
       refreshMessages()
