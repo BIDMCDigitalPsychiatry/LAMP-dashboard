@@ -195,7 +195,7 @@ export default function Researchers({ history, ...props }) {
       } else {
         setPaginatedResearchers(data.slice(0, rowCount))
       }
-      setPage(0)
+      setPage(page)
       setResearchers(data)
     })
   }
@@ -217,12 +217,7 @@ export default function Researchers({ history, ...props }) {
   const handleChangePage = (page: number, rowCount: number) => {
     setPage(page)
     setRowCount(rowCount)
-    if (search.trim().length > 0) {
-      let data = researchers.filter((researcher) => researcher.name.includes(search))
-      setPaginatedResearchers(data.slice(page, rowCount))
-    } else {
-      setPaginatedResearchers(researchers.slice(page, rowCount))
-    }
+    setPaginatedResearchers(researchers.slice(page * rowCount, page * rowCount + rowCount))
   }
 
   return (
