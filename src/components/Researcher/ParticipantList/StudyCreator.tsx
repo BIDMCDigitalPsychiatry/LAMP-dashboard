@@ -94,27 +94,10 @@ export default function StudyCreator({
       let result = JSON.parse(JSON.stringify(res))
       let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
       Service.addData("studies", [studiesData])
-      let selectedStudy = result.data
-      let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
-      let id = typeof idData === "object" ? idData.id : idData
-      let newParticipant: any = {}
-      if (typeof idData === "object") {
-        newParticipant = idData
-      } else {
-        newParticipant["id"] = idData
-      }
-      if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
-        enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
-      } else {
-        newParticipant.study_id = selectedStudy
-        newParticipant.study_name = studyName
-        Service.addData("participants", [newParticipant])
-        Service.updateCount("studies", selectedStudy, "participants_count")
-        enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
-          variant: "success",
-        })
-      }
-      studiesData.participant_count = 1
+      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+        variant: "success",
+      })
+      studiesData.participant_count = 0
       handleNewStudy(studiesData)
       closePopUp(2)
       setStudyName("")
@@ -140,16 +123,14 @@ export default function StudyCreator({
         "#type": "Study",
         id: "study" + parseInt(studiesCount + 1),
         name: studyName,
-        participant_count: 1,
+        participant_count: 0,
         sensor_count: 0,
         activity_count: 0,
       }
       Service.addData("studies", [newStudyObj])
-      let newParticipant: any = {}
-      newParticipant.id = "U" + Math.random().toString().substring(2, 11)
-      newParticipant.study_id = newStudyObj.id
-      newParticipant.study_name = studyName
-      Service.addData("participants", [newParticipant])
+      enqueueSnackbar(t("Successfully created new study - studyName.", { studyName: studyName }), {
+        variant: "success",
+      })
       handleNewStudy(newStudyObj)
       closePopUp(2)
       setStudyName("")
@@ -172,7 +153,7 @@ export default function StudyCreator({
         <CircularProgress color="inherit" />
       </Backdrop>
       <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
+        <Typography variant="h6">{t("Add a new study.")}</Typography>
         <IconButton
           aria-label="close"
           className={classes.closeButton}

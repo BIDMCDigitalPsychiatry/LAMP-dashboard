@@ -241,7 +241,11 @@ export default function PatientStudyCreator({
                 let filteredParticipants = results.studies[0].participants.filter(
                   (eachParticipant) => eachParticipant.study_id === newStudyId
                 )
-                saveStudyData(filteredParticipants, "participants")
+                if (filteredParticipants.length > 0) {
+                  filteredParticipants[0].name = studyName
+                  LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
+                  saveStudyData(filteredParticipants, "participants")
+                }
               }
               setLoading(false)
             })
@@ -266,7 +270,11 @@ export default function PatientStudyCreator({
               let filteredParticipants = results.studies[0].participants.filter(
                 (eachParticipant) => eachParticipant.study_id === newStudyId
               )
-              saveStudyData(filteredParticipants, "participants")
+              if (filteredParticipants.length > 0) {
+                filteredParticipants[0].name = studyName
+                LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
+                saveStudyData(filteredParticipants, "participants")
+              }
             }
             newStudyData.participant_count = 1
             setLoading(false)
@@ -364,9 +372,10 @@ export default function PatientStudyCreator({
             }}
             classes={{ checked: classes.checkboxActive }}
             inputProps={{ "aria-label": "primary checkbox" }}
-          />{" "}
+          />
           {t("Create a new patient under this study")}
         </Box>
+        {!!createPatient && <Typography variant="caption">{t("Study name and patient name will be same.")}</Typography>}
       </DialogContent>
       <DialogActions>
         <Box textAlign="right" width={1} mt={1} mb={3} mx={3}>
