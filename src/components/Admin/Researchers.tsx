@@ -168,7 +168,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Researchers({ history, ...props }) {
+export default function Researchers({ history, updateStore, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
@@ -188,15 +188,17 @@ export default function Researchers({ history, ...props }) {
   }, [])
 
   const refreshResearchers = () => {
+    setPaginatedResearchers([])
+    setPage(0)
+    setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
-        setPaginatedResearchers(data.slice(0, rowCount))
+        setResearchers(data)
       } else {
-        setPaginatedResearchers(data.slice(0, rowCount))
+        setResearchers(data)
       }
-      setPage(page)
-      setResearchers(data)
+      setPaginatedResearchers(data.slice(0, rowCount))
     })
   }
 
@@ -238,6 +240,7 @@ export default function Researchers({ history, ...props }) {
                     history={history}
                     refreshResearchers={refreshResearchers}
                     researchers={researchers}
+                    updateStore={updateStore}
                   />
                 </Grid>
               ))}

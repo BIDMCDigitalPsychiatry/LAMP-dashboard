@@ -112,7 +112,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Root({ ...props }) {
+export default function Root({ updateStore, ...props }) {
   const { t, i18n } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -170,7 +170,7 @@ export default function Root({ ...props }) {
               </ListItem>
             </List>
           </Drawer>
-          {currentTab === 0 && <Researchers history={props.history} />}
+          {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} />}
         </ResponsivePaper>
       </Container>
     </Container>

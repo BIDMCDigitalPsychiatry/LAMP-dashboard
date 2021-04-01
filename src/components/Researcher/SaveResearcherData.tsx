@@ -72,34 +72,36 @@ export const saveDataToCache = (authString, id) => {
   Service.getAll("researcher").then((data) => {
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
-        saveStudiesAndParticipants(result)
-        Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
-        result.studies.map((study) => {
-          if (result.unityhealth_settings) {
-            fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {
-              saveSettings(settings, "name")
-              saveSettings(settings, "unity_settings")
-            })
-          } else {
-            fetchResult(authString, study.id, "participant/mode/4", "study").then((settings) => {
-              saveSettings(settings, "name")
-            })
-          }
-          fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
-            saveSettings(sensors, "accelerometer")
-            saveSettings(sensors, "analytics")
-            saveSettings(sensors, "gps")
-            fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
-              saveSettings(events, "active")
+        if (!!result.studies) {
+          saveStudiesAndParticipants(result)
+          Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
+          result.studies.map((study) => {
+            if (result.unityhealth_settings) {
+              fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {
+                saveSettings(settings, "name")
+                saveSettings(settings, "unity_settings")
+              })
+            } else {
+              fetchResult(authString, study.id, "participant/mode/4", "study").then((settings) => {
+                saveSettings(settings, "name")
+              })
+            }
+            fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
+              saveSettings(sensors, "accelerometer")
+              saveSettings(sensors, "analytics")
+              saveSettings(sensors, "gps")
+              fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
+                saveSettings(events, "active")
+              })
             })
           })
-        })
-        fetchResult(authString, id, "activity", "researcher").then((result) => {
-          saveStudyData(result, "activities")
-          fetchResult(authString, id, "sensor", "researcher").then((result) => {
-            saveStudyData(result, "sensors")
+          fetchResult(authString, id, "activity", "researcher").then((result) => {
+            saveStudyData(result, "activities")
+            fetchResult(authString, id, "sensor", "researcher").then((result) => {
+              saveStudyData(result, "sensors")
+            })
           })
-        })
+        }
       })
     }
   })

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useState } from "react"
 import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
@@ -42,14 +42,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, ...props }) {
+export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, updateStore, ...props }) {
   const classes = useStyles()
+  const [name, setName] = useState(researcher.name)
 
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" alignItems="center">
         <Box flexGrow={1} py={1}>
-          <CardHeader className={classes.activityHeader} title={researcher.name} />
+          <CardHeader className={classes.activityHeader} title={name} />
         </Box>
         <Box>
           <CardActions>
@@ -57,7 +58,9 @@ export default function ResearcherRow({ history, researcher, researchers, refres
             <AddUpdateResearcher
               researcher={researcher}
               refreshResearchers={refreshResearchers}
+              setName={setName}
               researchers={researchers}
+              updateStore={updateStore}
             />
             <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <Fab
