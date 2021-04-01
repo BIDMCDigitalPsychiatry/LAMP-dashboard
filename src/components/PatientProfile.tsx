@@ -293,7 +293,7 @@ const useStyles = makeStyles((theme) =>
 )
 const availableAtiveSpecs = [
   "lamp.group",
-  "lamp.suvey",
+  "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",

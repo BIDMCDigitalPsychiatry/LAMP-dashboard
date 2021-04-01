@@ -348,7 +348,7 @@ export function spliceCTActivity({ raw, tag }) {
 
 const availableAtiveSpecs = [
   "lamp.group",
-  "lamp.suvey",
+  "lamp.survey",
   "lamp.journal",
   "lamp.jewels_a",
   "lamp.jewels_b",
