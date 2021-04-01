@@ -203,10 +203,6 @@ export default function Researchers({ history, updateStore, ...props }) {
   }
 
   useEffect(() => {
-    console.log(page)
-  }, [page])
-
-  useEffect(() => {
     refreshResearchers()
   }, [search])
 
