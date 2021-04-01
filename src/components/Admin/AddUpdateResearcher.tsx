@@ -75,17 +75,21 @@ export default function AddUpdateResearcher({
   researcher,
   researchers,
   refreshResearchers,
+  setName,
+  updateStore,
   ...props
 }: {
   researcher?: any
   researchers?: any
   refreshResearchers?: Function
+  setName?: Function
+  updateStore?: Function
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
-  const [name, setName] = useState(!!researcher ? researcher.name : "")
+  const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
 
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
@@ -103,14 +107,19 @@ export default function AddUpdateResearcher({
           ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any).error === undefined
           : ((await LAMP.Researcher.create(researcherObj)) as any).error === undefined
       ) {
+        if (!!researcher) {
+          updateStore(researcher.id)
+          setName(name)
+        } else {
+          refreshResearchers()
+        }
         enqueueSnackbar(
           !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
           {
             variant: "success",
           }
         )
-        refreshResearchers()
-        setName("")
+        setResearcherName("")
         setOpen(false)
       } else
         enqueueSnackbar(t("Failed to create a new researcher."), {
@@ -138,7 +147,7 @@ export default function AddUpdateResearcher({
             id="name"
             label="Name"
             fullWidth
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => setResearcherName(event.target.value)}
             value={name}
             helperText={typeof name == "undefined" || name === null || name.trim() === "" ? t("Please enter name") : ""}
           />

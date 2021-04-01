@@ -309,6 +309,17 @@ function AppRouter({ ...props }) {
     })
   }
 
+  const updateStore = (id: string) => {
+    if (!!store.researchers[id]) {
+      LAMP.Researcher.view(id).then((x) => {
+        setStore({
+          researchers: { ...store.researchers, [id]: x },
+          participants: store.participants,
+        })
+      })
+    }
+  }
+
   return (
     <Switch>
       <Route
@@ -427,7 +438,7 @@ function AppRouter({ ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Root {...props} />
+                <Root {...props} updateStore={updateStore} />
               </NavigationLayout>
             </React.Fragment>
           )
@@ -450,6 +461,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
+              {console.log(getResearcher(props.match.params.id).name)}
               <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
               <NavigationLayout
                 authType={state.authType}

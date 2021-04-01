@@ -154,17 +154,9 @@ export default function TipsHeader({
     settings: [{ title: "", text: "", image: "" }],
     studyID: "",
   }
-  useEffect(() => {
-    if (activitySpecId === "lamp.tips") {
-      // getAllTips
-      console.log(1002, study, studies, studyId)
-    }
-  }, [activitySpecId])
 
   useEffect(() => {
-    console.log(1003, studyId)
     setStudyId(studyId)
-
     if (activitySpecId === "lamp.tips") {
       getAllTips(studyId)
     }
@@ -175,7 +167,6 @@ export default function TipsHeader({
     ;(async () => {
       if (category && category !== "add_new") {
         let existsData = categoryArray.find((o) => o.id === category)
-        console.log(4000, existsData)
         if (Object.keys(existsData).length > 0) {
           if (existsData.id) {
             let iconsData: any = await LAMP.Type.getAttachment(existsData.id, "lamp.dashboard.activity_details")
@@ -183,26 +174,17 @@ export default function TipsHeader({
               setCategoryImage(iconsData.data.icon)
             }
           }
-          /*
-          if (!activities) {
-            let mergedSettings = existsData.settings.concat(defaultSettingsArray)
-            existsData.settings = mergedSettings
-          }
-          */
           if (!value) {
             let mergedSettings = existsData.settings.concat(defaultSettingsArray)
             existsData.settings = mergedSettings
-            console.log(4001, existsData)
           }
           setSelectedCategory(existsData)
           tipsArrayValue(existsData)
           setTipsDataArray(existsData.settings)
         }
       } else {
-        console.log(4002, defaultSettingsArray)
         setTipsDataArray(defaultSettingsArray)
         tipsArrayValue(defaultSettingsArray)
-        //tipsArrayValue({ title: "", text: "", image: "" })
         setSelectedCategory(defaultSelectedCategory)
       }
       setLoading(false)
@@ -213,16 +195,9 @@ export default function TipsHeader({
     if (studyId) {
       Service.getDataByKey("activities", [studyId], "study_id").then((activitiesObject) => {
         let tipActivities = activitiesObject.filter((x) => x.spec === activitySpecId)
-        console.log(1001, tipActivities)
         setCategoryArray(tipActivities)
       })
-    } /*else {
-      Service.getAll("activities").then((activitiesObject: any) => {
-        let tipActivities = activitiesObject.filter((x) => x.spec === activitySpecId)
-        console.log(1004, tipActivities)
-        setCategoryArray(tipActivities)
-      })
-    }*/
+    }
   }
 
   const getBase64 = (file, cb, type = "") => {
