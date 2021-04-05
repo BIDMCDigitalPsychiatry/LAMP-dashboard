@@ -14,16 +14,17 @@ import {
   makeStyles,
   createStyles,
   Link,
+  Theme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
+import { Service } from "./DBService/DBService"
 
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
-import { Theme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -50,7 +51,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "& input": { backgroundColor: "#f5f5f5", borderRadius: 10 },
       "& fieldset": { border: 0 },
     },
-
     buttonNav: {
       "& button": { width: 200, "& span": { textTransform: "capitalize", fontSize: 16, fontWeight: "bold" } },
     },
@@ -80,7 +80,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
-
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
@@ -91,7 +90,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       }
     }
   }, [])
-
   useEffect(() => {
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
@@ -134,6 +132,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             language: selectedLanguage,
           })
         )
+        ;(async () => {
+          await Service.deleteDB()
+        })()
         setLoginClick(false)
         onComplete()
       })
@@ -156,43 +157,42 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           onClick={(event) => setHelpMenu(event.currentTarget)}
         >
           <Icon>help</Icon>
-          <Menu
-            keepMounted
-            open={Boolean(helpMenu)}
-            anchorPosition={helpMenu?.getBoundingClientRect()}
-            anchorReference="anchorPosition"
-            onClose={() => setHelpMenu(undefined)}
-          >
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://community.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("mailto:team@digitalpsych.org", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
-            </MenuItem>
-          </Menu>
         </IconButton>
-
+        <Menu
+          id="simple-menu"
+          anchorEl={helpMenu}
+          keepMounted
+          open={Boolean(helpMenu)}
+          onClose={() => setHelpMenu(undefined)}
+        >
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://docs.lamp.digital", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://community.lamp.digital", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("mailto:team@digitalpsych.org", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
+          </MenuItem>
+        </Menu>
         <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
             <form onSubmit={(e) => handleLogin(e)}>
@@ -238,7 +238,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   variant="outlined"
                   style={{ width: "100%", height: 90 }}
                   // label="Domain"
-                  placeholder="api.lampv2.unityhealth.to"
+                  placeholder="api.lamp.digital"
                   helperText={t("Don't enter a domain if you're not sure what this option does.")}
                   value={state.serverAddress || ""}
                   onChange={handleChange}
@@ -321,7 +321,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   <Link
                     underline="none"
                     className={classes.linkBlue}
-                    onClick={(event) => (window.location.href = "https://www.digitalpsych.org/studies.html")}
+                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
                   >
                     {t("Research studies using mindLAMP")}
                   </Link>
