@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import {
   Card,
-  Icon,
   Step,
   Stepper,
   StepLabel,
@@ -18,13 +18,10 @@ import {
   DialogActions,
   DialogContent,
   Button,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
+  Icon,
+} from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
-
 import InfoIcon from "../icons/Info.svg"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
@@ -49,6 +46,7 @@ class LocalizedUtils extends DateFnsUtils {
     return ["S", "M", "T", "W", "T", "F", "S"]
   }
 }
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -377,8 +375,8 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
           )
           return view
         }}
-        leftArrowIcon={<Icon>chevron_left</Icon>}
-        rightArrowIcon={<Icon>chevron_right</Icon>}
+        leftArrowIcon={<Icon>arrow_back_ios</Icon>}
+        rightArrowIcon={<Icon>arrow_forward_ios</Icon>}
       />
     </MuiPickersUtilsProvider>
   )
@@ -527,12 +525,11 @@ export default function Feed({
       feeds.map((feed) => {
         savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
-          scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
+          scheduleStartDate = new Date(schedule.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
-
           if (currentDate.getTime() < scheduleStartDate.getTime()) {
             currentDate = new Date(schedule.start_date)
           }
@@ -541,12 +538,11 @@ export default function Feed({
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = new Date(new Date(schedule.time).toLocaleString())
+            scheduleTime = new Date(schedule.time)
             let timeVal = getTimeValue(scheduleTime)
             startD.setHours(scheduleTime.getHours())
             startD.setMinutes(scheduleTime.getMinutes())
             startD.setSeconds(0)
-            scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
             let scheduledDate = new Date(scheduleStartDate)
             let scDate = new Date(scheduleStartDate)
             scDate.setHours(0)
@@ -633,7 +629,6 @@ export default function Feed({
                         date.toLocaleDateString() === new Date(startTime).toLocaleDateString()
                           ? startTime
                           : endTime - ((date.getTime() - startTime) % hourVal) - 86400000
-
                       let intervalStart, intervalEnd
                       let time
                       let completedVal
@@ -781,7 +776,9 @@ export default function Feed({
       //  let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedWeekViewDays)
 
-      currentFeed = currentFeed.sort((x, y) => x.time - y.time)
+      currentFeed = currentFeed.sort((x, y) => {
+        return x.time > y.time ? 1 : x.time < y.time ? -1 : 0
+      })
       return currentFeed
     } else {
       return (currentFeed = [])
