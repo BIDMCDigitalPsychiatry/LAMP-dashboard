@@ -874,7 +874,9 @@ function Question({ onResponse, number, text, desc, type, options, value, startT
   ]
   switch (type) {
     case "slider":
-      options = options.sort((a, b) => parseInt(a.value) - parseInt(b.value))
+      options = options.sort((a, b) =>
+        parseInt(a.value) > parseInt(b.value) ? 1 : parseInt(a.value) < parseInt(b.value) ? -1 : 0
+      )
       component = <Rating options={options} onChange={onChange} value={!!value ? value.value : undefined} />
       break
     case "rating":
@@ -972,7 +974,7 @@ function Questions({
                 responses.current
                   .filter((item) => item.value != null)
                   .sort(function (a, b) {
-                    return a.endTime - b.endTime
+                    return a.endTime > b.endTime ? 1 : a.endTime < b.endTime ? -1 : 0
                   })
                   .pop()?.endTime ?? startTime
               let currentItem = responses.current.filter((item) => item.item == x.text).pop()

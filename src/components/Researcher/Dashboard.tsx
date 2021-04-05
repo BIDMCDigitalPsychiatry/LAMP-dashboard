@@ -117,7 +117,7 @@ export const sortData = (data, studies, key) => {
   studies.map((study) => {
     let filteredData = data.filter((d) => d.study_name === study)
     filteredData.sort((a, b) => {
-      return a[key] > b[key] ? 1 : 1
+      return a[key] > b[key] ? 1 : a[key] < b[key] ? -1 : 0
     })
     result = result.concat(filteredData)
   })
