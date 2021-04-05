@@ -14,6 +14,7 @@ import {
   makeStyles,
   createStyles,
   Link,
+  Theme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
