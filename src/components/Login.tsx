@@ -157,43 +157,42 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           onClick={(event) => setHelpMenu(event.currentTarget)}
         >
           <Icon>help</Icon>
-          <Menu
-            keepMounted
-            open={Boolean(helpMenu)}
-            anchorPosition={helpMenu?.getBoundingClientRect()}
-            anchorReference="anchorPosition"
-            onClose={() => setHelpMenu(undefined)}
-          >
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://docs.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("https://community.lamp.digital", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
-            </MenuItem>
-            <MenuItem
-              dense
-              onClick={() => {
-                setHelpMenu(undefined)
-                window.open("mailto:team@digitalpsych.org", "_blank")
-              }}
-            >
-              <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
-            </MenuItem>
-          </Menu>
         </IconButton>
-
+        <Menu
+          id="simple-menu"
+          anchorEl={helpMenu}
+          keepMounted
+          open={Boolean(helpMenu)}
+          onClose={() => setHelpMenu(undefined)}
+        >
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://docs.lamp.digital", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{t("Help & Support")}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("https://community.lamp.digital", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>LAMP {t("Community")}</b>
+          </MenuItem>
+          <MenuItem
+            dense
+            onClick={() => {
+              setHelpMenu(undefined)
+              window.open("mailto:team@digitalpsych.org", "_blank")
+            }}
+          >
+            <b style={{ color: colors.grey["600"] }}>{t("Contact Us")}</b>
+          </MenuItem>
+        </Menu>
         <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
             <form onSubmit={(e) => handleLogin(e)}>
@@ -322,7 +321,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   <Link
                     underline="none"
                     className={classes.linkBlue}
-                    onClick={(event) => (window.location.href = "https://www.digitalpsych.org/studies.html")}
+                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
                   >
                     {t("Research studies using mindLAMP")}
                   </Link>
