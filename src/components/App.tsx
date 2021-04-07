@@ -461,7 +461,6 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              {console.log(getResearcher(props.match.params.id).name)}
               <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
               <NavigationLayout
                 authType={state.authType}

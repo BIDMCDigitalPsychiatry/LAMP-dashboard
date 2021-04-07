@@ -100,7 +100,6 @@ export default function AddUpdateResearcher({
     if (duplicates.length > 0) {
       enqueueSnackbar("Researcher with same name already exist.", { variant: "error" })
       setResearcherName(!!researcher ? researcher.name : "")
-      setName(!!researcher ? researcher.name : "")
     } else {
       const researcherObj = new Researcher()
       researcherObj.name = name.trim()
@@ -113,6 +112,7 @@ export default function AddUpdateResearcher({
           updateStore(researcher.id)
           setName(name.trim())
         } else {
+          setResearcherName("")
           refreshResearchers()
         }
         enqueueSnackbar(
@@ -158,7 +158,6 @@ export default function AddUpdateResearcher({
             onClick={() => {
               setOpen(false)
               setResearcherName(!!researcher ? researcher.name : "")
-              setName(!!researcher ? researcher.name : "")
             }}
             color="primary"
           >
