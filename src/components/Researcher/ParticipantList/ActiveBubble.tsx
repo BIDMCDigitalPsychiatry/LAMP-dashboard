@@ -71,7 +71,6 @@ export default function Active({ participant, ...props }) {
   }
   return (
     <span>
-      {/* {console.log(dateInfo(participant.id).relative)} */}
       {dateInfo(participant.id).relative !== "in NaN years" &&
       dateInfo(participant.id).relative !== undefined &&
       dateInfo(participant.id).relative !== 0 ? (
