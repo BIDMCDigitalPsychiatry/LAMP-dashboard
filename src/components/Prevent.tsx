@@ -798,7 +798,6 @@ export default function Prevent({
         getSelectedSensors(participant).then(setSelectedSensors)
         getSelectedExperimental(participant).then(setSelectedExperimental)
         getSensorEvents(participant).then((sensorEvents) => {
-          console.log(sensorEvents)
           let sensorEventCount = getSensorEventCount(sensorEvents)
           setSensorEvents(sensorEvents)
           setCortex(
