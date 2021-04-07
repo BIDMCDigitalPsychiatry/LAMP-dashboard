@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Button,
   DialogTitle,
@@ -23,6 +23,10 @@ export default function ConfirmationDialog({
 } & DialogProps) {
   const { t } = useTranslation()
   const [isClicked, setIsClicked] = useState(false)
+
+  useEffect(() => {
+    setIsClicked(false)
+  }, [])
 
   return (
     <Dialog {...props} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">

@@ -99,9 +99,11 @@ export default function AddUpdateResearcher({
     )
     if (duplicates.length > 0) {
       enqueueSnackbar("Researcher with same name already exist.", { variant: "error" })
+      setResearcherName(!!researcher ? researcher.name : "")
+      setName(!!researcher ? researcher.name : "")
     } else {
       const researcherObj = new Researcher()
-      researcherObj.name = name
+      researcherObj.name = name.trim()
       if (
         !!researcher
           ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any).error === undefined
@@ -109,7 +111,7 @@ export default function AddUpdateResearcher({
       ) {
         if (!!researcher) {
           updateStore(researcher.id)
-          setName(name)
+          setName(name.trim())
         } else {
           refreshResearchers()
         }
@@ -119,7 +121,6 @@ export default function AddUpdateResearcher({
             variant: "success",
           }
         )
-        setResearcherName("")
         setOpen(false)
       } else
         enqueueSnackbar(t("Failed to create a new researcher."), {
@@ -153,7 +154,14 @@ export default function AddUpdateResearcher({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)} color="primary">
+          <Button
+            onClick={() => {
+              setOpen(false)
+              setResearcherName(!!researcher ? researcher.name : "")
+              setName(!!researcher ? researcher.name : "")
+            }}
+            color="primary"
+          >
             Cancel
           </Button>
           <Button
