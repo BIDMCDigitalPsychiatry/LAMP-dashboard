@@ -777,58 +777,43 @@ export default function Prevent({
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
-      //  getVisualizations(participant).then(setVisualizations)
-      let visualizations = await getVisualizations(participant)
-      let selActivities = await getSelectedActivities(participant)
-      setSelectedActivities(selActivities)
-      let selSensors = await getSelectedSensors(participant)
-      let selExperimental = await getSelectedExperimental(participant)
-      let activities = await getActivities(participant)
-      // let goals = await getGoals(participant)
-      // let groupByType
-      // if (typeof goals !== "undefined") {
-      //   goals.map((goal) => {
-      //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
-      //       activities.push({ name: goal.goalType, type: "goals" })
-      //     }
-      //   })
-      // }
-      activities = !disabled ? activities : activities.filter((activity) => activity.spec === "lamp.journal")
-      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
-      setActivityEvents(activityEvents)
-
-      let activityEventCount = getActivityEventCount(activityEvents)
-      // if (typeof goals !== "undefined") {
-      //   groupByType = goals.reduce((goal, it) => {
-      //     goal[it.goalType] = goal[it.goalType] + 1 || 1
-      //     activityEventCount[it.goalType] = goal[it.goalType]
-      //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
-      //     return goal
-      //   }, {})
-      // }
-      setTimeSpans(timeSpans)
-      setActivityCounts(activityEventCount)
-      activities = activities.filter(
-        (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group"
-      )
-      setActivities(activities)
-      setVisualizations(visualizations)
+      getActivities(participant).then((activities) => {
+        activities = !disabled ? activities : activities.filter((activity) => activity.spec === "lamp.journal")
+        getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
+          let timeSpans = Object.fromEntries(
+            Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
+          )
+          setActivityEvents(activityEvents)
+          let activityEventCount = getActivityEventCount(activityEvents)
+          setTimeSpans(timeSpans)
+          setActivityCounts(activityEventCount)
+          activities = activities.filter(
+            (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group"
+          )
+          setActivities(activities)
+          getSelectedActivities(participant).then(setSelectedActivities)
+        })
+      })
       if (!disabled) {
-        let sensorEvents = await getSensorEvents(participant)
-        let sensorEventCount = getSensorEventCount(sensorEvents)
-        setSelectedSensors(selSensors)
-        setSelectedExperimental(selExperimental)
-        setCortex(
-          [`Environmental Context`, `Step Count`, `Social Context`]
-            .filter((sensor) => sensorEventCount[sensor] > 0)
-            .concat(Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", "")))
-        )
-        setSensorEvents(sensorEvents)
-        let visualizationCount = Object.keys(visualizations)
-          .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-          .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-        setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
+        getSelectedSensors(participant).then(setSelectedSensors)
+        getSelectedExperimental(participant).then(setSelectedExperimental)
+        getSensorEvents(participant).then((sensorEvents) => {
+          console.log(sensorEvents)
+          let sensorEventCount = getSensorEventCount(sensorEvents)
+          setSensorEvents(sensorEvents)
+          setCortex(
+            [`Environmental Context`, `Step Count`, `Social Context`]
+              .filter((sensor) => sensorEventCount[sensor] > 0)
+              .concat(Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+          )
+          getVisualizations(participant).then((data) => {
+            setVisualizations(data)
+            let visualizationCount = Object.keys(data)
+              .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+              .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+            setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
+          })
+        })
       }
       setLoading(false)
     })()
