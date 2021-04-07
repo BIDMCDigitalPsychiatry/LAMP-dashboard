@@ -3,7 +3,7 @@ import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
 
 export const fetchResult = async (authString, id, type, modal) => {
-  const baseUrl = "https://" + LAMP.Auth._auth.serverAddress
+  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
@@ -17,7 +17,7 @@ export const fetchResult = async (authString, id, type, modal) => {
 }
 
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
-  const baseUrl = "https://" + LAMP.Auth._auth.serverAddress
+  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
   let result = await (
     await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,

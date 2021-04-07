@@ -107,7 +107,7 @@ class DBService {
           let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
           let cursor = await store.openCursor()
           while (cursor) {
-            newVal[tablespace].map((data) => {
+            ;(newVal[tablespace] || []).map((data) => {
               if (cursor.key === data[conditionKey]) {
                 let value = cursor.value
                 value[key] = data[key]
@@ -129,7 +129,7 @@ class DBService {
           let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
           let cursor = await store.openCursor()
           while (cursor) {
-            newVal[tablespace].map((data) => {
+            ;(newVal[tablespace] || []).map((data) => {
               if (cursor.key === data[conditionKey]) {
                 let value = cursor.value
                 keys.forEach(function (eachKey) {
@@ -286,7 +286,7 @@ class DBService {
           let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
           let cursor = await store.openCursor()
           while (cursor) {
-            newVal[tablespace].map((data) => {
+            ;(newVal[tablespace] || []).map((data) => {
               let value = cursor.value
               keys.forEach(function (eachKey) {
                 value[eachKey] = data[eachKey]
