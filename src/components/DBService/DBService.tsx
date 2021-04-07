@@ -199,12 +199,10 @@ class DBService {
   addData(tablespace: any, data: any) {
     return dbPromise
       .then((db) => {
-        let store = db
-          .transaction(tablespace, "readwrite")
-          .objectStore(tablespace)(data || [])
-          .map((d) => {
-            store.put(d)
-          })
+        let store = db.transaction(tablespace, "readwrite").objectStore(tablespace)
+        data.map((d) => {
+          store.put(d)
+        })
       })
       .catch((error) => {
         // Do something?
