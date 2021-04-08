@@ -120,7 +120,6 @@ export default function AddActivity({
   const [createMenu, setCreateMenu] = useState(false)
   const [activitySpecId, setActivitySpecId] = useState(null)
   const [createDialogue, setCreate] = useState(false)
-
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
@@ -281,6 +280,7 @@ export default function AddActivity({
                 setCreateMenu(false)
                 setCreate(false)
               }}
+              openWindow={createDialogue}
               setActivities={setActivities}
               setUpdateCount={setUpdateCount}
             />

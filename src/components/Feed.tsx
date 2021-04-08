@@ -408,7 +408,6 @@ export default function Feed({
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [activity, setActivity] = useState(null)
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   const { t } = useTranslation()
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -747,9 +746,7 @@ export default function Feed({
 
   const getFeedByDate = (date: Date) => {
     setLoading(true)
-    console.log(activities)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
-    console.log(feeds)
     setFeeds(feeds)
     changeDate(new Date(date))
     getEvents(date).then(setEvents)

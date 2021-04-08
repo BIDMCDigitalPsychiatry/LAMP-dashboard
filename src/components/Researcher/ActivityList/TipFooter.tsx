@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import {
   Grid,
   Tooltip,
@@ -48,6 +48,14 @@ export default function TipFooter({
 }) {
   const { t } = useTranslation()
   const classes = useStyles()
+
+  useEffect(() => {
+    validate()
+  }, [])
+
+  useEffect(() => {
+    validate()
+  }, [isError])
 
   return (
     <Grid

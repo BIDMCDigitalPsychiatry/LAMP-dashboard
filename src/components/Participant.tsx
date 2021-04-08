@@ -243,7 +243,6 @@ export default function Participant({
     //  getShowWelcome(participant).then(setOpen)
     ;(async () => {
       let activities = await LAMP.Activity.allByParticipant(participant.id)
-      console.log(activities)
       setActivities(activities)
       setLoading(false)
     })()

@@ -674,27 +674,32 @@ export const schemaList: any = {
     type: "object",
     properties: {
       settings: {
-        title: "Activity Settings",
+        title: "Tip Details",
         type: "array",
         items: {
           type: "object",
-          required: ["title", "content"],
+          required: ["title", "text"],
           minItems: 1,
           properties: {
             title: {
-              title: "Tip Title",
+              title: "Tips Title",
               type: "string",
               minLength: 1,
             },
-            content: {
-              title: "Tip Content",
-              description: "The tip content supports extended GitHub-flavored Markdown formatting.",
+            text: {
+              title: "Tips Description",
               type: "string",
               minLength: 1,
               "ui:widget": "textarea",
               "ui:options": {
-                rows: 15,
+                rows: 5,
               },
+            },
+            image: {
+              title: "Tips Image",
+              description: "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
+              type: "string",
+              format: "data-url",
             },
           },
         },
@@ -754,7 +759,6 @@ export function spliceActivity({ raw, tag }) {
         })),
   }
 }
-
 // Un-splice an object into its raw Tips Activity object
 export function unspliceTipsActivity(x) {
   return {
@@ -904,7 +908,6 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
     } else {
       if (selectedActivity?.study_id !== x.studyID) {
         // let tag = await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", null)
-        // console.dir("deleted tag " + JSON.stringify(tag))
         // await LAMP.Activity.delete(x.id)
         // result = (await LAMP.Activity.create(x.studyID, x)) as any
         // await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
@@ -976,7 +979,6 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
     }
   }
 }
-
 export function addActivity(x, studies) {
   Service.updateCount("studies", x.studyID, "activity_count")
   x["study_id"] = x.studyID

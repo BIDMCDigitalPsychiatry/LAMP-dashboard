@@ -62,6 +62,14 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   const [selectedActivity, setSelectedActivity] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
+  const [createDialogue, setcreateDialogue] = useState(true)
+  const toBinary = (string) => {
+    const codeUnits = new Uint16Array(string.length)
+    for (let i = 0; i < codeUnits.length; i++) {
+      codeUnits[i] = string.charCodeAt(i)
+    }
+  }
+  const defaultBase64 = toBinary("data:image/png;base64,")
   const [loading, setLoading] = useState(false)
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
@@ -93,6 +101,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
     setSelectedActivity(undefined)
     setLoading(false)
   }
+
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async () => {
     let data = await LAMP.Activity.view(activity.id)
@@ -114,6 +123,14 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
         !!y.error ? undefined : y.data
       )[0]
       setGameDetails(tag)
+    } else if (activity.spec === "lamp.tips") {
+      activity.settings = activity.settings.reduce((ds, d) => {
+        let newD = d
+        if (d.image === "") {
+          newD = Object.assign({}, d, { image: defaultBase64 })
+        }
+        return ds.concat(newD)
+      }, [])
     }
     setConfirmationDialog(0)
     setSelectedActivity(activity)
@@ -163,7 +180,14 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       >
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setSelectedActivity(undefined)} color="default" aria-label="Menu">
+            <IconButton
+              onClick={() => {
+                setSelectedActivity(undefined)
+                setcreateDialogue(false)
+              }}
+              color="default"
+              aria-label="Menu"
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">{t("Modify an existing activity")}</Typography>
@@ -180,6 +204,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
             onCancel={() => {
               setSelectedActivity(undefined)
             }}
+            openWindow={createDialogue}
           />
         </Box>
       </ResponsiveDialog>

@@ -225,7 +225,7 @@ export default function Learn({
               name: activity.name,
               settings: activity.settings,
               schedule: activity.schedule,
-              icon: iconData.data ? iconData.data.icon : undefined,
+              icon: iconData.data ? iconData.data.photo : "static/media/Info.bbbe679e.svg",
             }
           })
         )
@@ -293,7 +293,7 @@ export default function Learn({
           ))
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
-            <Icon>info</Icon> <p>There are no Learn activities available.</p>
+            <Icon>info</Icon> <p>{t("There are no Learn activities available.")}</p>
           </Box>
         )}
       </Grid>

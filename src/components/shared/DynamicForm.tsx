@@ -88,7 +88,6 @@ const formTheme = createMuiTheme({
     },
   },
 })
-
 // This function recursively extracts all "ui:"-prefixed properties within the JSONSchema.
 // These are passed to the JSONSchemaForm as a single nested uiSchema object.
 // TODO: Does not resolve dependencies, oneOf, allOf, anyOf, etc. internal props.

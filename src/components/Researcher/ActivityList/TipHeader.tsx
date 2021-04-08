@@ -483,7 +483,6 @@ export default function TipsHeader({
                 {t("Duplicate")}
               </Box>
             </Grid>
-
             <Grid item xs sm={6} md={6} lg={4}>
               {isDuplicate ? (
                 <Box mb={3}>
@@ -510,14 +509,6 @@ export default function TipsHeader({
         ) : (
           ""
         )}
-        {/* JSON.stringify(category) +
-          " *** " +
-          JSON.stringify(value) +
-          " +++ " +
-          JSON.stringify(details) +
-          " === " +
-        JSON.stringify(study)   */}
-        ***** {JSON.stringify(selectedCategory)} +++++
       </Grid>
     </Grid>
   )

@@ -46,6 +46,7 @@ export default function Activity({
   onClose,
   setActivities,
   setUpdateCount,
+  openWindow,
   ...props
 }: {
   allActivities?: Array<JSON>
@@ -59,6 +60,7 @@ export default function Activity({
   onClose?: Function
   setActivities?: Function
   setUpdateCount?: Function
+  openWindow?: Boolean
 }) {
   const [loading, setLoading] = useState(false)
   const isTip = (activity || {}).spec === "lamp.tips" || activitySpecId === "lamp.tips"
@@ -176,9 +178,12 @@ export default function Activity({
           onSave={activity && activity.id ? updateActivity : saveTipsActivity}
           studies={studies}
           allActivities={allActivities}
+          activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}
+          openWindow={openWindow}
         />
       )}
+
       {isSurvey && (
         <SurveyCreator
           value={activity ?? null}
