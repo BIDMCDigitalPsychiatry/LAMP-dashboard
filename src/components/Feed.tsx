@@ -358,7 +358,6 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
         }}
         renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
           const isSelected = isInCurrentMonth && selectedDays.includes(date.toLocaleDateString())
-          const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
           const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
           const view = isSelected ? (
             <div onClick={() => getFeedByDate(date)}>
@@ -748,7 +747,9 @@ export default function Feed({
 
   const getFeedByDate = (date: Date) => {
     setLoading(true)
+    console.log(activities)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
+    console.log(feeds)
     setFeeds(feeds)
     changeDate(new Date(date))
     getEvents(date).then(setEvents)

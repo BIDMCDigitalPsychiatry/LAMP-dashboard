@@ -193,7 +193,7 @@ export default function Participant({
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
-  const [loading, setLoading] = useState(![3, 4].includes(getTab()))
+  const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const { t, i18n } = useTranslation()
@@ -239,11 +239,14 @@ export default function Participant({
       ? getSelectedLanguage()
       : "en-US"
     i18n.changeLanguage(language)
+    setLoading(true)
     //  getShowWelcome(participant).then(setOpen)
-    LAMP.Activity.allByParticipant(participant.id).then((e) => {
-      setActivities(e)
+    ;(async () => {
+      let activities = await LAMP.Activity.allByParticipant(participant.id)
+      console.log(activities)
+      setActivities(activities)
       setLoading(false)
-    })
+    })()
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])

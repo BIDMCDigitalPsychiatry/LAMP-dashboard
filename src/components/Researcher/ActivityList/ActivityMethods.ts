@@ -923,6 +923,10 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
   } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
     if (isDuplicated) {
       result = (await LAMP.Activity.create(x.studyID, x)) as any
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+        description: x.description,
+        photo: x.photo,
+      })
       return result
     } else {
       result = (await LAMP.Activity.update(selectedActivity?.id, {
