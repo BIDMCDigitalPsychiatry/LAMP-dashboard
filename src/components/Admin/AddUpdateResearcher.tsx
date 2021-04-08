@@ -28,7 +28,6 @@ const useStyles = makeStyles((theme: Theme) =>
     optionsMain: {
       background: "#ECF4FF",
       borderTop: "1px solid #C7C7C7",
-
       marginTop: 20,
       width: "99.4vw",
       position: "relative",

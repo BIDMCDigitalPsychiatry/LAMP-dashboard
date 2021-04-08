@@ -106,7 +106,6 @@ function AppRouter({ ...props }) {
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
       //
-
       reset({
         id: x[0],
         password: x[1],
@@ -180,7 +179,6 @@ function AppRouter({ ...props }) {
       )
     }
     if (!!state.identity && state.authType === "participant") {
-      // console.log(messages(state.identity))
       // setState((state) => ({
       //   ...state,
       //   messageCount:messages(state.identity)

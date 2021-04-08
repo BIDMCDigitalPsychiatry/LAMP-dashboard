@@ -342,7 +342,6 @@ const games = [
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
-
   return (
     <MuiPickersUtilsProvider utils={LocalizedUtils}>
       <DatePicker
@@ -408,7 +407,6 @@ export default function Feed({
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [activity, setActivity] = useState(null)
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   const { t } = useTranslation()
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -561,7 +559,6 @@ export default function Feed({
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
-
                 break
               case "daily":
               case "hourly":
@@ -662,9 +659,8 @@ export default function Feed({
 
                       currentFeed.push(each)
                     })
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 break
@@ -717,8 +713,8 @@ export default function Feed({
                       new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
                         ? true
                         : false
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
@@ -747,9 +743,7 @@ export default function Feed({
 
   const getFeedByDate = (date: Date) => {
     setLoading(true)
-    console.log(activities)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
-    console.log(feeds)
     setFeeds(feeds)
     changeDate(new Date(date))
     getEvents(date).then(setEvents)

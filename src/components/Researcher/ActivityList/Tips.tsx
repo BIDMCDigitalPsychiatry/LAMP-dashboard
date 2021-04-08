@@ -15,13 +15,15 @@ import {
   CircularProgress,
   Backdrop,
 } from "@material-ui/core"
+import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import TipDetails from "./TipDetails"
 import TipFooter from "./TipFooter"
 import { Service } from "../../DBService/DBService"
+import DynamicForm from "../../shared/DynamicForm"
+import { schemaList } from "./ActivityMethods"
 
 const theme = createMuiTheme({
   palette: {
@@ -126,7 +128,9 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
+  activitySpecId,
   study,
+  openWindow,
   ...props
 }: {
   activities?: any
@@ -134,7 +138,9 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
+  activitySpecId: string
   study?: string
+  openWindow: Boolean
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -150,17 +156,41 @@ export default function Tips({
   const [studyId, setStudyId] = useState(!!activities ? activities.study_id : study)
   const [isDuplicate, setIsDuplicate] = useState(false)
   const [isError, setIsError] = useState(false)
-  const defaultSettingsArray = [{ title: "", text: "", image: "" }]
-  const { t } = useTranslation()
-  const defaultSelectedCategory = {
-    id: undefined,
-    name: "",
-    spec: "lamp.tips",
-    icon: "",
-    schedule: [],
-    settings: [{ title: "", text: "", image: "" }],
-    studyID: "",
+  const [newSchemaList, setNewSchemaList] = useState({})
+  const [isImagError, setIsImagError] = useState(false)
+  const toBinary = (string) => {
+    const codeUnits = new Uint16Array(string.length)
+    for (let i = 0; i < codeUnits.length; i++) {
+      codeUnits[i] = string.charCodeAt(i)
+    }
   }
+  const defaultBase64 = toBinary("data:image/png;base64,")
+  const defaultSettingsArray: any = [
+    {
+      title: "",
+      text: "",
+      image: defaultBase64,
+    },
+  ]
+  const { t } = useTranslation()
+  const [settings, setSettings]: Array<any> = useState([])
+  const [data, setData] = useState({
+    id: activities?.id ?? undefined,
+    name: activities?.name ?? "",
+    spec: activities?.spec ?? activitySpecId,
+    schedule: [],
+    description: "",
+    settings: settings ?? [],
+    studyID: !!activities ? activities.study_id : study,
+  })
+
+  useEffect(() => {
+    setSettings(activities)
+  }, [openWindow])
+
+  useEffect(() => {
+    validate()
+  }, [categoryImage])
 
   useEffect(() => {
     category === "add_new" ? validate() : ""
@@ -187,6 +217,13 @@ export default function Tips({
             if (!activities) {
               let settingsData = await LAMP.Activity.view(existsData.id)
               if (settingsData) {
+                settingsData.settings = settingsData.settings.reduce((ds, d) => {
+                  let newD = d
+                  if (d.image === "") {
+                    newD = Object.assign({}, d, { image: defaultBase64 })
+                  }
+                  return ds.concat(newD)
+                }, [])
                 existsData.settings = settingsData.settings.concat(defaultSettingsArray)
               } else {
                 existsData.settings = defaultSettingsArray
@@ -194,12 +231,19 @@ export default function Tips({
             }
             setSelectedCategory(existsData)
             setTipsDataArray(existsData.settings)
+            let newObj = { settings: existsData.settings }
+            setSettings(newObj)
           }
         }
       } else {
-        setTipsDataArray(defaultSettingsArray)
-        setSelectedCategory(defaultSelectedCategory)
+        if (!activities) {
+          let existsData = { settings: defaultSettingsArray }
+          setSelectedCategory(existsData)
+          setTipsDataArray(defaultSettingsArray)
+          setSettings(existsData)
+        }
       }
+      setNewSchemaList(schemaList)
       setLoading(false)
     })()
   }, [category])
@@ -322,6 +366,13 @@ export default function Tips({
         return false
       }
     }
+    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+      let newD = d
+      if (d.image === defaultBase64) {
+        newD = Object.assign({}, d, { image: "" })
+      }
+      return ds.concat(newD)
+    }, [])
     setLoading(true)
     category === "add_new" || duplicate
       ? onSave(
@@ -348,11 +399,19 @@ export default function Tips({
           },
           false
         )
+    openWindow = false
     setLoading(true)
   }
 
   const handleSaveTipsData = () => {
     let duplicate = isDuplicate
+    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+      let newD = d
+      if (d.image === defaultBase64) {
+        newD = Object.assign({}, d, { image: "" })
+      }
+      return ds.concat(newD)
+    }, [])
     let dataObj =
       category === "add_new" || duplicate
         ? {
@@ -361,7 +420,7 @@ export default function Tips({
             spec: "lamp.tips",
             icon: categoryImage,
             schedule: [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
           }
         : {
@@ -370,7 +429,7 @@ export default function Tips({
             spec: "lamp.tips",
             icon: categoryImage,
             schedule: [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
           }
     onSave(dataObj, duplicate)
@@ -379,8 +438,34 @@ export default function Tips({
   const validate = () => {
     let validationData = false
     if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
-      validationData = selectedCategory.settings.some((item) => item.title === "" || item.text === "")
+      validationData = selectedCategory.settings.some((item) => {
+        let sizeInBytes = 0
+        let type = ""
+        let imageTypes = ["jpeg", "jpg", "png", "gif", "svg+xml"]
+        let base64Img = item.image
+        if (base64Img !== "" && base64Img !== undefined) {
+          let img = new Image()
+          img.src = base64Img
+          type = base64Img.split(";")[0].split("/")[1]
+          let stringLength = base64Img.length - ("data:image/" + type + ";base64,").length
+          sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
+          if ((type !== "" && !imageTypes.includes(type)) || sizeInBytes > 4194304) {
+            setIsImagError(true)
+          } else {
+            setIsImagError(false)
+          }
+        }
+        return (
+          item.title === "" ||
+          typeof item.title === "undefined" ||
+          item.text === "" ||
+          typeof item.text === "undefined" ||
+          (type !== "" && !imageTypes.includes(type)) ||
+          sizeInBytes > 4194304
+        )
+      })
     }
+
     let duplicates = []
     if (
       (typeof newTipText !== "undefined" && newTipText?.trim() !== "") ||
@@ -401,6 +486,7 @@ export default function Tips({
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
       validationData ||
+      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
       duplicates.length > 0
     )
       ? setIsError(true)
@@ -414,6 +500,7 @@ export default function Tips({
       category === null ||
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
+      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
       validationData ||
       duplicates.length > 0
     )
@@ -427,6 +514,21 @@ export default function Tips({
 
   const handleType = (val) => {
     val === 1 ? handleSaveTips(isDuplicate) : handleSaveTipsData()
+  }
+
+  const updateSettings = (settingsData) => {
+    setData({ ...data, settings: settingsData })
+    setSettings(settingsData)
+    let newSelectedCategory = selectedCategory
+    settingsData = settingsData.settings.map((x) => {
+      let xVal = x
+      xVal.title = typeof x.title !== "undefined" ? x.title : ""
+      xVal.text = typeof x.text !== "undefined" ? x.text : ""
+      return xVal
+    })
+    newSelectedCategory.settings = settingsData
+    setSelectedCategory(newSelectedCategory)
+    validate()
   }
 
   return (
@@ -602,13 +704,30 @@ export default function Tips({
               </Grid>
             </Grid>
           </Grid>
-          <TipDetails
-            selectedDataCategory={selectedCategory}
-            studyId={studyId}
-            category={category}
-            tipsDataArrayVal={tipsDataArray}
-            handleTipsDataArray={handleTipsDataArray}
-          />
+          {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
+            <Grid container spacing={2}>
+              <Grid item xs sm={12}>
+                <Alert severity="error">{t("Atleast one tip details required")}</Alert>
+              </Grid>
+            </Grid>
+          )}
+          {isImagError && (
+            <Grid container spacing={2}>
+              <Grid item xs sm={12}>
+                <Alert severity="error">
+                  {t("Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.")}
+                </Alert>
+              </Grid>
+            </Grid>
+          )}
+          {((activities?.spec && Object.keys(newSchemaList).includes(activities.spec)) ||
+            Object.keys(newSchemaList).includes(activitySpecId)) && (
+            <DynamicForm
+              schema={newSchemaList[activitySpecId]}
+              initialData={settings}
+              onChange={(x) => updateSettings({ ...settings, ...x })}
+            />
+          )}
         </Container>
       </MuiThemeProvider>
       <TipFooter

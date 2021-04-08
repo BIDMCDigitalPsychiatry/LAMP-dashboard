@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Icon, IconButton, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
 import EditUserField from "./EditUserField"
 
@@ -17,6 +17,13 @@ export default function ParticipantName({ participant, ...props }) {
   const [editData, setEditData] = useState(false)
   const [editUserId, setEditUserId] = useState("")
   const [aliasName, setAliasName] = useState("")
+  const [name, setName] = useState(participant.name ?? "")
+
+  useEffect(() => {
+    setName(participant.name)
+    setAliasName(participant.name)
+  }, [participant])
+
   const editNameTextField = (id, event) => {
     setEditData(true)
     setEditUserId(id)
@@ -26,6 +33,7 @@ export default function ParticipantName({ participant, ...props }) {
     setEditData(false)
     setAliasName(data)
   }
+
   return (
     <Box display="flex">
       <Box>
@@ -38,8 +46,8 @@ export default function ParticipantName({ participant, ...props }) {
           />
         ) : aliasName && editUserId === participant.id ? (
           aliasName
-        ) : participant.name ? (
-          participant.name
+        ) : name ? (
+          name
         ) : (
           participant.id
         )}
