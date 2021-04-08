@@ -85,9 +85,6 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   useEffect(() => {
     refreshStudies()
-    Service.getAll("activities").then((data) => {
-      setAllActivities(data || [])
-    })
   }, [])
 
   const refreshStudies = () => {
@@ -105,6 +102,9 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
+    Service.getAll("activities").then((data) => {
+      setAllActivities(data || [])
+    })
     selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
     if (selectedStudies.length > 0 && !loading) {
       let result = []
@@ -155,7 +155,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
       <Header
         studies={studiesData}
         researcher={researcher}
-        activities={activities}
+        activities={allActivities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
         selectedStudies={selected}

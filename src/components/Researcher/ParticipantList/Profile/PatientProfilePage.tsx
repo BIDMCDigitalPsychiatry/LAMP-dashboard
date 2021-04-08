@@ -118,6 +118,9 @@ export default function PatientProfile({
 
   useEffect(() => {
     onChangeAccounts()
+    LAMP.Type.getAttachment(participant.id, "lamp.name").then((res: any) => {
+      setNickname(!!res.data ? res.data : null)
+    })
   }, [])
 
   const updateName = () => {
@@ -146,6 +149,7 @@ export default function PatientProfile({
                     label={t("Nickname(optional)")}
                     variant="filled"
                     value={nickname}
+                    defaultValue={nickname}
                     onChange={(event) => setNickname(event.target.value)}
                     inputProps={{ maxLength: 2500 }}
                   />

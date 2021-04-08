@@ -42,6 +42,7 @@ export default function ConfirmationDialog({
           onClick={() => {
             setIsClicked(true)
             confirmAction("Yes")
+            setIsClicked(false)
           }}
           color="primary"
           autoFocus
