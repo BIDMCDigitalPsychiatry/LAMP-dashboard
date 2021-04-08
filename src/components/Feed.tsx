@@ -392,12 +392,9 @@ export default function Feed({
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
-  const [show, setShow] = useState(false)
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
-  const [medications, setMedications] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [goals, setGoals] = useState({})
   const [surveyName, setSurveyName] = useState<string>()
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
@@ -420,43 +417,8 @@ export default function Feed({
     setCurrentFeed(feed)
   }
 
-  const getFeedData = async () => {
-    setGoals(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )[participant.id || ""] ?? []
-    )
-
-    setMedications(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )[participant.id || ""] ?? []
-    )
-  }
-
   useEffect(() => {
     getFeedByDate(new Date())
-    ;(async () => {
-      await getFeedData()
-    })()
   }, [])
 
   function getDayNumber(date: Date) {
@@ -766,16 +728,7 @@ export default function Feed({
           }
         })
       })
-      //  currentFeed.push(tip)
-      // let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
-      // currentFeed = goalsFeedData.feed
-      // selectedWeekViewDays = goalsFeedData.weekDays
-      // let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
-      // currentFeed = medicationsData.feed
-      // selectedWeekViewDays = medicationsData.weekDays
-      //  let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedWeekViewDays)
-
       currentFeed = currentFeed.sort((x, y) => {
         return x.time > y.time ? 1 : x.time < y.time ? -1 : 0
       })
@@ -794,45 +747,11 @@ export default function Feed({
   }, [events])
 
   const getFeedByDate = (date: Date) => {
+    setLoading(true)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
     setFeeds(feeds)
     changeDate(new Date(date))
-    ;(async () => {
-      setLoading(true)
-      await getEvents(date).then(setEvents)
-    })()
-  }
-
-  const checkDataForFeed = (date: any, data: any, currentFeed: any, selectedWeekViewDays: any) => {
-    let currentDate = new Date(date)
-    let dates = []
-    Object.keys(data).forEach((key) => {
-      if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
-        data[key].weekdays.map((day) => {
-          dates.push(weekdays.indexOf(day))
-        })
-        selectedWeekViewDays = selectedWeekViewDays.concat(getDates(dates, date))
-        if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
-          data[key].timeValue = getTimeValue(new Date(data[key].timeValue))
-          data[key].time = new Date(data[key].timeValue).getTime()
-          currentFeed.push(data[key])
-        }
-      }
-      //   switch(data[key].frequency) {
-      //     case "hourly":
-      //     case "daily":
-      //       currentFeed.push(data[key])
-      //     case "weekly":
-      //       if(data[key].weekdays.indexOf(weekdays[new Date().getDay()]) > -1){
-      //         currentFeed.push(data[key])
-      //       }
-      //       break
-      //     case "monthly":
-      //       break
-      // }
-    })
-    let result = { weekDays: selectedWeekViewDays, feed: currentFeed }
-    return result
+    getEvents(date).then(setEvents)
   }
 
   const showFeedDetails = (type) => {

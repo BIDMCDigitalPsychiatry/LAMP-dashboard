@@ -11,6 +11,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
@@ -60,9 +62,11 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   const [selectedActivity, setSelectedActivity] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
+  const [loading, setLoading] = useState(false)
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
+    setLoading(true)
     let result = await updateActivityData(x, isDuplicated, selectedActivity)
     if (!!result.error)
       enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -87,6 +91,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       setActivities()
     }
     setSelectedActivity(undefined)
+    setLoading(false)
   }
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async () => {
@@ -123,6 +128,9 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
 
   return (
     <span>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Fab
         size="small"
         color="primary"
