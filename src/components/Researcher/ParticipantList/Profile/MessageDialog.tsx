@@ -39,7 +39,7 @@ export default function PatientProfile({ participant, ...props }: { participant:
       <Grid item>
         <Tooltip title={t("Message")} placement="left">
           <Fab className={classes.profileMessage} style={{ position: "fixed" }} onClick={() => setDialogOpen(true)}>
-            <Icon>comment</Icon>
+            <Icon style={{ color: "white" }}>comment</Icon>
           </Fab>
         </Tooltip>
       </Grid>
