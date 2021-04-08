@@ -199,10 +199,8 @@ export default function PatientStudyCreator({
   const createStudy = async (studyName: string) => {
     setLoading(true)
     setAddStudy(false)
-    let auth = await LAMP.Auth
-    let authId = auth._me["id"]
-    let authUser = auth._auth
-    let authString = authUser.id + ":" + authUser.password
+    let authId = researcher.id
+    let authString = LAMP.Auth._auth.id + ":" + LAMP.Auth._auth.password
     let bodyData = {
       study_id: duplicateStudyName, //old study id
       should_add_participant: createPatient ? createPatient : false,
