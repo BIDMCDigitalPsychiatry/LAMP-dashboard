@@ -5,6 +5,9 @@ import { ReactComponent as Background03 } from "../icons/scratch/Background-03.s
 import { ReactComponent as Background04 } from "../icons/scratch/Background-04.svg"
 import { ReactComponent as Background05 } from "../icons/scratch/Background-05.svg"
 import { ReactComponent as Background06 } from "../icons/scratch/Background-06.svg"
+import circle from "../icons/scratch/circle.svg"
+import ScratchCover from "../icons/scratch/ScratchCover.svg"
+
 import { useTranslation } from "react-i18next"
 import {
   Typography,
@@ -56,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "calc(100vh - 65px)",
   },
   svgouter: {
-    "& svg": { width: "100%" },
+    "& svg": { width: "100%", maxHeight: "calc(100vh - 70px)" },
     background: "#FFF",
   },
   scratchCompleteMsg: {
@@ -79,6 +82,12 @@ const useStyles = makeStyles((theme) => ({
 
 function CanvasElement({ setCanvas, ...props }) {
   return <canvas style={{ position: "absolute", zIndex: 2, width: "100%" }} ref={(el) => setCanvas(el)} />
+}
+function BrushElement({ setBrush, ...props }) {
+  return <img ref={(el) => setBrush(el)} width={150} height={150} src={circle} style={{ display: "none" }} />
+}
+function CoverElement({ setCover, ...props }) {
+  return <img ref={(el) => setCover(el)} src={ScratchCover} style={{ display: "none" }} />
 }
 const background = () => {
   const images = [
@@ -103,14 +112,19 @@ export default function ScratchImage({ participant, activity, ...props }) {
   const [loading, setLoading] = useState(true)
   const [savedX, setSavedx] = useState([])
   const [savedY, setSavedY] = useState([])
-
-  let brush = new Image()
-  let cover = new Image()
-  brush.width = 150
-  brush.height = 150
+  const [brush, setBrush] = useState(null)
+  const [cover, setCover] = useState(null)
+  const [brushComponent, setBrushComponent] = useState(<BrushElement setBrush={setBrush} />)
+  const [coverComponent, setCoverComponent] = useState(<CoverElement setCover={setCover} />)
   const classes = useStyles()
   let area = 0
   let val = 0
+
+  useEffect(() => {
+    setBrushComponent(<BrushElement setBrush={setBrush} />)
+    setCanvasComponent(<CanvasElement setCanvas={setCanvas} />)
+    setCoverComponent(<CoverElement setCover={setCover} />)
+  }, [])
 
   const getPosition = (event: any) => {
     let target = canvas
@@ -123,7 +137,6 @@ export default function ScratchImage({ participant, activity, ...props }) {
         offsetY += target.offsetTop
       }
     }
-
     const x = (event.pageX || (event.touches && event.touches[0].clientX)) - offsetX
     const y = (event.pageY || (event.touches && event.touches[0].clientY)) - offsetY
     return { x, y }
@@ -141,6 +154,10 @@ export default function ScratchImage({ participant, activity, ...props }) {
         .catch((e) => console.dir(e))
         .then((x) => {
           setCanvasComponent(null)
+          setBrushComponent(null)
+          setCoverComponent(null)
+          cover.remove()
+          brush.remove()
           canvas.remove()
         })
     }
@@ -183,7 +200,7 @@ export default function ScratchImage({ participant, activity, ...props }) {
   }
 
   useEffect(() => {
-    if (canvas != null) {
+    if (canvas != null && cover !== null && brush !== null) {
       canvas.width = window.innerWidth
       canvas.height = document.getElementById("canvasDiv").clientHeight
       context = canvas.getContext("2d")
@@ -193,8 +210,6 @@ export default function ScratchImage({ participant, activity, ...props }) {
       canvas.addEventListener("touchmove", touchMove)
       canvas.addEventListener("mouseup", touchEnd)
       canvas.addEventListener("touchend", touchEnd)
-      brush.src = require("../icons/scratch/circle.svg")
-      cover.src = require("../icons/scratch/ScratchCover.svg")
       cover.onload = () => {
         context.drawImage(cover, 0, 0, canvas.width, canvas.height)
         context.textAlign = "center"
@@ -222,6 +237,8 @@ export default function ScratchImage({ participant, activity, ...props }) {
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      {brushComponent}
+      {coverComponent}
       <AppBar position="static" style={{ background: "#FBF1EF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
           <IconButton onClick={props.onComplete} color="default" aria-label="Menu">
@@ -245,7 +262,9 @@ export default function ScratchImage({ participant, activity, ...props }) {
               <Link
                 className={classes.linkpeach}
                 onClick={() => {
+                  setBrushComponent(<BrushElement setBrush={setBrush} />)
                   setCanvasComponent(<CanvasElement setCanvas={setCanvas} />)
+                  setCoverComponent(<CoverElement setCover={setCover} />)
                   setVisibility(false)
                   setDone(false)
                 }}
