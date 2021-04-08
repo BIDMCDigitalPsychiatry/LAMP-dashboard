@@ -447,7 +447,6 @@ export default function Tips({
           let img = new Image()
           img.src = base64Img
           type = base64Img.split(";")[0].split("/")[1]
-          console.log(200, type)
           let stringLength = base64Img.length - ("data:image/" + type + ";base64,").length
           sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
           if ((type !== "" && !imageTypes.includes(type)) || sizeInBytes > 4194304) {

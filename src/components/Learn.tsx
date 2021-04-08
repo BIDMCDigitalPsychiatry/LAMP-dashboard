@@ -27,6 +27,7 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import LearnTips from "./LearnTips"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
+import InfoIcon from "../icons/Info.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -225,7 +226,7 @@ export default function Learn({
               name: activity.name,
               settings: activity.settings,
               schedule: activity.schedule,
-              icon: iconData.data ? iconData.data.photo : "static/media/Info.bbbe679e.svg",
+              icon: iconData.data ? iconData.data.photo : InfoIcon,
             }
           })
         )

@@ -342,7 +342,6 @@ const games = [
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
-
   return (
     <MuiPickersUtilsProvider utils={LocalizedUtils}>
       <DatePicker
@@ -560,7 +559,6 @@ export default function Feed({
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
-
                 break
               case "daily":
               case "hourly":
@@ -661,9 +659,8 @@ export default function Feed({
 
                       currentFeed.push(each)
                     })
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 break
@@ -716,8 +713,8 @@ export default function Feed({
                       new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
                         ? true
                         : false
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)

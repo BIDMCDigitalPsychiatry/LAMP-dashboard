@@ -103,6 +103,10 @@ export default function ParticipantListItem({
     setName({ ...user, name: nameVal })
   }
 
+  useEffect(() => {
+    setName(user)
+  }, [user])
+
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" p={1}>
