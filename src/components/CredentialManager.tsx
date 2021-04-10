@@ -323,7 +323,7 @@ export const CredentialManager: React.FunctionComponent<{
 
   useEffect(() => {
     LAMP.Type.parent(id)
-      .then((x) => Object.keys(x.data).length === 0)
+      .then((x) => Object.keys(x?.data || []).length === 0)
       .then((x) => setShouldSyncWithChildren(x))
     LAMP.Credential.list(id).then((cred) => {
       setAllCreds(cred)
@@ -332,7 +332,7 @@ export const CredentialManager: React.FunctionComponent<{
   }, [])
 
   const setRoles = () => {
-    if (LAMP.Auth._type === "researcher") {
+    if (LAMP.Auth._type === "researcher" || LAMP.Auth._type === "admin") {
       const prefix = "lamp.dashboard.credential_roles"
       ;(async () => {
         let ext = ((await LAMP.Type.getAttachment(id, `${prefix}.external`)) as any).data
@@ -349,7 +349,7 @@ export const CredentialManager: React.FunctionComponent<{
   }
 
   useEffect(() => {
-    if (LAMP.Auth._type === "researcher") {
+    if (LAMP.Auth._type === "researcher" || LAMP.Auth._type === "admin") {
       if (shouldSyncWithChildren !== true) return
       LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) => {
         !!res.data
