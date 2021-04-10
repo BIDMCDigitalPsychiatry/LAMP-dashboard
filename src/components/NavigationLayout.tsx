@@ -315,7 +315,7 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  Patient View: {id}
+                  User View: {id}
                 </Box>
               ) : (
                 <Box>
