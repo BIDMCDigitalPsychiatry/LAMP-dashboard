@@ -256,7 +256,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   questionhead: {
-    "& h5": { fontSize: 18, fontWeight: 600 },
+    "& h5": { fontSize: 18, fontWeight: 600, maxHeight: 100, overflow: "auto" },
     "& span": {
       marginTop: 15,
       fontSize: 12,
@@ -1096,8 +1096,10 @@ function Section({
 
   const handleChange = (event) => {
     const target = event.target
-    const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
-    setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    if (target.getAttribute("role") === "dialog") {
+      const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
+      setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    }
   }
 
   return (
@@ -1110,7 +1112,7 @@ function Section({
       </AppBar>
       {supportsSidebar ? (
         value.settings.map((x, idx) => (
-          <Box my={4} onScroll={handleChange}>
+          <Box my={4}>
             <Questions
               idx={idx}
               x={x}
