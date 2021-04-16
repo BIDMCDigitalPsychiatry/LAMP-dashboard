@@ -24,26 +24,21 @@ import {
   Popover,
   Divider,
   Fab,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import { ReactComponent as Message } from "../icons/Message.svg"
-import { ReactComponent as User } from "../icons/User.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
-import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import { ReactComponent as UserIcon } from "../icons/User.svg"
-
+import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    scrollOuter: { overflowY: "hidden" },
     toolbar: {
       paddingLeft: 20,
       paddingRight: 20,
@@ -78,23 +73,19 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     headerRight: {
+      "& span": {
+        color: "rgba(0, 0, 0, 0.54)",
+      },
       [theme.breakpoints.down("xs")]: {
         display: "block",
         float: "right",
       },
     },
-    toolbarinner: { minHeight: 95 },
     backbtn: {
       [theme.breakpoints.up("md")]: {},
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
-    },
-    notification: {
-      borderRadius: "50%",
-      padding: "8px",
-      background: "#CFE4FF",
-      display: "inline-block",
     },
     thumbContainer: {
       maxWidth: 1055,
@@ -120,6 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       top: 0,
       paddingTop: 120,
+      paddingBottom: 100,
       [theme.breakpoints.down("sm")]: {
         paddingTop: 94,
       },
@@ -127,6 +119,8 @@ const useStyles = makeStyles((theme: Theme) =>
     appbarResearcher: { zIndex: 1111, position: "relative", boxShadow: "none", background: "transparent" },
     toolbarResearcher: {
       minHeight: 50,
+      width: "100%",
+      background: "transparent",
       "& h5": {
         padding: "55px 0 25px",
         [theme.breakpoints.down("sm")]: {
@@ -136,7 +130,6 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     logToolbarResearcher: { marginTop: 50, paddingTop: 0, background: "transparent", "& h5": { paddingTop: 35 } },
-
     customPopover: { backgroundColor: "rgba(0, 0, 0, 0.4)" },
     customPaper: {
       maxWidth: 380,
@@ -169,7 +162,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "&:hover": { background: "transparent" },
       "&:active": { background: "transparent", boxShadow: "none" },
       "& svg": { marginRight: 10 },
-      "& path": { fill: "#fff", fillOpacity: "1" },
     },
     logResearcherToolbar: {
       background: "#7599FF",
@@ -236,8 +228,8 @@ export default function NavigationLayout({
       if (sensorData === null) {
         ;(async () => {
           let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
-          data = data.filter((d) => d.data.page === "conversations")
-          setSensorData(data ? data[0] : [])
+          data = Array.isArray(data) ? (data || []).filter((d) => d.data.page === "conversations") : null
+          setSensorData(!!data ? data[0] : [])
         })()
       }
       refreshMessages()
@@ -317,11 +309,12 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  Patient View: {id}
+                  {t("Patient View")}: {id}
                 </Box>
               ) : (
                 <Box>
-                  {authType === "admin" && title !== "Administrator" && (
+                  {console.log(authType, title, activeTab)}
+                  {authType === "admin" && (title !== "Administrator" || activeTab === "Studies") && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -341,7 +334,8 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <UserIcon /> {title} <ArrowDropDownIcon />
+                    <AccountCircleOutlinedIcon />
+                    {title} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}
@@ -362,14 +356,13 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {!!id && authType === "admin" && (
+                    {authType === "admin" && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
                     </MenuItem>
-                    <Divider />
                     <MenuItem
                       dense
                       onClick={() => {
@@ -409,7 +402,7 @@ export default function NavigationLayout({
                 (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
             }}
           >
-            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
+            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <IconButton
                   onClick={goBack}
@@ -436,7 +429,7 @@ export default function NavigationLayout({
                 )}
               </Container>
             )}
-            {authType !== "admin" && !sameLineTitle && (
+            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <Typography
                   variant="h5"
@@ -464,7 +457,7 @@ export default function NavigationLayout({
                           setOpenMessages(true)
                         }}
                       >
-                        <Message />
+                        <Icon>comment</Icon>
                       </Badge>
                     </Tooltip>
                   ) : (
@@ -481,7 +474,8 @@ export default function NavigationLayout({
                     onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                     color="default"
                   >
-                    <User />
+                    {/* <User /> */}
+                    <Icon>account_circle</Icon>
                   </IconButton>
                 </Tooltip>
                 <Menu
@@ -590,9 +584,9 @@ export default function NavigationLayout({
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={!!passwordChange && !!id} onClose={() => setPasswordChange(false)}>
+      <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={id} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} />
         </DialogContent>
       </Dialog>
 

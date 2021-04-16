@@ -5,6 +5,7 @@ import {
   useTheme,
   useMediaQuery,
   Slide,
+  Icon,
   Backdrop,
   CircularProgress,
   Dialog,
@@ -12,11 +13,12 @@ import {
   DialogContent,
   IconButton,
   Typography,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 // Local Imports
-import CloseIcon from "@material-ui/icons/Close"
 
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
@@ -158,7 +160,6 @@ export default function Participant({
 }) {
   const [activities, setActivities] = useState([])
   const [visibleActivities, setVisibleActivities] = useState([])
-
   const getTab = () => {
     let tabNum
     switch (props.tabValue) {
@@ -192,7 +193,7 @@ export default function Participant({
   const [hiddenEvents, setHiddenEvents] = React.useState([])
   const [surveyName, setSurveyName] = useState(null)
   const classes = useStyles()
-  const [loading, setLoading] = useState(![3, 4].includes(getTab()))
+  const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const { t, i18n } = useTranslation()
@@ -238,11 +239,13 @@ export default function Participant({
       ? getSelectedLanguage()
       : "en-US"
     i18n.changeLanguage(language)
+    setLoading(true)
     //  getShowWelcome(participant).then(setOpen)
-    LAMP.Activity.allByParticipant(participant.id).then((e) => {
-      setActivities(e)
+    ;(async () => {
+      let activities = await LAMP.Activity.allByParticipant(participant.id)
+      setActivities(activities)
       setLoading(false)
-    })
+    })()
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
@@ -437,7 +440,7 @@ export default function Participant({
       >
         <DialogTitle>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent>

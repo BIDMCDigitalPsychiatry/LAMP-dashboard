@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   Card,
+  Icon,
   Box,
   Dialog,
   DialogTitle,
@@ -13,24 +14,23 @@ import {
   DialogActions,
   AppBar,
   Toolbar,
-  Icon,
   ButtonBase,
   Link,
   Backdrop,
   CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
-import CloseIcon from "@material-ui/icons/Close"
 import MultipleSelect from "./MultipleSelect"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
@@ -377,7 +377,7 @@ async function getActivityEvents(
       activity: _activities.find((y) => x.activity === y.id),
     }))
     .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
-    .sort((x, y) => x.timestamp - y.timestamp)
+    .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
     .map((x) => ({
       ...x,
       activity: (x.activity || { name: "" }).name || x.static_data?.survey_name,
@@ -561,6 +561,10 @@ export const strategies = {
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
+    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
+  "lamp.breathe": (slices, activity, scopedItem) =>
     ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
@@ -773,58 +777,42 @@ export default function Prevent({
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
-      //  getVisualizations(participant).then(setVisualizations)
-      let visualizations = await getVisualizations(participant)
-      let selActivities = await getSelectedActivities(participant)
-      setSelectedActivities(selActivities)
-      let selSensors = await getSelectedSensors(participant)
-      let selExperimental = await getSelectedExperimental(participant)
-      let activities = await getActivities(participant)
-      // let goals = await getGoals(participant)
-      // let groupByType
-      // if (typeof goals !== "undefined") {
-      //   goals.map((goal) => {
-      //     if (activities.filter((it) => it.name == goal.goalType && it.type == "goals").length == 0) {
-      //       activities.push({ name: goal.goalType, type: "goals" })
-      //     }
-      //   })
-      // }
-      activities = !disabled ? activities : activities.filter((activity) => activity.spec === "lamp.journal")
-      let activityEvents = await getActivityEvents(participant, activities, hiddenEvents)
-      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
-      setActivityEvents(activityEvents)
-
-      let activityEventCount = getActivityEventCount(activityEvents)
-      // if (typeof goals !== "undefined") {
-      //   groupByType = goals.reduce((goal, it) => {
-      //     goal[it.goalType] = goal[it.goalType] + 1 || 1
-      //     activityEventCount[it.goalType] = goal[it.goalType]
-      //     timeSpans[it.goalType + "-goal"] = { timestamp: new Date().getTime() }
-      //     return goal
-      //   }, {})
-      // }
-      setTimeSpans(timeSpans)
-      setActivityCounts(activityEventCount)
-      activities = activities.filter(
-        (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group"
-      )
-      setActivities(activities)
-      setVisualizations(visualizations)
+      getActivities(participant).then((activities) => {
+        activities = !disabled ? activities : activities.filter((activity) => activity.spec === "lamp.journal")
+        getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
+          let timeSpans = Object.fromEntries(
+            Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
+          )
+          setActivityEvents(activityEvents)
+          let activityEventCount = getActivityEventCount(activityEvents)
+          setTimeSpans(timeSpans)
+          setActivityCounts(activityEventCount)
+          activities = activities.filter(
+            (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group"
+          )
+          setActivities(activities)
+          getSelectedActivities(participant).then(setSelectedActivities)
+        })
+      })
       if (!disabled) {
-        let sensorEvents = await getSensorEvents(participant)
-        let sensorEventCount = getSensorEventCount(sensorEvents)
-        setSelectedSensors(selSensors)
-        setSelectedExperimental(selExperimental)
-        setCortex(
-          [`Environmental Context`, `Step Count`, `Social Context`]
-            .filter((sensor) => sensorEventCount[sensor] > 0)
-            .concat(Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", "")))
-        )
-        setSensorEvents(sensorEvents)
-        let visualizationCount = Object.keys(visualizations)
-          .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-          .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-        setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
+        getSelectedSensors(participant).then(setSelectedSensors)
+        getSelectedExperimental(participant).then(setSelectedExperimental)
+        getSensorEvents(participant).then((sensorEvents) => {
+          let sensorEventCount = getSensorEventCount(sensorEvents)
+          setSensorEvents(sensorEvents)
+          setCortex(
+            [`Environmental Context`, `Step Count`, `Social Context`]
+              .filter((sensor) => sensorEventCount[sensor] > 0)
+              .concat(Object.keys(visualizations).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+          )
+          getVisualizations(participant).then((data) => {
+            setVisualizations(data)
+            let visualizationCount = Object.keys(data)
+              .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+              .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+            setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
+          })
+        })
       }
       setLoading(false)
     })()
@@ -899,7 +887,7 @@ export default function Prevent({
       .filter((x) => (selectedActivities || []).includes(x.name))
       .map((x) => (activityEvents || {})[x.name] || [])
       .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
-      .sort((a, b) => a - b /* min */)
+      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
       .slice(0, 1)
       .map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
@@ -916,7 +904,7 @@ export default function Prevent({
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(0)}>
-                <AddCircleOutlineIcon className={classes.addicon} />
+                <Icon className={classes.addicon}>add_circle_outline</Icon>
               </IconButton>
             </Grid>
           </Grid>
@@ -1067,7 +1055,7 @@ export default function Prevent({
             </Grid>
             <Grid item xs className={classes.addbtnmain}>
               <IconButton onClick={() => handleClickOpen(1)}>
-                <AddCircleOutlineIcon className={classes.addicon} />
+                <Icon className={classes.addicon}>add_circle_outline</Icon>
               </IconButton>
             </Grid>
           </Grid>
@@ -1279,7 +1267,7 @@ export default function Prevent({
         <DialogTitle id="alert-dialog-slide-title">
           {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
           <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
           <Box mt={2}>
             <Typography>{t("Choose the data you want to see in your dashboard.")}</Typography>

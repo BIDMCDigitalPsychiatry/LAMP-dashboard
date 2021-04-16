@@ -18,9 +18,6 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import CloseIcon from "@material-ui/icons/Close"
-import { ReactComponent as ThumbsUp } from "../icons/ThumbsUp.svg"
-import { ReactComponent as ThumbsDown } from "../icons/ThumbsDown.svg"
 import classnames from "classnames"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
@@ -60,7 +57,6 @@ const useStyles = makeStyles((theme) => ({
   closeButton: {
     color: theme.palette.grey[500],
   },
-
   textAreaControl: {
     width: "100%",
     marginTop: 35,
@@ -93,7 +89,6 @@ const useStyles = makeStyles((theme) => ({
         "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
     },
   },
-
   toolbardashboard: {
     minHeight: 65,
     padding: "0 10px",
@@ -131,16 +126,17 @@ export default function JournalEntries({ participant, activityId, ...props }) {
 
   const saveJournal = () => {
     setLoading(true)
-    LAMP.ActivityEvent.create(participant.id, {
-      timestamp: time,
+    let data = {
+      timestamp: new Date().getTime(),
       duration: new Date().getTime() - time,
       activity: activityId,
       static_data: {
         text: journalValue,
         sentiment: status,
       },
-      temporal_slices: [],
-    } as any)
+      temporal_slices: {},
+    }
+    LAMP.ActivityEvent.create(participant.id, data)
       .catch((e) => console.dir(e))
       .then((x) => {
         setLoading(false)
@@ -196,14 +192,14 @@ export default function JournalEntries({ participant, activityId, ...props }) {
                       onClick={() => handleClickStatus("good")}
                       className={status === "good" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
-                      <ThumbsUp />
+                      <Icon>thumb_up_off_alt</Icon>
                       <label>{t("Good")}</label>
                     </IconButton>
                     <IconButton
                       onClick={() => handleClickStatus("bad")}
                       className={status === "bad" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
                     >
-                      <ThumbsDown />
+                      <Icon>thumb_down_off_alt</Icon>
                       <label>{t("Bad")}</label>
                     </IconButton>
                   </Box>
@@ -230,7 +226,7 @@ export default function JournalEntries({ participant, activityId, ...props }) {
               <Box display="flex" justifyContent="flex-end">
                 <Box>
                   <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>

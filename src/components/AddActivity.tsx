@@ -10,7 +10,6 @@ import BreatheCreator from "./BreatheCreator"
 import SCImageCreator from "./SCImageCreator"
 
 export default function AddActivity({ ...props }) {
-  console.log(props.studyId)
   return (
     <Box py={8} px={4}>
       {!!props.groupCreate && (

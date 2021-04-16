@@ -7,6 +7,7 @@ import {
   DialogContent,
   Button,
   Box,
+  Icon,
   DialogTitle,
   IconButton,
   Typography,
@@ -16,7 +17,6 @@ import {
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
-import CloseIcon from "@material-ui/icons/Close"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import JournalEntries from "./JournalEntries"
@@ -104,12 +104,11 @@ export default function NotificationPage({ participant, activityId, ...props }) 
 
   useEffect(() => {
     ;(async () => {
-      console.log(activityId)
       LAMP.Activity.view(activityId).then(setActivity)
     })()
   }, [])
+
   useEffect(() => {
-    console.log(activity)
     if (!!activity) {
       ;(async () => {
         let iconData = (await LAMP.Type.getAttachment(activity?.id, "lamp.dashboard.activity_details")) as any
@@ -174,6 +173,8 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.jewels_a" ||
           activity?.spec === "lamp.jewels_b" ||
           activity?.spec === "lamp.spatial_span" ||
+          activity?.spec === "lamp.pop_the_bubbles" ||
+          activity?.spec === "lamp.balloon_risk" ||
           activity?.spec === "lamp.dbt_diary_card" ? (
           <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
         ) : activity?.spec === "lamp.journal" ? (
@@ -226,7 +227,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
       >
         <DialogTitle>
           <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent>

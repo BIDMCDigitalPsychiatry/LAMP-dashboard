@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { makeStyles, Theme, createStyles, withStyles } from "@material-ui/core/styles"
 import {
   Box,
+  Icon,
   useMediaQuery,
   useTheme,
   Drawer,
@@ -9,14 +9,17 @@ import {
   IconButton,
   Typography,
   ClickAwayListener,
+  makeStyles,
+  Theme,
+  createStyles,
+  withStyles,
+  Tooltip,
 } from "@material-ui/core"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
 import { ReactComponent as Assess } from "../icons/Assess.svg"
 import { ReactComponent as Manage } from "../icons/Manage.svg"
 import { ReactComponent as PreventIcon } from "../icons/Prevent.svg"
-import CloseIcon from "@material-ui/icons/Close"
-import Tooltip from "@material-ui/core/Tooltip"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 
@@ -92,7 +95,6 @@ const useStyles = makeStyles((theme: Theme) =>
     navigationLabel: {
       textTransform: "capitalize",
       fontSize: "12px !important",
-
       letterSpacing: 0,
       color: "rgba(0, 0, 0, 0.4)",
       width: "100%",
@@ -103,7 +105,6 @@ const useStyles = makeStyles((theme: Theme) =>
           backgroundColor: "#F8F8F8",
           border: 0,
         },
-
         "& a": {
           [theme.breakpoints.down("sm")]: {
             flex: 1,
@@ -319,7 +320,6 @@ export default function BottomMenu({ ...props }) {
       tabVal === 4 && typeof tabValues[4] === "undefined" ? true : false,
     ])
   }
-
   useEffect(() => {
     localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(tabValues))
   }, [tabValues])
@@ -388,7 +388,7 @@ export default function BottomMenu({ ...props }) {
                       setOpenTabs({ ...openTabs, 4: false })
                     }}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                   <Typography variant="h6">{t("Welcome to the Feed section")}</Typography>
                   <Typography variant="body1">{t("Review today's activities.")}</Typography>
@@ -432,7 +432,7 @@ export default function BottomMenu({ ...props }) {
                       setOpenTabs({ ...openTabs, 0: false })
                     }}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                   <Typography variant="h6">{t("Welcome to the Learn section")}</Typography>
                   <Typography variant="body1">{t("Find useful information and practice healthy habits.")}</Typography>
@@ -471,7 +471,7 @@ export default function BottomMenu({ ...props }) {
                       setOpenTabs({ ...openTabs, 1: false })
                     }}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                   <Typography variant="h6">{t("Welcome to the Assess section")}</Typography>
                   <Typography variant="body1">{t("Log feelings, behavior, and activity.")}</Typography>
@@ -510,7 +510,7 @@ export default function BottomMenu({ ...props }) {
                       setOpenTabs({ ...openTabs, 2: false })
                     }}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                   <Typography variant="h6">{t("Welcome to the Manage section")}</Typography>
                   <Typography variant="body1">{t("Take steps to refocus, reflect, and recover.")}</Typography>
@@ -549,7 +549,7 @@ export default function BottomMenu({ ...props }) {
                       setOpenTabs({ ...openTabs, 3: false })
                     }}
                   >
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                   <Typography variant="h6">{t("Welcome to the Prevent section")}</Typography>
                   <Typography variant="body1">{t("Track progress and make connections.")}</Typography>

@@ -1,58 +1,11 @@
 // Core Imports
 import React, { useState } from "react"
-import { Box, Icon, IconButton, Tooltip, Typography, Divider } from "@material-ui/core"
-import { blue } from "@material-ui/core/colors"
-
+import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@material-ui/core"
 // Local Imports
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 import { useTranslation } from "react-i18next"
-
-export const strategies = {
-  "lamp.survey": (slices, activity, scopedItem) =>
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
-        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else return parseInt(x?.value ?? 0) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
-  "lamp.dashboard.custom_survey_group": (slices, activity, scopedItem) =>
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
-        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else if (!!question && question.type === "slider")
-          return !!x.value ? parseInt(question.options.filter((option) => option.description === x.value)[0].value) : 0
-        else return parseInt(x?.value ?? 0) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.jewels_b": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.spatial_span": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.balloon_risk": (slices, activity, scopedItem) => parseInt(slices.points ?? 0).toFixed(1) || 0,
-  "lamp.pop_the_bubbles": (slices, activity, scopedItem) => {
-    let temporalSlices = slices.filter(function (data) {
-      return data.type === true
-    })
-    return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
-  },
-  "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
-  "lamp.scratch_image": (slices, activity, scopedItem) =>
-    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
-      ? 100
-      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
-  __default__: (slices, activity, scopedItem) =>
-    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
-}
+import { strategies } from "./Prevent"
 
 export default function ActivityCard({
   activity,
@@ -72,7 +25,7 @@ export default function ActivityCard({
   const [helpAnchor, setHelpAnchor] = useState<Element>()
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
-  const [selectedActivity, setActivity] = useState(activity)
+  const selectedActivity = activity
 
   return (
     <React.Fragment>
@@ -155,14 +108,14 @@ export default function ActivityCard({
             <Sparkline
               minWidth={48}
               minHeight={48}
-              color={blue[500]}
+              color={colors.blue[500]}
               data={events.map((d) => ({
                 x: new Date(d.timestamp),
                 y: strategies[activity.spec]
                   ? strategies[activity.spec](
                       activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                         ? d.temporal_slices
-                        : activity.spec === "lamp.scratch_image"
+                        : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
                         ? d
                         : d.static_data,
                       selectedActivity,
@@ -198,7 +151,7 @@ export default function ActivityCard({
           minHeight={350}
           XAxisLabel={t("Time")}
           YAxisLabel={t("Score")}
-          color={blue[500]}
+          color={colors.blue[500]}
           startDate={startDate}
           data={events.map((d) => ({
             x: new Date(d.timestamp),
@@ -206,7 +159,7 @@ export default function ActivityCard({
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                     ? d.temporal_slices
-                    : activity.spec === "lamp.scratch_image"
+                    : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
                     ? d
                     : d.static_data,
                   selectedActivity,

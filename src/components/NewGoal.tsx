@@ -5,11 +5,11 @@ import {
   makeStyles,
   Box,
   Grid,
+  Icon,
   IconButton,
   FormControl,
   AppBar,
   Toolbar,
-  Icon,
   Dialog,
   DialogContent,
   Link,
@@ -23,7 +23,6 @@ import {
   InputBase,
 } from "@material-ui/core"
 import { DatePicker, TimePicker } from "@material-ui/pickers"
-import CloseIcon from "@material-ui/icons/Close"
 import classnames from "classnames"
 import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
@@ -75,7 +74,6 @@ export default function NewGoal({ participant, ...props }) {
   const valueInput = useRef(null)
   const { t } = useTranslation()
   const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-
   const getDateString = (date: Date) => {
     var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
     return monthname[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear()
@@ -490,7 +488,7 @@ export default function NewGoal({ participant, ...props }) {
               <Box display="flex" justifyContent="flex-end">
                 <Box>
                   <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-                    <CloseIcon />
+                    <Icon>close</Icon>
                   </IconButton>
                 </Box>
               </Box>

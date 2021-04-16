@@ -1,7 +1,5 @@
-// Core Imports
 // eslint-disable-next-line
 import React, { useState, useEffect, useRef } from "react"
-
 export default function useInterval(callback, delay, now) {
   const savedCallback = useRef<any>()
   useEffect(() => {
@@ -11,8 +9,9 @@ export default function useInterval(callback, delay, now) {
     function tick() {
       savedCallback.current?.()
     }
+    let id
     if (delay !== null) {
-      let id = setInterval(tick, delay)
+      id = setInterval(tick, delay)
       if (now) tick()
       return () => clearInterval(id)
     }

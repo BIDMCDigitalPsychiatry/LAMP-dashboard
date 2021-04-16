@@ -1,11 +1,7 @@
-// Core Imports
 import React from "react"
-import { Box, Chip, Tooltip } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     badgeCount: {
@@ -30,16 +26,14 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "flex",
       justifyContent: "center",
       maxWidth: 1055,
-      margin: "0 auto",
+      margin: "15px auto 0",
       width: "100%",
     },
   })
 )
-
 export default function MultipleSelect({ ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-
   return (
     <Box className={classes.filterChips}>
       {(props.items || []).map((item) => (

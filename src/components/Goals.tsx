@@ -11,9 +11,11 @@ import {
   AppBar,
   Toolbar,
   Icon,
+  makeStyles,
+  Theme,
+  createStyles,
 } from "@material-ui/core"
 
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import { ReactComponent as Exercise } from "../icons/Exercise.svg"
 import { ReactComponent as Reading } from "../icons/Reading.svg"
 import { ReactComponent as Sleeping } from "../icons/Sleeping.svg"
@@ -42,7 +44,6 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
-
     cardlabel: {
       fontSize: 14,
 
@@ -54,7 +55,6 @@ const useStyles = makeStyles((theme: Theme) =>
         bottom: 30,
       },
     },
-
     header: {
       background: "#FFEFEC",
       padding: "25px 20px 10px",

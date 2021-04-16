@@ -39,9 +39,6 @@ import { green, yellow, red, grey } from "@material-ui/core/colors"
 import CloseIcon from "@material-ui/icons/Close"
 import PatientProfile from "./PatientProfile"
 // External Imports
-import { saveAs } from "file-saver"
-import JSZip from "jszip"
-import jsonexport from "jsonexport"
 import TimeAgo from "javascript-time-ago"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -734,37 +731,6 @@ export default function ParticipantList({
     }
   }
 
-  let downloadFiles = async (filetype) => {
-    setLoading(true)
-    let selectedRows = state.selectedRows
-    setState({
-      ...state,
-      popoverAttachElement: null,
-      selectedIcon: "",
-      selectedRows: [],
-    })
-    let zip = new JSZip()
-    for (let row of selectedRows) {
-      let sensorEvents = await LAMP.SensorEvent.allByParticipant(row.id)
-      let activityEvents = await LAMP.ActivityEvent.allByParticipant(row.id)
-      if (filetype === "json") {
-        zip.file(`${row.id}/sensor_event.json`, JSON.stringify(sensorEvents))
-        zip.file(`${row.id}/result_event.json`, JSON.stringify(activityEvents))
-      } else if (filetype === "csv") {
-        jsonexport(JSON.parse(JSON.stringify(sensorEvents)), function (err, csv) {
-          if (err) return console.log(err)
-          zip.file(`${row.id}/sensor_event.csv`, csv)
-        })
-        jsonexport(JSON.parse(JSON.stringify(activityEvents)), function (err, csv) {
-          if (err) return console.log(err)
-          zip.file(`${row.id}/result_event.csv`, csv)
-        })
-      }
-    }
-    setLoading(false)
-    zip.generateAsync({ type: "blob" }).then((x) => saveAs(x, "export.zip"))
-  }
-
   let deleteParticipants = async () => {
     setLoading(true)
     setState((state) => ({
@@ -1232,17 +1198,6 @@ export default function ParticipantList({
                               {t("Delete")}
                             </Button>
                           </Box>
-                          <Box>
-                            <Button
-                              className={classes.btnOptions}
-                              onClick={(event) => {
-                                saveSelectedUserState("download", props.selectedRows, event)
-                              }}
-                              startIcon={<ExportIcon />}
-                            >
-                              {t("Export")}
-                            </Button>
-                          </Box>
                         </Box>
                       </Container>
                     </Box>
@@ -1270,12 +1225,7 @@ export default function ParticipantList({
           horizontal: "right",
         }}
       >
-        {state.selectedIcon === "download" ? (
-          <React.Fragment>
-            <MenuItem onClick={() => downloadFiles("csv")}>{t("CSV")}</MenuItem>
-            <MenuItem onClick={() => downloadFiles("json")}>{t("JSON")}</MenuItem>
-          </React.Fragment>
-        ) : state.selectedIcon === "add" ? (
+        {state.selectedIcon === "add" ? (
           <React.Fragment>
             <MenuItem
               onClick={() => {

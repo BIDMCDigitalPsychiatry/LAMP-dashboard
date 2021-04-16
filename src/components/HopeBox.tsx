@@ -1,9 +1,18 @@
 import React from "react"
-import { Theme, createStyles, makeStyles } from "@material-ui/core/styles"
-import GridList from "@material-ui/core/GridList"
-import GridListTile from "@material-ui/core/GridListTile"
 import { ReactComponent as HopeBoxHeader } from "../icons/HopeBoxHeader.svg"
-import { Typography, AppBar, Toolbar, IconButton, Icon, Grid } from "@material-ui/core"
+import {
+  Typography,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Icon,
+  Grid,
+  Theme,
+  createStyles,
+  makeStyles,
+  GridList,
+  GridListTile,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -16,13 +25,11 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.background.paper,
     },
     singletile: { padding: "0 8px 15px 8px  !important", "& div": { borderRadius: 10 } },
-
     gridList: {
       width: "100%",
       height: "100%",
       padding: "0 10px",
     },
-
     toolbardashboard: {
       minHeight: 65,
       padding: "0 10px",

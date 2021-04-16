@@ -1,7 +1,17 @@
 // Core Imports
 import React from "react"
-import { Dialog, DialogProps, Icon, IconButton, Slide, useTheme, useMediaQuery } from "@material-ui/core"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import {
+  Dialog,
+  DialogProps,
+  Icon,
+  IconButton,
+  Slide,
+  useTheme,
+  useMediaQuery,
+  makeStyles,
+  Theme,
+  createStyles,
+} from "@material-ui/core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -20,10 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
 const SlideUp: any = React.forwardRef((props: any, ref) => <Slide direction="up" {...props} ref={ref} />)
-
-//
 export default function ResponsiveDialog({
   transient,
   animate,

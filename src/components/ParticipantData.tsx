@@ -10,6 +10,7 @@ import LAMP, {
 import ActivityCard from "./ActivityCard"
 import MultipleSelect from "./MultipleSelect"
 import Sparkline from "./Sparkline"
+// import MultiPieChart from "./MultiPieChart"
 import { useTranslation } from "react-i18next"
 
 // TODO: all SensorEvents?
@@ -70,7 +71,7 @@ async function getActivityEvents(
       activity: _activities.find((y) => x.activity === y.id),
     }))
     .filter((x) => (!!x.activity ? !_hidden.includes(`${x.timestamp}/${x.activity.id}`) : true))
-    .sort((x, y) => x.timestamp - y.timestamp)
+    .sort((x, y) => (x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0))
     .map((x) => ({
       ...x,
       activity: (x.activity || { name: "" }).name,
@@ -280,7 +281,7 @@ export default function ParticipantData({
       .filter((x) => (selectedActivities || []).includes(x.name))
       .map((x) => (activityEvents || {})[x.name] || [])
       .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
-      .sort((a, b) => a - b /* min */)
+      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
       .slice(0, 1)
       .map((x) => (x === 0 ? undefined : new Date(x)))[0]
 
@@ -417,7 +418,7 @@ export default function ParticipantData({
               {t("Environmental Context")}
             </Typography>
             <Divider />
-            {/*<MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} />*/}
+            {/* <MultiPieChart data={getEnvironmentalContextGroups(sensorEvents?.["lamp.gps.contextual"])} /> */}
           </Card>
         )}
         {((selectedSensors || []).includes("Step Count") || !!printView) && (

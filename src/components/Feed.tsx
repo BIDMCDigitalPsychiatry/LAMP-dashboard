@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-
 import {
   Card,
   Step,
@@ -19,14 +18,11 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  Icon,
 } from "@material-ui/core/"
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
-
-import { ReactComponent as LeftArrow } from "../icons/LeftArrow.svg"
-import { ReactComponent as RightArrow } from "../icons/RightArrow.svg"
 import InfoIcon from "../icons/Info.svg"
-import { ReactComponent as EmptyManageIcon } from "../icons/EmptyTab.svg"
 import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
@@ -346,7 +342,6 @@ const games = [
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
-
   return (
     <MuiPickersUtilsProvider utils={LocalizedUtils}>
       <DatePicker
@@ -362,7 +357,6 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
         }}
         renderDay={(date, selectedDate, isInCurrentMonth, dayComponent) => {
           const isSelected = isInCurrentMonth && selectedDays.includes(date.toLocaleDateString())
-          const isCurrentDay = new Date().getDate() === date.getDate() ? true : false
           const isActiveDate = selectedDate.getDate() === date.getDate() ? true : false
           const view = isSelected ? (
             <div onClick={() => getFeedByDate(date)}>
@@ -379,8 +373,8 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
           )
           return view
         }}
-        leftArrowIcon={<LeftArrow />}
-        rightArrowIcon={<RightArrow />}
+        leftArrowIcon={<Icon>arrow_back_ios</Icon>}
+        rightArrowIcon={<Icon>arrow_forward_ios</Icon>}
       />
     </MuiPickersUtilsProvider>
   )
@@ -396,12 +390,9 @@ export default function Feed({
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [date, changeDate] = useState(new Date())
-  const [show, setShow] = useState(false)
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
-  const [medications, setMedications] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [goals, setGoals] = useState({})
   const [surveyName, setSurveyName] = useState<string>()
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
@@ -416,7 +407,6 @@ export default function Feed({
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [activity, setActivity] = useState(null)
-  const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   const { t } = useTranslation()
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -424,43 +414,8 @@ export default function Feed({
     setCurrentFeed(feed)
   }
 
-  const getFeedData = async () => {
-    setGoals(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.goals").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )[participant.id || ""] ?? []
-    )
-
-    setMedications(
-      Object.fromEntries(
-        (
-          await Promise.all(
-            [participant.id || ""].map(async (x) => [
-              x,
-              await LAMP.Type.getAttachment(x, "lamp.feed.medications").catch((e) => []),
-            ])
-          )
-        )
-          .filter((x: any) => x[1].message !== "404.object-not-found")
-          .map((x: any) => [x[0], x[1].data])
-      )[participant.id || ""] ?? []
-    )
-  }
-
   useEffect(() => {
     getFeedByDate(new Date())
-    ;(async () => {
-      await getFeedData()
-    })()
   }, [])
 
   function getDayNumber(date: Date) {
@@ -529,12 +484,11 @@ export default function Feed({
       feeds.map((feed) => {
         savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
-          scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
+          scheduleStartDate = new Date(schedule.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
-
           if (currentDate.getTime() < scheduleStartDate.getTime()) {
             currentDate = new Date(schedule.start_date)
           }
@@ -543,12 +497,11 @@ export default function Feed({
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = new Date(new Date(schedule.time).toLocaleString())
+            scheduleTime = new Date(schedule.time)
             let timeVal = getTimeValue(scheduleTime)
             startD.setHours(scheduleTime.getHours())
             startD.setMinutes(scheduleTime.getMinutes())
             startD.setSeconds(0)
-            scheduleStartDate = new Date(new Date(schedule.start_date).toLocaleString())
             let scheduledDate = new Date(scheduleStartDate)
             let scDate = new Date(scheduleStartDate)
             scDate.setHours(0)
@@ -606,7 +559,6 @@ export default function Feed({
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
-
                 break
               case "daily":
               case "hourly":
@@ -635,7 +587,6 @@ export default function Feed({
                         date.toLocaleDateString() === new Date(startTime).toLocaleDateString()
                           ? startTime
                           : endTime - ((date.getTime() - startTime) % hourVal) - 86400000
-
                       let intervalStart, intervalEnd
                       let time
                       let completedVal
@@ -708,9 +659,8 @@ export default function Feed({
 
                       currentFeed.push(each)
                     })
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 break
@@ -763,8 +713,8 @@ export default function Feed({
                       new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
                         ? true
                         : false
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
-                  selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
@@ -773,17 +723,10 @@ export default function Feed({
           }
         })
       })
-      //  currentFeed.push(tip)
-      // let goalsFeedData = checkDataForFeed(date, goals, currentFeed, selectedWeekViewDays)
-      // currentFeed = goalsFeedData.feed
-      // selectedWeekViewDays = goalsFeedData.weekDays
-      // let medicationsData = checkDataForFeed(date, medications, currentFeed, selectedWeekViewDays)
-      // currentFeed = medicationsData.feed
-      // selectedWeekViewDays = medicationsData.weekDays
-      //  let selectedDays = selectedWeekViewDays.filter((n, i) => selectedWeekViewDays.indexOf(n) === i)
       setSelectedDays(selectedWeekViewDays)
-
-      currentFeed = currentFeed.sort((x, y) => x.time - y.time)
+      currentFeed = currentFeed.sort((x, y) => {
+        return x.time > y.time ? 1 : x.time < y.time ? -1 : 0
+      })
       return currentFeed
     } else {
       return (currentFeed = [])
@@ -799,45 +742,11 @@ export default function Feed({
   }, [events])
 
   const getFeedByDate = (date: Date) => {
+    setLoading(true)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
     setFeeds(feeds)
     changeDate(new Date(date))
-    ;(async () => {
-      setLoading(true)
-      await getEvents(date).then(setEvents)
-    })()
-  }
-
-  const checkDataForFeed = (date: any, data: any, currentFeed: any, selectedWeekViewDays: any) => {
-    let currentDate = new Date(date)
-    let dates = []
-    Object.keys(data).forEach((key) => {
-      if (currentDate >= new Date(data[key].startDate) && new Date(data[key].endDate) >= currentDate) {
-        data[key].weekdays.map((day) => {
-          dates.push(weekdays.indexOf(day))
-        })
-        selectedWeekViewDays = selectedWeekViewDays.concat(getDates(dates, date))
-        if (data[key].weekdays.indexOf(weekdays[new Date(date).getDay()]) > -1) {
-          data[key].timeValue = getTimeValue(new Date(data[key].timeValue))
-          data[key].time = new Date(data[key].timeValue).getTime()
-          currentFeed.push(data[key])
-        }
-      }
-      //   switch(data[key].frequency) {
-      //     case "hourly":
-      //     case "daily":
-      //       currentFeed.push(data[key])
-      //     case "weekly":
-      //       if(data[key].weekdays.indexOf(weekdays[new Date().getDay()]) > -1){
-      //         currentFeed.push(data[key])
-      //       }
-      //       break
-      //     case "monthly":
-      //       break
-      // }
-    })
-    let result = { weekDays: selectedWeekViewDays, feed: currentFeed }
-    return result
+    getEvents(date).then(setEvents)
   }
 
   const showFeedDetails = (type) => {
@@ -867,7 +776,8 @@ export default function Feed({
               ""
             ) : (
               <Box display="flex" className={classes.blankMsg} ml={1}>
-                <EmptyManageIcon /> <p>There are no scheduled activities available.</p>
+                <Icon>info</Icon>
+                <p>There are no scheduled activities available.</p>
               </Box>
             )
           ) : (

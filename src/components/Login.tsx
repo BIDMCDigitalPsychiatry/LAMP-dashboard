@@ -19,7 +19,6 @@ import {
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import locale_lang from "../locale_map.json"
-
 // Local Imports
 import { ResponsivePaper, ResponsiveMargin } from "./Utils"
 import { ReactComponent as Logo } from "../icons/Logo.svg"
@@ -234,7 +233,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   variant="outlined"
                   style={{ width: "100%", height: 90 }}
                   // label="Domain"
-                  placeholder="api.lampv2.unityhealth.to"
+                  placeholder="api.lamp.digital"
                   helperText={t("Don't enter a domain if you're not sure what this option does.")}
                   value={state.serverAddress || ""}
                   onChange={handleChange}
