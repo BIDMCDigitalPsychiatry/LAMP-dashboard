@@ -313,8 +313,7 @@ export default function NavigationLayout({
                 </Box>
               ) : (
                 <Box>
-                  {console.log(authType, title, activeTab)}
-                  {authType === "admin" && (title !== "Administrator" || activeTab === "Studies") && (
+                  {authType === "admin" && title !== "Administrator" && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -402,7 +401,7 @@ export default function NavigationLayout({
                 (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
             }}
           >
-            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && activeTab !== "Studies" && (
+            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
               <Container className={classes.thumbContainer}>
                 <IconButton
                   onClick={goBack}
