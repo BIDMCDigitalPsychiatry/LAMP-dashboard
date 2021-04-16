@@ -17,14 +17,22 @@ import {
   CircularProgress,
   Typography,
   makeStyles,
+  Grid,
+  Tooltip,
 } from "@material-ui/core"
-
+import SnackMessage from "../../SnackMessage"
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import { fetchPostData, fetchResult } from "../SaveResearcherData"
 import { updateActivityData, addActivity } from "../ActivityList/ActivityMethods"
+import QRCode from "qrcode.react"
+
+const _qrLink = (credID, password) =>
+  window.location.href.split("#")[0] +
+  "#/?a=" +
+  btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -241,6 +249,7 @@ export default function PatientStudyCreator({
                 )
                 if (filteredParticipants.length > 0) {
                   filteredParticipants[0].name = studyName
+                  showResult(filteredParticipants[0]?.id)
                   LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
                   saveStudyData(filteredParticipants, "participants")
                 }
@@ -270,6 +279,7 @@ export default function PatientStudyCreator({
               )
               if (filteredParticipants.length > 0) {
                 filteredParticipants[0].name = studyName
+                showResult(filteredParticipants[0]?.id)
                 LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
                 saveStudyData(filteredParticipants, "participants")
               }
@@ -288,6 +298,40 @@ export default function PatientStudyCreator({
         }
       }
     })
+  }
+
+  const showResult = (id: string) => {
+    enqueueSnackbar(
+      t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
+        id: id,
+      }),
+      {
+        variant: "success",
+        persist: true,
+        content: (key: string, message: string) => (
+          <SnackMessage id={key} message={message}>
+            <TextField variant="outlined" size="small" label={t("Temporary email address")} value={`${id}@lamp.com`} />
+            <Box style={{ height: 16 }} />
+            <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
+            <Grid item>
+              <TextField
+                fullWidth
+                label={t("One-time login link")}
+                style={{ marginTop: 16 }}
+                variant="outlined"
+                value={_qrLink(`${id}@lamp.com`, id)}
+                onChange={(event) => {}}
+              />
+              <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
+                <Grid container justify="center" style={{ padding: 16 }}>
+                  <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
+                </Grid>
+              </Tooltip>
+            </Grid>
+          </SnackMessage>
+        ),
+      }
+    )
   }
 
   return (
