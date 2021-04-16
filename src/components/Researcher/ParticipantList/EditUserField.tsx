@@ -36,7 +36,7 @@ export default function EditUserField({
     if (!!alias) return
     LAMP.Type.getAttachment(participant.id, "lamp.name")
       .then((res: any) =>
-        res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null
+        res.error === undefined && typeof res.data === "string" && res.data?.trim().length > 0 ? res.data : null
       )
       .then((res) => {
         if (!unmounted) setAlias((oldValue.current = res))
@@ -60,12 +60,12 @@ export default function EditUserField({
     if (!(typeof alias === "string" && alias !== participant.id)) {
       return
     }
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.name", alias ?? null)
+    LAMP.Type.setAttachment(participant.id, "me", "lamp.name", alias?.trim() ?? null)
       .then((res) => setAlias((oldValue.current = alias)))
       .then((res) => {
         Service.update("participants", { participants: [{ id: participant.id, name: alias }] }, "name", "id")
-        updateName(alias === "" ? participant.id : alias)
-        if (alias === "")
+        updateName(alias.trim() === "" ? participant.id : alias.trim())
+        if (alias.trim() === "")
           enqueueSnackbar(t("Removed participantId's alias.", { participantId: participant.id }), {
             variant: "success",
           })
@@ -107,8 +107,8 @@ export default function EditUserField({
   const updateEditing = () => {
     setEditing(false)
     setEditComplete(true)
-    if (!(typeof alias === "string" && alias !== participant.id)) {
-      updateName(alias === "" ? participant.id : alias)
+    if (!(typeof alias === "string" && alias !== participant.id && alias.trim() === "")) {
+      updateName(alias.trim() === "" ? participant.id : alias.trim())
     }
   }
 
@@ -150,7 +150,7 @@ export default function EditUserField({
           }}
         />
       ) : alias ? (
-        t(alias)
+        alias?.trim()
       ) : (
         participant.id
       )}
