@@ -161,14 +161,14 @@ export default function TipNotification({ ...props }) {
                 onClick={() => handleClickStatus("Yes")}
                 className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <Icon>thumbs_up</Icon>
+                <Icon>thumb_up_off_alt</Icon>
                 <label>{t("Yes")}</label>
               </IconButton>
               <IconButton
                 onClick={() => handleClickStatus("No")}
                 className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <Icon>thumbs_down</Icon>
+                <Icon>thumb_down_off_alt</Icon>
                 <label>{t("No")}</label>
               </IconButton>
             </Box>

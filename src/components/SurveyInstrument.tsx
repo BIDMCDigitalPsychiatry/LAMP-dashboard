@@ -166,6 +166,9 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("md")]: {
       marginTop: 30,
     },
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "40%",
+    },
     "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#92E7CA",
@@ -211,6 +214,9 @@ const useStyles = makeStyles((theme) => ({
     margin: "5% 5px 0 5px",
     [theme.breakpoints.up("md")]: {
       marginTop: 30,
+    },
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "40%",
     },
   },
   ampm: {

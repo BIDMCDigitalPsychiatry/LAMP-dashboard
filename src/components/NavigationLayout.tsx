@@ -32,16 +32,13 @@ import {
 // Local Imports
 import { CredentialManager } from "./CredentialManager"
 import { ResponsiveMargin } from "./Utils"
-import classnames from "classnames"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
-import useInterval from "./useInterval"
 import { useTranslation } from "react-i18next"
-
+import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    scrollOuter: { overflowY: "hidden" },
     toolbar: {
       paddingLeft: 20,
       paddingRight: 20,
@@ -76,23 +73,19 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     headerRight: {
+      "& span": {
+        color: "rgba(0, 0, 0, 0.54)",
+      },
       [theme.breakpoints.down("xs")]: {
         display: "block",
         float: "right",
       },
     },
-    toolbarinner: { minHeight: 95 },
     backbtn: {
       [theme.breakpoints.up("md")]: {},
       [theme.breakpoints.down("xs")]: {
         paddingLeft: 0,
       },
-    },
-    notification: {
-      borderRadius: "50%",
-      padding: "8px",
-      background: "#CFE4FF",
-      display: "inline-block",
     },
     thumbContainer: {
       maxWidth: 1055,
@@ -118,6 +111,7 @@ const useStyles = makeStyles((theme: Theme) =>
       left: 0,
       top: 0,
       paddingTop: 120,
+      paddingBottom: 100,
       [theme.breakpoints.down("sm")]: {
         paddingTop: 94,
       },
@@ -167,7 +161,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
       "&:hover": { background: "transparent" },
       "&:active": { background: "transparent", boxShadow: "none" },
-      "& span": { marginRight: 10 },
+      "& svg": { marginRight: 10 },
     },
     logResearcherToolbar: {
       background: "#7599FF",
@@ -315,11 +309,12 @@ export default function NavigationLayout({
                   <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
-                  User View: {id}
+                  {t("Patient View")}: {id}
                 </Box>
               ) : (
                 <Box>
-                  {authType === "admin" && title !== "Administrator" && (
+                  {console.log(authType, title, activeTab)}
+                  {authType === "admin" && (title !== "Administrator" || activeTab === "Studies") && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -339,9 +334,7 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <span className="material-icons-outlined MuiIcon-root" aria-hidden="true">
-                      account_circle_outlined
-                    </span>
+                    <AccountCircleOutlinedIcon />
                     {title} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
@@ -409,7 +402,7 @@ export default function NavigationLayout({
                 (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
             }}
           >
-            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
+            {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <IconButton
                   onClick={goBack}
@@ -436,7 +429,7 @@ export default function NavigationLayout({
                 )}
               </Container>
             )}
-            {authType !== "admin" && !sameLineTitle && (
+            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <Typography
                   variant="h5"
