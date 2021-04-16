@@ -211,7 +211,7 @@ export default function Activity({
           onSave={activitySpecId ? saveCTest : updateActivity}
           details={details}
           activities={allActivities}
-          onCancel={onCancel}
+          onCancel={onClose}
           studies={studies}
           activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}

@@ -10,6 +10,7 @@ import DynamicForm from "../../shared/DynamicForm"
 import { schemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
+import BreatheIcon from "../../../icons/Breathe.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -218,6 +219,8 @@ export default function GameCreator({
               ? ScratchCard
               : (value?.spec && "lamp.journal" === value.spec) || "lamp.journal" === activitySpecId
               ? JournalIcon
+              : (value?.spec && "lamp.breathe" === value.spec) || "lamp.breathe" === activitySpecId
+              ? BreatheIcon
               : null
           }
         />

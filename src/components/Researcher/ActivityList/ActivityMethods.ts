@@ -16,6 +16,7 @@ export const schemaList: any = {
             type: "number",
             default: 15,
             minimum: 1,
+            maximum: 100,
             "ui:grid": {
               xs: 4,
             },
@@ -26,6 +27,7 @@ export const schemaList: any = {
             type: "number",
             default: 64.5,
             minimum: 1,
+            maximum: 100,
             "ui:grid": {
               xs: 4,
             },
@@ -35,6 +37,7 @@ export const schemaList: any = {
             description: "The standard deviation of the breakpoint for balloon risk.",
             type: "number",
             default: 37,
+            maximum: 100,
             minimum: 1,
             "ui:grid": {
               xs: 4,
@@ -278,7 +281,7 @@ export const schemaList: any = {
             },
           },
           y_changes_in_level_count: {
-            title: "X Changes in Level Count",
+            title: "Y Changes in Level Count",
             description: "",
             type: "number",
             minimum: 0,
@@ -443,7 +446,7 @@ export const schemaList: any = {
             },
           },
           y_changes_in_level_count: {
-            title: "X Changes in Level Count",
+            title: "Y Changes in Level Count",
             description: "",
             type: "number",
             minimum: 0,
