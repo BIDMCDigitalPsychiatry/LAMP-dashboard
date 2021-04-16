@@ -482,8 +482,6 @@ function ImportActivity({
     </Container>
   )
 }
-
-// Create a new Activity object & survey descriptions if set.
 export async function saveTipActivity(x) {
   const { raw } = unspliceTipsActivity(x)
   let result
@@ -574,15 +572,25 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       }
     }
   } else if (x.spec === "lamp.group" || x.spec === "lamp.dbt_diary_card") {
-    result = (await LAMP.Activity.update(selectedActivity.id, {
-      name: x.name,
-      settings: x.settings,
-    })) as any
+    if (isDuplicated) {
+      result = (await LAMP.Activity.create(x.studyID, x)) as any
+      await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
+        description: x.description,
+        photo: x.photo,
+      })
+      return result
+    } else {
+      result = (await LAMP.Activity.update(selectedActivity?.id, {
+        name: x.name,
+        settings: x.settings,
+      })) as any
 
-    await LAMP.Type.setAttachment(selectedActivity.id, "me", "lamp.dashboard.activity_details", {
-      description: x.description,
-      photo: x.photo,
-    })
+      await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
+        description: x.description,
+        photo: x.photo,
+      })
+      return result
+    }
   } else if (x.spec === "lamp.survey") {
     const { raw, tag } = unspliceActivity(x)
     if (isDuplicated) {
@@ -830,7 +838,7 @@ export default function ActivityList({ researcher, title, ...props }) {
           })
           data.push(activity)
         } catch (e) {}
-      } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
+      } else if (!["lamp.survey"].includes(x.spec)) {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
           let activity = spliceCTActivity({
@@ -949,9 +957,7 @@ export default function ActivityList({ researcher, title, ...props }) {
       )[0]
       const activity = spliceActivity({ raw, tag })
       setSelectedActivity(activity)
-    } else if (raw.spec === "lamp.dbt_diary_card") {
-      setSelectedActivity(raw)
-    } else if (raw.spec === "lamp.tips") {
+    } else if (raw.spec === "lamp.dbt_diary_card" || raw.spec === "lamp.tips") {
       setSelectedActivity(raw)
     } else if (
       games.includes(raw.spec) ||
