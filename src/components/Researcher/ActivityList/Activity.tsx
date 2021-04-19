@@ -5,7 +5,6 @@ import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import Tips from "./Tips"
 import GameCreator from "./GameCreator"
-import DBTCreator from "./DBTCreator"
 import {
   saveGroupActivity,
   saveTipActivity,
