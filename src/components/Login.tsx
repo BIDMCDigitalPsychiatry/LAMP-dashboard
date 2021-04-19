@@ -247,6 +247,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                 <TextField
                   required
                   name="id"
+                  type="email"
                   margin="normal"
                   variant="outlined"
                   style={{ width: "100%", height: 50 }}
@@ -258,6 +259,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     classes: {
                       root: classes.textfieldStyle,
                     },
+                    autoCapitalize: "off",
                   }}
                 />
 
