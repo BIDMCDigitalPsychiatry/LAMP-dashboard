@@ -194,24 +194,12 @@ export default function Activity({
           details={details ?? null}
         />
       )}
-      {(isGames || isSCImage || isJournal || isBreathe) && (
+      {(isGames || isSCImage || isJournal || isBreathe || isDBT) && (
         <GameCreator
           activities={allActivities}
           value={activity ?? null}
           details={details ?? null}
           onSave={activitySpecId ? saveCTest : updateActivity}
-          studies={studies}
-          activitySpecId={activitySpecId ?? activity.spec}
-          study={studyId ?? activity?.study_id ?? null}
-        />
-      )}
-      {isDBT && (
-        <DBTCreator
-          value={activity ?? null}
-          onSave={activitySpecId ? saveCTest : updateActivity}
-          details={details}
-          activities={allActivities}
-          onCancel={onClose}
           studies={studies}
           activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}
