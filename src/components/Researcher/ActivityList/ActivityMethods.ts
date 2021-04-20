@@ -16,6 +16,7 @@ export const schemaList: any = {
             type: "number",
             default: 15,
             minimum: 1,
+            maximum: 100,
             "ui:grid": {
               xs: 4,
             },
@@ -26,6 +27,7 @@ export const schemaList: any = {
             type: "number",
             default: 64.5,
             minimum: 1,
+            maximum: 100,
             "ui:grid": {
               xs: 4,
             },
@@ -35,6 +37,7 @@ export const schemaList: any = {
             description: "The standard deviation of the breakpoint for balloon risk.",
             type: "number",
             default: 37,
+            maximum: 100,
             minimum: 1,
             "ui:grid": {
               xs: 4,
@@ -278,7 +281,7 @@ export const schemaList: any = {
             },
           },
           y_changes_in_level_count: {
-            title: "X Changes in Level Count",
+            title: "Y Changes in Level Count",
             description: "",
             type: "number",
             minimum: 0,
@@ -443,7 +446,7 @@ export const schemaList: any = {
             },
           },
           y_changes_in_level_count: {
-            title: "X Changes in Level Count",
+            title: "Y Changes in Level Count",
             description: "",
             type: "number",
             minimum: 0,
@@ -575,9 +578,9 @@ export const schemaList: any = {
       settings: {
         title: "Activity Settings",
         type: "object",
-        required: ["life_worth_living_goal", "target_behaviors", "emotions"],
+        required: ["livingGoal", "targetEffective", "targetIneffective", "emotions"],
         properties: {
-          life_worth_living_goal: {
+          livingGoal: {
             title: "Life Worth Living Goal",
             description: "300 characters max.",
             type: "string",
@@ -587,20 +590,40 @@ export const schemaList: any = {
               rows: 10,
             },
           },
-          target_behaviors: {
+          targetEffective: {
             title: "Target Behaviors",
-            description: "Both good and bad behaviors.",
             type: "array",
             items: {
               type: "object",
-              required: ["name", "unit"],
+              required: ["target", "measure"],
               properties: {
-                name: {
+                target: {
                   title: "Behavior Name",
                   type: "string",
                   minLength: 1,
                 },
-                unit: {
+                measure: {
+                  title: "Measure of Action",
+                  type: "string",
+                  minLength: 1,
+                  examples: ["Times", "Hours", "Minutes"],
+                },
+              },
+            },
+          },
+          targetIneffective: {
+            title: "Target Ineffective Behaviors",
+            type: "array",
+            items: {
+              type: "object",
+              required: ["target", "measure"],
+              properties: {
+                target: {
+                  title: "Behavior Name",
+                  type: "string",
+                  minLength: 1,
+                },
+                measure: {
                   title: "Measure of Action",
                   type: "string",
                   minLength: 1,
@@ -614,9 +637,15 @@ export const schemaList: any = {
             description: "Both good and bad emotions.",
             type: "array",
             items: {
-              title: "Emotion",
-              type: "string",
-              minLength: 1,
+              type: "object",
+              required: ["emotion"],
+              properties: {
+                emotion: {
+                  title: "Emotions",
+                  type: "string",
+                  minLength: 1,
+                },
+              },
             },
           },
         },

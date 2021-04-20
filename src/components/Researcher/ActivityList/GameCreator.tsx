@@ -10,6 +10,7 @@ import DynamicForm from "../../shared/DynamicForm"
 import { schemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
+import BreatheIcon from "../../../icons/Breathe.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -169,6 +170,65 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
+    } else if (activitySpecId === "lamp.dbt_diary_card") {
+      console.log(data.settings)
+      let validateEffective = false
+      if (data.settings && data.settings.targetEffective !== undefined) {
+        if (data.settings.targetEffective.length > 0) {
+          validateEffective = data.settings.targetEffective.some((item) => {
+            return (
+              item.target === "" ||
+              typeof item.target === "undefined" ||
+              item.measure === "" ||
+              typeof item.measure === "undefined"
+            )
+          })
+        } else {
+          validateEffective = true
+        }
+      } else {
+        validateEffective = true
+      }
+      let validateInEffective = false
+      if (data.settings && data.settings.targetIneffective !== undefined) {
+        if (data.settings.targetIneffective.length > 0) {
+          validateInEffective = data.settings.targetIneffective.some((item) => {
+            return (
+              item.target === "" ||
+              typeof item.target === "undefined" ||
+              item.measure === "" ||
+              typeof item.measure === "undefined"
+            )
+          })
+        } else {
+          validateInEffective = true
+        }
+      } else {
+        validateInEffective = true
+      }
+      let validateEmotions = false
+      if (data.settings && data.settings.emotions !== undefined) {
+        if (data.settings.emotions.length > 0) {
+          validateEmotions = data.settings.emotions.some((item) => {
+            return item.emotion === "" || typeof item.emotion === "undefined"
+          })
+        } else {
+          validateEmotions = true
+        }
+      } else {
+        validateEmotions = true
+      }
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+        validateEffective ||
+        validateInEffective ||
+        validateEmotions
+      )
     } else {
       return !(
         typeof data.studyID == "undefined" ||
@@ -218,6 +278,8 @@ export default function GameCreator({
               ? ScratchCard
               : (value?.spec && "lamp.journal" === value.spec) || "lamp.journal" === activitySpecId
               ? JournalIcon
+              : (value?.spec && "lamp.breathe" === value.spec) || "lamp.breathe" === activitySpecId
+              ? BreatheIcon
               : null
           }
         />

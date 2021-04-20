@@ -31,7 +31,7 @@ export default function ParticipantName({ participant, ...props }) {
 
   const updateName = (data) => {
     setEditData(false)
-    setAliasName(data)
+    setAliasName(data?.trim() || "")
   }
 
   return (
@@ -44,9 +44,9 @@ export default function ParticipantName({ participant, ...props }) {
             editUserId={editUserId}
             updateName={updateName}
           />
-        ) : aliasName && editUserId === participant.id ? (
+        ) : aliasName && editUserId === participant.id && aliasName?.trim().length > 0 ? (
           aliasName
-        ) : name ? (
+        ) : name && name?.trim().length > 0 ? (
           name
         ) : (
           participant.id

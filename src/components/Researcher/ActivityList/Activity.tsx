@@ -5,7 +5,6 @@ import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import Tips from "./Tips"
 import GameCreator from "./GameCreator"
-import DBTCreator from "./DBTCreator"
 import {
   saveGroupActivity,
   saveTipActivity,
@@ -194,24 +193,12 @@ export default function Activity({
           details={details ?? null}
         />
       )}
-      {(isGames || isSCImage || isJournal || isBreathe) && (
+      {(isGames || isSCImage || isJournal || isBreathe || isDBT) && (
         <GameCreator
           activities={allActivities}
           value={activity ?? null}
           details={details ?? null}
           onSave={activitySpecId ? saveCTest : updateActivity}
-          studies={studies}
-          activitySpecId={activitySpecId ?? activity.spec}
-          study={studyId ?? activity?.study_id ?? null}
-        />
-      )}
-      {isDBT && (
-        <DBTCreator
-          value={activity ?? null}
-          onSave={activitySpecId ? saveCTest : updateActivity}
-          details={details}
-          activities={allActivities}
-          onCancel={onCancel}
           studies={studies}
           activitySpecId={activitySpecId ?? activity.spec}
           study={studyId ?? activity?.study_id ?? null}
