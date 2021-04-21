@@ -424,17 +424,7 @@ async function getActivityEvents(
 
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
-  let custom =
-    ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.custom_survey_groups")) as any)?.data?.map((x) => ({
-      ...x,
-      spec: "lamp.dashboard.custom_survey_group",
-      schedule: {},
-      settings: x.settings.map((y) => ({
-        ...y,
-        ...original.find((z) => z.name === y.activity)?.settings.find((a) => a.text === y.question),
-      })),
-    })) ?? [] // original.filter((x) => x.spec !== "lamp.survey")
-  return [...original, ...custom]
+  return [...original]
 }
 
 async function getSelectedActivities(participant: ParticipantObj) {
