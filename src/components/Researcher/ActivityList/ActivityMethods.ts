@@ -898,28 +898,8 @@ export async function saveSurveyActivity(x) {
   return newItem
 }
 
-export async function saveGroupActivity(x) {
-  let newItem = (await LAMP.Activity.create(x.studyID, {
-    ...x,
-    id: undefined,
-    schedule: [
-      {
-        start_date: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
-        time: "1970-01-01T00:00:00.000Z", // FIXME should not need this!
-        repeat_interval: "none", // FIXME should not need this!
-        custom_time: null, // FIXME should not need this!
-      },
-    ],
-  })) as any
-  await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
-    description: x.description,
-    photo: x.photo,
-  })
-  return newItem
-}
-
 export const updateSchedule = async (activity) => {
-  let result = await LAMP.Activity.update(activity.id, { schedule: activity.schedule })
+  await LAMP.Activity.update(activity.id, { schedule: activity.schedule })
   Service.update("activities", { activities: [{ schedule: activity.schedule, id: activity.id }] }, "schedule", "id")
 }
 // Commit an update to an Activity object (ONLY DESCRIPTIONS).
