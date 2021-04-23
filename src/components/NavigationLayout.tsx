@@ -36,7 +36,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import AccountCircleOutlinedIcon from "@material-ui/icons/AccountCircleOutlined"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -334,7 +333,7 @@ export default function NavigationLayout({
                     className={classes.researcherAccount}
                     onClick={handleClick}
                   >
-                    <AccountCircleOutlinedIcon />
+                    <Icon>account_circle</Icon>
                     {title} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover

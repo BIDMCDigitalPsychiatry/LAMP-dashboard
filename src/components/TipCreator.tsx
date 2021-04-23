@@ -22,8 +22,6 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AddIcon from "@material-ui/icons/Add"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 
@@ -613,7 +611,7 @@ export default function TipCreator({
                   }}
                   disabled={!category || !studyId ? true : false}
                 >
-                  <AddIcon /> {t("Add")}
+                  <Icon>add</Icon> {t("Add")}
                 </Fab>
               </Grid>
             </Grid>
@@ -732,7 +730,8 @@ export default function TipCreator({
                                 setClickDeleteId(idx)
                               }}
                             >
-                              <DeleteIcon /> {t("Delete")}
+                              <Icon>delete</Icon>
+                              {t("Delete")}
                             </Fab>
                           </Tooltip>
                         </Box>

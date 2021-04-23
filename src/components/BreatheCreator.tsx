@@ -18,8 +18,6 @@ import {
 } from "@material-ui/core"
 import { useDropzone } from "react-dropzone"
 import { CheckboxProps } from "@material-ui/core/Checkbox"
-import DeleteIcon from "@material-ui/icons/Delete"
-import AudiotrackIcon from "@material-ui/icons/Audiotrack"
 
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
@@ -394,7 +392,7 @@ export default function BreatheCreator({
                     />
 
                     <Fab component="span" className={classes.btnText} aria-label="Upload-Audio" variant="extended">
-                      <AudiotrackIcon /> {t("Upload audio")}
+                      <Icon>music_note</Icon> {t("Upload audio")}
                     </Fab>
                   </label>
 
@@ -416,7 +414,7 @@ export default function BreatheCreator({
                           variant="extended"
                           onClick={() => setSettings({ ...settings, audio: null, audio_name: null })}
                         >
-                          <DeleteIcon />
+                          <Icon>delete_outline</Icon>
                         </Fab>
                       )}
                     </Grid>

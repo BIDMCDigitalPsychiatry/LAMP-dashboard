@@ -30,8 +30,6 @@ import {
 } from "@material-ui/core"
 import { makeStyles, createStyles, withStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
-import Close from "@material-ui/icons/Close"
-import AddCircleOutline from "@material-ui/icons/AddCircleOutline"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Message } from "../icons/Message.svg"
 import Messages from "./Messages"
@@ -868,7 +866,7 @@ export default function PatientProfile({
                 style={{ marginBottom: 52, marginTop: 15 }}
               >
                 <div className={classes.addButton}>
-                  <AddCircleOutline />
+                  <Icon>add</Icon>
                 </div>
                 <Typography className={classes.addButtonTitle}>{t("Add item")}</Typography>
               </ButtonBase>
@@ -928,11 +926,18 @@ export default function PatientProfile({
               })}
               <ButtonBase className={classes.addContainer} style={{ marginBottom: 52, marginTop: 15 }}>
                 <div className={classes.addButton}>
-                  <AddCircleOutline onClick={() => setSensorDialog(true)} />
+                  <Fab
+                    variant="extended"
+                    color="primary"
+                    // classes={{ root: classes.btnBlue }}
+                    onClick={() => setSensorDialog(true)}
+                  >
+                    <Icon>add</Icon>
+                    <Typography onClick={() => setSensorDialog(true)} className={classes.addButtonTitle}>
+                      {t("Add item")}
+                    </Typography>
+                  </Fab>
                 </div>
-                <Typography onClick={() => setSensorDialog(true)} className={classes.addButtonTitle}>
-                  {t("Add item")}
-                </Typography>
               </ButtonBase>
             </Grid>
             <Grid item xs={10} sm={2} />

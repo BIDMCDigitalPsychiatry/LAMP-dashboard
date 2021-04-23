@@ -36,7 +36,6 @@ import { ReactComponent as EditIcon } from "../icons/TagBlue.svg"
 import { ReactComponent as VpnKeyIcon } from "../icons/EditPasswordBlue.svg"
 import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 import { green, yellow, red, grey } from "@material-ui/core/colors"
-import CloseIcon from "@material-ui/icons/Close"
 import PatientProfile from "./PatientProfile"
 // External Imports
 import TimeAgo from "javascript-time-ago"
@@ -54,8 +53,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import SnackMessage from "./SnackMessage"
 import { makeStyles, Theme, createStyles, MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles"
 import { ReactComponent as Filter } from "../icons/Filter.svg"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
 import { useTranslation } from "react-i18next"
 
@@ -329,7 +326,7 @@ function StudyCreator({ addStudy, setAddStudy, createStudy, studies, ...props })
             setAddStudy(false)
           }}
         >
-          <CloseIcon />
+          <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
@@ -1105,7 +1102,7 @@ export default function ParticipantList({
                       }}
                     >
                       <Filter /> {t("Filter results")}{" "}
-                      {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                      {showFilter === true ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
                     </Fab>
                     <Tooltip title="Manage Studies">
                       <IconButton
@@ -1307,7 +1304,7 @@ export default function ParticipantList({
             onClick={handleCloseStudies}
             //disabled={!!studyBtnClicked ? true : false}
           >
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.manageStudypop }}>
@@ -1379,7 +1376,7 @@ export default function ParticipantList({
             onClick={handleClose}
             disabled={!!studyBtnClicked ? true : false}
           >
-            <CloseIcon />
+            <Icon>close</Icon>
           </IconButton>
         </DialogTitle>
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>

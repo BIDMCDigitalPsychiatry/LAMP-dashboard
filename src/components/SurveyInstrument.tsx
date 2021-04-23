@@ -35,8 +35,6 @@ import {
   InputBase,
 } from "@material-ui/core"
 import Checkbox, { CheckboxProps } from "@material-ui/core/Checkbox"
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank"
-import CheckBoxIcon from "@material-ui/icons/CheckBox"
 import classnames from "classnames"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./ActivityList"
@@ -262,7 +260,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   questionhead: {
-    "& h5": { fontSize: 18, fontWeight: 600, maxHeight: 100, overflow: "auto" },
+    "& h5": { fontSize: 18, fontWeight: 600 },
     "& span": {
       marginTop: 15,
       fontSize: 12,
@@ -312,6 +310,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
+      maxHeight: "calc(100vh - 280px)",
+      overflow: "auto",
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important", textAlign: "left" },
@@ -321,8 +321,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 30,
     paddingLeft: 10,
     [theme.breakpoints.down("xs")]: {
-      height: "calc(100vh - 380px)",
-      overflow: "auto",
+      // height: "calc(100vh - 380px)",
+      // overflow: "auto",
       position: "relative",
       top: 0,
     },
@@ -335,6 +335,11 @@ const useStyles = makeStyles((theme) => ({
   },
   sliderValueLabel: {
     width: "100%",
+    "& div": {
+      [theme.breakpoints.down("xs")]: {
+        maxWidth: "100px",
+      },
+    },
   },
   lightGray: { color: "#999", fontSize: "0.75rem" },
   mxSmall: { margin: "0 6px" },
@@ -843,8 +848,8 @@ function MultiSelectResponse({ onChange, options, value, ...props }) {
               }}
               // icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
               // checkedIcon={<Icon fontSize="large">check_box</Icon>}
-              icon={<CheckBoxOutlineBlankIcon fontSize="large" />}
-              checkedIcon={<CheckBoxIcon fontSize="large" />}
+              icon={<Icon fontSize="large">check_box_outline_blank</Icon>}
+              checkedIcon={<Icon fontSize="large">check_box</Icon>}
             />
           }
           label={

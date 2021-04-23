@@ -32,7 +32,6 @@ import { ReactComponent as ExportIcon } from "../icons/Export.svg"
 // External Imports
 import { saveAs } from "file-saver"
 import { useDropzone } from "react-dropzone"
-import CloudUploadIcon from "@material-ui/icons/CloudUpload"
 // Local Imports
 import LAMP, { Study } from "lamp-core"
 import Activity from "./Activity"
@@ -40,8 +39,6 @@ import AddActivity from "./AddActivity"
 import ActivityScheduler from "./ActivityScheduler"
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as Filter } from "../icons/Filter.svg"
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown"
-import ArrowDropUpIcon from "@material-ui/icons/ArrowDropUp"
 import MultipleSelect from "./MultipleSelect"
 import { useTranslation } from "react-i18next"
 
@@ -1124,7 +1121,7 @@ export default function ActivityList({ researcher, title, ...props }) {
                       }}
                     >
                       <Filter /> {t("Filter results")}{" "}
-                      {showFilter === true ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
+                      {showFilter === true ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
                     </Fab>
                     {/* <Tooltip title="Import">
                       <Fab
@@ -1246,7 +1243,7 @@ export default function ActivityList({ researcher, title, ...props }) {
             >
               <Grid container style={{ marginLeft: "-15px" }}>
                 <Grid item xs={2} style={{ textAlign: "center" }}>
-                  <CloudUploadIcon />
+                  <Icon>cloud_upload</Icon>
                 </Grid>
                 <Grid item xs={10}>
                   {t("Import activities")}
