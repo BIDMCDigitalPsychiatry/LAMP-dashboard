@@ -255,7 +255,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   questionhead: {
-    "& h5": { fontSize: 18, fontWeight: 600, maxHeight: 100, overflow: "auto" },
+    "& h5": { fontSize: 18, fontWeight: 600 },
     "& span": {
       marginTop: 15,
       fontSize: 12,
@@ -305,6 +305,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
+      maxHeight: "calc(100vh - 280px)",
+      overflow: "auto",
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important", textAlign: "left" },
@@ -316,8 +318,6 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       height: "calc(100vh - 380px)",
       overflow: "auto",
-      position: "relative",
-      top: 0,
     },
   },
   fieldGroup: {
@@ -328,6 +328,11 @@ const useStyles = makeStyles((theme) => ({
   },
   sliderValueLabel: {
     width: "100%",
+    "& div": {
+      [theme.breakpoints.down("xs")]: {
+        maxWidth: "100px",
+      },
+    },
   },
   lightGray: { color: "#999", fontSize: "0.75rem" },
   mxSmall: { margin: "0 6px" },
