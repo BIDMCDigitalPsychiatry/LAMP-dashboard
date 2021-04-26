@@ -310,7 +310,8 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
-      maxHeight: "calc(100vh - 280px)",
+      maxHeight: "55%",
+      position: "absolute",
       overflow: "auto",
     },
   },
