@@ -23989,7 +23989,7 @@ textarea.ant-mentions {
 }
 .ant-slider-handle.ant-tooltip-open {
   border-color: #2f9d7e;
-  transform: translateX(10%) !important;
+  /* transform: translateX(10%) !important; */
 }
 .ant-slider:hover .ant-slider-rail {
   background-color: #e1e1e1;
