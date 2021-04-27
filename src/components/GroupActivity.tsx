@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
@@ -219,17 +218,12 @@ export default function GroupActivity({ participant, activity, ...props }) {
           currentActivity?.spec === "lamp.jewels_a" ||
           currentActivity?.spec === "lamp.jewels_b" ||
           currentActivity?.spec === "lamp.spatial_span" ||
-          currentActivity?.spec === "lamp.dbt_diary_card" ? (
+          currentActivity?.spec === "lamp.dbt_diary_card" ||
+          currentActivity?.spec === "lamp.journal" ? (
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
             participant={participant}
-            onComplete={() => completeActivity()}
-          />
-        ) : currentActivity?.spec === "lamp.journal" ? (
-          <JournalEntries
-            participant={participant}
-            activityId={currentActivity?.id ?? null}
             onComplete={() => completeActivity()}
           />
         ) : currentActivity?.spec === "lamp.scratch_image" ? (

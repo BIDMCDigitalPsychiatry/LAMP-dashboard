@@ -21,6 +21,7 @@ const demoActivities = {
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
+  "lamp.journal": "journal",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
