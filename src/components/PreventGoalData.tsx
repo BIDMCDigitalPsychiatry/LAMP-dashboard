@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function JournalEntries({ ...props }) {
+export default function GoalEntries({ ...props }) {
   const classes = useStyles()
   const [date, changeDate] = useState(new Date())
   const [selectedDays, setSelectedDays] = useState([1, 2, 15])

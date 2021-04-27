@@ -21,6 +21,7 @@ const demoActivities = {
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
+  "lamp.journal": "journal",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -54,7 +55,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     eventer(
       messageEvent,
       function (e) {
-        if (!saved && activityId !== null && activityId !== "") {
+        if (e.data === null) {
+          setSaved(true)
+          onComplete()
+        } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
           delete data["activity"]
           data["activity"] = activityId

@@ -34,7 +34,6 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
-import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import Goals from "./Goals"
 import HopeBoxSelect from "./HopeBoxSelect"
@@ -351,9 +350,10 @@ export default function Manage({ participant, activities, ...props }) {
               />
             ),
             "lamp.journal": (
-              <JournalEntries
+              <EmbeddedActivity
+                name={activity?.name ?? ""}
+                activity={activity ?? []}
                 participant={participant}
-                activityId={activity?.id ?? null}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}

@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
@@ -175,10 +174,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.spatial_span" ||
           activity?.spec === "lamp.pop_the_bubbles" ||
           activity?.spec === "lamp.balloon_risk" ||
-          activity?.spec === "lamp.dbt_diary_card" ? (
+          activity?.spec === "lamp.dbt_diary_card" ||
+          activity?.spec === "lamp.journal" ? (
           <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.journal" ? (
-          <JournalEntries participant={participant} activityId={activity?.id ?? null} onComplete={() => {}} />
         ) : activity?.spec === "lamp.scratch_image" ? (
           <ScratchImage participant={participant} activity={activity ?? []} onComplete={() => {}} />
         ) : activity?.spec === "lamp.breathe" ? (

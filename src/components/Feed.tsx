@@ -23,7 +23,6 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
-import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -820,8 +819,11 @@ export default function Feed({
                             setVisibleActivities([feed.activityData])
                             showFeedDetails(feed.type)
                           }
-
-                          if (games.includes(feed.type) || feed.type === "lamp.dbt_diary_card") {
+                          if (
+                            games.includes(feed.type) ||
+                            feed.type === "lamp.journal" ||
+                            feed.type === "lamp.dbt_diary_card"
+                          ) {
                             setActivityName(feed.title)
                             setVisibleActivities(feed.activityData)
                             showFeedDetails("game")
@@ -924,16 +926,6 @@ export default function Feed({
                 name={activityName}
                 activity={visibleActivities}
                 participant={participant}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.journal": (
-              <JournalEntries
-                participant={participant}
-                activityId={activity?.id ?? null}
                 onComplete={() => {
                   completeFeed(index)
                   setLaunchedActivity(undefined)
