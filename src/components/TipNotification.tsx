@@ -103,7 +103,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
     colorLine: { maxWidth: 115 },
-    headerIcon: { textAlign: "center", marginBottom: 15 },
+    headerIcon: {
+      textAlign: "center",
+      marginBottom: 15,
+      "& img": { maxWidth: "100%" },
+    },
     mainContainer: { padding: 0 },
     tipsdetails: {
       "& blockquote": { borderLeft: "5px solid #ccc", margin: "1.5em 10px", padding: "0.5em 10px" },
