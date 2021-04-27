@@ -55,7 +55,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     eventer(
       messageEvent,
       function (e) {
-        if (!saved && activityId !== null && activityId !== "") {
+        if (e.data === null) {
+          setSaved(true)
+          onComplete()
+        } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
           delete data["activity"]
           data["activity"] = activityId
