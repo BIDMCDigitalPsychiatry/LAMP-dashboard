@@ -22,6 +22,7 @@ const demoActivities = {
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
   "lamp.journal": "journal",
+  "lamp.breathe": "breathe",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -88,7 +89,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
     setSaved(false)
-    setSettings({ ...settings, settings: activity.settings, configuration: { language: i18n.language } })
+    setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]
