@@ -822,6 +822,7 @@ export default function Feed({
                           if (
                             games.includes(feed.type) ||
                             feed.type === "lamp.journal" ||
+                            feed.type === "lamp.breathe" ||
                             feed.type === "lamp.dbt_diary_card"
                           ) {
                             setActivityName(feed.title)
@@ -936,16 +937,6 @@ export default function Feed({
               <ScratchImage
                 participant={participant}
                 activity={activity ?? []}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.breathe": (
-              <Breathe
-                activity={activity}
-                participant={participant}
                 onComplete={() => {
                   completeFeed(index)
                   setLaunchedActivity(undefined)
