@@ -19,10 +19,8 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
-import { SCALE_CATEGORY_INDEX } from "vega-lite/build/src/scale"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -219,7 +217,8 @@ export default function GroupActivity({ participant, activity, ...props }) {
           currentActivity?.spec === "lamp.jewels_b" ||
           currentActivity?.spec === "lamp.spatial_span" ||
           currentActivity?.spec === "lamp.dbt_diary_card" ||
-          currentActivity?.spec === "lamp.journal" ? (
+          currentActivity?.spec === "lamp.journal" ||
+          currentActivity?.spec === "lamp.breathe" ? (
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
@@ -232,8 +231,6 @@ export default function GroupActivity({ participant, activity, ...props }) {
             activity={currentActivity ?? []}
             onComplete={() => completeActivity()}
           />
-        ) : currentActivity?.spec === "lamp.breathe" ? (
-          <Breathe activity={currentActivity} participant={participant} onComplete={() => completeActivity()} />
         ) : currentActivity?.spec === "lamp.tips" ? (
           <TipNotification
             participant={participant}
