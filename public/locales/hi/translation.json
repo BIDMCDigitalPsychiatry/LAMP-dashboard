@@ -555,5 +555,6 @@
 	"Add a patient": "एक रोगी को जोड़ें",
 	"An error occured while deleting. Please try again.": "डिलीट करते समय एक त्रुटि हुई। कृपया पुन: प्रयास करें ",
 	"No Records Found": "कोई रिकॉर्ड नहीं मिला",
-	"Confirm": "पुष्टि करें" 
+	"Confirm": "पुष्टि करें",
+	"Balloon risk": "गुब्बारा जोखिम"
 }
