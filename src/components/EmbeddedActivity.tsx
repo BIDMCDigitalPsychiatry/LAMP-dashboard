@@ -71,8 +71,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       },
       false
     )
+    localStorage.setItem('lamp-activity-settings', JSON.stringify(activity.settings));
+    localStorage.setItem('lamp-language', i18n.language);
   }, [activityId])
-
+  
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
       LAMP.ActivityEvent.create(participant.id, data)
@@ -85,7 +87,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         })
     }
   }, [embeddedActivity])
-
+  
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
     setSaved(false)
@@ -95,7 +97,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         demoActivities[activity.spec]
       }.html.b64`
     )
-    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    //let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
