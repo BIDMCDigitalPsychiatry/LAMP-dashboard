@@ -48,11 +48,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
+    localStorage.setItem("lamp-activity-settings", JSON.stringify(activity.settings))
+    localStorage.setItem("lamp-language", i18n.language)
+
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
     // Listen to message from child window
-
     eventer(
       messageEvent,
       function (e) {
