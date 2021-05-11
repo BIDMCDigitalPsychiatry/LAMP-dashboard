@@ -60,6 +60,11 @@ export default function EmbeddedActivity({
   }, [iFrame]);
 
   useEffect(() => {
+    localStorage.setItem(
+      'lamp-activity-settings',
+      JSON.stringify(activity.settings)
+    );
+    localStorage.setItem('lamp-language', i18n.language);
     var eventMethod = window.addEventListener
       ? 'addEventListener'
       : 'attachEvent';
@@ -85,11 +90,6 @@ export default function EmbeddedActivity({
       },
       false
     );
-    localStorage.setItem(
-      'lamp-activity-settings',
-      JSON.stringify(activity.settings)
-    );
-    localStorage.setItem('lamp-language', i18n.language);
   }, [activityId]);
 
   useEffect(() => {
