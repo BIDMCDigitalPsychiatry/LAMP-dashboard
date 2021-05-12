@@ -535,7 +535,7 @@
 	"Please enter Bubble Speed with comma seperated.": "कृपया बुलबुले की गति को अल्पविराम(Comma) के साथ अलग-अलग दर्ज करेंl",
 	"Atleast one tip details required": "Atleast one tip details required",
 	"Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
-	"There are no Learn activities available.": "There are no Learn activities available.",
+	"There are no Learn activities available.": "कोई सीख गतिविधियाँ उपलब्ध नहीं हैं।",
 	"Please select the Study": "कृपया अध्ययन का चयन करें",	
 	"Add a new study": "एक नया अध्ययन जोड़ें",	
 	"Create a new study.": "एक नया अध्ययन बनाएं",	
@@ -556,5 +556,6 @@
 	"An error occured while deleting. Please try again.": "डिलीट करते समय एक त्रुटि हुई। कृपया पुन: प्रयास करें ",
 	"No Records Found": "कोई रिकॉर्ड नहीं मिला",
 	"Confirm": "पुष्टि करें",
-	"Balloon risk": "गुब्बारा जोखिम"
+	"Balloon risk": "गुब्बारा जोखिम",
+	"There are no scheduled activities available.": "कोई अनुसूचित गतिविधियाँ उपलब्ध नहीं हैं।"
 }
