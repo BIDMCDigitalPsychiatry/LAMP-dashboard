@@ -556,5 +556,6 @@
 	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated.",
 	"Atleast one tip details required": "Atleast one tip details required",
 	"Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
-	"There are no Learn activities available.": "There are no Learn activities available."
+	"There are no Learn activities available.": "There are no Learn activities available.",
+	"There are no scheduled activities available.": "There are no scheduled activities available."
 }
