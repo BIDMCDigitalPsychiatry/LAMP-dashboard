@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,6 +36,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
+
   useEffect(() => {
     activateEmbeddedActivity(activity)
   }, [])
@@ -48,9 +51,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
-    localStorage.setItem("lamp-activity-settings", JSON.stringify(activity.settings))
-    localStorage.setItem("lamp-language", i18n.language)
-
+    handleLocalStorage()
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
@@ -74,6 +75,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       false
     )
   }, [activityId])
+
+  const handleLocalStorage = () => {
+    try {
+      localStorage.setItem("lamp-activity-settings", JSON.stringify(activity.settings))
+      localStorage.setItem("lamp-language", i18n.language)
+    } catch {
+      enqueueSnackbar(t("Encountered an error: "), {
+        variant: "error",
+      })
+      return false
+    }
+  }
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
