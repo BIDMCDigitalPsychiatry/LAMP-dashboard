@@ -51,7 +51,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
-    handleLocalStorage()
+    if (activity.spec === "lamp.dbt_diary_card") handleLocalStorage()
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
