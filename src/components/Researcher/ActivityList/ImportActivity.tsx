@@ -23,7 +23,7 @@ import { useSnackbar } from "notistack"
 import { useDropzone } from "react-dropzone"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
-import { saveGroupActivity, saveSurveyActivity, saveCTestActivity, addActivity } from "../ActivityList/ActivityMethods"
+import { saveSurveyActivity, saveCTestActivity, addActivity } from "../ActivityList/ActivityMethods"
 import Pagination from "../../PaginatedElement"
 import { Service } from "../../DBService/DBService"
 
@@ -267,7 +267,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     // Groups only. This MUST be done last or the mapping will be incorrect (allIDs).
     for (let x of _importFile.filter((x) => ["lamp.group"].includes(x.spec))) {
       try {
-        let newItem = await saveGroupActivity({
+        let newItem = await saveCTestActivity({
           ...x,
           id: undefined,
           tableData: undefined,

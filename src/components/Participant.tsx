@@ -97,8 +97,6 @@ async function setShowWelcome(participant: ParticipantObj): Promise<void> {
 
 async function tempHideCareTeam(participant: ParticipantObj): Promise<boolean> {
   if (_hideCareTeam()) return true
-  let _hidden = (await LAMP.Type.getAttachment(participant.id, "lamp.dashboard._nancy")) as any
-  return !!_hidden.error ? false : (_hidden.data as boolean)
 }
 
 async function addHiddenEvent(

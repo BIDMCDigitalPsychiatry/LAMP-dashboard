@@ -26,6 +26,7 @@ import LAMP from "lamp-core"
 import SnackMessage from "../../SnackMessage"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
+import NewPatientDetail from "./NewPatientDetail"
 
 const _qrLink = (credID, password) =>
   window.location.href.split("#")[0] +
@@ -87,8 +88,9 @@ export default function AddUser({
   const [showErrorMsg, setShowErrorMsg] = useState(false)
   const [studyBtnClicked, setStudyBtnClicked] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
-  const [loading, setLoading] = useState(false)
   const { t } = useTranslation()
+  const [newId, setNewId] = useState(null)
+
   const validate = () => {
     return !(
       typeof selectedStudy === "undefined" ||
@@ -105,7 +107,6 @@ export default function AddUser({
       setShowErrorMsg(true)
       return false
     } else {
-      setLoading(true)
       setStudyBtnClicked(true)
       let newCount = 1
       let ids = []
@@ -128,46 +129,10 @@ export default function AddUser({
           Service.getData("studies", selectedStudy).then((studiesObject) => {
             handleNewStudy(studiesObject)
           })
-          enqueueSnackbar(
-            t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
-              id: id,
-            }),
-            {
-              variant: "success",
-              persist: true,
-              content: (key: string, message: string) => (
-                <SnackMessage id={key} message={message}>
-                  <TextField
-                    variant="outlined"
-                    size="small"
-                    label={t("Temporary email address")}
-                    value={`${id}@lamp.com`}
-                  />
-                  <Box style={{ height: 16 }} />
-                  <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
-                  <Grid item>
-                    <TextField
-                      fullWidth
-                      label={t("One-time login link")}
-                      style={{ marginTop: 16 }}
-                      variant="outlined"
-                      value={_qrLink(`${id}@lamp.com`, id)}
-                      onChange={(event) => {}}
-                    />
-                    <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
-                      <Grid container justify="center" style={{ padding: 16 }}>
-                        <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
-                      </Grid>
-                    </Tooltip>
-                  </Grid>
-                </SnackMessage>
-              ),
-            }
-          )
+          setNewId(newParticipant.id)
         }
         ids = [...ids, id]
       }
-      setLoading(false)
       setParticipants()
     }
     setSelectedStudy("")
@@ -190,7 +155,6 @@ export default function AddUser({
       return false
     } else {
       let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
-      setLoading(true)
       setStudyBtnClicked(true)
       let newParticipant: any = {}
       newParticipant.id = "U" + Math.random().toString().substring(2, 11)
@@ -201,46 +165,9 @@ export default function AddUser({
       Service.getData("studies", selectedStudy).then((studiesObject) => {
         handleNewStudy(studiesObject)
       })
-      let id = newParticipant.id
-      enqueueSnackbar(
-        t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
-          id: id,
-        }),
-        {
-          variant: "success",
-          persist: true,
-          content: (key: string, message: string) => (
-            <SnackMessage id={key} message={message}>
-              <TextField
-                variant="outlined"
-                size="small"
-                label={t("Temporary email address")}
-                value={`${id}@lamp.com`}
-              />
-              <Box style={{ height: 16 }} />
-              <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
-              <Grid item>
-                <TextField
-                  fullWidth
-                  label={t("One-time login link")}
-                  style={{ marginTop: 16 }}
-                  variant="outlined"
-                  value={_qrLink(`${id}@lamp.com`, id)}
-                  onChange={(event) => {}}
-                />
-                <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
-                  <Grid container justify="center" style={{ padding: 16 }}>
-                    <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
-                  </Grid>
-                </Tooltip>
-              </Grid>
-            </SnackMessage>
-          ),
-        }
-      )
+      setNewId(newParticipant.id)
       closePopUp(3)
       setSelectedStudy("")
-      setLoading(false)
       setParticipants()
     }
     setSelectedStudy("")
@@ -249,78 +176,81 @@ export default function AddUser({
   }
 
   return (
-    <Dialog
-      {...props}
-      onEnter={() => {
-        setSelectedStudy("")
-      }}
-      scroll="paper"
-      aria-labelledby="alert-dialog-slide-title"
-      aria-describedby="alert-dialog-slide-description"
-      classes={{ paper: classes.addNewDialog }}
-    >
-      <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{t("Create a new user.")}</Typography>
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={props.onClose as any}
-          disabled={!!studyBtnClicked ? true : false}
-        >
-          <Icon>close</Icon>
-        </IconButton>
-      </DialogTitle>
-      <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-        <Box mt={2} mb={3}>
-          <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
-        </Box>
-        <TextField
-          error={!validate()}
-          select
-          autoFocus
-          fullWidth
-          variant="outlined"
-          label={t("Study")}
-          value={selectedStudy}
-          onChange={handleChangeStudy}
-          helperText={!validate() ? t("Please select the Study") : ""}
-        >
-          {(studies || []).map((study) => (
-            <MenuItem key={study.id} value={study.id}>
-              {study.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        {!!showErrorMsg && (
-          <Box mt={1}>
-            <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
+    <React.Fragment>
+      <Dialog
+        {...props}
+        onEnter={() => {
+          setSelectedStudy("")
+        }}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{ paper: classes.addNewDialog }}
+      >
+        <DialogTitle id="alert-dialog-slide-title" disableTypography>
+          <Typography variant="h6">{t("Create a new user.")}</Typography>
+          <IconButton
+            aria-label="close"
+            className={classes.closeButton}
+            onClick={props.onClose as any}
+            disabled={!!studyBtnClicked ? true : false}
+          >
+            <Icon>close</Icon>
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mt={2} mb={3}>
+            <Typography variant="body2">{t("Choose the Study you want to save this participant.")}</Typography>
           </Box>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Box textAlign="right" width={1} mt={3} mb={3} mx={3}>
-          <Button
-            color="primary"
-            onClick={() => {
-              closePopUp(3)
-            }}
-          >
-            {t("Cancel")}
-          </Button>
-          <Button
-            //onClick={() => addParticipant()}
-            onClick={() => {
-              createNewStudy()
-            }}
-            color="primary"
+          <TextField
+            error={!validate()}
+            select
             autoFocus
-            //disabled={!!studyBtnClicked ? true : false}
-            disabled={!validate()}
+            fullWidth
+            variant="outlined"
+            label={t("Study")}
+            value={selectedStudy}
+            onChange={handleChangeStudy}
+            helperText={!validate() ? t("Please select the Study") : ""}
           >
-            {t("Save")}
-          </Button>
-        </Box>
-      </DialogActions>
-    </Dialog>
+            {(studies || []).map((study) => (
+              <MenuItem key={study.id} value={study.id}>
+                {study.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          {!!showErrorMsg && (
+            <Box mt={1}>
+              <Typography className={classes.errorMsg}>{t("Select a Study to create a participant.")}</Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="right" width={1} mt={3} mb={3} mx={3}>
+            <Button
+              color="primary"
+              onClick={() => {
+                closePopUp(3)
+              }}
+            >
+              {t("Cancel")}
+            </Button>
+            <Button
+              //onClick={() => addParticipant()}
+              onClick={() => {
+                createNewStudy()
+              }}
+              color="primary"
+              autoFocus
+              //disabled={!!studyBtnClicked ? true : false}
+              disabled={!validate()}
+            >
+              {t("Save")}
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+      {!!newId && <NewPatientDetail id={newId} />}
+    </React.Fragment>
   )
 }

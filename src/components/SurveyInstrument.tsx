@@ -166,6 +166,9 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up("md")]: {
       marginTop: 30,
     },
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "40%",
+    },
     "& span": { cursor: "pointer" },
     "&:hover": {
       background: "#92E7CA",
@@ -211,6 +214,9 @@ const useStyles = makeStyles((theme) => ({
     margin: "5% 5px 0 5px",
     [theme.breakpoints.up("md")]: {
       marginTop: 30,
+    },
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "40%",
     },
   },
   ampm: {
@@ -299,6 +305,9 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       textAlign: "left",
       padding: "0 40px",
+      maxHeight: "55%",
+      position: "absolute",
+      overflow: "auto",
     },
   },
   radioLabel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", alignItems: "center !important", textAlign: "left" },
@@ -310,8 +319,6 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down("xs")]: {
       height: "calc(100vh - 380px)",
       overflow: "auto",
-      position: "relative",
-      top: 0,
     },
   },
   fieldGroup: {
@@ -322,6 +329,11 @@ const useStyles = makeStyles((theme) => ({
   },
   sliderValueLabel: {
     width: "100%",
+    "& div": {
+      [theme.breakpoints.down("xs")]: {
+        maxWidth: "100px",
+      },
+    },
   },
   lightGray: { color: "#999", fontSize: "0.75rem" },
   mxSmall: { margin: "0 6px" },
@@ -1085,8 +1097,10 @@ function Section({
 
   const handleChange = (event) => {
     const target = event.target
-    const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
-    setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    if (target.getAttribute("role") === "dialog") {
+      const progressVal = (target.scrollTop / (target.scrollHeight - target.clientHeight)) * 100
+      setProgressValue(progressVal + 10 > 100 ? progressVal : progressVal + 10)
+    }
   }
 
   return (
@@ -1099,7 +1113,7 @@ function Section({
       </AppBar>
       {supportsSidebar ? (
         value.settings.map((x, idx) => (
-          <Box my={4} onScroll={handleChange}>
+          <Box my={4}>
             <Questions
               idx={idx}
               x={x}

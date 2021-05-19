@@ -34,8 +34,6 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
-import JournalEntries from "./JournalEntries"
-import Breathe from "./Breathe"
 import Goals from "./Goals"
 import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
@@ -198,7 +196,6 @@ export default function Manage({ participant, activities, ...props }) {
   const [loading, setLoading] = useState(true)
   const [spec, setSpec] = useState(null)
   const { t } = useTranslation()
-
   useEffect(() => {
     setLoading(true)
     let gActivities = activities.filter(
@@ -350,10 +347,11 @@ export default function Manage({ participant, activities, ...props }) {
                 }}
               />
             ),
-            "lamp.journal": (
-              <JournalEntries
+            embed: (
+              <EmbeddedActivity
+                name={activity?.name ?? ""}
+                activity={activity ?? []}
                 participant={participant}
-                activityId={activity?.id ?? null}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}
@@ -363,15 +361,6 @@ export default function Manage({ participant, activities, ...props }) {
               <ScratchImage
                 participant={participant}
                 activity={activity ?? []}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.breathe": (
-              <Breathe
-                activity={activity}
-                participant={participant}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}
@@ -460,7 +449,7 @@ export default function Manage({ participant, activities, ...props }) {
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity(spec)
+                setLaunchedActivity(spec === "lamp.journal" || spec === "lamp.breathe" ? "embed" : spec)
               }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}

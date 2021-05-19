@@ -104,7 +104,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     howFeel: { fontSize: 14, color: "rgba(0, 0, 0, 0.5)", fontStyle: "italic", textAlign: "center", marginBottom: 10 },
     colorLine: { maxWidth: 115 },
-    headerIcon: { textAlign: "center", marginBottom: 15 },
+    headerIcon: {
+      textAlign: "center",
+      marginBottom: 15,
+      "& img": { maxWidth: "100%" },
+    },
     mainContainer: { padding: 0 },
     tipsdetails: {
       "& blockquote": { borderLeft: "5px solid #ccc", margin: "1.5em 10px", padding: "0.5em 10px" },
@@ -162,14 +166,14 @@ export default function TipNotification({ ...props }) {
                 onClick={() => handleClickStatus("Yes")}
                 className={status === "Yes" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <Icon>thumbs_up</Icon>
+                <Icon>thumb_up_off_alt</Icon>
                 <label>{t("Yes")}</label>
               </IconButton>
               <IconButton
                 onClick={() => handleClickStatus("No")}
                 className={status === "No" ? classnames(classes.likebtn, classes.active) : classes.likebtn}
               >
-                <Icon>thumbs_down</Icon>
+                <Icon>thumb_down_off_alt</Icon>
                 <label>{t("No")}</label>
               </IconButton>
             </Box>

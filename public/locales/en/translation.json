@@ -535,6 +535,9 @@
 	"Study Name": "Group Name",
 	"Duplicate Study": "Duplicate Group",
 	"Existing Study Name": "Existing Group Name",
+	"Add a new study.": "Add a new group.",
+	"Study name and patient name will be same.": "Group name and user name will be same.",
+	"Patient View": "User View",
 	"Create a new patient under this study": "Create a new user under this group",
 	"An error occured while deleting. Please try again.": "An error occured while deleting. Please try again.",
 	"No Records Found": "No Records Found",
@@ -553,5 +556,6 @@
 	"Please enter Bubble Speed with comma seperated.": "Please enter Bubble Speed with comma seperated.",
 	"Atleast one tip details required": "Atleast one tip details required",
 	"Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.": "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB.",
-	"There are no Learn activities available.": "There are no Learn activities available."
+	"There are no Learn activities available.": "There are no Learn activities available.",
+	"There are no scheduled activities available.": "There are no scheduled activities available."
 }

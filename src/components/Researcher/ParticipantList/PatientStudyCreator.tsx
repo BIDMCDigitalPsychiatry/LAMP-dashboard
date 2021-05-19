@@ -18,13 +18,13 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core"
-
 import { useSnackbar } from "notistack"
 import LAMP, { Study } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 import { fetchPostData, fetchResult } from "../SaveResearcherData"
 import { updateActivityData, addActivity } from "../ActivityList/ActivityMethods"
+import NewPatientDetail from "./NewPatientDetail"
 
 const useStyles = makeStyles((theme) => ({
   dataQuality: {
@@ -73,12 +73,10 @@ export default function PatientStudyCreator({
   const [duplicateCnt, setDuplicateCnt] = useState(0)
   const { t, i18n } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
-  const [addStudy, setAddStudy] = useState(false)
   const [duplicateStudyName, setDuplicateStudyName] = useState<any>("")
   const [createPatient, setCreatePatient] = useState(false)
-  const [studiedData, setStudiedData] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [demoStudyCount, setDemoStudyCount] = useState(0)
+  const [newId, setNewId] = useState(null)
 
   const validate = () => {
     return !(
@@ -198,7 +196,6 @@ export default function PatientStudyCreator({
 
   const createStudy = async (studyName: string) => {
     setLoading(true)
-    setAddStudy(false)
     let authId = researcher.id
     let authString = LAMP.Auth._auth.id + ":" + LAMP.Auth._auth.password
     let bodyData = {
@@ -241,6 +238,7 @@ export default function PatientStudyCreator({
                 )
                 if (filteredParticipants.length > 0) {
                   filteredParticipants[0].name = studyName
+                  setNewId(filteredParticipants[0]?.id)
                   LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
                   saveStudyData(filteredParticipants, "participants")
                 }
@@ -270,6 +268,7 @@ export default function PatientStudyCreator({
               )
               if (filteredParticipants.length > 0) {
                 filteredParticipants[0].name = studyName
+                setNewId(filteredParticipants[0]?.id)
                 LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
                 saveStudyData(filteredParticipants, "participants")
               }
@@ -291,113 +290,118 @@ export default function PatientStudyCreator({
   }
 
   return (
-    <Dialog
-      {...props}
-      onEnter={() => {
-        setStudyName("")
-        setDuplicateStudyName("")
-        setCreatePatient(false)
-      }}
-      scroll="paper"
-      aria-labelledby="alert-dialog-slide-title"
-      aria-describedby="alert-dialog-slide-description"
-      classes={{ paper: classes.addNewDialog }}
-    >
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
-      <DialogTitle id="alert-dialog-slide-title" disableTypography>
-        <Typography variant="h6">{t("Create a new study.")}</Typography>
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={() => {
-            closePopUp(1)
-            setStudyName("")
-            setDuplicateStudyName("")
-            setCreatePatient(false)
-          }}
-        >
-          <Icon>close</Icon>
-        </IconButton>
-      </DialogTitle>
-      <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
-        <Box mb={2}>
-          <TextField
-            error={!validate()}
-            autoFocus
-            fullWidth
-            variant="outlined"
-            label={t("Study Name")}
-            value={studyName}
-            onChange={(e) => {
-              setStudyName(e.target.value)
-            }}
-            inputProps={{ maxLength: 80 }}
-            helperText={
-              duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""
-            }
-          />
-        </Box>
-        <Box>
-          <TextField
-            select
-            autoFocus
-            fullWidth
-            variant="outlined"
-            label={t("Duplicate from")}
-            value={duplicateStudyName}
-            onChange={(e) => {
-              setDuplicateStudyName(e.target.value)
-            }}
-            inputProps={{ maxLength: 80 }}
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {studies.map((study) => (
-              <MenuItem key={study.id} value={study.id}>
-                {study.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box ml={-1}>
-          <Checkbox
-            checked={createPatient}
-            onChange={(event) => {
-              setCreatePatient(event.target.checked)
-            }}
-            classes={{ checked: classes.checkboxActive }}
-            inputProps={{ "aria-label": "primary checkbox" }}
-          />
-          {t("Create a new patient under this study")}
-        </Box>
-        {!!createPatient && <Typography variant="caption">{t("Study name and patient name will be same.")}</Typography>}
-      </DialogContent>
-      <DialogActions>
-        <Box textAlign="right" width={1} mt={1} mb={3} mx={3}>
-          <Button
-            color="primary"
+    <React.Fragment>
+      <Dialog
+        {...props}
+        onEnter={() => {
+          setStudyName("")
+          setDuplicateStudyName("")
+          setCreatePatient(false)
+        }}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{ paper: classes.addNewDialog }}
+      >
+        <Backdrop className={classes.backdrop} open={loading}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        <DialogTitle id="alert-dialog-slide-title" disableTypography>
+          <Typography variant="h6">{t("Create a new study.")}</Typography>
+          <IconButton
+            aria-label="close"
+            className={classes.closeButton}
             onClick={() => {
               closePopUp(1)
+              setStudyName("")
+              setDuplicateStudyName("")
               setCreatePatient(false)
             }}
           >
-            {t("Cancel")}
-          </Button>
-          <Button
-            onClick={() => {
-              createNewStudy(studyName)
-            }}
-            color="primary"
-            autoFocus
-            disabled={!validate()}
-          >
-            {t("Confirm")}
-          </Button>
-        </Box>
-      </DialogActions>
-    </Dialog>
+            <Icon>close</Icon>
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+          <Box mb={2}>
+            <TextField
+              error={!validate()}
+              autoFocus
+              fullWidth
+              variant="outlined"
+              label={t("Study Name")}
+              value={studyName}
+              onChange={(e) => {
+                setStudyName(e.target.value)
+              }}
+              inputProps={{ maxLength: 80 }}
+              helperText={
+                duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""
+              }
+            />
+          </Box>
+          <Box>
+            <TextField
+              select
+              autoFocus
+              fullWidth
+              variant="outlined"
+              label={t("Duplicate from")}
+              value={duplicateStudyName}
+              onChange={(e) => {
+                setDuplicateStudyName(e.target.value)
+              }}
+              inputProps={{ maxLength: 80 }}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {studies.map((study) => (
+                <MenuItem key={study.id} value={study.id}>
+                  {study.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Box>
+          <Box ml={-1}>
+            <Checkbox
+              checked={createPatient}
+              onChange={(event) => {
+                setCreatePatient(event.target.checked)
+              }}
+              classes={{ checked: classes.checkboxActive }}
+              inputProps={{ "aria-label": "primary checkbox" }}
+            />
+            {t("Create a new patient under this study")}
+          </Box>
+          {!!createPatient && (
+            <Typography variant="caption">{t("Study name and patient name will be same.")}</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="right" width={1} mt={1} mb={3} mx={3}>
+            <Button
+              color="primary"
+              onClick={() => {
+                closePopUp(1)
+                setCreatePatient(false)
+              }}
+            >
+              {t("Cancel")}
+            </Button>
+            <Button
+              onClick={() => {
+                createNewStudy(studyName)
+              }}
+              color="primary"
+              autoFocus
+              disabled={!validate()}
+            >
+              {t("Confirm")}
+            </Button>
+          </Box>
+        </DialogActions>
+      </Dialog>
+      {!!newId && <NewPatientDetail id={newId} />}
+    </React.Fragment>
   )
 }

@@ -23,7 +23,6 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
-import JournalEntries from "./JournalEntries"
 import Breathe from "./Breathe"
 import ScratchImage from "./ScratchImage"
 import ResponsiveDialog from "./ResponsiveDialog"
@@ -777,7 +776,7 @@ export default function Feed({
             ) : (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>There are no scheduled activities available.</p>
+                <p>{t("There are no scheduled activities available.")}</p>
               </Box>
             )
           ) : (
@@ -820,8 +819,12 @@ export default function Feed({
                             setVisibleActivities([feed.activityData])
                             showFeedDetails(feed.type)
                           }
-
-                          if (games.includes(feed.type) || feed.type === "lamp.dbt_diary_card") {
+                          if (
+                            games.includes(feed.type) ||
+                            feed.type === "lamp.journal" ||
+                            feed.type === "lamp.breathe" ||
+                            feed.type === "lamp.dbt_diary_card"
+                          ) {
                             setActivityName(feed.title)
                             setVisibleActivities(feed.activityData)
                             showFeedDetails("game")
@@ -930,30 +933,10 @@ export default function Feed({
                 }}
               />
             ),
-            "lamp.journal": (
-              <JournalEntries
-                participant={participant}
-                activityId={activity?.id ?? null}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
             "lamp.scratch_image": (
               <ScratchImage
                 participant={participant}
                 activity={activity ?? []}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.breathe": (
-              <Breathe
-                activity={activity}
-                participant={participant}
                 onComplete={() => {
                   completeFeed(index)
                   setLaunchedActivity(undefined)

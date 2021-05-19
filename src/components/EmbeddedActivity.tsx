@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -21,6 +22,8 @@ const demoActivities = {
   "lamp.dbt_diary_card": "dbtdiarycard",
   "lamp.balloon_risk": "balloonrisk",
   "lamp.pop_the_bubbles": "popthebubbles",
+  "lamp.journal": "journal",
+  "lamp.breathe": "breathe",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -33,6 +36,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
+
   useEffect(() => {
     activateEmbeddedActivity(activity)
   }, [])
@@ -46,15 +51,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
+    if (activity.spec === "lamp.dbt_diary_card") handleLocalStorage()
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
     // Listen to message from child window
-
     eventer(
       messageEvent,
       function (e) {
-        if (!saved && activityId !== null && activityId !== "") {
+        if (e.data === null) {
+          setSaved(true)
+          onComplete()
+        } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
           delete data["activity"]
           data["activity"] = activityId
@@ -67,6 +75,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       false
     )
   }, [activityId])
+
+  const handleLocalStorage = () => {
+    try {
+      localStorage.setItem("lamp-activity-settings", JSON.stringify(activity.settings))
+      localStorage.setItem("lamp-language", i18n.language)
+    } catch {
+      enqueueSnackbar(t("Encountered an error: "), {
+        variant: "error",
+      })
+      return false
+    }
+  }
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
@@ -84,7 +104,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)
     setSaved(false)
-    setSettings({ ...settings, settings: activity.settings, configuration: { language: i18n.language } })
+    setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
     let response = await fetch(
       `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
         demoActivities[activity.spec]
