@@ -117,7 +117,8 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       activity.spec === "lamp.journal" ||
       activity.spec === "lamp.scratch_image" ||
       activity.spec === "lamp.breathe" ||
-      activity.spec === "lamp.group"
+      activity.spec === "lamp.group" ||
+      activity.spec === "lamp.dbt_diary_card"
     ) {
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data

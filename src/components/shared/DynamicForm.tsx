@@ -109,10 +109,12 @@ function AutocompleteTextWidget(props) {
   }
   return (
     <Autocomplete
+      onChange={(_, data) => props.onChange(data)}
       freeSolo
       options={props.schema.examples ?? []}
       renderInput={(params) => <Widgets.TextWidget {...params} {...props} />}
       {...(props.uiSchema ?? {})}
+      value={props.value}
     />
   )
 }

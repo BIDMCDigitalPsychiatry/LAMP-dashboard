@@ -89,6 +89,7 @@ export default function AddUpdateResearcher({
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
+  const [rData, setRdara] = useState(researcher)
 
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
@@ -110,6 +111,7 @@ export default function AddUpdateResearcher({
         if (!!researcher) {
           updateStore(researcher.id)
           setName(name.trim())
+          setRdara({ ...rData, name: name.trim() })
         } else {
           setResearcherName("")
           refreshResearchers()
@@ -156,7 +158,7 @@ export default function AddUpdateResearcher({
           <Button
             onClick={() => {
               setOpen(false)
-              setResearcherName(!!researcher ? researcher.name : "")
+              setResearcherName(!!rData ? rData.name : "")
             }}
             color="primary"
           >
