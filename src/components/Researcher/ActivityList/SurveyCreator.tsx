@@ -44,6 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    mw175: { minWidth: 175 },
   })
 )
 
@@ -433,17 +434,28 @@ export default function SurveyCreator({
                   setSelected={() => setActiveStep(idx)}
                 />
               ))}
-              <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
-                <Fab
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    setQuestions((questions) => (!!questions ? [...questions, {}] : []))
-                    setActiveStep(!!questions ? questions.length : 0)
-                  }}
-                >
-                  <Icon fontSize="small">add_circle</Icon>
-                </Fab>
+              <Grid
+                container
+                direction="row"
+                justify="flex-start"
+                alignItems="center"
+                className={classes.mw175}
+                spacing={2}
+              >
+                <Grid item>
+                  <Box ml={-1}>
+                    <Fab
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setQuestions((questions) => (!!questions ? [...questions, {}] : []))
+                        setActiveStep(!!questions ? questions.length : 0)
+                      }}
+                    >
+                      <Icon fontSize="small">add_circle</Icon>
+                    </Fab>
+                  </Box>
+                </Grid>
                 <Grid item>
                   <Typography variant="subtitle2">{t("Add Question")}</Typography>
                 </Grid>

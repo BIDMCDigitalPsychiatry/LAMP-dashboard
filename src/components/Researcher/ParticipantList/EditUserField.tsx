@@ -107,9 +107,6 @@ export default function EditUserField({
   const updateEditing = () => {
     setEditing(false)
     setEditComplete(true)
-    if (!(typeof alias === "string" && alias !== participant.id)) {
-      updateName(alias === "" ? participant.id : alias)
-    }
   }
 
   return (

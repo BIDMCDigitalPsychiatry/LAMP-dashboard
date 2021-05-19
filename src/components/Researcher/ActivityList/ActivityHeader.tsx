@@ -66,7 +66,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs md={2}>
+      <Grid item xs={12} md={3} lg={2}>
         <Tooltip
           title={
             !photo
@@ -94,9 +94,9 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
           </Box>
         </Tooltip>
       </Grid>
-      <Grid item md={10}>
+      <Grid item lg={10} md={9} xs={12}>
         <Grid container spacing={2}>
-          <Grid item lg={4}>
+          <Grid item lg={4} sm={4} xs={12}>
             <TextField
               error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
               id="filled-select-currency"
@@ -119,7 +119,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
               ))}
             </TextField>
           </Grid>
-          <Grid item xs>
+          <Grid item lg={8} sm={8} xs={12}>
             <Box mb={3}>
               <TextField
                 error={

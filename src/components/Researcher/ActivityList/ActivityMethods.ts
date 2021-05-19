@@ -852,12 +852,10 @@ export async function saveTipActivity(x) {
 
 export async function saveCTestActivity(x) {
   let newItem = (await LAMP.Activity.create(x.studyID, x)) as any
-  if (x.spec !== "lamp.dbt_diary_card") {
-    await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
-      description: x.description,
-      photo: x.photo,
-    })
-  }
+  await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
+    description: x.description,
+    photo: x.photo,
+  })
   return newItem
 }
 

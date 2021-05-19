@@ -32,6 +32,9 @@ const useStyles = makeStyles((theme: Theme) =>
         fontWeight: "600",
         fontSize: 30,
         width: "calc(100% - 96px)",
+        [theme.breakpoints.down("sm")]: {
+          fontSize: 25,
+        },
       },
     },
     btnBlue: {
