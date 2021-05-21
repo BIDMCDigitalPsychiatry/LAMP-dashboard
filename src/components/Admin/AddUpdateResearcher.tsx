@@ -86,7 +86,7 @@ export default function AddUpdateResearcher({
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
   const [rData, setRdara] = useState(researcher)
@@ -147,7 +147,7 @@ export default function AddUpdateResearcher({
             autoFocus
             margin="dense"
             id="name"
-            label="Name"
+            label={t("Name")}
             fullWidth
             onChange={(event) => setResearcherName(event.target.value)}
             value={name}
