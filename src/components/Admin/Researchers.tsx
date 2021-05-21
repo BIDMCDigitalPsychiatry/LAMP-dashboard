@@ -172,7 +172,7 @@ export default function Researchers({ history, updateStore, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
-  const [rowCount, setRowCount] = useState(20)
+  const [rowCount, setRowCount] = useState(40)
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
   const classes = useStyles()
@@ -244,12 +244,7 @@ export default function Researchers({ history, updateStore, ...props }) {
                   />
                 </Grid>
               ))}
-              <Pagination
-                data={researchers}
-                updatePage={handleChangePage}
-                defaultCount={20}
-                rowPerPage={[20, 40, 60, 80]}
-              />
+              <Pagination data={researchers} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
             <Grid item lg={6} xs={12}>

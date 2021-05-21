@@ -138,7 +138,7 @@ export default function AddUpdateResearcher({
         </Fab>
       ) : (
         <Fab variant="extended" classes={{ root: classes.btnBlue }} onClick={() => setOpen(true)}>
-          <Icon>add</Icon> Add
+          <Icon>add</Icon> {t("Add")}
         </Fab>
       )}
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
@@ -162,7 +162,7 @@ export default function AddUpdateResearcher({
             }}
             color="primary"
           >
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             onClick={() => addResearcher()}

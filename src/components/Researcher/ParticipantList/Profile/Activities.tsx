@@ -74,11 +74,6 @@ export default function PatientProfile({
     setSelectedActivities([])
   }
 
-  const addedActivity = (data) => {
-    addActivity(data)
-    setActivities((prevState) => [...prevState, data])
-  }
-
   const handleActivitySelected = (activity, checked) => {
     if (!!checked) {
       setSelectedActivities((prevState) => [...prevState, activity])
@@ -159,7 +154,7 @@ export default function PatientProfile({
                   studies={studies}
                   index={index}
                   handleSelected={handleActivitySelected}
-                  setActivities={onChangeActivities}
+                  setActivities={setSelectedActivities}
                 />
               </Grid>
             ))}

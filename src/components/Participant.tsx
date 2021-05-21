@@ -414,11 +414,10 @@ export default function Participant({
           }}
         >
           <SurveyInstrument
-            id={participant.id}
+            participant={participant}
             fromPrevent={true}
             type={surveyName}
             group={visibleActivities}
-            setVisibleActivities={setVisibleActivities}
             onComplete={submitSurvey}
           />
         </ResponsiveDialog>

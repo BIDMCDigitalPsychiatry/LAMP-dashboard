@@ -160,11 +160,10 @@ export default function NotificationPage({ participant, activityId, ...props }) 
       {loaded &&
         (activity?.spec === "lamp.survey" ? (
           <SurveyInstrument
-            id={participant}
+            participant={participant}
             type={activity?.name ?? ""}
             fromPrevent={false}
             group={[activity]}
-            setVisibleActivities={setActivity}
             onComplete={submitSurvey}
           />
         ) : activity?.spec === "lamp.cats_and_dogs" ||

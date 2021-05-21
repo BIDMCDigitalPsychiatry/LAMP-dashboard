@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
 import DynamicForm from "../../shared/DynamicForm"
-import { schemaList } from "./ActivityMethods"
+import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
@@ -45,6 +45,11 @@ export default function GameCreator({
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const [loading, setLoading] = React.useState(false)
+  const [schemaListObj, setSchemaListObj] = React.useState({})
+
+  useEffect(() => {
+    setSchemaListObj(SchemaList())
+  }, [])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,
@@ -171,7 +176,6 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if (activitySpecId === "lamp.dbt_diary_card") {
-      console.log(data.settings)
       let validateEffective = false
       if (data.settings && data.settings.targetEffective !== undefined) {
         if (data.settings.targetEffective.length > 0) {
@@ -283,10 +287,10 @@ export default function GameCreator({
               : null
           }
         />
-        {((value?.spec && Object.keys(schemaList).includes(value.spec)) ||
-          Object.keys(schemaList).includes(activitySpecId)) && (
+        {((value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
+          Object.keys(schemaListObj).includes(activitySpecId)) && (
           <DynamicForm
-            schema={schemaList[activitySpecId]}
+            schema={schemaListObj[activitySpecId]}
             initialData={data}
             onChange={(x) => {
               updateSettings(x)

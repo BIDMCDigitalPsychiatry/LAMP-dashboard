@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next"
 import TipFooter from "./TipFooter"
 import { Service } from "../../DBService/DBService"
 import DynamicForm from "../../shared/DynamicForm"
-import { schemaList } from "./ActivityMethods"
+import { SchemaList } from "./ActivityMethods"
 
 const theme = createMuiTheme({
   palette: {
@@ -243,7 +243,7 @@ export default function Tips({
           setSettings(existsData)
         }
       }
-      setNewSchemaList(schemaList)
+      setNewSchemaList(SchemaList())
       setLoading(false)
     })()
   }, [category])
