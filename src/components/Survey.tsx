@@ -430,11 +430,10 @@ export default function Survey({
           />
         ) : (
           <SurveyInstrument
-            id={participant.id}
             type={dialogueType}
             fromPrevent={false}
             group={visibleActivities}
-            setVisibleActivities={setVisibleActivities}
+            participant={participant}
             onComplete={submitSurveyType}
           />
         )}

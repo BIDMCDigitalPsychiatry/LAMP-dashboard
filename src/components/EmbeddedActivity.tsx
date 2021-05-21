@@ -24,6 +24,7 @@ const demoActivities = {
   "lamp.pop_the_bubbles": "popthebubbles",
   "lamp.journal": "journal",
   "lamp.breathe": "breathe",
+  "lamp.survey": "survey",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -51,7 +52,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
-    if (activity.spec === "lamp.dbt_diary_card") handleLocalStorage()
+    if (activity.spec === "lamp.dbt_diary_card" || activity.spec === "lamp.survey") handleLocalStorage()
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
@@ -64,12 +65,16 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           onComplete()
         } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
-          delete data["activity"]
-          data["activity"] = activityId
-          setData(data)
-          setEmbeddedActivity(undefined)
-          setSettings(null)
-          setActivityId(null)
+          if (activity.spec === "lamp.survey") {
+            onComplete(data.response, data.prefillTimestamp ?? null)
+          } else {
+            delete data["activity"]
+            data["activity"] = activityId
+            setData(data)
+            setEmbeddedActivity(undefined)
+            setSettings(null)
+            setActivityId(null)
+          }
         }
       },
       false
@@ -78,7 +83,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const handleLocalStorage = () => {
     try {
-      localStorage.setItem("lamp-activity-settings", JSON.stringify(activity.settings))
+      localStorage.setItem(
+        "lamp-activity-settings",
+        JSON.stringify(activity.spec === "lamp.survey" ? activity : activity.settings)
+      )
       localStorage.setItem("lamp-language", i18n.language)
     } catch {
       enqueueSnackbar(t("Encountered an error: "), {

@@ -1,6 +1,6 @@
+import { DBSchema } from "idb"
 import * as idb from "idb"
 const DATABASE_NAME = "LAMP-DB"
-import { DBSchema } from "idb"
 
 interface LampDB extends DBSchema {
   researcher: {

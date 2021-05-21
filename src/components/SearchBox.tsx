@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Box, Typography, TextField, InputBase, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Box, InputBase, Icon, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,6 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Header({ searchData, ...props }: { searchData: Function }) {
   const classes = useStyles()
   const [search, setSearch] = useState("")
+  const { t, i18n } = useTranslation()
 
   useEffect(() => {
     searchData(search)
@@ -59,7 +61,7 @@ export default function Header({ searchData, ...props }: { searchData: Function 
           <Icon>search</Icon>
         </div>
         <InputBase
-          placeholder="Search…"
+          placeholder={t("Search") + "…"}
           classes={{
             root: classes.inputRoot,
             input: classes.inputInput,

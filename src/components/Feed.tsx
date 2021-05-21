@@ -902,11 +902,10 @@ export default function Feed({
           {
             "lamp.survey": (
               <SurveyInstrument
-                id={participant.id}
+                participant={participant}
                 type={surveyName}
                 fromPrevent={false}
                 group={visibleActivities}
-                setVisibleActivities={setVisibleActivities}
                 onComplete={submitSurvey}
               />
             ),

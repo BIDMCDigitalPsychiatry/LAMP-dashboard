@@ -304,14 +304,14 @@ export default function SensorDialog({
             }
             value={sensorName}
             variant="filled"
-            label="Name"
+            label={t("Name")}
             onChange={(event) => setSensorName(event.target.value)}
             placeholder={t("Name")}
             helperText={
               duplicateCnt > 0
                 ? t("Unique name required")
                 : typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
-                ? t("Please enter Name")
+                ? t("Please enter name.")
                 : ""
             }
           />

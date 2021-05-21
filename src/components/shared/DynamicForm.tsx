@@ -3,6 +3,7 @@ import { Grid, Button, Icon, TextField, createMuiTheme, MuiThemeProvider } from 
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
+import { useTranslation } from "react-i18next"
 
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
@@ -24,12 +25,13 @@ const ObjectFieldTemplate = ({
   formData,
   onAddClick,
 }: ObjectFieldTemplateProps) => {
+  const { t } = useTranslation()
   return (
     <>
       {!!properties && properties.length > 0 && (uiSchema["ui:title"] || title) && (
-        <TitleField id={`${idSchema.$id}-title`} title={title} required={required} />
+        <TitleField id={`${idSchema.$id}-title`} title={t(title)} required={required} />
       )}
-      {description && <DescriptionField id={`${idSchema.$id}-description`} description={description} />}
+      {description && <DescriptionField id={`${idSchema.$id}-description`} description={t(description)} />}
       <Grid container={true} spacing={2} style={{ marginTop: 10 }} {...(uiSchema?.["ui:grid"] ?? {})}>
         {properties.map((element: any, index: number) => (
           <Grid
@@ -107,6 +109,7 @@ function AutocompleteTextWidget(props) {
   if (!Array.isArray(props.schema.examples)) {
     return <Widgets.TextWidget {...props} />
   }
+
   return (
     <Autocomplete
       onChange={(_, data) => props.onChange(data)}

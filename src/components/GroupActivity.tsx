@@ -205,11 +205,10 @@ export default function GroupActivity({ participant, activity, ...props }) {
       {!activityRun &&
         (currentActivity?.spec === "lamp.survey" ? (
           <SurveyInstrument
-            id={participant}
+            participant={participant}
             type={currentActivity?.name ?? ""}
             fromPrevent={false}
             group={[currentActivity]}
-            setVisibleActivities={setCurrentActivity}
             onComplete={submitSurvey}
           />
         ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
