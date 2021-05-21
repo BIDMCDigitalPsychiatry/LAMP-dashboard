@@ -147,7 +147,7 @@ export default function AddUpdateResearcher({
             autoFocus
             margin="dense"
             id="name"
-            label="Name"
+            label={t("Name")}
             fullWidth
             onChange={(event) => setResearcherName(event.target.value)}
             value={name}
