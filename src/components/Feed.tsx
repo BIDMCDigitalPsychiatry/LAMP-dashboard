@@ -776,7 +776,7 @@ export default function Feed({
             ) : (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>There are no scheduled activities available.</p>
+                <p>{t("There are no scheduled activities available.")}</p>
               </Box>
             )
           ) : (
