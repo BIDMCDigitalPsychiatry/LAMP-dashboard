@@ -6,6 +6,7 @@ import ExportActivity from "./ExportActivity"
 import DeleteActivity from "./DeleteActivity"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
 import SearchBox from "../../SearchBox"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,6 +45,7 @@ export default function Header({
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, updateStudyCount] = useState(0)
+  const { t } = useTranslation()
 
   const setUpdateCount = (type: number) => {
     updateStudyCount(type)
@@ -57,7 +59,7 @@ export default function Header({
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">Activities</Typography>
+          <Typography variant="h5">{t("Activities")}</Typography>
         </Box>
         <Box>
           <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
