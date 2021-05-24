@@ -234,7 +234,8 @@ export default function AddActivity({
                   setCreate(true)
                 }}
               >
-                {x.name ? t(activitiesObj[x.name]) : x?.name?.replace("lamp.", "")}
+                {console.log(x)}
+                {activitiesObj[x.name] ? t(activitiesObj[x.name]) : t(x?.name?.replace("lamp.", ""))}
               </MenuItem>
             )),
           ]}
