@@ -71,10 +71,10 @@
     "vega-tooltip": "^0.24.2"
   },
   "scripts": {
-    "start": "node buildEnv.mjs dev && react-scripts start",
+    "start": "node buildEnv dev && react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
-    "build": "node buildEnv.mjs && react-scripts build",
+    "build": "node buildEnv && react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
     "build-storybook": "build-storybook -s public"
