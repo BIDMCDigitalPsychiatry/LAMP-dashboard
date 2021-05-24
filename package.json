@@ -25,7 +25,9 @@
     "lint-staged": "^10.1.3",
     "prettier": "2.0.4",
     "react-scripts": "^4.0.3",
-    "typescript": "3.8"
+    "typescript": "3.8",
+    "fs-extra": "10.0.0",
+    "child-process": "1.0.2"
   },
   "dependencies": {
     "@date-io/date-fns": "^1.3.13",
@@ -33,6 +35,7 @@
     "@material-ui/core": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.48",
     "@material-ui/pickers": "^3.2.8",
+    "@material-ui/icons": "4.11.2",
     "@rjsf/core": "^2.5.1",
     "@rjsf/material-ui": "^2.5.1",
     "core-js": "^3.6.5",
@@ -68,10 +71,10 @@
     "vega-tooltip": "^0.24.2"
   },
   "scripts": {
-    "start": "SKIP_PREFLIGHT_CHECK=true BROWSER=none NODE_ENV=production REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git describe --tags --exact-match --abbrev=0 || echo dev` react-scripts start",
+    "start": "node buildEnv.mjs dev && react-scripts start",
     "start-sw": "http-server -p 3000 ./build",
     "test": "echo \"no tests configured\"",
-    "build": "SKIP_PREFLIGHT_CHECK=true NODE_ENV=production CI=false REACT_APP_GIT_NUM=`git rev-list --count HEAD` REACT_APP_GIT_SHA=`git describe --tags --exact-match --abbrev=0 || echo dev` react-scripts build",
+    "build": "node buildEnv.mjs && react-scripts build",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss}'",
     "storybook": "start-storybook -p 3000 -s public",
     "build-storybook": "build-storybook -s public"
