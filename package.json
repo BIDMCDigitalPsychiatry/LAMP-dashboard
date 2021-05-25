@@ -94,6 +94,14 @@
     "printWidth": 120
   },
   "eslintConfig": {
+    "rules": {
+      "prettier/prettier": [
+        "off",
+        {
+          "singleQuote": true
+        }
+      ]
+    },
     "parser": "@typescript-eslint/parser",
     "plugins": [
       "@typescript-eslint"
