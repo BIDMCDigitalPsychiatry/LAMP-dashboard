@@ -33,7 +33,7 @@ function compress(file, width, height) {
 }
 const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
 
-export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
+export default function ActivityHeader({ studies, value, details, study, onChange, image = undefined }) {
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)

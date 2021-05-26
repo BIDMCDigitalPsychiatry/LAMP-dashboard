@@ -41,6 +41,13 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
   const [saveClicked, setSaveClicked] = useState(false)
   const [duplicateClicked, setDuplicateClicked] = useState(false)
 
+  const handleSave = React.useCallback(() => {
+    if (validate()) {
+      setSaveClicked(true)
+      onSave(data, false)
+    }
+  }, [validate, setSaveClicked, JSON.stringify(data)])
+
   return (
     <Grid
       container
@@ -84,12 +91,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
             className={classes.btnBlue}
             aria-label="Save"
             variant="extended"
-            onClick={() => {
-              if (validate()) {
-                setSaveClicked(true)
-                onSave(data, false)
-              }
-            }}
+            onClick={handleSave}
             disabled={saveClicked || !validate() || !onSave || !data.name}
           >
             {t("Save")}
