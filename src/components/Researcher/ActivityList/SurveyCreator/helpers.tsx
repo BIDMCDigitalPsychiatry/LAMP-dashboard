@@ -28,11 +28,11 @@ export const validateDetails = ({ details }) => {
 
   const { text = "", studyId = "" } = details
 
-  if (isEmpty(text.trim())) {
+  if (isEmpty(text)) {
     errors["text"] = "Required"
   }
 
-  if (isEmpty(studyId.trim())) {
+  if (isEmpty(studyId)) {
     errors["studyId"] = "Required"
   }
 

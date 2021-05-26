@@ -45,6 +45,7 @@ const Content = ({ question, onChange }) => {
   const handleChange = React.useCallback((id) => (event) => onChange(id, event?.target?.value), [onChange])
   const handleDelete = React.useCallback((id) => () => onChange(id, ""), [onChange])
   const handleClick = React.useCallback((id, value) => () => onChange(id, value), [onChange])
+  const onChangeValue = React.useCallback((id) => (value) => onChange(id, value), [onChange])
 
   return (
     <Grid container direction="column" spacing={spacing}>
@@ -95,8 +96,8 @@ const Content = ({ question, onChange }) => {
             <SelectList
               checkbox={type === "multiselect"}
               type={type}
-              value={question["options"]}
-              onChange={handleChange("options")}
+              options={question["options"]}
+              onChange={onChangeValue("options")}
             />
           </Box>
         </Grid>
@@ -125,6 +126,11 @@ export default function QuestionStepper({ questions = {}, onChange, onRemove }) 
 
   return (
     <div className={classes.root}>
+      <Button variant="contained" color="primary" onClick={handleAdd}>
+        <Icons.AddCircle fontSize="small" style={{ marginRight: 8 }} />
+        {t("Add Question")}
+      </Button>
+
       <Stepper activeStep={activeStep} orientation="vertical">
         {Object.keys(questions).map((k, i) => {
           const question = questions[k]
@@ -166,12 +172,6 @@ export default function QuestionStepper({ questions = {}, onChange, onRemove }) 
                             <Button variant="contained" onClick={handleRemove(k)} className={classes.buttonRemove}>
                               <Icons.RemoveCircle fontSize="small" style={{ marginRight: 8 }} />
                               {t("Remove Question")}
-                            </Button>
-                          </Grid>
-                          <Grid item>
-                            <Button variant="contained" color="primary" onClick={handleAdd}>
-                              <Icons.AddCircle fontSize="small" style={{ marginRight: 8 }} />
-                              {t("Add Question")}
                             </Button>
                           </Grid>
                         </Grid>
