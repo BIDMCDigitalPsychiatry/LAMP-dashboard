@@ -95,8 +95,6 @@ export default function SurveyCreator({
         variant: "error",
       })
     } else {
-      console.log("Saving...")
-      console.log({ value, data, details, questions, isDuplicate })
       onSave({ ...data }, isDuplicate) // Create copy of the data object to isolate external modifications
     }
   }
