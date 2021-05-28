@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-    mw175: { minWidth: 175 },
+    mw175: { minWidth: 250 },
   })
 )
 

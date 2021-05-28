@@ -25,6 +25,7 @@ const demoActivities = {
   "lamp.journal": "journal",
   "lamp.breathe": "breathe",
   "lamp.survey": "survey",
+  "lamp.scratch_image": "scratchimage",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
@@ -68,9 +69,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           if (activity.spec === "lamp.survey") {
             onComplete(data.response, data.prefillTimestamp ?? null)
           } else {
-            delete data["activity"]
-            data["activity"] = activityId
-            setData(data)
+            if (data.completed) {
+              onComplete()
+            } else {
+              delete data["activity"]
+              data["activity"] = activityId
+              setData(data)
+            }
             setEmbeddedActivity(undefined)
             setSettings(null)
             setActivityId(null)
@@ -104,7 +109,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         })
         .then((x) => {
           setSaved(true)
-          onComplete()
+          if (activity.spec !== "lamp.scratch_image") onComplete()
         })
     }
   }, [embeddedActivity])

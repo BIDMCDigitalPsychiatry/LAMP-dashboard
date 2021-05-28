@@ -156,7 +156,7 @@ export default function Participant({
   submitSurvey: Function
   setShowDemoMessage: Function
 }) {
-  const [activities, setActivities] = useState([])
+  const [activities, setActivities] = useState(null)
   const [visibleActivities, setVisibleActivities] = useState([])
   const getTab = () => {
     let tabNum
@@ -229,21 +229,20 @@ export default function Participant({
   }
 
   useEffect(() => {
-    const tabName = getTabName(tab)
-    props.activeTab(tabName)
-    let language = !!localStorage.getItem("LAMP_user_" + participant.id)
-      ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-      : getSelectedLanguage()
-      ? getSelectedLanguage()
-      : "en-US"
-    i18n.changeLanguage(language)
     setLoading(true)
-    //  getShowWelcome(participant).then(setOpen)
-    ;(async () => {
-      let activities = await LAMP.Activity.allByParticipant(participant.id)
+    LAMP.Activity.allByParticipant(participant.id).then((activities) => {
       setActivities(activities)
+      const tabName = getTabName(tab)
+      props.activeTab(tabName)
+      let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+        ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+        : getSelectedLanguage()
+        ? getSelectedLanguage()
+        : "en-US"
+      i18n.changeLanguage(language)
+      //  getShowWelcome(participant).then(setOpen)
       setLoading(false)
-    })()
+    })
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
@@ -312,117 +311,118 @@ export default function Participant({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Box>
-        <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
-          <Box mt={1} mb={4}>
-            <Learn participant={participant} activities={activities} activeTab={activeTab} />
-          </Box>
-        </Slide>
-        <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
-          <Box mt={1} mb={4}>
-            <Survey
-              participant={participant}
-              activities={activities}
-              visibleActivities={visibleActivities}
-              onComplete={submitSurvey}
-              setVisibleActivities={setVisibleActivities}
-            />
-          </Box>
-        </Slide>
-        <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
-          <Box mt={1} mb={4}>
-            <Manage participant={participant} activities={activities} activeTab={activeTab} />
-          </Box>
-        </Slide>
-        <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-          <Box mt={1} mb={4}>
-            <Prevent
-              participant={participant}
-              activeTab={activeTab}
-              hiddenEvents={hiddenEvents}
-              enableEditMode={!_patientMode()}
-              onEditAction={(activity, data) => {
-                setSurveyName(activity.name)
-                setVisibleActivities([
-                  {
-                    ...activity,
-                    prefillData: [
-                      data.slice.map(({ item, value }) => ({
-                        item,
-                        value,
-                      })),
-                    ],
-                    prefillTimestamp: new Date(
-                      data.x
-                    ).getTime() /* post-increment later to avoid double-reporting events! */,
-                  },
-                ])
-              }}
-              onCopyAction={(activity, data) => {
-                setSurveyName(activity.name)
-                setVisibleActivities([
-                  {
-                    ...activity,
-                    prefillData: [
-                      data.slice.map(({ item, value }) => ({
-                        item,
-                        value,
-                      })),
-                    ],
-                  },
-                ])
-              }}
-              onDeleteAction={(activity, data) => hideEvent(new Date(data.x).getTime(), activity.id)}
-            />
-          </Box>
-        </Slide>
-        <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
-          <Box mt={1} mb={4}>
-            <Feed
-              participant={participant}
-              activeTab={activeTab}
-              activities={activities}
-              visibleActivities={visibleActivities}
-              onComplete={submitSurvey}
-              setVisibleActivities={setVisibleActivities}
-            />
-          </Box>
-        </Slide>
-        <BottomMenu
-          activeTab={activeTab}
-          tabValue={tab}
-          participant={participant}
-          showWelcome={openDialog}
-          setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
-        />
-        <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
-          <Welcome
-            activities={activities}
-            onClose={() => {
-              setOpen(false)
-              setShowWelcome(participant)
-            }}
-          />
-        </ResponsiveDialog>
-        <ResponsiveDialog
-          transient
-          animate
-          fullScreen
-          open={tab === 3 && visibleActivities.length > 0}
-          onClose={() => {
-            setVisibleActivities([])
-          }}
-        >
-          <SurveyInstrument
+      {activities !== null && (
+        <Box>
+          <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
+            <Box mt={1} mb={4}>
+              <Learn participant={participant} activities={activities} activeTab={activeTab} />
+            </Box>
+          </Slide>
+          <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
+            <Box mt={1} mb={4}>
+              <Survey
+                participant={participant}
+                activities={activities}
+                visibleActivities={visibleActivities}
+                onComplete={submitSurvey}
+                setVisibleActivities={setVisibleActivities}
+              />
+            </Box>
+          </Slide>
+          <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
+            <Box mt={1} mb={4}>
+              <Manage participant={participant} activities={activities} activeTab={activeTab} />
+            </Box>
+          </Slide>
+          <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+            <Box mt={1} mb={4}>
+              <Prevent
+                participant={participant}
+                activeTab={activeTab}
+                hiddenEvents={hiddenEvents}
+                enableEditMode={!_patientMode()}
+                onEditAction={(activity, data) => {
+                  setSurveyName(activity.name)
+                  setVisibleActivities([
+                    {
+                      ...activity,
+                      prefillData: [
+                        data.slice.map(({ item, value }) => ({
+                          item,
+                          value,
+                        })),
+                      ],
+                      prefillTimestamp: new Date(
+                        data.x
+                      ).getTime() /* post-increment later to avoid double-reporting events! */,
+                    },
+                  ])
+                }}
+                onCopyAction={(activity, data) => {
+                  setSurveyName(activity.name)
+                  setVisibleActivities([
+                    {
+                      ...activity,
+                      prefillData: [
+                        data.slice.map(({ item, value }) => ({
+                          item,
+                          value,
+                        })),
+                      ],
+                    },
+                  ])
+                }}
+                onDeleteAction={(activity, data) => hideEvent(new Date(data.x).getTime(), activity.id)}
+              />
+            </Box>
+          </Slide>
+          <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+            <Box mt={1} mb={4}>
+              <Feed
+                participant={participant}
+                activeTab={activeTab}
+                activities={activities}
+                visibleActivities={visibleActivities}
+                onComplete={submitSurvey}
+                setVisibleActivities={setVisibleActivities}
+              />
+            </Box>
+          </Slide>
+          <BottomMenu
+            activeTab={activeTab}
+            tabValue={tab}
             participant={participant}
-            fromPrevent={true}
-            type={surveyName}
-            group={visibleActivities}
-            onComplete={submitSurvey}
+            showWelcome={openDialog}
+            setShowDemoMessage={(val) => props.setShowDemoMessage(val)}
           />
-        </ResponsiveDialog>
-      </Box>
-
+          <ResponsiveDialog open={!!openDialog} transient animate fullScreen>
+            <Welcome
+              activities={activities}
+              onClose={() => {
+                setOpen(false)
+                setShowWelcome(participant)
+              }}
+            />
+          </ResponsiveDialog>
+          <ResponsiveDialog
+            transient
+            animate
+            fullScreen
+            open={tab === 3 && visibleActivities.length > 0}
+            onClose={() => {
+              setVisibleActivities([])
+            }}
+          >
+            <SurveyInstrument
+              participant={participant}
+              fromPrevent={true}
+              type={surveyName}
+              group={visibleActivities}
+              onComplete={submitSurvey}
+            />
+          </ResponsiveDialog>
+        </Box>
+      )}
       <Dialog
         open={openComplete}
         onClose={() => setOpenComplete(false)}

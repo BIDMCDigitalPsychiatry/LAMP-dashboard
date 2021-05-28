@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
 import GroupActivity from "./GroupActivity"
 const useStyles = makeStyles((theme) => ({
@@ -174,10 +173,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.balloon_risk" ||
           activity?.spec === "lamp.dbt_diary_card" ||
           activity?.spec === "lamp.journal" ||
-          activity?.spec === "lamp.breathe" ? (
+          activity?.spec === "lamp.breathe" ||
+          activity?.spec === "lamp.scratch_image" ? (
           <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.scratch_image" ? (
-          <ScratchImage participant={participant} activity={activity ?? []} onComplete={() => {}} />
         ) : activity?.spec === "lamp.tips" ? (
           <TipNotification
             participant={participant}
