@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import ScratchImage from "./ScratchImage"
 import TipNotification from "./TipNotification"
 
 const useStyles = makeStyles((theme) => ({
@@ -217,17 +216,12 @@ export default function GroupActivity({ participant, activity, ...props }) {
           currentActivity?.spec === "lamp.spatial_span" ||
           currentActivity?.spec === "lamp.dbt_diary_card" ||
           currentActivity?.spec === "lamp.journal" ||
-          currentActivity?.spec === "lamp.breathe" ? (
+          currentActivity?.spec === "lamp.breathe" ||
+          currentActivity?.spec === "lamp.scratch_image" ? (
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
             participant={participant}
-            onComplete={() => completeActivity()}
-          />
-        ) : currentActivity?.spec === "lamp.scratch_image" ? (
-          <ScratchImage
-            participant={participant}
-            activity={currentActivity ?? []}
             onComplete={() => completeActivity()}
           />
         ) : currentActivity?.spec === "lamp.tips" ? (
