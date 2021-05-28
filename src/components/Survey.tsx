@@ -22,7 +22,9 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import SurveyInstrument from "./SurveyInstrument"
 import LAMP from "lamp-core"
 import classnames from "classnames"
+import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
+import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 import GroupActivity from "./GroupActivity"
@@ -191,7 +193,14 @@ export const games = [
   "lamp.balloon_risk",
 ]
 
-export default function Survey({ participant, activities = [], visibleActivities, setVisibleActivities, onComplete }) {
+export default function Survey({
+  participant,
+  activities,
+  visibleActivities,
+  setVisibleActivities,
+  onComplete,
+  ...props
+}) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -200,8 +209,9 @@ export default function Survey({ participant, activities = [], visibleActivities
   const { t } = useTranslation()
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
-  const [tags, setTags] = useState({})
-
+  const [tag, setTag] = useState([])
+  const [savedActivities, setSavedActivities] = useState([])
+  const [loading, setLoading] = useState(true)
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
@@ -212,28 +222,33 @@ export default function Survey({ participant, activities = [], visibleActivities
     onComplete(response)
   }
 
-  const filtered = activities.filter(
-    (x) =>
-      games.includes(x.spec) ||
-      x.spec === "lamp.group" ||
-      x.spec === "lamp.dbt_diary_card" ||
-      (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-  )
-
   useEffect(() => {
-    filtered.forEach((activity, i) => {
-      getDetails(activity.id, activity.spec)
-        .then((details) => {
-          setTags((prev) => ({ ...prev, [activity.id]: { ...details, complete: true, error: undefined } }))
+    setLoading(true)
+    let gActivities = (activities || []).filter(
+      (x) =>
+        games.includes(x.spec) ||
+        x.spec === "lamp.group" ||
+        x.spec === "lamp.dbt_diary_card" ||
+        (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+    )
+    setSavedActivities(gActivities)
+    if (gActivities.length > 0) {
+      let tags = []
+      let count = 0
+      gActivities.map((activity, index) => {
+        getDetails(activity.id, activity.spec).then((img) => {
+          tags[activity.id] = img
+          if (count === gActivities.length - 1) {
+            setTag(tags)
+            setLoading(false)
+          }
+          count++
         })
-        .catch((error) =>
-          setTags((prev) => ({ ...prev, [activity.id]: { ...prev[activity.id], complete: true, error } }))
-        )
-    })
-  }, [JSON.stringify(filtered)])
-
-  const loading = !(Object.keys(tags).filter((k) => tags[k].complete).length === filtered.length)
-
+      })
+    } else {
+      setLoading(false)
+    }
+  }, [])
   // var date = new Date()
   // date.setDate(date.getDate() - 21)
 
@@ -241,66 +256,49 @@ export default function Survey({ participant, activities = [], visibleActivities
   // const month = date.getMonth() + 1
   // const day = date.getDate()
   // const formattedDate = year + "-" + month + "-" + day
-  const activitiesArray = activities.filter(
-    (x) =>
-      x.spec === "lamp.dbt_diary_card" ||
-      x.spec === "lamp.group" ||
-      (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-  )
 
   return (
     <Container className={classes.thumbContainer}>
       <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
-        {loading === true ? (
-          " "
-        ) : activitiesArray.length ? (
-          activities
-            .filter(
-              (x) =>
-                x.spec === "lamp.dbt_diary_card" ||
-                x.spec === "lamp.group" ||
-                games.includes(x.spec) ||
-                (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
-            )
-            .map((y) => (
-              <Grid
-                key={y.id}
-                item
-                xs={6}
-                sm={4}
-                md={3}
-                lg={3}
-                onClick={() => {
-                  setSpec(y.spec)
-                  setActivity(y)
-                  y.spec === "lamp.dbt_diary_card"
-                    ? setQuestionCount(6)
-                    : games.includes(y.spec)
-                    ? setQuestionCount(0)
-                    : setQuestionCount(y.settings.length)
-                  setVisibleActivities([y])
-                  handleClickOpen(y.name)
-                }}
-                className={classes.thumbMain}
-              >
-                <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                  <Card className={classes.assess}>
-                    <Box mt={2} mb={1}>
-                      <Box
-                        className={classes.mainIcons}
-                        style={{
-                          margin: "auto",
-                          background: tags[y?.id]?.photo
-                            ? `url(${tags[y?.id]?.photo}) center center/contain no-repeat`
-                            : `url(${InfoIcon}) center center/contain no-repeat`,
-                        }}
-                      ></Box>
-                    </Box>
-                    <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
-                  </Card>
-                </ButtonBase>
-              </Grid>
-            ))
+        {savedActivities.length ? (
+          savedActivities.map((y) => (
+            <Grid
+              item
+              xs={6}
+              sm={4}
+              md={3}
+              lg={3}
+              onClick={() => {
+                setSpec(y.spec)
+                setActivity(y)
+                y.spec === "lamp.dbt_diary_card"
+                  ? setQuestionCount(6)
+                  : games.includes(y.spec)
+                  ? setQuestionCount(0)
+                  : setQuestionCount(y.settings.length)
+                setVisibleActivities([y])
+                handleClickOpen(y.name)
+              }}
+              className={classes.thumbMain}
+            >
+              <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                <Card className={classes.assess}>
+                  <Box mt={2} mb={1}>
+                    <Box
+                      className={classes.mainIcons}
+                      style={{
+                        margin: "auto",
+                        background: tag[y?.id]?.photo
+                          ? `url(${tag[y?.id]?.photo}) center center/contain no-repeat`
+                          : `url(${InfoIcon}) center center/contain no-repeat`,
+                      }}
+                    ></Box>
+                  </Box>
+                  <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
+                </Card>
+              </ButtonBase>
+            </Grid>
+          ))
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
             <Icon>info</Icon>
@@ -330,8 +328,8 @@ export default function Survey({ participant, activities = [], visibleActivities
               className={classes.topicon}
               style={{
                 margin: "auto",
-                background: tags[activity?.id]?.photo
-                  ? `url(${tags[activity?.id]?.photo}) center center/contain no-repeat`
+                background: tag[activity?.id]?.photo
+                  ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
                   : `url(${InfoIcon}) center center/contain no-repeat`,
               }}
             ></Box>
@@ -353,7 +351,7 @@ export default function Survey({ participant, activities = [], visibleActivities
             </Typography>
           )}
           <Typography variant="body2" component="p">
-            {spec !== "lamp.dbt_diary_card" && t(tags[activity?.id]?.description ?? null)}
+            {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
             {spec === "lamp.dbt_diary_card" &&
               t("Daily log of events and related feelings. Track target behaviors and use of skills.")}
           </Typography>

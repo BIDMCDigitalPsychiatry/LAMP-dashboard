@@ -23,8 +23,6 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
-import Breathe from "./Breathe"
-import ScratchImage from "./ScratchImage"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import TipNotification from "./TipNotification"
@@ -823,7 +821,8 @@ export default function Feed({
                             games.includes(feed.type) ||
                             feed.type === "lamp.journal" ||
                             feed.type === "lamp.breathe" ||
-                            feed.type === "lamp.dbt_diary_card"
+                            feed.type === "lamp.dbt_diary_card" ||
+                            feed.type === "lamp.scratch_image"
                           ) {
                             setActivityName(feed.title)
                             setVisibleActivities(feed.activityData)
@@ -926,16 +925,6 @@ export default function Feed({
                 name={activityName}
                 activity={visibleActivities}
                 participant={participant}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.scratch_image": (
-              <ScratchImage
-                participant={participant}
-                activity={activity ?? []}
                 onComplete={() => {
                   completeFeed(index)
                   setLaunchedActivity(undefined)

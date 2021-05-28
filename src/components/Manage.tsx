@@ -29,7 +29,6 @@ import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
-import ScratchImage from "./ScratchImage"
 import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
@@ -357,15 +356,6 @@ export default function Manage({ participant, activities, ...props }) {
                 }}
               />
             ),
-            "lamp.scratch_image": (
-              <ScratchImage
-                participant={participant}
-                activity={activity ?? []}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
             HopeBox: (
               <HopeBoxSelect
                 onComplete={() => {
@@ -449,7 +439,9 @@ export default function Manage({ participant, activities, ...props }) {
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity(spec === "lamp.journal" || spec === "lamp.breathe" ? "embed" : spec)
+                setLaunchedActivity(
+                  spec === "lamp.scratch_image" || spec === "lamp.journal" || spec === "lamp.breathe" ? "embed" : spec
+                )
               }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
