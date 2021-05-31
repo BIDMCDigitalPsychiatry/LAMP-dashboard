@@ -118,11 +118,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setActivityId(activity.id)
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
-    let response = await fetch(
-      `https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/master/dist/out/${
-        demoActivities[activity.spec]
-      }.html.b64`
-    )
+    let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/dist/out"
+    //activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+    let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
     // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
