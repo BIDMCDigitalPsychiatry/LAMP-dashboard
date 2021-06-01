@@ -174,6 +174,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.dbt_diary_card" ||
           activity?.spec === "lamp.journal" ||
           activity?.spec === "lamp.breathe" ||
+          activity?.spec === "lamp.recording" ||
           activity?.spec === "lamp.scratch_image" ? (
           <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
         ) : activity?.spec === "lamp.tips" ? (

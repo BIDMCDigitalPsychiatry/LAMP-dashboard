@@ -64,6 +64,7 @@ export default function Activity({
   const isBreathe = (activity || {}).spec === "lamp.breathe" || activitySpecId === "lamp.breathe"
   const isDBT = (activity || {}).spec === "lamp.dbt_diary_card" || activitySpecId === "lamp.dbt_diary_card"
   const isSCImage = (activity || {}).spec === "lamp.scratch_image" || activitySpecId === "lamp.scratch_image"
+  const isRecording = (activity || {}).spec === "lamp.recording" || activitySpecId === "lamp.recording"
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -152,7 +153,7 @@ export default function Activity({
           details={details ?? null}
         />
       )}
-      {(isGames || isSCImage || isJournal || isBreathe || isDBT) && (
+      {(isGames || isSCImage || isJournal || isBreathe || isDBT || isRecording) && (
         <GameCreator
           activities={allActivities}
           value={activity ?? null}

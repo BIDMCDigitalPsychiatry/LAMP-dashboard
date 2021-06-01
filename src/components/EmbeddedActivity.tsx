@@ -24,6 +24,7 @@ const demoActivities = {
   "lamp.pop_the_bubbles": "popthebubbles",
   "lamp.journal": "journal",
   "lamp.breathe": "breathe",
+  "lamp.recording": "voicerecording",
   "lamp.survey": "survey",
   "lamp.scratch_image": "scratchimage",
 }
@@ -66,6 +67,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           onComplete()
         } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
+          if (settings.spec === "lamp.recording") {
+            formatAndSaveToS3(data)
+          }
           if (activity.spec === "lamp.survey") {
             onComplete(data.response, data.prefillTimestamp ?? null)
           } else {
@@ -113,6 +117,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         })
     }
   }, [embeddedActivity])
+
+  const formatAndSaveToS3 = (data) => {}
 
   const activateEmbeddedActivity = async (activity) => {
     setActivityId(activity.id)

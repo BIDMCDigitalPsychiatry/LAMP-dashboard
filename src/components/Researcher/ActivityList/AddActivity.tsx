@@ -138,7 +138,8 @@ export default function AddActivity({
     "lamp.jewels_b": t("Jewels B"),
     "lamp.spatial_span": t("Spatial Span"),
     "lamp.pop_the_bubbles": t("Pop the bubbles"),
-    "lamp.balloon_risk": t("Balloon Risk"),
+    "lamp.balloon_risk": t("Balloon risk"),
+    "lamp.recording": t("Voice Recording"),
   }
 
   useEffect(() => {
@@ -148,6 +149,7 @@ export default function AddActivity({
       )
     })
   }, [])
+
   return (
     <Box>
       <Fab
