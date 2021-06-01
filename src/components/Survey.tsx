@@ -229,6 +229,7 @@ export default function Survey({
         games.includes(x.spec) ||
         x.spec === "lamp.group" ||
         x.spec === "lamp.dbt_diary_card" ||
+        x.spec === "lamp.recording" ||
         (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
     )
     setSavedActivities(gActivities)
@@ -335,6 +336,8 @@ export default function Survey({
             ></Box>
             {games.includes(spec) ? (
               <Typography variant="h6">{t("Games")} </Typography>
+            ) : spec === "lamp.recording" ? (
+              <Typography variant="h6">{t("Voice Recording")}</Typography>
             ) : (
               <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
@@ -345,7 +348,7 @@ export default function Survey({
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {!games.includes(spec) && spec !== "lamp.group" && (
+          {!games.includes(spec) && spec !== "lamp.group" && spec !== "lamp.recording" && (
             <Typography variant="h4" gutterBottom>
               {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
             </Typography>
@@ -381,7 +384,9 @@ export default function Survey({
               underline="none"
               className={classnames(classes.btngreen, classes.linkButton)}
             >
-              {!games.includes(spec) && spec !== "lamp.group" ? t("Start survey") : t("Begin")}
+              {!games.includes(spec) && spec !== "lamp.group" && spec !== "lamp.recording"
+                ? t("Start survey")
+                : t("Begin")}
             </Link>
           </Box>
         </DialogActions>
@@ -396,7 +401,7 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-        {spec === "lamp.dbt_diary_card" || games.includes(spec) ? (
+        {spec === "lamp.dbt_diary_card" || spec === "lamp.recording" || games.includes(spec) ? (
           <EmbeddedActivity
             name={activity?.name ?? ""}
             activity={activity ?? []}

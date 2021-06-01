@@ -51,6 +51,7 @@ export const availableActivitySpecs = [
   "lamp.dbt_diary_card",
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
+  "lamp.recording",
 ]
 export const games = [
   "lamp.jewels_a",

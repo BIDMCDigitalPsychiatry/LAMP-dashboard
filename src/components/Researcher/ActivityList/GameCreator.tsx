@@ -46,7 +46,6 @@ export default function GameCreator({
   const classes = useStyles()
   const [loading, setLoading] = React.useState(false)
   const [schemaListObj, setSchemaListObj] = React.useState({})
-
   useEffect(() => {
     setSchemaListObj(SchemaList())
   }, [])

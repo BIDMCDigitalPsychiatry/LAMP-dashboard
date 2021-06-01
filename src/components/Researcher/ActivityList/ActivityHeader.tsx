@@ -49,6 +49,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
       studyId,
     })
   }, [text, description, photo, studyId])
+
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
       compress(acceptedFiles[0], 64, 64).then(setPhoto)

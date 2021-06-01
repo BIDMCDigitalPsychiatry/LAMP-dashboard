@@ -820,6 +820,7 @@ export default function Feed({
                           if (
                             games.includes(feed.type) ||
                             feed.type === "lamp.journal" ||
+                            feed.type === "lamp.recording" ||
                             feed.type === "lamp.breathe" ||
                             feed.type === "lamp.dbt_diary_card" ||
                             feed.type === "lamp.scratch_image"

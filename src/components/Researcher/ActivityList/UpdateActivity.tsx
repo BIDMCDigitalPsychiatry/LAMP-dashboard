@@ -134,6 +134,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       }, [])
     }
     setConfirmationDialog(0)
+    console.log(activity)
     setSelectedActivity(activity)
   }
 

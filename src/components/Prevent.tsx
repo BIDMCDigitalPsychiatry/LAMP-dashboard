@@ -35,6 +35,7 @@ import MultipleSelect from "./MultipleSelect"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
 import PreventDBT from "./PreventDBT"
+import VoiceRecoding from "./VoiceRecoding"
 import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
 import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
 import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
@@ -46,6 +47,7 @@ import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
 import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
+import { ReactComponent as PreventRecording } from "../icons/PreventRecording.svg"
 
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -720,6 +722,7 @@ export default function Prevent({
   }
 
   const [selectedActivities, setSelectedActivities] = React.useState([])
+  const [selectedSpec, setSelectedSpec] = React.useState("")
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
   const [sensorEvents, setSensorEvents] = React.useState({})
@@ -902,18 +905,25 @@ export default function Prevent({
             {(activities || [])
               .filter((x) => (selectedActivities || []).includes(x.name))
               .map((activity) =>
-                activity.spec === "lamp.journal" || activity.spec === "lamp.dbt_diary_card" ? (
+                activity.spec === "lamp.recording" ||
+                activity.spec === "lamp.journal" ||
+                activity.spec === "lamp.dbt_diary_card" ? (
                   <Grid item xs={6} sm={3} md={3} lg={3}>
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card
                         className={classes.prevent}
                         onClick={() => {
+                          setSelectedSpec(activity.spec)
                           if (activity.spec === "lamp.dbt_diary_card") {
                             openDetails(activity, activityEvents, 0)
                           } else {
                             setSelectedActivity(activityEvents?.[activity.name] ?? null)
                             setSelectedActivityName(
-                              activity.spec === "lamp.journal" ? "Journal entries" : " DBT entries"
+                              activity.spec === "lamp.journal"
+                                ? "Journal entries"
+                                : activity.spec === "lamp.recording"
+                                ? "Voice Recording entries"
+                                : "DBT entries"
                             )
                             setOpenData(true)
                           }
@@ -924,7 +934,13 @@ export default function Prevent({
                             <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
-                            {activity.spec === "lamp.journal" ? <JournalBlue /> : <AssessDbt width="50" height="50" />}
+                            {activity.spec === "lamp.journal" ? (
+                              <JournalBlue />
+                            ) : activity.spec === "lamp.recording" ? (
+                              <PreventRecording />
+                            ) : (
+                              <AssessDbt width="50" height="50" />
+                            )}
                           </Box>
                         </Box>
                         <Box className={classes.preventGraph}>
@@ -1322,12 +1338,14 @@ export default function Prevent({
             >
               <Icon>arrow_back</Icon>
             </IconButton>
-            <Typography variant="h5">{t(selectedActivityName)}</Typography>
+            <Typography variant="h5"> {t(selectedActivityName)} </Typography>
           </Toolbar>
         </AppBar>
 
         {selectedActivityName === "Journal entries" ? (
           <Journal participant={participant} selectedEvents={selectedActivity} />
+        ) : selectedSpec === "lamp.recording" ? (
+          <VoiceRecoding participant={participant} selectedEvents={selectedActivity} />
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
         ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (
