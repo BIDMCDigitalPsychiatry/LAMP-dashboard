@@ -49,6 +49,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& img": {
         maxWidth: "100%",
         marginBottom: 15,
+        minWidth: "100%",
       },
       "& h6": { fontSize: 14, fontWeight: 700, fontStyle: "italic" },
       "& a": { fontSize: 14, fontStyle: "italic" },

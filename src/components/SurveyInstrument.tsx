@@ -673,12 +673,21 @@ function ShortTextSection({ onChange, value, ...props }) {
 }
 
 function RadioRating({ onChange, options, value, ...props }) {
+  const [val, setValue] = useState(value)
+
   return (
     <Box textAlign="center" mt={5}>
       <Grid direction="row" container justify="center" alignItems="center">
         {options.map((option) => (
           <Box mr={1}>
-            <RateAnswer checked={value === option.value} onChange={() => onChange(option.value)} value={option.value} />
+            <RateAnswer
+              checked={val === option.value}
+              onChange={() => {
+                setValue(option.value)
+                onChange(option.value)
+              }}
+              value={option.value}
+            />
             <Typography variant="caption">{option.description}</Typography>
           </Box>
         ))}

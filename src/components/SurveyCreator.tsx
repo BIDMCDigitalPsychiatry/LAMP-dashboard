@@ -72,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+    mw175: { minWidth: 175 },
   })
 )
 
@@ -513,7 +514,14 @@ export default function SurveyCreator({
                       setSelected={() => setActiveStep(idx)}
                     />
                   ))}
-                  <Grid container direction="row" justify="flex-start" alignItems="center" spacing={2}>
+                  <Grid
+                    container
+                    direction="row"
+                    justify="flex-start"
+                    alignItems="center"
+                    className={classes.mw175}
+                    spacing={2}
+                  >
                     <Fab
                       size="small"
                       color="primary"
