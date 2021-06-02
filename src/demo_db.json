@@ -398,8 +398,6 @@
       "spec": "lamp.breathe",
       "name": "Anchoring Ambience",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/anchoring_ambience.mp3"
       },
       "schedule": []
@@ -411,8 +409,6 @@
       "spec": "lamp.breathe",
       "name": "Breathe with your Body",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/breathe_body.mp3"
       },
       "schedule": []
@@ -424,8 +420,6 @@
       "spec": "lamp.breathe",
       "name": "Breathing Exercise (Long)",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/breathing_long.mp3"
       },
       "schedule": []
@@ -437,8 +431,6 @@
       "spec": "lamp.breathe",
       "name": "Calming your Body",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/calming_body.mp3"
       },
       "schedule": []
@@ -450,8 +442,6 @@
       "spec": "lamp.breathe",
       "name": "Forest and Nature Sounds",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/forest_nature.mp3"
       },
       "schedule": []
@@ -463,8 +453,6 @@
       "spec": "lamp.breathe",
       "name": "Inner Teacher",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/inner_teacher.mp3"
       },
       "schedule": []
@@ -476,8 +464,6 @@
       "spec": "lamp.breathe",
       "name": "Kindness (Long)",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/kindness_long.mp3"
       },
       "schedule": []
@@ -489,8 +475,6 @@
       "spec": "lamp.breathe",
       "name": "Loving Kindness",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/loving_kindness.mp3"
       },
       "schedule": []
@@ -502,8 +486,6 @@
       "spec": "lamp.breathe",
       "name": "Mountain Meditation",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/mountain_meditation.mp3"
       },
       "schedule": []
@@ -515,8 +497,6 @@
       "spec": "lamp.breathe",
       "name": "Positive Thinking",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/positive_thinking.mp3"
       },
       "schedule": []
@@ -528,8 +508,6 @@
       "spec": "lamp.breathe",
       "name": "Nature Relaxation",
       "settings": {
-        "audio": null,
-        "audio_name": null,
         "audio_url": "https://github.com/BIDMCDigitalPsychiatry/LAMP-activities/raw/master/dist/misc/relaxation_nature.mp3"
       },
       "schedule": []
@@ -1008,6 +986,15 @@
       "id": "activity24",
       "spec": "lamp.spin_wheel",
       "name": "Spin Wheel",
+      "settings": {},
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
+      "id": "activity50",
+      "spec": "lamp.recording",
+      "name": "Voice Recording",
       "settings": {},
       "schedule": []
     }
@@ -32828,6 +32815,13 @@
       "#parent": null,
       "id": "lamp.balloon_risk",
       "name": "lamp.balloon_risk",
+      "settings_schema": {}
+    },
+    {
+      "#type": "ActivitySpec",
+      "#parent": null,
+      "id": "lamp.recording",
+      "name": "lamp.recording",
       "settings_schema": {}
     }
   ],
