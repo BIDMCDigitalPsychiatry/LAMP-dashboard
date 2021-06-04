@@ -26,7 +26,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import JournalImg from "../icons/Journal.svg"
 import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
-import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
+// import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
 import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
@@ -34,7 +34,6 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
 import Goals from "./Goals"
-import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
@@ -198,7 +197,7 @@ export default function Manage({ participant, activities, ...props }) {
   useEffect(() => {
     setLoading(true)
     let gActivities = activities.filter(
-      (x: any) => x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image"
+      (x: any) => x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image" //|| x.spec === "lamp.hopebox"
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
@@ -267,6 +266,8 @@ export default function Manage({ participant, activities, ...props }) {
                           ? `url(${JournalIcon}) center center/contain no-repeat`
                           : activity.spec === "lamp.scratch_image"
                           ? `url(${ScratchCard}) center center/contain no-repeat`
+                          // : activity.spec === "lamp.hopebox"
+                          // ? `url(${HopeBoxIcon}) center center/contain no-repeat`
                           : `url(${InfoIcon}) center center/contain no-repeat`,
                       }}
                     ></Box>
@@ -356,13 +357,6 @@ export default function Manage({ participant, activities, ...props }) {
                 }}
               />
             ),
-            HopeBox: (
-              <HopeBoxSelect
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
             resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             Medication_tracker: (
               <NewMedication
@@ -440,6 +434,7 @@ export default function Manage({ participant, activities, ...props }) {
               onClick={() => {
                 setOpen(false)
                 setLaunchedActivity(
+                  // spec === "lamp.scratch_image" || spec === "lamp.journal" || spec === "lamp.breathe" || x.spec === "lamp.hopebox" ? "embed" : spec
                   spec === "lamp.scratch_image" || spec === "lamp.journal" || spec === "lamp.breathe" ? "embed" : spec
                 )
               }}
