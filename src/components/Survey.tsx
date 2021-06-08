@@ -393,7 +393,7 @@ export default function Survey({
       </Dialog>
 
       <ResponsiveDialog
-        transient={"lamp.group" || "lamp.survey" ? false : true}
+        transient={spec === "lamp.group" || spec === "lamp.survey" ? false : true}
         animate
         fullScreen
         open={openData}
