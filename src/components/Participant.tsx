@@ -267,7 +267,7 @@ export default function Participant({
 
   const submitSurvey = (response, overwritingTimestamp) => {
     setLoading(true)
-    if (response === null) {
+    if (!!!response || response === null) {
       setLoading(false)
       setVisibleActivities([])
     } else {
