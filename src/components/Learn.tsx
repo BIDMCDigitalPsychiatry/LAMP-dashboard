@@ -24,10 +24,10 @@ import {
 } from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import ResponsiveDialog from "./ResponsiveDialog"
-import LearnTips from "./LearnTips"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import InfoIcon from "../icons/Info.svg"
+import EmbeddedActivity from "./EmbeddedActivity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -211,6 +211,8 @@ export default function Learn({
   const [loading, setLoading] = useState(true)
   const [savedActivities, setSavedActivities] = useState([])
   const [activitiesArray, setActivitiesArray] = useState({})
+  const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [spec, setSpec] = useState(null)
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -242,9 +244,11 @@ export default function Learn({
       let activityData = await savedActivities.reduce(function (r, a) {
         r[a.name] = r[a.name] || []
         r[a.name] = {
-          description: a.name,
+          id: a.id,
+          name: a.name,
           icon: a.icon,
-          data: a.settings,
+          spec: "lamp.tips",
+          settings: a.settings,
         }
         setLoading(false)
         return r
@@ -280,6 +284,7 @@ export default function Learn({
               onClick={() => {
                 setData(key)
                 setOpen(true)
+                setSpec(activitiesArray[key])
               }}
             >
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -329,6 +334,7 @@ export default function Learn({
               onClick={() => {
                 setOpen(false)
                 setOpenData(true)
+                setLaunchedActivity(spec)
               }}
               underline="none"
               className={classnames(classes.btnyellow, classes.linkButton)}
@@ -338,6 +344,7 @@ export default function Learn({
           </Box>
         </DialogActions>
       </Dialog>
+
       <ResponsiveDialog
         transient={false}
         animate
@@ -347,20 +354,14 @@ export default function Learn({
           setOpenData(false)
         }}
       >
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => setOpenData(false)}
-              color="default"
-              className={classes.backbtn}
-              aria-label="Menu"
-            >
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">{t(tip)}</Typography>
-          </Toolbar>
-        </AppBar>
-        <LearnTips tip={tip} icon={icon} details={details} closeDialog={() => setOpenData(false)} />
+        <EmbeddedActivity
+          name={spec?.description ?? ""}
+          activity={spec ?? []}
+          participant={participant}
+          onComplete={() => {
+            setOpenData(false)
+          }}
+        />
       </ResponsiveDialog>
     </Container>
   )

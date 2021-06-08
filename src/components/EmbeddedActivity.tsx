@@ -27,6 +27,7 @@ const demoActivities = {
   "lamp.recording": "voicerecording",
   "lamp.survey": "survey",
   "lamp.scratch_image": "scratchimage",
+  "lamp.tips": "tips",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
