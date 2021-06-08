@@ -268,11 +268,7 @@ export default function Participant({
   const submitSurvey = (response, overwritingTimestamp) => {
     setLoading(true)
     if (response === null) {
-      getEvents(participant, visibleActivities[0].id).then((steak) => {
-        setSteak(steak)
-        setOpenComplete(true)
-        setLoading(false)
-      })
+      setLoading(false)
       setVisibleActivities([])
     } else {
       let events = response.map((x, idx) => ({

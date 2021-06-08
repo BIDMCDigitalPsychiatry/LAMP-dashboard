@@ -176,7 +176,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
         setTimeout(() => {
           setOpenComplete(false)
           completeActivity()
-        }, 10000)
+        }, 8000)
       })
     }
   }
