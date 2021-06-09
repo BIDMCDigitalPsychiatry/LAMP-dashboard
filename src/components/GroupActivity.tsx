@@ -143,7 +143,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   const submitSurvey = (response) => {
     setLoading(true)
-    if (response === null) {
+    if (!!!response || response === null) {
       getEvents(participant, currentActivity.id).then((steak) => {
         setSteak(steak)
         setOpenComplete(true)

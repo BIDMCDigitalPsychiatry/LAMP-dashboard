@@ -40,7 +40,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
-  const { enqueueSnackbar } = useSnackbar()
 
   useEffect(() => {
     activateEmbeddedActivity(activity)
@@ -55,7 +54,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [iFrame])
 
   useEffect(() => {
-    if (activity.spec === "lamp.dbt_diary_card" || activity.spec === "lamp.survey") handleLocalStorage()
     var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
     var eventer = window[eventMethod]
     var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
@@ -65,7 +63,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       function (e) {
         if (e.data === null) {
           setSaved(true)
-          onComplete()
+          activity.spec === "lamp.survey" ? onComplete(null) : onComplete()
         } else if (!saved && activityId !== null && activityId !== "") {
           let data = JSON.parse(e.data)
           if (settings.spec === "lamp.recording") {
@@ -91,21 +89,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     )
   }, [activityId])
 
-  const handleLocalStorage = () => {
-    try {
-      localStorage.setItem(
-        "lamp-activity-settings",
-        JSON.stringify(activity.spec === "lamp.survey" ? activity : activity.settings)
-      )
-      localStorage.setItem("lamp-language", i18n.language)
-    } catch {
-      enqueueSnackbar(t("Encountered an error: "), {
-        variant: "error",
-      })
-      return false
-    }
-  }
-
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
       LAMP.ActivityEvent.create(participant.id, data)
@@ -127,8 +110,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    // let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
+    let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
