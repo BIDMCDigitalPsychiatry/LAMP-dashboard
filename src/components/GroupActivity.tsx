@@ -128,6 +128,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   const completeActivity = () => {
     let val = index + 1
+    setCurrentActivity(null)
     setIndex(val)
     setActivityRun(true)
     if (groupActivities.length === val) {
@@ -141,19 +142,18 @@ export default function GroupActivity({ participant, activity, ...props }) {
     }
   }
 
-  const submitSurvey = (response) => {
+  const submitSurvey = (response) => { 
+    setActivityRun(true) 
     setLoading(true)
+    const activityId =  currentActivity.id   
+    setCurrentActivity(null)  
     if (!!!response || response === null) {
-      getEvents(participant, currentActivity.id).then((steak) => {
-        setSteak(steak)
-        setOpenComplete(true)
-        setLoading(false)
-      })
+      setLoading(false)
     } else {
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
         duration: response.duration,
-        activity: currentActivity.id,
+        activity: activityId,
         static_data: {},
         temporal_slices: (x || []).map((y) => ({
           item: y !== undefined ? y.item : null,
@@ -167,16 +167,16 @@ export default function GroupActivity({ participant, activity, ...props }) {
         events
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
-      ).then((x) => {
-        getEvents(participant, currentActivity.id).then((steak) => {
-          setSteak(steak)
-          setOpenComplete(true)
-          setLoading(false)
+      ).then((x) => {        
+        getEvents(participant, activityId).then((steak) => {
+          setSteak(steak)         
+          setOpenComplete(true)          
         })
         setTimeout(() => {
           setOpenComplete(false)
           completeActivity()
-        }, 8000)
+          setLoading(false)
+        }, 5000)
       })
     }
   }
@@ -202,7 +202,8 @@ export default function GroupActivity({ participant, activity, ...props }) {
   return (
     <div style={{ height: "100%" }}>
       {!activityRun &&
-        (currentActivity?.spec === "lamp.survey" ? (
+      <Box>
+        {(currentActivity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             participant={participant}
             type={currentActivity?.name ?? ""}
@@ -223,7 +224,9 @@ export default function GroupActivity({ participant, activity, ...props }) {
             name={currentActivity?.name}
             activity={currentActivity}
             participant={participant}
-            onComplete={() => completeActivity()}
+            onComplete={() => {
+              completeActivity()
+            }}
           />
         ) : currentActivity?.spec === "lamp.tips" ? (
           <TipNotification
@@ -254,6 +257,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
             </DialogActions>
           </Dialog>
         ))}
+        </Box>}
       <Dialog
         open={openComplete}
         onClose={() => {

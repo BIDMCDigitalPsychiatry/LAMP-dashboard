@@ -1,6 +1,19 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { makeStyles, Box, Grid, Drawer, Fab, Tooltip, Icon, Backdrop, CircularProgress } from "@material-ui/core"
+import { 
+  makeStyles,
+  Box,
+  Grid,
+  Drawer,
+  Fab,
+  Tooltip,
+  Icon,
+  Backdrop,
+  CircularProgress,
+  AppBar,
+  Toolbar,
+  IconButton,
+} from "@material-ui/core"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
 import { useSnackbar } from "notistack"
@@ -13,6 +26,17 @@ const useStyles = makeStyles((theme) => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
+  },
+  toolbardashboard: {
+    minHeight: 65,
+    padding: "0 10px",
+    "& h5": {
+      color: "rgba(0, 0, 0, 0.75)",
+      textAlign: "center",
+      fontWeight: "600",
+      fontSize: 18,
+      width: "calc(100% - 96px)",
+    },
   },
 }))
 // Splice together all selected activities & their tags.
@@ -61,6 +85,7 @@ export default function SurveyInstrument({ group, onComplete, type, fromPrevent,
         toolBarBack: fromPrevent,
         type: type,
         spec: "lamp.survey",
+        id: group[0].id
       })
     })
     setTimeout(() => {
@@ -73,7 +98,7 @@ export default function SurveyInstrument({ group, onComplete, type, fromPrevent,
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid item style={{ width: "100%" }}>
+      <Grid item style={{ width: "100%" }}>     
         {survey !== null && (
           <EmbeddedActivity
             name={survey?.name ?? ""}

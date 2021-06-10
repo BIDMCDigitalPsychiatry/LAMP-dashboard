@@ -40,10 +40,18 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
+  const [currentActivity, setCurrentActivity] = useState(null)
 
   useEffect(() => {
-    activateEmbeddedActivity(activity)
-  }, [])
+    setCurrentActivity(activity)    
+  }, [activity])
+
+  useEffect(() => {
+    setActivityId(currentActivity?.id ?? null)
+    if(currentActivity !== null) {    
+      activateEmbeddedActivity(currentActivity)
+    }
+  }, [currentActivity])
 
   useEffect(() => {
     if (iFrame != null) {
@@ -61,57 +69,64 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     eventer(
       messageEvent,
       function (e) {
-        if (e.data === null) {
-          setSaved(true)
-          activity.spec === "lamp.survey" ? onComplete(null) : onComplete()
-        } else if (!saved && activityId !== null && activityId !== "") {
-          let data = JSON.parse(e.data)
-          if (settings.spec === "lamp.recording") {
-            formatAndSaveToS3(data)
-          }
-          if (activity.spec === "lamp.survey") {
-            onComplete(data.response, data.prefillTimestamp ?? null)
-          } else {
-            if (data.completed) {
-              onComplete()
-            } else {
-              delete data["activity"]
-              data["activity"] = activityId
-              setData(data)
+        if (currentActivity !== null && !saved) {         
+          if (e.data === null) {
+            setSaved(true)
+            onComplete()
+          } else if (!saved && activityId !== null && activityId !== "") {
+            let data = JSON.parse(e.data)
+            if (currentActivity?.spec === "lamp.recording") {
+              formatAndSaveToS3(data)
             }
-            setEmbeddedActivity(undefined)
-            setSettings(null)
-            setActivityId(null)
+            delete data["activity"]
+            data["activity"] = activityId
+            if ((currentActivity?.spec === "lamp.scratch_image" && data.completed) || currentActivity?.spec !== "lamp.scratch_image" ) {
+              setData(data)
+              setEmbeddedActivity(undefined)
+              setSettings(null)
+              setActivityId(null)
+            }
           }
         }
       },
       false
     )
-  }, [activityId])
+  }, [settings])
 
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
-      LAMP.ActivityEvent.create(participant.id, data)
+      const activitySpec = currentActivity.spec
+      if(activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
+      if (activitySpec === "lamp.survey"){
+        onComplete(data.response, data.prefillTimestamp ?? null)        
+      } else if (activitySpec === "lamp.scratch_image" && data.completed) {
+        setSaved(true)
+        setCurrentActivity(null)
+        onComplete()        
+      } else {      
+        LAMP.ActivityEvent.create(participant.id, data)
         .catch((e) => {
           console.dir(e)
         })
-        .then((x) => {
-          setSaved(true)
-          if (activity.spec !== "lamp.scratch_image") onComplete()
+        .then((x) => {          
+          if (activitySpec !== "lamp.scratch_image") {
+            setSaved(true)
+            onComplete()
+          }
         })
+      }
     }
   }, [embeddedActivity])
 
   const formatAndSaveToS3 = (data) => {}
 
   const activateEmbeddedActivity = async (activity) => {
-    setActivityId(activity.id)
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    // let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
+    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
