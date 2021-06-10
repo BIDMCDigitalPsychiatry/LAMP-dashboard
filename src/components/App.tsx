@@ -14,7 +14,6 @@ import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
 import HopeBox from "./HopeBox"
-import TipNotification from "./TipNotification"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 
@@ -374,16 +373,6 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           )
         }
-      />
-      <Route
-        exact
-        path="/participant/:id/tip"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | {t("Hope Box")}</PageTitle>
-            <TipNotification goBack={props.history.goBack} />
-          </React.Fragment>
-        )}
       />
       {/* Route index => login or home (which redirects based on user type). */}
       <Route

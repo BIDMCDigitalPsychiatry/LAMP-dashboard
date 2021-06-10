@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import TipNotification from "./TipNotification"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -218,8 +217,11 @@ export default function GroupActivity({ participant, activity, ...props }) {
           currentActivity?.spec === "lamp.dbt_diary_card" ||
           currentActivity?.spec === "lamp.journal" ||
           currentActivity?.spec === "lamp.breathe" ||
+          currentActivity?.spec === "lamp.pop_the_bubbles" ||
+          currentActivity?.spec === "lamp.balloon_risk" ||
           currentActivity?.spec === "lamp.recording" ||
-          currentActivity?.spec === "lamp.scratch_image" ? (
+          currentActivity?.spec === "lamp.scratch_image" ||
+          currentActivity?.spec === "lamp.tips" ? (
           <EmbeddedActivity
             name={currentActivity?.name}
             activity={currentActivity}
@@ -227,14 +229,6 @@ export default function GroupActivity({ participant, activity, ...props }) {
             onComplete={() => {
               completeActivity()
             }}
-          />
-        ) : currentActivity?.spec === "lamp.tips" ? (
-          <TipNotification
-            participant={participant}
-            title={currentActivity.name}
-            details={currentActivity?.settings ?? {}}
-            icon={activityDetails?.icon ?? undefined}
-            onComplete={() => completeActivity()}
           />
         ) : (
           <Dialog
