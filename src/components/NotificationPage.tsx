@@ -19,7 +19,6 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import TipNotification from "./TipNotification"
 import GroupActivity from "./GroupActivity"
 const useStyles = makeStyles((theme) => ({
   root: {
