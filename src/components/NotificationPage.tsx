@@ -175,16 +175,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.journal" ||
           activity?.spec === "lamp.breathe" ||
           activity?.spec === "lamp.recording" ||
-          activity?.spec === "lamp.scratch_image" ? (
+          activity?.spec === "lamp.scratch_image" ||
+          activity?.spec === "lamp.tips" ? (
           <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
-        ) : activity?.spec === "lamp.tips" ? (
-          <TipNotification
-            participant={participant}
-            title={activity.name}
-            details={activity?.settings ?? {}}
-            icon={activityDetails?.icon ?? undefined}
-            onComplete={() => {}}
-          />
         ) : activity?.spec === "lamp.group" ? (
           <GroupActivity
             activity={activity}

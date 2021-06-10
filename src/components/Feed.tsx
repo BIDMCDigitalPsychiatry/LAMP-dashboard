@@ -823,7 +823,8 @@ export default function Feed({
                             feed.type === "lamp.recording" ||
                             feed.type === "lamp.breathe" ||
                             feed.type === "lamp.dbt_diary_card" ||
-                            feed.type === "lamp.scratch_image"
+                            feed.type === "lamp.scratch_image" ||
+                            feed.type === "lamp.tips"
                           ) {
                             setActivityName(feed.title)
                             setVisibleActivities(feed.activityData)
@@ -907,18 +908,6 @@ export default function Feed({
                 fromPrevent={false}
                 group={visibleActivities}
                 onComplete={submitSurvey}
-              />
-            ),
-            "lamp.tips": (
-              <TipNotification
-                participant={participant}
-                title={title}
-                details={details}
-                icon={icon}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
               />
             ),
             game: (
