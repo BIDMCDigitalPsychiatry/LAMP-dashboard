@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { 
+import {
   makeStyles,
   Box,
   Grid,
@@ -85,7 +85,7 @@ export default function SurveyInstrument({ group, onComplete, type, fromPrevent,
         toolBarBack: fromPrevent,
         type: type,
         spec: "lamp.survey",
-        id: group[0].id
+        id: group[0].id,
       })
     })
     setTimeout(() => {
@@ -98,7 +98,7 @@ export default function SurveyInstrument({ group, onComplete, type, fromPrevent,
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid item style={{ width: "100%" }}>     
+      <Grid item style={{ width: "100%" }}>
         {survey !== null && (
           <EmbeddedActivity
             name={survey?.name ?? ""}

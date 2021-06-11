@@ -24,6 +24,7 @@ import TipFooter from "./TipFooter"
 import { Service } from "../../DBService/DBService"
 import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
+
 const theme = createMuiTheme({
   palette: {
     secondary: {

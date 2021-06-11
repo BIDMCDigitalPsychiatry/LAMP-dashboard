@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react"
 import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
-import { useSnackbar } from "notistack"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,12 +42,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [currentActivity, setCurrentActivity] = useState(null)
 
   useEffect(() => {
-    setCurrentActivity(activity)    
+    setCurrentActivity(activity)
   }, [activity])
 
   useEffect(() => {
     setActivityId(currentActivity?.id ?? null)
-    if(currentActivity !== null) {    
+    if (currentActivity !== null) {
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
@@ -69,7 +68,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     eventer(
       messageEvent,
       function (e) {
-        if (currentActivity !== null && !saved) {         
+        if (currentActivity !== null && !saved) {
           if (e.data === null) {
             setSaved(true)
             onComplete()
@@ -80,7 +79,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }
             delete data["activity"]
             data["activity"] = activityId
-            if ((currentActivity?.spec === "lamp.scratch_image" && data.completed) || currentActivity?.spec !== "lamp.scratch_image" ) {
+            if (
+              (currentActivity?.spec === "lamp.scratch_image" && data.completed) ||
+              currentActivity?.spec !== "lamp.scratch_image"
+            ) {
               setData(data)
               setEmbeddedActivity(undefined)
               setSettings(null)
@@ -96,24 +98,24 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved) {
       const activitySpec = currentActivity.spec
-      if(activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
-      if (activitySpec === "lamp.survey"){
-        onComplete(data.response, data.prefillTimestamp ?? null)        
+      if (activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
+      if (activitySpec === "lamp.survey") {
+        onComplete(data.response, data.prefillTimestamp ?? null)
       } else if (activitySpec === "lamp.scratch_image" && data.completed) {
         setSaved(true)
         setCurrentActivity(null)
-        onComplete()        
-      } else {      
+        onComplete()
+      } else {
         LAMP.ActivityEvent.create(participant.id, data)
-        .catch((e) => {
-          console.dir(e)
-        })
-        .then((x) => {          
-          if (activitySpec !== "lamp.scratch_image") {
-            setSaved(true)
-            onComplete()
-          }
-        })
+          .catch((e) => {
+            console.dir(e)
+          })
+          .then((x) => {
+            if (activitySpec !== "lamp.scratch_image") {
+              setSaved(true)
+              onComplete()
+            }
+          })
       }
     }
   }, [embeddedActivity])
