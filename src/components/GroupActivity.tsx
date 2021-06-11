@@ -147,6 +147,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
     const activityId =  currentActivity.id   
     setCurrentActivity(null)  
     if (!!!response || response === null) {
+      props.onComplete()
       setLoading(false)
     } else {
       let events = response.map((x, idx) => ({
