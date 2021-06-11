@@ -141,11 +141,11 @@ export default function GroupActivity({ participant, activity, ...props }) {
     }
   }
 
-  const submitSurvey = (response) => { 
-    setActivityRun(true) 
+  const submitSurvey = (response) => {
+    setActivityRun(true)
     setLoading(true)
-    const activityId =  currentActivity.id   
-    setCurrentActivity(null)  
+    const activityId = currentActivity.id
+    setCurrentActivity(null)
     if (!!!response || response === null) {
       props.onComplete()
       setLoading(false)
@@ -167,10 +167,10 @@ export default function GroupActivity({ participant, activity, ...props }) {
         events
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
-      ).then((x) => {        
+      ).then((x) => {
         getEvents(participant, activityId).then((steak) => {
-          setSteak(steak)         
-          setOpenComplete(true)          
+          setSteak(steak)
+          setOpenComplete(true)
         })
         setTimeout(() => {
           setOpenComplete(false)
@@ -201,58 +201,59 @@ export default function GroupActivity({ participant, activity, ...props }) {
 
   return (
     <div style={{ height: "100%" }}>
-      {!activityRun &&
-      <Box>
-        {(currentActivity?.spec === "lamp.survey" ? (
-          <SurveyInstrument
-            participant={participant}
-            type={currentActivity?.name ?? ""}
-            fromPrevent={false}
-            group={[currentActivity]}
-            onComplete={submitSurvey}
-          />
-        ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
-          currentActivity?.spec === "lamp.jewels_a" ||
-          currentActivity?.spec === "lamp.jewels_b" ||
-          currentActivity?.spec === "lamp.spatial_span" ||
-          currentActivity?.spec === "lamp.dbt_diary_card" ||
-          currentActivity?.spec === "lamp.journal" ||
-          currentActivity?.spec === "lamp.breathe" ||
-          currentActivity?.spec === "lamp.pop_the_bubbles" ||
-          currentActivity?.spec === "lamp.balloon_risk" ||
-          currentActivity?.spec === "lamp.recording" ||
-          currentActivity?.spec === "lamp.scratch_image" ||
-          currentActivity?.spec === "lamp.tips" ? (
-          <EmbeddedActivity
-            name={currentActivity?.name}
-            activity={currentActivity}
-            participant={participant}
-            onComplete={() => {
-              completeActivity()
-            }}
-          />
-        ) : (
-          <Dialog
-            open={openNotImplemented}
-            onClose={() => setOpenNotImplemented(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  setOpenNotImplemented(false)
-                  completeActivity()
-                }}
-                color="primary"
-              >
-                {t("Ok")}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        ))}
-        </Box>}
+      {!activityRun && (
+        <Box>
+          {currentActivity?.spec === "lamp.survey" ? (
+            <SurveyInstrument
+              participant={participant}
+              type={currentActivity?.name ?? ""}
+              fromPrevent={false}
+              group={[currentActivity]}
+              onComplete={submitSurvey}
+            />
+          ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
+            currentActivity?.spec === "lamp.jewels_a" ||
+            currentActivity?.spec === "lamp.jewels_b" ||
+            currentActivity?.spec === "lamp.spatial_span" ||
+            currentActivity?.spec === "lamp.dbt_diary_card" ||
+            currentActivity?.spec === "lamp.journal" ||
+            currentActivity?.spec === "lamp.breathe" ||
+            currentActivity?.spec === "lamp.pop_the_bubbles" ||
+            currentActivity?.spec === "lamp.balloon_risk" ||
+            currentActivity?.spec === "lamp.recording" ||
+            currentActivity?.spec === "lamp.scratch_image" ||
+            currentActivity?.spec === "lamp.tips" ? (
+            <EmbeddedActivity
+              name={currentActivity?.name}
+              activity={currentActivity}
+              participant={participant}
+              onComplete={() => {
+                completeActivity()
+              }}
+            />
+          ) : (
+            <Dialog
+              open={openNotImplemented}
+              onClose={() => setOpenNotImplemented(false)}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => {
+                    setOpenNotImplemented(false)
+                    completeActivity()
+                  }}
+                  color="primary"
+                >
+                  {t("Ok")}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          )}
+        </Box>
+      )}
       <Dialog
         open={openComplete}
         onClose={() => {

@@ -33,8 +33,6 @@ import ScratchCard from "../icons/ScratchCard.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
-import Goals from "./Goals"
-import HopeBoxSelect from "./HopeBoxSelect"
 import NewMedication from "./NewMedication"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
@@ -338,26 +336,11 @@ export default function Manage({ participant, activities, ...props }) {
       >
         {
           {
-            Goals: (
-              <Goals
-                participant={participant}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
             embed: (
               <EmbeddedActivity
                 name={activity?.name ?? ""}
                 activity={activity ?? []}
                 participant={participant}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            HopeBox: (
-              <HopeBoxSelect
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}

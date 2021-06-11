@@ -13,7 +13,6 @@ import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
 import NavigationLayout from "./NavigationLayout"
-import HopeBox from "./HopeBox"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 
@@ -340,17 +339,6 @@ function AppRouter({ ...props }) {
                 participant={getParticipant(props.match.params.id).id}
               />
             </NavigationLayout>
-          </React.Fragment>
-        )}
-      />
-
-      <Route
-        exact
-        path="/participant/:id/hopebox"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | {t("Hope Box")}</PageTitle>
-            <HopeBox goBack={props.history.goBack} />
           </React.Fragment>
         )}
       />

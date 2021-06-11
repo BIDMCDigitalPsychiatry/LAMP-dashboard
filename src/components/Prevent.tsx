@@ -426,7 +426,8 @@ async function getActivityEvents(
 
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id)
-  return [...original]
+  let originalFiltered = original.filter((data) => data.spec !== "lamp.recording")
+  return [...originalFiltered]
 }
 
 async function getSelectedActivities(participant: ParticipantObj) {
@@ -904,9 +905,10 @@ export default function Prevent({
           <Grid container spacing={2}>
             {(activities || [])
               .filter((x) => (selectedActivities || []).includes(x.name))
-              .map((activity) =>
-                activity.spec === "lamp.recording" ||
-                activity.spec === "lamp.journal" ||
+              .map((
+                activity // Uncomment if you want to view the Voice Recording Details on Prevent
+              ) =>
+                /*activity.spec === "lamp.recording" ||*/ activity.spec === "lamp.journal" ||
                 activity.spec === "lamp.dbt_diary_card" ? (
                   <Grid item xs={6} sm={3} md={3} lg={3}>
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
@@ -921,9 +923,9 @@ export default function Prevent({
                             setSelectedActivityName(
                               activity.spec === "lamp.journal"
                                 ? "Journal entries"
-                                : activity.spec === "lamp.recording"
-                                ? "Voice Recording entries"
-                                : "DBT entries"
+                                : /*: activity.spec === "lamp.recording" // Uncomment if you want to view the Voice Recording Details on Prevent 
+                                ? "Voice Recording entries"*/
+                                  "DBT entries"
                             )
                             setOpenData(true)
                           }
@@ -935,9 +937,9 @@ export default function Prevent({
                           </Box>
                           <Box mr={1} className={classes.preventRightSVG}>
                             {activity.spec === "lamp.journal" ? (
-                              <JournalBlue />
-                            ) : activity.spec === "lamp.recording" ? (
+                              <JournalBlue /> /*: activity.spec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
                               <PreventRecording />
+                            )*/
                             ) : (
                               <AssessDbt width="50" height="50" />
                             )}
@@ -1343,9 +1345,12 @@ export default function Prevent({
         </AppBar>
 
         {selectedActivityName === "Journal entries" ? (
-          <Journal participant={participant} selectedEvents={selectedActivity} />
-        ) : selectedSpec === "lamp.recording" ? (
+          <Journal
+            participant={participant}
+            selectedEvents={selectedActivity}
+          /> /* : selectedSpec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
           <VoiceRecoding participant={participant} selectedEvents={selectedActivity} />
+        ) */
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
         ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (

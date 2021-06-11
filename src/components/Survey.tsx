@@ -148,7 +148,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     calendatInput: {
       width: "100%",
-      "& input": { textAlign: "center", fontSize: 18, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+      "& input": {
+        textAlign: "center",
+        fontSize: 18,
+        fontWeight: 600,
+        color: "rgba(0, 0, 0, 0.75)",
+      },
     },
     mainIcons: {
       width: 100,
@@ -391,9 +396,8 @@ export default function Survey({
           </Box>
         </DialogActions>
       </Dialog>
-
       <ResponsiveDialog
-        transient={spec === "lamp.group" || spec === "lamp.survey" ? false : true}
+        transient={false}
         animate
         fullScreen
         open={openData}
