@@ -1357,15 +1357,12 @@ export default function Prevent({
             type={graphType === 2 ? (selectedActivity === "Environmental Context" ? envContexts : socialContexts) : []}
             events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
             graphType={graphType}
-            earliestDate={earliestDate}
-            enableEditMode={!_patientMode()}
+            earliestDate={earliestDate}            enableEditMode={!_patientMode()}
             onEditAction={onEditAction}
             onCopyAction={onCopyAction}
             onDeleteAction={onDeleteAction}
           />
-        )}   
-
-        
+        )} 
       </ResponsiveDialog>
     </Container>
   )
