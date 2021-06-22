@@ -164,7 +164,6 @@ export default function PatientProfile({
           <Activties participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
           <Sensors participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
-
           <div className={classes.buttonsContainer}>
             <Button className={classes.buttonContainer} onClick={() => updateName()}>
               <Typography className={classes.buttonText}>{t("Save")}</Typography>

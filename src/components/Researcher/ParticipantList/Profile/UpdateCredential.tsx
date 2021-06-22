@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Link, Icon, Box, Dialog, DialogContent, makeStyles, createStyles } from "@material-ui/core"
 import { CredentialManager, CredentialEditor, updateDetails } from "../../../CredentialManager"
+import { useTranslation } from "react-i18next"
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -11,6 +12,8 @@ const useStyles = makeStyles((theme) =>
 export default function UpdateCredential({ participant, allRoles, ext, ...props }) {
   const [showCredentials, setShowCredentials] = useState(false)
   const classes = useStyles()
+  const { t } = useTranslation()
+
   return (
     <Box>
       <Link
@@ -20,7 +23,7 @@ export default function UpdateCredential({ participant, allRoles, ext, ...props 
         className={classes.linkBtn}
       >
         <Icon>key</Icon>
-        Reset account password
+        {t("Reset account password")}
       </Link>
       <Dialog open={showCredentials} onClose={() => setShowCredentials(false)}>
         <DialogContent style={{ marginBottom: 12 }}>

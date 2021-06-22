@@ -612,5 +612,20 @@
 	"Add Sensor": "Add Sensor",
 	"Update Sensor": "Update Sensor",
 	"Please select the sensor spec": "Please select the sensor spec",
-	"Sensor spec": "Sensor spec"
+	"Sensor spec": "Sensor spec",
+	"Duplicate from" : "Duplicate from",
+	"No Activities": "No Activities",
+	"Nickname(optional)": "Nickname(optional)",
+	"Reset account password": "Reset account password",
+	"No Sensors": "No Sensors",
+	"Please enter Question Title": "Please enter Question Title",
+	"Review today's activities.": "Review today's activities.",
+	"There are no scheduled activities available.": "There are no scheduled activities available.",
+	"Find useful information and practice healthy habits." : "Find useful information and practice healthy habits.",
+	"Log feelings, behavior, and activity.": "Log feelings, behavior, and activity.",
+	"There are no Survey activities available.": "There are no Survey activities available.",
+	"There are no Manage activities available.": "There are no Manage activities available.",
+	"Last Passive": "Last Passive",
+	"Cortex": "Cortex",
+	"Rows per page:": "Rows per page:"
 }

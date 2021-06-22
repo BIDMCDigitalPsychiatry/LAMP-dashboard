@@ -143,7 +143,7 @@ export default function Sensors({
                 <Grid item className={classes.w120}></Grid>
               </Grid>
             ) : (
-              "No Sensors"
+              t("No Sensors")
             )}
           </Box>
           <Grid container>
