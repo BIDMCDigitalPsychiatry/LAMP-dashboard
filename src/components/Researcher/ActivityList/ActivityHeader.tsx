@@ -31,7 +31,7 @@ function compress(file, width, height) {
     }
   })
 }
-const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
+const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 
 export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
   const { t } = useTranslation()

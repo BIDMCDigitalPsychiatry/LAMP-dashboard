@@ -46,7 +46,7 @@ function compress(file, width, height) {
   })
 }
 
-const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
+const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
