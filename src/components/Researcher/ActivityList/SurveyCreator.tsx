@@ -243,10 +243,10 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
                 {t("Slider")}
               </Button>
               <Button color={type === "short" ? "primary" : "default"} onClick={() => setType("short")}>
-              {t("Short Answer")}
+                {t("Short Answer")}
               </Button>
               <Button color={type === "rating" ? "primary" : "default"} onClick={() => setType("rating")}>
-              {t("Rating")}
+                {t("Rating")}
               </Button>
             </ButtonGroup>
           </Grid>
@@ -262,7 +262,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
     </Step>
   )
 }
-const removeExtraSpace = (s) => s.trim().split(/ +/).join(" ")
+const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 export default function SurveyCreator({
   value,
   onSave,
