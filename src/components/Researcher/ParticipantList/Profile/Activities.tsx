@@ -142,7 +142,7 @@ export default function PatientProfile({
                 <Grid item className={classes.w120}></Grid>
               </Grid>
             ) : (
-              "No activities"
+              t("No Activities")
             )}
           </Box>
           <Grid container>

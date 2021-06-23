@@ -308,7 +308,7 @@ export default function Survey({
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
             <Icon>info</Icon>
-            <p>There are no Survey activities available.</p>
+            <p>{t("There are no Survey activities available.")}</p>
           </Box>
         )}
       </Grid>

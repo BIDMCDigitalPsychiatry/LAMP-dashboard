@@ -243,10 +243,10 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
                 {t("Slider")}
               </Button>
               <Button color={type === "short" ? "primary" : "default"} onClick={() => setType("short")}>
-                Short Answer
+              {t("Short Answer")}
               </Button>
               <Button color={type === "rating" ? "primary" : "default"} onClick={() => setType("rating")}>
-                Rating
+              {t("Rating")}
               </Button>
             </ButtonGroup>
           </Grid>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Grid, TablePagination } from "@material-ui/core"
+import { useTranslation } from "react-i18next"
 
 export default function Pagination({
   data,
@@ -15,6 +16,7 @@ export default function Pagination({
 }) {
   const [page, setPage] = useState(0)
   const [rowCount, setRowCount] = useState(defaultCount ?? 40)
+  const { t } = useTranslation()
 
   const handleRowChange = (event) => {
     setRowCount(event.target.value)
@@ -37,6 +39,7 @@ export default function Pagination({
     <Grid item xs={12}>
       <TablePagination
         component="div"
+        labelRowsPerPage={t("Rows per page:")}
         count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}

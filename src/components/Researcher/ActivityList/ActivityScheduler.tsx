@@ -89,8 +89,8 @@ export default function ActivityScheduler({ activity, activities, setActivities,
           <TableRow>
             <TableCell>{t("Start date")}</TableCell>
             <TableCell>{t("Time")}</TableCell>
-            <TableCell>{t("Repeat interval")}</TableCell>
-            <TableCell>{t("Custom times")}</TableCell>
+            <TableCell>{t("Repeat Interval")}</TableCell>
+            <TableCell>{t("Custom Times")}</TableCell>
             <TableCell>{t("Actions")}</TableCell>
           </TableRow>
         </TableHead>

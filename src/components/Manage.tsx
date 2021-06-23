@@ -277,7 +277,7 @@ export default function Manage({ participant, activities, ...props }) {
         ) : (
           <Box display="flex" className={classes.blankMsg} ml={1}>
             <Icon>info</Icon>
-            <p>There are no Manage activities available.</p>
+            <p>{t("There are no Manage activities available.")}</p>
           </Box>
         )}
       </Grid>
