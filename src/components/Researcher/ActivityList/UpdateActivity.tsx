@@ -121,6 +121,9 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       activity.spec === "lamp.dbt_diary_card" ||
       activity.spec === "lamp.recording"
     ) {
+      if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
+        delete activity.settings.audio
+      }
       let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
         !!y.error ? undefined : y.data
       )[0]
