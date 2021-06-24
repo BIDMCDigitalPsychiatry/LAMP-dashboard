@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
     },
     checkboxActive: { color: "#7599FF !important" },
-    participantHeader: { padding: "12px 5px 0" },
+    participantHeader: { padding: "12px 5px 0", wordBreak: "break-all" },
     moreBtn: {},
     participantSub: { padding: "0 5px", "&:last-child": { paddingBottom: 10 } },
     btnWhite: {
