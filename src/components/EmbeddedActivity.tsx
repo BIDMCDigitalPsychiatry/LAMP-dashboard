@@ -47,7 +47,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     setActivityId(currentActivity?.id ?? null)
-    if (currentActivity !== null) {
+    if (currentActivity !== null && !!currentActivity?.spec) {
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
