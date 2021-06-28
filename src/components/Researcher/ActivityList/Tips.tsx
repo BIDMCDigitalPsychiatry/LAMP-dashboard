@@ -193,11 +193,11 @@ export default function Tips({
   }, [categoryImage])
 
   useEffect(() => {
-    category === "add_new" ? validate() : ""
+    if (category === "add_new") validate()
   }, [newTipText])
 
   useEffect(() => {
-    isDuplicate ? validate() : ""
+    if (isDuplicate) validate()
   }, [duplicateTipText])
 
   useEffect(() => {

@@ -137,7 +137,7 @@ export default function AddUser({
     }
     setSelectedStudy("")
     closePopUp(3)
-    props.onClose as any
+    props.onClose()
   }
 
   const createNewStudy = () => {
@@ -172,7 +172,7 @@ export default function AddUser({
     }
     setSelectedStudy("")
     closePopUp(3)
-    props.onClose as any
+    props.onClose()
   }
 
   return (
