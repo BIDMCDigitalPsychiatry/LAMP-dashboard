@@ -139,7 +139,7 @@ export default function AddActivity({
     "lamp.spatial_span": t("Spatial Span"),
     "lamp.pop_the_bubbles": t("Pop the bubbles"),
     "lamp.balloon_risk": t("Balloon Risk"),
-    "lamp.recording": t("Voice Recording"),
+    //   "lamp.recording": t("Voice Recording"),
   }
 
   useEffect(() => {
