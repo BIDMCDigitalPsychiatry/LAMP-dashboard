@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   Typography,
@@ -48,12 +48,14 @@ export default function PatientProfile({
   studies,
   onClose,
   setUpdateCount,
+  openSettings,
   ...props
 }: {
   participant: any
   studies: any
   onClose: Function
   setUpdateCount: Function
+  openSettings: Function
 }) {
   const classes = useStyles()
   const [profileDialog, setProfileDialog] = useState(false)
@@ -66,6 +68,7 @@ export default function PatientProfile({
         color="primary"
         className={classes.btnWhite}
         onClick={() => {
+          openSettings(true)
           setProfileDialog(true)
         }}
       >
@@ -74,7 +77,14 @@ export default function PatientProfile({
       <ResponsiveDialog fullScreen transient={false} animate open={!!profileDialog}>
         <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
           <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setProfileDialog(false)} color="default" aria-label="Menu">
+            <IconButton
+              onClick={() => {
+                openSettings(false)
+                setProfileDialog(false)
+              }}
+              color="default"
+              aria-label="Menu"
+            >
               <Icon>arrow_back</Icon>
             </IconButton>
             <Typography variant="h5">
@@ -87,6 +97,7 @@ export default function PatientProfile({
           <PatientProfilePage
             participant={participant}
             onClose={(name) => {
+              openSettings(false)
               setProfileDialog(false)
               onClose(name)
             }}

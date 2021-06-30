@@ -92,6 +92,7 @@ export default function ParticipantListItem({
   const classes = useStyles()
   const [checked, setChecked] = React.useState(false)
   const [user, setName] = useState(participant)
+  const [openSettings, setOpenSettings] = useState(false)
 
   const handleChange = (participant, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
@@ -120,7 +121,9 @@ export default function ParticipantListItem({
         </Box>
         <Box flexGrow={1}>
           <CardHeader
-            title={<ParticipantName participant={user} />}
+            title={
+              <ParticipantName participant={user} updateParticipant={updateParticipant} openSettings={openSettings} />
+            }
             subheader={<Typography variant="overline">{participant.study_name}</Typography>}
             className={classes.participantHeader}
           />
@@ -138,6 +141,7 @@ export default function ParticipantListItem({
               studies={studies}
               onClose={updateParticipant}
               setUpdateCount={setUpdateCount}
+              openSettings={setOpenSettings}
             />
             <Fab
               size="small"

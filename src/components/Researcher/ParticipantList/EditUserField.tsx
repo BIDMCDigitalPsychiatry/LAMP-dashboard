@@ -89,12 +89,12 @@ export default function EditUserField({
           { variant: "error" }
         )
       )
+    if (!editing) setEditComplete(false)
   }, [editing])
 
   useEffect(() => {
     if (editData && editUserId === participant.id && !editComplete) {
       setEditing(true)
-
       if (!!editing || editData) {
         inputRef.current.focus()
       } else {
@@ -136,7 +136,7 @@ export default function EditUserField({
                   <IconButton
                     edge="end"
                     aria-label="save edit"
-                    onClick={() => updateEditing()}
+                    onClick={updateEditing}
                     onMouseDown={(event) => event.preventDefault()}
                   >
                     <Icon fontSize="small">{editing ? "check" : ""}</Icon>

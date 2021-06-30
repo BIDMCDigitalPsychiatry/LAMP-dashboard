@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Box, Icon, IconButton, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
 import EditUserField from "./EditUserField"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -12,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function ParticipantName({ participant, ...props }) {
+export default function ParticipantName({ participant, updateParticipant, openSettings, ...props }) {
   const classes = useStyles()
   const [editData, setEditData] = useState(false)
   const [editUserId, setEditUserId] = useState("")
@@ -20,9 +21,13 @@ export default function ParticipantName({ participant, ...props }) {
   const [name, setName] = useState(participant.name ?? "")
 
   useEffect(() => {
-    setName(participant.name)
-    setAliasName(participant.name)
+    setAliasName(participant.name ?? participant.id ?? "")
+    setName(participant.name ?? participant.id ?? "")
   }, [participant])
+
+  useEffect(() => {
+    if (openSettings) setEditData(false)
+  }, [openSettings])
 
   const editNameTextField = (id, event) => {
     setEditData(true)
@@ -32,6 +37,8 @@ export default function ParticipantName({ participant, ...props }) {
   const updateName = (data) => {
     setEditData(false)
     setAliasName(data?.trim() || "")
+    setName(data?.trim() || "")
+    updateParticipant(data?.trim() || "")
   }
 
   return (
