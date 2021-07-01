@@ -628,7 +628,6 @@
 	"Last Passive": "Last Passive",
 	"Cortex": "Cortex",
 	"Rows per page:": "Rows per page:",
-	"Voice Recording has been saved Successfully.": "Voice Recording has been saved Successfully.",
 	"Success": "Success",
 	"Take steps to refocus, reflect, and recover.": "Take steps to refocus, reflect, and recover.",
 	"Track progress and make connections.": "Track progress and make connections.",
@@ -659,5 +658,13 @@
 	"Spend some time scratching off an image to relax yourself": "Spend some time scratching off an image to relax yourself",
 	"Cortex data": "Cortex data",
 	"Studies": "Studies",
-	"Schedule": "Schedule"
+	"Schedule": "Schedule",
+	"Please enter Option": "Please enter Option",
+	"Whether taps are going forwards or backwards.": "Whether taps are going forwards or backwards.",
+	"The number diamonds in Jewels game": "The number diamonds in Jewels game",
+	"This activity will be deleted for all the participants under this study. Are you sure you want to proceed?": "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?",
+	"Are you sure you want to delete this sensor" : "Are you sure you want to delete this sensor",
+	"The duration between bubbles.": "The duration between bubbles.",
+	"Bubble Count": "Bubble Count",
+	"Add Item": "Add Item"
 }
