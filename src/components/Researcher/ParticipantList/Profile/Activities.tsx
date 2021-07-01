@@ -136,7 +136,7 @@ export default function PatientProfile({
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    {t("SCHEDULE")}
+                    {t("Schedule")}
                   </Typography>
                 </Grid>
                 <Grid item className={classes.w120}></Grid>

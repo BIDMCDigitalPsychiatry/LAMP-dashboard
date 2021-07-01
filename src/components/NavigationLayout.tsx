@@ -331,7 +331,7 @@ export default function NavigationLayout({
                     onClick={handleClick}
                   >
                     <Icon>account_circle</Icon>
-                    {title} <Icon>arrow_drop_down</Icon>
+                    {t(title)} <Icon>arrow_drop_down</Icon>
                   </Fab>
                   <Popover
                     classes={{ root: classes.customPopover, paper: classes.customPaper }}

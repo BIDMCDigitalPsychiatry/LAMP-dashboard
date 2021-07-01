@@ -108,7 +108,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 setStudyId(e.target.value)
               }}
               helperText={
-                typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the study") : ""
+                typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the Study") : ""
               }
               variant="filled"
               disabled={!!value ? true : false}

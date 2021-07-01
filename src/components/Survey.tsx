@@ -168,6 +168,14 @@ const useStyles = makeStyles((theme: Theme) =>
       "& p": { margin: "2px 5px" },
     },
     niceWorkbadge: { position: "relative", "& span": { fontSize: "110px", color: "#2F9D7E" } },
+    dayNotification: {
+      position: "absolute",
+      top: 0,
+      width: "100%",
+      paddingTop: 50,
+      "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
+      "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
+    },
   })
 )
 
@@ -211,8 +219,8 @@ export default function Survey({
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [questionCount, setQuestionCount] = useState(0)
+  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const { t } = useTranslation()
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
@@ -222,6 +230,11 @@ export default function Survey({
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
+  }
+
+  const submitSurveyType = (response) => {
+    setOpenData(false)
+    onComplete(response)
   }
 
   const submitEmbeddedActivity = (response) => {
@@ -236,11 +249,6 @@ export default function Survey({
       setOpenData(false)
       onComplete(null)
     }
-  }
-
-  const submitSurveyType = (response) => {
-    setOpenData(false)
-    onComplete(response)
   }
 
   useEffect(() => {
@@ -271,7 +279,6 @@ export default function Survey({
       setLoading(false)
     }
   }, [])
-
   // var date = new Date()
   // date.setDate(date.getDate() - 21)
 
