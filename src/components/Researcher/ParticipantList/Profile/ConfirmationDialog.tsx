@@ -31,7 +31,7 @@ export default function ConfirmationDialog({
               )
             : confirmationDialog === 2
             ? t(
-                "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?."
+                "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?"
               )
             : confirmationDialog === 3
             ? t(

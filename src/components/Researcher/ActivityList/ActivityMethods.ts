@@ -135,7 +135,7 @@ export const SchemaList = () => {
               title: i18n.t("Tap Order"),
               description: i18n.t("Whether taps are going forwards or backwards."),
               type: "boolean",
-              enumNames: [i18n.t("Backwards"), i18n.t("Forwards")],
+              enumNames: [i18n.t("Backward"), i18n.t("Forward")],
               default: true,
               "ui:widget": "radio",
             },

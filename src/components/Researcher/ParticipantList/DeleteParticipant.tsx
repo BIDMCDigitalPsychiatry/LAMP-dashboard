@@ -68,7 +68,7 @@ export default function DeleteParticipant({ participants, setParticipants, setUp
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={deleteParticipants}
-        confirmationMsg={"Are you sure you want to delete this Participant(s)?"}
+        confirmationMsg={"Are you sure you want to delete this Participant?"}
       />
     </span>
   )

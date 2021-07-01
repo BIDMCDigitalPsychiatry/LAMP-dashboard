@@ -89,8 +89,10 @@ export default function DeleteActivity({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?."
-            : "Are you sure you want to delete this activity(s)?."
+            ? t(
+                "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?"
+              )
+            : t("Are you sure you want to delete this Activity?")
         }
       />
     </span>
