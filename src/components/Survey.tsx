@@ -167,6 +167,7 @@ const useStyles = makeStyles((theme: Theme) =>
       "& path": { fill: "#666" },
       "& p": { margin: "2px 5px" },
     },
+    niceWorkbadge: { position: "relative", "& span": { fontSize: "110px", color: "#2F9D7E" } },
   })
 )
 
@@ -210,6 +211,7 @@ export default function Survey({
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
   const [openData, setOpenData] = React.useState(false)
+  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [questionCount, setQuestionCount] = useState(0)
   const { t } = useTranslation()
   const [spec, setSpec] = useState(null)
@@ -220,6 +222,20 @@ export default function Survey({
   const handleClickOpen = (type: string) => {
     setDialogueType(type)
     setOpen(true)
+  }
+
+  const submitEmbeddedActivity = (response) => {
+    if (spec === "lamp.recording") {
+      setOpenRecordSuccess(true)
+      setTimeout(function () {
+        setOpenRecordSuccess(false)
+        setOpenData(false)
+        onComplete(null)
+      }, 2000)
+    } else {
+      setOpenData(false)
+      onComplete(null)
+    }
   }
 
   const submitSurveyType = (response) => {
@@ -255,6 +271,7 @@ export default function Survey({
       setLoading(false)
     }
   }, [])
+
   // var date = new Date()
   // date.setDate(date.getDate() - 21)
 
@@ -410,10 +427,7 @@ export default function Survey({
             name={activity?.name ?? ""}
             activity={activity ?? []}
             participant={participant}
-            onComplete={() => {
-              setOpenData(false)
-              onComplete(null)
-            }}
+            onComplete={submitEmbeddedActivity}
           />
         ) : spec === "lamp.group" ? (
           <GroupActivity
@@ -432,6 +446,37 @@ export default function Survey({
             onComplete={submitSurveyType}
           />
         )}
+        <Dialog
+          open={openRecordSuccess}
+          onClose={() => setOpenRecordSuccess(false)}
+          scroll="paper"
+          aria-labelledby="alert-dialog-slide-title"
+          aria-describedby="alert-dialog-slide-description"
+          classes={{
+            root: classes.dialogueStyle,
+            paper: classes.dialogueCurve,
+            paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+          }}
+        >
+          <DialogTitle>
+            <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenRecordSuccess(false)}>
+              <Icon>close</Icon>
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <Box textAlign="center" pb={4} className={classes.niceWork}>
+              <Typography variant="h5" gutterBottom>
+                {t("Success") + "!"}
+              </Typography>
+              <Typography className={classes.ribbonText} component="p">
+                {t("Voice Recorded has been submitted Successfully.")}
+              </Typography>
+              <Box textAlign="center" className={classes.niceWorkbadge}>
+                <Icon>check_circle</Icon>
+              </Box>
+            </Box>
+          </DialogContent>
+        </Dialog>
       </ResponsiveDialog>
     </Container>
   )

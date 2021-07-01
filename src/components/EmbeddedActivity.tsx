@@ -74,9 +74,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onComplete()
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
-            if (currentActivity?.spec === "lamp.recording") {
-              formatAndSaveToS3(data)
-            }
             delete data["activity"]
             data["activity"] = activityId
             if (
@@ -119,8 +116,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       }
     }
   }, [embeddedActivity])
-
-  const formatAndSaveToS3 = (data) => {}
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)

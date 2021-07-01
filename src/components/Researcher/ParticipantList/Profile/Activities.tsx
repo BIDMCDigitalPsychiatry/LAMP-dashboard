@@ -126,17 +126,17 @@ export default function PatientProfile({
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    NAME
+                    {t("Name")}
                   </Typography>
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    Type
+                    {t("Type")}
                   </Typography>
                 </Grid>
                 <Grid item xs>
                   <Typography className={classes.contentText} style={{ flex: 1 }}>
-                    SCHEDULE
+                    {t("SCHEDULE")}
                   </Typography>
                 </Grid>
                 <Grid item className={classes.w120}></Grid>
