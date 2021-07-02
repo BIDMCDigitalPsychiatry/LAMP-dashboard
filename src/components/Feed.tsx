@@ -883,14 +883,7 @@ export default function Feed({
         </Grid>
       </Grid>
       <ResponsiveDialog
-        transient={
-          launchedActivity === "game" ||
-          launchedActivity === "lamp.dbt_diary_card" ||
-          launchedActivity === "lamp.survey" ||
-          launchedActivity === "lamp.tips"
-            ? true
-            : false
-        }
+        transient={false}
         animate
         fullScreen
         open={!!launchedActivity}

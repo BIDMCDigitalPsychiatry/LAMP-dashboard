@@ -238,16 +238,16 @@ export default function Survey({
   }
 
   const submitEmbeddedActivity = (response) => {
-    if (spec === "lamp.recording") {
+    if (response.clickBack || spec !== "lamp.recording") {
+      setOpenData(false)
+      onComplete(null)
+    } else {
       setOpenRecordSuccess(true)
       setTimeout(function () {
         setOpenRecordSuccess(false)
         setOpenData(false)
         onComplete(null)
       }, 2000)
-    } else {
-      setOpenData(false)
-      onComplete(null)
     }
   }
 
