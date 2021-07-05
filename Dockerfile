@@ -1,7 +1,7 @@
 FROM node:14.0
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install
+RUN npm cache clean -f && npm install
 COPY . .
 RUN npm run build
 FROM nginx:alpine
