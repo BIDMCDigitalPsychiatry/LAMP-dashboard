@@ -28,7 +28,7 @@ const ObjectFieldTemplate = ({
   const { t } = useTranslation()
   return (
     <>
-      {!!properties && properties.length > 0 && (uiSchema["ui:title"] || title) && (
+      {!!properties && (properties || []).length > 0 && (uiSchema["ui:title"] || title) && (
         <TitleField id={`${idSchema.$id}-title`} title={t(title)} required={required} />
       )}
       {description && <DescriptionField id={`${idSchema.$id}-description`} description={t(description)} />}
