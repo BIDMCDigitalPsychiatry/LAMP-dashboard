@@ -111,7 +111,7 @@ export default function Sensors({
           />
         </Box>
       </Box>
-      {selectedSensors.length > 0 && (
+      {(selectedSensors || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <DeleteSensor
             sensors={selectedSensors}
@@ -127,7 +127,7 @@ export default function Sensors({
       <Grid container spacing={0}>
         <Grid item xs={12} sm={12}>
           <Box p={1}>
-            {sensors.length > 0 ? (
+            {(sensors || []).length > 0 ? (
               <Grid container>
                 <Grid item className={classes.w45}></Grid>
                 <Grid item xs>

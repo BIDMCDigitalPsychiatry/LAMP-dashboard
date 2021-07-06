@@ -86,7 +86,7 @@ export default function Header({
           />
         </Box>
       )}
-      {selectedSensors.length > 0 && (
+      {(selectedSensors || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <DeleteSensor sensors={selectedSensors} setSensors={setSensors} setUpdateCount={setUpdateCount} />

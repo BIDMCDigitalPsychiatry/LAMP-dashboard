@@ -108,7 +108,7 @@ export default function PatientProfile({
           />
         </Box>
       </Box>
-      {selectedActivities.length > 0 && (
+      {(selectedActivities || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <DeleteActivity
             activities={selectedActivities}

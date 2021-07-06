@@ -89,7 +89,7 @@ export default function Header({
           />
         </Box>
       )}
-      {selectedParticipants.length > 0 && (
+      {(selectedParticipants || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <DeleteParticipant
