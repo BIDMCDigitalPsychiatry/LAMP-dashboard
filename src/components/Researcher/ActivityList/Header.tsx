@@ -87,7 +87,7 @@ export default function Header({
           setUpdateCount={setUpdateCount}
         />
       </Box>
-      {selectedActivities.length > 0 && (
+      {(selectedActivities || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <ExportActivity activities={selectedActivities} />

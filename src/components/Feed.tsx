@@ -475,7 +475,7 @@ export default function Feed({
     let selectedWeekViewDays = []
     let scheduleTime, scheduleStartDate
     let savedData = []
-    if (feeds.length > 0) {
+    if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
         savedData = events.filter((event) => event.activity === feed.id)

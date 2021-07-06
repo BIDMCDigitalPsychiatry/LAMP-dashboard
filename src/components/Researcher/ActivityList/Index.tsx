@@ -96,7 +96,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies.length > 0) {
+    if ((selectedStudies || []).length > 0) {
       searchActivities()
     }
   }, [selectedStudies])

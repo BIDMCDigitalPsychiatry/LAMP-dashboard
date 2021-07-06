@@ -115,8 +115,8 @@ export default function StudiesList({
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
-          {allStudies !== null && allStudies.length > 0 ? (
-            allStudies.map((study) => (
+          {allStudies !== null && (allStudies || []).length > 0 ? (
+            (allStudies || []).map((study) => (
               <Grid item lg={6} xs={12} key={study.id}>
                 <Box display="flex" p={1} className={classes.studyMain}>
                   <Box flexGrow={1}>
