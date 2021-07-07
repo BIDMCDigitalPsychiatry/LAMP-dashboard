@@ -238,7 +238,7 @@ export default function Survey({
   }
 
   const submitEmbeddedActivity = (response) => {
-    if (response.clickBack || spec !== "lamp.recording") {
+    if (!!response?.clickBack || spec !== "lamp.recording") {
       setOpenData(false)
       onComplete(null)
     } else {
