@@ -97,7 +97,7 @@ export default function PatientProfile({
   onClose: Function
   setUpdateCount: Function
 }) {
-  const [nickname, setNickname] = useState(participant.name)
+  const [nickname, setNickname] = useState(participant?.name ?? "")
   const [loading, setLoading] = React.useState(false)
   const [ext, setExt] = useState([])
   const [allRoles, setAllRoles] = useState({})
