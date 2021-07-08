@@ -179,13 +179,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
-function _shouldRestrict() {
-  return _patientMode()
-}
-
 async function getDetails(activityId: string, spec: string) {
   return [
     await LAMP.Type.getAttachment(
@@ -256,7 +249,7 @@ export default function Survey({
         x.spec === "lamp.group" ||
         x.spec === "lamp.dbt_diary_card" ||
         x.spec === "lamp.recording" ||
-        (x.spec === "lamp.survey" && (_shouldRestrict() ? x.name.includes("SELF REPORT") : true))
+        x.spec === "lamp.survey"
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
