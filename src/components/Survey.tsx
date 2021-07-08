@@ -179,14 +179,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _hideCareTeam() {
-  return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
-}
 function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
 function _shouldRestrict() {
-  return _patientMode() && _hideCareTeam()
+  return _patientMode()
 }
 
 async function getDetails(activityId: string, spec: string) {
