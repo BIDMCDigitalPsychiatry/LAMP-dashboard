@@ -12,6 +12,10 @@ const useStyles = makeStyles((theme: Theme) =>
       border: "1px solid #C6C6C6",
       background: "#FFFFFF",
       color: "rgba(0, 0, 0, 0.4)",
+      height: "auto",
+      minHeight: "32px",
+      paddingTop: "5px",
+      paddingBottom: "5px",
       "&:focus": { background: "#FFFFFF !important" },
     },
     multiselectPrimary: {
@@ -29,6 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "15px auto 0",
       width: "100%",
     },
+    chiplabel: { whiteSpace: "break-spaces" },
   })
 )
 export default function MultipleSelect({ ...props }) {
@@ -44,7 +49,7 @@ export default function MultipleSelect({ ...props }) {
           title={(props.tooltips || {})[item] || props.defaultTooltip || item}
         >
           <Chip
-            classes={{ root: classes.multiselect, colorPrimary: classes.multiselectPrimary }}
+            classes={{ root: classes.multiselect, colorPrimary: classes.multiselectPrimary, label: classes.chiplabel }}
             label={
               <section>
                 {t(item)}
