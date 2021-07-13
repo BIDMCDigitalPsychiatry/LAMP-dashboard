@@ -77,8 +77,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             delete data["activity"]
             data["activity"] = activityId
             if (
-              (currentActivity?.spec === "lamp.scratch_image" && data?.completed) ||
-              currentActivity?.spec !== "lamp.scratch_image"
+              ((currentActivity?.spec === "lamp.scratch_image" || currentActivity?.spec === "lamp.tips") &&
+                data?.completed) ||
+              (currentActivity?.spec !== "lamp.scratch_image" && currentActivity?.spec !== "lamp.tips")
             ) {
               setData(data)
               setEmbeddedActivity(undefined)
@@ -110,7 +111,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             console.dir(e)
           })
           .then((x) => {
-            if (activitySpec !== "lamp.scratch_image") {
+            if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
               setSaved(true)
               activitySpec === "lamp.recording" ? onComplete(data) : onComplete()
             }
@@ -125,7 +126,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
     let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    //let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
