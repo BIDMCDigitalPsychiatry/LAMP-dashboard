@@ -145,10 +145,7 @@ export default function AddActivity({
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
       setActivitySpecs(
-        res.filter(
-          (x: any) =>
-            availableActivitySpecs.includes(x.id) && !["lamp.group", "lamp.survey", "lamp.recording"].includes(x.id)
-        )
+        res.filter((x: any) => availableActivitySpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
       )
     })
   }, [])
