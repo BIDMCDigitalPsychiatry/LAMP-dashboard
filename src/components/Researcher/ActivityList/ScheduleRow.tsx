@@ -122,7 +122,7 @@ export default function ScheduleRow({
                 </MenuItem>
               ))}
             </Select>
-            <FormHelperText>Select the Repeat interval.</FormHelperText>
+            <FormHelperText>{t("Select the Repeat interval.")}</FormHelperText>
           </FormControl>
         )}
       </TableCell>
