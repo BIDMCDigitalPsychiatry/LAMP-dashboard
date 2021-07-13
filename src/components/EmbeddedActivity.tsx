@@ -77,10 +77,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             delete data["activity"]
             data["activity"] = activityId
             if (
-              (currentActivity?.spec === "lamp.scratch_image" && data.completed) ||
+              (currentActivity?.spec === "lamp.scratch_image" && data?.completed) ||
               currentActivity?.spec !== "lamp.scratch_image"
             ) {
-              currentActivity?.spec !== "lamp.tips" ? setData(data) : data?.completed ? onComplete() : {}
+              setData(data)
               setEmbeddedActivity(undefined)
               setSettings(null)
               setActivityId(null)
@@ -98,9 +98,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       if (activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
-      } else if (activitySpec === "lamp.scratch_image" && data.completed) {
+      } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
         setSaved(true)
         setCurrentActivity(null)
+        onComplete()
+      } else if (activitySpec === "lamp.tips" && data?.completed) {
         onComplete()
       } else {
         LAMP.ActivityEvent.create(participant.id, data)
