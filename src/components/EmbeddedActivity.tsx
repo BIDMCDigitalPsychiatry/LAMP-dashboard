@@ -80,7 +80,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               (currentActivity?.spec === "lamp.scratch_image" && data.completed) ||
               currentActivity?.spec !== "lamp.scratch_image"
             ) {
-              setData(data)
+              currentActivity?.spec !== "lamp.tips" ? setData(data) : data?.completed ? onComplete() : {}
               setEmbeddedActivity(undefined)
               setSettings(null)
               setActivityId(null)
@@ -110,11 +110,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           .then((x) => {
             if (activitySpec !== "lamp.scratch_image") {
               setSaved(true)
-              if (activitySpec === "lamp.recording") {
-                onComplete(data)
-              } else {
-                onComplete()
-              }
+              activitySpec === "lamp.recording" ? onComplete(data) : onComplete()
             }
           })
       }
@@ -142,7 +138,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;"
           srcDoc={embeddedActivity}
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-same-origin allow-scripts allow-top-navigation"
         />
       )}
       <Backdrop className={classes.backdrop} open={loading}>
