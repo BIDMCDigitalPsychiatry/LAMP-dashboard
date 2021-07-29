@@ -18,7 +18,13 @@ export default function Sparkline({ ...props }) {
   }, [])
 
   if (props.data.length === 1) {
-    props.data[0].x = new Date(props.data[0].x).toLocaleString()
+    let propsDate = new Date(props.data[0].x)
+    let timeString = propsDate.toLocaleTimeString()
+    let curreDate = propsDate.getDate().toString().padStart(2, "0")
+    var curreMonth = (propsDate.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+    var curreYear = propsDate.getFullYear()
+    let dateTimeString = curreMonth + "/" + curreDate + "/" + curreYear + ", " + timeString
+    props.data[0].x = dateTimeString
   }
 
   const handleClick = (...args) => {
