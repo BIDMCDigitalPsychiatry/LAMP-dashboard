@@ -143,7 +143,9 @@ function getDates(startDate, endDate) {
   let curr = new Date(parseInt(startDate))
   let end = new Date(parseInt(endDate))
   while (curr.getTime() <= end.getTime()) {
-    let day = curr.getFullYear() + "-" + (curr.getMonth() + 1) + "-" + curr.getDate()
+    let curMonth = (curr.getMonth() + 1).toString().padStart(2, "0")
+    let curDate = curr.getDate().toString().padStart(2, "0")
+    let day = curr.getFullYear() + "-" + curMonth + "-" + curDate
     dates.push(day)
     curr.setDate(curr.getDate() + 1)
   }
@@ -215,8 +217,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     setDateArray(dateArray)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
-      var curr_date = date.getDate()
-      var curr_month = date.getMonth() + 1 //Months are zero based
+      var curr_date = date.getDate().toString().padStart(2, "0")
+      var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
       event.temporal_slices.map((slice) => {
         if (slice.level === "skill") {
           !!skills[curr_month + "/" + curr_date]
@@ -258,8 +260,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = emotionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {
@@ -273,7 +275,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         })
       })
-
       let dates = getDates(timeStamp[1], timeStamp[0])
       dates.map((d) => {
         if (emotionData.length === 0) {
@@ -295,11 +296,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = effectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
-
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -311,7 +311,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         })
       })
-
       let dates = getDates(timeStamp[1], timeStamp[0])
       dates.map((d) => {
         if (effectivesData.length === 0) {
@@ -320,7 +319,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         }
       })
-
       let effectiveD = JSON.parse(JSON.stringify(effective))
       effectiveD.data.values = effectivesData
       effectiveD.title = t(effectiveD.title)
@@ -334,11 +332,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = inEffectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
-
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -350,7 +347,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         })
       })
-
       let dates = getDates(timeStamp[1], timeStamp[0])
       dates.map((d) => {
         if (inEffectiveData.length === 0) {
@@ -359,7 +355,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         }
       })
-
       let ineffectiveD = JSON.parse(JSON.stringify(ineffective))
       ineffectiveD.data.values = inEffectiveData
       ineffectiveD.title = t(ineffectiveD.title)
@@ -374,11 +369,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = actionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
-
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             if (
@@ -393,7 +387,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       Object.keys(tData).forEach(function (key) {
         timelineData.push({ date: key, count: tData[key], action: "Effective/Ineffective" })
       })
-
       let selfcareD = JSON.parse(JSON.stringify(selfcare))
       selfcareD.data.values = timelineData
       selfcareD.title = t(selfcareD.title)
