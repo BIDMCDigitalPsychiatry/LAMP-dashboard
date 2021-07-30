@@ -20,6 +20,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -97,6 +98,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [loading, setLoading] = useState(true)
   const [activityDetails, setActivityDetails] = useState(null)
   const { t } = useTranslation()
+  const [response, setResponse] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -154,8 +156,22 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     })
   }
   return (
-    <div style={{ height: "100%" }}>
-      {loaded &&
+    <div style={{ height: "100%", marginTop: "45%" }}>
+      {!!response && (
+        <Box textAlign="center" pb={4} className={classes.niceWork}>
+          <Typography variant="h5" gutterBottom>
+            {t("Success") + "!"}
+          </Typography>
+          <Typography className={classes.ribbonText} component="p">
+            {t("You have successfully completed your activity.")}
+          </Typography>
+          <Box textAlign="center" className={classes.niceWorkbadge}>
+            <Icon>check_circle</Icon>
+          </Box>
+        </Box>
+      )}
+      {!response &&
+        loaded &&
         (activity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             participant={participant}
@@ -176,13 +192,18 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           activity?.spec === "lamp.recording" ||
           activity?.spec === "lamp.scratch_image" ||
           activity?.spec === "lamp.tips" ? (
-          <EmbeddedActivity name={activity?.name} activity={activity} participant={participant} onComplete={() => {}} />
+          <EmbeddedActivity
+            name={activity?.name}
+            activity={activity}
+            participant={participant}
+            onComplete={() => setResponse(true)}
+          />
         ) : activity?.spec === "lamp.group" ? (
           <GroupActivity
             activity={activity}
             participant={participant}
             submitSurvey={submitSurvey}
-            onComplete={() => {}}
+            onComplete={() => setResponse(true)}
           />
         ) : (
           <Dialog
