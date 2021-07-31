@@ -106,7 +106,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       } else if (activitySpec === "lamp.tips" && data?.completed) {
         onComplete()
       } else {
-        LAMP.ActivityEvent.create(participant.id, data)
+        LAMP.ActivityEvent.create(participant?.id ?? participant, data)
           .catch((e) => {
             console.dir(e)
           })
