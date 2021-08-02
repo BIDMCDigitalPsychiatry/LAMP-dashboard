@@ -467,8 +467,6 @@ export default function Feed({
 
   const getDetails = () => {
     let currentFeed = []
-    let currentDate = new Date(date)
-    let startD = new Date(date)
     date.setHours(0)
     date.setMinutes(0)
     date.setSeconds(0)
@@ -478,6 +476,8 @@ export default function Feed({
     if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
+        let currentDate = new Date(date)
+        let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
           scheduleStartDate = new Date(schedule.start_date)
