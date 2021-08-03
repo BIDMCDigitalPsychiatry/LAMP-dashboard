@@ -147,12 +147,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
       getEvents(participant, activity.id).then((steak) => {
+        setResponse(true)
         setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })
       setTimeout(() => {
-        window.location.href = "/#/"
+        setOpenComplete(false)
       }, 10000)
     })
   }
