@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "0 42px",
   },
   niceWork: {
+    marginTop: "20%",
     "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
   },
   dialogueStyle: {
@@ -156,7 +157,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
     })
   }
   return (
-    <div style={{ height: "100%", marginTop: "45%" }}>
+    <div style={{ height: "100%" }}>
       {!!response && (
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
