@@ -152,7 +152,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         setLoading(false)
       })
       setTimeout(() => {
-        window.location.href = "/#/"
+        setResponse(true)
       }, 10000)
     })
   }
