@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
     padding: "0 42px",
   },
   niceWork: {
+    marginTop: "20%",
     "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
   },
   dialogueStyle: {
@@ -146,17 +147,18 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
       getEvents(participant, activity.id).then((steak) => {
+        setResponse(true)
         setSteak(steak)
         setOpenComplete(true)
         setLoading(false)
       })
       setTimeout(() => {
-        window.location.href = "/#/"
+        setOpenComplete(false)
       }, 10000)
     })
   }
   return (
-    <div style={{ height: "100%", marginTop: "45%" }}>
+    <div style={{ height: "100%" }}>
       {!!response && (
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>

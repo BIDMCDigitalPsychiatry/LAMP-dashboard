@@ -131,7 +131,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
     setIndex(val)
     setActivityRun(true)
     if (groupActivities.length === val) {
-      LAMP.ActivityEvent.create(participant.id, {
+      LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
         duration: new Date().getTime() - startTime,
         activity: activity.id,
