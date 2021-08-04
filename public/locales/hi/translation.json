@@ -667,5 +667,6 @@
 	"The duration between bubbles.": "बुलबुलो के बीच की अवधि |",
 	"Bubble Count": "बुलबुलो की संख्या ", 
 	"Add Item": "आइटम जोडें",
-	"Select the Repeat interval.": "Select the Repeat interval."
+	"Select the Repeat interval.": "Select the Repeat interval.",
+	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
 }

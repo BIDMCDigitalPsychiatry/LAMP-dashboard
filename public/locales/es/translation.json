@@ -667,5 +667,6 @@
 	"The duration between bubbles.": "The duration between bubbles.",
 	"Bubble Count": "Bubble Count",
 	"Add Item": "Add Item",
-	"Select the Repeat interval.": "Select the Repeat interval."
+	"Select the Repeat interval.": "Select the Repeat interval.",
+	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
 }
