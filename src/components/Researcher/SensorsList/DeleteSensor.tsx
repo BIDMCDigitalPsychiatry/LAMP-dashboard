@@ -136,8 +136,8 @@ export default function DeleteSensor({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?."
-            : "Are you sure you want to delete this sensor(s)?."
+            ? "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
+            : "Are you sure you want to delete this sensor?"
         }
       />
     </span>

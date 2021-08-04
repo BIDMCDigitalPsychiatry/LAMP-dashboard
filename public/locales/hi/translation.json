@@ -663,9 +663,10 @@
 	"Whether taps are going forwards or backwards.": "Whether taps are going forwards or backwards.",
 	"The number diamonds in Jewels game": "The number diamonds in Jewels game",
 	"This activity will be deleted for all the participants under this study. Are you sure you want to proceed?": "This activity will be deleted for all the participants under this study. Are you sure you want to proceed?",
-	"Are you sure you want to delete this sensor" : "Are you sure you want to delete this sensor",
+	"Are you sure you want to delete this sensor?" : "Are you sure you want to delete this sensor?",
 	"The duration between bubbles.": "The duration between bubbles.",
 	"Bubble Count": "Bubble Count",
 	"Add Item": "Add Item",
-	"Select the Repeat interval.": "Select the Repeat interval."
+	"Select the Repeat interval.": "Select the Repeat interval.",
+	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
 }
