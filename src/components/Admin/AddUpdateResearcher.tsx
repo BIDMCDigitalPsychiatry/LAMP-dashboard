@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Box,
   DialogContent,
@@ -11,6 +11,7 @@ import {
   DialogActions,
   TextField,
   Button,
+  MenuItem,
 } from "@material-ui/core"
 import SearchBox from "../SearchBox"
 import LAMP, { Researcher } from "lamp-core"
@@ -71,18 +72,22 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export default function AddUpdateResearcher({
+  authuserType,
   researcher,
   researchers,
   refreshResearchers,
   setName,
   updateStore,
+  setType,
   ...props
 }: {
+  authuserType?: string
   researcher?: any
   researchers?: any
   refreshResearchers?: Function
   setName?: Function
   updateStore?: Function
+  setType?: Function
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -90,7 +95,10 @@ export default function AddUpdateResearcher({
   const [open, setOpen] = useState(false)
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
   const [rData, setRdara] = useState(researcher)
-
+  const [userType, setUserType] = useState("researcher")
+  useEffect(() => {
+    console.log(authuserType)
+  }, [])
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
       !!researcher
@@ -103,19 +111,27 @@ export default function AddUpdateResearcher({
     } else {
       const researcherObj = new Researcher()
       researcherObj.name = name.trim()
-      if (
-        !!researcher
-          ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any).error === undefined
-          : ((await LAMP.Researcher.create(researcherObj)) as any).error === undefined
-      ) {
+      let result = !!researcher
+        ? ((await LAMP.Researcher.update(researcher.id, researcherObj)) as any)
+        : ((await LAMP.Researcher.create(researcherObj)) as any)
+      if (result?.error !== undefined) {
+        enqueueSnackbar(t("Failed to create a new researcher."), {
+          variant: "error",
+        })
+      } else {
         if (!!researcher) {
           updateStore(researcher.id)
           setName(name.trim())
-          setRdara({ ...rData, name: name.trim() })
+          setType(userType)
+          setRdara({ ...rData, name: name.trim(), userType: userType })
         } else {
           setResearcherName("")
+          setUserType("researcher")
           refreshResearchers()
         }
+        await LAMP.Type.setAttachment(!!researcher ? researcher.id : result.data, "me", "lamp.dashboard.user_type", {
+          userType: userType,
+        })
         enqueueSnackbar(
           !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
           {
@@ -123,10 +139,7 @@ export default function AddUpdateResearcher({
           }
         )
         setOpen(false)
-      } else
-        enqueueSnackbar(t("Failed to create a new researcher."), {
-          variant: "error",
-        })
+      }
     }
   }
 
@@ -143,11 +156,34 @@ export default function AddUpdateResearcher({
       )}
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
         <DialogContent>
+          {authuserType === "admin" && (
+            <TextField
+              select
+              autoFocus
+              fullWidth
+              label={t("User type")}
+              value={userType}
+              onChange={(e) => {
+                setUserType(e.target.value)
+              }}
+              inputProps={{ maxLength: 80 }}
+            >
+              <MenuItem key="user_admin" value="user_admin">
+                User Administartor
+              </MenuItem>
+              <MenuItem key="clinical_admin" value="clinical_admin">
+                Clinical Administartor
+              </MenuItem>
+              <MenuItem key="researcher" value="researcher">
+                Researcher
+              </MenuItem>
+            </TextField>
+          )}
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            label={t("Name")}
+            label={t(authuserType !== "admin" ? "Clinician" : "Name")}
             fullWidth
             onChange={(event) => setResearcherName(event.target.value)}
             value={name}

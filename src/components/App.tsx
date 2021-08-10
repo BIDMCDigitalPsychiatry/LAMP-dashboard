@@ -89,6 +89,7 @@ function AppRouter({ ...props }) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
+  const [userType, setUserType] = useState("researcher")
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -240,6 +241,7 @@ function AppRouter({ ...props }) {
     if (!!store.researchers[id]) {
       return store.researchers[id]
     } else if (!storeRef.current.includes(id)) {
+      getResearcherType(id)
       LAMP.Researcher.view(id).then((x) => {
         setStore({
           researchers: { ...store.researchers, [id]: x },
@@ -281,6 +283,7 @@ function AppRouter({ ...props }) {
       })
       .join(" ")
   }
+
   const submitSurvey = () => {
     setState((state) => ({
       ...state,
@@ -314,6 +317,11 @@ function AppRouter({ ...props }) {
         })
       })
     }
+  }
+
+  const getResearcherType = async (id: string) => {
+    let res = (await LAMP.Type.getAttachment(id, "lamp.dashboard.user_type")) as any
+    setUserType(res.data.userType)
   }
 
   return (
@@ -413,12 +421,44 @@ function AppRouter({ ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Root {...props} updateStore={updateStore} />
+                <Root {...props} updateStore={updateStore} userType="admin" />
               </NavigationLayout>
             </React.Fragment>
           )
         }
       />
+
+      <Route
+        exact
+        path="/user-admin/:id"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : !getResearcher(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{t("User Administrator")}</PageTitle>
+              <NavigationLayout
+                authType={state.authType}
+                title="User Administrator"
+                goBack={props.history.goBack}
+                onLogout={() => reset()}
+              >
+                <Root {...props} updateStore={updateStore} userType="user_admin" />
+              </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
+
       <Route
         exact
         path="/researcher/:id"

@@ -168,7 +168,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Researchers({ history, updateStore, ...props }) {
+export default function Researchers({ history, updateStore, userType, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
@@ -176,6 +176,8 @@ export default function Researchers({ history, updateStore, ...props }) {
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
   const classes = useStyles()
+  const userTypes = ["researcher", "user_admin", "clinical_admin"]
+  const [filterData, setFilterData] = useState(false)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -184,17 +186,35 @@ export default function Researchers({ history, updateStore, ...props }) {
   }
 
   useEffect(() => {
+    setFilterData(false)
     refreshResearchers()
   }, [])
 
   const refreshResearchers = () => {
+    setFilterData(false)
     setPaginatedResearchers([])
     setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
-        setResearchers(data)
+      }
+      if (userType === "user_admin" && !filterData) {
+        ;(async function () {
+          data = (
+            await Promise.all(
+              data.map(async (x) => ({
+                id: x.id,
+                name: x.name,
+                res:
+                  ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any).data.userType ??
+                  "researcher",
+              }))
+            )
+          ).filter((y) => !userTypes.includes(y.res))
+          setFilterData(true)
+          setResearchers(data)
+        })()
       } else {
         setResearchers(data)
       }
@@ -228,6 +248,7 @@ export default function Researchers({ history, updateStore, ...props }) {
         researchers={researchers}
         searchData={(data) => setSearch(data)}
         refreshResearchers={refreshResearchers}
+        userType={userType}
       />
       <Box className={classes.tableContainer} mt={4}>
         <Grid container spacing={3}>
@@ -241,6 +262,7 @@ export default function Researchers({ history, updateStore, ...props }) {
                     refreshResearchers={refreshResearchers}
                     researchers={researchers}
                     updateStore={updateStore}
+                    userType={userType}
                   />
                 </Grid>
               ))}

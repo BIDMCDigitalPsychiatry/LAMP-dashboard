@@ -15,7 +15,7 @@ import {
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
 import SensorsList from "./SensorsList/Index"
-import StudiesList from "./Studies/Index"
+import StudiesList from "../Admin/Studies/Index"
 import { ResponsivePaper } from "../Utils"
 import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
@@ -27,6 +27,7 @@ import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 // import { Researcher } from "../DBService/Types/Researcher"
 // import { Study } from "../DBService/Types/Study"
+import DashboardStudies from "../Admin/DashboardStudies"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -130,6 +131,7 @@ export const sortData = (data, studies, key) => {
 //   activity_count?: number
 //   sensor_count?: number
 // }
+
 export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
@@ -141,57 +143,16 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   const [newStudy, setNewStudy] = useState(null)
   const [search, setSearch] = useState(null)
   const classes = useStyles()
+  const [data, setData] = useState(null)
   const { t } = useTranslation()
 
-  useInterval(
-    () => {
-      getDBStudies()
-    },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
-    true
-  )
-
   useEffect(() => {
-    if (!!newStudy) getAllStudies()
-  }, [newStudy])
-
-  useEffect(() => {
-    if (updatedData !== null) getAllStudies()
-  }, [updatedData])
-
-  useEffect(() => {
-    if (deletedData !== null) {
-      let newStudies = studies.filter((item) => {
-        if (!!search) {
-          return item?.name?.toLowerCase()?.includes(search?.toLowerCase()) && item.id !== deletedData
-        } else {
-          return item?.id !== deletedData
-        }
-      })
-      setStudies(newStudies)
-    } else {
-      getAllStudies()
-    }
-  }, [deletedData])
-
-  const getDBStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
-      setCurrentTab(0)
-      Service.getAll("researcher").then((data) => {
-        let researcherNotification = !!data ? data[0]?.notification ?? false : false
-        setNotification(researcherNotification)
-      })
+    setCurrentTab(0)
+    Service.getAll("researcher").then((data) => {
+      let researcherNotification = !!data ? data[0]?.notification ?? false : false
+      setNotification(researcherNotification)
     })
-  }
-
-  const getAllStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
-    })
-  }
+  }, [])
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
@@ -217,7 +178,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
             : classes.tableContainerWidth
         }
       >
-        {!!studies && (
+        {!!data && (
           <ResponsivePaper elevation={0}>
             <Drawer
               anchor={supportsSidebar ? "left" : "bottom"}
@@ -282,8 +243,6 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
-                getAllStudies={getAllStudies}
-                newAdddeStudy={setNewStudy}
               />
             )}
             {currentTab === 1 && (
@@ -305,15 +264,16 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
               />
             )}
             {currentTab === 3 && (
-              <StudiesList
-                title={null}
-                researcher={researcher}
-                studies={studies}
-                upatedDataStudy={(data) => setUpdatedData(data)}
-                deletedDataStudy={(data) => setDeletedData(data)}
-                searchData={(data) => setSearch(data)}
-                newAdddeStudy={setNewStudy}
-              />
+              <DashboardStudies researcher={researcher} setData={setData} filterStudies={filterStudies} />
+              // <StudiesList
+              //   title={null}
+              //   researcher={researcher}
+              //   studies={studies}
+              //   upatedDataStudy={(data) => setUpdatedData(data)}
+              //   deletedDataStudy={(data) => setDeletedData(data)}
+              //   searchData={(data) => setSearch(data)}
+              //   newAdddeStudy={setNewStudy}
+              // />
             )}
           </ResponsivePaper>
         )}

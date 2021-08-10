@@ -46,6 +46,14 @@ export default function StudiesList({
   searchData,
   newAdddeStudy,
   ...props
+}: {
+  title: string
+  researcher: any
+  studies: any
+  upatedDataStudy?: any
+  deletedDataStudy?: any
+  searchData?: any
+  newAdddeStudy?: any
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()

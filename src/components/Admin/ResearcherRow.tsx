@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
+import React, { useState, useEffect } from "react"
+import { Box, Fab, Card, CardHeader, CardActions, Icon, Typography } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
 import LAMP from "lamp-core"
@@ -42,15 +42,44 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, updateStore, ...props }) {
+export default function ResearcherRow({
+  history,
+  researcher,
+  researchers,
+  refreshResearchers,
+  updateStore,
+  userType,
+  ...props
+}) {
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
+  const [type, setType] = useState("")
+  const userTypes = {
+    researcher: "Researcher",
+    user_admin: "User Administrator",
+    clinical_admin: "Clinical Administrator",
+  }
+
+  const updateType = (type) => {
+    setType(!!userTypes[type] ? userTypes[type] : "Researcher")
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      let res = (await LAMP.Type.getAttachment(researcher.id, "lamp.dashboard.user_type")) as any
+      setType(!!res.data && res.data.userType ? res.data.userType : "Researcher")
+    })()
+  }, [])
 
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" alignItems="center">
         <Box flexGrow={1} py={1}>
-          <CardHeader className={classes.activityHeader} title={name} />
+          <CardHeader
+            className={classes.activityHeader}
+            title={name}
+            subheader={<Typography variant="overline">{userTypes[type]}</Typography>}
+          />
         </Box>
         <Box>
           <CardActions>
@@ -59,15 +88,25 @@ export default function ResearcherRow({ history, researcher, researchers, refres
               researcher={researcher}
               refreshResearchers={refreshResearchers}
               setName={setName}
+              setType={updateType}
               researchers={researchers}
               updateStore={updateStore}
+              authuserType={userType}
             />
             <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}
               onClick={() => {
-                history.push(`/researcher/${researcher.id}`)
+                type === "researcher"
+                  ? history.push(`/researcher/${researcher.id}`)
+                  : type === "user_admin"
+                  ? history.push(`/user-admin/${researcher.id}`)
+                  : type === "clinical_admin"
+                  ? history.push(`/clinical-admin/${researcher.id}`)
+                  : type === "clinician"
+                  ? history.push(`/clinician/${researcher.id}`)
+                  : history.push(`/researcher/${researcher.id}`)
               }}
             >
               <Icon>arrow_forward</Icon>

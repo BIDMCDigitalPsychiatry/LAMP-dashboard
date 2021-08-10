@@ -21,6 +21,8 @@ import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } fro
 import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
+import StudiesList from "./Studies/Index"
+import DashboardStudies from "./DashboardStudies"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -112,7 +114,18 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Root({ updateStore, ...props }) {
+export default function Root({
+  updateStore,
+  userType,
+  researcher,
+  history,
+  ...props
+}: {
+  updateStore: Function
+  userType: string
+  researcher?: any
+  history: any
+}) {
   const { t, i18n } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -125,6 +138,7 @@ export default function Root({ updateStore, ...props }) {
   }
 
   useEffect(() => {
+    console.log(userType)
     if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
   }, [])
@@ -168,9 +182,23 @@ export default function Root({ updateStore, ...props }) {
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>
+              {userType === "user_admin" && (
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={currentTab === 1}
+                  onClick={(event) => setCurrentTab(1)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <Researcher />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Studies")} />
+                </ListItem>
+              )}
             </List>
           </Drawer>
-          {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} />}
+          {currentTab === 0 && <Researchers history={history} updateStore={updateStore} userType={userType} />}
+          {currentTab === 1 && <DashboardStudies researcher={researcher} />}
         </ResponsivePaper>
       </Container>
     </Container>

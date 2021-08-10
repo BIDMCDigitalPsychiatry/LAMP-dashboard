@@ -1,8 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
 import SearchBox from "../SearchBox"
-import LAMP from "lamp-core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
 
@@ -41,9 +39,13 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Header({ researchers, searchData, refreshResearchers, ...props }) {
+export default function Header({ researchers, searchData, refreshResearchers, userType, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
+
+  useEffect(() => {
+    console.log(userType)
+  }, [])
 
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
@@ -51,7 +53,7 @@ export default function Header({ researchers, searchData, refreshResearchers, ..
         <Typography variant="h5">{t("Researchers")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} />
+      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} authuserType={userType} />
     </Box>
   )
 }

@@ -121,7 +121,6 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
-  getAllStudies,
   ...props
 }) {
   const classes = useStyles()
@@ -139,13 +138,6 @@ export default function ParticipantList({
 
   const { t } = useTranslation()
 
-  useInterval(
-    () => {
-      getAllStudies()
-    },
-    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
-    true
-  )
   useEffect(() => {
     setSelected(selectedStudies)
     if (selectedStudies.length > 0) {
@@ -156,10 +148,6 @@ export default function ParticipantList({
   useEffect(() => {
     setStudiesData(studies)
   }, [studies])
-
-  useEffect(() => {
-    getAllStudies()
-  }, [newStudy])
 
   const handleChange = (participant, checked) => {
     if (checked) {
