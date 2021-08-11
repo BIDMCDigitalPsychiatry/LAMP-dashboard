@@ -12,6 +12,7 @@ import Messages from "./Messages"
 import Root from "./Admin/Index"
 import Researcher from "./Researcher/Index"
 import Participant from "./Participant"
+import DataPortal from "./data_portal/DataPortal"
 import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
@@ -460,6 +461,17 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           )
         }
+      />
+
+      <Route
+        exact
+        path="/data_portal"
+        render={(props) => (
+          <React.Fragment>
+            <PageTitle>Data Portal</PageTitle>
+            <DataPortal />
+          </React.Fragment>
+        )}
       />
 
       <Route
