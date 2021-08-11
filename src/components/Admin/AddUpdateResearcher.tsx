@@ -79,6 +79,7 @@ export default function AddUpdateResearcher({
   setName,
   updateStore,
   setType,
+  studies,
   ...props
 }: {
   authuserType?: string
@@ -88,6 +89,7 @@ export default function AddUpdateResearcher({
   setName?: Function
   updateStore?: Function
   setType?: Function
+  studies?: any
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -96,9 +98,14 @@ export default function AddUpdateResearcher({
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
   const [rData, setRdara] = useState(researcher)
   const [userType, setUserType] = useState("researcher")
+  const [studyId, setStudyId] = useState("")
+
   useEffect(() => {
-    console.log(authuserType)
+    if (authuserType !== "admin") {
+      setUserType("clinician")
+    }
   }, [])
+
   const addResearcher = async () => {
     let duplicates = researchers.filter((x) =>
       !!researcher
@@ -131,6 +138,8 @@ export default function AddUpdateResearcher({
         }
         await LAMP.Type.setAttachment(!!researcher ? researcher.id : result.data, "me", "lamp.dashboard.user_type", {
           userType: userType,
+          studyId: studyId,
+          studyName: studies.filter((study) => study.id === studyId)[0]?.name,
         })
         enqueueSnackbar(
           !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
@@ -177,6 +186,25 @@ export default function AddUpdateResearcher({
               <MenuItem key="researcher" value="researcher">
                 Researcher
               </MenuItem>
+            </TextField>
+          )}
+          {authuserType !== "admin" && (
+            <TextField
+              select
+              autoFocus
+              fullWidth
+              variant="outlined"
+              label={t("Study")}
+              value={studyId}
+              onChange={(e) => {
+                setStudyId(e.target.value)
+              }}
+            >
+              {(studies || []).map((study) => (
+                <MenuItem key={study.id} value={study.id}>
+                  {study.name}
+                </MenuItem>
+              ))}
             </TextField>
           )}
           <TextField

@@ -23,6 +23,7 @@ import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
 import StudiesList from "./Studies/Index"
 import DashboardStudies from "./DashboardStudies"
+import { saveDataToCache, saveDemoData } from "../Researcher/SaveResearcherData"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -138,7 +139,6 @@ export default function Root({
   }
 
   useEffect(() => {
-    console.log(userType)
     if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
   }, [])
@@ -151,6 +151,15 @@ export default function Root({
       ? getSelectedLanguage()
       : "en"
     i18n.changeLanguage(language)
+    ;(async () => {
+      let lampAuthId = LAMP.Auth._auth.id
+      let lampAuthPswd = LAMP.Auth._auth.password
+      if (userType === "user_admin") {
+        lampAuthId === "researcher@demo.lamp.digital"
+          ? saveDemoData()
+          : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+      }
+    })()
   }, [])
 
   return (
@@ -180,7 +189,7 @@ export default function Root({
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={t("Researchers")} />
+                <ListItemText primary={userType === "user_admin" ? t("Clinicians") : t("Researchers")} />
               </ListItem>
               {userType === "user_admin" && (
                 <ListItem

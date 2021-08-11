@@ -199,7 +199,8 @@ export default function Researchers({ history, updateStore, userType, ...props }
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
       }
-      if (userType === "user_admin" && !filterData) {
+      console.log(data, userType, filterData)
+      if (userType === "user_admin" || userType === "clinical_admin") {
         ;(async function () {
           data = (
             await Promise.all(
@@ -207,11 +208,12 @@ export default function Researchers({ history, updateStore, userType, ...props }
                 id: x.id,
                 name: x.name,
                 res:
-                  ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any).data.userType ??
+                  ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
                   "researcher",
               }))
             )
           ).filter((y) => !userTypes.includes(y.res))
+          console.log(data)
           setFilterData(true)
           setResearchers(data)
         })()

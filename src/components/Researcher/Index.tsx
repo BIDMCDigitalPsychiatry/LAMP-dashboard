@@ -7,7 +7,7 @@ import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
 // import { useWorker } from "@koale/useworker"
 
-export default function Researcher({ researcher, onParticipantSelect, ...props }) {
+export default function Researcher({ researcher, onParticipantSelect, userType, ...props }) {
   const { t, i18n } = useTranslation()
   // const [dataWorker] = useWorker(saveDataToCache)
   // const [demoWorker] = useWorker(saveDemoData)
@@ -43,6 +43,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
           : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
       } else if (LAMP.Auth._type === "admin") {
         if (researcher.id) {
+          console.log("user admin")
           saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
         }
       }
@@ -51,7 +52,7 @@ export default function Researcher({ researcher, onParticipantSelect, ...props }
 
   return (
     <React.Fragment>
-      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} />
+      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} userType={userType} />
     </React.Fragment>
   )
 }

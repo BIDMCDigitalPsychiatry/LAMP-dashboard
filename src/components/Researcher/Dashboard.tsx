@@ -132,23 +132,23 @@ export const sortData = (data, studies, key) => {
 //   sensor_count?: number
 // }
 
-export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
+export default function Dashboard({ onParticipantSelect, researcher, userType, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [updatedData, setUpdatedData] = useState(null)
-  const [deletedData, setDeletedData] = useState(null)
-  const [newStudy, setNewStudy] = useState(null)
-  const [search, setSearch] = useState(null)
   const classes = useStyles()
-  const [data, setData] = useState(null)
   const { t } = useTranslation()
 
   useEffect(() => {
-    setCurrentTab(0)
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      filterStudies(studies)
+      setCurrentTab(0)
+    })
     Service.getAll("researcher").then((data) => {
+      console.log("dg")
       let researcherNotification = !!data ? data[0]?.notification ?? false : false
       setNotification(researcherNotification)
     })
@@ -178,7 +178,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
             : classes.tableContainerWidth
         }
       >
-        {!!data && (
+        {!!studies && (
           <ResponsivePaper elevation={0}>
             <Drawer
               anchor={supportsSidebar ? "left" : "bottom"}
@@ -221,17 +221,19 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   </ListItemIcon>
                   <ListItemText primary={t("Sensors")} />
                 </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 3}
-                  onClick={(event) => setCurrentTab(3)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Studies />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Studies")} />
-                </ListItem>
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 3}
+                    onClick={(event) => setCurrentTab(3)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Studies />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Studies")} />
+                  </ListItem>
+                )}
               </List>
             </Drawer>
             {currentTab === 0 && (
@@ -243,6 +245,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                userType={userType}
               />
             )}
             {currentTab === 1 && (
@@ -252,6 +255,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                userType={userType}
               />
             )}
             {currentTab === 2 && (
@@ -261,10 +265,11 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                userType={userType}
               />
             )}
             {currentTab === 3 && (
-              <DashboardStudies researcher={researcher} setData={setData} filterStudies={filterStudies} />
+              <DashboardStudies researcher={researcher} filterStudies={filterStudies} />
               // <StudiesList
               //   title={null}
               //   researcher={researcher}

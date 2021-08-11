@@ -61,7 +61,15 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
+export default function ActivityList({
+  researcher,
+  title,
+  studies,
+  selectedStudies,
+  setSelectedStudies,
+  userType,
+  ...props
+}) {
   const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const classes = useStyles()
@@ -162,6 +170,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
+        userType={userType}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

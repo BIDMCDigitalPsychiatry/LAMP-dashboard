@@ -54,10 +54,13 @@ export default function ResearcherRow({
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
   const [type, setType] = useState("")
+  const [study, setStudy] = useState("")
+
   const userTypes = {
     researcher: "Researcher",
     user_admin: "User Administrator",
     clinical_admin: "Clinical Administrator",
+    clinician: "Clinician",
   }
 
   const updateType = (type) => {
@@ -67,7 +70,8 @@ export default function ResearcherRow({
   useEffect(() => {
     ;(async () => {
       let res = (await LAMP.Type.getAttachment(researcher.id, "lamp.dashboard.user_type")) as any
-      setType(!!res.data && res.data.userType ? res.data.userType : "Researcher")
+      setType(!!res.data && res.data.userType ? res.data.userType : "researcher")
+      setStudy(!!res.data && res.data.studyName ? res.data.studyName : "")
     })()
   }, [])
 
@@ -78,22 +82,35 @@ export default function ResearcherRow({
           <CardHeader
             className={classes.activityHeader}
             title={name}
-            subheader={<Typography variant="overline">{userTypes[type]}</Typography>}
+            subheader={
+              <Box>
+                <Typography variant="overline">{userTypes[type]}</Typography>
+                {userType !== "admin" && (
+                  <Box>
+                    <Typography variant="overline">{study}</Typography>
+                  </Box>
+                )}
+              </Box>
+            }
           />
         </Box>
         <Box>
           <CardActions>
-            <Credentials user={researcher} />
-            <AddUpdateResearcher
-              researcher={researcher}
-              refreshResearchers={refreshResearchers}
-              setName={setName}
-              setType={updateType}
-              researchers={researchers}
-              updateStore={updateStore}
-              authuserType={userType}
-            />
-            <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+            {userType === "user_admin" && (
+              <Box>
+                <Credentials user={researcher} />
+                <AddUpdateResearcher
+                  researcher={researcher}
+                  refreshResearchers={refreshResearchers}
+                  setName={setName}
+                  setType={updateType}
+                  researchers={researchers}
+                  updateStore={updateStore}
+                  authuserType={userType}
+                />
+                <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+              </Box>
+            )}
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}

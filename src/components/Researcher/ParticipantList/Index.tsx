@@ -121,6 +121,7 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
+  userType,
   ...props
 }) {
   const classes = useStyles()
@@ -161,11 +162,13 @@ export default function ParticipantList({
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+    console.log(selectedStudies)
     if (selectedData.length > 0 && !loading) {
       let result = []
       setLoading(true)
       selectedData.map((study) => {
         Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
+          console.log(participantData)
           if ((participantData || []).length > 0) {
             if (!!searchTxt && searchTxt.trim().length > 0) {
               result = result.concat(participantData)
@@ -214,6 +217,7 @@ export default function ParticipantList({
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
         newStudyObj={setNewStudy}
+        userType={userType}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

@@ -3,6 +3,7 @@ import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@ma
 import SearchBox from "../SearchBox"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
+import { Service } from "../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -42,18 +43,28 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Header({ researchers, searchData, refreshResearchers, userType, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
+  const [studies, setStudies] = useState(null)
 
   useEffect(() => {
-    console.log(userType)
+    if (userType === "user_admin") {
+      Service.getAll("studies").then((studies) => {
+        setStudies(studies)
+      })
+    }
   }, [])
 
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
       <Box flexGrow={1}>
-        <Typography variant="h5">{t("Researchers")}</Typography>
+        <Typography variant="h5">{userType === "user_admin" ? t("Clinicians") : t("Researchers")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} authuserType={userType} />
+      <AddUpdateResearcher
+        refreshResearchers={refreshResearchers}
+        researchers={researchers}
+        authuserType={userType}
+        studies={studies}
+      />
     </Box>
   )
 }
