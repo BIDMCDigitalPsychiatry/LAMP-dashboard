@@ -4,7 +4,7 @@ export const effective = {
   width: 440,
   height: 224,
   padding: 5,
-  title: "Urges (effective)",
+  title: "Urges (Effective)",
   data: {
     values: [
       { value: 1, date: "2020-09-20", symbol: "Self-care" },
