@@ -601,7 +601,7 @@ export const SchemaList = () => {
               },
             },
             targetEffective: {
-              title: i18n.t("Target Effective Behaviors"),
+              title: i18n.t("Effective Target Behaviors"),
               type: "array",
               items: {
                 type: "object",
@@ -622,7 +622,7 @@ export const SchemaList = () => {
               },
             },
             targetIneffective: {
-              title: i18n.t("Target InEffective Behaviors"),
+              title: i18n.t("Ineffective Target Behaviors"),
               type: "array",
               items: {
                 type: "object",
