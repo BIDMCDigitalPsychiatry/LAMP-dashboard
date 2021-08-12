@@ -380,7 +380,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               event.timestamp <= parseInt(timeStamp[0]) &&
               event.timestamp >= parseInt(timeStamp[1])
             ) {
-              let typeTarget = slice.level === "target_effective" ? "Effective" : "InEffective"
+              let typeTarget = slice.level === "target_effective" ? "Effective" : "Ineffective"
               tData[dateString + "~" + typeTarget] = tData[dateString + "~" + typeTarget]
                 ? tData[dateString + "~" + typeTarget] + parseInt(slice.type)
                 : parseInt(slice.type)
