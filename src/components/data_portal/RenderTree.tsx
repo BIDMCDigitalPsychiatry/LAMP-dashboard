@@ -124,7 +124,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
             onSetQuery={onSetQuery}
             onUpdateGUI={onUpdateGUI}
             isGUIEditor={isGUIEditor}
-          ></RenderTree>
+          />
         ))}
     </Card>
   )

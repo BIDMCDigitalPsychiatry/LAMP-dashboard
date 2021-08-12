@@ -466,12 +466,35 @@ function AppRouter({ ...props }) {
       <Route
         exact
         path="/data_portal"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>Data Portal</PageTitle>
-            <DataPortal />
-          </React.Fragment>
-        )}
+        render={(props) =>
+          !state.identity || (state.authType !== "admin" && state.authType !== "researcher") ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/data_portal")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>Data Portal</PageTitle>
+              <DataPortal
+                token={{
+                  username: LAMP.Auth._auth.id,
+                  password: LAMP.Auth._auth.password,
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                  type: state.authType === "admin" ? "Administrator" : "Researcher",
+                  //@ts-ignore: state.identity will have an id param if not admin
+                  id: state.authType === "admin" ? null : state.identity.id,
+                  //@ts-ignore: state.identity will have an name param if not admin
+                  name: state.authType === "admin" ? "Administrator" : state.identity.name,
+                }}
+                onLogout={() => reset()}
+              />
+            </React.Fragment>
+          )
+        }
       />
 
       <Route

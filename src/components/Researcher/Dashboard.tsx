@@ -21,10 +21,12 @@ import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
+import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
+import DataPortal from "../data_portal/DataPortal"
 // import { Researcher } from "../DBService/Types/Researcher"
 // import { Study } from "../DBService/Types/Study"
 
@@ -271,6 +273,17 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   </ListItemIcon>
                   <ListItemText primary={t("Studies")} />
                 </ListItem>
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={currentTab === 4}
+                  onClick={(event) => setCurrentTab(4)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <DataPortalIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Data Portal"} />
+                </ListItem>
               </List>
             </Drawer>
             {currentTab === 0 && (
@@ -313,6 +326,21 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 deletedDataStudy={(data) => setDeletedData(data)}
                 searchData={(data) => setSearch(data)}
                 newAdddeStudy={setNewStudy}
+              />
+            )}
+
+            {currentTab === 4 && (
+              <DataPortal
+                onLogout={null}
+                token={{
+                  username: LAMP.Auth._auth.id,
+                  password: LAMP.Auth._auth.password,
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                  type: "Researcher",
+                  id: researcher.id,
+                  name: researcher.name,
+                }}
+                data={LAMP.Auth}
               />
             )}
           </ResponsivePaper>

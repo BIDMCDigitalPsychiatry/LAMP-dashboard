@@ -83,10 +83,12 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           </div>
           <div style={{ flexGrow: 1 }} />
           <Typography style={{ color: "red" }}>Alpha - V8.11.2021</Typography>
-          <IconButton onClick={onLogout} color="inherit">
-            <Typography>Log-out&nbsp;</Typography>
-            <Icon className={classes.icon}>lock_outlined</Icon>
-          </IconButton>
+          {typeof onLogout === "function" && (
+            <IconButton onClick={onLogout} color="inherit">
+              <Typography>Log-out&nbsp;</Typography>
+              <Icon className={classes.icon}>lock_outlined</Icon>
+            </IconButton>
+          )}
         </Toolbar>
       </AppBar>
       <Box flexWrap="nowrap" style={{ flexGrow: 1, height: "90%", marginTop: 8 }}>

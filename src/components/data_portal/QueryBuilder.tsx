@@ -13,6 +13,7 @@ import {
   Checkbox,
   Box,
   Input,
+  Icon,
 } from "@material-ui/core"
 import { tagged_entities, ajaxRequest } from "./DataPortalShared"
 
@@ -248,10 +249,12 @@ export default function QueryBuilder(props) {
     if (!props.availableSharedTags) {
       return (
         <Typography>
-          `There are no common tags for this ${currentQuery.id_string[currentQuery.id_string.length - 2]}, or they have
-          not correctly been added to the tag "lamp.dashboard.$
-          {currentQuery.id_string[currentQuery.id_string.length - 2]}_tags" - if you believe this is in error, please
-          contact your study administrator.`
+          There are no shared tags set for this {currentQuery.id_string[currentQuery.id_string.length - 2]}. To display
+          data on tags shared between participants, set "lamp.dashboard.
+          {currentQuery.id_string[currentQuery.id_string.length - 2].slice(0, 1).toLowerCase() +
+            currentQuery.id_string[currentQuery.id_string.length - 2].slice(1)}
+          _tags" to an array of strings, where each string is a tag you would like to see. Please contact your study
+          administrator for more info.
         </Typography>
       )
     }
@@ -486,16 +489,19 @@ export default function QueryBuilder(props) {
               />
             )}
 
-          {!tagsLoaded &&
-          !sharedTagsLoaded && <Typography>Please wait, data is loading...</Typography> //insert additional loads here
+          {
+            !tagsLoaded && !sharedTagsLoaded && <Typography>Please wait, data is loading...</Typography> //insert additional loads here
           }
           <br />
         </Card>
       ) : (
         <Card style={{ margin: "0% 5%" }}>
           <Typography>
-            To start building a query, use the left navigation bar to find a participant you want to analyze, then press
-            the arrow to bring them to this pane.
+            To start building a query:
+            <br />
+            1. Navigate to the level of your target on the left.
+            <br />
+            2. Click on <Icon>subdirectory_arrow_right</Icon>
           </Typography>
         </Card>
       )}

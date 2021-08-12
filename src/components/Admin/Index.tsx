@@ -17,10 +17,12 @@ import { CredentialManager } from "../CredentialManager"
 import { ResponsivePaper } from "../Utils"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
+import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
+import DataPortal from "../data_portal/DataPortal"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -168,9 +170,32 @@ export default function Root({ updateStore, ...props }) {
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>
+              <ListItem
+                className={classes.menuItems + " " + classes.btnCursor}
+                button
+                selected={currentTab === 1}
+                onClick={(event) => setCurrentTab(1)}
+              >
+                <ListItemIcon className={classes.menuIcon}>
+                  <DataPortalIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Data Portal"} />
+              </ListItem>
             </List>
           </Drawer>
           {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} />}
+          {currentTab === 1 && (
+            <DataPortal
+              onLogout={null}
+              token={{
+                username: LAMP.Auth._auth.id,
+                password: LAMP.Auth._auth.password,
+                server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                type: "Administrator",
+                name: "Administrator",
+              }}
+            />
+          )}
         </ResponsivePaper>
       </Container>
     </Container>

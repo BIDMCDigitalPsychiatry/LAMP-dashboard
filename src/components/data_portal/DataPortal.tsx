@@ -3,10 +3,17 @@ import { useLocalStorage } from "./DataPortalShared"
 import DataPortalHome from "./DataPortalHome"
 import SignIn from "./SignIn"
 
-export default function DataPortal({ ...props }) {
-  const [token, setToken] = useLocalStorage("_query_auth", null)
+export default function DataPortal({ onLogout, ...props }) {
+  const [token, setToken] = React.useState(null)
+
+  React.useEffect(() => {
+    if (props.token) {
+      setToken(props.token)
+    }
+  }, [])
+
   if (!!token) {
-    return <DataPortalHome token={token} onLogout={() => setToken(null)} />
+    return <DataPortalHome token={token} onLogout={onLogout} />
   } else {
     return <SignIn onSubmit={setToken} />
   }
