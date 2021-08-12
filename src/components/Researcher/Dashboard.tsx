@@ -79,6 +79,22 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingLeft: 0,
       paddingRight: 0,
     },
+    tableContainerDataPortalWidth: {
+      width: "calc(100% - 100px)",
+      height: "calc(100% - 55px)",
+      maxWidth: "100%",
+      maxHeight: "calc(100% - 55px)",
+      backgroundColor: "lightgrey",
+      top: "55px",
+      left: "90px",
+      overflow: "hidden",
+      position: "absolute",
+      [theme.breakpoints.down("sm")]: {
+        left: "0px",
+        width: "100vw",
+        height: "calc(100% - 155px)",
+      },
+    },
     menuOuter: {
       paddingTop: 0,
       [theme.breakpoints.down("sm")]: {
@@ -214,9 +230,11 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     <Container maxWidth={false}>
       <Container
         className={
-          window.innerWidth >= 1280 && window.innerWidth <= 1350
-            ? classes.tableContainerWidthPad
-            : classes.tableContainerWidth
+          currentTab !== 4
+            ? window.innerWidth >= 1280 && window.innerWidth <= 1350
+              ? classes.tableContainerWidthPad
+              : classes.tableContainerWidth
+            : classes.tableContainerDataPortalWidth
         }
       >
         {!!studies && (

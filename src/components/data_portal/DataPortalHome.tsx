@@ -63,9 +63,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   }
 
   return (
-    <div
-      style={{ background: "lightgrey", display: "flex", flexDirection: "column", height: "100vh", overflow: "scroll" }}
-    >
+    <div style={{ background: "lightgrey", display: "flex", flexDirection: "column", height: "100vh" }}>
       <AppBar position="static" style={{ background: "black" }}>
         <Toolbar>
           <Icon className={classes.icon}>code</Icon>
@@ -93,7 +91,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
       </AppBar>
       <Box flexWrap="nowrap" style={{ flexGrow: 1, height: "90%", marginTop: 8 }}>
         <Grid container alignContent={"flex-start"} style={{ height: "100%", flexWrap: "nowrap" }}>
-          <Grid container item xs={3} style={{ height: "100%", overflowY: "scroll", background: "lightgray" }}>
+          <Grid container item xs={3} style={{ height: "90%", overflowY: "scroll", background: "lightgray" }}>
             <Grid style={{ marginBottom: "30px" }} item xs={12}>
               <RenderTree
                 token={token}
