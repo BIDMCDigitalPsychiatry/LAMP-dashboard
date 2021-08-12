@@ -126,6 +126,9 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             },
           } as any).then((res) => console.dir(res))
         }
+        process.env.REACT_APP_LATEST_LAMP === "true"
+          ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
+          : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
         localStorage.setItem(
           "LAMP_user_" + res.identity.id,
           JSON.stringify({

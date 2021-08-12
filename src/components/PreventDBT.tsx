@@ -379,13 +379,18 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               slice.type !== null &&
               event.timestamp <= parseInt(timeStamp[0]) &&
               event.timestamp >= parseInt(timeStamp[1])
-            )
-              tData[dateString] = tData[dateString] ? tData[dateString] + parseInt(slice.type) : parseInt(slice.type)
+            ) {
+              let typeTarget = slice.level === "target_effective" ? "Effective" : "Ineffective"
+              tData[dateString + "~" + typeTarget] = tData[dateString + "~" + typeTarget]
+                ? tData[dateString + "~" + typeTarget] + parseInt(slice.type)
+                : parseInt(slice.type)
+            }
           }
         })
       })
       Object.keys(tData).forEach(function (key) {
-        timelineData.push({ date: key, count: tData[key], action: "Effective/Ineffective" })
+        const keys = key.split("~")
+        timelineData.push({ date: keys[0], count: tData[key], action: keys[1] })
       })
       let selfcareD = JSON.parse(JSON.stringify(selfcare))
       selfcareD.data.values = timelineData

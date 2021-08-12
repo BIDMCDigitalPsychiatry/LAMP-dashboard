@@ -22,7 +22,7 @@ export const selfcare = {
     color: {
       field: "action",
       type: "nominal",
-      scale: { range: ["#38C396"] },
+      scale: { range: ["#4C66D6", "#38C396"] },
     },
     strokeWidth: { value: 2 },
   },

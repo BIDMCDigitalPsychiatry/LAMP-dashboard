@@ -4,7 +4,7 @@ export const ineffective = {
   width: 440,
   height: 224,
   padding: 5,
-  title: "Urges (ineffective)",
+  title: "Urges (Ineffective)",
   data: {
     values: [
       { value: 1, date: "2020-09-20", symbol: "Punching self" },

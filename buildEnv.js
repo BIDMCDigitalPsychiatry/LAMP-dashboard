@@ -52,6 +52,11 @@ function writeFile() {
       .then((headCount) => {
         execShellCommand("git describe --tags --exact-match --abbrev=0 || echo dev")
           .then((description) => {
+            execShellCommand("git rev-parse HEAD ")
+            .then((latestCommit) => {
+            execShellCommand("git rev-list --tags --max-count=1")
+            .then((prodCommit) => {
+            const latest = latestCommit === prodCommit
             debug && console.log({ headCount, description })
             fs.outputFile(
               file,
@@ -60,6 +65,7 @@ function writeFile() {
                 "NODE_ENV=production",
                 `REACT_APP_GIT_NUM=${headCount}`,
                 `REACT_APP_GIT_SHA=${description}`,
+                `REACT_APP_LATEST_LAMP=${latest}`,
                 isDev ? "BROWSER=none" : "CI=false",
               ].join("\r\n")
             )
@@ -78,6 +84,8 @@ function writeFile() {
         resolve(err)
       })
   }).catch((err) => reject(err))
+}).catch((err) => reject(err))
+}).catch((err) => reject(err))
 }
 
 prepareDestination()

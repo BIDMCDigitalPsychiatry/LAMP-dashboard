@@ -601,7 +601,7 @@ export const SchemaList = () => {
               },
             },
             targetEffective: {
-              title: i18n.t("Target behaviors"),
+              title: i18n.t("Effective Target Behaviors"),
               type: "array",
               items: {
                 type: "object",
@@ -616,13 +616,13 @@ export const SchemaList = () => {
                     title: "Measure of Action",
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes")],
+                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
             },
             targetIneffective: {
-              title: i18n.t("Target Ineffective Behaviors"),
+              title: i18n.t("Ineffective Target Behaviors"),
               type: "array",
               items: {
                 type: "object",
@@ -637,7 +637,7 @@ export const SchemaList = () => {
                     title: i18n.t("Measure of action"),
                     type: "string",
                     minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes")],
+                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
                   },
                 },
               },
