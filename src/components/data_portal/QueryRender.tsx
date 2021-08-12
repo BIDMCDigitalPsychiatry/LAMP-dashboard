@@ -277,8 +277,8 @@ export default function QueryRender(props) {
                       return (
                         <Grid
                           key={`${subFilterName}-box`}
-                          //@ts-ignore: the only values this can return in normal use are 3,6,9,12 -- all valid
                           item
+                          //@ts-ignore: the only values this can return in normal use are 3,6,9,12 -- all valid
                           xs={parseInt(scale)}
                           style={{
                             flexGrow: 1,
@@ -395,9 +395,9 @@ export default function QueryRender(props) {
     //we intentionally fall through to here so that we always display something
     case "string":
     default:
-      //@ts-ignore
       return (
         <Editor
+          //@ts-ignore
           path="result"
           wordWrapBreakAfterCharacters="},"
           wordWrap="bounded"
