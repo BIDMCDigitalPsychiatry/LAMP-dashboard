@@ -385,7 +385,6 @@ export default function QueryRender(props) {
           let filterValue = filterRef.current.value
           if (!filterValue) {
             filterValue = ""
-            console.log(`Filtering by name: ${filterValue}`)
           }
           setStringFilter(filterValue)
         }
@@ -404,7 +403,7 @@ export default function QueryRender(props) {
         }
 
         return (
-          //@ts-ignore: We need to be able to reference this box for
+          //@ts-ignore: We need to be able to reference this box to adjust sizing option availability
           <Box ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%" }}>
             <div style={{ height: "70px", width: "100%", background: "white", margin: "0px 10px 0px 0px" }}>
               <div style={{ height: "60px", float: "left" }}>
