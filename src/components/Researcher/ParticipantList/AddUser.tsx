@@ -93,20 +93,6 @@ export default function AddUser({
   const { t } = useTranslation()
   const [newId, setNewId] = useState(null)
 
-  useEffect(() => {
-    console.log(props)
-    if (userType === "clinician" && props.open) {
-      console.log(studies)
-      setSelectedStudy(studies[0]?.id)
-    }
-  }, [studies])
-
-  useEffect(() => {
-    if (userType === "clinician" && props.open) {
-      createNewStudy()
-    }
-  }, [selectedStudy])
-
   const validate = () => {
     return !(
       typeof selectedStudy === "undefined" ||

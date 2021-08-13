@@ -11,6 +11,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -110,6 +112,10 @@ const useStyles = makeStyles((theme: Theme) =>
         cursor: "pointer !important",
       },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -137,16 +143,29 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
+  const [loading, setLoading] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const classes = useStyles()
   const { t } = useTranslation()
 
-  useEffect(() => {
+  useInterval(
+    () => {
+      getDBStudies()
+    },
+    studies !== null && (studies || []).length > 0 ? null : 2000,
+    true
+  )
+
+  const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
+      if ((studies || []).length > 0) setLoading(false)
       setStudies(studies)
       filterStudies(studies)
       setCurrentTab(0)
     })
+  }
+
+  useEffect(() => {
     Service.getAll("researcher").then((data) => {
       console.log("dg")
       let researcherNotification = !!data ? data[0]?.notification ?? false : false
@@ -171,6 +190,9 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
 
   return (
     <Container maxWidth={false}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Container
         className={
           window.innerWidth >= 1280 && window.innerWidth <= 1350

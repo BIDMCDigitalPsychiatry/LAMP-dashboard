@@ -139,6 +139,8 @@ export default function Root({
   }
 
   useEffect(() => {
+    console.log(userType)
+
     if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
   }, [])

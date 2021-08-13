@@ -188,7 +188,7 @@ export default function Researchers({ history, updateStore, userType, ...props }
   useEffect(() => {
     setFilterData(false)
     refreshResearchers()
-  }, [])
+  }, [userType])
 
   const refreshResearchers = () => {
     setFilterData(false)
@@ -199,27 +199,25 @@ export default function Researchers({ history, updateStore, userType, ...props }
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
       }
-      console.log(data, userType, filterData)
-      if (userType === "user_admin" || userType === "clinical_admin") {
-        ;(async function () {
-          data = (
-            await Promise.all(
-              data.map(async (x) => ({
-                id: x.id,
-                name: x.name,
-                res:
-                  ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
-                  "researcher",
-              }))
-            )
-          ).filter((y) => !userTypes.includes(y.res))
-          console.log(data)
-          setFilterData(true)
-          setResearchers(data)
-        })()
-      } else {
+      ;(async function () {
+        data = (
+          await Promise.all(
+            data.map(async (x) => ({
+              id: x.id,
+              name: x.name,
+              res:
+                ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
+                "researcher",
+            }))
+          )
+        ).filter((y) =>
+          userType === "user_admin" || userType === "clinical_admin"
+            ? !userTypes.includes(y.res)
+            : y.res !== "clinician"
+        )
+        setFilterData(true)
         setResearchers(data)
-      }
+      })()
       setPaginatedResearchers(data.slice(0, rowCount))
     })
   }
