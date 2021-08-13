@@ -13,7 +13,7 @@ export default function Vega({ spec, config, ...props }) {
   return (
     //@ts-ignore - see above
     <div ref={ref} {...props}>
-      ${isRendered ? "" : "Rendering graph"}
+      &nbsp;{isRendered ? "" : "Rendering graph..."}
     </div>
   )
 }

@@ -96,16 +96,13 @@ export default function QueryRender(props) {
       promises.push(
         vegaEmbed(canvas, spec, {
           renderer: "canvas",
-          actions: { source: false, compiled: false, editor: false },
+          actions: false,
         }).then(() => {
           let imgStream, cHeight, cWidth
-          //@ts-ignore: This element is always a canvas, which does have a toDataURL fxn
-          imgStream = canvas.firstElementChild.firstElementChild.toDataURL("image/png")
-
-          //@ts-ignore: This element is always a canvas, which does have a height
-          let imgHeight = canvas.firstElementChild.firstElementChild.height
-          //@ts-ignore: This element is always a canvas, which does have a width
-          let imgWidth = canvas.firstElementChild.firstElementChild.width
+          let targetCanvas = canvas.getElementsByTagName("canvas")[0]
+          imgStream = targetCanvas.toDataURL("image/png")
+          let imgHeight = targetCanvas.height
+          let imgWidth = targetCanvas.width
           if (imgWidth >= imgHeight) {
             let scale = chunkWidth / imgWidth
             cHeight = scale * imgHeight
@@ -185,8 +182,40 @@ export default function QueryRender(props) {
         const [stringFilter, setStringFilter] = React.useState("")
         const filterRef = React.useRef(null)
 
+        //here, we calculate the size of the box containing the graph
+        //this helps us determine which size options to display
+        const boxRef = React.useRef(null)
+        const [boxDimensions, setBoxDimensions] = React.useState({
+          height: 0,
+          width: 0,
+        })
+        const updateDimensions = () => {
+          if (boxRef.current) {
+            setBoxDimensions({
+              height: boxRef.current.offsetHeight,
+              width: boxRef.current.offsetWidth,
+            })
+          }
+          if (boxDimensions.width < 400 && parseInt(scale) < 12) setScale("12")
+          else if (boxDimensions.width < 550 && parseInt(scale) < 6) setScale("6")
+          else if (boxDimensions.width < 700 && parseInt(scale) < 4) setScale("4")
+        }
+        let movement_timer = null
+        React.useLayoutEffect(() => {
+          updateDimensions()
+
+          window.addEventListener("resize", () => {
+            clearInterval(movement_timer)
+            movement_timer = setTimeout(updateDimensions, 1000)
+          })
+        }, [])
+
         //set default scale to "Large"
-        const [scale, setScale] = React.useState("6")
+        const [scale, setScale] = React.useState("")
+        React.useEffect(() => {
+          if (boxDimensions.width < 400) setScale("12")
+          else setScale("6")
+        }, [])
 
         const handleChange = (event) => {
           setScale(event.target.value)
@@ -200,6 +229,26 @@ export default function QueryRender(props) {
             (acc, obj) => (acc.includes(obj[filter]) ? acc : acc.concat(obj[filter])),
             []
           )
+
+          const adjustVegaTitle = (currentTitle) => {
+            if (Array.isArray(currentTitle)) currentTitle = currentTitle.join(" ")
+
+            //if there are multiple spaces in a row, replace them
+            //with a single space
+            currentTitle.replace(/ +/g, " ")
+            //we get the width of each card
+            let cardWidth = boxDimensions.width / (12 / parseInt(scale))
+            return currentTitle.split(" ").reduce(
+              (acc, elem) => {
+                if (acc[acc.length - 1].length + elem.length > cardWidth / 11) {
+                  acc.push("")
+                }
+                acc[acc.length - 1] = `${acc[acc.length - 1]} ${elem}`.replace(/ +/g, " ")
+                return acc
+              },
+              [""]
+            )
+          }
 
           const formatName = (name) => {
             if (name.indexOf("lamp") !== -1) {
@@ -238,7 +287,13 @@ export default function QueryRender(props) {
                   style={{ width: "100%", margin: "5px 0px 0px 0px" }}
                 >
                   <Typography
-                    style={{ marginLeft: "5px", top: "3px", position: "relative", fontSize: "140%", float: "left" }}
+                    style={{
+                      marginLeft: "5px",
+                      top: "3px",
+                      position: "relative",
+                      fontSize: "140%",
+                      float: "left",
+                    }}
                   >
                     <b>{formatName(targetName)}</b>
                   </Typography>
@@ -273,6 +328,21 @@ export default function QueryRender(props) {
                       ) {
                         result = { ...elem["result"] }
                         result["width"] = "container"
+                        //here, we attempt to make titles display better
+
+                        if (result["layer"]) {
+                          result.layer.forEach((layer) => {
+                            if ("title" in layer && "text" in layer["title"]) {
+                              layer["title"]["text"] = adjustVegaTitle(layer["title"]["text"])
+                            }
+                          })
+                        } else {
+                          if ("title" in result && "text" in result["title"]) {
+                            result["title"]["text"] = adjustVegaTitle(result["title"]["text"])
+                          }
+                        }
+                        //we alter the image height
+                        result["height"] = `${50 * (parseInt(scale) / 3)}`
                       }
                       return (
                         <Grid
@@ -313,8 +383,10 @@ export default function QueryRender(props) {
 
         const setFilter = () => {
           let filterValue = filterRef.current.value
-          console.log(`Filtering by name: ${filterValue}`)
-          if (!filterValue) filterValue = ""
+          if (!filterValue) {
+            filterValue = ""
+            console.log(`Filtering by name: ${filterValue}`)
+          }
           setStringFilter(filterValue)
         }
 
@@ -332,7 +404,8 @@ export default function QueryRender(props) {
         }
 
         return (
-          <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
+          //@ts-ignore: We need to be able to reference this box for
+          <Box ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%" }}>
             <div style={{ height: "70px", width: "100%", background: "white", margin: "0px 10px 0px 0px" }}>
               <div style={{ height: "60px", float: "left" }}>
                 <Switch color="primary" checked={groupByID} onClick={() => toggleGroupByID(!groupByID)} />
@@ -364,9 +437,15 @@ export default function QueryRender(props) {
 
               <FormControl style={{ float: "right" }} component="fieldset">
                 <RadioGroup aria-label="scale" name="scale" value={scale} onChange={handleChange} row>
-                  <FormControlLabel value="3" labelPlacement="top" control={<Radio />} label="Small" />
-                  <FormControlLabel value="4" labelPlacement="top" control={<Radio />} label="Medium" />
-                  <FormControlLabel value="6" labelPlacement="top" control={<Radio />} label="Large" />
+                  {boxDimensions.width > 700 && (
+                    <FormControlLabel value="3" labelPlacement="top" control={<Radio />} label="Small" />
+                  )}
+                  {boxDimensions.width > 550 && (
+                    <FormControlLabel value="4" labelPlacement="top" control={<Radio />} label="Medium" />
+                  )}
+                  {boxDimensions.width > 400 && (
+                    <FormControlLabel value="6" labelPlacement="top" control={<Radio />} label="Large" />
+                  )}
                   <FormControlLabel value="12" labelPlacement="top" control={<Radio />} label="Fill" />
                 </RadioGroup>
               </FormControl>
@@ -388,7 +467,7 @@ export default function QueryRender(props) {
           <Vega
             style={props.style ? props.style : {}}
             spec={props.queryResult}
-            config={{ renderer: "canvas", actions: { source: false, compiled: false, editor: false } }}
+            config={{ renderer: "canvas", actions: false }}
           />
         )
 
