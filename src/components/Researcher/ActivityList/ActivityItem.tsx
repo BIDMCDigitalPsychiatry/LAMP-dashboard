@@ -52,7 +52,9 @@ export default function ActivityItem({
   ...props
 }) {
   const classes = useStyles()
-  const [checked, setChecked] = React.useState(false)
+  const [checked, setChecked] = React.useState(
+    selectedActivities.filter((d) => d.id === activity.id).length > 0 ? true : false
+  )
 
   const handleChange = (activity, event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked(event.target.checked)
