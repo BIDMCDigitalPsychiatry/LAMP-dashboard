@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Box,
   Typography,
@@ -45,11 +45,13 @@ export default function SensorListItem({
   sensor?: Sensors
   studies?: Array<Object>
   handleSelectionChange: Function
-  selectedSensors?: Array<Object>
+  selectedSensors?: any
   setSensors?: Function
 }) {
   const classes = useStyles()
-  const [checked, setChecked] = React.useState(false)
+  const [checked, setChecked] = React.useState(
+    selectedSensors.filter((d) => d.id === sensor.id).length > 0 ? true : false
+  )
 
   const handleChange = (sensor, event) => {
     setChecked(event.target.checked)

@@ -240,6 +240,7 @@ export default function ParticipantList({
                     notificationColumn={notificationColumn}
                     handleSelectionChange={handleChange}
                     setUpdateCount={setUpdateCount}
+                    selectedParticipants={selectedParticipants}
                   />
                 </Grid>
               ))}

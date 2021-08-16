@@ -87,10 +87,13 @@ export default function ParticipantListItem({
   notificationColumn,
   handleSelectionChange,
   setUpdateCount,
+  selectedParticipants,
   ...props
 }) {
   const classes = useStyles()
-  const [checked, setChecked] = React.useState(false)
+  const [checked, setChecked] = React.useState(
+    selectedParticipants.filter((d) => d.id === participant.id).length > 0 ? true : false
+  )
   const [user, setName] = useState(participant)
   const [openSettings, setOpenSettings] = useState(false)
 
