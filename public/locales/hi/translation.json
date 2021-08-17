@@ -668,5 +668,6 @@
 	"Bubble Count": "बुलबुलो की संख्या ", 
 	"Add Item": "आइटम जोडें",
 	"Select the Repeat interval.": "Select the Repeat interval.",
-	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?"
+	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?",
+	"The audio size should not exceed 10 MB.": "The audio size should not exceed 10 MB."
 }
