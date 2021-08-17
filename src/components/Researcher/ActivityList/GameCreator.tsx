@@ -1,6 +1,17 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Grid, Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
+import {
+  Grid,
+  Container,
+  Backdrop,
+  CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Box,
+  Typography,
+  Icon,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
@@ -18,6 +29,10 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
+    },
+    errorcustom: {
+      "& span": { color: "#f44336", minWidth: "56px" },
+      "& h6": { fontSize: "1.25rem", fontWeight: "normal" },
     },
   })
 )
@@ -46,6 +61,10 @@ export default function GameCreator({
   const classes = useStyles()
   const [loading, setLoading] = React.useState(false)
   const [schemaListObj, setSchemaListObj] = React.useState({})
+  const [fileMB, setFileMB] = React.useState(0)
+  const { t } = useTranslation()
+  const breatheFileLimit = 10
+
   useEffect(() => {
     setSchemaListObj(SchemaList())
   }, [])
@@ -233,16 +252,21 @@ export default function GameCreator({
         validateEmotions
       )
     } else {
+      if (activitySpecId === "lamp.breathe") {
+        validateAudioSize()
+      }
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
         typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "")
+        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+        fileMB > breatheFileLimit
       )
     }
   }
+
   const handleChange = (details) => {
     setData({
       id: value?.id ?? undefined,
@@ -254,6 +278,20 @@ export default function GameCreator({
       photo: details.photo,
       studyID: details.studyId,
     })
+  }
+
+  const validateAudioSize = () => {
+    setFileMB(0)
+    let settingsData = data.settings
+    let b64Settings = settingsData ? settingsData.audio : ""
+    let totalSizeMB = 0
+    if (b64Settings) {
+      let stringLength = b64Settings.length - "data:audio/mpeg;base64,".length
+      let sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
+      totalSizeMB = sizeInBytes / Math.pow(1024, 2)
+    }
+    setFileMB(totalSizeMB)
+    return totalSizeMB
   }
 
   const updateSettings = (settingsData) => {
@@ -286,6 +324,14 @@ export default function GameCreator({
               : null
           }
         />
+        {fileMB > breatheFileLimit && (
+          <Box my={2} p={2} border={1} borderColor="#0000001f" className={classes.errorcustom}>
+            <Typography variant="h6">Errors</Typography>
+            <Box alignItems="center" display="flex" p={2}>
+              <Icon>error</Icon> {t("The audio size should not exceed 10 MB.")}
+            </Box>
+          </Box>
+        )}
         {((value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
           Object.keys(schemaListObj).includes(activitySpecId)) && (
           <DynamicForm
