@@ -42,7 +42,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [currentActivity, setCurrentActivity] = useState(null)
 
   useEffect(() => {
-    console.log(activity)
     setCurrentActivity(activity)
   }, [activity])
 

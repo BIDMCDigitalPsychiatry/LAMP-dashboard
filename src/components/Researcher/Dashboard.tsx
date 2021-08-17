@@ -167,7 +167,6 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
 
   useEffect(() => {
     Service.getAll("researcher").then((data) => {
-      console.log("dg")
       let researcherNotification = !!data ? data[0]?.notification ?? false : false
       setNotification(researcherNotification)
     })

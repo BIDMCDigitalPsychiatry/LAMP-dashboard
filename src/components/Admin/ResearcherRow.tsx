@@ -39,6 +39,11 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    buttoncontainer: {
+      "& button": {
+        marginLeft: "8px",
+      },
+    },
   })
 )
 
@@ -84,20 +89,16 @@ export default function ResearcherRow({
             title={name}
             subheader={
               <Box>
-                <Typography variant="overline">{userTypes[type]}</Typography>
-                {userType !== "admin" && (
-                  <Box>
-                    <Typography variant="overline">{study}</Typography>
-                  </Box>
-                )}
+                {userType === "admin" && <Typography variant="overline">{userTypes[type]}</Typography>}
+                {userType !== "admin" && <Typography variant="overline">{study}</Typography>}
               </Box>
             }
           />
         </Box>
         <Box>
           <CardActions>
-            {userType === "user_admin" && (
-              <Box>
+            {userType !== "clinical_admin" && (
+              <Box display="flex" flexDirection="row" className={classes.buttoncontainer}>
                 <Credentials user={researcher} />
                 <AddUpdateResearcher
                   researcher={researcher}

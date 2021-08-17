@@ -24,6 +24,7 @@ import Researchers from "./Researchers"
 import StudiesList from "./Studies/Index"
 import DashboardStudies from "./DashboardStudies"
 import { saveDataToCache, saveDemoData } from "../Researcher/SaveResearcherData"
+import useInterval from "../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -131,6 +132,7 @@ export default function Root({
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
+  const [studies, setStudies] = useState(null)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -138,14 +140,37 @@ export default function Root({
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
-  useEffect(() => {
-    console.log(userType)
+  useInterval(
+    () => {
+      getDBStudies()
+    },
+    studies !== null ? null : 2000,
+    true
+  )
 
-    if (LAMP.Auth._type !== "admin") return
+  const getDBStudies = () => {
+    Service.getAll("studies").then((data) => {
+      console.log(data)
+      setStudies(data || [])
+    })
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      let lampAuthId = LAMP.Auth._auth.id
+      let lampAuthPswd = LAMP.Auth._auth.password
+      if (userType === "user_admin") {
+        lampAuthId === "researcher@demo.lamp.digital"
+          ? await saveDemoData()
+          : await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+      }
+    })()
+    setCurrentTab(0)
+  }, [userType])
+
+  useEffect(() => {
+    //if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
-  }, [])
-
-  useEffect(() => {
     let authId = LAMP.Auth._auth.id
     let language = !!localStorage.getItem("LAMP_user_" + authId)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
@@ -153,15 +178,6 @@ export default function Root({
       ? getSelectedLanguage()
       : "en"
     i18n.changeLanguage(language)
-    ;(async () => {
-      let lampAuthId = LAMP.Auth._auth.id
-      let lampAuthPswd = LAMP.Auth._auth.password
-      if (userType === "user_admin") {
-        lampAuthId === "researcher@demo.lamp.digital"
-          ? saveDemoData()
-          : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
-      }
-    })()
   }, [])
 
   return (
@@ -208,7 +224,9 @@ export default function Root({
               )}
             </List>
           </Drawer>
-          {currentTab === 0 && <Researchers history={history} updateStore={updateStore} userType={userType} />}
+          {currentTab === 0 && (
+            <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
+          )}
           {currentTab === 1 && <DashboardStudies researcher={researcher} />}
         </ResponsivePaper>
       </Container>

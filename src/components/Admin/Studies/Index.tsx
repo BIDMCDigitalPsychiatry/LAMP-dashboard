@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { Box, Icon, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
-import { useSnackbar } from "notistack"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
@@ -55,7 +54,6 @@ export default function StudiesList({
   searchData?: any
   newAdddeStudy?: any
 }) {
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
   const [search, setSearch] = useState(null)

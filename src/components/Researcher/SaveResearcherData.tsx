@@ -71,10 +71,8 @@ export const saveDemoData = () => {
 
 export const saveDataToCache = (authString, id) => {
   Service.getAll("researcher").then((data) => {
-    console.log(data)
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
-        console.log(result)
         if (!!result.studies) {
           saveStudiesAndParticipants(result)
           Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])

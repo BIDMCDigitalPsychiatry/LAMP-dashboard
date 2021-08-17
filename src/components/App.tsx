@@ -232,7 +232,6 @@ function AppRouter({ ...props }) {
   }
 
   let getResearcher = (id) => {
-    console.log(id, state)
     if (id === "me" && state.authType === "researcher" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }
@@ -322,7 +321,7 @@ function AppRouter({ ...props }) {
 
   const getResearcherType = async (id: string) => {
     let res = (await LAMP.Type.getAttachment(id, "lamp.dashboard.user_type")) as any
-    setUserType(res.data.userType)
+    setUserType(res.data?.userType ?? "researcher")
   }
 
   return (

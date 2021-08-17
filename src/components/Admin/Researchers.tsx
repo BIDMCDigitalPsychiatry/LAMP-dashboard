@@ -168,7 +168,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Researchers({ history, updateStore, userType, ...props }) {
+export default function Researchers({ history, updateStore, userType, studies, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
@@ -199,7 +199,9 @@ export default function Researchers({ history, updateStore, userType, ...props }
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
       }
+
       ;(async function () {
+        console.log(studies)
         data = (
           await Promise.all(
             data.map(async (x) => ({
@@ -208,10 +210,13 @@ export default function Researchers({ history, updateStore, userType, ...props }
               res:
                 ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
                 "researcher",
+              study: ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyId ?? "",
             }))
           )
         ).filter((y) =>
-          userType === "user_admin" || userType === "clinical_admin"
+          userType === "user_admin"
+            ? !userTypes.includes(y.res) && (studies || []).filter((d) => d.id === y.study)
+            : userType === "clinical_admin"
             ? !userTypes.includes(y.res)
             : y.res !== "clinician"
         )
