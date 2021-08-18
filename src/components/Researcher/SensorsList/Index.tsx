@@ -58,7 +58,7 @@ export default function SensorsList({
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [sensors, setSensors] = useState(null)
-  const [selectedSensors, setSelectedSensors] = useState<any>([])
+  const [selectedSensors, setSelectedSensors] = useState([])
   const [paginatedSensors, setPaginatedSensors] = useState([])
   const [selected, setSelected] = useState(selectedStudies)
   const [rowCount, setRowCount] = useState(40)
