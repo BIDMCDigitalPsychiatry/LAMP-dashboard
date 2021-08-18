@@ -182,23 +182,23 @@ export default function QueryRender(props) {
         const [stringFilter, setStringFilter] = React.useState("")
         const filterRef = React.useRef(null)
 
+        //set default scale to "Large"
+        const [scale, setScale] = React.useState("6")
+
         //here, we calculate the size of the box containing the graph
         //this helps us determine which size options to display
         const boxRef = React.useRef(null)
         const [boxDimensions, setBoxDimensions] = React.useState({
-          height: 0,
-          width: 0,
+          height: null,
+          width: null,
         })
         const updateDimensions = () => {
-          if (boxRef.current) {
+          if (boxRef.current && boxRef.current.offsetWidth > 0) {
             setBoxDimensions({
               height: boxRef.current.offsetHeight,
               width: boxRef.current.offsetWidth,
             })
           }
-          if (boxDimensions.width < 400 && parseInt(scale) < 12) setScale("12")
-          else if (boxDimensions.width < 550 && parseInt(scale) < 6) setScale("6")
-          else if (boxDimensions.width < 700 && parseInt(scale) < 4) setScale("4")
         }
         let movement_timer = null
         React.useLayoutEffect(() => {
@@ -210,12 +210,16 @@ export default function QueryRender(props) {
           })
         }, [])
 
-        //set default scale to "Large"
-        const [scale, setScale] = React.useState("")
         React.useEffect(() => {
-          if (boxDimensions.width < 400) setScale("12")
-          else setScale("6")
-        }, [])
+          //if the window has become too narrow, we resize the graphs here
+
+          if (typeof boxDimensions.width === "number" && boxDimensions.width < 400 && parseInt(scale) < 12)
+            setScale("12")
+          else if (typeof boxDimensions.width === "number" && boxDimensions.width < 550 && parseInt(scale) < 6)
+            setScale("6")
+          else if (typeof boxDimensions.width === "number" && boxDimensions.width < 700 && parseInt(scale) < 4)
+            setScale("4")
+        }, [boxDimensions])
 
         const handleChange = (event) => {
           setScale(event.target.value)
