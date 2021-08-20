@@ -41,18 +41,18 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     }
   }
 
-  React.useEffect(() => {
-    if (!!editorRef.current) {
-      let cursorY = editorRef.current.getPosition().lineNumber
-      let cursorX = editorRef.current.getPosition().column
-      editorRef.current.getModel().setValue(query)
-      editorRef.current.setPosition({ lineNumber: cursorY, column: cursorX })
-    }
-  }, [query])
   const onMonacoMount = (ref) => {
     editorRef.current = ref
-    if (!!editorRef.current) editorRef.current.getModel().setValue(query)
+    if (!!editorRef.current) editorRef.current.editor.getModel().setValue(query)
   }
+  React.useEffect(() => {
+    if (!!editorRef.current) {
+      let cursorY = editorRef.current.editor.getPosition().lineNumber
+      let cursorX = editorRef.current.editor.getPosition().column
+      editorRef.current.editor.getModel().setValue(query)
+      editorRef.current.editor.setPosition({ lineNumber: cursorY, column: cursorX })
+    }
+  }, [query])
 
   function updateGUIQuery(change) {
     let updatedQuery = { ...GUIQuery }
@@ -72,7 +72,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           </Typography>
           <div style={{ flexGrow: 0.2 }} />
 
-          <div style={{ flexGrow: 0.5, width: "50px" }}>
+          <div style={{ flexGrow: 0.5, width: "50px", overflowY: "scroll" }}>
             <Typography>Query Builder</Typography>
           </div>
           <div style={{ flexGrow: 0.5, width: "50px" }}>
@@ -131,7 +131,13 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                 />
               ) : (
                 //@ts-ignore
-                <Editor path="query" onChange={(x) => setQuery(x)} onMount={onMonacoMount} />
+                <Editor
+                  style={{ margin: "5%" }}
+                  path="query"
+                  ref={editorRef}
+                  onChange={(x) => setQuery(x)}
+                  onMount={onMonacoMount}
+                />
               )}
             </Grid>
             <Grid

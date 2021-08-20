@@ -76,12 +76,13 @@ const useStyles = makeStyles((theme: Theme) =>
     tableContainerDataPortalWidth: {
       width: "calc(100% - 100px)",
       height: "calc(100% - 55px)",
+      zIndex: 5000,
       maxWidth: "100%",
       maxHeight: "calc(100% - 55px)",
       backgroundColor: "lightgrey",
       top: "55px",
       left: "90px",
-      overflow: "hidden",
+      overflow: "scroll",
       position: "absolute",
       [theme.breakpoints.down("sm")]: {
         left: "0px",

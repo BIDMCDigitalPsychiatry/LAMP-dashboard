@@ -92,8 +92,8 @@ export const useStyles3 = makeStyles((theme) => ({
 export const tags_object = {
   Administrator: ["Researcher", "ActivitySpec", "SensorSpec"],
   Researcher: ["Study", "ActivitySpec", "SensorSpec"],
-  Study: ["Participant", "ActivitySpec", "SensorSpec"],
-  Participant: ["ActivityEvent", "SensorEvent"],
+  Study: ["Participant", "ActivitySpec", "SensorSpec", "Activity", "Sensor"],
+  Participant: ["ActivityEvent", "SensorEvent", "Activity", "Sensor"],
 }
 
 export const queryables_array = [
