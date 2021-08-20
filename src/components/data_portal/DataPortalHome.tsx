@@ -130,9 +130,8 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                   queryResult={result}
                 />
               ) : (
-                //@ts-ignore
                 <Editor
-                  style={{ margin: "5%" }}
+                  //@ts-ignore
                   path="query"
                   ref={editorRef}
                   onChange={(x) => setQuery(x)}
