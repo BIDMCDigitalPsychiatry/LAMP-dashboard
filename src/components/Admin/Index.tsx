@@ -204,7 +204,7 @@ export default function Root({
     <Container maxWidth={false}>
       <Container
         className={
-          currentTab !== 1
+          currentTab !== 2
             ? window.innerWidth >= 1280 && window.innerWidth <= 1350
               ? classes.tableContainerWidthPad
               : classes.tableContainerWidth
