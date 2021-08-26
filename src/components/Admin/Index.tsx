@@ -17,7 +17,7 @@ import { CredentialManager } from "../CredentialManager"
 import { ResponsivePaper } from "../Utils"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
-import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
@@ -142,7 +142,7 @@ export default function Root({
 
   useInterval(
     () => {
-      getDBStudies()
+      if (userType === "user_admin") getDBStudies()
     },
     studies !== null ? null : 2000,
     true
@@ -150,8 +150,7 @@ export default function Root({
 
   const getDBStudies = () => {
     Service.getAll("studies").then((data) => {
-      console.log(data)
-      setStudies(data || [])
+      setStudies((data || []).length > 0 ? data : null)
     })
   }
 
@@ -207,7 +206,11 @@ export default function Root({
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={userType === "user_admin" ? t("Clinicians") : t("Researchers")} />
+                <ListItemText
+                  primary={
+                    userType === "user_admin" || userType === "clinical_admin" ? t("Clinicians") : t("Researchers")
+                  }
+                />
               </ListItem>
               {userType === "user_admin" && (
                 <ListItem
@@ -227,7 +230,7 @@ export default function Root({
           {currentTab === 0 && (
             <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
           )}
-          {currentTab === 1 && <DashboardStudies researcher={researcher} />}
+          {currentTab === 1 && <DashboardStudies researcher={researcher} setData={(data) => setStudies(data)} />}
         </ResponsivePaper>
       </Container>
     </Container>

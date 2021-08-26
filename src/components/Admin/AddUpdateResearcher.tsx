@@ -97,13 +97,13 @@ export default function AddUpdateResearcher({
   const [open, setOpen] = useState(false)
   const [name, setResearcherName] = useState(!!researcher ? researcher.name : "")
   const [rData, setRdara] = useState(researcher)
-  const [userType, setUserType] = useState("researcher")
-  const [studyId, setStudyId] = useState("")
+  const [userType, setUserType] = useState(!!researcher ? researcher.res : "researcher")
+  const [studyId, setStudyId] = useState(!!researcher ? researcher.study : "")
 
   useEffect(() => {
-    if (authuserType !== "admin") {
-      setUserType("clinician")
-    }
+    let type = authuserType !== "admin" ? "clinician" : "researcher"
+    type = !!researcher ? researcher.res : type
+    setUserType(type)
   }, [])
 
   const addResearcher = async () => {
@@ -125,7 +125,21 @@ export default function AddUpdateResearcher({
         enqueueSnackbar(t("Failed to create a new researcher."), {
           variant: "error",
         })
+        setOpen(false)
       } else {
+        await LAMP.Type.setAttachment(!!researcher ? researcher.id : result.data, "me", "lamp.dashboard.user_type", {
+          userType: userType,
+          studyId: userType === "clinician" ? studyId : "",
+          studyName: userType === "clinician" ? studies.filter((study) => study.id === studyId)[0]?.name : "",
+        })
+        enqueueSnackbar(
+          !!researcher
+            ? t("Successfully updated  the " + userType.replace("/_/g", " "))
+            : t("Successfully created a new " + userType.replace("/_/g", " ")),
+          {
+            variant: "success",
+          }
+        )
         if (!!researcher) {
           updateStore(researcher.id)
           setName(name.trim())
@@ -133,20 +147,8 @@ export default function AddUpdateResearcher({
           setRdara({ ...rData, name: name.trim(), userType: userType })
         } else {
           setResearcherName("")
-          setUserType("researcher")
           refreshResearchers()
         }
-        await LAMP.Type.setAttachment(!!researcher ? researcher.id : result.data, "me", "lamp.dashboard.user_type", {
-          userType: userType,
-          studyId: studyId,
-          studyName: studies.filter((study) => study.id === studyId)[0]?.name,
-        })
-        enqueueSnackbar(
-          !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
-          {
-            variant: "success",
-          }
-        )
         setOpen(false)
       }
     }
@@ -178,10 +180,10 @@ export default function AddUpdateResearcher({
               inputProps={{ maxLength: 80 }}
             >
               <MenuItem key="user_admin" value="user_admin">
-                User Administartor
+                User Administrator
               </MenuItem>
               <MenuItem key="clinical_admin" value="clinical_admin">
-                Clinical Administartor
+                Clinical Administrator
               </MenuItem>
               <MenuItem key="researcher" value="researcher">
                 Researcher

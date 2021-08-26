@@ -13,6 +13,7 @@ import {
   createStyles,
   Backdrop,
   CircularProgress,
+  Box,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -220,28 +221,32 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                   </ListItemIcon>
                   <ListItemText primary={t("Users")} />
                 </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 1}
-                  onClick={(event) => setCurrentTab(1)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Activities />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Activities")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 2}
-                  onClick={(event) => setCurrentTab(2)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Sensors />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Sensors")} />
-                </ListItem>
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 1}
+                    onClick={(event) => setCurrentTab(1)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Activities />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Activities")} />
+                  </ListItem>
+                )}
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 2}
+                    onClick={(event) => setCurrentTab(2)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Sensors />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Sensors")} />
+                  </ListItem>
+                )}
                 {userType === "researcher" && (
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}

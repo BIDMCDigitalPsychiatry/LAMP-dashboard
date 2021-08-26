@@ -340,6 +340,23 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     <MenuItem disabled divider>
                       <b>{t("Try mindLAMP out as a...")}</b>
                     </MenuItem>
+                    {/* <MenuItem                      
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "clinical_admin")
+                      }}
+                    >
+                      {t("Clinical Administrator")}
+                    </MenuItem>
+                    <MenuItem
+                      divider
+                      onClick={(event) => {
+                        setTryitMenu(undefined)
+                        handleLogin(event, "user_admin")
+                      }}
+                    >
+                      {t("User Administrator")}
+                    </MenuItem> */}
                     <MenuItem
                       onClick={(event) => {
                         setTryitMenu(undefined)
@@ -357,6 +374,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     >
                       {t("Clinician")}
                     </MenuItem>
+
                     <MenuItem
                       onClick={(event) => {
                         setTryitMenu(undefined)

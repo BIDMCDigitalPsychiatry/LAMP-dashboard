@@ -209,6 +209,7 @@ function AppRouter({ ...props }) {
       return
     })
     if (!!identity) {
+      await getResearcherType(LAMP.Auth._auth.id)
       let type = {
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
@@ -227,11 +228,13 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
+      window.location.href = "/#/"
       return null
     }
   }
 
   let getResearcher = (id) => {
+    getResearcherType(id)
     if (id === "me" && state.authType === "researcher" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }
@@ -241,7 +244,6 @@ function AppRouter({ ...props }) {
     if (!!store.researchers[id]) {
       return store.researchers[id]
     } else if (!storeRef.current.includes(id)) {
-      getResearcherType(id)
       LAMP.Researcher.view(id).then((x) => {
         setStore({
           researchers: { ...store.researchers, [id]: x },
@@ -321,6 +323,7 @@ function AppRouter({ ...props }) {
 
   const getResearcherType = async (id: string) => {
     let res = (await LAMP.Type.getAttachment(id, "lamp.dashboard.user_type")) as any
+    console.log(res)
     setUserType(res.data?.userType ?? "researcher")
   }
 
@@ -385,6 +388,12 @@ function AppRouter({ ...props }) {
                   onComplete={() => props.history.replace("/")}
                 />
               </React.Fragment>
+            ) : userType === "user_admin" ? (
+              <Redirect to="/user-admin/me" />
+            ) : userType === "clinical_admin" ? (
+              <Redirect to="/clinical-admin/me" />
+            ) : userType === "clinician" ? (
+              <Redirect to="/clinician/me" />
             ) : state.authType === "admin" ? (
               <Redirect to="/researcher" />
             ) : state.authType === "researcher" ? (
@@ -451,6 +460,7 @@ function AppRouter({ ...props }) {
                 title="User Administrator"
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab="Clinicians"
               >
                 <Root
                   {...props}
@@ -487,6 +497,7 @@ function AppRouter({ ...props }) {
                 title="Clinical Administrator"
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
+                activeTab="Clinicians"
               >
                 <Root
                   {...props}
@@ -524,8 +535,8 @@ function AppRouter({ ...props }) {
                 title={`${getResearcher(props.match.params.id).name}`}
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
-                activeTab="Clinician"
-                sameLineTitle={true}
+                activeTab="Clinicians"
+                sameLineTitle={false}
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
@@ -559,6 +570,12 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : !getResearcher(props.match.params.id) ? (
             <React.Fragment />
+          ) : userType === "user_admin" ? (
+            <Redirect to="/user-admin/me" />
+          ) : userType === "clinical_admin" ? (
+            <Redirect to="/clinical-admin/me" />
+          ) : userType === "clinician" ? (
+            <Redirect to="/clinician/me" />
           ) : (
             <React.Fragment>
               <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>

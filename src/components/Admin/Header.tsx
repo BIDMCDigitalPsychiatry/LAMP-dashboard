@@ -74,15 +74,19 @@ export default function Header({ researchers, searchData, refreshResearchers, us
         <CircularProgress color="inherit" />
       </Backdrop>
       <Box flexGrow={1}>
-        <Typography variant="h5">{userType === "user_admin" ? t("Clinicians") : t("Researchers")}</Typography>
+        <Typography variant="h5">
+          {userType === "user_admin" || userType === "clinical_admin" ? t("Clinicians") : t("Researchers")}
+        </Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      <AddUpdateResearcher
-        refreshResearchers={refreshResearchers}
-        researchers={researchers}
-        authuserType={userType}
-        studies={studies}
-      />
+      {userType !== "clinical_admin" && (
+        <AddUpdateResearcher
+          refreshResearchers={refreshResearchers}
+          researchers={researchers}
+          authuserType={userType}
+          studies={studies}
+        />
+      )}
     </Box>
   )
 }

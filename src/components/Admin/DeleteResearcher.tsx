@@ -24,10 +24,12 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function DeleteResearcher({
   researcher,
   refreshResearchers,
+  type,
   ...props
 }: {
   researcher: Researcher
   refreshResearchers: Function
+  type: string
 }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
@@ -37,12 +39,12 @@ export default function DeleteResearcher({
   const confirmAction = async (status) => {
     if (status === "Yes") {
       if (((await LAMP.Researcher.delete(researcher.id)) as any).error === undefined) {
-        enqueueSnackbar(t("Successfully deleted the Researcher."), {
+        enqueueSnackbar(t("Successfully deleted the " + type + "."), {
           variant: "success",
         })
         refreshResearchers()
       } else {
-        enqueueSnackbar(t("Failed to delete the Researcher."), {
+        enqueueSnackbar(t("Failed to delete the " + type + "."), {
           variant: "error",
         })
       }
@@ -60,7 +62,7 @@ export default function DeleteResearcher({
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
-        confirmationMsg={"Are you sure you want to delete this researcher(s)?."}
+        confirmationMsg={"Are you sure you want to delete this " + type.toLowerCase() + "(s)?."}
       />
     </span>
   )

@@ -188,7 +188,8 @@ export default function Researchers({ history, updateStore, userType, studies, .
   useEffect(() => {
     setFilterData(false)
     refreshResearchers()
-  }, [userType])
+    console.log(userType)
+  }, [userType, studies])
 
   const refreshResearchers = () => {
     setFilterData(false)
@@ -196,12 +197,12 @@ export default function Researchers({ history, updateStore, userType, studies, .
     setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
+      console.log(data)
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
       }
-
       ;(async function () {
-        console.log(studies)
+        const studyIds = (studies || []).map((d) => d.id)
         data = (
           await Promise.all(
             data.map(async (x) => ({
@@ -211,19 +212,21 @@ export default function Researchers({ history, updateStore, userType, studies, .
                 ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
                 "researcher",
               study: ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyId ?? "",
+              studyName:
+                ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyName ?? "",
             }))
           )
         ).filter((y) =>
           userType === "user_admin"
-            ? !userTypes.includes(y.res) && (studies || []).filter((d) => d.id === y.study)
+            ? !userTypes.includes(y.res) && studyIds.includes(y.study)
             : userType === "clinical_admin"
             ? !userTypes.includes(y.res)
             : y.res !== "clinician"
         )
         setFilterData(true)
         setResearchers(data)
+        setPaginatedResearchers(data.slice(0, rowCount))
       })()
-      setPaginatedResearchers(data.slice(0, rowCount))
     })
   }
 
@@ -268,6 +271,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
                     researchers={researchers}
                     updateStore={updateStore}
                     userType={userType}
+                    studies={studies}
                   />
                 </Grid>
               ))}

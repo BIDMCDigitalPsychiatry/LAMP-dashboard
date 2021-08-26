@@ -54,12 +54,15 @@ export default function ResearcherRow({
   refreshResearchers,
   updateStore,
   userType,
+  studies,
   ...props
 }) {
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
-  const [type, setType] = useState("")
-  const [study, setStudy] = useState("")
+  const [type, setType] = useState(researcher.res ?? "")
+  const [study, setStudy] = useState(
+    researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : ""
+  )
 
   const userTypes = {
     researcher: "Researcher",
@@ -69,16 +72,12 @@ export default function ResearcherRow({
   }
 
   const updateType = (type) => {
-    setType(!!userTypes[type] ? userTypes[type] : "Researcher")
+    setType(type)
   }
 
   useEffect(() => {
-    ;(async () => {
-      let res = (await LAMP.Type.getAttachment(researcher.id, "lamp.dashboard.user_type")) as any
-      setType(!!res.data && res.data.userType ? res.data.userType : "researcher")
-      setStudy(!!res.data && res.data.studyName ? res.data.studyName : "")
-    })()
-  }, [])
+    setStudy(researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : "")
+  }, [studies])
 
   return (
     <Card className={classes.cardMain}>
@@ -108,27 +107,34 @@ export default function ResearcherRow({
                   researchers={researchers}
                   updateStore={updateStore}
                   authuserType={userType}
+                  studies={studies}
                 />
-                <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+                <DeleteResearcher
+                  researcher={researcher}
+                  refreshResearchers={refreshResearchers}
+                  type={userTypes[type]}
+                />
               </Box>
             )}
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                type === "researcher"
-                  ? history.push(`/researcher/${researcher.id}`)
-                  : type === "user_admin"
-                  ? history.push(`/user-admin/${researcher.id}`)
-                  : type === "clinical_admin"
-                  ? history.push(`/clinical-admin/${researcher.id}`)
-                  : type === "clinician"
-                  ? history.push(`/clinician/${researcher.id}`)
-                  : history.push(`/researcher/${researcher.id}`)
-              }}
-            >
-              <Icon>arrow_forward</Icon>
-            </Fab>
+            {userType !== "user_admin" && (
+              <Fab
+                size="small"
+                classes={{ root: classes.btnWhite }}
+                onClick={() => {
+                  type === "researcher"
+                    ? history.push(`/researcher/${researcher.id}`)
+                    : type === "user_admin"
+                    ? history.push(`/user-admin/${researcher.id}`)
+                    : type === "clinical_admin"
+                    ? history.push(`/clinical-admin/${researcher.id}`)
+                    : type === "clinician"
+                    ? history.push(`/clinician/${researcher.id}`)
+                    : history.push(`/researcher/${researcher.id}`)
+                }}
+              >
+                <Icon>arrow_forward</Icon>
+              </Fab>
+            )}
           </CardActions>
         </Box>
       </Box>

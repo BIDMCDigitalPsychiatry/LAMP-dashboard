@@ -123,6 +123,8 @@ export default function AddUser({
       userType === "clinician" ? addDemoParticipant() : createDemoStudy()
     } else {
       userType === "clinician" ? addParticipant() : createStudy()
+      closePopUp(3)
+      props.onClose as any
     }
   }
 
