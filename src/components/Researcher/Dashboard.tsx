@@ -11,11 +11,14 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Backdrop,
+  CircularProgress,
+  Box,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
 import SensorsList from "./SensorsList/Index"
-import StudiesList from "./Studies/Index"
+import StudiesList from "../Admin/Studies/Index"
 import { ResponsivePaper } from "../Utils"
 import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
@@ -29,6 +32,7 @@ import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
 // import { Researcher } from "../DBService/Types/Researcher"
 // import { Study } from "../DBService/Types/Study"
+import DashboardStudies from "../Admin/DashboardStudies"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -128,6 +132,10 @@ const useStyles = makeStyles((theme: Theme) =>
         cursor: "pointer !important",
       },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
   })
 )
 
@@ -149,16 +157,14 @@ export const sortData = (data, studies, key) => {
 //   activity_count?: number
 //   sensor_count?: number
 // }
-export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
+
+export default function Dashboard({ onParticipantSelect, researcher, userType, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
+  const [loading, setLoading] = useState(false)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [updatedData, setUpdatedData] = useState(null)
-  const [deletedData, setDeletedData] = useState(null)
-  const [newStudy, setNewStudy] = useState(null)
-  const [search, setSearch] = useState(null)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -170,47 +176,21 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
     true
   )
 
-  useEffect(() => {
-    if (!!newStudy) getAllStudies()
-  }, [newStudy])
-
-  useEffect(() => {
-    if (updatedData !== null) getAllStudies()
-  }, [updatedData])
-
-  useEffect(() => {
-    if (deletedData !== null) {
-      let newStudies = studies.filter((item) => {
-        if (!!search) {
-          return item?.name?.toLowerCase()?.includes(search?.toLowerCase()) && item.id !== deletedData
-        } else {
-          return item?.id !== deletedData
-        }
-      })
-      setStudies(newStudies)
-    } else {
-      getAllStudies()
-    }
-  }, [deletedData])
-
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
+      if ((studies || []).length > 0) setLoading(false)
       setStudies(studies)
       filterStudies(studies)
       setCurrentTab(0)
-      Service.getAll("researcher").then((data) => {
-        let researcherNotification = !!data ? data[0]?.notification ?? false : false
-        setNotification(researcherNotification)
-      })
     })
   }
 
-  const getAllStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
+  useEffect(() => {
+    Service.getAll("researcher").then((data) => {
+      let researcherNotification = !!data ? data[0]?.notification ?? false : false
+      setNotification(researcherNotification)
     })
-  }
+  }, [])
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
@@ -229,6 +209,9 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
 
   return (
     <Container maxWidth={false}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Container
         className={
           currentTab !== 4
@@ -259,50 +242,45 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   </ListItemIcon>
                   <ListItemText primary={t("Users")} />
                 </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 1}
-                  onClick={(event) => setCurrentTab(1)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Activities />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Activities")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 2}
-                  onClick={(event) => setCurrentTab(2)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Sensors />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Sensors")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 3}
-                  onClick={(event) => setCurrentTab(3)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Studies />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Studies")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 4}
-                  onClick={(event) => setCurrentTab(4)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <DataPortalIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={"Data Portal"} />
-                </ListItem>
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 1}
+                    onClick={(event) => setCurrentTab(1)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Activities />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Activities")} />
+                  </ListItem>
+                )}
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 2}
+                    onClick={(event) => setCurrentTab(2)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Sensors />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Sensors")} />
+                  </ListItem>
+                )}
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 3}
+                    onClick={(event) => setCurrentTab(3)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Studies />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Studies")} />
+                  </ListItem>
+                )}
               </List>
             </Drawer>
             {currentTab === 0 && (
@@ -314,8 +292,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
-                getAllStudies={getAllStudies}
-                newAdddeStudy={setNewStudy}
+                userType={userType}
               />
             )}
             {currentTab === 1 && (
@@ -325,6 +302,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                userType={userType}
               />
             )}
             {currentTab === 2 && (
@@ -334,19 +312,10 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                userType={userType}
               />
             )}
-            {currentTab === 3 && (
-              <StudiesList
-                title={null}
-                researcher={researcher}
-                studies={studies}
-                upatedDataStudy={(data) => setUpdatedData(data)}
-                deletedDataStudy={(data) => setDeletedData(data)}
-                searchData={(data) => setSearch(data)}
-                newAdddeStudy={setNewStudy}
-              />
-            )}
+            {currentTab === 3 && <DashboardStudies researcher={researcher} filterStudies={filterStudies} />}
 
             {currentTab === 4 && (
               <DataPortal

@@ -99,7 +99,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({ researcher, studies, setUpdateCount, setParticipants, newStudyObj, ...props }) {
+export default function AddButton({
+  researcher,
+  studies,
+  setUpdateCount,
+  setParticipants,
+  newStudyObj,
+  userType,
+  ...props
+}) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
@@ -160,25 +168,29 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
             <Typography variant="h6">{t("Add a patient")}</Typography>
             <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setAddStudy(true)
-            }}
-          >
-            <Typography variant="h6">{t("Add a new study")}</Typography>
-            <Typography variant="body2">{t("Create a new study.")}</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setAddStudy(false)
-              setAddParticipantStudy(true)
-            }}
-          >
-            <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
-            <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
-          </MenuItem>
+          {userType === "researcher" && (
+            <Box>
+              <MenuItem
+                onClick={() => {
+                  setPopover(null)
+                  setAddStudy(true)
+                }}
+              >
+                <Typography variant="h6">{t("Add a new study")}</Typography>
+                <Typography variant="body2">{t("Create a new study.")}</Typography>
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setPopover(null)
+                  setAddStudy(false)
+                  setAddParticipantStudy(true)
+                }}
+              >
+                <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
+                <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
+              </MenuItem>
+            </Box>
+          )}
         </React.Fragment>
       </Popover>
       <StudyCreator
@@ -197,6 +209,7 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
         handleNewStudy={handleNewStudyData}
         setParticipants={setParticipants}
         closePopUp={handleClosePopUp}
+        userType={userType}
       />
       <PatientStudyCreator
         studies={studies}

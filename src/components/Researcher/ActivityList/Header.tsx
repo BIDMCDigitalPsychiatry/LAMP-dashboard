@@ -40,6 +40,7 @@ export default function Header({
   setSelectedStudies,
   selectedStudies,
   setActivities,
+  userType,
   ...props
 }) {
   const classes = useStyles()
@@ -61,9 +62,11 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">{t("Activities")}</Typography>
         </Box>
-        <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
-        </Box>
+        {userType === "researcher" && (
+          <Box>
+            <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
+          </Box>
+        )}
         <SearchBox searchData={searchData} />
         <Box>
           <AddActivity

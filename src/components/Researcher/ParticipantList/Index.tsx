@@ -121,7 +121,7 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
-  getAllStudies,
+  userType,
   ...props
 }) {
   const classes = useStyles()
@@ -139,13 +139,6 @@ export default function ParticipantList({
 
   const { t } = useTranslation()
 
-  useInterval(
-    () => {
-      getAllStudies()
-    },
-    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
-    true
-  )
   useEffect(() => {
     setSelected(selectedStudies)
     if (selectedStudies.length > 0) {
@@ -156,10 +149,6 @@ export default function ParticipantList({
   useEffect(() => {
     setStudiesData(studies)
   }, [studies])
-
-  useEffect(() => {
-    getAllStudies()
-  }, [newStudy])
 
   const handleChange = (participant, checked) => {
     if (checked) {
@@ -226,6 +215,7 @@ export default function ParticipantList({
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
         newStudyObj={setNewStudy}
+        userType={userType}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

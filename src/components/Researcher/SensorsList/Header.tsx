@@ -38,6 +38,7 @@ export default function Header({
   selectedStudies,
   setSensors,
   setChangeCount,
+  userType,
   ...props
 }: {
   studies?: Array<Object>
@@ -48,6 +49,7 @@ export default function Header({
   selectedStudies: Array<string>
   setSensors?: Function
   setChangeCount?: Function
+  userType?: string
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
@@ -64,9 +66,11 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">{t("Sensors")}</Typography>
         </Box>
-        <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
-        </Box>
+        {userType === "researcher" && (
+          <Box>
+            <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
+          </Box>
+        )}
         <SearchBox searchData={searchData} />
         <Box>
           <AddSensor studies={studies} setSensors={setSensors} setUpdateCount={setUpdateCount} />

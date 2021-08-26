@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
+import React, { useState, useEffect } from "react"
+import { Box, Fab, Card, CardHeader, CardActions, Icon, Typography } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
 import LAMP from "lamp-core"
@@ -39,39 +39,102 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    buttoncontainer: {
+      "& button": {
+        marginLeft: "8px",
+      },
+    },
   })
 )
 
-export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, updateStore, ...props }) {
+export default function ResearcherRow({
+  history,
+  researcher,
+  researchers,
+  refreshResearchers,
+  updateStore,
+  userType,
+  studies,
+  ...props
+}) {
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
+  const [type, setType] = useState(researcher.res ?? "")
+  const [study, setStudy] = useState(
+    researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : ""
+  )
+
+  const userTypes = {
+    researcher: "Researcher",
+    user_admin: "User Administrator",
+    clinical_admin: "Clinical Administrator",
+    clinician: "Clinician",
+  }
+
+  const updateType = (type) => {
+    setType(type)
+  }
+
+  useEffect(() => {
+    setStudy(researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : "")
+  }, [studies])
 
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" alignItems="center">
         <Box flexGrow={1} py={1}>
-          <CardHeader className={classes.activityHeader} title={name} />
+          <CardHeader
+            className={classes.activityHeader}
+            title={name}
+            subheader={
+              <Box>
+                {userType === "admin" && <Typography variant="overline">{userTypes[type]}</Typography>}
+                {userType !== "admin" && <Typography variant="overline">{study}</Typography>}
+              </Box>
+            }
+          />
         </Box>
         <Box>
           <CardActions>
-            <Credentials user={researcher} />
-            <AddUpdateResearcher
-              researcher={researcher}
-              refreshResearchers={refreshResearchers}
-              setName={setName}
-              researchers={researchers}
-              updateStore={updateStore}
-            />
-            <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                history.push(`/researcher/${researcher.id}`)
-              }}
-            >
-              <Icon>arrow_forward</Icon>
-            </Fab>
+            {userType !== "clinical_admin" && (
+              <Box display="flex" flexDirection="row" className={classes.buttoncontainer}>
+                <Credentials user={researcher} />
+                <AddUpdateResearcher
+                  researcher={researcher}
+                  refreshResearchers={refreshResearchers}
+                  setName={setName}
+                  setType={updateType}
+                  researchers={researchers}
+                  updateStore={updateStore}
+                  authuserType={userType}
+                  studies={studies}
+                />
+                <DeleteResearcher
+                  researcher={researcher}
+                  refreshResearchers={refreshResearchers}
+                  type={userTypes[type]}
+                />
+              </Box>
+            )}
+            {userType !== "user_admin" && (
+              <Fab
+                size="small"
+                classes={{ root: classes.btnWhite }}
+                onClick={() => {
+                  type === "researcher"
+                    ? history.push(`/researcher/${researcher.id}`)
+                    : type === "user_admin"
+                    ? history.push(`/user-admin/${researcher.id}`)
+                    : type === "clinical_admin"
+                    ? history.push(`/clinical-admin/${researcher.id}`)
+                    : type === "clinician"
+                    ? history.push(`/clinician/${researcher.id}`)
+                    : history.push(`/researcher/${researcher.id}`)
+                }}
+              >
+                <Icon>arrow_forward</Icon>
+              </Fab>
+            )}
           </CardActions>
         </Box>
       </Box>

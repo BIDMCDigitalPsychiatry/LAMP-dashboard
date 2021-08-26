@@ -75,13 +75,15 @@ export default function AddUser({
   setParticipants,
   handleNewStudy,
   closePopUp,
+  userType,
   ...props
 }: {
   researcher: any
   studies: any
   setParticipants?: Function
-  handleNewStudy: Function
-  closePopUp: Function
+  handleNewStudy?: Function
+  closePopUp?: Function
+  userType?: string
 } & DialogProps) {
   const classes = useStyles()
   const [selectedStudy, setSelectedStudy] = useState("")
@@ -108,32 +110,7 @@ export default function AddUser({
       return false
     } else {
       setStudyBtnClicked(true)
-      let newCount = 1
-      let ids = []
-      for (let i = 0; i < newCount; i++) {
-        let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
-        let id = typeof idData === "object" ? idData.id : idData
-        let newParticipant: any = {}
-        if (typeof idData === "object") {
-          newParticipant = idData
-        } else {
-          newParticipant["id"] = idData
-        }
-        if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
-          enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
-        } else {
-          newParticipant.study_id = selectedStudy
-          newParticipant.study_name = studies.filter((study) => study.id === selectedStudy)[0]?.name
-          Service.addData("participants", [newParticipant])
-          Service.updateCount("studies", selectedStudy, "participant_count")
-          Service.getData("studies", selectedStudy).then((studiesObject) => {
-            handleNewStudy(studiesObject)
-          })
-          setNewId(newParticipant.id)
-        }
-        ids = [...ids, id]
-      }
-      setParticipants()
+      addParticipant()
     }
     setSelectedStudy("")
     closePopUp(3)
@@ -143,10 +120,52 @@ export default function AddUser({
   const createNewStudy = () => {
     let lampAuthId = LAMP.Auth._auth.id
     if (LAMP.Auth._type === "researcher" && lampAuthId === "researcher@demo.lamp.digital") {
-      createDemoStudy()
+      userType === "clinician" ? addDemoParticipant() : createDemoStudy()
     } else {
-      createStudy()
+      userType === "clinician" ? addParticipant() : createStudy()
+      closePopUp(3)
+      props.onClose as any
     }
+  }
+
+  const addDemoParticipant = () => {
+    let newParticipant: any = {}
+    newParticipant.id = "U" + Math.random().toString().substring(2, 11)
+    newParticipant.study_id = selectedStudy
+    let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
+    newParticipant.study_name = studyName
+    Service.addData("participants", [newParticipant])
+    Service.updateCount("studies", selectedStudy, "participant_count")
+    Service.getData("studies", selectedStudy).then((studiesObject) => {
+      handleNewStudy(studiesObject)
+    })
+    setNewId(newParticipant.id)
+  }
+
+  const addParticipant = async () => {
+    let ids = []
+    let idData = ((await LAMP.Participant.create(selectedStudy, { study_code: "001" } as any)) as any).data
+    let id = typeof idData === "object" ? idData.id : idData
+    let newParticipant: any = {}
+    if (typeof idData === "object") {
+      newParticipant = idData
+    } else {
+      newParticipant["id"] = idData
+    }
+    if (!!((await LAMP.Credential.create(id, `${id}@lamp.com`, id, "Temporary Login")) as any).error) {
+      enqueueSnackbar(t("Could not create credential for id.", { id: id }), { variant: "error" })
+    } else {
+      newParticipant.study_id = selectedStudy
+      newParticipant.study_name = studies.filter((study) => study.id === selectedStudy)[0]?.name
+      Service.addData("participants", [newParticipant])
+      Service.updateCount("studies", selectedStudy, "participant_count")
+      Service.getData("studies", selectedStudy).then((studiesObject) => {
+        handleNewStudy(studiesObject)
+      })
+      setNewId(newParticipant.id)
+    }
+    ids = [...ids, id]
+    setParticipants()
   }
 
   const createDemoStudy = () => {
@@ -154,18 +173,8 @@ export default function AddUser({
       setShowErrorMsg(true)
       return false
     } else {
-      let studyName = studies.filter((study) => study.id === selectedStudy)[0]?.name
       setStudyBtnClicked(true)
-      let newParticipant: any = {}
-      newParticipant.id = "U" + Math.random().toString().substring(2, 11)
-      newParticipant.study_id = selectedStudy
-      newParticipant.study_name = studyName
-      Service.addData("participants", [newParticipant])
-      Service.updateCount("studies", selectedStudy, "participant_count")
-      Service.getData("studies", selectedStudy).then((studiesObject) => {
-        handleNewStudy(studiesObject)
-      })
-      setNewId(newParticipant.id)
+      addDemoParticipant()
       closePopUp(3)
       setSelectedStudy("")
       setParticipants()
