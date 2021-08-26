@@ -24,10 +24,12 @@ import { ReactComponent as Patients } from "../../icons/Patients.svg"
 import { ReactComponent as Activities } from "../../icons/Activities.svg"
 import { ReactComponent as Sensors } from "../../icons/Sensor.svg"
 import { ReactComponent as Studies } from "../../icons/Study.svg"
+import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
 import { useTranslation } from "react-i18next"
 import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
+import DataPortal from "../data_portal/DataPortal"
 // import { Researcher } from "../DBService/Types/Researcher"
 // import { Study } from "../DBService/Types/Study"
 import DashboardStudies from "../Admin/DashboardStudies"
@@ -80,6 +82,23 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 1055,
       paddingLeft: 0,
       paddingRight: 0,
+    },
+    tableContainerDataPortalWidth: {
+      width: "calc(100% - 100px)",
+      height: "calc(100%)",
+      zIndex: 5000,
+      maxWidth: "100%",
+      maxHeight: "calc(100%)",
+      backgroundColor: "lightgrey",
+      top: "0px",
+      left: "90px",
+      overflow: "scroll",
+      position: "absolute",
+      [theme.breakpoints.down("sm")]: {
+        left: "0px",
+        width: "100vw",
+        height: "calc(100% - 155px)",
+      },
     },
     menuOuter: {
       paddingTop: 0,
@@ -195,9 +214,11 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
       </Backdrop>
       <Container
         className={
-          window.innerWidth >= 1280 && window.innerWidth <= 1350
-            ? classes.tableContainerWidthPad
-            : classes.tableContainerWidth
+          currentTab !== 4
+            ? window.innerWidth >= 1280 && window.innerWidth <= 1350
+              ? classes.tableContainerWidthPad
+              : classes.tableContainerWidth
+            : classes.tableContainerDataPortalWidth
         }
       >
         {!!studies && (
@@ -294,17 +315,21 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                 userType={userType}
               />
             )}
-            {currentTab === 3 && (
-              <DashboardStudies researcher={researcher} filterStudies={filterStudies} />
-              // <StudiesList
-              //   title={null}
-              //   researcher={researcher}
-              //   studies={studies}
-              //   upatedDataStudy={(data) => setUpdatedData(data)}
-              //   deletedDataStudy={(data) => setDeletedData(data)}
-              //   searchData={(data) => setSearch(data)}
-              //   newAdddeStudy={setNewStudy}
-              // />
+            {currentTab === 3 && <DashboardStudies researcher={researcher} filterStudies={filterStudies} />}
+
+            {currentTab === 4 && (
+              <DataPortal
+                onLogout={null}
+                token={{
+                  username: LAMP.Auth._auth.id,
+                  password: LAMP.Auth._auth.password,
+                  server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                  type: "Researcher",
+                  id: researcher.id,
+                  name: researcher.name,
+                }}
+                data={LAMP.Auth}
+              />
             )}
           </ResponsivePaper>
         )}

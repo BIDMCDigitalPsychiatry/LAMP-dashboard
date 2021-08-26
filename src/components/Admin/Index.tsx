@@ -17,11 +17,12 @@ import { CredentialManager } from "../CredentialManager"
 import { ResponsivePaper } from "../Utils"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
+import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
+import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
-import StudiesList from "./Studies/Index"
+import DataPortal from "../data_portal/DataPortal"
 import DashboardStudies from "./DashboardStudies"
 import { saveDataToCache, saveDemoData } from "../Researcher/SaveResearcherData"
 import useInterval from "../useInterval"
@@ -74,6 +75,26 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 1055,
       paddingLeft: 0,
       paddingRight: 0,
+    },
+    tableContainerDataPortalWidth: {
+      width: "calc(100% - 100px)",
+      height: "calc(100% - 55px)",
+      zIndex: 5000,
+      maxWidth: "100%",
+      maxHeight: "calc(100% - 55px)",
+      backgroundColor: "lightgrey",
+      top: "55px",
+      left: "90px",
+      overflow: "scroll",
+      position: "absolute",
+      [theme.breakpoints.down("sm")]: {
+        left: "0px",
+        width: "100vw",
+        height: "calc(100% - 155px)",
+      },
+    },
+    responsivePaperDataPortal: {
+      paddingBottom: 0,
     },
     menuOuter: {
       paddingTop: 0,
@@ -183,10 +204,13 @@ export default function Root({
     <Container maxWidth={false}>
       <Container
         className={
-          window.innerWidth >= 1280 && window.innerWidth <= 1350
-            ? classes.tableContainerWidthPad
-            : classes.tableContainerWidth
+          currentTab !== 1
+            ? window.innerWidth >= 1280 && window.innerWidth <= 1350
+              ? classes.tableContainerWidthPad
+              : classes.tableContainerWidth
+            : classes.tableContainerDataPortalWidth
         }
+        style={{ marginBottom: "0px" }}
       >
         <ResponsivePaper elevation={0}>
           <Drawer
@@ -195,6 +219,7 @@ export default function Root({
             classes={{
               paper: classes.researcherMenu + " " + classes.logResearcher,
             }}
+            style={{ marginBottom: "0px" }}
           >
             <List component="nav" className={classes.menuOuter}>
               <ListItem
@@ -225,12 +250,35 @@ export default function Root({
                   <ListItemText primary={t("Studies")} />
                 </ListItem>
               )}
+              <ListItem
+                className={classes.menuItems + " " + classes.btnCursor}
+                button
+                selected={currentTab === 2}
+                onClick={(event) => setCurrentTab(2)}
+              >
+                <ListItemIcon className={classes.menuIcon}>
+                  <DataPortalIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Data Portal"} />
+              </ListItem>
             </List>
           </Drawer>
           {currentTab === 0 && (
             <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
           )}
           {currentTab === 1 && <DashboardStudies researcher={researcher} setData={(data) => setStudies(data)} />}
+          {currentTab === 2 && (
+            <DataPortal
+              onLogout={null}
+              token={{
+                username: LAMP.Auth._auth.id,
+                password: LAMP.Auth._auth.password,
+                server: LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital",
+                type: "Administrator",
+                name: "Administrator",
+              }}
+            />
+          )}
         </ResponsivePaper>
       </Container>
     </Container>
