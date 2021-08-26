@@ -323,7 +323,6 @@ function AppRouter({ ...props }) {
 
   const getResearcherType = async (id: string) => {
     let res = (await LAMP.Type.getAttachment(id, "lamp.dashboard.user_type")) as any
-    console.log(res)
     setUserType(res.data?.userType ?? "researcher")
   }
 

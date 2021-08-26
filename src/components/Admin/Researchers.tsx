@@ -188,7 +188,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
   useEffect(() => {
     setFilterData(false)
     refreshResearchers()
-    console.log(userType)
   }, [userType, studies])
 
   const refreshResearchers = () => {
@@ -197,7 +196,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
     setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
-      console.log(data)
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name.includes(search))
       }
