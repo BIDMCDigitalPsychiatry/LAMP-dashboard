@@ -30,6 +30,10 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    norecordsmain: {
+      minHeight: "calc(100% - 114px)",
+      position: "absolute",
+    },
     norecords: {
       "& span": { marginRight: 5 },
     },
@@ -79,37 +83,42 @@ export default function SensorsList({
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies.length > 0) {
+    if (selectedStudies) {
       searchFilterSensors()
     }
   }, [selectedStudies])
 
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedStudies.length > 0 && !loading) {
-      let result = []
-      setLoading(true)
-      selectedStudies.map((study) => {
-        Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
-          if ((sensorData || []).length > 0) {
-            if (!!searchTxt && searchTxt.trim().length > 0) {
-              result = result.concat(sensorData)
-              result = result.filter((i) => i.name?.toLowerCase().includes(searchTxt?.toLowerCase()))
-              setSensors(sortData(result, selectedStudies, "name"))
+    if (selectedStudies.length > 0) {
+      const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
+      if (selectedData.length > 0 && !loading) {
+        let result = []
+        setLoading(true)
+        selectedData.map((study) => {
+          Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
+            if ((sensorData || []).length > 0) {
+              if (!!searchTxt && searchTxt.trim().length > 0) {
+                result = result.concat(sensorData)
+                result = result.filter((i) => i.name?.toLowerCase().includes(searchTxt?.toLowerCase()))
+                setSensors(sortData(result, selectedData, "name"))
+              } else {
+                result = result.concat(sensorData)
+                setSensors(sortData(result, selectedData, "name"))
+              }
+              setPaginatedSensors(result.slice(0, rowCount))
+              setPage(0)
             } else {
-              result = result.concat(sensorData)
-              setSensors(sortData(result, selectedStudies, "name"))
+              if (result.length === 0) setSensors([])
             }
-            setPaginatedSensors(result.slice(0, rowCount))
-            setPage(0)
-          } else {
-            if (result.length === 0) setSensors([])
-          }
-          setLoading(false)
+            setLoading(false)
+          })
         })
-      })
+      } else {
+        setLoading(false)
+      }
     } else {
+      setSensors([])
       setLoading(false)
     }
     setSelectedSensors([])
@@ -130,9 +139,9 @@ export default function SensorsList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading || sensors === null}>
+      {/*<Backdrop className={classes.backdrop} open={loading || sensors === null}>
         <CircularProgress color="inherit" />
-      </Backdrop>
+  </Backdrop>*/}
       <Header
         studies={studies}
         researcher={researcher}
@@ -161,12 +170,12 @@ export default function SensorsList({
               <Pagination data={sensors} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
-            <Grid item lg={6} xs={12}>
-              <Box display="flex" alignItems="center" className={classes.norecords}>
+            <Box className={classes.norecordsmain}>
+              <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
                 <Icon>info</Icon>
                 {t("No Records Found")}
               </Box>
-            </Grid>
+            </Box>
           )}
         </Grid>
       </Box>

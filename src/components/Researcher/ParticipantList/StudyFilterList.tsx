@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { Box, Fab } from "@material-ui/core"
+import { Box, Chip, Fab, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 // Local Imports
 import LAMP, { StudyService } from "lamp-core"
 import MultipleSelect from "../../MultipleSelect"
 import { useTranslation } from "react-i18next"
-import { useSnackbar } from "notistack"
 import { Service } from "../../DBService/DBService"
 
 export interface NewStudy {
@@ -18,6 +17,42 @@ export interface Study {
 export interface Researcher {
   id?: string
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    badgeCount: {
+      color: "#6083E7",
+      paddingLeft: 10,
+    },
+    multiselect: {
+      border: "1px solid #C6C6C6",
+      background: "#FFFFFF",
+      color: "rgba(0, 0, 0, 0.4)",
+      height: "auto",
+      minHeight: "32px",
+      paddingTop: "5px",
+      paddingBottom: "5px",
+      "&:focus": { background: "#FFFFFF !important" },
+    },
+    multiselectPrimary: {
+      background: "#ECF4FF !important",
+      border: "1px solid #ECF4FF",
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: 500,
+      "&:focus": { background: "#ECF4FF !important" },
+    },
+    filterChips: {
+      flexWrap: "wrap",
+      display: "flex",
+      justifyContent: "center",
+      maxWidth: 1055,
+      margin: "15px auto 0",
+      width: "100%",
+    },
+    chiplabel: { whiteSpace: "break-spaces" },
+  })
+)
+
 export default function StudyFilterList({
   studies,
   researcher,
@@ -38,10 +73,13 @@ export default function StudyFilterList({
   updateCount?: number
   setUpdateCount?: Function
 }) {
+  const classes = useStyles()
   const { t } = useTranslation()
   const [studiesCount, setStudiesCount] = useState(null)
-  const { enqueueSnackbar } = useSnackbar()
   const [studs, setStuds] = useState(studies)
+  const [allStudies, setAllStudies] = useState([])
+  const [selectAll, setSelectAll] = useState(false)
+  const [deSelectAll, setDeselectAll] = useState(false)
 
   useEffect(() => {
     refreshStudies()
@@ -52,8 +90,12 @@ export default function StudyFilterList({
   }, [studies])
 
   const refreshStudies = () => {
-    Service.getAll("studies").then((data) => {
+    Service.getAll("studies").then((data: any) => {
       setStuds(data || [])
+      let studiesArray = data.map(function (obj) {
+        return obj.name
+      })
+      setAllStudies(studiesArray)
     })
     setUpdateCount(0)
   }
@@ -85,28 +127,88 @@ export default function StudyFilterList({
     )
   }
 
+  const getFilterTypeStorage = () => {
+    return localStorage.getItem("studyFilter_" + LAMP.Auth._auth.id) !== null
+      ? JSON.parse(localStorage.getItem("studyFilter_" + LAMP.Auth._auth.id))
+      : 0
+  }
+
   return (
     <Box>
       {showFilterStudies === true && (
         <Box mt={1}>
-          {
-            <MultipleSelect
-              selected={selectedStudies}
-              items={(studs || []).map((x) => `${x.name}`)}
-              showZeroBadges={false}
-              badges={studiesCount}
-              onChange={(x) => {
-                if (x.length > 0) {
-                  LAMP.Type.setAttachment(researcher.id, "me", "lamp.selectedStudies", x)
+          <Box className={classes.filterChips}>
+            {[t("Select All"), t("Deselect All")].map((item) => (
+              <Tooltip key={item} style={{ margin: 4 }} title={item}>
+                <Chip
+                  classes={{
+                    root: classes.multiselect,
+                    colorPrimary: classes.multiselectPrimary,
+                    label: classes.chiplabel,
+                  }}
+                  label={
+                    <section>
+                      <b>{t(item)}</b>
+                    </section>
+                  }
+                  color={
+                    (getFilterTypeStorage() === 1 && item === "Select All") ||
+                    (getFilterTypeStorage() === 2 && item === "Deselect All")
+                      ? "primary"
+                      : undefined
+                  }
+                  onClick={(x) => {
+                    let allStudiesArray = []
+                    let selectAllStudy = false
+                    let deselectAllStudy = false
+                    let flagData = 0 // 0 = "", 1 = "Select All", 2 = "Deselect All"
+                    if (item === "Select All") {
+                      allStudiesArray = allStudies
+                      selectAllStudy = true
+                      deselectAllStudy = false
+                      flagData = 1
+                    } else if (item === "Deselect All") {
+                      selectAllStudy = false
+                      deselectAllStudy = true
+                      flagData = 2
+                    } else {
+                      selectAllStudy = false
+                      deselectAllStudy = false
+                    }
+                    setSelectAll(selectAllStudy)
+                    setDeselectAll(deselectAllStudy)
+                    localStorage.setItem("studies_" + LAMP.Auth._auth.id, JSON.stringify(allStudiesArray))
+                    localStorage.setItem("studyFilter_" + LAMP.Auth._auth.id, JSON.stringify(flagData))
+                    setSelectedStudies(allStudiesArray)
+                  }}
+                />
+              </Tooltip>
+            ))}
+          </Box>
+          <Box>
+            {
+              <MultipleSelect
+                selected={selectedStudies}
+                items={(studs || []).map((x) => `${x.name}`)}
+                showZeroBadges={false}
+                badges={studiesCount}
+                onChange={(x) => {
+                  localStorage.setItem("studies_" + LAMP.Auth._auth.id, JSON.stringify(x))
                   setSelectedStudies(x)
-                } else {
-                  enqueueSnackbar(t("Atleast 1 study should be selected."), {
-                    variant: "error",
-                  })
-                }
-              }}
-            />
-          }
+                  let flagData = 0 // 0 = "", 1 = "Select All", 2 = "Deselect All"
+                  if (allStudies.length !== x.length) {
+                    setDeselectAll(false)
+                    setSelectAll(false)
+                  } else {
+                    setSelectAll(true)
+                    setDeselectAll(false)
+                    flagData = 1
+                  }
+                  localStorage.setItem("studyFilter_" + LAMP.Auth._auth.id, JSON.stringify(flagData))
+                }}
+              />
+            }
+          </Box>
         </Box>
       )}
     </Box>

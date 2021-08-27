@@ -194,15 +194,20 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
-      let selected = ((await LAMP.Type.getAttachment(researcher.id, "lamp.selectedStudies")) as any).data ?? []
-      let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
-      selected =
-        selected.length === 0 || filtered.length === 0
-          ? (studies ?? []).map((study) => {
-              return study.name
-            })
-          : filtered
-      selected.sort()
+      let selected =
+        localStorage.getItem("studies_" + LAMP.Auth._auth.id) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + LAMP.Auth._auth.id))
+          : []
+      if (selected.length > 0) {
+        let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
+        selected =
+          selected.length === 0 || filtered.length === 0
+            ? (studies ?? []).map((study) => {
+                return study.name
+              })
+            : filtered
+        selected.sort()
+      }
       setSelectedStudies(selected)
     }
   }

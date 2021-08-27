@@ -104,7 +104,8 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
       height: "100%",
-      overflowY: "scroll",
+      /*overflowY: "scroll",*/
+      overflowY: "auto",
       left: 0,
       top: 0,
       paddingTop: 120,
@@ -418,7 +419,7 @@ export default function NavigationLayout({
                       marginLeft: supportsSidebar ? 35 : undefined,
                     }}
                   >
-                    {t(activeTab)}fgh
+                    {t(activeTab)}
                   </Typography>
                 )}
               </Container>
