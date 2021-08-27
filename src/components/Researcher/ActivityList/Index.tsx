@@ -31,6 +31,10 @@ const useStyles = makeStyles((theme: Theme) =>
         marginBottom: 80,
       },
     },
+    norecordsmain: {
+      minHeight: "calc(100% - 114px)",
+      position: "absolute",
+    },
     norecords: {
       "& span": { marginRight: 5 },
     },
@@ -104,7 +108,7 @@ export default function ActivityList({
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if ((selectedStudies || []).length > 0) {
+    if (selectedStudies) {
       searchActivities()
     }
   }, [selectedStudies])
@@ -114,30 +118,35 @@ export default function ActivityList({
     Service.getAll("activities").then((data) => {
       setAllActivities(data || [])
     })
-    selectedStudies = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedStudies.length > 0 && !loading) {
-      let result = []
-      setLoading(true)
-      selectedStudies.map((study) => {
-        Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
-          if ((activitiesData || []).length > 0) {
-            if (!!searchTxt && searchTxt.trim().length > 0) {
-              result = result.concat(activitiesData)
-              result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
-              setActivities(sortData(result, selectedStudies, "name"))
+    if (selectedStudies.length > 0) {
+      const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
+      if (selectedStudies.length > 0 && !loading) {
+        let result = []
+        setLoading(true)
+        selectedData.map((study) => {
+          Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
+            if ((activitiesData || []).length > 0) {
+              if (!!searchTxt && searchTxt.trim().length > 0) {
+                result = result.concat(activitiesData)
+                result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
+                setActivities(sortData(result, selectedData, "name"))
+              } else {
+                result = result.concat(activitiesData)
+                setActivities(sortData(result, selectedData, "name"))
+              }
+              setPaginatedActivities(result.slice(0, rowCount))
+              setPage(0)
             } else {
-              result = result.concat(activitiesData)
-              setActivities(sortData(result, selectedStudies, "name"))
+              if (result.length === 0) setActivities([])
             }
-            setPaginatedActivities(result.slice(0, rowCount))
-            setPage(0)
-          } else {
-            if (result.length === 0) setActivities([])
-          }
-          setLoading(false)
+            setLoading(false)
+          })
         })
-      })
+      } else {
+        setLoading(false)
+      }
     } else {
+      setActivities([])
       setLoading(false)
     }
     setSelectedActivities([])
@@ -158,9 +167,9 @@ export default function ActivityList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading || activities === null}>
+      {/*<Backdrop className={classes.backdrop} open={loading || activities === null}>
         <CircularProgress color="inherit" />
-      </Backdrop>
+  </Backdrop>*/}
       <Header
         studies={studiesData}
         researcher={researcher}
@@ -193,9 +202,11 @@ export default function ActivityList({
               <Pagination data={activities} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
-            <Box display="flex" alignItems="center" className={classes.norecords}>
-              <Icon>info</Icon>
-              {t("No Records Found")}
+            <Box className={classes.norecordsmain}>
+              <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
+                <Icon>info</Icon>
+                {t("No Records Found")}
+              </Box>
             </Box>
           )}
         </Grid>

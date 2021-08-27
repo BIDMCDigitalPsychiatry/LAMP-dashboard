@@ -35,6 +35,10 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    norecordsmain: {
+      minHeight: "calc(100% - 114px)",
+      position: "absolute",
+    },
     norecords: {
       "& span": { marginRight: 5 },
     },
@@ -141,7 +145,7 @@ export default function ParticipantList({
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies.length > 0) {
+    if (selectedStudies) {
       searchParticipants()
     }
   }, [selectedStudies])
@@ -161,29 +165,34 @@ export default function ParticipantList({
 
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
-    const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
-    if (selectedData.length > 0 && !loading) {
-      let result = []
-      setLoading(true)
-      selectedData.map((study) => {
-        Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
-          if ((participantData || []).length > 0) {
-            if (!!searchTxt && searchTxt.trim().length > 0) {
-              result = result.concat(participantData)
-              result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
-              setParticipants(sortData(result, selectedData, "id"))
+    if (selectedStudies.length > 0) {
+      const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+      if (selectedData.length > 0 && !loading) {
+        let result = []
+        setLoading(true)
+        selectedData.map((study) => {
+          Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
+            if ((participantData || []).length > 0) {
+              if (!!searchTxt && searchTxt.trim().length > 0) {
+                result = result.concat(participantData)
+                result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
+                setParticipants(sortData(result, selectedData, "id"))
+              } else {
+                result = result.concat(participantData)
+                setParticipants(sortData(result, selectedData, "id"))
+              }
+              setPaginatedParticipants(result.slice(0, rowCount))
+              setPage(0)
             } else {
-              result = result.concat(participantData)
-              setParticipants(sortData(result, selectedData, "id"))
+              if (result.length === 0) setParticipants([])
             }
-            setPaginatedParticipants(result.slice(0, rowCount))
-            setPage(0)
-          } else {
-            if (result.length === 0) setParticipants([])
-          }
-          setLoading(false)
+            setLoading(false)
+          })
         })
-      })
+      }
+    } else {
+      setParticipants([])
+      setLoading(false)
     }
     setSelectedParticipants([])
   }
@@ -203,9 +212,9 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading || participants === null}>
+      {/*<Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
-      </Backdrop>
+  </Backdrop>*/}
       <Header
         studies={studiesData}
         researcher={researcher}
@@ -237,9 +246,11 @@ export default function ParticipantList({
               <Pagination data={participants} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
             </Grid>
           ) : (
-            <Box display="flex" alignItems="center" className={classes.norecords}>
-              <Icon>info</Icon>
-              {t("No Records Found")}
+            <Box className={classes.norecordsmain}>
+              <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
+                <Icon>info</Icon>
+                {t("No Records Found")}
+              </Box>
             </Box>
           )}
         </Grid>
