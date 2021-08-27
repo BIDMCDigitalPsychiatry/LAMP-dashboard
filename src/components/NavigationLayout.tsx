@@ -418,7 +418,7 @@ export default function NavigationLayout({
                       marginLeft: supportsSidebar ? 35 : undefined,
                     }}
                   >
-                    {t(activeTab)}fgh
+                    {t(activeTab)}
                   </Typography>
                 )}
               </Container>

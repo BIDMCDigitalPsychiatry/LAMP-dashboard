@@ -43,7 +43,6 @@ export default function Researcher({ researcher, onParticipantSelect, userType, 
           : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
       } else if (LAMP.Auth._type === "admin") {
         if (researcher.id) {
-          console.log("user admin")
           saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
         }
       }

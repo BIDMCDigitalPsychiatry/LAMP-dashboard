@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function EditStudy({ study, upatedDataStudy, allStudies, ...props }) {
+export default function EditStudy({ study, upatedDataStudy, allStudies, researcherId, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -66,6 +66,7 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, ...props
               updateName={updateStudyName}
               callbackModal={callbackModal}
               allStudies={allStudies}
+              researcherId={researcherId}
             />
           </Box>
         ) : aliasStudyName && editStudyName === study.id ? (

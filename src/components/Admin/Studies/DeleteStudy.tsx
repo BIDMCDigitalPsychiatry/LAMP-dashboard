@@ -40,7 +40,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function DeleteStudy({ study, deletedStudy, ...props }) {
+export default function DeleteStudy({ study, deletedStudy, researcherId, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
@@ -57,6 +57,12 @@ export default function DeleteStudy({ study, deletedStudy, ...props }) {
         Service.deleteByKey("activities", [studyId], "study_id")
         Service.deleteByKey("sensors", [studyId], "study_id")
         deletedStudy(studyId)
+        ;(async () => {
+          let selectedStudies =
+            ((await LAMP.Type.getAttachment(researcherId, "lamp.selectedStudies")) as any).data ?? []
+          let data = selectedStudies.filter((d) => d !== study.name)
+          LAMP.Type.setAttachment(researcherId, "me", "lamp.selectedStudies", data)
+        })()
         enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
       })
       .catch((error) => {
