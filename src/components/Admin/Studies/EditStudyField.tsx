@@ -14,6 +14,8 @@ export default function EditStudyField({
   onUpdate,
   callbackModal,
   allStudies,
+  researcherId,
+  selectedStudies,
   ...props
 }: {
   study?: any
@@ -24,6 +26,8 @@ export default function EditStudyField({
   onUpdate?: any
   callbackModal?: any
   allStudies?: any
+  researcherId?: string
+  selectedStudies?: any
 }) {
   const inputRef = useRef<any>()
   const oldValue = useRef<string>()
@@ -37,21 +41,16 @@ export default function EditStudyField({
   useEffect(() => {
     let unmounted = false
     if (!!aliasStudyName) return
-    let studyname = new Study()
-    studyname.name = aliasStudyName
-    LAMP.Study.update(study, studyname)
-      .then((res: any) =>
-        res.error === undefined && typeof res.data === "string" && res.data.length > 0 ? res.data : null
-      )
+    LAMP.Study.view(study)
       .then((res) => {
         if (!unmounted) {
-          setAliasStudyName((oldValue.current = res))
+          setAliasStudyName((oldValue.current = res.name))
         }
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to load participantId's alias: errorMessage", {
-            participantId: study,
+          t("Failed to load study's alias: errorMessage", {
+            alias: study,
             errorMessage: err.message,
           }),
           { variant: "error" }
@@ -72,39 +71,51 @@ export default function EditStudyField({
     LAMP.Study.update(study, studyname)
       .then((res) => setAliasStudyName((oldValue.current = aliasStudyName)))
       .then((res) => {
+        ;(async () => {
+          let selectedStudies =
+            ((await LAMP.Type.getAttachment(researcherId, "lamp.selectedStudies")) as any).data ?? []
+          let index = selectedStudies.indexOf(studyName)
+          selectedStudies[index] = aliasStudyName
+          LAMP.Type.setAttachment(researcherId, "me", "lamp.selectedStudies", selectedStudies)
+        })()
         updateName(aliasStudyName === "" ? studyName : aliasStudyName)
-        if (aliasStudyName === "")
-          enqueueSnackbar(t("Removed study's alias.", { study: study }), {
-            variant: "success",
-          })
-        else
-          enqueueSnackbar(
-            t("Set participantId's alias to participantName", {
-              participantId: study,
-              participantName: aliasStudyName,
-            }),
-            {
-              variant: "success",
-            }
-          )
+        enqueueSnackbar(t("Study name updated"), {
+          variant: "success",
+        })
         callbackModal()
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to change participantId's alias: errorMessage", {
-            participantId: study,
+          t("Failed to change study name : errorMessage", {
             errorMessage: err.message,
           }),
           { variant: "error" }
         )
       ) //}
     Service.update("studies", { studies: [{ id: study, name: aliasStudyName }] }, "name", "id")
+    Service.updateValue(
+      "participants",
+      { participants: [{ study_id: study, study_name: aliasStudyName }] },
+      "study_name",
+      "study_id"
+    )
+    Service.updateValue(
+      "activities",
+      { activities: [{ study_id: study, study_name: aliasStudyName }] },
+      "study_name",
+      "study_id"
+    )
+    Service.updateValue(
+      "sensors",
+      { sensors: [{ study_id: study, study_name: aliasStudyName }] },
+      "study_name",
+      "study_id"
+    )
   }, [editing])
 
   useEffect(() => {
     if (editData && editStudyName === study && !editComplete) {
       setEditing(true)
-
       if (!!editing || editData) {
         inputRef.current.focus()
       } else {

@@ -100,6 +100,29 @@ class DBService {
       })
   }
 
+  updateValue(tablespace: any, newVal: any, key: string, conditionKey: string) {
+    return dbPromise
+      .then((db) => {
+        ;(async () => {
+          let store = db.transaction([tablespace], "readwrite").objectStore(tablespace)
+          let cursor = await store.openCursor()
+          while (cursor) {
+            ;(newVal[tablespace] || []).map((data) => {
+              if (cursor.value[conditionKey] === data[conditionKey]) {
+                let value = cursor.value
+                value[key] = data[key]
+                cursor.update(value)
+              }
+            })
+            cursor = await cursor.continue()
+          }
+        })()
+      })
+      .catch((error) => {
+        // Do something?
+      })
+  }
+
   update(tablespace: any, newVal: any, key: string, conditionKey: string) {
     return dbPromise
       .then((db) => {

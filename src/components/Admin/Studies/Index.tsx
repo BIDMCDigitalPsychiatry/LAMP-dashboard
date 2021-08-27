@@ -126,9 +126,14 @@ export default function StudiesList({
               <Grid item lg={6} xs={12} key={study.id}>
                 <Box display="flex" p={1} className={classes.studyMain}>
                   <Box flexGrow={1}>
-                    <EditStudy study={study} upatedDataStudy={handleUpdatedStudyObject} allStudies={allStudies} />
+                    <EditStudy
+                      study={study}
+                      upatedDataStudy={handleUpdatedStudyObject}
+                      allStudies={allStudies}
+                      researcherId={researcher.id}
+                    />
                   </Box>
-                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} />
+                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher.id} />
                 </Box>
               </Grid>
             ))
