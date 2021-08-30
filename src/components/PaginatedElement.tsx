@@ -43,7 +43,7 @@ export default function Pagination({
         count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}
-        onChangePage={handleChangePage}
+        onPageChange={handleChangePage}
         onChangeRowsPerPage={handleRowChange}
         rowsPerPageOptions={rowPerPage ?? [10, 25, 50, 100]}
       />
