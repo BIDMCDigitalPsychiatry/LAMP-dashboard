@@ -195,8 +195,8 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
       let selected =
-        localStorage.getItem("studies_" + LAMP.Auth._auth.id) !== null
-          ? JSON.parse(localStorage.getItem("studies_" + LAMP.Auth._auth.id))
+        localStorage.getItem("studies_" + researcher.id) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + researcher.id))
           : []
       if (selected.length > 0) {
         let filtered = selected.filter((o) => studies.some(({ name }) => o === name))

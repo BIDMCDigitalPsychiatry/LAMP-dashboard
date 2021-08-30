@@ -80,6 +80,7 @@ export default function StudyFilterList({
   const [allStudies, setAllStudies] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [deSelectAll, setDeselectAll] = useState(false)
+  const [researcherId, setResearcherId] = useState(researcher.id)
 
   useEffect(() => {
     refreshStudies()
@@ -128,8 +129,8 @@ export default function StudyFilterList({
   }
 
   const getFilterTypeStorage = () => {
-    return localStorage.getItem("studyFilter_" + LAMP.Auth._auth.id) !== null
-      ? JSON.parse(localStorage.getItem("studyFilter_" + LAMP.Auth._auth.id))
+    return localStorage.getItem("studyFilter_" + researcherId) !== null
+      ? JSON.parse(localStorage.getItem("studyFilter_" + researcherId))
       : 0
   }
 
@@ -177,8 +178,8 @@ export default function StudyFilterList({
                     }
                     setSelectAll(selectAllStudy)
                     setDeselectAll(deselectAllStudy)
-                    localStorage.setItem("studies_" + LAMP.Auth._auth.id, JSON.stringify(allStudiesArray))
-                    localStorage.setItem("studyFilter_" + LAMP.Auth._auth.id, JSON.stringify(flagData))
+                    localStorage.setItem("studies_" + researcherId, JSON.stringify(allStudiesArray))
+                    localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(flagData))
                     setSelectedStudies(allStudiesArray)
                   }}
                 />
@@ -193,7 +194,7 @@ export default function StudyFilterList({
                 showZeroBadges={false}
                 badges={studiesCount}
                 onChange={(x) => {
-                  localStorage.setItem("studies_" + LAMP.Auth._auth.id, JSON.stringify(x))
+                  localStorage.setItem("studies_" + researcherId, JSON.stringify(x))
                   setSelectedStudies(x)
                   let flagData = 0 // 0 = "", 1 = "Select All", 2 = "Deselect All"
                   if (allStudies.length !== x.length) {
@@ -204,7 +205,7 @@ export default function StudyFilterList({
                     setDeselectAll(false)
                     flagData = 1
                   }
-                  localStorage.setItem("studyFilter_" + LAMP.Auth._auth.id, JSON.stringify(flagData))
+                  localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(flagData))
                 }}
               />
             }
