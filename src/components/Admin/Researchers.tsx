@@ -197,7 +197,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search.trim().length > 0) {
-        data = data.filter((researcher) => researcher.name.includes(search))
+        data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
       }
       ;(async function () {
         const studyIds = (studies || []).map((d) => d.id)
