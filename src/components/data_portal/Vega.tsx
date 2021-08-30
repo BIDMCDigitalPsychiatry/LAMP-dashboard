@@ -8,7 +8,9 @@ export default function Vega({ spec, config, ...props }) {
     //todo: add message while vega renders
     setRenderedState(false)
     //@ts-ignore - as this returns a promise, the reference should always be ready in time
-    vegaEmbed(ref.current, spec, config).then(() => setRenderedState(true))
+    vegaEmbed(ref.current, spec, config)
+      .then(() => setRenderedState(true))
+      .catch((e) => (ref.current.innerText = `This vega graph failed to render. ${e}`))
   }, [spec])
   return (
     //@ts-ignore - see above

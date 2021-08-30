@@ -1,14 +1,29 @@
-import React from "react"
-import { useStyles3, useLocalStorage } from "./DataPortalShared"
-import { Typography, Icon, IconButton, AppBar, Toolbar, Grid, Switch, Box, Fab } from "@material-ui/core"
+import React, { useRef } from "react"
+import { portalHomeStyle, useLocalStorage } from "./DataPortalShared"
+import {
+  Typography,
+  Icon,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Grid,
+  Switch,
+  Box,
+  Fab,
+  Card,
+  FormControlLabel,
+} from "@material-ui/core"
 import RenderTree from "./RenderTree"
 import QueryRender from "./QueryRender"
 import QueryBuilder from "./QueryBuilder"
+import SelectionWindow from "./SelectionWindow"
 import Editor from "./Editor"
 import jsonata from "jsonata"
+import { DndProvider } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
-  const classes = useStyles3()
+  const classes = portalHomeStyle()
   const editorRef = React.useRef(null)
   const [query, setQuery] = React.useState("")
   const [result, setResult] = React.useState("")
@@ -62,25 +77,17 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     setGUIQuery(updatedQuery)
   }
 
-  return (
-    <div style={{ background: "lightgrey", display: "flex", flexDirection: "column", height: "100vh" }}>
-      <AppBar position="static" style={{ background: "black" }}>
-        <Toolbar>
-          <Icon className={classes.icon}>code</Icon>
-          <Typography variant="h6" color="inherit" noWrap>
-            LAMP Platform API Query
-          </Typography>
-          <div style={{ flexGrow: 0.2 }} />
+  const [viewModeSwitch, setViewModeSwitch] = React.useState(false)
+  React.useEffect(() => {
+    setViewModeSwitch(!isGUIEditor)
+  }, [isGUIEditor])
 
-          <div style={{ flexGrow: 0.5, width: "50px", overflowY: "scroll" }}>
-            <Typography>Query Builder</Typography>
-          </div>
-          <div style={{ flexGrow: 0.5, width: "50px" }}>
-            <Switch checked={isGUIEditor} color="primary" onClick={() => toggleEditorStyle(!isGUIEditor)} />
-            <Typography>{isGUIEditor ? "User Interface" : "Terminal"}</Typography>
-          </div>
+  return (
+    <Box className={classes.box}>
+      <AppBar position="static" style={{ background: "#7599FF" }}>
+        <Toolbar>
           <div style={{ flexGrow: 1 }} />
-          <Typography style={{ color: "red" }}>Alpha - V8.11.2021</Typography>
+          <Typography className={classes.alphaBadge}>Alpha - V8.11.2021</Typography>
           {typeof onLogout === "function" && (
             <IconButton onClick={onLogout} color="inherit">
               <Typography>Log-out&nbsp;</Typography>
@@ -89,78 +96,128 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           )}
         </Toolbar>
       </AppBar>
-      <Box flexWrap="nowrap" style={{ flexGrow: 1, height: "90%", marginTop: 8 }}>
-        <Grid container alignContent={"flex-start"} style={{ height: "100%", flexWrap: "nowrap" }}>
-          <Grid container item xs={3} style={{ height: "90%", overflowY: "scroll", background: "lightgray" }}>
-            <Grid style={{ marginBottom: "30px" }} item xs={12}>
-              <RenderTree
-                token={token}
-                name={token.name}
-                id={token.type === "Administrator" ? [token.id] : [token.type, token.id]}
-                type={token.type}
-                isGUIEditor={isGUIEditor}
-                onSetQuery={(q) => setQuery(q)}
-                onUpdateGUI={(q) => updateGUIQuery(q)}
+      <DndProvider backend={HTML5Backend}>
+        <Box className={classes.queryWrapperBox}>
+          <Grid className={classes.columnsGrid} item xs={12} direction={"row"} container alignContent={"flex-start"}>
+            <Grid container className={classes.treeColumn} direction={"column"} item xs={3}>
+              <SelectionWindow
+                openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
+                displaySubmitButton={true}
+                handleResult={() => {
+                  toggleEditorStyle(!viewModeSwitch)
+                }}
+                closesOnSubmit={true}
+                submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
+                children={
+                  <React.Fragment>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          name={"setToTerminal"}
+                          checked={viewModeSwitch}
+                          onChange={() => setViewModeSwitch(!viewModeSwitch)}
+                        />
+                      }
+                      label={viewModeSwitch ? "Terminal Mode" : "GUI Mode"}
+                    />
+                    {viewModeSwitch ? (
+                      <Typography>
+                        While in Terminal mode, you can directly write JSONata style queries to pull data directly from
+                        your database. <br />
+                        <br />
+                        For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
+                        with a user's id to get a list of the last 10,000 activities completed through LAMP.
+                        <br />
+                        <br />
+                        Want to learn more about JSONata queries or what special data you can pull from LAMP?
+                        <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
+                          Click here!
+                        </a>
+                      </Typography>
+                    ) : (
+                      <Typography>
+                        While in GUI mode, you can directly pull graphs you have already generated from the LAMP
+                        database, easily view information across an entire study or researcher, or quickly view tags
+                        that give info about things like survey scoring. If this is your first time using the LAMP
+                        data_portal, or you need to get data quckly, this is the mode we recommend!
+                      </Typography>
+                    )}
+                  </React.Fragment>
+                }
               />
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            item
-            direction={"column"}
-            xs={9}
-            style={{ height: "100%", flexWrap: "nowrap", background: "lightgray" }}
-          >
-            <Grid
-              item
-              style={{
-                minHeight: "10%",
-                maxHeight: "40%",
-                margin: "0px 0px 10px 0px",
-                top: "10%",
-                overflowY: "scroll",
-              }}
-            >
-              {isGUIEditor ? (
-                <QueryBuilder
-                  query={GUIQuery}
+              <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "70vh", marginTop: "10px" }}>
+                <RenderTree
                   token={token}
-                  setQueryResult={setResult}
-                  setLoadingGraphs={setLoadingGraphs}
-                  queryResult={result}
+                  name={token.name}
+                  id={token.type === "Administrator" ? [token.id] : [token.type, token.id]}
+                  type={token.type}
+                  isGUIEditor={isGUIEditor}
+                  onSetQuery={(q) => setQuery(q)}
+                  onUpdateGUI={(q) => updateGUIQuery(q)}
                 />
-              ) : (
-                <Editor
-                  //@ts-ignore
-                  path="query"
-                  ref={editorRef}
-                  onChange={(x) => setQuery(x)}
-                  onMount={onMonacoMount}
-                />
-              )}
+              </Card>
             </Grid>
             <Grid
+              container
               item
-              style={{
-                flexGrow: 1,
-                minHeight: "50%",
-                maxHeight: "80%",
-                overflowY: "scroll",
-                margin: " 0 5%",
-                background: "white",
-              }}
+              direction={"column"}
+              xs={9}
+              style={{ height: "100%", userSelect: "text", flexWrap: "nowrap" }}
             >
-              <QueryRender loading={loadingGraphs} queryResult={result} />
+              <Grid
+                item
+                style={{
+                  flexGrow: 1,
+                  minHeight: "20%",
+                  maxHeight: "40%",
+                  margin: " 0 5%",
+                  top: "10%",
+                  overflowY: "scroll",
+                }}
+              >
+                {isGUIEditor ? (
+                  <QueryBuilder
+                    query={GUIQuery}
+                    token={token}
+                    setQueryResult={setResult}
+                    setLoadingGraphs={setLoadingGraphs}
+                    queryResult={result}
+                  />
+                ) : (
+                  <Card>
+                    <Editor
+                      //@ts-ignore
+                      path="query"
+                      ref={editorRef}
+                      onChange={(x) => setQuery(x)}
+                      onMount={onMonacoMount}
+                    />
+                  </Card>
+                )}
+              </Grid>
+              <Grid
+                item
+                style={{
+                  flexGrow: 2,
+                  minHeight: "50%",
+                  maxHeight: "80%",
+                  overflowY: "scroll",
+                  margin: " 10% 5% 5%",
+                  background: "white",
+                }}
+              >
+                <QueryRender loading={loadingGraphs} queryResult={result} />
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
+      </DndProvider>
       {!isGUIEditor && (
         <Fab color="primary" variant="extended" className={classes.fab} onClick={runQuery}>
           <Icon className={classes.extendedIcon}>get_app</Icon>
           Run Query
         </Fab>
       )}
-    </div>
+    </Box>
   )
 }

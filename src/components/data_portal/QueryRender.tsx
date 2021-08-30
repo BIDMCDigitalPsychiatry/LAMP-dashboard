@@ -20,8 +20,17 @@ import { jsPDF } from "jspdf"
 import vegaEmbed from "vega-embed"
 import Vega from "./Vega"
 import Editor from "./Editor"
+import SelectionWindow from "./SelectionWindow"
 
 export default function QueryRender(props) {
+  if (!("queryResult" in props) || !props.queryResult) {
+    return (
+      <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
+        <Typography>Your data will appear here</Typography>
+      </Box>
+    )
+  }
+
   if (props.loading && props.loading === true) {
     return (
       <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
@@ -336,12 +345,12 @@ export default function QueryRender(props) {
 
                         if (result["layer"]) {
                           result.layer.forEach((layer) => {
-                            if ("title" in layer && "text" in layer["title"]) {
+                            if ("title" in layer && typeof layer["title"] === "object" && "text" in layer["title"]) {
                               layer["title"]["text"] = adjustVegaTitle(layer["title"]["text"])
                             }
                           })
                         } else {
-                          if ("title" in result && "text" in result["title"]) {
+                          if ("title" in result && typeof result["title"] === "object" && "text" in result["title"]) {
                             result["title"]["text"] = adjustVegaTitle(result["title"]["text"])
                           }
                         }
@@ -409,50 +418,83 @@ export default function QueryRender(props) {
         return (
           //@ts-ignore: We need to be able to reference this box to adjust sizing option availability
           <Box ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%" }}>
-            <div style={{ height: "70px", width: "100%", background: "white", margin: "0px 10px 0px 0px" }}>
-              <div style={{ height: "60px", float: "left" }}>
-                <Switch color="primary" checked={groupByID} onClick={() => toggleGroupByID(!groupByID)} />
-                <Typography>Group by: {groupByID ? "ID#" : "Tag Name"}</Typography>
-              </div>
-
-              <div style={{ height: "60px", float: "left", margin: "-4px 0px 0px 20px" }}>
-                <Checkbox checked={displayMissingData} onClick={() => setDisplayMissingData(!displayMissingData)} />
-                <Typography>Show missing data</Typography>
-              </div>
-
-              <div style={{ height: "60px", float: "left" }}>
-                <TextField
-                  style={{ height: "0px", float: "left", margin: "10px 0px 0px 10px" }}
-                  id="outlined-basic"
-                  inputRef={filterRef}
-                  defaultValue=""
-                  InputProps={{
-                    endAdornment: (
-                      <IconButton onClick={setFilter}>
-                        <Icon>filter_alt</Icon>
-                      </IconButton>
-                    ),
-                  }}
-                  label="Filter by ID/Name"
-                  variant="outlined"
-                />
-              </div>
-
-              <FormControl style={{ float: "right" }} component="fieldset">
-                <RadioGroup aria-label="scale" name="scale" value={scale} onChange={handleChange} row>
-                  {boxDimensions.width > 700 && (
-                    <FormControlLabel value="3" labelPlacement="top" control={<Radio />} label="Small" />
+            <SelectionWindow
+              openButtonText={`Adjust Graph Display`}
+              displaySubmitButton={true}
+              handleResult={setFilter}
+              closesOnSubmit={true}
+              children={
+                <React.Fragment>
+                  <FormControlLabel
+                    control={
+                      <Switch name={"groupByID"} checked={groupByID} onClick={() => toggleGroupByID(!groupByID)} />
+                    }
+                    label={groupByID ? "Group By ID" : "Group By Tag Name"}
+                  />
+                  {groupByID ? (
+                    <Typography>
+                      While grouping by ID, your data will be grouped by participant - use this to examine individual
+                      participants.
+                    </Typography>
+                  ) : (
+                    <Typography>
+                      While grouping by Tag Name, your data will be grouped by graph/chart - use this to examine study
+                      trends.
+                    </Typography>
                   )}
-                  {boxDimensions.width > 550 && (
-                    <FormControlLabel value="4" labelPlacement="top" control={<Radio />} label="Medium" />
-                  )}
-                  {boxDimensions.width > 400 && (
-                    <FormControlLabel value="6" labelPlacement="top" control={<Radio />} label="Large" />
-                  )}
-                  <FormControlLabel value="12" labelPlacement="top" control={<Radio />} label="Fill" />
-                </RadioGroup>
-              </FormControl>
-            </div>
+                  <br />
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={displayMissingData}
+                        onClick={() => setDisplayMissingData(!displayMissingData)}
+                      />
+                    }
+                    label={"Display Missing Data"}
+                  />
+                  <Typography>
+                    If no data is found for a particular tag,
+                    {displayMissingData ? " a box will still display" : " no box will display"}
+                  </Typography>
+                  <br />
+                  <FormControlLabel
+                    control={
+                      <TextField
+                        id="outlined-basic"
+                        inputRef={filterRef}
+                        defaultValue=""
+                        label="Filter by ID/Name"
+                        variant="outlined"
+                      />
+                    }
+                    labelPlacement="top"
+                    label={"Filter by a participant's name or LAMP id (case-sensitive)"}
+                  />
+
+                  <br />
+                  <br />
+
+                  <Typography>
+                    Chart Size: {boxDimensions.width < 700 ? "Some dimensions unavailble at smaller screen sizes" : ""}
+                  </Typography>
+                  <FormControl component="fieldset">
+                    <RadioGroup aria-label="scale" name="scale" value={scale} onChange={handleChange} row>
+                      {boxDimensions.width > 700 && (
+                        <FormControlLabel value="3" labelPlacement="top" control={<Radio />} label="Small" />
+                      )}
+                      {boxDimensions.width > 550 && (
+                        <FormControlLabel value="4" labelPlacement="top" control={<Radio />} label="Medium" />
+                      )}
+                      {boxDimensions.width > 400 && (
+                        <FormControlLabel value="6" labelPlacement="top" control={<Radio />} label="Large" />
+                      )}
+                      <FormControlLabel value="12" labelPlacement="top" control={<Radio />} label="Fill" />
+                    </RadioGroup>
+                  </FormControl>
+                </React.Fragment>
+              }
+            />
             <div>{result}</div>
           </Box>
         )

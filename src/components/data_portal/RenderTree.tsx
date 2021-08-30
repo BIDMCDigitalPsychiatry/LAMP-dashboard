@@ -1,11 +1,89 @@
 import React from "react"
-import { Typography, Card, Icon, IconButton } from "@material-ui/core"
+import {
+  Typography,
+  Card,
+  CardHeader,
+  CardActions,
+  Icon,
+  IconButton,
+  FormControlLabel,
+  makeStyles,
+  TextField,
+  ClickAwayListener,
+} from "@material-ui/core"
 import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
+import { useDrag, DragPreviewImage } from "react-dnd"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
   const [expanded, setExpanded] = React.useState(false)
-
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "TARGETINFO",
+    item: { target: id[id.length - 1], type, name, id_string: id },
+    canDrag:
+      !expanded &&
+      !Object.keys(tags_object).includes(id[id.length - 1]) &&
+      id[id.length - 1] !== "Administrator" &&
+      !queryables_array.includes(id[id.length - 1]),
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }))
+  const [showFilter, toggleShowFilter] = React.useState(false)
+  const [currentFilter, setCurrentFilter] = React.useState("")
+  const useStyles = makeStyles((theme) => ({
+    treeCard: {
+      width: `${100 - 2 * (id.length > 2 ? 1 : 0)}%`,
+      marginLeft: `${2 * (id.length > 2 ? 1 : 0)}%`,
+      marginTop: "5px",
+    },
+    cardActions: {
+      display: "flex",
+      flexDirection: "row",
+      flexGrow: 1,
+      float: "right",
+      marginTop: "0px",
+    },
+    treeButton: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    treeFilter: {
+      position: "fixed",
+      top: "50vh",
+      left: "30vw",
+      width: "50vw",
+      paddingTop: "5px",
+      height: "60px",
+      background: "white",
+      "&:hover": {
+        backgroundColor: "#eee",
+      },
+      border: "1px solid black",
+      borderRadius: "3px",
+      paddingLeft: "10px",
+      zIndex: 1111,
+    },
+    cardHeader: {
+      display: "flex",
+      flexGrow: 3,
+      flexDirection: "row",
+      marginBottom: "0px",
+      marginRight: "5px",
+      fontSize: "16px",
+      wordBreak: "break-word",
+      height: "100%",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+  }))
+  const classes = useStyles()
   //let's define our function we'll use to ping the api
   const getData = async (query) => {
     try {
@@ -70,23 +148,49 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   }
 
   return (
-    <Card key={"div" + id[id.length - 1]} style={{ marginTop: "2px" }}>
-      <Typography
+    <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
+      <CardHeader
+        className={classes.cardHeader}
         key={"text" + id[id.length - 1]}
-        style={{
-          scrollBehavior: "smooth",
-          marginTop: `${5 * (id.length - 1 > 0 ? 1 : 0)}px`,
-          marginLeft: `${5 * (id.length - 1)}%`,
-          marginRight: "5px",
-          height: "100%",
-        }}
-      >
-        {`${name ? name : id[id.length - 1]}`}
+        title={`${name ? name : id[id.length - 1]}`}
+      />
+      <CardActions className={classes.cardActions}>
+        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && (
+          <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
+            <Icon>search</Icon>
+          </IconButton>
+        )}
+        {showFilter && (
+          <ClickAwayListener onClickAway={() => toggleShowFilter(!showFilter)}>
+            <TextField
+              className={classes.treeFilter}
+              value={currentFilter}
+              onChange={(e) => {
+                setCurrentFilter(e.target.value)
+              }}
+              placeholder={`Search ${id[id.length - 1]} list`}
+              InputProps={{
+                disableUnderline: true,
+                endAdornment: (
+                  <React.Fragment>
+                    <IconButton className={classes.treeButton} onClick={() => setCurrentFilter("")}>
+                      <Icon>backspace</Icon>
+                    </IconButton>
+                    <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
+                      <Icon>close</Icon>
+                    </IconButton>
+                  </React.Fragment>
+                ),
+              }}
+            />
+          </ClickAwayListener>
+        )}
 
         {isGUIEditor &&
           !Object.keys(tags_object).includes(id[id.length - 1]) &&
           Object.keys(tags_object).includes(id[id.length - 2]) && (
             <IconButton
+              className={classes.treeButton}
               onClick={() =>
                 onUpdateGUI({
                   _update: ["target", "type", "name", "id_string"],
@@ -94,14 +198,14 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                 })
               }
             >
-              <Icon>subdirectory_arrow_right</Icon>
+              <Icon>arrow_forward</Icon>
             </IconButton>
           )}
 
-        <IconButton style={{ textAlign: "right" }} onClick={() => setExpanded(!expanded)}>
+        <IconButton className={classes.treeButton} onClick={() => setExpanded(!expanded)}>
           {queryables_array.includes(id[id.length - 1]) ? (
             !isGUIEditor ? (
-              <Icon>subdirectory_arrow_right</Icon>
+              <Icon>arrow_forward</Icon>
             ) : null
           ) : expanded ? (
             <Icon>expand_less</Icon>
@@ -109,23 +213,29 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
             <Icon>expand_more</Icon>
           )}
         </IconButton>
-      </Typography>
+      </CardActions>
       {/*
 						For each branch in our tree, we output some info and create a new level
 						*/}
       {expanded &&
-        (!!treeDisplay ? treeDisplay : []).map((branch, index) => (
-          <RenderTree
-            key={"tree" + id[id.length - 1] + index}
-            id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
-            name={typeof branch === "string" ? branch : branch.name}
-            type={typeof branch === "string" ? branch : branch.id}
-            token={token}
-            onSetQuery={onSetQuery}
-            onUpdateGUI={onUpdateGUI}
-            isGUIEditor={isGUIEditor}
-          />
-        ))}
+        (!!treeDisplay ? treeDisplay : []).map(
+          (branch, index) =>
+            (!currentFilter ||
+              currentFilter === "" ||
+              branch.id.indexOf(currentFilter) !== -1 ||
+              (typeof branch !== "string" && branch.name.indexOf(currentFilter) !== -1)) && (
+              <RenderTree
+                key={"tree" + id[id.length - 1] + index}
+                id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
+                name={typeof branch === "string" ? branch : branch.name}
+                type={typeof branch === "string" ? branch : branch.id}
+                token={token}
+                onSetQuery={onSetQuery}
+                onUpdateGUI={onUpdateGUI}
+                isGUIEditor={isGUIEditor}
+              />
+            )
+        )}
     </Card>
   )
 }

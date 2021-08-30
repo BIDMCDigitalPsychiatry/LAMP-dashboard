@@ -71,9 +71,38 @@ export const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export const useStyles3 = makeStyles((theme) => ({
+export const portalHomeStyle = makeStyles((theme) => ({
+  box: {
+    background: "inherit",
+    userSelect: "text",
+    display: "flex",
+    position: "relative",
+    flexDirection: "column",
+    height: "100%",
+    width: "100%",
+  },
+  queryWrapperBox: {
+    flexGrow: 1,
+    height: "90%",
+    marginTop: 8,
+  },
+  alphaBadge: {
+    right: -theme.spacing(2),
+    color: "#fff",
+  },
   icon: {
-    marginRight: theme.spacing(2),
+    position: "fixed",
+    right: -theme.spacing(2),
+  },
+  columnsGrid: {
+    height: "100%",
+    flexWrap: "nowrap",
+    spacing: "1",
+  },
+  treeColumn: {
+    maxHeight: "90%",
+    flexWrap: "nowrap",
+    overFlowY: "scroll",
   },
   cardGrid: {
     paddingTop: theme.spacing(8),

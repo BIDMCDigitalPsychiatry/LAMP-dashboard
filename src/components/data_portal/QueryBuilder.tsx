@@ -16,11 +16,24 @@ import {
   Icon,
 } from "@material-ui/core"
 import { tagged_entities, ajaxRequest } from "./DataPortalShared"
+import { useDrop } from "react-dnd"
 
 export default function QueryBuilder(props) {
   //this tracks the current query
   const [currentQuery, setCurrentQuery] = React.useState(props.query)
 
+  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+    // The type (or types) to accept - strings or symbols
+    accept: "TARGETINFO",
+    // Props to collect,
+    drop: (item, monitor) => {
+      setCurrentQuery(item)
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }))
   //If true, we analyse "shared" data for researchers/studies. Study,Researcher default
   //If false, we analyse specific data. Participant default
   const [analyzeShared, setAnalyzeShared] = React.useState(
@@ -431,7 +444,8 @@ export default function QueryBuilder(props) {
   }
 
   return (
-    <Box>
+    //@ts-ignore
+    <Box ref={drop} role={"QueryBuilder"} style={{ border: isOver ? "1 px solid green" : "white" }}>
       {currentQuery.target.length > 0 ? (
         <Card variant="outlined" style={{ margin: "0% 5%" }}>
           <Typography style={{ fontWeight: 600 }}>
@@ -502,6 +516,9 @@ export default function QueryBuilder(props) {
             1. Navigate to the level of your target on the left.
             <br />
             2. Click on <Icon>subdirectory_arrow_right</Icon>
+            <br />
+            <br />
+            Alternatively, drag and drop a researcher, study, or participant into this box.
           </Typography>
         </Card>
       )}
