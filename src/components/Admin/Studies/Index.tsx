@@ -130,10 +130,10 @@ export default function StudiesList({
                       study={study}
                       upatedDataStudy={handleUpdatedStudyObject}
                       allStudies={allStudies}
-                      researcherId={researcher.id}
+                      researcherId={researcher?.id ?? ""}
                     />
                   </Box>
-                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher.id} />
+                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher?.id ?? ""} />
                 </Box>
               </Grid>
             ))
