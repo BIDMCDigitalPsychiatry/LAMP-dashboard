@@ -247,32 +247,28 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                   </ListItemIcon>
                   <ListItemText primary={t("Users")} />
                 </ListItem>
-                {userType === "researcher" && (
-                  <ListItem
-                    className={classes.menuItems + " " + classes.btnCursor}
-                    button
-                    selected={currentTab === 1}
-                    onClick={(event) => setCurrentTab(1)}
-                  >
-                    <ListItemIcon className={classes.menuIcon}>
-                      <Activities />
-                    </ListItemIcon>
-                    <ListItemText primary={t("Activities")} />
-                  </ListItem>
-                )}
-                {userType === "researcher" && (
-                  <ListItem
-                    className={classes.menuItems + " " + classes.btnCursor}
-                    button
-                    selected={currentTab === 2}
-                    onClick={(event) => setCurrentTab(2)}
-                  >
-                    <ListItemIcon className={classes.menuIcon}>
-                      <Sensors />
-                    </ListItemIcon>
-                    <ListItemText primary={t("Sensors")} />
-                  </ListItem>
-                )}
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={currentTab === 1}
+                  onClick={(event) => setCurrentTab(1)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <Activities />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Activities")} />
+                </ListItem>
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={currentTab === 2}
+                  onClick={(event) => setCurrentTab(2)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <Sensors />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Sensors")} />
+                </ListItem>
                 {userType === "researcher" && (
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
