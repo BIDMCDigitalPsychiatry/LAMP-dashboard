@@ -197,6 +197,8 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
       let selected =
         localStorage.getItem("studies_" + researcher.id) !== null
           ? JSON.parse(localStorage.getItem("studies_" + researcher.id))
+          : userType === "clinician"
+          ? studies
           : []
       if (selected.length > 0) {
         let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
