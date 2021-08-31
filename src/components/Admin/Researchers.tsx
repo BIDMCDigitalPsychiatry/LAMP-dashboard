@@ -183,6 +183,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const userTypes = ["researcher", "user_admin", "clinical_admin"]
   const [filterData, setFilterData] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [studyIds, setStudyIds] = useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -191,8 +192,20 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
+    const ids = (studies || []).map((d) => d.id)
+    setStudyIds(ids)
+  }, [])
+
+  useEffect(() => {
     setFilterData(false)
     refreshResearchers()
+    setLoading(true)
+  }, [studyIds])
+
+  useEffect(() => {
+    setFilterData(false)
+    const ids = (studies || []).map((d) => d.id)
+    setStudyIds(ids)
     setLoading(true)
   }, [userType, studies])
 
@@ -206,7 +219,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
         data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
       }
       ;(async function () {
-        const studyIds = (studies || []).map((d) => d.id)
         data = (
           await Promise.all(
             data.map(async (x) => ({
@@ -216,8 +228,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
                 ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
                 "researcher",
               study: ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyId ?? "",
-              studyName:
-                ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyName ?? "",
             }))
           )
         ).filter((y) =>
@@ -257,7 +267,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading && studyIds !== null}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header

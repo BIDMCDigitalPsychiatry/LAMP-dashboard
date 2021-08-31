@@ -40,7 +40,7 @@ export default function DashboardStudies({
   const [search, setSearch] = useState(null)
 
   useEffect(() => {
-    getDBStudies()
+    getAllStudies()
   }, [])
 
   useEffect(() => {
@@ -69,13 +69,7 @@ export default function DashboardStudies({
   const getAllStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(studies)
-      !!filterStudies ? filterStudies(studies) : {}
-    })
-  }
-
-  const getDBStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
+      setData(studies)
       !!filterStudies ? filterStudies(studies) : {}
     })
   }
