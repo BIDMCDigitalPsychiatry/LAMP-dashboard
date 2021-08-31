@@ -182,7 +182,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const classes = useStyles()
   const userTypes = ["researcher", "user_admin", "clinical_admin"]
   const [filterData, setFilterData] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [studyIds, setStudyIds] = useState([])
 
   const getSelectedLanguage = () => {
@@ -198,15 +198,15 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   useEffect(() => {
     setFilterData(false)
+    setLoading(studyIds.length > 0 ? true : false)
     refreshResearchers()
-    setLoading(true)
   }, [studyIds])
 
   useEffect(() => {
     setFilterData(false)
     const ids = (studies || []).map((d) => d.id)
     setStudyIds(ids)
-    setLoading(true)
+    setLoading(ids.length > 0 ? true : false)
   }, [userType, studies])
 
   const refreshResearchers = () => {
@@ -267,7 +267,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading && studyIds !== null}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
