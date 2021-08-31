@@ -128,7 +128,7 @@ export default function AddUpdateResearcher({
         setOpen(false)
       } else {
         await LAMP.Type.setAttachment(!!researcher ? researcher.id : result.data, "me", "lamp.dashboard.user_type", {
-          userType: userType,
+          userType: authuserType === "user_admin" ? "clinician" : userType,
           studyId: userType === "clinician" ? studyId : "",
           studyName: userType === "clinician" ? studies.filter((study) => study.id === studyId)[0]?.name : "",
         })
