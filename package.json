@@ -68,6 +68,7 @@
     "remark-gfm": "^1.0.0",
     "stacktrace-js": "^2.0.2",
     "url-search-params-polyfill": "^7.0.0",
+    "vega": "^5.20.2",
     "vega-embed": "^6.18.2",
     "vega-lite": "^4.17.0",
     "vega-tooltip": "^0.24.2"
