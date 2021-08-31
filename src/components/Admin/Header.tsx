@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles, Backdrop, CircularProgress } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import SearchBox from "../SearchBox"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
@@ -39,17 +39,12 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
-    backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
-      color: "#fff",
-    },
   })
 )
 export default function Header({ researchers, searchData, refreshResearchers, userType, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
   const [studies, setStudies] = useState(null)
-  const [loading, setLoading] = useState(userType === "user_admin" ? true : false)
 
   useInterval(
     () => {
@@ -62,7 +57,6 @@ export default function Header({ researchers, searchData, refreshResearchers, us
   const getDBStudies = async () => {
     if (userType === "user_admin") {
       Service.getAll("studies").then((studies) => {
-        if ((studies || []).length > 0) setLoading(false)
         setStudies(studies)
       })
     }
@@ -70,9 +64,6 @@ export default function Header({ researchers, searchData, refreshResearchers, us
 
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       <Box flexGrow={1}>
         <Typography variant="h5">
           {userType === "user_admin" || userType === "clinical_admin" ? t("Clinicians") : t("Researchers")}
