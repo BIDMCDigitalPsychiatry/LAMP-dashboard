@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Dialog, DialogContent, Grid, Icon } from "@material-ui/core"
+import { Box, Backdrop, CircularProgress, DialogContent, Grid, Icon } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
@@ -22,6 +22,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       "& span": { fontSize: 12 },
       "& div.Mui-selected": { backgroundColor: "transparent", color: "#5784EE", "& path": { fill: "#5784EE" } },
+    },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
     },
     menuItems: {
       display: "inline-block",
@@ -178,6 +182,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const classes = useStyles()
   const userTypes = ["researcher", "user_admin", "clinical_admin"]
   const [filterData, setFilterData] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -188,6 +193,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   useEffect(() => {
     setFilterData(false)
     refreshResearchers()
+    setLoading(true)
   }, [userType, studies])
 
   const refreshResearchers = () => {
@@ -224,6 +230,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
         setFilterData(true)
         setResearchers(data)
         setPaginatedResearchers(data.slice(0, rowCount))
+        setLoading(false)
       })()
     })
   }
@@ -250,6 +257,9 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   return (
     <React.Fragment>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Header
         researchers={researchers}
         searchData={(data) => setSearch(data)}

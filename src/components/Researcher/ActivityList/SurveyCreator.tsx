@@ -31,8 +31,6 @@ import {
   createStyles,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { useDropzone } from "react-dropzone"
-import { id } from "vega"
 import { useSnackbar } from "notistack"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
