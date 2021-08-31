@@ -211,6 +211,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
         selected.sort()
       }
       setSelectedStudies(selected)
+      setStudies(studies)
     }
   }
 
@@ -319,7 +320,6 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
               />
             )}
             {currentTab === 3 && <DashboardStudies researcher={researcher} filterStudies={filterStudies} />}
-
             {currentTab === 4 && (
               <DataPortal
                 onLogout={null}

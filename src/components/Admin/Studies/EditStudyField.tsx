@@ -71,13 +71,13 @@ export default function EditStudyField({
     LAMP.Study.update(study, studyname)
       .then((res) => setAliasStudyName((oldValue.current = aliasStudyName)))
       .then((res) => {
-        ;(async () => {
-          let selectedStudies =
-            ((await LAMP.Type.getAttachment(researcherId, "lamp.selectedStudies")) as any).data ?? []
-          let index = selectedStudies.indexOf(studyName)
-          selectedStudies[index] = aliasStudyName
-          LAMP.Type.setAttachment(researcherId, "me", "lamp.selectedStudies", selectedStudies)
-        })()
+        let selectedStudies =
+          localStorage.getItem("studies_" + researcherId) !== null
+            ? JSON.parse(localStorage.getItem("studies_" + researcherId))
+            : []
+        let index = selectedStudies.indexOf(studyName)
+        selectedStudies[index] = aliasStudyName
+        localStorage.setItem("studies_" + researcherId, JSON.stringify(selectedStudies))
         updateName(aliasStudyName === "" ? studyName : aliasStudyName)
         enqueueSnackbar(t("Study name updated"), {
           variant: "success",
