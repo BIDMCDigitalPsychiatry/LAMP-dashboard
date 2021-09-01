@@ -31,12 +31,22 @@ export const fetchPostData = async (authString, id, type, modal, methodType, bod
   return result
 }
 
-const saveStudiesAndParticipants = (result) => {
+const saveStudiesAndParticipants = (result, researcherId) => {
   const studies = result.studies.map(({ id, name, participant_count }) => ({ id, name, participant_count }))
   let participants = []
+  let studiesList = []
   result.studies.map((study) => {
     participants = participants.concat(study.participants)
+    studiesList = studiesList.concat(study.name)
   })
+  let studiesSelected =
+    localStorage.getItem("studies_" + researcherId) !== null
+      ? JSON.parse(localStorage.getItem("studies_" + researcherId))
+      : []
+  if (studiesSelected.length === 0) {
+    localStorage.setItem("studies_" + researcherId, JSON.stringify(studiesList))
+    localStorage.setItem("studyFilter_" + researcherId, JSON.stringify(1))
+  }
   Service.addData("studies", studies)
   Service.addData("participants", participants)
 }
@@ -74,7 +84,7 @@ export const saveDataToCache = (authString, id) => {
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
         if (!!result.studies) {
-          saveStudiesAndParticipants(result)
+          saveStudiesAndParticipants(result, id)
           Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
           result.studies.map((study) => {
             if (result.unityhealth_settings) {
