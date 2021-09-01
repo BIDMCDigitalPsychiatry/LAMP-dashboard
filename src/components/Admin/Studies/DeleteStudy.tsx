@@ -57,12 +57,12 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
         Service.deleteByKey("activities", [studyId], "study_id")
         Service.deleteByKey("sensors", [studyId], "study_id")
         deletedStudy(studyId)
-        ;(async () => {
-          let selectedStudies =
-            ((await LAMP.Type.getAttachment(researcherId, "lamp.selectedStudies")) as any).data ?? []
-          let data = selectedStudies.filter((d) => d !== study.name)
-          LAMP.Type.setAttachment(researcherId, "me", "lamp.selectedStudies", data)
-        })()
+        let selectedStudies =
+          localStorage.getItem("studies_" + researcherId) !== null
+            ? JSON.parse(localStorage.getItem("studies_" + researcherId))
+            : []
+        let data = selectedStudies.filter((d) => d !== study.name)
+        localStorage.setItem("studies_" + researcherId, JSON.stringify(data))
         enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
       })
       .catch((error) => {

@@ -194,6 +194,13 @@ export default function PatientStudyCreator({
     closePopUp(1)
   }
 
+  const updateStudyLocalStorage = async (authId: string, studyName: string) => {
+    let studiesSelected =
+      localStorage.getItem("studies_" + authId) !== null ? JSON.parse(localStorage.getItem("studies_" + authId)) : []
+    studiesSelected.push(studyName)
+    localStorage.setItem("studies_" + authId, JSON.stringify(studiesSelected))
+  }
+
   const createStudy = async (studyName: string) => {
     setLoading(true)
     let authId = researcher.id
@@ -286,6 +293,7 @@ export default function PatientStudyCreator({
           closePopUp(1)
         }
       }
+      updateStudyLocalStorage(authId, studyName)
     })
   }
 

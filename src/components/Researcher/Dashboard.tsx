@@ -197,6 +197,8 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
       let selected =
         localStorage.getItem("studies_" + researcher.id) !== null
           ? JSON.parse(localStorage.getItem("studies_" + researcher.id))
+          : userType === "clinician"
+          ? studies
           : []
       if (selected.length > 0) {
         let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
@@ -209,6 +211,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
         selected.sort()
       }
       setSelectedStudies(selected)
+      setStudies(studies)
     }
   }
 
@@ -317,7 +320,6 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
               />
             )}
             {currentTab === 3 && <DashboardStudies researcher={researcher} filterStudies={filterStudies} />}
-
             {currentTab === 4 && (
               <DataPortal
                 onLogout={null}

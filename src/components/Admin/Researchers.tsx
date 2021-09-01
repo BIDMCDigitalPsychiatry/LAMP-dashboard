@@ -1,6 +1,6 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Box, Dialog, DialogContent, Grid, Icon } from "@material-ui/core"
+import { Box, Backdrop, CircularProgress, DialogContent, Grid, Icon } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
@@ -22,6 +22,10 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       "& span": { fontSize: 12 },
       "& div.Mui-selected": { backgroundColor: "transparent", color: "#5784EE", "& path": { fill: "#5784EE" } },
+    },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
     },
     menuItems: {
       display: "inline-block",
@@ -178,6 +182,8 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const classes = useStyles()
   const userTypes = ["researcher", "user_admin", "clinical_admin"]
   const [filterData, setFilterData] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [studyIds, setStudyIds] = useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -187,10 +193,13 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   useEffect(() => {
     setFilterData(false)
-    refreshResearchers()
+    const ids = (studies || []).map((d) => d.id)
+    setStudyIds(ids)
+    refreshResearchers(ids)
+    setLoading(ids.length > 0 ? true : false)
   }, [userType, studies])
 
-  const refreshResearchers = () => {
+  const refreshResearchers = (ids) => {
     setFilterData(false)
     setPaginatedResearchers([])
     setPage(0)
@@ -200,7 +209,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
         data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
       }
       ;(async function () {
-        const studyIds = (studies || []).map((d) => d.id)
         data = (
           await Promise.all(
             data.map(async (x) => ({
@@ -210,13 +218,11 @@ export default function Researchers({ history, updateStore, userType, studies, .
                 ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
                 "researcher",
               study: ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyId ?? "",
-              studyName:
-                ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyName ?? "",
             }))
           )
         ).filter((y) =>
           userType === "user_admin"
-            ? !userTypes.includes(y.res) && studyIds.includes(y.study)
+            ? !userTypes.includes(y.res) && (ids ?? studyIds).includes(y.study)
             : userType === "clinical_admin"
             ? !userTypes.includes(y.res)
             : y.res !== "clinician"
@@ -224,12 +230,15 @@ export default function Researchers({ history, updateStore, userType, studies, .
         setFilterData(true)
         setResearchers(data)
         setPaginatedResearchers(data.slice(0, rowCount))
+        setLoading(false)
       })()
     })
   }
 
   useEffect(() => {
-    refreshResearchers()
+    const ids = (studies || []).map((d) => d.id)
+    setStudyIds(ids)
+    refreshResearchers(ids)
   }, [search])
 
   useEffect(() => {
@@ -250,6 +259,9 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   return (
     <React.Fragment>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Header
         researchers={researchers}
         searchData={(data) => setSearch(data)}

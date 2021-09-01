@@ -183,6 +183,7 @@ export default function Root({
         lampAuthId === "researcher@demo.lamp.digital"
           ? await saveDemoData()
           : await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+        getDBStudies()
       }
     })()
     setCurrentTab(0)
