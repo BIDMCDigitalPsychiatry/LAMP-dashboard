@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: "0px",
       maxWidth: "100%",
       maxHeight: "calc(100%)",
-      top: "50px",
+      top: "0px",
       left: "100px",
       overflow: "scroll",
       position: "absolute",
@@ -283,6 +283,19 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                       <Studies />
                     </ListItemIcon>
                     <ListItemText primary={t("Studies")} />
+                  </ListItem>
+                )}
+                {userType === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 4}
+                    onClick={(event) => setCurrentTab(4)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <DataPortalIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"Data Portal"} />
                   </ListItem>
                 )}
               </List>
