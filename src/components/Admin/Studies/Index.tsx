@@ -60,7 +60,6 @@ export default function StudiesList({
   const [allStudies, setAllStudies] = useState(studies)
   const [updateCount, setUpdateCount] = useState(0)
   const [newStudy, setNewStudy] = useState(null)
-  const [studiesData, setStudiesData] = useState(studies)
 
   useEffect(() => {
     refreshStudies()
@@ -73,13 +72,8 @@ export default function StudiesList({
 
   const refreshStudies = () => {
     Service.getAll("studies").then((data) => {
-      setStudiesData(data || [])
+      setAllStudies(data || [])
     })
-  }
-
-  const getAllStudies = async () => {
-    let studies = await Service.getAll("studies")
-    setAllStudies(studies)
   }
 
   const searchFilterStudies = async () => {
@@ -88,7 +82,7 @@ export default function StudiesList({
       let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
       setAllStudies(newStudies)
     } else {
-      getAllStudies()
+      refreshStudies()
     }
   }
 
@@ -102,6 +96,7 @@ export default function StudiesList({
 
   const handleDeletedStudy = (data) => {
     deletedDataStudy(data)
+    refreshStudies()
     searchData(search)
   }
 
@@ -112,7 +107,7 @@ export default function StudiesList({
   return (
     <React.Fragment>
       <Header
-        studies={studiesData}
+        studies={allStudies}
         researcher={researcher}
         searchData={handleSearchData}
         setParticipants={searchFilterStudies}

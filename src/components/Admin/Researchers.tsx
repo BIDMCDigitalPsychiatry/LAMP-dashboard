@@ -236,7 +236,9 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
-    refreshResearchers(studyIds)
+    const ids = (studies || []).map((d) => d.id)
+    setStudyIds(ids)
+    refreshResearchers(ids)
   }, [search])
 
   useEffect(() => {
