@@ -27,6 +27,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const editorRef = React.useRef(null)
   const [query, setQuery] = React.useState("")
   const [result, setResult] = React.useState("")
+  const [focusBuilder, toggleFocus] = React.useState(false)
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
 
@@ -59,6 +60,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const onMonacoMount = (ref) => {
     editorRef.current = ref
     if (!!editorRef.current) editorRef.current.editor.getModel().setValue(query)
+    debugger
   }
   React.useEffect(() => {
     if (!!editorRef.current) {
@@ -89,7 +91,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           <div style={{ flexGrow: 1 }} />
           <Typography className={classes.alphaBadge}>Alpha - V8.11.2021</Typography>
           {typeof onLogout === "function" && (
-            <IconButton onClick={onLogout} color="inherit">
+            <IconButton className={classes.icon} onClick={onLogout} color="inherit">
               <Typography>Log-out&nbsp;</Typography>
               <Icon className={classes.icon}>lock_outlined</Icon>
             </IconButton>
@@ -166,47 +168,43 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
             >
               <Grid
                 item
-                style={{
-                  flexGrow: 1,
-                  minHeight: "20%",
-                  maxHeight: "40%",
-                  margin: " 0 5%",
-                  top: "10%",
-                  overflowY: "scroll",
+                className={focusBuilder ? classes.builderStyleFocus : classes.builderStyleUnfocus}
+                onClick={() => {
+                  toggleFocus(true)
+                  if (editorRef.current) editorRef.current.editor.layout()
                 }}
               >
                 {isGUIEditor ? (
                   <QueryBuilder
                     query={GUIQuery}
+                    focusMe={() => toggleFocus(true)}
                     token={token}
                     setQueryResult={setResult}
                     setLoadingGraphs={setLoadingGraphs}
+                    loadingGraphs={loadingGraphs}
                     queryResult={result}
                   />
                 ) : (
-                  <Card>
-                    <Editor
-                      //@ts-ignore
-                      path="query"
-                      ref={editorRef}
-                      onChange={(x) => setQuery(x)}
-                      onMount={onMonacoMount}
-                    />
-                  </Card>
+                  <Editor
+                    //@ts-ignore
+                    path="query"
+                    automaticLayout={true}
+                    ref={editorRef}
+                    onChange={(x) => {
+                      setQuery(x)
+                      toggleFocus(true)
+                      editorRef.current.editor.layout()
+                    }}
+                    onMount={onMonacoMount}
+                  />
                 )}
               </Grid>
               <Grid
                 item
-                style={{
-                  flexGrow: 2,
-                  minHeight: "50%",
-                  maxHeight: "80%",
-                  overflowY: "scroll",
-                  margin: " 10% 5% 5%",
-                  background: "white",
-                }}
+                className={focusBuilder ? classes.renderStyleUnfocus : classes.renderStyleFocus}
+                onClick={() => toggleFocus(false)}
               >
-                <QueryRender loading={loadingGraphs} queryResult={result} />
+                <QueryRender focusMe={() => toggleFocus(false)} loading={loadingGraphs} queryResult={result} />
               </Grid>
             </Grid>
           </Grid>

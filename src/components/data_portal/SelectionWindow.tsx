@@ -1,5 +1,15 @@
 import React, { useState, useRef } from "react"
-import { Backdrop, Card, Box, Typography, Button, makeStyles, IconButton } from "@material-ui/core"
+import {
+  Backdrop,
+  Card,
+  Box,
+  Typography,
+  Button,
+  makeStyles,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+} from "@material-ui/core"
 import CloseIcon from "@material-ui/icons/Close"
 
 const useStyles = makeStyles((theme) => ({
@@ -61,7 +71,9 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function SelectionWindow({
-  openButtonText = "Open Window",
+  openButtonText,
+  customButton = null,
+  exposeButton = false,
   handleResult = console.log,
   children = <Typography>Set the 'children' prop to display elements</Typography>,
   submitText = "Submit",
@@ -72,14 +84,37 @@ export default function SelectionWindow({
 }) {
   const classes = useStyles()
   const [open, toggleOpen] = useState(false)
-  //const [inputChildren, alterChildren] = useState(children)\
-  const cardRef = useRef()
+  const [awaitingClose, setAwaitClose] = useState(false)
+
+  function ConditionalCardWrap({ condition, children }) {
+    return condition ? (
+      <Card className={classes.container} style={props.style ? props.style : {}}>
+        {children}
+      </Card>
+    ) : (
+      <React.Fragment>{children}</React.Fragment>
+    )
+  }
+
+  function toggle() {
+    toggleOpen(!open)
+  }
 
   return (
-    <Card className={classes.container} style={props.style ? props.style : {}}>
-      <Button style={style} className={classes.openButton} onClick={() => toggleOpen(!open)}>
-        {openButtonText}
-      </Button>
+    <ConditionalCardWrap condition={!exposeButton}>
+      {React.isValidElement(customButton) ? (
+        <Tooltip title={openButtonText}>
+          {React.cloneElement(
+            customButton,
+            //@ts-ignore: Assigning a function to onclick prop
+            { onClick: toggle, ...props }
+          )}
+        </Tooltip>
+      ) : (
+        <Button style={style} className={classes.openButton} onClick={() => toggleOpen(!open)}>
+          {openButtonText}
+        </Button>
+      )}
       {open && (
         <Backdrop className={classes.backdrop} open={open} onClick={() => toggleOpen(!open)}>
           <Box
@@ -91,26 +126,27 @@ export default function SelectionWindow({
             <IconButton className={classes.closeIcon} onClick={() => toggleOpen(false)}>
               <CloseIcon />
             </IconButton>
-            <Card ref={cardRef} className={classes.cardDisplay}>
-              {children}
-            </Card>
+            <Card className={classes.cardDisplay}>{children}</Card>
             <div className={classes.buttonWrapper}>
               {displaySubmitButton && (
                 <Button
-                  onClick={() => {
-                    if (closesOnSubmit) toggleOpen(false)
-                    handleResult()
-                    if (!closesOnSubmit) toggleOpen(false)
+                  onClick={async () => {
+                    if (!!closesOnSubmit) toggleOpen(false)
+                    else setAwaitClose(true)
+                    await handleResult()
+                    toggleOpen(false)
+                    setAwaitClose(false)
                   }}
+                  disabled={awaitingClose}
                   className={classes.submitButton}
                 >
-                  {submitText}
+                  {!awaitingClose ? submitText : <CircularProgress size={24} />}
                 </Button>
               )}
             </div>
           </Box>
         </Backdrop>
       )}
-    </Card>
+    </ConditionalCardWrap>
   )
 }

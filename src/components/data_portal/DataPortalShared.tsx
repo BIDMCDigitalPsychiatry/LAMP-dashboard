@@ -1,5 +1,6 @@
 import React from "react"
 import { makeStyles } from "@material-ui/core"
+import LAMP from "lamp-core"
 
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = React.useState(() => {
@@ -71,6 +72,11 @@ export const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const focusedQueryBuilderHeight = "65vh"
+const unfocusedQueryBuilderHeight = "15vh"
+const focusedQueryRenderHeight = "65vh"
+const unfocusedQueryRenderHeight = "15vh"
+
 export const portalHomeStyle = makeStyles((theme) => ({
   box: {
     background: "inherit",
@@ -116,8 +122,93 @@ export const portalHomeStyle = makeStyles((theme) => ({
     bottom: theme.spacing(4),
     right: theme.spacing(4),
   },
+  builderStyleFocus: {
+    animation: `$myEffect 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    border: "1px solid red",
+    height: focusedQueryBuilderHeight,
+  },
+  builderStyleUnfocus: {
+    animation: `$myEffectExit 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    border: "1px solid red",
+    height: unfocusedQueryBuilderHeight,
+  },
+  "@keyframes myEffect": {
+    "0%": {
+      height: unfocusedQueryBuilderHeight,
+    },
+    "100%": {
+      height: focusedQueryBuilderHeight,
+    },
+  },
+  "@keyframes myEffectExit": {
+    "0%": {
+      height: focusedQueryBuilderHeight,
+    },
+    "100%": {
+      height: unfocusedQueryBuilderHeight,
+    },
+  },
+  renderStyleFocus: {
+    animation: `$focusRender 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    background: "white",
+    border: "1px solid black",
+    height: focusedQueryRenderHeight,
+  },
+  renderStyleUnfocus: {
+    animation: `$unfocusRender 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    background: "white",
+    border: "1px solid black",
+    height: unfocusedQueryRenderHeight,
+  },
+  "@keyframes focusRender": {
+    "0%": {
+      height: unfocusedQueryRenderHeight,
+    },
+    "100%": {
+      height: focusedQueryRenderHeight,
+    },
+  },
+  "@keyframes unfocusRender": {
+    "0%": {
+      height: focusedQueryRenderHeight,
+    },
+    "100%": {
+      height: unfocusedQueryRenderHeight,
+    },
+  },
 }))
 
+//given a valid researcher, study, or participant id,
+//an array of ids is returned
+export async function generate_ids(id_set) {
+  if (typeof id_set === "string") {
+    let { data: parents } = await LAMP.Type.parent(id_set)
+    //if study exists, return id_set
+    if (parents?.Study) return [id_set]
+    //else if researcher exists
+    //this is a study
+    else if (parents?.Researcher) {
+      let res = await LAMP.Participant.allByStudy(id_set)
+      return res.map((participant) => participant.id)
+    }
+    //if nothing exists, this is a researcher, so we recursively call
+    else {
+      //@ts-ignore
+      let res = await LAMP.Study.allByResearcher(id_set)
+      return await generate_ids(res.map((study) => study.id))
+    }
+  } else if (Array.isArray(id_set)) {
+    const res = await Promise.all(id_set.map((id) => generate_ids(id)))
+    //now, res is an array of arrays. let's combine them
+    return res.reduce((acc, array) => acc.concat(array), [])
+  } else {
+    return [id_set]
+  }
+}
 export const tags_object = {
   Administrator: ["Researcher", "ActivitySpec", "SensorSpec"],
   Researcher: ["Study", "ActivitySpec", "SensorSpec"],

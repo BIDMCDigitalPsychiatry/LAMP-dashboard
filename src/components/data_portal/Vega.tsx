@@ -10,7 +10,7 @@ export default function Vega({ spec, config, ...props }) {
     //@ts-ignore - as this returns a promise, the reference should always be ready in time
     vegaEmbed(ref.current, spec, config)
       .then(() => setRenderedState(true))
-      .catch((e) => (ref.current.innerText = `This vega graph failed to render. ${e}`))
+      .catch((e) => ((ref.current as HTMLElement).textContent = `This vega graph failed to render. ${e}`))
   }, [spec])
   return (
     //@ts-ignore - see above

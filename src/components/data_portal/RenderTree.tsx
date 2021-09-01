@@ -10,9 +10,15 @@ import {
   makeStyles,
   TextField,
   ClickAwayListener,
+  Switch,
 } from "@material-ui/core"
 import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
 import { useDrag, DragPreviewImage } from "react-dnd"
+import SelectionWindow from "./SelectionWindow"
+import LAMP from "lamp-core"
+import { generate_ids } from "./DataPortalShared"
+
+import { saveAs } from "file-saver"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -147,6 +153,44 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     }, [expanded])
   }
 
+  let dateObj = new Date()
+  let month = dateObj.getMonth() + 1 //months from 1-12
+  let day = dateObj.getDate()
+  let year = dateObj.getFullYear()
+  let newdate = month + "_" + day + "_" + year
+  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv") {
+    //TODO: add selection between one big file and multiple files
+    //TODO: add json vs csv selection
+    console.log(`Downloading data for ${id}`)
+
+    //first, let's generate a complete id list
+    let id_list = await generate_ids(id)
+    console.log(id_list)
+
+    //now, let's pull some data
+    let resultsPulled = await Promise.all(
+      id_list.map(async (id) => {
+        let res = await LAMP.ActivityEvent.allByParticipant(id)
+        return {
+          userID: id,
+          activityEvents: res,
+        }
+      })
+    )
+
+    console.log(resultsPulled)
+
+    let csv = [
+      ["ID", "Activity Events"],
+      ...resultsPulled.map((object) => [object["userID"], JSON.stringify(object["activityEvents"])]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n")
+    debugger
+    const file = new Blob([csv], { type: "text/csv" })
+    name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+  }
+
   return (
     <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
       <CardHeader
@@ -184,6 +228,27 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               }}
             />
           </ClickAwayListener>
+        )}
+
+        {!Object.keys(tags_object).includes(id[id.length - 1]) && Object.keys(tags_object).includes(id[id.length - 2]) && (
+          <SelectionWindow
+            openButtonText={`Download ${id[id.length - 2]} data`}
+            customButton={
+              <IconButton className={classes.treeButton}>
+                <Icon>get_app</Icon>
+              </IconButton>
+            }
+            displaySubmitButton={true}
+            handleResult={() => downloadData(id[id.length - 1])}
+            closesOnSubmit={false}
+            exposeButton={true}
+            submitText={`Download`}
+            children={
+              <Typography>
+                Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
+              </Typography>
+            }
+          />
         )}
 
         {isGUIEditor &&
