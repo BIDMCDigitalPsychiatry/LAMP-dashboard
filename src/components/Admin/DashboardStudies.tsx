@@ -52,18 +52,7 @@ export default function DashboardStudies({
   }, [updatedData])
 
   useEffect(() => {
-    if (deletedData !== null) {
-      let newStudies = studies.filter((item) => {
-        if (!!search) {
-          return item?.name?.toLowerCase()?.includes(search?.toLowerCase()) && item.id !== deletedData
-        } else {
-          return item?.id !== deletedData
-        }
-      })
-      setStudies(newStudies)
-    } else {
-      getAllStudies()
-    }
+    getAllStudies()
   }, [deletedData])
 
   const getAllStudies = async () => {

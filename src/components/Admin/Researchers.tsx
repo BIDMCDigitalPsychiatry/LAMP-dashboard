@@ -192,24 +192,14 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
-    const ids = (studies || []).map((d) => d.id)
-    setStudyIds(ids)
-  }, [])
-
-  useEffect(() => {
-    setFilterData(false)
-    setLoading(studyIds.length > 0 ? true : false)
-    refreshResearchers()
-  }, [studyIds])
-
-  useEffect(() => {
     setFilterData(false)
     const ids = (studies || []).map((d) => d.id)
     setStudyIds(ids)
+    refreshResearchers(ids)
     setLoading(ids.length > 0 ? true : false)
   }, [userType, studies])
 
-  const refreshResearchers = () => {
+  const refreshResearchers = (ids) => {
     setFilterData(false)
     setPaginatedResearchers([])
     setPage(0)
@@ -232,7 +222,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
           )
         ).filter((y) =>
           userType === "user_admin"
-            ? !userTypes.includes(y.res) && studyIds.includes(y.study)
+            ? !userTypes.includes(y.res) && (ids ?? studyIds).includes(y.study)
             : userType === "clinical_admin"
             ? !userTypes.includes(y.res)
             : y.res !== "clinician"
@@ -246,7 +236,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
-    refreshResearchers()
+    refreshResearchers(studyIds)
   }, [search])
 
   useEffect(() => {
