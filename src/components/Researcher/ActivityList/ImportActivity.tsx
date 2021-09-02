@@ -210,7 +210,6 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
-
     if (brokenGroupsCount > 0) {
       enqueueSnackbar(t("Couldn't import the Activities because some Activities are misconfigured or missing."), {
         variant: "error",
@@ -321,7 +320,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "application/json,.json",
-    maxSize: 5 * 1024 * 1024 /* 5MB */,
+    maxSize: 15 * 1024 * 1024 /* 5MB */,
   })
   return (
     <Container>
@@ -383,6 +382,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
         <input {...getInputProps()} />
 
         <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
+        <Typography className={classes.errorMsg}>The maximum allowed file size is 15 MB.</Typography>
       </Box>
 
       <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
