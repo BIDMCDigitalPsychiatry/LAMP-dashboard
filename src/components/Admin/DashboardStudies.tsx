@@ -58,7 +58,7 @@ export default function DashboardStudies({
   const getAllStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(studies)
-      setData(studies)
+      !!setData ? setData(studies) : {}
       !!filterStudies ? filterStudies(studies) : {}
     })
   }
