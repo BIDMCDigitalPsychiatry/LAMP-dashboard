@@ -18,6 +18,8 @@ import {
   createStyles,
   FormControl,
   InputLabel,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useDropzone } from "react-dropzone"
@@ -195,6 +197,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   const [paginatedImported, setPaginatedImported] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const [loading, setLoading] = useState(false)
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
@@ -204,6 +207,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
 
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
+    setLoading(true)
     let status = true
     const _importFile = [...importFile] // clone it so we can close the dialog first
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
@@ -290,10 +294,12 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     if (status) {
       setUpdateCount(2)
       setActivities()
+      setLoading(false)
       enqueueSnackbar(t("The selected Activities were successfully imported."), {
         variant: "success",
       })
     } else {
+      setLoading(false)
       enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
     }
     onClose()
@@ -324,6 +330,9 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   })
   return (
     <Container>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box mt={2} mb={2}>
         <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
       </Box>

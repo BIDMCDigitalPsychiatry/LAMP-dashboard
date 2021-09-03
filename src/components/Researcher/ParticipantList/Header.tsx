@@ -71,22 +71,17 @@ export default function Header({
   setSelectedStudies,
   selectedStudies,
   setParticipants,
-  newStudyObj,
   userType,
+  setData,
   ...props
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
   const [updateCount, setUpdateCount] = useState(0)
-  const [addUser, setAddUser] = useState(false)
 
   const handleShowFilterStudies = (status) => {
     setShowFilterStudies(status)
-  }
-
-  const handleNewStudyObj = (data) => {
-    newStudyObj(data)
   }
 
   return (
@@ -107,8 +102,9 @@ export default function Header({
             studies={studies}
             setUpdateCount={setUpdateCount}
             setParticipants={setParticipants}
-            newStudyObj={handleNewStudyObj}
+            setSelectedStudies={setSelectedStudies}
             userType={userType}
+            setData={setData}
           />
         </Box>
       </Box>
