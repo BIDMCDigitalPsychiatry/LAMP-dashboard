@@ -126,6 +126,7 @@ export default function ParticipantList({
   selectedStudies,
   setSelectedStudies,
   userType,
+  setData,
   ...props
 }) {
   const classes = useStyles()
@@ -135,7 +136,6 @@ export default function ParticipantList({
   const [updateCount, setUpdateCount] = useState(0)
   const [selected, setSelected] = useState(selectedStudies)
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
-  const [newStudy, setNewStudy] = useState(null)
   const [studiesData, setStudiesData] = useState(studies)
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
@@ -146,11 +146,13 @@ export default function ParticipantList({
   useEffect(() => {
     setSelected(selectedStudies)
     if (selectedStudies) {
+      setLoading(false)
       searchParticipants()
     }
   }, [selectedStudies])
 
   useEffect(() => {
+    setLoading(false)
     setStudiesData(studies)
   }, [studies])
 
@@ -181,6 +183,7 @@ export default function ParticipantList({
                 result = result.concat(participantData)
                 setParticipants(sortData(result, selectedData, "id"))
               }
+              result = sortData(result, selectedData, "id")
               setPaginatedParticipants(result.slice(0, rowCount))
               setPage(0)
             } else {
@@ -214,7 +217,7 @@ export default function ParticipantList({
     <React.Fragment>
       {/*<Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
-  </Backdrop>*/}
+      </Backdrop>*/}
       <Header
         studies={studiesData}
         researcher={researcher}
@@ -223,8 +226,8 @@ export default function ParticipantList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        newStudyObj={setNewStudy}
         userType={userType}
+        setData={setData}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

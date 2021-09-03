@@ -148,7 +148,7 @@ export const sortData = (data, studies, key) => {
     })
     result = result.concat(filteredData)
   })
-  return result
+  return [...new Map(result.map((item) => [item["id"], item])).values()]
 }
 // export interface Study {
 //   id?: string
@@ -297,6 +297,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 userType={userType}
+                setData={getDBStudies}
               />
             )}
             {currentTab === 1 && (

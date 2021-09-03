@@ -104,8 +104,9 @@ export default function AddButton({
   studies,
   setUpdateCount,
   setParticipants,
-  newStudyObj,
+  setSelectedStudies,
   userType,
+  setData,
   ...props
 }) {
   const [addUser, setAddUser] = useState(false)
@@ -113,12 +114,11 @@ export default function AddButton({
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
-  // const [closePopUp, setClosePopUp] = useState(false)
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
+
   const handleNewStudyData = (data) => {
     setUpdateCount(1)
-    setParticipants()
-    newStudyObj(data)
+    setData()
   }
 
   const handleClosePopUp = (data) => {
@@ -218,6 +218,7 @@ export default function AddButton({
         open={addParticipantStudy}
         handleNewStudy={handleNewStudyData}
         closePopUp={handleClosePopUp}
+        setSelectedStudies={setSelectedStudies}
       />
     </Box>
   )

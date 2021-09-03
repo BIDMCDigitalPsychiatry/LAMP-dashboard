@@ -61,12 +61,14 @@ export default function PatientStudyCreator({
   researcher,
   handleNewStudy,
   closePopUp,
+  setSelectedStudies,
   ...props
 }: {
   studies: any
   researcher: any
   handleNewStudy: Function
   closePopUp: Function
+  setSelectedStudies?: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
@@ -86,7 +88,7 @@ export default function PatientStudyCreator({
     )
   }
 
-  const saveStudyData = (result, type) => {
+  const saveStudyData = async (result, type) => {
     for (let resultData of result) {
       Service.addData(type, [resultData])
     }
@@ -199,6 +201,7 @@ export default function PatientStudyCreator({
       localStorage.getItem("studies_" + authId) !== null ? JSON.parse(localStorage.getItem("studies_" + authId)) : []
     studiesSelected.push(studyName)
     localStorage.setItem("studies_" + authId, JSON.stringify(studiesSelected))
+    !!setSelectedStudies ? setSelectedStudies(studiesSelected) : {}
   }
 
   const createStudy = async (studyName: string) => {
@@ -245,19 +248,26 @@ export default function PatientStudyCreator({
                 )
                 if (filteredParticipants.length > 0) {
                   filteredParticipants[0].name = studyName
+                  saveStudyData(filteredParticipants, "participants").then((d) => {
+                    updateStudyLocalStorage(authId, studyName)
+                  })
                   setNewId(filteredParticipants[0]?.id)
                   LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
-                  saveStudyData(filteredParticipants, "participants")
                 }
               }
+              newStudyData.participant_count = 1
               setLoading(false)
+              Service.addData("studies", [newStudyData])
+              handleNewStudy(newStudyData)
+              closePopUp(1)
             })
-            updatedNewStudy.participant_count = 1
           } else {
+            newStudyData.participant_count = 1
             setLoading(false)
+            Service.addData("studies", [newStudyData])
+            handleNewStudy(newStudyData)
+            closePopUp(1)
           }
-          closePopUp(1)
-          handleNewStudy(updatedNewStudy)
         })
       } else {
         let newStudyData = {
@@ -275,9 +285,11 @@ export default function PatientStudyCreator({
               )
               if (filteredParticipants.length > 0) {
                 filteredParticipants[0].name = studyName
+                saveStudyData(filteredParticipants, "participants").then((d) => {
+                  updateStudyLocalStorage(authId, studyName)
+                })
                 setNewId(filteredParticipants[0]?.id)
                 LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
-                saveStudyData(filteredParticipants, "participants")
               }
             }
             newStudyData.participant_count = 1
@@ -289,11 +301,11 @@ export default function PatientStudyCreator({
         } else {
           setLoading(false)
           Service.addData("studies", [newStudyData])
+          updateStudyLocalStorage(authId, studyName)
           handleNewStudy(newStudyData)
           closePopUp(1)
         }
       }
-      updateStudyLocalStorage(authId, studyName)
     })
   }
 
