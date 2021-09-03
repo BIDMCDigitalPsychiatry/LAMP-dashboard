@@ -347,23 +347,6 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
         </FormControl>
       </Grid>
 
-      {/* <Typography variant="caption">{t("Study")}</Typography>
-      <Select
-        labelId="demo-simple-select-filled-label"
-        id="demo-simple-select-filled"
-        value={selectedStudy}
-        onChange={(event) => {
-          setSelectedStudy(event.target.value)
-        }}
-        style={{ width: "100%" }}
-      >
-        {studies.map((study) => (
-          <MenuItem key={study.id} value={study.id}>
-            {study.name}
-          </MenuItem>
-        ))}
-      </Select> */}
-
       {typeof selectedStudy === "undefined" ||
       (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
         <Box mt={1}>
