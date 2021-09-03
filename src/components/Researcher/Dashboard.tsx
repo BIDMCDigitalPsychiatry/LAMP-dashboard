@@ -319,7 +319,13 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
                 userType={userType}
               />
             )}
-            {currentTab === 3 && <DashboardStudies researcher={researcher} filterStudies={filterStudies} />}
+            {currentTab === 3 && (
+              <DashboardStudies
+                researcher={researcher}
+                filterStudies={filterStudies}
+                setData={(data) => setStudies(data)}
+              />
+            )}
             {currentTab === 4 && (
               <DataPortal
                 onLogout={null}
