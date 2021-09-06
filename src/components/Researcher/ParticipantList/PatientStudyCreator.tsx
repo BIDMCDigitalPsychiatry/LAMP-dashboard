@@ -255,10 +255,10 @@ export default function PatientStudyCreator({
                   LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
                 }
               }
-              studyUpdate(newStudyData, null)
+              studyUpdate(newStudyData, null, createPatient)
             })
           } else {
-            studyUpdate(newStudyData, studyName)
+            studyUpdate(newStudyData, studyName, createPatient)
           }
         })
       } else {
@@ -284,18 +284,18 @@ export default function PatientStudyCreator({
                 LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
               }
             }
-            studyUpdate(newStudyData, null)
+            studyUpdate(newStudyData, null, createPatient)
           })
         } else {
-          studyUpdate(newStudyData, studyName)
+          studyUpdate(newStudyData, studyName, createPatient)
         }
       }
     })
   }
 
-  const studyUpdate = (newStudyData, studyName) => {
+  const studyUpdate = (newStudyData, studyName, createPatient) => {
     let authId = researcher.id
-    newStudyData.participant_count = 1
+    newStudyData.participant_count = !!createPatient ? 1 : 0
     setLoading(false)
     Service.addData("studies", [newStudyData])
     if (!!studyName) updateStudyLocalStorage(authId, studyName)

@@ -215,9 +215,9 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-      {/*<Backdrop className={classes.backdrop} open={loading || participants === null}>
+      <Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
-      </Backdrop>*/}
+      </Backdrop>
       <Header
         studies={studiesData}
         researcher={researcher}
