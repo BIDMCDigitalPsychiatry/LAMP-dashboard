@@ -192,7 +192,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
     })
   }, [])
 
-  const filterStudies = async (studies) => {
+  const filterStudies = (studies) => {
     if (studies !== null && (studies || []).length > 0) {
       let selected =
         localStorage.getItem("studies_" + researcher.id) !== null

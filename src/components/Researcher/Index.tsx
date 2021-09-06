@@ -5,6 +5,7 @@ import locale_lang from "../../locale_map.json"
 import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
+import { Service } from "../DBService/DBService"
 // import { useWorker } from "@koale/useworker"
 
 export default function Researcher({ researcher, onParticipantSelect, userType, ...props }) {
@@ -37,13 +38,15 @@ export default function Researcher({ researcher, onParticipantSelect, userType, 
       //     dataWorker(lampAuthId + ":" + lampAuthPswd, researcher.id)
       //   }
       // }
-      if (LAMP.Auth._type === "researcher") {
+      let res = (await LAMP.Type.getAttachment(lampAuthId, "lamp.dashboard.user_type")) as any
+      await Service.deleteDB()
+      if (LAMP.Auth._type === "researcher" && (userType === "clinician" || userType === "researcher")) {
         lampAuthId === "researcher@demo.lamp.digital"
           ? saveDemoData()
-          : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
-      } else if (LAMP.Auth._type === "admin") {
+          : await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+      } else if (LAMP.Auth._type === "admin" && (userType === "clinician" || userType === "researcher")) {
         if (researcher.id) {
-          saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+          await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
         }
       }
     })()
