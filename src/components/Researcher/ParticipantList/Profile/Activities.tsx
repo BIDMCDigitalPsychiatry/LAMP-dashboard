@@ -154,7 +154,7 @@ export default function PatientProfile({
                   studies={studies}
                   index={index}
                   handleSelected={handleActivitySelected}
-                  setActivities={setSelectedActivities}
+                  setActivities={onChangeActivities}
                 />
               </Grid>
             ))}
