@@ -106,7 +106,7 @@ export default function SensorsList({
                 result = result.concat(sensorData)
                 setSensors(sortData(result, selectedData, "name"))
               }
-              setPaginatedSensors(result.slice(0, rowCount))
+              setPaginatedSensors(sortData(result, selectedData, "name").slice(0, rowCount))
               setPage(0)
             } else {
               if (result.length === 0) setSensors([])

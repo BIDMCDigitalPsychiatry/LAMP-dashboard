@@ -134,7 +134,7 @@ export default function ActivityList({
                 result = result.concat(activitiesData)
                 setActivities(sortData(result, selectedData, "name"))
               }
-              setPaginatedActivities(result.slice(0, rowCount))
+              setPaginatedActivities(sortData(result, selectedData, "name").slice(0, rowCount))
               setPage(0)
             } else {
               if (result.length === 0) setActivities([])
