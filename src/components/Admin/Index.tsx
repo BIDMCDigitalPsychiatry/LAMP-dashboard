@@ -179,6 +179,7 @@ export default function Root({
     ;(async () => {
       let lampAuthId = LAMP.Auth._auth.id
       let lampAuthPswd = LAMP.Auth._auth.password
+      await Service.deleteDB()
       if (userType === "user_admin") {
         lampAuthId === "researcher@demo.lamp.digital"
           ? await saveDemoData()
@@ -267,7 +268,9 @@ export default function Root({
           {currentTab === 0 && (
             <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
           )}
-          {currentTab === 1 && <DashboardStudies researcher={researcher} setData={(data) => setStudies(data)} />}
+          {currentTab === 1 && (
+            <DashboardStudies researcher={researcher} data={studies} setData={(data) => setStudies(data)} />
+          )}
           {currentTab === 2 && (
             <DataPortal
               onLogout={null}

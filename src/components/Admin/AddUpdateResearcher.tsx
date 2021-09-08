@@ -183,7 +183,7 @@ export default function AddUpdateResearcher({
                 User Administrator
               </MenuItem>
               <MenuItem key="clinical_admin" value="clinical_admin">
-                Clinical Administrator
+                Practice Lead
               </MenuItem>
               <MenuItem key="researcher" value="researcher">
                 Researcher

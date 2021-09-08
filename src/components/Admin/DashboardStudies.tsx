@@ -25,18 +25,20 @@ import LAMP from "lamp-core"
 
 export default function DashboardStudies({
   researcher,
+  data,
   setData,
   filterStudies,
   ...props
 }: {
   researcher: any
+  data?: any
   setData?: Function
   filterStudies?: Function
 }) {
   const [updatedData, setUpdatedData] = useState(null)
   const [deletedData, setDeletedData] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
-  const [studies, setStudies] = useState(null)
+  const [studies, setStudies] = useState(data ?? null)
   const [search, setSearch] = useState(null)
 
   useEffect(() => {
@@ -56,12 +58,24 @@ export default function DashboardStudies({
   }, [deletedData])
 
   const getAllStudies = async () => {
-    Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      !!setData ? setData(studies) : {}
-      !!filterStudies ? filterStudies(studies) : {}
-    })
+    if (!!data) {
+      setStudies(data)
+      !!setData ? setData(data) : {}
+      !!filterStudies ? filterStudies(data) : {}
+    } else {
+      Service.getAll("studies").then((studies) => {
+        setStudies(studies)
+        !!setData ? setData(studies) : {}
+        !!filterStudies ? filterStudies(studies) : {}
+      })
+    }
   }
+
+  useEffect(() => {
+    setStudies(data)
+    !!setData ? setData(data) : {}
+    !!filterStudies ? filterStudies(data) : {}
+  }, [data])
 
   return (
     <StudiesList
