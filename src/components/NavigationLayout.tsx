@@ -312,9 +312,7 @@ export default function NavigationLayout({
               ) : (
                 <Box>
                   {((authType === "admin" && title !== "Administrator") ||
-                    (authType === "researcher" &&
-                      title !== "User Administrator" &&
-                      title !== "Clinical Administrator")) && (
+                    (authType === "researcher" && title !== "User Administrator" && title !== "Practice Lead")) && (
                     <IconButton
                       onClick={goBack}
                       color="default"

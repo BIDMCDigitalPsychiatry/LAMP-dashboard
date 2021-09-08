@@ -181,7 +181,6 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
       if ((studies || []).length > 0) setLoading(false)
       setStudies(studies)
       filterStudies(studies)
-      setCurrentTab(0)
     })
   }
 
@@ -190,6 +189,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
       let researcherNotification = !!data ? data[0]?.notification ?? false : false
       setNotification(researcherNotification)
     })
+    setCurrentTab(0)
   }, [])
 
   const filterStudies = (studies) => {
@@ -324,6 +324,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
               <DashboardStudies
                 researcher={researcher}
                 filterStudies={filterStudies}
+                data={studies}
                 setData={(data) => setStudies(data)}
               />
             )}

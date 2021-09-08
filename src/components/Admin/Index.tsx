@@ -268,7 +268,9 @@ export default function Root({
           {currentTab === 0 && (
             <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
           )}
-          {currentTab === 1 && <DashboardStudies researcher={researcher} setData={(data) => setStudies(data)} />}
+          {currentTab === 1 && (
+            <DashboardStudies researcher={researcher} data={studies} setData={(data) => setStudies(data)} />
+          )}
           {currentTab === 2 && (
             <DataPortal
               onLogout={null}

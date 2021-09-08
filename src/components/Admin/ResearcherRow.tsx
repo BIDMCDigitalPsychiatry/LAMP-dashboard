@@ -67,7 +67,7 @@ export default function ResearcherRow({
   const userTypes = {
     researcher: "Researcher",
     user_admin: "User Administrator",
-    clinical_admin: "Clinical Administrator",
+    clinical_admin: "Practice Lead",
     clinician: "Clinician",
   }
 

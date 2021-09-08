@@ -183,7 +183,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const userTypes = ["researcher", "user_admin", "clinical_admin"]
   const [filterData, setFilterData] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [studyIds, setStudyIds] = useState([])
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -193,13 +192,13 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   useEffect(() => {
     setFilterData(false)
-    const ids = (studies || []).map((d) => d.id)
-    setStudyIds(ids)
-    refreshResearchers(ids)
-    setLoading(ids.length > 0 ? true : false)
-  }, [userType, studies])
+    // const ids = (studies || []).map((d) => d.id)
+    // setStudyIds(ids)
+    refreshResearchers()
+    setLoading(true)
+  }, [userType])
 
-  const refreshResearchers = (ids) => {
+  const refreshResearchers = () => {
     setFilterData(false)
     setPaginatedResearchers([])
     setPage(0)
@@ -221,10 +220,10 @@ export default function Researchers({ history, updateStore, userType, studies, .
             }))
           )
         ).filter((y) =>
-          userType === "user_admin"
-            ? !userTypes.includes(y.res) && (ids ?? studyIds).includes(y.study)
-            : userType === "clinical_admin"
-            ? !userTypes.includes(y.res)
+          userType === "user_admin" || userType === "clinical_admin"
+            ? // ? !userTypes.includes(y.res) && (ids ?? studyIds).includes(y.study)
+              // : userType === "clinical_admin"
+              !userTypes.includes(y.res)
             : y.res !== "clinician"
         )
         setFilterData(true)
@@ -236,9 +235,7 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
-    const ids = (studies || []).map((d) => d.id)
-    setStudyIds(ids)
-    refreshResearchers(ids)
+    refreshResearchers()
   }, [search])
 
   useEffect(() => {

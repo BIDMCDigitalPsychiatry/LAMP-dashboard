@@ -491,10 +491,10 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{t("Clinical Administrator")}</PageTitle>
+              <PageTitle>{t("Practice Lead")}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
-                title="Clinical Administrator"
+                title="Practice Lead"
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
                 activeTab="Clinicians"
