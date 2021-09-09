@@ -256,8 +256,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
-export async function updateDetails(id, data, mode, allRoles, type) {
+export async function updateDetails(id, data, mode, allRoles, type, userType) {
   try {
+    id = userType !== "user_admin" && userType !== "clinical_admin" ? id : null
     if (mode === "reset-password" && !!data.password) {
       if (
         !!((await LAMP.Credential.update(id, data.credential.access_key, {
@@ -306,7 +307,8 @@ export const CredentialManager: React.FunctionComponent<{
   style?: any
   credential?: any
   mode?: string
-}> = ({ id, onComplete, credential, mode, ...props }) => {
+  userType?: string
+}> = ({ id, onComplete, credential, mode, userType, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
@@ -361,7 +363,7 @@ export const CredentialManager: React.FunctionComponent<{
 
   const _submitCredential = async (data) => {
     let type = ext.includes(data.emailAddress) ? 1 : 2
-    let result = await updateDetails(id, data, selected.mode, allRoles, type)
+    let result = await updateDetails(id, data, selected.mode, allRoles, type, userType)
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {
         variant: "error",

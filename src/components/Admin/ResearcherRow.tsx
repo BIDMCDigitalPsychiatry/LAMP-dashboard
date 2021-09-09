@@ -98,7 +98,7 @@ export default function ResearcherRow({
           <CardActions>
             {userType !== "clinical_admin" && (
               <Box display="flex" flexDirection="row" className={classes.buttoncontainer}>
-                <Credentials user={researcher} />
+                <Credentials user={researcher} userType={type} />
                 <AddUpdateResearcher
                   researcher={researcher}
                   refreshResearchers={refreshResearchers}
