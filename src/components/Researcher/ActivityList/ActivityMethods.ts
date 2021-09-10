@@ -160,49 +160,6 @@ export const SchemaList = () => {
             "shape_count",
             "bonus_point_count",
           ],
-          dependencies: {
-            variant: {
-              oneOf: [
-                {
-                  properties: {
-                    variant: {
-                      const: "trails_a",
-                    },
-                  },
-                },
-                {
-                  properties: {
-                    variant: {
-                      const: "trails_b",
-                    },
-                    y_changes_in_level_count: {
-                      title: i18n.t("Y changes in level count"),
-                      description: "",
-                      type: "number",
-                      minimum: 0,
-                      maximum: 25,
-                      default: 2,
-                      "ui:grid": {
-                        xs: 3,
-                      },
-                    },
-                    y_shape_count: {
-                      title: i18n.t("Y shape count"),
-                      description: "",
-                      type: "number",
-                      minimum: 0,
-                      maximum: 4,
-                      default: 1,
-                      "ui:grid": {
-                        xs: 3,
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-          },
-
           properties: {
             mode: {
               title: i18n.t("Mode"),
@@ -325,6 +282,28 @@ export const SchemaList = () => {
                 xs: 3,
               },
             },
+            y_changes_in_level_count: {
+              title: i18n.t("Y changes in level count"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 25,
+              default: 2,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            y_shape_count: {
+              title: i18n.t("Y shape count"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 4,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
           },
         },
       },
@@ -346,48 +325,6 @@ export const SchemaList = () => {
             "shape_count",
             "bonus_point_count",
           ],
-          dependencies: {
-            variant: {
-              oneOf: [
-                {
-                  properties: {
-                    variant: {
-                      const: "trails_a",
-                    },
-                  },
-                },
-                {
-                  properties: {
-                    variant: {
-                      const: "trails_b",
-                    },
-                    y_changes_in_level_count: {
-                      title: i18n.t("Y changes in level count"),
-                      description: "",
-                      type: "number",
-                      minimum: 0,
-                      maximum: 25,
-                      default: 2,
-                      "ui:grid": {
-                        xs: 3,
-                      },
-                    },
-                    y_shape_count: {
-                      title: i18n.t("Y shape count"),
-                      description: "",
-                      type: "number",
-                      minimum: 0,
-                      maximum: 4,
-                      default: 1,
-                      "ui:grid": {
-                        xs: 3,
-                      },
-                    },
-                  },
-                },
-              ],
-            },
-          },
           properties: {
             mode: {
               title: i18n.t("Mode"),
@@ -506,6 +443,28 @@ export const SchemaList = () => {
               minimum: 0,
               maximum: 25,
               default: 4,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            y_changes_in_level_count: {
+              title: i18n.t("Y changes in level count"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 25,
+              default: 2,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            y_shape_count: {
+              title: i18n.t("Y shape count"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 4,
+              default: 1,
               "ui:grid": {
                 xs: 3,
               },

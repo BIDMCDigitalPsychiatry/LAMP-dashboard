@@ -369,7 +369,7 @@ export default function PatientStudyCreator({
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {(studies || []).map((study) => (
+              {studies.map((study) => (
                 <MenuItem key={study.id} value={study.id}>
                   {study.name}
                 </MenuItem>

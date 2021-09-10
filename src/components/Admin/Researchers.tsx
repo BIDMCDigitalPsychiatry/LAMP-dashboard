@@ -172,7 +172,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Researchers({ history, updateStore, userType, studies, ...props }) {
+export default function Researchers({ history, updateStore, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
@@ -180,9 +180,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
   const [search, setSearch] = useState("")
   const { t, i18n } = useTranslation()
   const classes = useStyles()
-  const userTypes = ["researcher", "user_admin", "clinical_admin"]
-  const [filterData, setFilterData] = useState(false)
-  const [loading, setLoading] = useState(false)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -191,46 +188,21 @@ export default function Researchers({ history, updateStore, userType, studies, .
   }
 
   useEffect(() => {
-    setFilterData(false)
-    // const ids = (studies || []).map((d) => d.id)
-    // setStudyIds(ids)
     refreshResearchers()
-    setLoading(true)
-  }, [userType])
+  }, [])
 
   const refreshResearchers = () => {
-    setFilterData(false)
     setPaginatedResearchers([])
     setPage(0)
     setResearchers([])
     LAMP.Researcher.all().then((data) => {
       if (search.trim().length > 0) {
         data = data.filter((researcher) => researcher.name?.toLowerCase()?.includes(search?.toLowerCase()))
-      }
-      ;(async function () {
-        data = (
-          await Promise.all(
-            data.map(async (x) => ({
-              id: x.id,
-              name: x.name,
-              res:
-                ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.userType ??
-                "researcher",
-              study: ((await LAMP.Type.getAttachment(x.id, "lamp.dashboard.user_type")) as any)?.data?.studyId ?? "",
-            }))
-          )
-        ).filter((y) =>
-          userType === "user_admin" || userType === "clinical_admin"
-            ? // ? !userTypes.includes(y.res) && (ids ?? studyIds).includes(y.study)
-              // : userType === "clinical_admin"
-              !userTypes.includes(y.res)
-            : y.res !== "clinician"
-        )
-        setFilterData(true)
         setResearchers(data)
-        setPaginatedResearchers(data.slice(0, rowCount))
-        setLoading(false)
-      })()
+      } else {
+        setResearchers(data)
+      }
+      setPaginatedResearchers(data.slice(0, rowCount))
     })
   }
 
@@ -256,14 +228,10 @@ export default function Researchers({ history, updateStore, userType, studies, .
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
-        <CircularProgress color="inherit" />
-      </Backdrop>
       <Header
         researchers={researchers}
         searchData={(data) => setSearch(data)}
         refreshResearchers={refreshResearchers}
-        userType={userType}
       />
       <Box className={classes.tableContainer} mt={4}>
         <Grid container spacing={3}>
@@ -277,8 +245,6 @@ export default function Researchers({ history, updateStore, userType, studies, .
                     refreshResearchers={refreshResearchers}
                     researchers={researchers}
                     updateStore={updateStore}
-                    userType={userType}
-                    studies={studies}
                   />
                 </Grid>
               ))}

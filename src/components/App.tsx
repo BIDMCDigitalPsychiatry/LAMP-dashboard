@@ -90,7 +90,6 @@ function AppRouter({ ...props }) {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const storeRef = useRef([])
   const [showDemoMessage, setShowDemoMessage] = useState(true)
-  const [userType, setUserType] = useState("researcher")
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -210,7 +209,6 @@ function AppRouter({ ...props }) {
       return
     })
     if (!!identity) {
-      await getResearcherType(LAMP.Auth._auth.id)
       let type = {
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
@@ -229,13 +227,11 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
-      window.location.href = "/#/"
       return null
     }
   }
 
   let getResearcher = (id) => {
-    getResearcherType(id)
     if (id === "me" && state.authType === "researcher" && !Array.isArray(state.identity)) {
       id = state.identity.id
     }
@@ -286,7 +282,6 @@ function AppRouter({ ...props }) {
       })
       .join(" ")
   }
-
   const submitSurvey = () => {
     setState((state) => ({
       ...state,
@@ -320,11 +315,6 @@ function AppRouter({ ...props }) {
         })
       })
     }
-  }
-
-  const getResearcherType = async (id: string) => {
-    let res = (await LAMP.Type.getAttachment(id, "lamp.dashboard.user_type")) as any
-    setUserType(res.data?.userType ?? "researcher")
   }
 
   return (
@@ -388,12 +378,6 @@ function AppRouter({ ...props }) {
                   onComplete={() => props.history.replace("/")}
                 />
               </React.Fragment>
-            ) : userType === "user_admin" ? (
-              <Redirect to="/user-admin/me" />
-            ) : userType === "clinical_admin" ? (
-              <Redirect to="/clinical-admin/me" />
-            ) : userType === "clinician" ? (
-              <Redirect to="/clinician/me" />
             ) : state.authType === "admin" ? (
               <Redirect to="/researcher" />
             ) : state.authType === "researcher" ? (
@@ -430,131 +414,12 @@ function AppRouter({ ...props }) {
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Root {...props} updateStore={updateStore} userType="admin" />
+                <Root {...props} updateStore={updateStore} />
               </NavigationLayout>
             </React.Fragment>
           )
         }
       />
-
-      <Route
-        exact
-        path="/user-admin/:id"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <Login
-                setIdentity={async (identity) => await reset(identity)}
-                lastDomain={state.lastDomain}
-                onComplete={() => props.history.replace("/")}
-              />
-            </React.Fragment>
-          ) : !getResearcher(props.match.params.id) ? (
-            <React.Fragment />
-          ) : (
-            <React.Fragment>
-              <PageTitle>{t("User Administrator")}</PageTitle>
-              <NavigationLayout
-                authType={state.authType}
-                title="User Administrator"
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-                activeTab="Clinicians"
-              >
-                <Root
-                  {...props}
-                  updateStore={updateStore}
-                  userType="user_admin"
-                  researcher={getResearcher(props.match.params.id)}
-                />
-              </NavigationLayout>
-            </React.Fragment>
-          )
-        }
-      />
-
-      <Route
-        exact
-        path="/clinical-admin/:id"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <Login
-                setIdentity={async (identity) => await reset(identity)}
-                lastDomain={state.lastDomain}
-                onComplete={() => props.history.replace("/")}
-              />
-            </React.Fragment>
-          ) : !getResearcher(props.match.params.id) ? (
-            <React.Fragment />
-          ) : (
-            <React.Fragment>
-              <PageTitle>{t("Practice Lead")}</PageTitle>
-              <NavigationLayout
-                authType={state.authType}
-                title="Practice Lead"
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-                activeTab="Clinicians"
-              >
-                <Root
-                  {...props}
-                  updateStore={updateStore}
-                  userType="clinical_admin"
-                  researcher={getResearcher(props.match.params.id)}
-                />
-              </NavigationLayout>
-            </React.Fragment>
-          )
-        }
-      />
-
-      <Route
-        exact
-        path="/clinician/:id"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <Login
-                setIdentity={async (identity) => await reset(identity)}
-                lastDomain={state.lastDomain}
-                onComplete={() => props.history.replace("/")}
-              />
-            </React.Fragment>
-          ) : !getResearcher(props.match.params.id) ? (
-            <React.Fragment />
-          ) : (
-            <React.Fragment>
-              <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
-              <NavigationLayout
-                authType={state.authType}
-                id={props.match.params.id}
-                title={`${getResearcher(props.match.params.id).name}`}
-                goBack={props.history.goBack}
-                onLogout={() => reset()}
-                activeTab="Clinicians"
-                sameLineTitle={false}
-              >
-                <Researcher
-                  researcher={getResearcher(props.match.params.id)}
-                  userType="clinician"
-                  onParticipantSelect={(id) => {
-                    setState((state) => ({
-                      ...state,
-                      activeTab: 3,
-                    }))
-                    props.history.push(`/participant/${id}`)
-                  }}
-                />
-              </NavigationLayout>
-            </React.Fragment>
-          )
-        }
-      />
-
       <Route
         exact
         path="/researcher/:id"
@@ -570,12 +435,6 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : !getResearcher(props.match.params.id) ? (
             <React.Fragment />
-          ) : userType === "user_admin" ? (
-            <Redirect to="/user-admin/me" />
-          ) : userType === "clinical_admin" ? (
-            <Redirect to="/clinical-admin/me" />
-          ) : userType === "clinician" ? (
-            <Redirect to="/clinician/me" />
           ) : (
             <React.Fragment>
               <PageTitle>{`${getResearcher(props.match.params.id).name}`}</PageTitle>
@@ -590,7 +449,6 @@ function AppRouter({ ...props }) {
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
-                  userType="researcher"
                   onParticipantSelect={(id) => {
                     setState((state) => ({
                       ...state,

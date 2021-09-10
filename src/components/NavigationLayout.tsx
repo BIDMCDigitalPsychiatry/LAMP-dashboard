@@ -212,7 +212,7 @@ export default function NavigationLayout({
   const classes = useStyles()
   const { t } = useTranslation()
   //sameLineTitle
-  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher", "Clinicians", "Studies"]
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
 
@@ -311,8 +311,7 @@ export default function NavigationLayout({
                 </Box>
               ) : (
                 <Box>
-                  {((authType === "admin" && title !== "Administrator") ||
-                    (authType === "researcher" && title !== "User Administrator" && title !== "Practice Lead")) && (
+                  {authType === "admin" && title !== "Administrator" && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -350,9 +349,14 @@ export default function NavigationLayout({
                       horizontal: "left",
                     }}
                   >
+                    {/* <MenuItem>
+                    <Typography variant="h6">{t("Manage team")}</Typography>
+                    <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
+                  </MenuItem> */}
                     {authType === "admin" && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
+                    {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
                     </MenuItem>
@@ -422,7 +426,7 @@ export default function NavigationLayout({
                 )}
               </Container>
             )}
-            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && activeTab !== "Clinicians" && (
+            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <Typography
                   variant="h5"
@@ -467,6 +471,7 @@ export default function NavigationLayout({
                     onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                     color="default"
                   >
+                    {/* <User /> */}
                     <Icon>account_circle</Icon>
                   </IconButton>
                 </Tooltip>
