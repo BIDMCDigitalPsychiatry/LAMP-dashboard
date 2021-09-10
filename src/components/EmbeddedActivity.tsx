@@ -42,16 +42,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [currentActivity, setCurrentActivity] = useState(null)
 
   useEffect(() => {
-    if (activity?.spec === "lamp.jewels_a" || activity?.spec === "lamp.jewels_b") {
-      ;(async () => {
-        let events = await LAMP.ActivityEvent.allByParticipant(participant.id)
-        events = events.filter((e) => e.activity === activity.id)
-        activity["events"] = events
-        setCurrentActivity(activity)
-      })()
-    } else {
-      setCurrentActivity(activity)
-    }
+    setCurrentActivity(activity)
   }, [activity])
 
   useEffect(() => {
@@ -135,7 +126,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
     let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    //let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }

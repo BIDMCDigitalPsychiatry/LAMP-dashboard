@@ -23,9 +23,6 @@ import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
 import DataPortal from "../data_portal/DataPortal"
-import DashboardStudies from "./DashboardStudies"
-import { saveDataToCache, saveDemoData } from "../Researcher/SaveResearcherData"
-import useInterval from "../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -137,23 +134,11 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Root({
-  updateStore,
-  userType,
-  researcher,
-  history,
-  ...props
-}: {
-  updateStore: Function
-  userType: string
-  researcher?: any
-  history: any
-}) {
+export default function Root({ updateStore, ...props }) {
   const { t, i18n } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [studies, setStudies] = useState(null)
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -161,38 +146,12 @@ export default function Root({
     return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
-  useInterval(
-    () => {
-      if (userType === "user_admin") getDBStudies()
-    },
-    studies !== null ? null : 2000,
-    true
-  )
-
-  const getDBStudies = () => {
-    Service.getAll("studies").then((data) => {
-      setStudies((data || []).length > 0 ? data : null)
-    })
-  }
-
   useEffect(() => {
-    ;(async () => {
-      let lampAuthId = LAMP.Auth._auth.id
-      let lampAuthPswd = LAMP.Auth._auth.password
-      await Service.deleteDB()
-      if (userType === "user_admin") {
-        lampAuthId === "researcher@demo.lamp.digital"
-          ? await saveDemoData()
-          : await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
-        getDBStudies()
-      }
-    })()
-    setCurrentTab(0)
-  }, [userType])
-
-  useEffect(() => {
-    //if (LAMP.Auth._type !== "admin") return
+    if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
+  }, [])
+
+  useEffect(() => {
     let authId = LAMP.Auth._auth.id
     let language = !!localStorage.getItem("LAMP_user_" + authId)
       ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
@@ -206,7 +165,7 @@ export default function Root({
     <Container maxWidth={false}>
       <Container
         className={
-          currentTab !== 2
+          currentTab !== 1
             ? window.innerWidth >= 1280 && window.innerWidth <= 1350
               ? classes.tableContainerWidthPad
               : classes.tableContainerWidth
@@ -233,30 +192,13 @@ export default function Root({
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText
-                  primary={
-                    userType === "user_admin" || userType === "clinical_admin" ? t("Clinicians") : t("Researchers")
-                  }
-                />
+                <ListItemText primary={t("Researchers")} />
               </ListItem>
-              {userType === "user_admin" && (
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 1}
-                  onClick={(event) => setCurrentTab(1)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Researcher />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Studies")} />
-                </ListItem>
-              )}
               <ListItem
                 className={classes.menuItems + " " + classes.btnCursor}
                 button
-                selected={currentTab === 2}
-                onClick={(event) => setCurrentTab(2)}
+                selected={currentTab === 1}
+                onClick={(event) => setCurrentTab(1)}
               >
                 <ListItemIcon className={classes.menuIcon}>
                   <DataPortalIcon />
@@ -265,13 +207,8 @@ export default function Root({
               </ListItem>
             </List>
           </Drawer>
-          {currentTab === 0 && (
-            <Researchers history={history} updateStore={updateStore} userType={userType} studies={studies} />
-          )}
+          {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} />}
           {currentTab === 1 && (
-            <DashboardStudies researcher={researcher} data={studies} setData={(data) => setStudies(data)} />
-          )}
-          {currentTab === 2 && (
             <DataPortal
               onLogout={null}
               token={{

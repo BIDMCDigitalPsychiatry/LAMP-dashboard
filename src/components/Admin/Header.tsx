@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
+import React, { useState } from "react"
+import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
 import SearchBox from "../SearchBox"
+import LAMP from "lamp-core"
+import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
-import { Service } from "../DBService/DBService"
-import useInterval from "../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -41,43 +41,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Header({ researchers, searchData, refreshResearchers, userType, ...props }) {
+export default function Header({ researchers, searchData, refreshResearchers, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
-  const [studies, setStudies] = useState(null)
-
-  useInterval(
-    () => {
-      getDBStudies()
-    },
-    studies !== null && (studies || []).length > 0 ? null : 2000,
-    true
-  )
-
-  const getDBStudies = async () => {
-    if (userType === "user_admin") {
-      Service.getAll("studies").then((studies) => {
-        setStudies(studies)
-      })
-    }
-  }
 
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
       <Box flexGrow={1}>
-        <Typography variant="h5">
-          {userType === "user_admin" || userType === "clinical_admin" ? t("Clinicians") : t("Researchers")}
-        </Typography>
+        <Typography variant="h5">{t("Researchers")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      {userType !== "clinical_admin" && (
-        <AddUpdateResearcher
-          refreshResearchers={refreshResearchers}
-          researchers={researchers}
-          authuserType={userType}
-          studies={studies}
-        />
-      )}
+      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} />
     </Box>
   )
 }

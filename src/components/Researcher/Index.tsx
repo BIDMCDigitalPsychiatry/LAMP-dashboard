@@ -5,10 +5,9 @@ import locale_lang from "../../locale_map.json"
 import Dashboard from "./Dashboard"
 import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
-import { Service } from "../DBService/DBService"
 // import { useWorker } from "@koale/useworker"
 
-export default function Researcher({ researcher, onParticipantSelect, userType, ...props }) {
+export default function Researcher({ researcher, onParticipantSelect, ...props }) {
   const { t, i18n } = useTranslation()
   // const [dataWorker] = useWorker(saveDataToCache)
   // const [demoWorker] = useWorker(saveDemoData)
@@ -38,15 +37,13 @@ export default function Researcher({ researcher, onParticipantSelect, userType, 
       //     dataWorker(lampAuthId + ":" + lampAuthPswd, researcher.id)
       //   }
       // }
-      let res = (await LAMP.Type.getAttachment(lampAuthId, "lamp.dashboard.user_type")) as any
-      await Service.deleteDB()
-      if (LAMP.Auth._type === "researcher" && (userType === "clinician" || userType === "researcher")) {
+      if (LAMP.Auth._type === "researcher") {
         lampAuthId === "researcher@demo.lamp.digital"
           ? saveDemoData()
-          : await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
-      } else if (LAMP.Auth._type === "admin" && (userType === "clinician" || userType === "researcher")) {
+          : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+      } else if (LAMP.Auth._type === "admin") {
         if (researcher.id) {
-          await saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
+          saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
         }
       }
     })()
@@ -54,7 +51,7 @@ export default function Researcher({ researcher, onParticipantSelect, userType, 
 
   return (
     <React.Fragment>
-      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} userType={userType} />
+      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} />
     </React.Fragment>
   )
 }

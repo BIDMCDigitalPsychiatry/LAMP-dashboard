@@ -139,7 +139,7 @@ export default function EditStudyField({
     let status = true
     if (studyDuplicateCount > 0) {
       enqueueSnackbar(
-        t("Failed to change study. Study name already exist", {
+        t("Failed to change participantId's alias: Study name already exist", {
           participantId: study,
         }),
         { variant: "error" }
@@ -147,13 +147,12 @@ export default function EditStudyField({
       status = false
     } else if (val?.trim().length === 0) {
       enqueueSnackbar(
-        t("Failed to change study. Study name required", {
+        t("Failed to change participantId's alias: Study name required", {
           participantId: study,
         }),
         { variant: "error" }
       )
       status = false
-      setAliasStudyName(studyName)
     }
     return status
   }
