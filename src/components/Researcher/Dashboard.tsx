@@ -149,7 +149,7 @@ export const sortData = (data, studies, key) => {
 //   activity_count?: number
 //   sensor_count?: number
 // }
-export default function Dashboard({ onParticipantSelect, researcher, ...props }) {
+export default function Dashboard({ onParticipantSelect, researcher, mode, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
@@ -254,50 +254,58 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                   </ListItemIcon>
                   <ListItemText primary={t("Users")} />
                 </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 1}
-                  onClick={(event) => setCurrentTab(1)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Activities />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Activities")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 2}
-                  onClick={(event) => setCurrentTab(2)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Sensors />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Sensors")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 3}
-                  onClick={(event) => setCurrentTab(3)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <Studies />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Studies")} />
-                </ListItem>
-                <ListItem
-                  className={classes.menuItems + " " + classes.btnCursor}
-                  button
-                  selected={currentTab === 4}
-                  onClick={(event) => setCurrentTab(4)}
-                >
-                  <ListItemIcon className={classes.menuIcon}>
-                    <DataPortalIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={"Data Portal"} />
-                </ListItem>
+                {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 1}
+                    onClick={(event) => setCurrentTab(1)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Activities />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Activities")} />
+                  </ListItem>
+                )}
+                {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 2}
+                    onClick={(event) => setCurrentTab(2)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Sensors />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Sensors")} />
+                  </ListItem>
+                )}
+                {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 3}
+                    onClick={(event) => setCurrentTab(3)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <Studies />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Studies")} />
+                  </ListItem>
+                )}
+                {mode === "researcher" && (
+                  <ListItem
+                    className={classes.menuItems + " " + classes.btnCursor}
+                    button
+                    selected={currentTab === 4}
+                    onClick={(event) => setCurrentTab(4)}
+                  >
+                    <ListItemIcon className={classes.menuIcon}>
+                      <DataPortalIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={"Data Portal"} />
+                  </ListItem>
+                )}
               </List>
             </Drawer>
             {currentTab === 0 && (
@@ -311,6 +319,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
                 setSelectedStudies={setSelectedStudies}
                 getAllStudies={getAllStudies}
                 setData={getDBStudies}
+                mode={mode}
               />
             )}
             {currentTab === 1 && (

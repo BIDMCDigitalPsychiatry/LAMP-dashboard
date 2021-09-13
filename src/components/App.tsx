@@ -76,6 +76,13 @@ function AppRouter({ ...props }) {
       activeTab: newTab,
     }))
   }
+
+  let changeResearcherType = (type: string) => {
+    setState((state) => ({
+      ...state,
+      researcherType: type,
+    }))
+  }
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -85,6 +92,7 @@ function AppRouter({ ...props }) {
     surveyDone: false,
     welcome: true,
     messageCount: 0,
+    researcherType: "clinician",
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -446,6 +454,7 @@ function AppRouter({ ...props }) {
                 onLogout={() => reset()}
                 activeTab="Researcher"
                 sameLineTitle={true}
+                changeResearcherType={changeResearcherType}
               >
                 <Researcher
                   researcher={getResearcher(props.match.params.id)}
@@ -456,6 +465,7 @@ function AppRouter({ ...props }) {
                     }))
                     props.history.push(`/participant/${id}`)
                   }}
+                  mode={state.researcherType}
                 />
               </NavigationLayout>
             </React.Fragment>

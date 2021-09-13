@@ -40,6 +40,7 @@ export default function Header({
   selectedStudies,
   setParticipants,
   setData,
+  mode,
   ...props
 }) {
   const classes = useStyles()
@@ -69,6 +70,7 @@ export default function Header({
             setParticipants={setParticipants}
             setSelectedStudies={setSelectedStudies}
             setData={setData}
+            mode={mode}
           />
         </Box>
       </Box>
