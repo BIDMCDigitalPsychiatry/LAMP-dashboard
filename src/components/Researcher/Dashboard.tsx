@@ -179,18 +179,7 @@ export default function Dashboard({ onParticipantSelect, researcher, ...props })
   }, [updatedData])
 
   useEffect(() => {
-    if (deletedData !== null) {
-      let newStudies = studies.filter((item) => {
-        if (!!search) {
-          return item?.name?.toLowerCase()?.includes(search?.toLowerCase()) && item.id !== deletedData
-        } else {
-          return item?.id !== deletedData
-        }
-      })
-      setStudies(newStudies)
-    } else {
-      getAllStudies()
-    }
+    if (deletedData !== null) getAllStudies()
   }, [deletedData])
 
   const getDBStudies = async () => {
