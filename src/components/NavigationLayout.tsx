@@ -170,13 +170,6 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: 50,
       justifyContent: "space-between",
       "& $backbtn": { color: "#fff" },
-      "& .togglebtn": {
-        padding: "5px 15px",
-        borderRadius: "30px",
-        color: "#fff",
-        fontSize: "13px",
-        textTransform: "capitalize",
-      },
     },
     logResearcherBorder: { paddingTop: 46, top: 50, height: "calc(100% - 50px)" },
     logParticipantBorder: {
