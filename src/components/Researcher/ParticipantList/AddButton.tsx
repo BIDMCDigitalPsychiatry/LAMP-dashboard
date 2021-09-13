@@ -106,6 +106,7 @@ export default function AddButton({
   setParticipants,
   setSelectedStudies,
   setData,
+  mode,
   ...props
 }) {
   const [addUser, setAddUser] = useState(false)
@@ -158,24 +159,28 @@ export default function AddButton({
         }}
       >
         <React.Fragment>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setAddUser(true)
-            }}
-          >
-            <Typography variant="h6">{t("Add a patient")}</Typography>
-            <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setAddStudy(true)
-            }}
-          >
-            <Typography variant="h6">{t("Add a new study")}</Typography>
-            <Typography variant="body2">{t("Create a new study.")}</Typography>
-          </MenuItem>
+          {mode === "researcher" && (
+            <MenuItem
+              onClick={() => {
+                setPopover(null)
+                setAddUser(true)
+              }}
+            >
+              <Typography variant="h6">{t("Add a patient")}</Typography>
+              <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
+            </MenuItem>
+          )}
+          {mode === "researcher" && (
+            <MenuItem
+              onClick={() => {
+                setPopover(null)
+                setAddStudy(true)
+              }}
+            >
+              <Typography variant="h6">{t("Add a new study")}</Typography>
+              <Typography variant="body2">{t("Create a new study.")}</Typography>
+            </MenuItem>
+          )}
           <MenuItem
             onClick={() => {
               setPopover(null)

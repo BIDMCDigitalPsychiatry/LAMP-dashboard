@@ -33,6 +33,7 @@ import { ResponsiveMargin } from "./Utils"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
+import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -167,7 +168,15 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       zIndex: 1,
       minHeight: 50,
+      justifyContent: "space-between",
       "& $backbtn": { color: "#fff" },
+      "& .togglebtn": {
+        padding: "5px 15px",
+        borderRadius: "30px",
+        color: "#fff",
+        fontSize: "13px",
+        textTransform: "capitalize",
+      },
     },
     logResearcherBorder: { paddingTop: 46, top: 50, height: "calc(100% - 50px)" },
     logParticipantBorder: {
@@ -189,6 +198,7 @@ export default function NavigationLayout({
   onLogout,
   activeTab,
   sameLineTitle,
+  changeResearcherType,
   ...props
 }: {
   title?: string
@@ -199,6 +209,7 @@ export default function NavigationLayout({
   onLogout?: any
   activeTab?: string
   sameLineTitle?: boolean
+  changeResearcherType?: Function
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -390,6 +401,12 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
+              {(authType === "researcher" ||
+                (authType === "admin" && title !== "Administrator" && !title.startsWith("Patient"))) && (
+                <Box>
+                  <ModeToggleButton changeResearcherType={changeResearcherType} id={id} />
+                </Box>
+              )}
             </Toolbar>
           )}
           <Toolbar
@@ -544,9 +561,9 @@ export default function NavigationLayout({
               typeof title != "undefined" &&
               title.startsWith("Patient")
                 ? " " + classes.logParticipantBorder
-                : authType === "researcher"
+                : authType === "researcher" || authType === "admin"
                 ? " " + classes.logResearcherBorder
-                : "")
+                : " ")
             }
           >
             {props.children}

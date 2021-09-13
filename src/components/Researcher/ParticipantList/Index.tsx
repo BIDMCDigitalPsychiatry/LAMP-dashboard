@@ -127,6 +127,7 @@ export default function ParticipantList({
   setSelectedStudies,
   getAllStudies,
   setData,
+  mode,
   ...props
 }) {
   const classes = useStyles()
@@ -234,6 +235,7 @@ export default function ParticipantList({
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
         setData={setData}
+        mode={mode}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
