@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import {
   Box,
   Button,
@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ImportActivity({ studies, setActivities, onClose, setUpdateCount, ...props }) {
+export default function ImportActivity({ studies, setActivities, activitiesList, onClose, setUpdateCount, ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -197,7 +197,9 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   const [paginatedImported, setPaginatedImported] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const [duplicateExists, setDuplicateExists] = useState(false)
   const [loading, setLoading] = useState(false)
+  const inputRef = React.useRef(null)
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
@@ -220,6 +222,10 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
       })
       return
     }
+
+    // checking and updating duplicate activities under same study
+    checkDuplicateUpdateActivity(_importFile, activitiesList, selectedStudy)
+
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
       try {
@@ -304,7 +310,38 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     }
     onClose()
   }
-  const onDrop = useCallback((acceptedFiles) => {
+
+  const checkDuplicateActivity = (obj, activitiesList, selectedStudyId) => {
+    setDuplicateExists(false)
+    const objArray = obj
+    objArray.map((eachData) => {
+      const nameExists = activitiesList.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
+      if (nameExists) {
+        setDuplicateExists(true)
+      }
+    })
+  }
+
+  const checkDuplicateUpdateActivity = (obj, activitiesList, selectedStudyId) => {
+    const objArray = obj
+    objArray.map((eachData, i) => {
+      let activityStudyCount = activitiesList.reduce(function (n, eachActivity) {
+        //return n + (eachActivity.name === eachData.name && eachActivity.study_id === selectedStudyId)
+        return n + (eachActivity.study_id === selectedStudyId)
+      }, 0)
+      const nameExists = activitiesList.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
+      if (nameExists) {
+        //setDuplicateExists(true)
+        if (activityStudyCount > 0) {
+          objArray[i].name = eachData.name + "-duplicate-" + parseInt(activityStudyCount + 1)
+        } else {
+          objArray[i].name = eachData.name + "-duplicate"
+        }
+      }
+    })
+  }
+
+  const onDrop = useCallback((acceptedFiles, event) => {
     const reader = new FileReader()
     reader.onabort = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
     reader.onerror = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
@@ -314,6 +351,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       ) {
+        checkDuplicateActivity(obj, activitiesList, inputRef.current.className)
         setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
       } else {
@@ -322,12 +360,14 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     }
     acceptedFiles.forEach((file) => reader.readAsText(file))
   }, [])
+
   // eslint-disable-next-line
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "application/json,.json",
     maxSize: 15 * 1024 * 1024 /* 5MB */,
   })
+
   return (
     <Container>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -367,12 +407,12 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
       <Box
         {...getRootProps()}
         py={3}
-        bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-        color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+        //bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
+        //color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
         className={classes.dragDrop}
+        onClick={() => inputRef.current?.click()}
       >
-        <input {...getInputProps()} />
-
+        <input {...getInputProps()} className={selectedStudy} ref={inputRef} disabled={selectedStudy ? false : true} />
         <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
         <Typography className={classes.errorMsg}>The maximum allowed file size is 15 MB.</Typography>
       </Box>
@@ -386,6 +426,9 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
             </Box>
           ))}
           <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
+          <Typography className={classes.errorMsg}>
+            {t("The Activities having same name under the selected study will be duplicated into new name.")}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Box p={2} pt={1}>

@@ -268,6 +268,7 @@ export default function AddActivity({
               studies={studies}
               activitieas={activities}
               setActivities={setActivities}
+              activitiesList={activities}
               onClose={() => {
                 setShowActivityImport(false)
                 setCreate(false)
