@@ -15,6 +15,7 @@ import {
   Radio,
   TextField,
   Checkbox,
+  makeStyles,
 } from "@material-ui/core"
 import { jsPDF } from "jspdf"
 import vegaEmbed from "vega-embed"
@@ -39,6 +40,53 @@ export default function QueryRender(props) {
       </Box>
     )
   }
+
+  const useStyles = makeStyles((theme) => ({
+    treeButton: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      flex: "auto",
+      margin: "auto",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    treeFilter: {
+      position: "fixed",
+      top: "50vh",
+      left: "30vw",
+      width: "50vw",
+      paddingTop: "5px",
+      height: "60px",
+      background: "white",
+      "&:hover": {
+        backgroundColor: "#eee",
+      },
+      border: "1px solid black",
+      borderRadius: "3px",
+      paddingLeft: "10px",
+      zIndex: 1111,
+    },
+    cardHeader: {
+      display: "flex",
+      flexGrow: 3,
+      flexDirection: "row",
+      marginBottom: "0px",
+      marginRight: "5px",
+      fontSize: "16px",
+      wordBreak: "break-word",
+      height: "100%",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    downloadFormControl: {
+      width: "100%",
+    },
+  }))
+  const classes = useStyles()
 
   function type(variable) {
     return Array.isArray(variable) ? "array" : typeof variable
@@ -148,7 +196,7 @@ export default function QueryRender(props) {
           graphArray = res
       }
       //res is now an array of images with 4 parameters we can use to build our pdf
-      //So that we can chunk, we avoid using foreach. This is still tragic as I very much like foreach
+      //So that we can chunk, we avoid using foreach.
       for (let i = 0; i < graphArray.length; i += graphsPerLine) {
         let singleLine = graphArray.slice(i, i + graphsPerLine)
         let maxHeight = singleLine.reduce((acc, x) => Math.max(acc, x.height), 0)
@@ -166,7 +214,9 @@ export default function QueryRender(props) {
             index * chunkWidth + (chunkWidth - spec.width) / 2,
             cursorYLoc + 10,
             spec.width,
-            spec.height
+            spec.height,
+            "",
+            "FAST"
           )
         })
         cursorYLoc += maxHeight + 20
@@ -224,6 +274,9 @@ export default function QueryRender(props) {
   const handleChange = (event) => {
     setScale(event.target.value)
   }
+
+  let PDFGraphSize = 3
+  let PDFGroupMethod = "height"
 
   React.useEffect(() => {
     if (
@@ -285,12 +338,18 @@ export default function QueryRender(props) {
 
         if (stringFilter.length && groupByID && !(targetName.indexOf(stringFilter) !== -1)) return null
 
-        const saveIndividualToPDF = async () => {
-          await saveVegaQueryResToPDF(selection, subfilter)
+        async function saveIndividualToPDF(graphsPerRow, groupBy) {
+          console.log(graphsPerRow)
+          console.log(groupBy)
+          await saveVegaQueryResToPDF(selection, subfilter, graphsPerRow, groupBy)
         }
 
         return (
-          <Card key={`${targetName}-card`} variant="outlined" style={{ width: "100%", margin: "5px 0px 0px 0px" }}>
+          <Card
+            key={`${targetName}-card`}
+            variant="outlined"
+            style={{ userSelect: "text", width: "100%", margin: "5px 0px 0px 0px" }}
+          >
             <Typography
               style={{
                 marginLeft: "5px",
@@ -303,9 +362,79 @@ export default function QueryRender(props) {
               <b>{formatName(targetName)}</b>
             </Typography>
 
-            <Button style={{ float: "right" }} onClick={saveIndividualToPDF}>
-              Download PDF
-            </Button>
+            <SelectionWindow
+              openButtonText={`Download PDF`}
+              customButton={
+                <IconButton className={classes.treeButton}>
+                  <Icon>get_app</Icon>
+                </IconButton>
+              }
+              exposeButton={true}
+              runOnOpen={() => {
+                PDFGraphSize = 3
+                PDFGroupMethod = "height"
+              }}
+              displaySubmitButton={true}
+              handleResult={() => saveIndividualToPDF(PDFGraphSize, PDFGroupMethod)}
+              closesOnSubmit={false}
+              style={{ float: "right" }}
+              submitText={`Download`}
+              children={
+                <React.Fragment>
+                  <Typography>
+                    <Box component={"span"} fontWeight={600}>
+                      Download a PDF of Graphs
+                    </Box>
+                  </Typography>
+                  <Typography>
+                    Number of Graphs per row. Bigger numbers give more visually compact PDF files, while smaller numbers
+                    may improve readability.
+                  </Typography>
+                  <RadioGroup
+                    row
+                    defaultValue={PDFGraphSize.toString()}
+                    onChange={(e) => {
+                      PDFGraphSize = parseInt(e.target.value)
+                    }}
+                  >
+                    <FormControlLabel value="4" control={<Radio color="primary" />} label="4" labelPlacement="top" />
+                    <FormControlLabel value="3" control={<Radio color="primary" />} label="3" labelPlacement="top" />
+                    <FormControlLabel value="2" control={<Radio color="primary" />} label="2" labelPlacement="top" />
+                    <FormControlLabel value="1" control={<Radio color="primary" />} label="1" labelPlacement="top" />
+                  </RadioGroup>
+                  <Typography>
+                    How to arrange graphs. 'Height' will group graphs of similar height, while 'width' will do the same
+                    for graphs of similar width. 'Default' will use the order seen here.{" "}
+                  </Typography>
+                  <RadioGroup
+                    row
+                    defaultValue={PDFGroupMethod}
+                    onChange={(e) => {
+                      PDFGroupMethod = e.target.value
+                    }}
+                  >
+                    <FormControlLabel
+                      value="height"
+                      control={<Radio color="primary" />}
+                      label="Height"
+                      labelPlacement="top"
+                    />
+                    <FormControlLabel
+                      value="width"
+                      control={<Radio color="primary" />}
+                      label="Width"
+                      labelPlacement="top"
+                    />
+                    <FormControlLabel
+                      value="default"
+                      control={<Radio color="primary" />}
+                      label="Default"
+                      labelPlacement="top"
+                    />
+                  </RadioGroup>
+                </React.Fragment>
+              }
+            />
             <Grid
               container
               spacing={3}

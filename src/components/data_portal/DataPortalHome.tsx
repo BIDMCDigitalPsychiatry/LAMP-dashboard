@@ -19,8 +19,7 @@ import QueryBuilder from "./QueryBuilder"
 import SelectionWindow from "./SelectionWindow"
 import Editor from "./Editor"
 import jsonata from "jsonata"
-import { DndProvider } from "react-dnd"
-import { HTML5Backend } from "react-dnd-html5-backend"
+import { useDrop } from "react-dnd"
 
 export default function DataPortalHome({ token, onLogout, ...props }) {
   const classes = portalHomeStyle()
@@ -28,6 +27,8 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const [query, setQuery] = React.useState("")
   const [result, setResult] = React.useState("")
   const [focusBuilder, toggleFocus] = React.useState(false)
+
+  const [treeCollapsed, setTreeCollapsed] = React.useState(false)
 
   const [loadingGraphs, setLoadingGraphs] = React.useState(false)
 
@@ -84,12 +85,28 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
     setViewModeSwitch(!isGUIEditor)
   }, [isGUIEditor])
 
+  const [{ canDrop, isOver }, drop] = useDrop(() => ({
+    // The type (or types) to accept - strings or symbols
+    accept: "TARGETINFO",
+    // if we drop a target in here, we switch to the GUI editor,
+    // and load the new query
+    drop: (item, monitor) => {
+      toggleEditorStyle(true)
+      //@ts-ignore: item should always be an object
+      setGUIQuery(item)
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  }))
+
   return (
     <Box className={classes.box}>
       <AppBar position="static" style={{ background: "#7599FF" }}>
         <Toolbar>
           <div style={{ flexGrow: 1 }} />
-          <Typography className={classes.alphaBadge}>Alpha - V8.11.2021</Typography>
+          <Typography className={classes.alphaBadge}>Alpha - V9.2021</Typography>
           {typeof onLogout === "function" && (
             <IconButton className={classes.icon} onClick={onLogout} color="inherit">
               <Typography>Log-out&nbsp;</Typography>
@@ -98,118 +115,119 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
           )}
         </Toolbar>
       </AppBar>
-      <DndProvider backend={HTML5Backend}>
-        <Box className={classes.queryWrapperBox}>
-          <Grid className={classes.columnsGrid} item xs={12} direction={"row"} container alignContent={"flex-start"}>
-            <Grid container className={classes.treeColumn} direction={"column"} item xs={3}>
-              <SelectionWindow
-                openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
-                displaySubmitButton={true}
-                handleResult={() => {
-                  toggleEditorStyle(!viewModeSwitch)
-                }}
-                closesOnSubmit={true}
-                submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
-                children={
-                  <React.Fragment>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          name={"setToTerminal"}
-                          checked={viewModeSwitch}
-                          onChange={() => setViewModeSwitch(!viewModeSwitch)}
-                        />
-                      }
-                      label={viewModeSwitch ? "Terminal Mode" : "GUI Mode"}
-                    />
-                    {viewModeSwitch ? (
-                      <Typography>
-                        While in Terminal mode, you can directly write JSONata style queries to pull data directly from
-                        your database. <br />
-                        <br />
-                        For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
-                        with a user's id to get a list of the last 10,000 activities completed through LAMP.
-                        <br />
-                        <br />
-                        Want to learn more about JSONata queries or what special data you can pull from LAMP?
-                        <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
-                          Click here!
-                        </a>
-                      </Typography>
-                    ) : (
-                      <Typography>
-                        While in GUI mode, you can directly pull graphs you have already generated from the LAMP
-                        database, easily view information across an entire study or researcher, or quickly view tags
-                        that give info about things like survey scoring. If this is your first time using the LAMP
-                        data_portal, or you need to get data quckly, this is the mode we recommend!
-                      </Typography>
-                    )}
-                  </React.Fragment>
-                }
+      <Box className={classes.queryWrapperBox}>
+        <Grid className={classes.columnsGrid} item xs={12} direction={"row"} container alignContent={"flex-start"}>
+          <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
+            <SelectionWindow
+              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
+              displaySubmitButton={true}
+              handleResult={() => {
+                toggleEditorStyle(!viewModeSwitch)
+              }}
+              closesOnSubmit={true}
+              submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
+              children={
+                <React.Fragment>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        name={"setToTerminal"}
+                        checked={viewModeSwitch}
+                        onChange={() => setViewModeSwitch(!viewModeSwitch)}
+                      />
+                    }
+                    label={viewModeSwitch ? "Terminal Mode" : "GUI Mode"}
+                  />
+                  {viewModeSwitch ? (
+                    <Typography>
+                      While in Terminal mode, you can directly write JSONata style queries to pull data directly from
+                      your database. <br />
+                      <br />
+                      For example, try: `LAMP.ActivityEvent.list(<b>participant_id</b>)`, replacing `participant_id`
+                      with a user's id to get a list of the last 10,000 activities completed through LAMP.
+                      <br />
+                      <br />
+                      Want to learn more about JSONata queries or what special data you can pull from LAMP?
+                      <a target={"_blank"} href={"https://docs.lamp.digital/data_science/jsonata"}>
+                        Click here!
+                      </a>
+                    </Typography>
+                  ) : (
+                    <Typography>
+                      While in GUI mode, you can directly pull graphs you have already generated from the LAMP database,
+                      easily view information across an entire study or researcher, or quickly view tags that give info
+                      about things like survey scoring. If this is your first time using the LAMP data_portal, or you
+                      need to get data quckly, this is the mode we recommend!
+                    </Typography>
+                  )}
+                </React.Fragment>
+              }
+            />
+            <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "70vh", marginTop: "10px" }}>
+              <RenderTree
+                token={token}
+                name={token.name}
+                id={token.type === "Administrator" ? [token.id] : [token.type, token.id]}
+                type={token.type}
+                isGUIEditor={isGUIEditor}
+                onSetQuery={(q) => setQuery(q)}
+                onUpdateGUI={(q) => updateGUIQuery(q)}
               />
-              <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "70vh", marginTop: "10px" }}>
-                <RenderTree
+            </Card>
+          </Grid>
+          <Grid
+            container
+            item
+            direction={"column"}
+            xs={9}
+            lg={10}
+            style={{ height: "100%", userSelect: "text", flexWrap: "nowrap" }}
+          >
+            <Grid
+              item
+              ref={drop}
+              role={"QueryBuilder"}
+              className={focusBuilder ? classes.builderStyleFocus : classes.builderStyleUnfocus}
+              onClick={() => {
+                toggleFocus(true)
+                if (editorRef.current) editorRef.current.editor.layout()
+              }}
+            >
+              {isGUIEditor ? (
+                <QueryBuilder
+                  query={GUIQuery}
+                  focusMe={() => toggleFocus(true)}
                   token={token}
-                  name={token.name}
-                  id={token.type === "Administrator" ? [token.id] : [token.type, token.id]}
-                  type={token.type}
-                  isGUIEditor={isGUIEditor}
-                  onSetQuery={(q) => setQuery(q)}
-                  onUpdateGUI={(q) => updateGUIQuery(q)}
+                  setQueryResult={setResult}
+                  setLoadingGraphs={setLoadingGraphs}
+                  loadingGraphs={loadingGraphs}
+                  queryResult={result}
                 />
-              </Card>
+              ) : (
+                <Editor
+                  //@ts-ignore
+                  path="query"
+                  automaticLayout={true}
+                  ref={editorRef}
+                  onChange={(x) => {
+                    setQuery(x)
+                    toggleFocus(true)
+                    editorRef.current.editor.layout()
+                  }}
+                  onMount={onMonacoMount}
+                />
+              )}
             </Grid>
             <Grid
-              container
               item
-              direction={"column"}
-              xs={9}
-              style={{ height: "100%", userSelect: "text", flexWrap: "nowrap" }}
+              className={focusBuilder ? classes.renderStyleUnfocus : classes.renderStyleFocus}
+              onClick={() => toggleFocus(false)}
             >
-              <Grid
-                item
-                className={focusBuilder ? classes.builderStyleFocus : classes.builderStyleUnfocus}
-                onClick={() => {
-                  toggleFocus(true)
-                  if (editorRef.current) editorRef.current.editor.layout()
-                }}
-              >
-                {isGUIEditor ? (
-                  <QueryBuilder
-                    query={GUIQuery}
-                    focusMe={() => toggleFocus(true)}
-                    token={token}
-                    setQueryResult={setResult}
-                    setLoadingGraphs={setLoadingGraphs}
-                    loadingGraphs={loadingGraphs}
-                    queryResult={result}
-                  />
-                ) : (
-                  <Editor
-                    //@ts-ignore
-                    path="query"
-                    automaticLayout={true}
-                    ref={editorRef}
-                    onChange={(x) => {
-                      setQuery(x)
-                      toggleFocus(true)
-                      editorRef.current.editor.layout()
-                    }}
-                    onMount={onMonacoMount}
-                  />
-                )}
-              </Grid>
-              <Grid
-                item
-                className={focusBuilder ? classes.renderStyleUnfocus : classes.renderStyleFocus}
-                onClick={() => toggleFocus(false)}
-              >
-                <QueryRender focusMe={() => toggleFocus(false)} loading={loadingGraphs} queryResult={result} />
-              </Grid>
+              <QueryRender focusMe={() => toggleFocus(false)} loading={loadingGraphs} queryResult={result} />
             </Grid>
           </Grid>
-        </Box>
-      </DndProvider>
+        </Grid>
+      </Box>
       {!isGUIEditor && (
         <Fab color="primary" variant="extended" className={classes.fab} onClick={runQuery}>
           <Icon className={classes.extendedIcon}>get_app</Icon>

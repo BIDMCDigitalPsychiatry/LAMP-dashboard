@@ -456,7 +456,7 @@ export default function QueryBuilder(props) {
   }
 
   return (
-    //@ts-ignore
+    //@ts-ignore: we need this ref for dnd to know what to target
     <Box
       ref={drop}
       role={"QueryBuilder"}
@@ -465,7 +465,7 @@ export default function QueryBuilder(props) {
       <Backdrop className={classes.loadingBackdrop} open={tagsLoading || sharedTagsLoading || props.loadingGraphs} />
       {currentQuery.target.length > 0 ? (
         <Card variant="outlined" style={{ margin: "0% 5%" }}>
-          <Typography style={{ fontWeight: 600 }}>
+          <Typography style={{ fontWeight: 600, userSelect: "text" }}>
             {`${
               currentQuery.id_string.length > 1 ? `${currentQuery.id_string[currentQuery.id_string.length - 2]}:` : ""
             }
@@ -532,7 +532,7 @@ export default function QueryBuilder(props) {
             <br />
             1. Navigate to the level of your target on the left.
             <br />
-            2. Click on <Icon>subdirectory_arrow_right</Icon>
+            2. Click on <Icon>arrow_forward</Icon>
             <br />
             <br />
             Alternatively, drag and drop a researcher, study, or participant into this box.

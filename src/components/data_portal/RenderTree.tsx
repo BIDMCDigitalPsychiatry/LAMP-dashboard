@@ -1,5 +1,6 @@
 import React from "react"
 import {
+  Box,
   Typography,
   Card,
   CardHeader,
@@ -19,6 +20,7 @@ import LAMP from "lamp-core"
 import { generate_ids } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
+import jsonexport from "jsonexport"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -26,17 +28,21 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TARGETINFO",
     item: { target: id[id.length - 1], type, name, id_string: id },
-    canDrag:
-      !expanded &&
-      !Object.keys(tags_object).includes(id[id.length - 1]) &&
-      id[id.length - 1] !== "Administrator" &&
-      !queryables_array.includes(id[id.length - 1]),
+    canDrag: () => {
+      return (
+        !expanded &&
+        !Object.keys(tags_object).includes(id[id.length - 1]) &&
+        id[id.length - 1] !== undefined &&
+        !queryables_array.includes(id[id.length - 1])
+      )
+    },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
   }))
   const [showFilter, toggleShowFilter] = React.useState(false)
   const [currentFilter, setCurrentFilter] = React.useState("")
+  const filterRef = React.useRef(null)
   const useStyles = makeStyles((theme) => ({
     treeCard: {
       width: `${100 - 2 * (id.length > 2 ? 1 : 0)}%`,
@@ -58,6 +64,8 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       textTransform: "capitalize",
       fontSize: "14px",
       color: "#7599FF",
+      flex: "auto",
+      margin: "auto",
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
@@ -87,6 +95,9 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       wordBreak: "break-word",
       height: "100%",
       "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    downloadFormControl: {
+      width: "100%",
     },
   }))
   const classes = useStyles()
@@ -158,7 +169,9 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   let day = dateObj.getDate()
   let year = dateObj.getFullYear()
   let newdate = month + "_" + day + "_" + year
-  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv") {
+  const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id.length - 1]}_Activity_Data_${newdate}.csv`
+  const [downloadName, setDownloadName] = React.useState(defaultDownloadName)
+  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv", delimiter = ",", returnChar = "\n") {
     //TODO: add selection between one big file and multiple files
     //TODO: add json vs csv selection
     console.log(`Downloading data for ${id}`)
@@ -173,23 +186,21 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         let res = await LAMP.ActivityEvent.allByParticipant(id)
         return {
           userID: id,
-          activityEvents: res,
+          activityEvents: JSON.stringify(res),
         }
       })
     )
 
-    console.log(resultsPulled)
-
-    let csv = [
-      ["ID", "Activity Events"],
-      ...resultsPulled.map((object) => [object["userID"], JSON.stringify(object["activityEvents"])]),
-    ]
-      .map((row) => row.join(","))
-      .join("\n")
-    debugger
-    const file = new Blob([csv], { type: "text/csv" })
-    name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+    jsonexport(resultsPulled, function (err, csv) {
+      if (err) return console.log(err)
+      const file = new Blob([csv], { type: "text/csv" })
+      name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+    })
   }
+
+  React.useEffect(() => {
+    if (showFilter && filterRef.current) filterRef.current.focus()
+  }, [showFilter])
 
   return (
     <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
@@ -213,6 +224,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                 setCurrentFilter(e.target.value)
               }}
               placeholder={`Search ${id[id.length - 1]} list`}
+              inputRef={filterRef}
               InputProps={{
                 disableUnderline: true,
                 endAdornment: (
@@ -239,13 +251,34 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               </IconButton>
             }
             displaySubmitButton={true}
-            handleResult={() => downloadData(id[id.length - 1])}
+            runOnOpen={() => {
+              setDownloadName(defaultDownloadName)
+            }}
+            handleResult={() => downloadData(id[id.length - 1], downloadName)}
             closesOnSubmit={false}
             exposeButton={true}
             submitText={`Download`}
             children={
               <Typography>
                 Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
+                <br />
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  labelPlacement={"top"}
+                  control={
+                    <TextField
+                      value={downloadName}
+                      onChange={(e) => {
+                        setDownloadName(e.target.value)
+                      }}
+                    />
+                  }
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      File Name
+                    </Box>
+                  }
+                />
               </Typography>
             }
           />

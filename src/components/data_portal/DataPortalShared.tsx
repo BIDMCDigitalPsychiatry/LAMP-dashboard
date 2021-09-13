@@ -97,7 +97,6 @@ export const portalHomeStyle = makeStyles((theme) => ({
     color: "#fff",
   },
   icon: {
-    position: "fixed",
     right: -theme.spacing(2),
   },
   columnsGrid: {
@@ -121,6 +120,17 @@ export const portalHomeStyle = makeStyles((theme) => ({
     position: "fixed",
     bottom: theme.spacing(4),
     right: theme.spacing(4),
+  },
+  collapseTree: {
+    background: "#fff",
+    borderRadius: "40px",
+    boxShadow: "none",
+    cursor: "pointer",
+    textTransform: "capitalize",
+    fontSize: "14px",
+    color: "#7599FF",
+    "& svg": { marginRight: 8 },
+    "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
   },
   builderStyleFocus: {
     animation: `$myEffect 1000ms ${theme.transitions.easing.easeInOut}`,

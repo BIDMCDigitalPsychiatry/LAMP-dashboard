@@ -80,12 +80,17 @@ export default function SelectionWindow({
   style = {},
   closesOnSubmit = true,
   displaySubmitButton = true,
+  runOnOpen = () => {},
   ...props
 }) {
   const classes = useStyles()
   const [open, toggleOpen] = useState(false)
   const [awaitingClose, setAwaitClose] = useState(false)
 
+  React.useEffect(() => {
+    if (open) console.log("Ran a function on open")
+    runOnOpen()
+  }, [open])
   function ConditionalCardWrap({ condition, children }) {
     return condition ? (
       <Card className={classes.container} style={props.style ? props.style : {}}>
@@ -101,20 +106,22 @@ export default function SelectionWindow({
   }
 
   return (
-    <ConditionalCardWrap condition={!exposeButton}>
-      {React.isValidElement(customButton) ? (
-        <Tooltip title={openButtonText}>
-          {React.cloneElement(
-            customButton,
-            //@ts-ignore: Assigning a function to onclick prop
-            { onClick: toggle, ...props }
-          )}
-        </Tooltip>
-      ) : (
-        <Button style={style} className={classes.openButton} onClick={() => toggleOpen(!open)}>
-          {openButtonText}
-        </Button>
-      )}
+    <React.Fragment>
+      <ConditionalCardWrap condition={!exposeButton}>
+        {React.isValidElement(customButton) ? (
+          <Tooltip title={openButtonText}>
+            {React.cloneElement(
+              customButton,
+              //@ts-ignore: Assigning a function to onclick prop
+              { onClick: toggle, ...props }
+            )}
+          </Tooltip>
+        ) : (
+          <Button style={style} className={classes.openButton} onClick={() => toggleOpen(!open)}>
+            {openButtonText}
+          </Button>
+        )}
+      </ConditionalCardWrap>
       {open && (
         <Backdrop className={classes.backdrop} open={open} onClick={() => toggleOpen(!open)}>
           <Box
@@ -147,6 +154,6 @@ export default function SelectionWindow({
           </Box>
         </Backdrop>
       )}
-    </ConditionalCardWrap>
+    </React.Fragment>
   )
 }
