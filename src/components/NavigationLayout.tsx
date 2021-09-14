@@ -397,7 +397,7 @@ export default function NavigationLayout({
               {(authType === "researcher" ||
                 (authType === "admin" && title !== "Administrator" && !title.startsWith("Patient"))) && (
                 <Box>
-                  <ModeToggleButton changeResearcherType={changeResearcherType} id={id} />
+                  <ModeToggleButton changeResearcherType={changeResearcherType} />
                 </Box>
               )}
             </Toolbar>
