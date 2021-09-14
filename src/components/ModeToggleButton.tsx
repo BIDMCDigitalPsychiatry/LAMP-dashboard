@@ -15,12 +15,12 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ModeToggleButton({ changeResearcherType, id, ...props }) {
+export default function ModeToggleButton({ changeResearcherType, ...props }) {
   const [selected, setSelected] = React.useState(false)
   const classes = useStyles()
 
   useEffect(() => {
-    const mode = localStorage.getItem("mode_" + id) !== null ? localStorage.getItem("mode_" + id) : "clinician"
+    const mode = localStorage.getItem("mode") !== null ? localStorage.getItem("mode") : "clinician"
     setSelected(mode === "researcher" ? true : false)
     changeResearcherType(mode)
   }, [])
@@ -33,7 +33,7 @@ export default function ModeToggleButton({ changeResearcherType, id, ...props })
       onChange={() => {
         const mode = !selected ? "researcher" : "clinician"
         changeResearcherType(mode)
-        localStorage.setItem("mode_" + id, mode)
+        localStorage.setItem("mode", mode)
         setSelected(!selected)
       }}
     >
