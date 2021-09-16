@@ -1,5 +1,5 @@
 import React from "react"
-import { makeStyles } from "@material-ui/core"
+import { createStyles, makeStyles, Theme } from "@material-ui/core"
 import LAMP from "lamp-core"
 
 export function useLocalStorage(key, initialValue) {
@@ -72,10 +72,10 @@ export const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const focusedQueryBuilderHeight = "65vh"
-const unfocusedQueryBuilderHeight = "15vh"
-const focusedQueryRenderHeight = "65vh"
-const unfocusedQueryRenderHeight = "15vh"
+const focusedQueryBuilderHeight = "75%"
+const unfocusedQueryBuilderHeight = "25%"
+const focusedQueryRenderHeight = "75%"
+const unfocusedQueryRenderHeight = "25%"
 
 export const portalHomeStyle = makeStyles((theme) => ({
   box: {
@@ -89,8 +89,12 @@ export const portalHomeStyle = makeStyles((theme) => ({
   },
   queryWrapperBox: {
     flexGrow: 1,
-    height: "90%",
-    marginTop: 8,
+    height: "calc(100% - 45px)",
+    marginTop: 10,
+  },
+  toolbar: {
+    height: "35px",
+    minHeight: "35px",
   },
   alphaBadge: {
     right: -theme.spacing(2),
@@ -105,10 +109,11 @@ export const portalHomeStyle = makeStyles((theme) => ({
     spacing: "1",
   },
   treeColumn: {
-    maxHeight: "90%",
+    maxHeight: "90vh",
     flexWrap: "nowrap",
     overFlowY: "scroll",
   },
+  queryColumn: { height: "100%", userSelect: "text", flexWrap: "nowrap", maxHeight: "90vh" },
   cardGrid: {
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
@@ -135,13 +140,15 @@ export const portalHomeStyle = makeStyles((theme) => ({
   builderStyleFocus: {
     animation: `$myEffect 1000ms ${theme.transitions.easing.easeInOut}`,
     overflowY: "scroll",
-    border: "1px solid red",
+    border: "1px solid black",
+    borderRadius: "5px",
     height: focusedQueryBuilderHeight,
   },
   builderStyleUnfocus: {
     animation: `$myEffectExit 1000ms ${theme.transitions.easing.easeInOut}`,
     overflowY: "scroll",
-    border: "1px solid red",
+    border: "1px solid black",
+    borderRadius: "5px",
     height: unfocusedQueryBuilderHeight,
   },
   "@keyframes myEffect": {
@@ -165,6 +172,7 @@ export const portalHomeStyle = makeStyles((theme) => ({
     overflowY: "scroll",
     background: "white",
     border: "1px solid black",
+    borderRadius: "5px",
     height: focusedQueryRenderHeight,
   },
   renderStyleUnfocus: {
@@ -172,6 +180,7 @@ export const portalHomeStyle = makeStyles((theme) => ({
     overflowY: "scroll",
     background: "white",
     border: "1px solid black",
+    borderRadius: "5px",
     height: unfocusedQueryRenderHeight,
   },
   "@keyframes focusRender": {
@@ -191,6 +200,14 @@ export const portalHomeStyle = makeStyles((theme) => ({
     },
   },
 }))
+
+export const standaloneStyle = makeStyles((theme: Theme) =>
+  createStyles({
+    standaloneContainer: {
+      height: "100vh",
+    },
+  })
+)
 
 //given a valid researcher, study, or participant id,
 //an array of ids is returned

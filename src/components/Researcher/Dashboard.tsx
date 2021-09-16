@@ -88,17 +88,24 @@ const useStyles = makeStyles((theme: Theme) =>
       height: "calc(100vh - 50px)",
       paddingLeft: "0px",
       paddingRight: "0px",
-      maxWidth: "100%",
-      maxHeight: "calc(100%)",
-      top: "0px",
+      maxWidth: "100vw",
+      maxHeight: "100vh",
+      //This line is here to solve a bug where a small white bar
+      //appears only when the researcher page uses 'me' instead
+      //of an id. This should be reverted to '50px' as SOON as
+      //this bug is solved, if only for stylistic reasons
+      top: window.location.href.endsWith("/me") ? "0px" : "50px",
       left: "100px",
       overflow: "scroll",
       position: "absolute",
       [theme.breakpoints.down("sm")]: {
         left: "0px",
         width: "100vw",
-        height: "calc(100% - 155px)",
+        height: "calc(100vh - 150px)",
       },
+    },
+    dataPortalPaper: {
+      height: "100%",
     },
     menuOuter: {
       paddingTop: 0,
@@ -230,7 +237,7 @@ export default function Dashboard({ onParticipantSelect, researcher, userType, .
         }
       >
         {!!studies && (
-          <ResponsivePaper elevation={0}>
+          <ResponsivePaper className={currentTab === 4 ? classes.dataPortalPaper : null} elevation={0}>
             <Drawer
               anchor={supportsSidebar ? "left" : "bottom"}
               variant="permanent"

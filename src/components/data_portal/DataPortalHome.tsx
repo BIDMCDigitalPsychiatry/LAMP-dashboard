@@ -104,7 +104,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   return (
     <Box className={classes.box}>
       <AppBar position="static" style={{ background: "#7599FF" }}>
-        <Toolbar>
+        <Toolbar className={classes.toolbar}>
           <div style={{ flexGrow: 1 }} />
           <Typography className={classes.alphaBadge}>Alpha - V9.2021</Typography>
           {typeof onLogout === "function" && (
@@ -116,7 +116,15 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         </Toolbar>
       </AppBar>
       <Box className={classes.queryWrapperBox}>
-        <Grid className={classes.columnsGrid} item xs={12} direction={"row"} container alignContent={"flex-start"}>
+        <Grid
+          className={classes.columnsGrid}
+          item
+          xs={12}
+          spacing={1}
+          direction={"row"}
+          container
+          alignContent={"flex-start"}
+        >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
             <SelectionWindow
               openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
@@ -126,6 +134,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
               }}
               closesOnSubmit={true}
               submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
+              style={{ height: "10%" }}
               children={
                 <React.Fragment>
                   <FormControlLabel
@@ -163,7 +172,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
                 </React.Fragment>
               }
             />
-            <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "70vh", marginTop: "10px" }}>
+            <Card style={{ overflowY: "scroll", border: "1px solid black", maxHeight: "90%", marginTop: "10px" }}>
               <RenderTree
                 token={token}
                 name={token.name}
@@ -175,14 +184,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
               />
             </Card>
           </Grid>
-          <Grid
-            container
-            item
-            direction={"column"}
-            xs={9}
-            lg={10}
-            style={{ height: "100%", userSelect: "text", flexWrap: "nowrap" }}
-          >
+          <Grid container item direction={"column"} xs={9} lg={10} className={classes.queryColumn}>
             <Grid
               item
               ref={drop}

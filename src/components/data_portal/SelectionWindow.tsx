@@ -33,12 +33,11 @@ const useStyles = makeStyles((theme) => ({
   cardDisplay: {
     border: "1px solid black",
     borderRadius: "15px",
-    width: "85%",
-    height: "calc(85% - 30px)",
+    width: "85vw",
+    height: "calc(85vh - 75px)",
     overflowY: "scroll",
-    padding: "50px",
+    padding: "25px",
     position: "relative",
-    top: "2.5vh",
     margin: "auto",
   },
   closeIcon: {
@@ -50,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   openButton: {
     width: "100%",
     height: "100%",
+    fontSize: "100%",
   },
   buttonWrapper: {
     minHeight: "30px",
@@ -81,6 +81,7 @@ export default function SelectionWindow({
   closesOnSubmit = true,
   displaySubmitButton = true,
   runOnOpen = () => {},
+
   ...props
 }) {
   const classes = useStyles()
@@ -93,7 +94,7 @@ export default function SelectionWindow({
   }, [open])
   function ConditionalCardWrap({ condition, children }) {
     return condition ? (
-      <Card className={classes.container} style={props.style ? props.style : {}}>
+      <Card className={classes.container} style={style ? style : {}}>
         {children}
       </Card>
     ) : (
@@ -117,7 +118,7 @@ export default function SelectionWindow({
             )}
           </Tooltip>
         ) : (
-          <Button style={style} className={classes.openButton} onClick={() => toggleOpen(!open)}>
+          <Button className={classes.openButton} onClick={() => toggleOpen(!open)}>
             {openButtonText}
           </Button>
         )}

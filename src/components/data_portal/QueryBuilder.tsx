@@ -424,7 +424,7 @@ export default function QueryBuilder(props) {
           <Button onClick={checkAllTags}>Select all shared tags</Button>
         )}
         <br />
-        <FormControl key="tagForm" style={{ minWidth: "80%", maxWidth: "90%" }}>
+        <FormControl key="tagForm" style={{ minWidth: "80%", maxWidth: "100%" }}>
           <InputLabel key="tagLabel" id="tag-selector">
             {props.availableSharedTags.length
               ? `Select ${props.currentQuery.id_string[props.currentQuery.id_string.length - 2]}-wide tags`
@@ -441,13 +441,18 @@ export default function QueryBuilder(props) {
             //@ts-ignore: selected will be an array here, so the join method exists
             renderValue={(selected) => selected.join(", ")}
           >
-            {props.availableSharedTags.map((name) => (
+            {props.availableSharedTags.map((name) => {
+              //let's format the names
+              let printedName = name.slice(name.lastIndexOf(".") + 1, name.length)
+
               //@ts-ignore:
-              <MenuItem key={name} value={name} name={name}>
-                <Checkbox key={name + "Checkbox"} checked={props.selectedSharedTags.indexOf(name) > -1} />
-                {name.slice(0, 1).toUpperCase() + name.slice(1, name.length)}
-              </MenuItem>
-            ))}
+              return (
+                <MenuItem key={name} value={name} name={name}>
+                  <Checkbox key={name + "Checkbox"} checked={props.selectedSharedTags.indexOf(name) > -1} />
+                  {printedName}
+                </MenuItem>
+              )
+            })}
           </Select>
         </FormControl>
         <br />
@@ -456,7 +461,7 @@ export default function QueryBuilder(props) {
   }
 
   return (
-    //@ts-ignore: we need this ref for dnd to know what to target
+    //@ts-ignore: we need this ref to enable drag and drop
     <Box
       ref={drop}
       role={"QueryBuilder"}

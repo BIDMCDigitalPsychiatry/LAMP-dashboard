@@ -11,7 +11,7 @@ import {
   makeStyles,
   TextField,
   ClickAwayListener,
-  Switch,
+  Tooltip,
 } from "@material-ui/core"
 import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
 import { useDrag, DragPreviewImage } from "react-dnd"
@@ -211,9 +211,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       />
       <CardActions className={classes.cardActions}>
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && (
-          <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
-            <Icon>search</Icon>
-          </IconButton>
+          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
+            <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
+              <Icon>search</Icon>
+            </IconButton>
+          </Tooltip>
         )}
         {showFilter && (
           <ClickAwayListener onClickAway={() => toggleShowFilter(!showFilter)}>
@@ -287,28 +289,36 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         {isGUIEditor &&
           !Object.keys(tags_object).includes(id[id.length - 1]) &&
           Object.keys(tags_object).includes(id[id.length - 2]) && (
-            <IconButton
-              className={classes.treeButton}
-              onClick={() =>
-                onUpdateGUI({
-                  _update: ["target", "type", "name", "id_string"],
-                  content: [id[id.length - 1], type, name, id],
-                })
-              }
-            >
-              <Icon>arrow_forward</Icon>
-            </IconButton>
+            <Tooltip title={`Analyze ${id[id.length - 2]}`}>
+              <IconButton
+                className={classes.treeButton}
+                onClick={() =>
+                  onUpdateGUI({
+                    _update: ["target", "type", "name", "id_string"],
+                    content: [id[id.length - 1], type, name, id],
+                  })
+                }
+              >
+                <Icon>arrow_forward</Icon>
+              </IconButton>
+            </Tooltip>
           )}
 
         <IconButton className={classes.treeButton} onClick={() => setExpanded(!expanded)}>
           {queryables_array.includes(id[id.length - 1]) ? (
             !isGUIEditor ? (
-              <Icon>arrow_forward</Icon>
+              <Tooltip title={`Load ${id[id.length - 1]} query for ${id[id.length - 2]} into terminal`}>
+                <Icon>arrow_forward</Icon>
+              </Tooltip>
             ) : null
           ) : expanded ? (
-            <Icon>expand_less</Icon>
+            <Tooltip title={"Collapse"}>
+              <Icon>expand_less</Icon>
+            </Tooltip>
           ) : (
-            <Icon>expand_more</Icon>
+            <Tooltip title={"Expand"}>
+              <Icon>expand_more</Icon>
+            </Tooltip>
           )}
         </IconButton>
       </CardActions>

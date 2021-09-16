@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingLeft: "0px",
       paddingRight: "0px",
       maxWidth: "100%",
-      maxHeight: "calc(100%)",
+      maxHeight: "100vh",
       top: "50px",
       left: "100px",
       overflow: "scroll",
@@ -90,11 +90,11 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         left: "0px",
         width: "100vw",
-        height: "calc(100% - 155px)",
+        height: "calc(100vh - 150px)",
       },
     },
-    responsivePaperDataPortal: {
-      paddingBottom: 0,
+    dataPortalPaper: {
+      height: "100%",
     },
     menuOuter: {
       paddingTop: 0,
@@ -211,9 +211,8 @@ export default function Root({
               : classes.tableContainerWidth
             : classes.tableContainerDataPortalWidth
         }
-        style={{ marginBottom: "0px" }}
       >
-        <ResponsivePaper elevation={0}>
+        <ResponsivePaper className={currentTab === 2 ? classes.dataPortalPaper : null} elevation={0}>
           <Drawer
             anchor={supportsSidebar ? "left" : "bottom"}
             variant="permanent"
