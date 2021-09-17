@@ -339,8 +339,6 @@ export default function QueryRender(props) {
         if (stringFilter.length && groupByID && !(targetName.indexOf(stringFilter) !== -1)) return null
 
         async function saveIndividualToPDF(graphsPerRow, groupBy) {
-          console.log(graphsPerRow)
-          console.log(groupBy)
           await saveVegaQueryResToPDF(selection, subfilter, graphsPerRow, groupBy)
         }
 
