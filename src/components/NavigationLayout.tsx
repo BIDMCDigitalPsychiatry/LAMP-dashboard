@@ -221,6 +221,7 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
 
   useEffect(() => {
+    console.log(title)
     refresh()
     setInterval(refresh, 60000)
   }, [])
@@ -593,7 +594,7 @@ export default function NavigationLayout({
       </Dialog>
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
         </DialogContent>
       </Dialog>
 

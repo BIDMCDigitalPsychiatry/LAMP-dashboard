@@ -93,6 +93,7 @@ function AppRouter({ ...props }) {
     welcome: true,
     messageCount: 0,
     researcherType: "clinician",
+    adminType: "admin",
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -132,9 +133,31 @@ function AppRouter({ ...props }) {
           authType: LAMP.Auth._type,
         }))
       })
+      getAdminType()
     }
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
+
+  const getAdminType = () => {
+    console.log(LAMP.Auth)
+    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
+      console.log(res)
+      if (!!res.data) {
+        Object.keys(res.data).map(function (key, index) {
+          // if(key === LAMP.Auth._auth.id)
+          console.log(key, index)
+        })
+
+        // res.data.map((cred, index) => {
+        //   if(cred)
+        // })
+      }
+      // setState((state) => ({
+      //   ...state,
+      //   adminType: ,
+      // })
+    })
+  }
 
   useEffect(() => {
     if (!deferredPrompt) return
@@ -217,6 +240,7 @@ function AppRouter({ ...props }) {
       return
     })
     if (!!identity) {
+      getAdminType()
       let type = {
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
@@ -281,15 +305,6 @@ function AppRouter({ ...props }) {
     return null
   }
 
-  const titlecase = (str) => {
-    return str
-      .toLowerCase()
-      .split("_")
-      .map(function (word) {
-        return word.replace(word[0], word[0].toUpperCase())
-      })
-      .join(" ")
-  }
   const submitSurvey = () => {
     setState((state) => ({
       ...state,
