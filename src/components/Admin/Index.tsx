@@ -194,17 +194,19 @@ export default function Root({ updateStore, adminType, ...props }) {
                 </ListItemIcon>
                 <ListItemText primary={t("Researchers")} />
               </ListItem>
-              <ListItem
-                className={classes.menuItems + " " + classes.btnCursor}
-                button
-                selected={currentTab === 1}
-                onClick={(event) => setCurrentTab(1)}
-              >
-                <ListItemIcon className={classes.menuIcon}>
-                  <DataPortalIcon />
-                </ListItemIcon>
-                <ListItemText primary={"Data Portal"} />
-              </ListItem>
+              {adminType === "admin" && (
+                <ListItem
+                  className={classes.menuItems + " " + classes.btnCursor}
+                  button
+                  selected={currentTab === 1}
+                  onClick={(event) => setCurrentTab(1)}
+                >
+                  <ListItemIcon className={classes.menuIcon}>
+                    <DataPortalIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={"Data Portal"} />
+                </ListItem>
+              )}
             </List>
           </Drawer>
           {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} adminType={adminType} />}
