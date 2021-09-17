@@ -7,7 +7,7 @@ export default function Vega({ spec, config, ...props }) {
   React.useEffect(() => {
     //todo: add message while vega renders
     setRenderedState(false)
-    //@ts-ignore - as this is in a useEffect, the reference should always be ready in time
+    //@ts-ignore: as this is in a useEffect, the reference should always be ready in time
     vegaEmbed(ref.current, spec, config)
       .then(() => setRenderedState(true))
       .catch((e) => {
@@ -16,8 +16,8 @@ export default function Vega({ spec, config, ...props }) {
       })
   }, [spec])
 
-  //@ts-ignore
   return (
+    //@ts-ignore:
     <div ref={ref} {...props}>
       &nbsp;{isRendered ? "" : "Rendering graph..."}
     </div>
