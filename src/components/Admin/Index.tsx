@@ -134,7 +134,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Root({ updateStore, ...props }) {
+export default function Root({ updateStore, adminType, ...props }) {
   const { t, i18n } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
@@ -207,7 +207,7 @@ export default function Root({ updateStore, ...props }) {
               </ListItem>
             </List>
           </Drawer>
-          {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} />}
+          {currentTab === 0 && <Researchers history={props.history} updateStore={updateStore} adminType={adminType} />}
           {currentTab === 1 && (
             <DataPortal
               onLogout={null}

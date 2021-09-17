@@ -351,8 +351,7 @@ export const CredentialManager: React.FunctionComponent<{
       setAllCreds(cred)
     })
     LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
-      console.log(res)
-      setPermissions(!!res.data ? res.data : [])
+      setPermissions(!!res.data ? res.data : null)
     })
     setRoles()
   }, [])
@@ -388,7 +387,7 @@ export const CredentialManager: React.FunctionComponent<{
   const _submitCredential = async (data) => {
     let typeEmail = ext.includes(data.emailAddress) ? 1 : 2
     let result = await updateDetails(id, data, selected.mode, allRoles, typeEmail, type)
-    if (!!type) {
+    if (!!type && !!permissions) {
       let newData = {}
       newData[data.emailAddress] = data.role
       permissions.push(newData)

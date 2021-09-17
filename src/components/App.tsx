@@ -126,6 +126,7 @@ function AppRouter({ ...props }) {
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
+        getAdminType()
         setState((state) => ({
           ...state,
           identity: LAMP.Auth._me,
@@ -133,29 +134,37 @@ function AppRouter({ ...props }) {
           authType: LAMP.Auth._type,
         }))
       })
-      getAdminType()
     }
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 
   const getAdminType = () => {
-    console.log(LAMP.Auth)
     LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
-      console.log(res)
       if (!!res.data) {
-        Object.keys(res.data).map(function (key, index) {
-          // if(key === LAMP.Auth._auth.id)
-          console.log(key, index)
+        let checked = false
+        Object.keys(res.data).map((key) => {
+          if (res.data[key].hasOwnProperty(LAMP.Auth._auth.id)) {
+            const id = Object.keys(res.data[key])[0]
+            checked = true
+            setState((state) => ({
+              ...state,
+              adminType:
+                res.data[key][id] === "view" ? "practice_lead" : res.data[key][id] === "edit" ? "user_admin" : "admin",
+            }))
+          }
         })
-
-        // res.data.map((cred, index) => {
-        //   if(cred)
-        // })
+        if (!checked) {
+          setState((state) => ({
+            ...state,
+            adminType: "admin",
+          }))
+        }
+      } else {
+        setState((state) => ({
+          ...state,
+          adminType: "admin",
+        }))
       }
-      // setState((state) => ({
-      //   ...state,
-      //   adminType: ,
-      // })
     })
   }
 
@@ -433,11 +442,17 @@ function AppRouter({ ...props }) {
               <PageTitle>{t("Administrator")}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
-                title="Administrator"
+                title={
+                  state.adminType === "admin"
+                    ? "Administrator"
+                    : state.adminType === "practice_lead"
+                    ? "Practice Lead"
+                    : "User Administrator"
+                }
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Root {...props} updateStore={updateStore} />
+                <Root {...props} updateStore={updateStore} adminType={state.adminType} />
               </NavigationLayout>
             </React.Fragment>
           )

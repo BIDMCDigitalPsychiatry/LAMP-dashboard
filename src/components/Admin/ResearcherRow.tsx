@@ -39,10 +39,23 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    buttoncontainer: {
+      "& button": {
+        marginLeft: "8px",
+      },
+    },
   })
 )
 
-export default function ResearcherRow({ history, researcher, researchers, refreshResearchers, updateStore, ...props }) {
+export default function ResearcherRow({
+  history,
+  researcher,
+  researchers,
+  refreshResearchers,
+  updateStore,
+  adminType,
+  ...props
+}) {
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
 
@@ -54,24 +67,30 @@ export default function ResearcherRow({ history, researcher, researchers, refres
         </Box>
         <Box>
           <CardActions>
-            <Credentials user={researcher} />
-            <AddUpdateResearcher
-              researcher={researcher}
-              refreshResearchers={refreshResearchers}
-              setName={setName}
-              researchers={researchers}
-              updateStore={updateStore}
-            />
-            <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
-            <Fab
-              size="small"
-              classes={{ root: classes.btnWhite }}
-              onClick={() => {
-                history.push(`/researcher/${researcher.id}`)
-              }}
-            >
-              <Icon>arrow_forward</Icon>
-            </Fab>
+            {adminType !== "practice_lead" && (
+              <Box display="flex" flexDirection="row" className={classes.buttoncontainer}>
+                <Credentials user={researcher} />
+                <AddUpdateResearcher
+                  researcher={researcher}
+                  refreshResearchers={refreshResearchers}
+                  setName={setName}
+                  researchers={researchers}
+                  updateStore={updateStore}
+                />
+                <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
+              </Box>
+            )}
+            {adminType !== "user_admin" && (
+              <Fab
+                size="small"
+                classes={{ root: classes.btnWhite }}
+                onClick={() => {
+                  history.push(`/researcher/${researcher.id}`)
+                }}
+              >
+                <Icon>arrow_forward</Icon>
+              </Fab>
+            )}
           </CardActions>
         </Box>
       </Box>

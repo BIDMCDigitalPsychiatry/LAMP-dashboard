@@ -358,7 +358,7 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {authType === "admin" && (
+                    {authType === "admin" && title === "Administrator" && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
@@ -396,7 +396,11 @@ export default function NavigationLayout({
                 </Box>
               )}
               {(authType === "researcher" ||
-                (authType === "admin" && title !== "Administrator" && !title.startsWith("Patient"))) && (
+                (authType === "admin" &&
+                  title !== "Administrator" &&
+                  title !== "User Administrator" &&
+                  title !== "Practice Lead" &&
+                  !title.startsWith("Patient"))) && (
                 <Box>
                   <ModeToggleButton changeResearcherType={changeResearcherType} />
                 </Box>

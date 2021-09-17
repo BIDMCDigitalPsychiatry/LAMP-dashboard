@@ -172,7 +172,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Researchers({ history, updateStore, ...props }) {
+export default function Researchers({ history, updateStore, adminType, ...props }) {
   const [researchers, setResearchers] = useState([])
   const [paginatedResearchers, setPaginatedResearchers] = useState([])
   const [page, setPage] = useState(0)
@@ -232,6 +232,7 @@ export default function Researchers({ history, updateStore, ...props }) {
         researchers={researchers}
         searchData={(data) => setSearch(data)}
         refreshResearchers={refreshResearchers}
+        adminType={adminType}
       />
       <Box className={classes.tableContainer} mt={4}>
         <Grid container spacing={3}>
@@ -245,6 +246,7 @@ export default function Researchers({ history, updateStore, ...props }) {
                     refreshResearchers={refreshResearchers}
                     researchers={researchers}
                     updateStore={updateStore}
+                    adminType={adminType}
                   />
                 </Grid>
               ))}
