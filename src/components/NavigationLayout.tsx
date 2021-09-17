@@ -395,16 +395,16 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-              {(authType === "researcher" ||
-                (authType === "admin" &&
-                  title !== "Administrator" &&
-                  title !== "User Administrator" &&
-                  title !== "Practice Lead" &&
-                  !title.startsWith("Patient"))) && (
-                <Box>
-                  <ModeToggleButton changeResearcherType={changeResearcherType} />
-                </Box>
-              )}
+              {console.log(title)}
+              {(authType === "researcher" || authType === "admin") &&
+                title !== "Administrator" &&
+                title !== "User Administrator" &&
+                title !== "Practice Lead" &&
+                !title.startsWith("Patient") && (
+                  <Box>
+                    <ModeToggleButton changeResearcherType={changeResearcherType} />
+                  </Box>
+                )}
             </Toolbar>
           )}
           <Toolbar
