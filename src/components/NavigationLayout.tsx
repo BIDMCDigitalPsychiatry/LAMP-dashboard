@@ -395,7 +395,6 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
-              {console.log(title)}
               {(authType === "researcher" || authType === "admin") &&
                 title !== "Administrator" &&
                 title !== "User Administrator" &&
