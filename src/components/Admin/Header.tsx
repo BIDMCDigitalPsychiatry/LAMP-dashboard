@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Header({ researchers, searchData, refreshResearchers, ...props }) {
+export default function Header({ researchers, searchData, refreshResearchers, adminType, ...props }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
 
@@ -51,7 +51,9 @@ export default function Header({ researchers, searchData, refreshResearchers, ..
         <Typography variant="h5">{t("Researchers")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
-      <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} />
+      {adminType !== "practice_lead" && (
+        <AddUpdateResearcher refreshResearchers={refreshResearchers} researchers={researchers} />
+      )}
     </Box>
   )
 }

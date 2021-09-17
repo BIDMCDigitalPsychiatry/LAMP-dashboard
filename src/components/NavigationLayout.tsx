@@ -357,7 +357,7 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {authType === "admin" && (
+                    {authType === "admin" && title === "Administrator" && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
@@ -597,7 +597,7 @@ export default function NavigationLayout({
       </Dialog>
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
         </DialogContent>
       </Dialog>
 

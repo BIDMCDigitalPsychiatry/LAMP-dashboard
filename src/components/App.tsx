@@ -93,6 +93,7 @@ function AppRouter({ ...props }) {
     welcome: true,
     messageCount: 0,
     researcherType: "clinician",
+    adminType: "admin",
   })
   const [store, setStore] = useState({ researchers: [], participants: [] })
   const { enqueueSnackbar, closeSnackbar } = useSnackbar()
@@ -125,6 +126,7 @@ function AppRouter({ ...props }) {
       })
     } else if (!state.identity) {
       LAMP.Auth.refresh_identity().then((x) => {
+        getAdminType()
         setState((state) => ({
           ...state,
           identity: LAMP.Auth._me,
@@ -135,6 +137,36 @@ function AppRouter({ ...props }) {
     }
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
+
+  const getAdminType = () => {
+    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
+      if (!!res.data) {
+        let checked = false
+        Object.keys(res.data).map((key) => {
+          if (res.data[key].hasOwnProperty(LAMP.Auth._auth.id)) {
+            const id = Object.keys(res.data[key])[0]
+            checked = true
+            setState((state) => ({
+              ...state,
+              adminType:
+                res.data[key][id] === "view" ? "practice_lead" : res.data[key][id] === "edit" ? "user_admin" : "admin",
+            }))
+          }
+        })
+        if (!checked) {
+          setState((state) => ({
+            ...state,
+            adminType: "admin",
+          }))
+        }
+      } else {
+        setState((state) => ({
+          ...state,
+          adminType: "admin",
+        }))
+      }
+    })
+  }
 
   useEffect(() => {
     if (!deferredPrompt) return
@@ -217,6 +249,7 @@ function AppRouter({ ...props }) {
       return
     })
     if (!!identity) {
+      getAdminType()
       let type = {
         identity: LAMP.Auth._me,
         auth: LAMP.Auth._auth,
@@ -281,15 +314,6 @@ function AppRouter({ ...props }) {
     return null
   }
 
-  const titlecase = (str) => {
-    return str
-      .toLowerCase()
-      .split("_")
-      .map(function (word) {
-        return word.replace(word[0], word[0].toUpperCase())
-      })
-      .join(" ")
-  }
   const submitSurvey = () => {
     setState((state) => ({
       ...state,
@@ -418,11 +442,17 @@ function AppRouter({ ...props }) {
               <PageTitle>{t("Administrator")}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
-                title="Administrator"
+                title={
+                  state.adminType === "admin"
+                    ? "Administrator"
+                    : state.adminType === "practice_lead"
+                    ? "Practice Lead"
+                    : "User Administrator"
+                }
                 goBack={props.history.goBack}
                 onLogout={() => reset()}
               >
-                <Root {...props} updateStore={updateStore} />
+                <Root {...props} updateStore={updateStore} adminType={state.adminType} />
               </NavigationLayout>
             </React.Fragment>
           )
