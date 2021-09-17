@@ -44,7 +44,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (activity?.spec === "lamp.jewels_a" || activity?.spec === "lamp.jewels_b") {
       ;(async () => {
-        let events = await LAMP.ActivityEvent.allByParticipant(participant.id)
+        let events = await LAMP.ActivityEvent.allByParticipant(participant?.id ?? participant)
         events = events.filter((e) => e.activity === activity.id)
         activity["events"] = events
         setCurrentActivity(activity)
