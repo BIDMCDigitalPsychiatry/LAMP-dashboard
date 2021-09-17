@@ -310,7 +310,6 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
       return -1
     }
   } catch (err) {
-    console.log(err)
     return -2
   }
   return 1
@@ -343,11 +342,8 @@ export const CredentialManager: React.FunctionComponent<{
       .then((x) => Object.keys(x?.data || []).length === 0)
       .then((x) => setShouldSyncWithChildren(x))
     id = !!type ? null : id
-    console.log(id)
     LAMP.Credential.list(id).then((cred) => {
-      console.log(cred)
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      console.log(cred)
       setAllCreds(cred)
     })
     LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
@@ -391,7 +387,6 @@ export const CredentialManager: React.FunctionComponent<{
       let newData = {}
       newData[data.emailAddress] = data.role
       permissions.push(newData)
-      console.log(permissions)
       LAMP.Type.setAttachment(null, "me", "gov.lacounty.dmh.admin_permissions", permissions)
     }
     if (result === -4) {

@@ -221,7 +221,6 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
 
   useEffect(() => {
-    console.log(title)
     refresh()
     setInterval(refresh, 60000)
   }, [])

@@ -83,7 +83,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onComplete()
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
-            console.log(data)
             delete data["activity"]
             data["activity"] = activityId
             if (
@@ -133,11 +132,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
-    console.log({ ...settings, activity: activity, configuration: { language: i18n.language } })
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    // let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    let response = await fetch(demoActivities[activity.spec] + ".html.b64")
+    let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
+    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
     setEmbeddedActivity(atob(await response.text()))
     setLoading(false)
   }
