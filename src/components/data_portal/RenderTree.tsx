@@ -29,10 +29,12 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     type: "TARGETINFO",
     item: { target: id[id.length - 1], type, name, id_string: id },
     canDrag: () => {
+      debugger
       return (
         !expanded &&
         !Object.keys(tags_object).includes(id[id.length - 1]) &&
         id[id.length - 1] !== undefined &&
+        id[id.length - 1] !== null &&
         !queryables_array.includes(id[id.length - 1])
       )
     },
