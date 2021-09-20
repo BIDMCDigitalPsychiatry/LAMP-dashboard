@@ -209,7 +209,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         key={"text" + id[id.length - 1]}
         title={`${name ? name : id[id.length - 1]}`}
       />
-      <CardActions className={classes.cardActions}>
+      <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
         {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && (
           <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
             <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>

@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: "0px",
       maxWidth: "100%",
       maxHeight: "100vh",
-      top: "50px",
+      top: "0px",
       left: "100px",
       overflow: "scroll",
       position: "absolute",
@@ -172,7 +172,7 @@ export default function Root({ updateStore, adminType, ...props }) {
             : classes.tableContainerDataPortalWidth
         }
       >
-        <ResponsivePaper className={currentTab === 2 ? classes.dataPortalPaper : null} elevation={0}>
+        <ResponsivePaper className={currentTab === 1 ? classes.dataPortalPaper : null} elevation={0}>
           <Drawer
             anchor={supportsSidebar ? "left" : "bottom"}
             variant="permanent"

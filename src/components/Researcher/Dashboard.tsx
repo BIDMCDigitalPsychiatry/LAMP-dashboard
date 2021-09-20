@@ -86,11 +86,7 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: "0px",
       maxWidth: "100vw",
       maxHeight: "100vh",
-      //This line is here to solve a bug where a small white bar
-      //appears only when the researcher page uses 'me' instead
-      //of an id. This should be reverted to '50px' as SOON as
-      //this bug is solved, if only for stylistic reasons
-      top: window.location.href.endsWith("/me") ? "0px" : "50px",
+      top: "0px",
       left: "100px",
       overflow: "scroll",
       position: "absolute",

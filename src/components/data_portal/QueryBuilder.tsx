@@ -11,7 +11,7 @@ import {
   InputLabel,
   MenuItem,
   Checkbox,
-  Box,
+  Container,
   Input,
   Icon,
   Backdrop,
@@ -179,38 +179,6 @@ export default function QueryBuilder(props) {
       }
       ajaxRequest(sending)
       //if the tag is not currently in our list
-      /*
-            if (!isTagQueriedForUser(tagName,currentQuery.target)){
-                //we get our data
-                let tagQuery = `$LAMP.Tag.get('${currentQuery.target}','${tagName}')`
-
-
-                let sending = {
-                    method: 'POST',
-                    url: `https://${props.token.server}/`,
-                    headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
-                    data:tagQuery,
-                    callback: function(res){
-                        if (typeof props.queryResult !=='object')
-                            props.setQueryResult({[identifier]: JSON.parse(res)})
-                        else {
-                            let combination = Object.assign(props.queryResult,{[identifier]: JSON.parse(res)})
-                            console.log(combination)
-                            props.setQueryResult(combination)
-                        }
-                        console.log(props.queryResult)
-                    }
-                }
-                ajaxRequest(sending);
-            }
-            //if the tag currently is in our list
-            else{
-                props.setQueryResult(Object.keys(props.queryResult).reduce((obj, key) =>{
-                    if (key !== identifier)
-                        obj[key] = props.queryResult[key]
-                    return obj;
-                },{}));
-            }*/
       //TODO: enable button after the other todo is completed
     }
     const ITEM_HEIGHT = 48
@@ -447,7 +415,7 @@ export default function QueryBuilder(props) {
 
               //@ts-ignore:
               return (
-                <MenuItem key={name} value={name} name={name}>
+                <MenuItem key={name} value={name}>
                   <Checkbox key={name + "Checkbox"} checked={props.selectedSharedTags.indexOf(name) > -1} />
                   {printedName}
                 </MenuItem>
@@ -461,8 +429,7 @@ export default function QueryBuilder(props) {
   }
 
   return (
-    //@ts-ignore: we need this ref to enable drag and drop
-    <Box
+    <Container
       ref={drop}
       role={"QueryBuilder"}
       style={{ position: "relative", border: isOver ? "1 px solid green" : "white" }}
@@ -544,6 +511,6 @@ export default function QueryBuilder(props) {
           </Typography>
         </Card>
       )}
-    </Box>
+    </Container>
   )
 }

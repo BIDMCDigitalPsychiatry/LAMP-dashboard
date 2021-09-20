@@ -134,7 +134,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
               }}
               closesOnSubmit={true}
               submitText={`Set Viewing Mode to ${!viewModeSwitch ? "GUI" : "Terminal"}`}
-              style={{ height: "10%" }}
+              style={{ minHeight: "10%" }}
               children={
                 <React.Fragment>
                   <FormControlLabel
