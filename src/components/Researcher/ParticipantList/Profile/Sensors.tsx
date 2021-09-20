@@ -58,7 +58,7 @@ export default function Sensors({
   const onChangeSensors = () => {
     ;(async () => {
       Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
-        let result = sortData(sensors, [participant.study_name], "id")
+        let result = sortData(sensors, [participant.study_name], "name")
         setSensors(result)
         setPaginatedSensors(result.slice(page, rowCount))
       })

@@ -18,6 +18,8 @@ import {
   createStyles,
   FormControl,
   InputLabel,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useDropzone } from "react-dropzone"
@@ -195,6 +197,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   const [paginatedImported, setPaginatedImported] = useState([])
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
+  const [loading, setLoading] = useState(false)
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
@@ -204,13 +207,13 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
 
   // Import a file containing pre-linked Activity objects from another Study.
   const importActivities = async (selectedStudy: string, importFile: any) => {
+    setLoading(true)
     let status = true
     const _importFile = [...importFile] // clone it so we can close the dialog first
     let allIDs = _importFile.map((x) => x.id).reduce((prev, curr) => ({ ...prev, [curr]: undefined }), {})
     let brokenGroupsCount = _importFile
       .filter((activity) => activity.spec === "lamp.group")
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
-
     if (brokenGroupsCount > 0) {
       enqueueSnackbar(t("Couldn't import the Activities because some Activities are misconfigured or missing."), {
         variant: "error",
@@ -291,10 +294,12 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
     if (status) {
       setUpdateCount(2)
       setActivities()
+      setLoading(false)
       enqueueSnackbar(t("The selected Activities were successfully imported."), {
         variant: "success",
       })
     } else {
+      setLoading(false)
       enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
     }
     onClose()
@@ -321,10 +326,13 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "application/json,.json",
-    maxSize: 5 * 1024 * 1024 /* 5MB */,
+    maxSize: 25 * 1024 * 1024 /* 5MB */,
   })
   return (
     <Container>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box mt={2} mb={2}>
         <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
       </Box>
@@ -348,23 +356,6 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
         </FormControl>
       </Grid>
 
-      {/* <Typography variant="caption">{t("Study")}</Typography>
-      <Select
-        labelId="demo-simple-select-filled-label"
-        id="demo-simple-select-filled"
-        value={selectedStudy}
-        onChange={(event) => {
-          setSelectedStudy(event.target.value)
-        }}
-        style={{ width: "100%" }}
-      >
-        {studies.map((study) => (
-          <MenuItem key={study.id} value={study.id}>
-            {study.name}
-          </MenuItem>
-        ))}
-      </Select> */}
-
       {typeof selectedStudy === "undefined" ||
       (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
         <Box mt={1}>
@@ -383,6 +374,7 @@ export default function ImportActivity({ studies, setActivities, onClose, setUpd
         <input {...getInputProps()} />
 
         <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
+        <Typography className={classes.errorMsg}>{t("The maximum allowed file size is 25 MB.")}</Typography>
       </Box>
 
       <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>

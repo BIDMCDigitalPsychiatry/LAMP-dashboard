@@ -7,7 +7,7 @@ import LAMP from "lamp-core"
 import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveResearcherData"
 // import { useWorker } from "@koale/useworker"
 
-export default function Researcher({ researcher, onParticipantSelect, userType, ...props }) {
+export default function Researcher({ researcher, onParticipantSelect, mode, ...props }) {
   const { t, i18n } = useTranslation()
   // const [dataWorker] = useWorker(saveDataToCache)
   // const [demoWorker] = useWorker(saveDemoData)
@@ -51,7 +51,7 @@ export default function Researcher({ researcher, onParticipantSelect, userType, 
 
   return (
     <React.Fragment>
-      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} userType={userType} />
+      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} mode={mode} />
     </React.Fragment>
   )
 }

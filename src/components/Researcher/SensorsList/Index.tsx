@@ -47,7 +47,6 @@ export default function SensorsList({
   selectedStudies,
   setSelectedStudies,
   getDBStudies,
-  userType,
   ...props
 }: {
   title?: string
@@ -56,7 +55,6 @@ export default function SensorsList({
   selectedStudies: Array<any>
   setSelectedStudies?: Function
   getDBStudies?: Function
-  userType?: string
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -106,7 +104,7 @@ export default function SensorsList({
                 result = result.concat(sensorData)
                 setSensors(sortData(result, selectedData, "name"))
               }
-              setPaginatedSensors(result.slice(0, rowCount))
+              setPaginatedSensors(sortData(result, selectedData, "name").slice(0, rowCount))
               setPage(0)
             } else {
               if (result.length === 0) setSensors([])
@@ -150,7 +148,6 @@ export default function SensorsList({
         setSelectedStudies={setSelectedStudies}
         selectedStudies={selected}
         setSensors={searchFilterSensors}
-        userType={userType}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

@@ -45,7 +45,7 @@ function compress(file, width, height) {
     }
   })
 }
-export function CredentialEditor({ credential, auxData, mode, onChange }) {
+export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
   const [name, setName] = useState(credential?.name ?? "")
@@ -83,7 +83,11 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
     window.location.href.split("#")[0] +
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-
+  const roles = [
+    { value: "admin", label: "System Admin" },
+    { value: "edit", label: "User Administrator" },
+    { value: "view", label: "Practice Lead" },
+  ]
   return (
     <Grid container justify="center" alignItems="center">
       {["create-new", "change-role", "update-profile"].includes(mode) && (
@@ -130,6 +134,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
       {["create-new", "change-role", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
+          select={!!permissions && !!title ? true : false}
           label={t("Role")}
           type="text"
           variant="outlined"
@@ -166,7 +171,15 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
               ),
             ],
           }}
-        />
+        >
+          {!!permissions &&
+            !!title &&
+            roles.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+        </TextField>
       )}
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
@@ -256,8 +269,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange }) {
   )
 }
 
-export async function updateDetails(id, data, mode, allRoles, type) {
+export async function updateDetails(id, data, mode, allRoles, type, title) {
   try {
+    id = !!title ? null : id
     if (mode === "reset-password" && !!data.password) {
       if (
         !!((await LAMP.Credential.update(id, data.credential.access_key, {
@@ -306,7 +320,8 @@ export const CredentialManager: React.FunctionComponent<{
   style?: any
   credential?: any
   mode?: string
-}> = ({ id, onComplete, credential, mode, ...props }) => {
+  type?: string
+}> = ({ id, onComplete, credential, mode, type, ...props }) => {
   const theme = useTheme()
   const [selected, setSelected] = useState<any>({
     anchorEl: undefined,
@@ -320,13 +335,19 @@ export const CredentialManager: React.FunctionComponent<{
   const { t } = useTranslation()
   const [ext, setExt] = useState([])
   const [int, setInt] = useState([])
+  const [permissions, setPermissions] = useState(null)
 
   useEffect(() => {
     LAMP.Type.parent(id)
       .then((x) => Object.keys(x?.data || []).length === 0)
       .then((x) => setShouldSyncWithChildren(x))
+    id = !!type ? null : id
     LAMP.Credential.list(id).then((cred) => {
+      cred = cred.filter((c) => c.hasOwnProperty("origin"))
       setAllCreds(cred)
+    })
+    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
+      setPermissions(!!res.data ? res.data : null)
     })
     setRoles()
   }, [])
@@ -360,8 +381,14 @@ export const CredentialManager: React.FunctionComponent<{
   }, [shouldSyncWithChildren, allRoles])
 
   const _submitCredential = async (data) => {
-    let type = ext.includes(data.emailAddress) ? 1 : 2
-    let result = await updateDetails(id, data, selected.mode, allRoles, type)
+    let typeEmail = ext.includes(data.emailAddress) ? 1 : 2
+    let result = await updateDetails(id, data, selected.mode, allRoles, typeEmail, type)
+    if (!!type && !!permissions) {
+      let newData = {}
+      newData[data.emailAddress] = data.role
+      permissions.push(newData)
+      LAMP.Type.setAttachment(null, "me", "gov.lacounty.dmh.admin_permissions", permissions)
+    }
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {
         variant: "error",
@@ -383,7 +410,11 @@ export const CredentialManager: React.FunctionComponent<{
       })
     }
     if (result === 1) {
-      LAMP.Credential.list(id).then(setAllCreds)
+      id = !!type ? null : id
+      LAMP.Credential.list(id).then((cred) => {
+        cred = cred.filter((c) => c.hasOwnProperty("origin"))
+        setAllCreds(cred)
+      })
       setRoles()
       return setSelected({
         anchorEl: undefined,
@@ -508,6 +539,8 @@ export const CredentialManager: React.FunctionComponent<{
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
           mode={selected.mode}
           onChange={(data) => _submitCredential(data)}
+          title={type ?? null}
+          permissions={permissions}
         />
       )}
     </Box>

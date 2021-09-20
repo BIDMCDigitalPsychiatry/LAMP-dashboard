@@ -125,7 +125,9 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
-  userType,
+  getAllStudies,
+  setData,
+  mode,
   ...props
 }) {
   const classes = useStyles()
@@ -135,7 +137,6 @@ export default function ParticipantList({
   const [updateCount, setUpdateCount] = useState(0)
   const [selected, setSelected] = useState(selectedStudies)
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
-  const [newStudy, setNewStudy] = useState(null)
   const [studiesData, setStudiesData] = useState(studies)
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
@@ -143,14 +144,23 @@ export default function ParticipantList({
 
   const { t } = useTranslation()
 
+  useInterval(
+    () => {
+      getAllStudies()
+    },
+    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
+    true
+  )
   useEffect(() => {
     setSelected(selectedStudies)
     if (selectedStudies) {
+      setLoading(false)
       searchParticipants()
     }
   }, [selectedStudies])
 
   useEffect(() => {
+    setLoading(false)
     setStudiesData(studies)
   }, [studies])
 
@@ -181,7 +191,8 @@ export default function ParticipantList({
                 result = result.concat(participantData)
                 setParticipants(sortData(result, selectedData, "id"))
               }
-              setPaginatedParticipants(result.slice(0, rowCount))
+              result = sortData(result, selectedData, "id")
+              setPaginatedParticipants(sortData(result, selectedData, "id").slice(0, rowCount))
               setPage(0)
             } else {
               if (result.length === 0) setParticipants([])
@@ -214,7 +225,7 @@ export default function ParticipantList({
     <React.Fragment>
       {/*<Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
-  </Backdrop>*/}
+      </Backdrop>*/}
       <Header
         studies={studiesData}
         researcher={researcher}
@@ -223,8 +234,8 @@ export default function ParticipantList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        newStudyObj={setNewStudy}
-        userType={userType}
+        setData={setData}
+        mode={mode}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

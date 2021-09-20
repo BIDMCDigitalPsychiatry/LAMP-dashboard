@@ -61,12 +61,14 @@ export default function PatientStudyCreator({
   researcher,
   handleNewStudy,
   closePopUp,
+  setSelectedStudies,
   ...props
 }: {
   studies: any
   researcher: any
   handleNewStudy: Function
   closePopUp: Function
+  setSelectedStudies?: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
@@ -86,7 +88,7 @@ export default function PatientStudyCreator({
     )
   }
 
-  const saveStudyData = (result, type) => {
+  const saveStudyData = async (result, type) => {
     for (let resultData of result) {
       Service.addData(type, [resultData])
     }
@@ -199,6 +201,7 @@ export default function PatientStudyCreator({
       localStorage.getItem("studies_" + authId) !== null ? JSON.parse(localStorage.getItem("studies_" + authId)) : []
     studiesSelected.push(studyName)
     localStorage.setItem("studies_" + authId, JSON.stringify(studiesSelected))
+    !!setSelectedStudies ? setSelectedStudies(studiesSelected) : {}
   }
 
   const createStudy = async (studyName: string) => {
@@ -245,19 +248,18 @@ export default function PatientStudyCreator({
                 )
                 if (filteredParticipants.length > 0) {
                   filteredParticipants[0].name = studyName
+                  saveStudyData(filteredParticipants, "participants").then((d) => {
+                    updateStudyLocalStorage(authId, studyName)
+                  })
                   setNewId(filteredParticipants[0]?.id)
                   LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
-                  saveStudyData(filteredParticipants, "participants")
                 }
               }
-              setLoading(false)
+              studyUpdate(newStudyData, null, createPatient)
             })
-            updatedNewStudy.participant_count = 1
           } else {
-            setLoading(false)
+            studyUpdate(newStudyData, studyName, createPatient)
           }
-          closePopUp(1)
-          handleNewStudy(updatedNewStudy)
         })
       } else {
         let newStudyData = {
@@ -275,26 +277,30 @@ export default function PatientStudyCreator({
               )
               if (filteredParticipants.length > 0) {
                 filteredParticipants[0].name = studyName
+                saveStudyData(filteredParticipants, "participants").then((d) => {
+                  updateStudyLocalStorage(authId, studyName)
+                })
                 setNewId(filteredParticipants[0]?.id)
                 LAMP.Type.setAttachment(filteredParticipants[0]?.id, "me", "lamp.name", studyName ?? null)
-                saveStudyData(filteredParticipants, "participants")
               }
             }
-            newStudyData.participant_count = 1
-            setLoading(false)
-            Service.addData("studies", [newStudyData])
-            handleNewStudy(newStudyData)
-            closePopUp(1)
+            studyUpdate(newStudyData, null, createPatient)
           })
         } else {
-          setLoading(false)
-          Service.addData("studies", [newStudyData])
-          handleNewStudy(newStudyData)
-          closePopUp(1)
+          studyUpdate(newStudyData, studyName, createPatient)
         }
       }
-      updateStudyLocalStorage(authId, studyName)
     })
+  }
+
+  const studyUpdate = (newStudyData, studyName, createPatient) => {
+    let authId = researcher.id
+    newStudyData.participant_count = !!createPatient ? 1 : 0
+    setLoading(false)
+    Service.addData("studies", [newStudyData])
+    if (!!studyName) updateStudyLocalStorage(authId, studyName)
+    handleNewStudy(newStudyData)
+    closePopUp(1)
   }
 
   return (
@@ -363,7 +369,7 @@ export default function PatientStudyCreator({
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {(studies || []).map((study) => (
+              {studies.map((study) => (
                 <MenuItem key={study.id} value={study.id}>
                   {study.name}
                 </MenuItem>

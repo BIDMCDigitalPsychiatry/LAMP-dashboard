@@ -65,15 +65,7 @@ export const games = [
   "lamp.pop_the_bubbles",
   "lamp.balloon_risk",
 ]
-export default function ActivityList({
-  researcher,
-  title,
-  studies,
-  selectedStudies,
-  setSelectedStudies,
-  userType,
-  ...props
-}) {
+export default function ActivityList({ researcher, title, studies, selectedStudies, setSelectedStudies, ...props }) {
   const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const classes = useStyles()
@@ -134,7 +126,7 @@ export default function ActivityList({
                 result = result.concat(activitiesData)
                 setActivities(sortData(result, selectedData, "name"))
               }
-              setPaginatedActivities(result.slice(0, rowCount))
+              setPaginatedActivities(sortData(result, selectedData, "name").slice(0, rowCount))
               setPage(0)
             } else {
               if (result.length === 0) setActivities([])
@@ -179,7 +171,6 @@ export default function ActivityList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
-        userType={userType}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

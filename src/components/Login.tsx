@@ -126,6 +126,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             },
           } as any).then((res) => console.dir(res))
         }
+        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+          let studiesSelected =
+            localStorage.getItem("studies_" + res.identity.id) !== null
+              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+              : []
+          if (studiesSelected.length === 0) {
+            let studiesList = [res.identity.name]
+            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+          }
+        }
         process.env.REACT_APP_LATEST_LAMP === "true"
           ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
           : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
@@ -340,23 +351,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     <MenuItem disabled divider>
                       <b>{t("Try mindLAMP out as a...")}</b>
                     </MenuItem>
-                    {/* <MenuItem                      
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "clinical_admin")
-                      }}
-                    >
-                      {t("Clinical Administrator")}
-                    </MenuItem>
-                    <MenuItem
-                      divider
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "user_admin")
-                      }}
-                    >
-                      {t("User Administrator")}
-                    </MenuItem> */}
                     <MenuItem
                       onClick={(event) => {
                         setTryitMenu(undefined)
@@ -374,7 +368,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     >
                       {t("Clinician")}
                     </MenuItem>
-
                     <MenuItem
                       onClick={(event) => {
                         setTryitMenu(undefined)

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react"
-import { Box, Fab, Card, CardHeader, CardActions, Icon, Typography } from "@material-ui/core"
+import React, { useState } from "react"
+import { Box, Fab, Card, CardHeader, CardActions, Icon } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import Credentials from "../Credentials"
 import LAMP from "lamp-core"
@@ -53,83 +53,39 @@ export default function ResearcherRow({
   researchers,
   refreshResearchers,
   updateStore,
-  userType,
-  studies,
+  adminType,
   ...props
 }) {
   const classes = useStyles()
   const [name, setName] = useState(researcher.name)
-  const [type, setType] = useState(researcher.res ?? "")
-  const [study, setStudy] = useState(
-    researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : ""
-  )
-
-  const userTypes = {
-    researcher: "Researcher",
-    user_admin: "User Administrator",
-    clinical_admin: "Clinical Administrator",
-    clinician: "Clinician",
-  }
-
-  const updateType = (type) => {
-    setType(type)
-  }
-
-  useEffect(() => {
-    setStudy(researcher.study ? (studies || []).filter((study) => study.id === researcher.study)[0]?.name : "")
-  }, [studies])
 
   return (
     <Card className={classes.cardMain}>
       <Box display="flex" alignItems="center">
         <Box flexGrow={1} py={1}>
-          <CardHeader
-            className={classes.activityHeader}
-            title={name}
-            subheader={
-              <Box>
-                {userType === "admin" && <Typography variant="overline">{userTypes[type]}</Typography>}
-                {userType !== "admin" && <Typography variant="overline">{study}</Typography>}
-              </Box>
-            }
-          />
+          <CardHeader className={classes.activityHeader} title={name} />
         </Box>
         <Box>
           <CardActions>
-            {userType !== "clinical_admin" && (
+            {adminType !== "practice_lead" && (
               <Box display="flex" flexDirection="row" className={classes.buttoncontainer}>
                 <Credentials user={researcher} />
                 <AddUpdateResearcher
                   researcher={researcher}
                   refreshResearchers={refreshResearchers}
                   setName={setName}
-                  setType={updateType}
                   researchers={researchers}
                   updateStore={updateStore}
-                  authuserType={userType}
-                  studies={studies}
                 />
-                <DeleteResearcher
-                  researcher={researcher}
-                  refreshResearchers={refreshResearchers}
-                  type={userTypes[type]}
-                />
+                <DeleteResearcher researcher={researcher} refreshResearchers={refreshResearchers} />
               </Box>
             )}
-            {userType !== "user_admin" && (
+            {adminType !== "user_admin" && (
               <Fab
                 size="small"
                 classes={{ root: classes.btnWhite }}
                 onClick={() => {
-                  type === "researcher"
-                    ? history.push(`/researcher/${researcher.id}`)
-                    : type === "user_admin"
-                    ? history.push(`/user-admin/${researcher.id}`)
-                    : type === "clinical_admin"
-                    ? history.push(`/clinical-admin/${researcher.id}`)
-                    : type === "clinician"
-                    ? history.push(`/clinician/${researcher.id}`)
-                    : history.push(`/researcher/${researcher.id}`)
+                  history.push(`/researcher/${researcher.id}`)
                 }}
               >
                 <Icon>arrow_forward</Icon>

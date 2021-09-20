@@ -664,12 +664,13 @@
 	"The number diamonds in Jewels game": "ज्वेल्स खेल में हींरो की संख्या", 
 	"This activity will be deleted for all the participants under this study. Are you sure you want to proceed?": "इस अध्ययन के अंतर्गत सभी प्रतिभागियों के लिए यह गतिविधि हटा दी जाएगी। क्या आप सही में आगे बढ़ना चाहते हैं?",
 	"Are you sure you want to delete this sensor" : "क्या आप वाकई में इस सेंसर को हटाना चाहते हैं",
-	"The duration between bubbles.": "बुलबुलो के बीच की अवधि |",
+	"The duration between bubbles.": "बुलबुलो के बीच की अवधि",
 	"Bubble Count": "बुलबुलो की संख्या ", 
 	"Add Item": "आइटम जोडें",
 	"Select the Repeat interval.": "Select the Repeat interval.",
-	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?",
-	"The audio size should not exceed 10 MB.": "ऑडियो का आकार 10 एमबी से अधिक नहीं होना चाहिएl",
+	"This sensor will be deleted for all the participants under this study. Are you sure you want to proceed?": "इस अध्ययन के तहत सभी प्रतिभागियों के लिए यह सेंसर हटा दिया जाएगा। क्या आप सुनिश्चित रूप से आगे बढ़ना चाहते हैं?",
+	"The audio size should not exceed 10 MB.": "ऑडियो का आकार 10 एमबी से अधिक नहीं होना चाहिए",
 	"Select All": "Select All",
-	"Deselect All": "Deselect All"
+	"Deselect All": "Deselect All",
+	"The maximum allowed file size is 25 MB." : "अधिकतम अनुमत फ़ाइल आकार 25 एमबी है"
 }
