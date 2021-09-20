@@ -786,6 +786,7 @@ export default function Prevent({
               activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
           )
           setActivities(activities)
+          setLoading(false)
           getSelectedActivities(participant).then(setSelectedActivities)
         })
       })
@@ -809,7 +810,6 @@ export default function Prevent({
           })
         })
       }
-      setLoading(false)
     })()
   }, [])
 
