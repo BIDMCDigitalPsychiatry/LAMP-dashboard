@@ -28,7 +28,9 @@ import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 import GroupActivity from "./GroupActivity"
-
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -314,7 +316,9 @@ export default function Survey({
                       }}
                     ></Box>
                   </Box>
-                  <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
+                  <Typography className={classes.cardlabel}>
+                    <ReactMarkdown source={t(y.name)} escapeHtml={false} plugins={[gfm, emoji]} />
+                  </Typography>
                 </Card>
               </ButtonBase>
             </Grid>
@@ -361,7 +365,7 @@ export default function Survey({
               <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
             <Typography variant="h2">
-              {t(activity?.name ?? null)}{" "}
+              <ReactMarkdown source={t(activity?.name ?? null)} escapeHtml={false} plugins={[gfm, emoji]} />
               {games.includes(spec) && spec !== null && " (" + spec.replace("lamp.", "") + ")"}
             </Typography>
           </div>
@@ -373,9 +377,15 @@ export default function Survey({
             </Typography>
           )}
           <Typography variant="body2" component="p">
-            {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
-            {spec === "lamp.dbt_diary_card" &&
-              t("Daily log of events and related feelings. Track target behaviors and use of skills.")}
+            <ReactMarkdown
+              source={
+                spec !== "lamp.dbt_diary_card"
+                  ? t(tag[activity?.id]?.description ?? null)
+                  : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
+              }
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+            />
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>
