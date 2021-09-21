@@ -281,7 +281,7 @@ export default function TipsHeader({
       if (study) {
         setSelectedCategory(defaultSelectedCategory)
         //let activityData = await LAMP.Activity.allByStudy(studyId)
-        let activityData = await LAMP.Activity.allByStudy(study)
+        let activityData = await LAMP.Activity.allByStudy(study, null, true)
         let tipsCategoryData = activityData.filter((activity) => activity.spec === "lamp.tips")
         setCategoryArray(tipsCategoryData)
       }

@@ -45,7 +45,7 @@
     "javascript-time-ago": "^2.0.4",
     "jsonata": "^1.8.4",
     "jspdf": "^2.3.1",
-    "lamp-core": "^1.0.8",
+    "lamp-core": "github:BIDMCDigitalPsychiatry/LAMP-js#master",
     "material-icons": "^0.5.4",
     "material-ui": "^0.20.2",
     "monaco-editor": "^0.26.1",
