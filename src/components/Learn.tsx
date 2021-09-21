@@ -248,7 +248,6 @@ export default function Learn({
           name: a.name,
           icon: a.icon,
           spec: "lamp.tips",
-          settings: a.settings,
         }
         setLoading(false)
         return r
@@ -262,6 +261,9 @@ export default function Learn({
     setIcon(activitiesArray[type].icon)
     Object.keys(activitiesArray[type])?.forEach((key) => {
       setDetails(activitiesArray[type][key])
+    })
+    LAMP.Activity.view(activitiesArray[type].id).then((data) => {
+      setSpec(data)
     })
   }
 
@@ -284,7 +286,6 @@ export default function Learn({
               onClick={() => {
                 setData(key)
                 setOpen(true)
-                setSpec(activitiesArray[key])
               }}
             >
               <ButtonBase focusRipple className={classes.fullwidthBtn}>

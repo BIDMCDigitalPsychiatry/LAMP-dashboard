@@ -278,6 +278,19 @@ export default function Survey({
   // const month = date.getMonth() + 1
   // const day = date.getDate()
   // const formattedDate = year + "-" + month + "-" + day
+  const getActivity = (y: any) => {
+    LAMP.Activity.view(y.id).then((data) => {
+      setSpec(y.spec)
+      setActivity(data)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : games.includes(y.spec)
+        ? setQuestionCount(0)
+        : setQuestionCount(data.settings?.length ?? 0)
+      setVisibleActivities([data])
+      handleClickOpen(y.name)
+    })
+  }
 
   return (
     <Container className={classes.thumbContainer}>
@@ -291,15 +304,7 @@ export default function Survey({
               md={3}
               lg={3}
               onClick={() => {
-                setSpec(y.spec)
-                setActivity(y)
-                y.spec === "lamp.dbt_diary_card"
-                  ? setQuestionCount(6)
-                  : games.includes(y.spec)
-                  ? setQuestionCount(0)
-                  : setQuestionCount(y.settings?.length ?? 0)
-                setVisibleActivities([y])
-                handleClickOpen(y.name)
+                getActivity(y)
               }}
               className={classes.thumbMain}
             >
