@@ -426,6 +426,7 @@ export const CredentialManager: React.FunctionComponent<{
 
   const _deleteCredential = async (credential) => {
     try {
+      id = !!type ? null : id
       if (!!((await LAMP.Credential.delete(id, credential.access_key)) as any).error)
         return enqueueSnackbar(t("Could not delete."), { variant: "error" })
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
@@ -435,7 +436,10 @@ export const CredentialManager: React.FunctionComponent<{
     } catch (err) {
       enqueueSnackbar(t("Credential management failed."), { variant: "error" })
     }
-    LAMP.Credential.list(id).then(setAllCreds)
+    LAMP.Credential.list(id).then((cred) => {
+      cred = cred.filter((c) => c.hasOwnProperty("origin"))
+      setAllCreds(cred)
+    })
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : [])
     )

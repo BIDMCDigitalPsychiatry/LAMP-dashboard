@@ -173,6 +173,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   useEffect(() => {
     if (mode === "clinician") setCurrentTab(0)
   }, [mode])
+
   useEffect(() => {
     if (!!newStudy) getAllStudies()
   }, [newStudy])
