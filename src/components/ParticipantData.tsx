@@ -35,7 +35,7 @@ export const strategies = {
 }
 
 async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id)
+  let original = await LAMP.Activity.allByParticipant(participant.id, null, true)
   return [...original]
 }
 
