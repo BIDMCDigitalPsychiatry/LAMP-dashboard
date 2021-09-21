@@ -297,7 +297,7 @@ export default function Survey({
                   ? setQuestionCount(6)
                   : games.includes(y.spec)
                   ? setQuestionCount(0)
-                  : setQuestionCount(y.settings.length)
+                  : setQuestionCount(y.settings?.length ?? 0)
                 setVisibleActivities([y])
                 handleClickOpen(y.name)
               }}
