@@ -217,11 +217,14 @@ export default function Manage({ participant, activities, ...props }) {
     }
   }, [])
 
-  const handleClickOpen = (type: string) => {
-    setDialogueType(type)
-    let classT = type === "lamp.scratch_image" ? classnames(classes.header, classes.scratch) : classes.header
+  const handleClickOpen = (y: any) => {
+    setDialogueType(y.spec)
+    let classT = y.spec === "lamp.scratch_image" ? classnames(classes.header, classes.scratch) : classes.header
     setClassType(classT)
-    setOpen(true)
+    LAMP.Activity.view(y.id).then((data) => {
+      setActivity(data)
+      setOpen(true)
+    })
   }
 
   const handleClose = () => {
@@ -245,8 +248,7 @@ export default function Manage({ participant, activities, ...props }) {
               lg={3}
               onClick={() => {
                 setSpec(activity.spec)
-                setActivity(activity)
-                handleClickOpen(activity.spec)
+                handleClickOpen(activity)
               }}
               className={classes.thumbMain}
             >
