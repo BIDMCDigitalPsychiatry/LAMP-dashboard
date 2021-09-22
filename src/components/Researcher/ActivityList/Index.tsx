@@ -159,9 +159,9 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   return (
     <React.Fragment>
-      {/*<Backdrop className={classes.backdrop} open={loading || activities === null}>
+      <Backdrop className={classes.backdrop} open={loading || activities === null}>
         <CircularProgress color="inherit" />
-  </Backdrop>*/}
+      </Backdrop>
       <Header
         studies={studiesData}
         researcher={researcher}

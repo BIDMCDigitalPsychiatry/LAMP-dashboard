@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Box, Icon, IconButton, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
 import EditUserField from "./EditUserField"
 import LAMP from "lamp-core"
+import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -23,6 +24,14 @@ export default function ParticipantName({ participant, updateParticipant, openSe
   useEffect(() => {
     setAliasName(participant.name ?? participant.id ?? "")
     setName(participant.name ?? participant.id ?? "")
+    if (!participant.name) {
+      setTimeout(() => {
+        Service.getDataByKey("participants", [participant.id], "id").then((data) => {
+          setAliasName(data[0]?.name ?? participant.id ?? "")
+          setName(data[0]?.name ?? participant.id ?? "")
+        })
+      }, 2000)
+    }
   }, [participant])
 
   useEffect(() => {
