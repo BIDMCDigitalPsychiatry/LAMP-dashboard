@@ -137,9 +137,9 @@ export default function SensorsList({
 
   return (
     <React.Fragment>
-      {/*<Backdrop className={classes.backdrop} open={loading || sensors === null}>
+      <Backdrop className={classes.backdrop} open={loading || sensors === null}>
         <CircularProgress color="inherit" />
-  </Backdrop>*/}
+      </Backdrop>
       <Header
         studies={studies}
         researcher={researcher}
