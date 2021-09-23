@@ -75,6 +75,7 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
+
   useEffect(() => {
     if (selectedStudies.length > 0) searchFilterSensors()
   }, [studies])

@@ -84,6 +84,7 @@ export const saveDataToCache = (authString, id) => {
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
         if (!!result.studies) {
+          let flag = 0
           saveStudiesAndParticipants(result, id)
           Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
           result.studies.map((study) => {
@@ -97,6 +98,15 @@ export const saveDataToCache = (authString, id) => {
                 saveSettings(settings, "name")
               })
             }
+            if (flag === 0) {
+              fetchResult(authString, id, "activity", "researcher").then((activities) => {
+                saveStudyData(activities, "activities")
+                fetchResult(authString, id, "sensor", "researcher").then((sensors) => {
+                  saveStudyData(sensors, "sensors")
+                })
+              })
+              flag = 1
+            }
             fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
               saveSettings(sensors, "accelerometer")
               saveSettings(sensors, "analytics")
@@ -104,12 +114,6 @@ export const saveDataToCache = (authString, id) => {
               fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
                 saveSettings(events, "active")
               })
-            })
-          })
-          fetchResult(authString, id, "activity", "researcher").then((result) => {
-            saveStudyData(result, "activities")
-            fetchResult(authString, id, "sensor", "researcher").then((result) => {
-              saveStudyData(result, "sensors")
             })
           })
         }
