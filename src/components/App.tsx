@@ -63,9 +63,7 @@ function PageTitle({ children, ...props }) {
   })
   return <React.Fragment />
 }
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
+
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
 
@@ -216,12 +214,6 @@ function AppRouter({ ...props }) {
           ),
         }
       )
-    }
-    if (!!state.identity && state.authType === "participant") {
-      // setState((state) => ({
-      //   ...state,
-      //   messageCount:messages(state.identity)
-      // }))
     }
   }, [state])
 

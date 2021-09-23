@@ -182,7 +182,6 @@ export default function ParticipantList({
         setLoading(true)
         selectedData.map((study) => {
           Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
-            console.log(participantData)
             if ((participantData || []).length > 0) {
               if (!!searchTxt && searchTxt.trim().length > 0) {
                 result = result.concat(participantData)
