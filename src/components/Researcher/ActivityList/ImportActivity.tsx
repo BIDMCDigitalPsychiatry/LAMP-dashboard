@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ImportActivity({ studies, setActivities, activitiesList, onClose, setUpdateCount, ...props }) {
+export default function ImportActivity({ studies, setActivities, activities, onClose, setUpdateCount, ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -224,7 +224,7 @@ export default function ImportActivity({ studies, setActivities, activitiesList,
     }
 
     // checking and updating duplicate activities under same study
-    checkDuplicateUpdateActivity(_importFile, activitiesList, selectedStudy)
+    checkDuplicateUpdateActivity(_importFile, activities, selectedStudy)
 
     // Surveys only.
     for (let x of _importFile.filter((x) => ["lamp.survey"].includes(x.spec))) {
@@ -315,7 +315,7 @@ export default function ImportActivity({ studies, setActivities, activitiesList,
     setDuplicateExists(false)
     const objArray = obj
     objArray.map((eachData) => {
-      const nameExists = activitiesList.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
+      const nameExists = activities.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
       if (nameExists) {
         setDuplicateExists(true)
       }
@@ -351,7 +351,7 @@ export default function ImportActivity({ studies, setActivities, activitiesList,
         Array.isArray(obj) &&
         obj.filter((x) => typeof x === "object" && !!x.name && !!x.settings && !!x.schedule).length > 0
       ) {
-        checkDuplicateActivity(obj, activitiesList, inputRef.current.className)
+        checkDuplicateActivity(obj, activities, inputRef.current.className)
         setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
       } else {

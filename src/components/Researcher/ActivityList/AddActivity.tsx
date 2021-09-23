@@ -266,9 +266,8 @@ export default function AddActivity({
           {!!showActivityImport && (
             <ImportActivity
               studies={studies}
-              activitieas={activities}
+              activities={activities}
               setActivities={setActivities}
-              activitiesList={activities}
               onClose={() => {
                 setShowActivityImport(false)
                 setCreate(false)
