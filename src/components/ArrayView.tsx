@@ -2,6 +2,10 @@ import React from "react"
 import { Table, TableBody, TableHead, TableCell, TableRow } from "@material-ui/core"
 import { humanize } from "./Utils"
 
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
+
 export default function ArrayView({
   value,
   hiddenKeys,
@@ -37,7 +41,9 @@ export default function ArrayView({
                   ) : !!row[key] && typeof row[key] === "object" ? (
                     <ArrayView value={[row[key]]} />
                   ) : (
-                    <TableCell key={row[key]}>{row[key]}</TableCell>
+                    <TableCell key={row[key]}>
+                      <ReactMarkdown source={row[key]} escapeHtml={false} plugins={[gfm, emoji]} />
+                    </TableCell>
                   )
                 )}
               </TableRow>

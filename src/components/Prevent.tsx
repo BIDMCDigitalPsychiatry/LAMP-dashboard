@@ -48,7 +48,9 @@ import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
 import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import { ReactComponent as PreventRecording } from "../icons/PreventRecording.svg"
-
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
 import es from "javascript-time-ago/locale/es"
@@ -987,8 +989,11 @@ export default function Prevent({
                     <ButtonBase focusRipple className={classes.fullwidthBtn}>
                       <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
                         <Typography className={classes.preventlabelFull}>
-                          {t(activity.name)}
-                          <Box component="span">({activityCounts[activity.name]})</Box>
+                          <ReactMarkdown
+                            source={`${t(activity.name)} (${activityCounts[activity.name]})`}
+                            escapeHtml={false}
+                            plugins={[gfm, emoji]}
+                          />
                         </Typography>
                         <Box className={classes.maxw300}>
                           <VegaLite

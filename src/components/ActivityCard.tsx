@@ -6,6 +6,9 @@ import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 import { useTranslation } from "react-i18next"
 import { strategies } from "./Prevent"
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
 
 export default function ActivityCard({
   activity,
@@ -45,9 +48,11 @@ export default function ActivityCard({
         )}
         <Tooltip title={Boolean(visibleSlice) ? activity.name : t(`Activity Type`)}>
           <Typography variant="h6" align="center" style={{ marginTop: 6, flexGrow: 1 }}>
-            {!Boolean(visibleSlice)
-              ? t(activity.name)
-              : visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))}
+            {!Boolean(visibleSlice) ? (
+              <ReactMarkdown source={t(activity.name)} escapeHtml={false} plugins={[gfm, emoji]} />
+            ) : (
+              visibleSlice.x.toLocaleString("en-US", Date.formatStyle("medium"))
+            )}
           </Typography>
         </Tooltip>
         <Box>
