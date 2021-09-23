@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Box, Icon, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { useSnackbar } from "notistack"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
@@ -45,15 +46,8 @@ export default function StudiesList({
   searchData,
   newAdddeStudy,
   ...props
-}: {
-  title: string
-  researcher: any
-  studies: any
-  upatedDataStudy?: any
-  deletedDataStudy?: any
-  searchData?: any
-  newAdddeStudy?: any
 }) {
+  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
   const [search, setSearch] = useState(null)
@@ -62,7 +56,7 @@ export default function StudiesList({
   const [newStudy, setNewStudy] = useState(null)
 
   useEffect(() => {
-    refreshStudies()
+    getAllStudies()
     newAdddeStudy(newStudy)
   }, [newStudy])
 
@@ -70,10 +64,9 @@ export default function StudiesList({
     setAllStudies(studies)
   }, [studies])
 
-  const refreshStudies = () => {
-    Service.getAll("studies").then((data) => {
-      setAllStudies(data || [])
-    })
+  const getAllStudies = async () => {
+    let studies = await Service.getAll("studies")
+    setAllStudies(studies)
   }
 
   const searchFilterStudies = async () => {
@@ -82,7 +75,7 @@ export default function StudiesList({
       let newStudies = studiesList.filter((i) => i.name?.toLowerCase()?.includes(search?.toLowerCase()))
       setAllStudies(newStudies)
     } else {
-      refreshStudies()
+      getAllStudies()
     }
   }
 
@@ -96,7 +89,6 @@ export default function StudiesList({
 
   const handleDeletedStudy = (data) => {
     deletedDataStudy(data)
-    refreshStudies()
     searchData(search)
   }
 
@@ -125,10 +117,10 @@ export default function StudiesList({
                       study={study}
                       upatedDataStudy={handleUpdatedStudyObject}
                       allStudies={allStudies}
-                      researcherId={researcher?.id ?? ""}
+                      researcherId={researcher.id}
                     />
                   </Box>
-                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher?.id ?? ""} />
+                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher.id} />
                 </Box>
               </Grid>
             ))

@@ -105,8 +105,8 @@ export default function AddButton({
   setUpdateCount,
   setParticipants,
   setSelectedStudies,
-  userType,
   setData,
+  mode,
   ...props
 }) {
   const [addUser, setAddUser] = useState(false)
@@ -159,38 +159,38 @@ export default function AddButton({
         }}
       >
         <React.Fragment>
+          {mode === "researcher" && (
+            <MenuItem
+              onClick={() => {
+                setPopover(null)
+                setAddUser(true)
+              }}
+            >
+              <Typography variant="h6">{t("Add a patient")}</Typography>
+              <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
+            </MenuItem>
+          )}
+          {mode === "researcher" && (
+            <MenuItem
+              onClick={() => {
+                setPopover(null)
+                setAddStudy(true)
+              }}
+            >
+              <Typography variant="h6">{t("Add a new study")}</Typography>
+              <Typography variant="body2">{t("Create a new study.")}</Typography>
+            </MenuItem>
+          )}
           <MenuItem
             onClick={() => {
               setPopover(null)
-              setAddUser(true)
+              setAddStudy(false)
+              setAddParticipantStudy(true)
             }}
           >
-            <Typography variant="h6">{t("Add a patient")}</Typography>
-            <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
+            <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
+            <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
           </MenuItem>
-          {userType === "researcher" && (
-            <Box>
-              <MenuItem
-                onClick={() => {
-                  setPopover(null)
-                  setAddStudy(true)
-                }}
-              >
-                <Typography variant="h6">{t("Add a new study")}</Typography>
-                <Typography variant="body2">{t("Create a new study.")}</Typography>
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  setPopover(null)
-                  setAddStudy(false)
-                  setAddParticipantStudy(true)
-                }}
-              >
-                <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
-                <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
-              </MenuItem>
-            </Box>
-          )}
         </React.Fragment>
       </Popover>
       <StudyCreator
@@ -209,7 +209,6 @@ export default function AddButton({
         handleNewStudy={handleNewStudyData}
         setParticipants={setParticipants}
         closePopUp={handleClosePopUp}
-        userType={userType}
       />
       <PatientStudyCreator
         studies={studies}

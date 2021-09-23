@@ -365,7 +365,7 @@ export default function ImportActivity({ studies, setActivities, activitiesList,
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDrop,
     accept: "application/json,.json",
-    maxSize: 15 * 1024 * 1024 /* 5MB */,
+    maxSize: 25 * 1024 * 1024 /* 5MB */,
   })
 
   return (
@@ -414,7 +414,7 @@ export default function ImportActivity({ studies, setActivities, activitiesList,
       >
         <input {...getInputProps()} className={selectedStudy} ref={inputRef} disabled={selectedStudy ? false : true} />
         <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
-        <Typography className={classes.errorMsg}>The maximum allowed file size is 15 MB.</Typography>
+        <Typography className={classes.errorMsg}>{t("The maximum allowed file size is 25 MB.")}</Typography>
       </Box>
 
       <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>

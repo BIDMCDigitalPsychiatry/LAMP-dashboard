@@ -28,7 +28,9 @@ import { DatePicker } from "@material-ui/pickers"
 import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
 import GroupActivity from "./GroupActivity"
-
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -276,6 +278,19 @@ export default function Survey({
   // const month = date.getMonth() + 1
   // const day = date.getDate()
   // const formattedDate = year + "-" + month + "-" + day
+  const getActivity = (y: any) => {
+    LAMP.Activity.view(y.id).then((data) => {
+      setSpec(y.spec)
+      setActivity(data)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : games.includes(y.spec)
+        ? setQuestionCount(0)
+        : setQuestionCount(data.settings?.length ?? 0)
+      setVisibleActivities([data])
+      handleClickOpen(y.name)
+    })
+  }
 
   return (
     <Container className={classes.thumbContainer}>
@@ -289,15 +304,7 @@ export default function Survey({
               md={3}
               lg={3}
               onClick={() => {
-                setSpec(y.spec)
-                setActivity(y)
-                y.spec === "lamp.dbt_diary_card"
-                  ? setQuestionCount(6)
-                  : games.includes(y.spec)
-                  ? setQuestionCount(0)
-                  : setQuestionCount(y.settings.length)
-                setVisibleActivities([y])
-                handleClickOpen(y.name)
+                getActivity(y)
               }}
               className={classes.thumbMain}
             >
@@ -314,7 +321,9 @@ export default function Survey({
                       }}
                     ></Box>
                   </Box>
-                  <Typography className={classes.cardlabel}>{t(y.name)}</Typography>
+                  <Typography className={classes.cardlabel}>
+                    <ReactMarkdown source={t(y.name)} escapeHtml={false} plugins={[gfm, emoji]} />
+                  </Typography>
                 </Card>
               </ButtonBase>
             </Grid>
@@ -361,7 +370,7 @@ export default function Survey({
               <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
             <Typography variant="h2">
-              {t(activity?.name ?? null)}{" "}
+              <ReactMarkdown source={t(activity?.name ?? null)} escapeHtml={false} plugins={[gfm, emoji]} />
               {games.includes(spec) && spec !== null && " (" + spec.replace("lamp.", "") + ")"}
             </Typography>
           </div>
@@ -373,9 +382,15 @@ export default function Survey({
             </Typography>
           )}
           <Typography variant="body2" component="p">
-            {spec !== "lamp.dbt_diary_card" && t(tag[activity?.id]?.description ?? null)}
-            {spec === "lamp.dbt_diary_card" &&
-              t("Daily log of events and related feelings. Track target behaviors and use of skills.")}
+            <ReactMarkdown
+              source={
+                spec !== "lamp.dbt_diary_card"
+                  ? t(tag[activity?.id]?.description ?? null)
+                  : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
+              }
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+            />
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (
             <Box mt={5}>

@@ -1,12 +1,11 @@
 import React, { useState } from "react"
-import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
+import { Box, Typography, makeStyles, Theme, createStyles } from "@material-ui/core"
 import StudyFilter from "../ParticipantList/StudyFilter"
 import DeleteParticipant from "./DeleteParticipant"
 import AddButton from "./AddButton"
 import StudyFilterList from "../ParticipantList/StudyFilterList"
 import { useTranslation } from "react-i18next"
 import SearchBox from "../../SearchBox"
-import AddUser from "./AddUser"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,38 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginLeft: "-50vw",
       marginRight: "-50vw",
     },
-    btnBlue: {
-      background: "#7599FF",
-      borderRadius: "40px",
-      minWidth: 100,
-      boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)",
-      lineHeight: "38px",
-      cursor: "pointer",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "#fff",
-      "& svg": { marginRight: 8 },
-      "&:hover": { background: "#5680f9" },
-      [theme.breakpoints.up("md")]: {
-        position: "absolute",
-      },
-      [theme.breakpoints.down("sm")]: {
-        minWidth: "auto",
-      },
-    },
     optionsSub: { width: 1030, maxWidth: "80%", margin: "0 auto", padding: "10px 0" },
-    popexpand: {
-      backgroundColor: "#fff",
-      color: "#618EF7",
-      zIndex: 11111,
-      "& path": { fill: "#618EF7" },
-      "&:hover": { backgroundColor: "#f3f3f3" },
-    },
-    addText: {
-      [theme.breakpoints.down("sm")]: {
-        display: "none",
-      },
-    },
   })
 )
 
@@ -71,8 +39,8 @@ export default function Header({
   setSelectedStudies,
   selectedStudies,
   setParticipants,
-  userType,
   setData,
+  mode,
   ...props
 }) {
   const classes = useStyles()
@@ -90,11 +58,9 @@ export default function Header({
         <Box flexGrow={1} pt={1}>
           <Typography variant="h5">{t("Users")}</Typography>
         </Box>
-        {userType === "researcher" && (
-          <Box>
-            <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
-          </Box>
-        )}
+        <Box>
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
+        </Box>
         <SearchBox searchData={searchData} />
         <Box>
           <AddButton
@@ -103,8 +69,8 @@ export default function Header({
             setUpdateCount={setUpdateCount}
             setParticipants={setParticipants}
             setSelectedStudies={setSelectedStudies}
-            userType={userType}
             setData={setData}
+            mode={mode}
           />
         </Box>
       </Box>

@@ -230,7 +230,7 @@ export default function Participant({
 
   useEffect(() => {
     setLoading(true)
-    LAMP.Activity.allByParticipant(participant.id).then((activities) => {
+    LAMP.Activity.allByParticipant(participant.id, null, true).then((activities) => {
       setActivities(activities)
       const tabName = getTabName(tab)
       props.activeTab(tabName)

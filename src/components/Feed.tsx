@@ -758,6 +758,13 @@ export default function Feed({
     setLaunchedActivity(undefined)
   }
 
+  const getActivity = (y: any) => {
+    LAMP.Activity.view(y).then((data) => {
+      data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
+      data.spec === "lamp.survey" ? showFeedDetails(data.spec) : showFeedDetails("game")
+    })
+  }
+
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
@@ -813,8 +820,7 @@ export default function Feed({
                           setActivity(feed.activityData)
                           if (feed.type == "lamp.survey") {
                             setSurveyName(feed.title)
-                            setVisibleActivities([feed.activityData])
-                            showFeedDetails(feed.type)
+                            getActivity(feed.activityData.id)
                           }
                           if (
                             games.includes(feed.type) ||
@@ -826,8 +832,6 @@ export default function Feed({
                             feed.type === "lamp.tips"
                           ) {
                             setActivityName(feed.title)
-                            setVisibleActivities(feed.activityData)
-                            showFeedDetails("game")
                           } else {
                             setLaunchedActivity(feed.type)
                           }

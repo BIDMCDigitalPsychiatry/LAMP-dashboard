@@ -33,6 +33,7 @@ import { ResponsiveMargin } from "./Utils"
 import ResponsiveDialog from "./ResponsiveDialog"
 import Messages from "./Messages"
 import LAMP from "lamp-core"
+import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -167,6 +168,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       zIndex: 1,
       minHeight: 50,
+      justifyContent: "space-between",
       "& $backbtn": { color: "#fff" },
     },
     logResearcherBorder: { paddingTop: 46, top: 50, height: "calc(100% - 50px)" },
@@ -189,6 +191,7 @@ export default function NavigationLayout({
   onLogout,
   activeTab,
   sameLineTitle,
+  changeResearcherType,
   ...props
 }: {
   title?: string
@@ -199,6 +202,7 @@ export default function NavigationLayout({
   onLogout?: any
   activeTab?: string
   sameLineTitle?: boolean
+  changeResearcherType?: Function
   children?: any
 }) {
   const [showCustomizeMenu, setShowCustomizeMenu] = useState<Element>()
@@ -212,7 +216,7 @@ export default function NavigationLayout({
   const classes = useStyles()
   const { t } = useTranslation()
   //sameLineTitle
-  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher", "Clinicians", "Studies"]
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
 
@@ -311,10 +315,7 @@ export default function NavigationLayout({
                 </Box>
               ) : (
                 <Box>
-                  {((authType === "admin" && title !== "Administrator") ||
-                    (authType === "researcher" &&
-                      title !== "User Administrator" &&
-                      title !== "Clinical Administrator")) && (
+                  {authType === "admin" && title !== "Administrator" && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -352,9 +353,14 @@ export default function NavigationLayout({
                       horizontal: "left",
                     }}
                   >
-                    {authType === "admin" && (
+                    {/* <MenuItem>
+                    <Typography variant="h6">{t("Manage team")}</Typography>
+                    <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
+                  </MenuItem> */}
+                    {authType === "admin" && title === "Administrator" && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
+                    {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {t("Logout")}
                     </MenuItem>
@@ -388,6 +394,15 @@ export default function NavigationLayout({
                   </Popover>
                 </Box>
               )}
+              {(authType === "researcher" || authType === "admin") &&
+                title !== "Administrator" &&
+                title !== "User Administrator" &&
+                title !== "Practice Lead" &&
+                !title.startsWith("Patient") && (
+                  <Box>
+                    <ModeToggleButton changeResearcherType={changeResearcherType} />
+                  </Box>
+                )}
             </Toolbar>
           )}
           <Toolbar
@@ -424,7 +439,7 @@ export default function NavigationLayout({
                 )}
               </Container>
             )}
-            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && activeTab !== "Clinicians" && (
+            {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
               <Container className={classes.thumbContainer}>
                 <Typography
                   variant="h5"
@@ -469,6 +484,7 @@ export default function NavigationLayout({
                     onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                     color="default"
                   >
+                    {/* <User /> */}
                     <Icon>account_circle</Icon>
                   </IconButton>
                 </Tooltip>
@@ -541,9 +557,9 @@ export default function NavigationLayout({
               typeof title != "undefined" &&
               title.startsWith("Patient")
                 ? " " + classes.logParticipantBorder
-                : authType === "researcher"
+                : authType === "researcher" || authType === "admin"
                 ? " " + classes.logResearcherBorder
-                : "")
+                : " ")
             }
           >
             {props.children}
@@ -580,7 +596,7 @@ export default function NavigationLayout({
       </Dialog>
       <Dialog open={!!passwordChange} onClose={() => setPasswordChange(false)}>
         <DialogContent style={{ marginBottom: 12 }}>
-          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} />
+          <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
         </DialogContent>
       </Dialog>
 

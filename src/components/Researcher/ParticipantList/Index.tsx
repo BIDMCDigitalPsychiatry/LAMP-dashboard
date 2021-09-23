@@ -125,8 +125,9 @@ export default function ParticipantList({
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
-  userType,
+  getAllStudies,
   setData,
+  mode,
   ...props
 }) {
   const classes = useStyles()
@@ -143,6 +144,13 @@ export default function ParticipantList({
 
   const { t } = useTranslation()
 
+  useInterval(
+    () => {
+      getAllStudies()
+    },
+    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
+    true
+  )
   useEffect(() => {
     setSelected(selectedStudies)
     if (selectedStudies) {
@@ -215,9 +223,9 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading || participants === null}>
+      {/*<Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
-      </Backdrop>
+      </Backdrop>*/}
       <Header
         studies={studiesData}
         researcher={researcher}
@@ -226,8 +234,8 @@ export default function ParticipantList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        userType={userType}
         setData={setData}
+        mode={mode}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
