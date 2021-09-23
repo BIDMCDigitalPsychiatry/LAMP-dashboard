@@ -147,8 +147,8 @@ export default function Root({ updateStore, adminType, ...props }) {
   }
 
   useEffect(() => {
-    if (LAMP.Auth._type !== "admin") return
     Service.deleteDB()
+    if (LAMP.Auth._type !== "admin") return
   }, [])
 
   useEffect(() => {

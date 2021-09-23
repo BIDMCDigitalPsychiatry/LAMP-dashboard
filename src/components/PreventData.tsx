@@ -5,6 +5,9 @@ import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "la
 import Sparkline from "./Sparkline"
 import ActivityCard from "./ActivityCard"
 import { useTranslation } from "react-i18next"
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,7 +67,11 @@ export default function PreventData({
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">
-            {graphType == 0 ? t(activity.name) : t(activity)}: <Box component="span">{/*fluctuating*/}</Box>
+            <ReactMarkdown
+              source={graphType == 0 ? t(activity.name) : t(activity)}
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+            />
           </Typography>
           <Typography variant="h5">{t("Summary")}</Typography>
           <Typography variant="body2">

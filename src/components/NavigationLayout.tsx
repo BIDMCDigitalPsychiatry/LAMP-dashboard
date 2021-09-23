@@ -327,7 +327,6 @@ export default function NavigationLayout({
                       }}
                     >
                       <Icon>arrow_back</Icon>
-                      {console.log(title, authType)}
                     </IconButton>
                   )}
                   <Fab
