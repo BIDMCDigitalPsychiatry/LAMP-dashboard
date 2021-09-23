@@ -297,7 +297,7 @@ export default function NavigationLayout({
 
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
-
+  const roles = ["Administrator", "User Administrator", "Practice Lead"]
   return (
     <Box>
       {!!noToolbar || !!print ? (
@@ -315,7 +315,7 @@ export default function NavigationLayout({
                 </Box>
               ) : (
                 <Box>
-                  {authType === "admin" && title !== "Administrator" && (
+                  {authType === "admin" && !roles.includes(title) && (
                     <IconButton
                       onClick={goBack}
                       color="default"
@@ -327,6 +327,7 @@ export default function NavigationLayout({
                       }}
                     >
                       <Icon>arrow_back</Icon>
+                      {console.log(title, authType)}
                     </IconButton>
                   )}
                   <Fab
