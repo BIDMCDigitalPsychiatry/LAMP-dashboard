@@ -175,9 +175,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           {!!permissions &&
             !!title &&
             roles.map((option) => (
-              <option key={option.value} value={option.value}>
+              <MenuItem key={option.value} value={option.value}>
                 {option.label}
-              </option>
+              </MenuItem>
             ))}
         </TextField>
       )}
