@@ -7,6 +7,8 @@ import ActivityItem from "./ActivityItem"
 import Header from "./Header"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
+import classNames from "classnames"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,12 +74,24 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   const [selectedActivities, setSelectedActivities] = useState<any>([])
   const [loading, setLoading] = useState(false)
   const [paginatedActivities, setPaginatedActivities] = useState([])
-  const [studiesData, setStudiesData] = useState(studies)
   const [selected, setSelected] = useState(selectedStudies)
   const [allActivities, setAllActivities] = useState(null)
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+
+  useEffect(() => {
+    setTimeout(() => {
+      getAllActivities()
+      searchActivities()
+    }, 10000)
+  }, [])
+
+  const getAllActivities = () => {
+    Service.getAll("activities").then((data) => {
+      setAllActivities(data || [])
+    })
+  }
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -89,14 +103,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   }
 
   useEffect(() => {
-    refreshStudies()
-  }, [])
-
-  const refreshStudies = () => {
-    Service.getAll("studies").then((data) => {
-      setStudiesData(data || [])
-    })
-  }
+    if (selectedStudies.length > 0) searchActivities()
+  }, [studies])
 
   useEffect(() => {
     setSelected(selectedStudies)
@@ -107,12 +115,10 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    Service.getAll("activities").then((data) => {
-      setAllActivities(data || [])
-    })
-    if (selectedStudies.length > 0) {
-      const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-      if (selectedStudies.length > 0 && !loading) {
+    getAllActivities()
+    if (selected.length > 0) {
+      const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+      if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)
         selectedData.map((study) => {
@@ -163,7 +169,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
-        studies={studiesData}
+        studies={studies}
         researcher={researcher}
         activities={allActivities}
         selectedActivities={selectedActivities}
@@ -181,7 +187,7 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                   <ActivityItem
                     activity={activity}
                     researcher={researcher}
-                    studies={studiesData}
+                    studies={studies}
                     activities={allActivities}
                     handleSelectionChange={handleChange}
                     selectedActivities={selectedActivities}
