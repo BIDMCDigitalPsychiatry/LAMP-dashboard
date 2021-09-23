@@ -817,10 +817,10 @@ export default function Feed({
                               feed.time <= new Date().getTime()))
                         ) {
                           setIndex(index)
+                          getActivity(feed.activityData.id)
                           setActivity(feed.activityData)
                           if (feed.type == "lamp.survey") {
                             setSurveyName(feed.title)
-                            getActivity(feed.activityData.id)
                           }
                           if (
                             games.includes(feed.type) ||
