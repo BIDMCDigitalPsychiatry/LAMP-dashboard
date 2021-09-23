@@ -672,5 +672,6 @@
 	"The audio size should not exceed 10 MB.": "ऑडियो का आकार 10 एमबी से अधिक नहीं होना चाहिए",
 	"Select All": "Select All",
 	"Deselect All": "Deselect All",
-	"The maximum allowed file size is 25 MB." : "अधिकतम अनुमत फ़ाइल आकार 25 एमबी है"
+	"The maximum allowed file size is 25 MB." : "अधिकतम अनुमत फ़ाइल आकार 25 एमबी है",
+	"The Activities having same name under the selected study will be duplicated into new name.": "The Activities having same name under the selected study will be duplicated into new name."
 }

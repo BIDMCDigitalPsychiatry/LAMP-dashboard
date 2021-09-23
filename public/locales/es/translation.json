@@ -672,5 +672,6 @@
 	"The audio size should not exceed 10 MB.": "El tamaño del audio no debe exceder los 10 MB.",
 	"Select All": "Select All",
 	"Deselect All": "Deselect All",
-	"The maximum allowed file size is 25 MB." : "El tamaño de archivo máximo permitido es de 25 MB."
+	"The maximum allowed file size is 25 MB." : "El tamaño de archivo máximo permitido es de 25 MB.",
+	"The Activities having same name under the selected study will be duplicated into new name.": "The Activities having same name under the selected study will be duplicated into new name."
 }
