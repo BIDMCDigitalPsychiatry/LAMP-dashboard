@@ -53,6 +53,10 @@ function ErrorFallback({ error }) {
         <code>
           mindLAMP Version: `v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`
         </code>
+        <br />
+        <a style={{ fontSize: "16px" }} href="javascript:void(0)" onClick={() => window.location.reload()}>
+          Back to page
+        </a>
       </pre>
     </div>
   )
