@@ -107,10 +107,12 @@ export default function GroupActivity({ participant, activity, ...props }) {
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
-      LAMP.Activity.view(actId).then((activity) => {
-        setCurrentActivity(activity)
-        setLoading(false)
-      })
+      if (!!actId) {
+        LAMP.Activity.view(actId).then((activity) => {
+          setCurrentActivity(activity)
+          setLoading(false)
+        })
+      }
     }
   }, [groupActivities, index])
 
@@ -122,7 +124,9 @@ export default function GroupActivity({ participant, activity, ...props }) {
   }, [currentActivity])
 
   useEffect(() => {
-    setGroupActivities(activity.settings)
+    LAMP.Activity.view(activity.id).then((data) => {
+      setGroupActivities(data.settings)
+    })
   }, [])
 
   const completeActivity = () => {
