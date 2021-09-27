@@ -758,9 +758,14 @@ export default function Feed({
   }
 
   const getActivity = (y: any) => {
+    setLoading(true)
+
     LAMP.Activity.view(y).then((data) => {
       data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
       data.spec === "lamp.survey" || data.spec === "lamp.group" ? showFeedDetails(data.spec) : showFeedDetails("game")
+      setLaunchedActivity("lamp.survey" || data.spec === "lamp.group" ? data.spec : "game")
+
+      setLoading(false)
     })
   }
 
@@ -829,8 +834,6 @@ export default function Feed({
                             feed.type === "lamp.tips"
                           ) {
                             setActivityName(feed.title)
-                          } else {
-                            setLaunchedActivity(feed.type)
                           }
                         }
                       }}

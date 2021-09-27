@@ -42,7 +42,11 @@ export default function ArrayView({
                     <ArrayView value={[row[key]]} />
                   ) : (
                     <TableCell key={row[key]}>
-                      <ReactMarkdown source={row[key]} escapeHtml={false} plugins={[gfm, emoji]} />
+                      {typeof row[key] === "string" ? (
+                        <ReactMarkdown source={row[key]} escapeHtml={false} plugins={[gfm, emoji]} />
+                      ) : (
+                        row[key]
+                      )}
                     </TableCell>
                   )
                 )}
