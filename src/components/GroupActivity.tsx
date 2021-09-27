@@ -104,7 +104,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    if (groupActivities.length > 0 && index <= groupActivities.length - 1) {
+    if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
