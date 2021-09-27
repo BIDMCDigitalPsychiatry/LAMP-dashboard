@@ -36,7 +36,6 @@ import LAMP, {
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
-import { check } from "prettier"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
