@@ -402,7 +402,6 @@ export default function Feed({
   const [activityName, setActivityName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [activity, setActivity] = useState(null)
   const { t } = useTranslation()
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -761,7 +760,7 @@ export default function Feed({
   const getActivity = (y: any) => {
     LAMP.Activity.view(y).then((data) => {
       data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
-      data.spec === "lamp.survey" ? showFeedDetails(data.spec) : showFeedDetails("game")
+      data.spec === "lamp.survey" || data.spec === "lamp.group" ? showFeedDetails(data.spec) : showFeedDetails("game")
     })
   }
 
@@ -818,11 +817,9 @@ export default function Feed({
                         ) {
                           setIndex(index)
                           getActivity(feed.activityData.id)
-                          setActivity(feed.activityData)
                           if (feed.type == "lamp.survey") {
                             setSurveyName(feed.title)
-                          }
-                          if (
+                          } else if (
                             games.includes(feed.type) ||
                             feed.type === "lamp.journal" ||
                             feed.type === "lamp.recording" ||
@@ -919,7 +916,7 @@ export default function Feed({
             ),
             "lamp.group": (
               <GroupActivity
-                activity={activity}
+                activity={visibleActivities}
                 participant={participant}
                 submitSurvey={submitSurvey}
                 onComplete={() => {
