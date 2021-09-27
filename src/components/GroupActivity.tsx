@@ -127,7 +127,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
     LAMP.Activity.view(activity.id).then((data) => {
       setGroupActivities(data.settings)
     })
-  }, [])
+  }, [activity])
 
   const completeActivity = () => {
     let val = index + 1
