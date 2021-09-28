@@ -17,6 +17,7 @@ import {
 import LAMP from "lamp-core"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
+import { getEvents } from "./Participant"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
@@ -66,28 +67,6 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
   },
 }))
-
-async function getEvents(participantId: string, activityId: string) {
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, activityId)
-  let dates = []
-  let steak = 0
-  activityEvents.map((activityEvent, i) => {
-    let date = new Date(activityEvent.timestamp)
-    if (!dates.includes(date.toLocaleDateString())) {
-      dates.push(date.toLocaleDateString())
-    }
-  })
-  let currentDate = new Date()
-  for (let date of dates) {
-    if (date === currentDate.toLocaleDateString()) {
-      steak++
-    } else {
-      break
-    }
-    currentDate.setDate(currentDate.getDate() - 1)
-  }
-  return steak > 0 ? steak : 1
-}
 
 export default function NotificationPage({ participant, activityId, ...props }) {
   const classes = useStyles()

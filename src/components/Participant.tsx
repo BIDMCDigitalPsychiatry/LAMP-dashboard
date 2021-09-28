@@ -34,6 +34,7 @@ import classes from "*.module.css"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import locale_lang from "../locale_map.json"
+import { ShowChart } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -123,8 +124,8 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
   return !!_hidden.error ? [] : (_hidden.data as string[])
 }
 
-async function getEvents(participant: ParticipantObj, activityId: string) {
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant.id, activityId)
+export async function getEvents(participant: any, activityId: string) {
+  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant?.id ?? participant, activityId)
   let dates = []
   let steak = 0
   activityEvents.map((activityEvent, i) => {
@@ -230,19 +231,23 @@ export default function Participant({
 
   useEffect(() => {
     setLoading(true)
-    LAMP.Activity.allByParticipant(participant.id, null, true).then((activities) => {
-      setActivities(activities)
-      const tabName = getTabName(tab)
-      props.activeTab(tabName)
-      let language = !!localStorage.getItem("LAMP_user_" + participant.id)
-        ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-        : getSelectedLanguage()
-        ? getSelectedLanguage()
-        : "en-US"
-      i18n.changeLanguage(language)
-      //  getShowWelcome(participant).then(setOpen)
-      setLoading(false)
-    })
+    console.log(LAMP.Auth._auth)
+
+    LAMP.Activity.allByParticipant(participant.id, null, !(LAMP.Auth._auth.serverAddress === "demo.lamp.digital")).then(
+      (activities) => {
+        setActivities(activities)
+        const tabName = getTabName(tab)
+        props.activeTab(tabName)
+        let language = !!localStorage.getItem("LAMP_user_" + participant.id)
+          ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
+          : getSelectedLanguage()
+          ? getSelectedLanguage()
+          : "en-US"
+        i18n.changeLanguage(language)
+        //  getShowWelcome(participant).then(setOpen)
+        setLoading(false)
+      }
+    )
     getHiddenEvents(participant).then(setHiddenEvents)
     tempHideCareTeam(participant).then(setHideCareTeam)
   }, [])
@@ -289,17 +294,21 @@ export default function Participant({
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        getEvents(participant, visibleActivities[0].id).then((steak) => {
-          setSteak(steak)
-          setOpenComplete(true)
-          setLoading(false)
-        })
+        showSteak(participant, visibleActivities[0].id)
         setVisibleActivities([])
         // If a timestamp was provided to overwrite data, hide the original event too.
         if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
         else hideEvent() // trigger a reload of dependent components anyway
       })
     }
+  }
+
+  const showSteak = (participant, activityId) => {
+    getEvents(participant, activityId).then((steak) => {
+      setSteak(steak)
+      setOpenComplete(true)
+      setLoading(false)
+    })
   }
 
   return (
@@ -311,7 +320,7 @@ export default function Participant({
         <Box>
           <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Learn participant={participant} activities={activities} activeTab={activeTab} />
+              <Learn participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
             </Box>
           </Slide>
           <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
@@ -322,12 +331,13 @@ export default function Participant({
                 visibleActivities={visibleActivities}
                 onComplete={submitSurvey}
                 setVisibleActivities={setVisibleActivities}
+                showSteak={showSteak}
               />
             </Box>
           </Slide>
           <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Manage participant={participant} activities={activities} activeTab={activeTab} />
+              <Manage participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
             </Box>
           </Slide>
           <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>

@@ -205,6 +205,7 @@ export default function Survey({
   visibleActivities,
   setVisibleActivities,
   onComplete,
+  showSteak,
   ...props
 }) {
   const classes = useStyles()
@@ -231,12 +232,14 @@ export default function Survey({
 
   const submitEmbeddedActivity = (response) => {
     if (!!response?.clickBack || spec !== "lamp.recording") {
+      if (!!response?.timestamp) showSteak(participant, activity.id)
       setOpenData(false)
       onComplete(null)
     } else {
       setOpenRecordSuccess(true)
       setTimeout(function () {
         setOpenRecordSuccess(false)
+        showSteak(participant, activity.id)
         setOpenData(false)
         onComplete(null)
       }, 2000)

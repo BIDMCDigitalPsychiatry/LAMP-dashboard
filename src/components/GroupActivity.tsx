@@ -19,7 +19,7 @@ import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-
+import { getEvents } from "./Participant"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -64,30 +64,6 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
   },
 }))
-
-async function getEvents(participantId: string, activityId: string) {
-  let activityEvents = await LAMP.ActivityEvent.allByParticipant(participantId, activityId)
-  let dates = []
-  let steak = 0
-  if (!!activityEvents) {
-    activityEvents.map((activityEvent, i) => {
-      let date = new Date(activityEvent.timestamp)
-      if (!dates.includes(date.toLocaleDateString())) {
-        dates.push(date.toLocaleDateString())
-      }
-    })
-    let currentDate = new Date()
-    for (let date of dates) {
-      if (date === currentDate.toLocaleDateString()) {
-        steak++
-      } else {
-        break
-      }
-      currentDate.setDate(currentDate.getDate() - 1)
-    }
-  }
-  return steak > 0 ? steak : 1
-}
 export default function GroupActivity({ participant, activity, ...props }) {
   const classes = useStyles()
   const [currentActivity, setCurrentActivity] = useState(null)
