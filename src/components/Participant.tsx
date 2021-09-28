@@ -231,8 +231,6 @@ export default function Participant({
 
   useEffect(() => {
     setLoading(true)
-    console.log(LAMP.Auth._auth)
-
     LAMP.Activity.allByParticipant(participant.id, null, !(LAMP.Auth._auth.serverAddress === "demo.lamp.digital")).then(
       (activities) => {
         setActivities(activities)

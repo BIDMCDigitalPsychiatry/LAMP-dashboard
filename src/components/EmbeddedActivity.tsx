@@ -122,7 +122,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           .then((x) => {
             if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
               setSaved(true)
-              activitySpec === "lamp.recording" ? onComplete(data) : onComplete(data)
+              onComplete(data)
             }
           })
       }
