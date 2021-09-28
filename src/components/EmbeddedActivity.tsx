@@ -80,7 +80,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         if (currentActivity !== null && !saved) {
           if (e.data === null) {
             setSaved(true)
-            onComplete()
+            onComplete(null)
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
             delete data["activity"]
@@ -111,9 +111,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
         setSaved(true)
         setCurrentActivity(null)
-        onComplete()
+        onComplete(data)
       } else if (activitySpec === "lamp.tips" && data?.completed) {
-        onComplete()
+        onComplete(data)
       } else {
         LAMP.ActivityEvent.create(participant?.id ?? participant, data)
           .catch((e) => {
@@ -122,7 +122,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           .then((x) => {
             if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
               setSaved(true)
-              activitySpec === "lamp.recording" ? onComplete(data) : onComplete()
+              onComplete(data)
             }
           })
       }

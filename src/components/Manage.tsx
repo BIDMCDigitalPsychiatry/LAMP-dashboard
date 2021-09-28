@@ -180,7 +180,7 @@ async function getImage(activityId: string) {
   )[0]
 }
 
-export default function Manage({ participant, activities, ...props }) {
+export default function Manage({ participant, activities, showSteak, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -343,7 +343,8 @@ export default function Manage({ participant, activities, ...props }) {
                 name={activity?.name ?? ""}
                 activity={activity ?? []}
                 participant={participant}
-                onComplete={() => {
+                onComplete={(response) => {
+                  if (!!response && !!response?.completed) showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)
                 }}
               />

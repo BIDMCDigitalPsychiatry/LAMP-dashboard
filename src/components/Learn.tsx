@@ -196,11 +196,13 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Learn({
   participant,
   activities,
+  showSteak,
   ...props
 }: {
   participant: ParticipantObj
   activities: any
   activeTab: Function
+  showSteak: Function
 }) {
   const classes = useStyles()
   const [details, setDetails] = useState(null)
@@ -360,6 +362,7 @@ export default function Learn({
           activity={spec ?? []}
           participant={participant}
           onComplete={() => {
+            showSteak(participant, spec.id)
             setOpenData(false)
           }}
         />
