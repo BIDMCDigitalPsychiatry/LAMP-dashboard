@@ -389,6 +389,7 @@ export default function Participant({
                 visibleActivities={visibleActivities}
                 onComplete={submitSurvey}
                 setVisibleActivities={setVisibleActivities}
+                showSteak={showSteak}
               />
             </Box>
           </Slide>

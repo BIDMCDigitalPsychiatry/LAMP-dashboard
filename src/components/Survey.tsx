@@ -246,6 +246,14 @@ export default function Survey({
     }
   }
 
+  function LinkRenderer(data: any) {
+    return (
+      <a href={data.href} target="_blank">
+        {data.children}
+      </a>
+    )
+  }
+
   useEffect(() => {
     setLoading(true)
     let gActivities = (activities || []).filter(
@@ -325,7 +333,12 @@ export default function Survey({
                     ></Box>
                   </Box>
                   <Typography className={classes.cardlabel}>
-                    <ReactMarkdown source={t(y.name)} escapeHtml={false} plugins={[gfm, emoji]} />
+                    <ReactMarkdown
+                      source={t(y.name)}
+                      escapeHtml={false}
+                      plugins={[gfm, emoji]}
+                      renderers={{ link: LinkRenderer }}
+                    />
                   </Typography>
                 </Card>
               </ButtonBase>
@@ -373,7 +386,12 @@ export default function Survey({
               <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
             )}
             <Typography variant="h2">
-              <ReactMarkdown source={t(activity?.name ?? null)} escapeHtml={false} plugins={[gfm, emoji]} />
+              <ReactMarkdown
+                source={t(activity?.name ?? null)}
+                escapeHtml={false}
+                plugins={[gfm, emoji]}
+                renderers={{ link: LinkRenderer }}
+              />
               {games.includes(spec) && spec !== null && " (" + spec.replace("lamp.", "") + ")"}
             </Typography>
           </div>
@@ -393,6 +411,7 @@ export default function Survey({
               }
               escapeHtml={false}
               plugins={[gfm, emoji]}
+              renderers={{ link: LinkRenderer }}
             />
           </Typography>
           {/* {spec === "lamp.dbt_diary_card" && (

@@ -381,6 +381,7 @@ export default function Feed({
   activities,
   visibleActivities,
   setVisibleActivities,
+  showSteak,
   ...props
 }) {
   const classes = useStyles()
@@ -909,7 +910,9 @@ export default function Feed({
                 name={activityName}
                 activity={visibleActivities}
                 participant={participant}
-                onComplete={() => {
+                onComplete={(response) => {
+                  if (!!response && (!!response?.completed || !!response.timestamp))
+                    showSteak(participant, visibleActivities.id)
                   completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
