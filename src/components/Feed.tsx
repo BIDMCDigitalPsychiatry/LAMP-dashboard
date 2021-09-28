@@ -759,12 +759,10 @@ export default function Feed({
 
   const getActivity = (y: any) => {
     setLoading(true)
-
     LAMP.Activity.view(y).then((data) => {
       data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
       data.spec === "lamp.survey" || data.spec === "lamp.group" ? showFeedDetails(data.spec) : showFeedDetails("game")
-      setLaunchedActivity("lamp.survey" || data.spec === "lamp.group" ? data.spec : "game")
-
+      setLaunchedActivity(data.spec === "lamp.survey" || data.spec === "lamp.group" ? data.spec : "game")
       setLoading(false)
     })
   }
@@ -821,7 +819,6 @@ export default function Feed({
                               feed.time <= new Date().getTime()))
                         ) {
                           setIndex(index)
-                          getActivity(feed.activityData.id)
                           if (feed.type == "lamp.survey") {
                             setSurveyName(feed.title)
                           } else if (
@@ -835,6 +832,7 @@ export default function Feed({
                           ) {
                             setActivityName(feed.title)
                           }
+                          getActivity(feed.activityData.id)
                         }
                       }}
                     >
