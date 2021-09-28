@@ -344,7 +344,7 @@ export default function Manage({ participant, activities, showSteak, ...props })
                 activity={activity ?? []}
                 participant={participant}
                 onComplete={(response) => {
-                  if (!!response && !!response?.completed) showSteak(participant, activity.id)
+                  if (!!response && (!!response?.completed || !!response.timestamp)) showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)
                 }}
               />
