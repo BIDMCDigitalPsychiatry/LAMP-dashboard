@@ -220,6 +220,7 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       enqueueSnackbar(t("Couldn't import the Activities because some Activities are misconfigured or missing."), {
         variant: "error",
       })
+      setLoading(false)
       return
     }
 
