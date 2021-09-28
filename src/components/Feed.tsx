@@ -811,35 +811,35 @@ export default function Feed({
                       variant="outlined"
                       onClick={() => {
                         console.log("sdfs2", feed)
-                        // if (
-                        //   !feed.completed &&
-                        //   feed.clickable &&
-                        //   ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&
-                        //     feed.time >= new Date().getTime()) ||
-                        //     (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
-                        //       feed.time <= new Date().getTime()))
-                        // ) {
-                        setIndex(index)
-                        getActivity(feed.activityData.id)
-                        setActivity(feed.activityData)
-                        if (feed.type == "lamp.survey") {
-                          setSurveyName(feed.title)
-                        }
-                        console.log("ndnd")
                         if (
-                          games.includes(feed.type) ||
-                          feed.type === "lamp.journal" ||
-                          feed.type === "lamp.recording" ||
-                          feed.type === "lamp.breathe" ||
-                          feed.type === "lamp.dbt_diary_card" ||
-                          feed.type === "lamp.scratch_image" ||
-                          feed.type === "lamp.tips"
+                          !feed.completed &&
+                          feed.clickable &&
+                          ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&
+                            feed.time >= new Date().getTime()) ||
+                            (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
+                              feed.time <= new Date().getTime()))
                         ) {
-                          setActivityName(feed.title)
-                        } else {
-                          setLaunchedActivity(feed.type)
+                          setIndex(index)
+                          getActivity(feed.activityData.id)
+                          setActivity(feed.activityData)
+                          if (feed.type == "lamp.survey") {
+                            setSurveyName(feed.title)
+                          }
+                          console.log("ndnd")
+                          if (
+                            games.includes(feed.type) ||
+                            feed.type === "lamp.journal" ||
+                            feed.type === "lamp.recording" ||
+                            feed.type === "lamp.breathe" ||
+                            feed.type === "lamp.dbt_diary_card" ||
+                            feed.type === "lamp.scratch_image" ||
+                            feed.type === "lamp.tips"
+                          ) {
+                            setActivityName(feed.title)
+                          } else {
+                            setLaunchedActivity(feed.type)
+                          }
                         }
-                        // }
                       }}
                     >
                       <Grid container spacing={0}>
