@@ -365,7 +365,10 @@ export default function SurveyCreator({
         setIsOptionNull(0)
       }
     }
-    if (questions.length === 0 || questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length === 0) {
+    if (
+      questions.length === 0 ||
+      questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length !== questions.length
+    ) {
       return false
     } else if (
       questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
@@ -377,8 +380,13 @@ export default function SurveyCreator({
   }
 
   const checkAndSave = (data, isDuplicate) => {
-    if (questions.length === 0 || questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length === 0) {
-      enqueueSnackbar(t("At least one question required."), { variant: "error" })
+    if (
+      questions.length === 0 ||
+      questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length !== questions.length
+    ) {
+      enqueueSnackbar(t("At least one question required and question title required for all questions."), {
+        variant: "error",
+      })
     } else if (
       questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
       isOptionNull === 1
