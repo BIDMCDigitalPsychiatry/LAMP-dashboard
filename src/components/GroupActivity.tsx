@@ -3,18 +3,15 @@ import React, { useEffect, useState } from "react"
 import {
   makeStyles,
   Dialog,
-  Icon,
   DialogActions,
   DialogContent,
   Button,
   Box,
-  DialogTitle,
-  IconButton,
-  Typography,
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
+import Steak from "./Steak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
@@ -25,39 +22,8 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: 20,
   },
-  ribbonText: {
-    fontSize: "16px",
-    color: "rgba(0, 0, 0, 0.75)",
-    fontWeight: 600,
-    marginBottom: "30px",
-    padding: "0 42px",
-  },
-  niceWork: {
-    "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-  },
-  dialogueStyle: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dialogueCurve: { borderRadius: 10, maxWidth: 400 },
   MuiDialogPaperScrollPaper: {
     maxHeight: "100% !important",
-  },
-  closeButton: {
-    position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-  niceWorkbadge: { position: "relative" },
-  dayNotification: {
-    position: "absolute",
-    top: 0,
-    width: "100%",
-    paddingTop: 50,
-    "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
-    "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -106,6 +72,10 @@ export default function GroupActivity({ participant, activity, ...props }) {
   }, [activity])
 
   const completeActivity = () => {
+    showSteak(participant, currentActivity.id)
+  }
+
+  const iterateActivity = () => {
     let val = index + 1
     setCurrentActivity(null)
     setIndex(val)
@@ -148,17 +118,21 @@ export default function GroupActivity({ participant, activity, ...props }) {
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
       ).then((x) => {
-        getEvents(participant, activityId).then((steak) => {
-          setSteak(steak)
-          setOpenComplete(true)
-        })
-        setTimeout(() => {
-          setOpenComplete(false)
-          completeActivity()
-          setLoading(false)
-        }, 5000)
+        completeActivity()
       })
     }
+  }
+
+  const showSteak = (participant, activityId) => {
+    getEvents(participant, activityId).then((steak) => {
+      setSteak(steak)
+      setOpenComplete(true)
+      setTimeout(() => {
+        setOpenComplete(false)
+        iterateActivity()
+        setLoading(false)
+      }, 5000)
+    })
   }
 
   useEffect(() => {
@@ -234,50 +208,14 @@ export default function GroupActivity({ participant, activity, ...props }) {
           )}
         </Box>
       )}
-      <Dialog
+      <Steak
         open={openComplete}
         onClose={() => {
           setOpenComplete(false)
-          completeActivity()
         }}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
-        }}
-      >
-        <DialogTitle>
-          <IconButton
-            aria-label="close"
-            className={classes.closeButton}
-            onClick={() => {
-              setOpenComplete(false)
-            }}
-          >
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Nice work!")}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("You’re on a streak, keep it going")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Ribbon width="170" height="226" />
-              <Box className={classes.dayNotification}>
-                <Typography variant="h4"> {steak}</Typography>{" "}
-                <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        setOpenComplete={setOpenComplete}
+        steak={steak}
+      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

@@ -5,14 +5,8 @@ import {
   useTheme,
   useMediaQuery,
   Slide,
-  Icon,
   Backdrop,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  IconButton,
-  Typography,
   makeStyles,
   Theme,
   createStyles,
@@ -30,9 +24,9 @@ import Welcome from "./Welcome"
 import Learn from "./Learn"
 import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
-import classes from "*.module.css"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
+import Steak from "./Steak"
+
 import locale_lang from "../locale_map.json"
 import { ShowChart } from "@material-ui/icons"
 
@@ -43,40 +37,8 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
-    ribbonText: {
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: 600,
-      marginBottom: "30px",
-      padding: "0 42px",
-    },
-    niceWork: {
-      paddingBottom: 70,
-      "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-    },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     MuiDialogPaperScrollPaper: {
       maxHeight: "100% !important",
-    },
-    closeButton: {
-      position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    niceWorkbadge: { position: "relative" },
-    dayNotification: {
-      position: "absolute",
-      top: 0,
-      width: "100%",
-      paddingTop: 50,
-      "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
-      "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
     },
   })
 )
@@ -428,41 +390,14 @@ export default function Participant({
           </ResponsiveDialog>
         </Box>
       )}
-      <Dialog
+      <Steak
         open={openComplete}
-        onClose={() => setOpenComplete(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+        onClose={() => {
+          setOpenComplete(false)
         }}
-      >
-        <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Nice work!")}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("You’re on a streak, keep it going")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Ribbon width="170" height="226" />
-              <Box className={classes.dayNotification}>
-                <Typography variant="h4"> {steak}</Typography>{" "}
-                <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        setOpenComplete={setOpenComplete}
+        steak={steak}
+      />
     </React.Fragment>
   )
 }
