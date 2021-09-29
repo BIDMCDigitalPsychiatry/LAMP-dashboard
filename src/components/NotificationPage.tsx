@@ -8,13 +8,12 @@ import {
   Button,
   Box,
   Icon,
-  DialogTitle,
-  IconButton,
   Typography,
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
+import Steak from "./Steak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
@@ -125,17 +124,21 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         .filter((x) => x.temporal_slices.length > 0)
         .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
     ).then((x) => {
-      getEvents(participant, activity.id).then((steak) => {
-        setResponse(true)
-        setSteak(steak)
-        setOpenComplete(true)
-        setLoading(false)
-      })
-      setTimeout(() => {
-        setOpenComplete(false)
-      }, 10000)
+      showSteak(participant, activity.id)
     })
   }
+
+  const showSteak = (participant, activityId) => {
+    getEvents(participant, activityId).then((steak) => {
+      setSteak(steak)
+      setOpenComplete(true)
+      setTimeout(() => {
+        setOpenComplete(false)
+        setResponse(true)
+      }, 8000)
+    })
+  }
+
   return (
     <div style={{ height: "100%" }}>
       {!!response && (
@@ -177,7 +180,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             name={activity?.name}
             activity={activity}
             participant={participant}
-            onComplete={() => setResponse(true)}
+            onComplete={() => showSteak(participant, activity.id)}
           />
         ) : activity?.spec === "lamp.group" ? (
           <GroupActivity
@@ -201,41 +204,16 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             </DialogActions>
           </Dialog>
         ))}
-      <Dialog
+
+      <Steak
         open={openComplete}
-        onClose={() => setOpenComplete(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+        onClose={() => {
+          setOpenComplete(false)
+          setResponse(true)
         }}
-      >
-        <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenComplete(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Nice work!")}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("You’re on a streak, keep it going")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Ribbon width="170" height="226" />
-              <Box className={classes.dayNotification}>
-                <Typography variant="h4"> {steak}</Typography>{" "}
-                <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        setOpenComplete={setOpenComplete}
+        steak={steak}
+      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
