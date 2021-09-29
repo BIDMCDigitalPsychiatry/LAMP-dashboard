@@ -5,6 +5,7 @@ import { humanize } from "./Utils"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
+import { useTranslation } from "react-i18next"
 
 export default function ArrayView({
   value,
@@ -18,6 +19,7 @@ export default function ArrayView({
   hasSpanningRowForIndex?: (index: number) => boolean
   spanningRowForIndex?: (index: number) => any
 }) {
+  const { t } = useTranslation()
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
   return (
     <div style={{ overflowX: "auto" }}>
@@ -43,7 +45,7 @@ export default function ArrayView({
                   ) : (
                     <TableCell key={row[key]}>
                       {typeof row[key] === "string" ? (
-                        <ReactMarkdown source={row[key]} escapeHtml={false} plugins={[gfm, emoji]} />
+                        <ReactMarkdown source={t(row[key])} escapeHtml={false} plugins={[gfm, emoji]} />
                       ) : (
                         row[key]
                       )}
