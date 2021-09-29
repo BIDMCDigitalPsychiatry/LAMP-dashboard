@@ -15,6 +15,7 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
+import Steak from "./Steak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
@@ -106,6 +107,10 @@ export default function GroupActivity({ participant, activity, ...props }) {
   }, [activity])
 
   const completeActivity = () => {
+    showSteak(participant, currentActivity.id)
+  }
+
+  const iterateActivity = () => {
     let val = index + 1
     setCurrentActivity(null)
     setIndex(val)
@@ -148,17 +153,21 @@ export default function GroupActivity({ participant, activity, ...props }) {
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
       ).then((x) => {
-        getEvents(participant, activityId).then((steak) => {
-          setSteak(steak)
-          setOpenComplete(true)
-        })
-        setTimeout(() => {
-          setOpenComplete(false)
-          completeActivity()
-          setLoading(false)
-        }, 5000)
+        completeActivity()
       })
     }
+  }
+
+  const showSteak = (participant, activityId) => {
+    getEvents(participant, activityId).then((steak) => {
+      setSteak(steak)
+      setOpenComplete(true)
+      setTimeout(() => {
+        setOpenComplete(false)
+        iterateActivity()
+        setLoading(false)
+      }, 5000)
+    })
   }
 
   useEffect(() => {
@@ -234,50 +243,14 @@ export default function GroupActivity({ participant, activity, ...props }) {
           )}
         </Box>
       )}
-      <Dialog
+      <Steak
         open={openComplete}
         onClose={() => {
           setOpenComplete(false)
-          completeActivity()
         }}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
-        }}
-      >
-        <DialogTitle>
-          <IconButton
-            aria-label="close"
-            className={classes.closeButton}
-            onClick={() => {
-              setOpenComplete(false)
-            }}
-          >
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Nice work!")}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("You’re on a streak, keep it going")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Ribbon width="170" height="226" />
-              <Box className={classes.dayNotification}>
-                <Typography variant="h4"> {steak}</Typography>{" "}
-                <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        setOpenComplete={setOpenComplete}
+        steak={steak}
+      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
