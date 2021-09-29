@@ -3,14 +3,10 @@ import React, { useEffect, useState } from "react"
 import {
   makeStyles,
   Dialog,
-  Icon,
   DialogActions,
   DialogContent,
   Button,
   Box,
-  DialogTitle,
-  IconButton,
-  Typography,
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
@@ -26,39 +22,8 @@ const useStyles = makeStyles((theme) => ({
     width: "100%",
     marginTop: 20,
   },
-  ribbonText: {
-    fontSize: "16px",
-    color: "rgba(0, 0, 0, 0.75)",
-    fontWeight: 600,
-    marginBottom: "30px",
-    padding: "0 42px",
-  },
-  niceWork: {
-    "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-  },
-  dialogueStyle: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dialogueCurve: { borderRadius: 10, maxWidth: 400 },
   MuiDialogPaperScrollPaper: {
     maxHeight: "100% !important",
-  },
-  closeButton: {
-    position: "absolute",
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-  niceWorkbadge: { position: "relative" },
-  dayNotification: {
-    position: "absolute",
-    top: 0,
-    width: "100%",
-    paddingTop: 50,
-    "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
-    "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
