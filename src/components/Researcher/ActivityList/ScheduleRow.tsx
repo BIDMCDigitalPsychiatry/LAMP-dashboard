@@ -138,7 +138,7 @@ export default function ScheduleRow({
                 {t("No custom times")}
               </Button>
             ) : (
-              <InlineMenu customTimes={data.value} onChange={(x) => setData({ ...data, custom_time: x })} />
+              <InlineMenu customTimes={data.custom_time} onChange={(x) => setData({ ...data, custom_time: x })} />
             )}
           </span>
         )}
