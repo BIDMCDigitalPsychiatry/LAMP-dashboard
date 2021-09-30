@@ -237,6 +237,7 @@ export default function ImportActivity({ studies, setActivities, activities, onC
           tableData: undefined,
         })
         if (!!newItem.data) {
+          allIDs[x.id] = newItem.data
           addActivity(
             {
               ...x,
@@ -260,6 +261,7 @@ export default function ImportActivity({ studies, setActivities, activities, onC
           studyID: selectedStudy,
         })
         if (!!newItem.data) {
+          allIDs[x.id] = newItem.data
           addActivity(
             {
               ...x,
