@@ -1,11 +1,108 @@
 import React from "react"
-import { Typography, Card, Icon, IconButton } from "@material-ui/core"
+import {
+  Box,
+  Typography,
+  Card,
+  CardHeader,
+  CardActions,
+  Icon,
+  IconButton,
+  FormControlLabel,
+  makeStyles,
+  TextField,
+  ClickAwayListener,
+  Tooltip,
+} from "@material-ui/core"
 import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
+import { useDrag, DragPreviewImage } from "react-dnd"
+import SelectionWindow from "./SelectionWindow"
+import LAMP from "lamp-core"
+import { generate_ids } from "./DataPortalShared"
+
+import { saveAs } from "file-saver"
+import jsonexport from "jsonexport"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
   const [expanded, setExpanded] = React.useState(false)
-
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: "TARGETINFO",
+    item: { target: id[id.length - 1], type, name, id_string: id },
+    canDrag: () => {
+      return (
+        !expanded &&
+        !Object.keys(tags_object).includes(id[id.length - 1]) &&
+        id[id.length - 1] !== undefined &&
+        id[id.length - 1] !== null &&
+        name !== "Administrator" &&
+        !queryables_array.includes(id[id.length - 1])
+      )
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }))
+  const [showFilter, toggleShowFilter] = React.useState(false)
+  const [currentFilter, setCurrentFilter] = React.useState("")
+  const filterRef = React.useRef(null)
+  const useStyles = makeStyles((theme) => ({
+    treeCard: {
+      width: `${100 - 2 * (id.length > 2 ? 1 : 0)}%`,
+      marginLeft: `${2 * (id.length > 2 ? 1 : 0)}%`,
+      marginTop: "5px",
+    },
+    cardActions: {
+      display: "flex",
+      flexDirection: "row",
+      flexGrow: 1,
+      float: "right",
+      marginTop: "0px",
+    },
+    treeButton: {
+      background: "#fff",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#7599FF",
+      flex: "auto",
+      margin: "auto",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    treeFilter: {
+      position: "fixed",
+      top: "50vh",
+      left: "30vw",
+      width: "50vw",
+      paddingTop: "5px",
+      height: "60px",
+      background: "white",
+      "&:hover": {
+        backgroundColor: "#eee",
+      },
+      border: "1px solid black",
+      borderRadius: "3px",
+      paddingLeft: "10px",
+      zIndex: 1111,
+    },
+    cardHeader: {
+      display: "flex",
+      flexGrow: 3,
+      flexDirection: "row",
+      marginBottom: "0px",
+      marginRight: "5px",
+      fontSize: "16px",
+      wordBreak: "break-word",
+      height: "100%",
+      "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
+    },
+    downloadFormControl: {
+      width: "100%",
+    },
+  }))
+  const classes = useStyles()
   //let's define our function we'll use to ping the api
   const getData = async (query) => {
     try {
@@ -69,63 +166,186 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     }, [expanded])
   }
 
+  let dateObj = new Date()
+  let month = dateObj.getMonth() + 1 //months from 1-12
+  let day = dateObj.getDate()
+  let year = dateObj.getFullYear()
+  let newdate = month + "_" + day + "_" + year
+  const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id.length - 1]}_Activity_Data_${newdate}.csv`
+  const [downloadName, setDownloadName] = React.useState(defaultDownloadName)
+  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv", delimiter = ",", returnChar = "\n") {
+    //TODO: add selection between one big file and multiple files
+    //TODO: add json vs csv selection
+    console.log(`Downloading data for ${id}`)
+
+    //first, let's generate a complete id list
+    let id_list = await generate_ids(id)
+    console.log(id_list)
+
+    //now, let's pull some data
+    let resultsPulled = await Promise.all(
+      id_list.map(async (id) => {
+        let res = await LAMP.ActivityEvent.allByParticipant(id)
+        return {
+          userID: id,
+          activityEvents: JSON.stringify(res),
+        }
+      })
+    )
+
+    jsonexport(resultsPulled, function (err, csv) {
+      if (err) return console.log(err)
+      const file = new Blob([csv], { type: "text/csv" })
+      name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+    })
+  }
+
+  React.useEffect(() => {
+    if (showFilter && filterRef.current) filterRef.current.focus()
+  }, [showFilter])
+
   return (
-    <Card key={"div" + id[id.length - 1]} style={{ marginTop: "2px" }}>
-      <Typography
+    <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
+      <CardHeader
+        className={classes.cardHeader}
         key={"text" + id[id.length - 1]}
-        style={{
-          scrollBehavior: "smooth",
-          marginTop: `${5 * (id.length - 1 > 0 ? 1 : 0)}px`,
-          marginLeft: `${5 * (id.length - 1)}%`,
-          marginRight: "5px",
-          height: "100%",
-        }}
-      >
-        {`${name ? name : id[id.length - 1]}`}
+        title={`${name ? name : id[id.length - 1]}`}
+      />
+      <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
+        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && (
+          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
+            <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
+              <Icon>search</Icon>
+            </IconButton>
+          </Tooltip>
+        )}
+        {showFilter && (
+          <ClickAwayListener onClickAway={() => toggleShowFilter(!showFilter)}>
+            <TextField
+              className={classes.treeFilter}
+              value={currentFilter}
+              onChange={(e) => {
+                setCurrentFilter(e.target.value)
+              }}
+              placeholder={`Search ${id[id.length - 1]} list`}
+              inputRef={filterRef}
+              InputProps={{
+                disableUnderline: true,
+                endAdornment: (
+                  <React.Fragment>
+                    <IconButton className={classes.treeButton} onClick={() => setCurrentFilter("")}>
+                      <Icon>backspace</Icon>
+                    </IconButton>
+                    <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
+                      <Icon>close</Icon>
+                    </IconButton>
+                  </React.Fragment>
+                ),
+              }}
+            />
+          </ClickAwayListener>
+        )}
+
+        {!Object.keys(tags_object).includes(id[id.length - 1]) && Object.keys(tags_object).includes(id[id.length - 2]) && (
+          <SelectionWindow
+            openButtonText={`Download ${id[id.length - 2]} data`}
+            customButton={
+              <IconButton className={classes.treeButton}>
+                <Icon>get_app</Icon>
+              </IconButton>
+            }
+            displaySubmitButton={true}
+            runOnOpen={() => {
+              setDownloadName(defaultDownloadName)
+            }}
+            handleResult={() => downloadData(id[id.length - 1], downloadName)}
+            closesOnSubmit={false}
+            exposeButton={true}
+            submitText={`Download`}
+            children={
+              <Typography>
+                Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
+                <br />
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  labelPlacement={"top"}
+                  control={
+                    <TextField
+                      value={downloadName}
+                      onChange={(e) => {
+                        setDownloadName(e.target.value)
+                      }}
+                    />
+                  }
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      File Name
+                    </Box>
+                  }
+                />
+              </Typography>
+            }
+          />
+        )}
 
         {isGUIEditor &&
           !Object.keys(tags_object).includes(id[id.length - 1]) &&
           Object.keys(tags_object).includes(id[id.length - 2]) && (
-            <IconButton
-              onClick={() =>
-                onUpdateGUI({
-                  _update: ["target", "type", "name", "id_string"],
-                  content: [id[id.length - 1], type, name, id],
-                })
-              }
-            >
-              <Icon>subdirectory_arrow_right</Icon>
-            </IconButton>
+            <Tooltip title={`Analyze ${id[id.length - 2]}`}>
+              <IconButton
+                className={classes.treeButton}
+                onClick={() =>
+                  onUpdateGUI({
+                    _update: ["target", "type", "name", "id_string"],
+                    content: [id[id.length - 1], type, name, id],
+                  })
+                }
+              >
+                <Icon>arrow_forward</Icon>
+              </IconButton>
+            </Tooltip>
           )}
 
-        <IconButton style={{ textAlign: "right" }} onClick={() => setExpanded(!expanded)}>
+        <IconButton className={classes.treeButton} onClick={() => setExpanded(!expanded)}>
           {queryables_array.includes(id[id.length - 1]) ? (
             !isGUIEditor ? (
-              <Icon>subdirectory_arrow_right</Icon>
+              <Tooltip title={`Load ${id[id.length - 1]} query for ${id[id.length - 2]} into terminal`}>
+                <Icon>arrow_forward</Icon>
+              </Tooltip>
             ) : null
           ) : expanded ? (
-            <Icon>expand_less</Icon>
+            <Tooltip title={"Collapse"}>
+              <Icon>expand_less</Icon>
+            </Tooltip>
           ) : (
-            <Icon>expand_more</Icon>
+            <Tooltip title={"Expand"}>
+              <Icon>expand_more</Icon>
+            </Tooltip>
           )}
         </IconButton>
-      </Typography>
+      </CardActions>
       {/*
 						For each branch in our tree, we output some info and create a new level
 						*/}
       {expanded &&
-        (!!treeDisplay ? treeDisplay : []).map((branch, index) => (
-          <RenderTree
-            key={"tree" + id[id.length - 1] + index}
-            id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
-            name={typeof branch === "string" ? branch : branch.name}
-            type={typeof branch === "string" ? branch : branch.id}
-            token={token}
-            onSetQuery={onSetQuery}
-            onUpdateGUI={onUpdateGUI}
-            isGUIEditor={isGUIEditor}
-          />
-        ))}
+        (!!treeDisplay ? treeDisplay : []).map(
+          (branch, index) =>
+            (!currentFilter ||
+              currentFilter === "" ||
+              branch.id.indexOf(currentFilter) !== -1 ||
+              (typeof branch !== "string" && branch.name.indexOf(currentFilter) !== -1)) && (
+              <RenderTree
+                key={"tree" + id[id.length - 1] + index}
+                id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
+                name={typeof branch === "string" ? branch : branch.name}
+                type={typeof branch === "string" ? branch : branch.id}
+                token={token}
+                onSetQuery={onSetQuery}
+                onUpdateGUI={onUpdateGUI}
+                isGUIEditor={isGUIEditor}
+              />
+            )
+        )}
     </Card>
   )
 }

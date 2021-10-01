@@ -80,21 +80,24 @@ const useStyles = makeStyles((theme: Theme) =>
       paddingRight: 0,
     },
     tableContainerDataPortalWidth: {
-      width: "calc(100% - 100px)",
-      height: "calc(100%)",
-      zIndex: 5000,
-      maxWidth: "100%",
-      maxHeight: "calc(100%)",
-      backgroundColor: "lightgrey",
+      width: "calc(100vw - 100px)",
+      height: "calc(100vh - 50px)",
+      paddingLeft: "0px",
+      paddingRight: "0px",
+      maxWidth: "100vw",
+      maxHeight: "100vh",
       top: "0px",
-      left: "90px",
+      left: "100px",
       overflow: "scroll",
       position: "absolute",
       [theme.breakpoints.down("sm")]: {
         left: "0px",
         width: "100vw",
-        height: "calc(100% - 155px)",
+        height: "calc(100vh - 150px)",
       },
+    },
+    dataPortalPaper: {
+      height: "100%",
     },
     menuOuter: {
       paddingTop: 0,
@@ -238,7 +241,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
         }
       >
         {!!studies && (
-          <ResponsivePaper elevation={0}>
+          <ResponsivePaper className={currentTab === 4 ? classes.dataPortalPaper : null} elevation={0}>
             <Drawer
               anchor={supportsSidebar ? "left" : "bottom"}
               variant="permanent"

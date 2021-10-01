@@ -1,5 +1,6 @@
 import React from "react"
-import { makeStyles } from "@material-ui/core"
+import { createStyles, makeStyles, Theme } from "@material-ui/core"
+import LAMP from "lamp-core"
 
 export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = React.useState(() => {
@@ -71,10 +72,48 @@ export const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export const useStyles3 = makeStyles((theme) => ({
-  icon: {
-    marginRight: theme.spacing(2),
+const focusedQueryBuilderHeight = "75%"
+const unfocusedQueryBuilderHeight = "25%"
+const focusedQueryRenderHeight = "75%"
+const unfocusedQueryRenderHeight = "25%"
+
+export const portalHomeStyle = makeStyles((theme) => ({
+  box: {
+    background: "inherit",
+    userSelect: "text",
+    display: "flex",
+    position: "relative",
+    flexDirection: "column",
+    height: "100%",
+    width: "100%",
   },
+  queryWrapperBox: {
+    flexGrow: 1,
+    height: "calc(100% - 45px)",
+    marginTop: 10,
+  },
+  toolbar: {
+    height: "35px",
+    minHeight: "35px",
+  },
+  alphaBadge: {
+    right: -theme.spacing(2),
+    color: "#fff",
+  },
+  icon: {
+    right: -theme.spacing(2),
+  },
+  columnsGrid: {
+    height: "100%",
+    flexWrap: "nowrap",
+    spacing: "1",
+  },
+  treeColumn: {
+    maxHeight: "90vh",
+    flexWrap: "nowrap",
+    overFlowY: "scroll",
+  },
+  queryColumn: { height: "100%", userSelect: "text", flexWrap: "nowrap", maxHeight: "90vh" },
   cardGrid: {
     paddingTop: theme.spacing(8),
     paddingBottom: theme.spacing(8),
@@ -87,8 +126,116 @@ export const useStyles3 = makeStyles((theme) => ({
     bottom: theme.spacing(4),
     right: theme.spacing(4),
   },
+  collapseTree: {
+    background: "#fff",
+    borderRadius: "40px",
+    boxShadow: "none",
+    cursor: "pointer",
+    textTransform: "capitalize",
+    fontSize: "14px",
+    color: "#7599FF",
+    "& svg": { marginRight: 8 },
+    "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+  },
+  builderStyleFocus: {
+    animation: `$myEffect 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    border: "1px solid black",
+    borderRadius: "5px",
+    height: focusedQueryBuilderHeight,
+  },
+  builderStyleUnfocus: {
+    animation: `$myEffectExit 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    border: "1px solid black",
+    borderRadius: "5px",
+    height: unfocusedQueryBuilderHeight,
+  },
+  "@keyframes myEffect": {
+    "0%": {
+      height: unfocusedQueryBuilderHeight,
+    },
+    "100%": {
+      height: focusedQueryBuilderHeight,
+    },
+  },
+  "@keyframes myEffectExit": {
+    "0%": {
+      height: focusedQueryBuilderHeight,
+    },
+    "100%": {
+      height: unfocusedQueryBuilderHeight,
+    },
+  },
+  renderStyleFocus: {
+    animation: `$focusRender 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    background: "white",
+    border: "1px solid black",
+    borderRadius: "5px",
+    height: focusedQueryRenderHeight,
+  },
+  renderStyleUnfocus: {
+    animation: `$unfocusRender 1000ms ${theme.transitions.easing.easeInOut}`,
+    overflowY: "scroll",
+    background: "white",
+    border: "1px solid black",
+    borderRadius: "5px",
+    height: unfocusedQueryRenderHeight,
+  },
+  "@keyframes focusRender": {
+    "0%": {
+      height: unfocusedQueryRenderHeight,
+    },
+    "100%": {
+      height: focusedQueryRenderHeight,
+    },
+  },
+  "@keyframes unfocusRender": {
+    "0%": {
+      height: focusedQueryRenderHeight,
+    },
+    "100%": {
+      height: unfocusedQueryRenderHeight,
+    },
+  },
 }))
 
+export const standaloneStyle = makeStyles((theme: Theme) =>
+  createStyles({
+    standaloneContainer: {
+      height: "100vh",
+    },
+  })
+)
+
+//given a valid researcher, study, or participant id,
+//an array of ids is returned
+export async function generate_ids(id_set) {
+  if (typeof id_set === "string") {
+    let { data: parents } = await LAMP.Type.parent(id_set)
+    //if study exists, return id_set
+    if (parents?.Study) return [id_set]
+    //else if researcher exists
+    //this is a study
+    else if (parents?.Researcher) {
+      let res = await LAMP.Participant.allByStudy(id_set)
+      return res.map((participant) => participant.id)
+    }
+    //if nothing exists, this is a researcher, so we recursively call
+    else {
+      //@ts-ignore
+      let res = await LAMP.Study.allByResearcher(id_set)
+      return await generate_ids(res.map((study) => study.id))
+    }
+  } else if (Array.isArray(id_set)) {
+    const res = await Promise.all(id_set.map((id) => generate_ids(id)))
+    //now, res is an array of arrays. let's combine them
+    return res.reduce((acc, array) => acc.concat(array), [])
+  } else {
+    return [id_set]
+  }
+}
 export const tags_object = {
   Administrator: ["Researcher", "ActivitySpec", "SensorSpec"],
   Researcher: ["Study", "ActivitySpec", "SensorSpec"],

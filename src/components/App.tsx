@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
@@ -516,6 +516,7 @@ function AppRouter({ ...props }) {
             <React.Fragment>
               <PageTitle>Data Portal</PageTitle>
               <DataPortal
+                standalone
                 token={{
                   username: LAMP.Auth._auth.id,
                   password: LAMP.Auth._auth.password,
