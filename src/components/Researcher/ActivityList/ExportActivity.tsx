@@ -50,7 +50,7 @@ export default function ExportActivity({ activities, ...props }) {
           })
           data.push(activity)
         } catch (e) {}
-      } else if (!["lamp.group", "lamp.survey"].includes(x.spec)) {
+      } else if (!["lamp.survey"].includes(x.spec)) {
         try {
           let res = (await LAMP.Type.getAttachment(x.id, "lamp.dashboard.activity_details")) as any
           let activity = spliceCTActivity({
