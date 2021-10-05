@@ -191,7 +191,7 @@ export default function Root({ updateStore, adminType, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={t("Researchers")} />
+                <ListItemText primary={t("Investigators")} />
               </ListItem>
               {adminType === "admin" && (
                 <ListItem

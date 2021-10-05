@@ -133,7 +133,7 @@ export default function Participant({
       case "Manage":
         tabNum = 2
         break
-      case "Prevent":
+      case "Portal":
         tabNum = 3
         break
       case "Feed":
@@ -176,7 +176,7 @@ export default function Participant({
         tabName = "Manage"
         break
       case 3:
-        tabName = "Prevent"
+        tabName = "Portal"
         break
       case 4:
         tabName = "Feed"

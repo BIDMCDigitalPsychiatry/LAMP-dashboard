@@ -48,7 +48,7 @@ export default function Header({ researchers, searchData, refreshResearchers, ad
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
       <Box flexGrow={1}>
-        <Typography variant="h5">{t("Researchers")}</Typography>
+        <Typography variant="h5">{t("Investigators")}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
       {adminType !== "practice_lead" && (

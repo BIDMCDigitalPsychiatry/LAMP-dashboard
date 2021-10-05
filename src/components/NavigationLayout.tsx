@@ -216,7 +216,7 @@ export default function NavigationLayout({
   const classes = useStyles()
   const { t } = useTranslation()
   //sameLineTitle
-  const dashboardMenus = ["Learn", "Manage", "Assess", "Prevent", "Feed", "Researcher"]
+  const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
 
