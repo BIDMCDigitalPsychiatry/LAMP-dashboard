@@ -551,7 +551,7 @@ export default function BottomMenu({ ...props }) {
                   >
                     <Icon>close</Icon>
                   </IconButton>
-                  <Typography variant="h6">{t("Welcome to the Prevent section")}</Typography>
+                  <Typography variant="h6">{t("Welcome to the Portal section")}</Typography>
                   <Typography variant="body1">{t("Track progress and make connections.")}</Typography>
                 </React.Fragment>
               }
@@ -561,7 +561,7 @@ export default function BottomMenu({ ...props }) {
               <BottomNavigationAction
                 showLabel
                 selected={tabVal === 3}
-                label={t("Prevent")}
+                label={t("Portal")}
                 value={3}
                 classes={{
                   root: classes.navigation,
