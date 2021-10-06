@@ -60,7 +60,7 @@ export default function DeleteResearcher({
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
-        confirmationMsg={"Are you sure you want to delete this researcher(s)?."}
+        confirmationMsg={"Are you sure you want to delete this investigator(s)?."}
       />
     </span>
   )
