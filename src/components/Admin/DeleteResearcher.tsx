@@ -37,12 +37,12 @@ export default function DeleteResearcher({
   const confirmAction = async (status) => {
     if (status === "Yes") {
       if (((await LAMP.Researcher.delete(researcher.id)) as any).error === undefined) {
-        enqueueSnackbar(t("Successfully deleted the Researcher."), {
+        enqueueSnackbar(t("Successfully deleted the investigator."), {
           variant: "success",
         })
         refreshResearchers()
       } else {
-        enqueueSnackbar(t("Failed to delete the Researcher."), {
+        enqueueSnackbar(t("Failed to delete the investigator."), {
           variant: "error",
         })
       }
