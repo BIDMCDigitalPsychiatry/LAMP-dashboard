@@ -98,7 +98,7 @@ export default function AddUpdateResearcher({
         : x.name?.toLowerCase() === name?.trim().toLowerCase()
     )
     if (duplicates.length > 0) {
-      enqueueSnackbar("Researcher with same name already exist.", { variant: "error" })
+      enqueueSnackbar("Investigator with same name already exist.", { variant: "error" })
       setResearcherName(!!researcher ? researcher.name : "")
     } else {
       const researcherObj = new Researcher()
@@ -117,14 +117,14 @@ export default function AddUpdateResearcher({
           refreshResearchers()
         }
         enqueueSnackbar(
-          !!researcher ? t("Successfully updated a new researcher.") : t("Successfully created a new researcher."),
+          !!researcher ? t("Successfully updated a new investigator.") : t("Successfully created a new investigator."),
           {
             variant: "success",
           }
         )
         setOpen(false)
       } else
-        enqueueSnackbar(t("Failed to create a new researcher."), {
+        enqueueSnackbar(t("Failed to create a new investigator."), {
           variant: "error",
         })
     }
