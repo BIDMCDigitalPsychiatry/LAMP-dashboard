@@ -98,7 +98,9 @@ export default function AddUpdateResearcher({
         : x.name?.toLowerCase() === name?.trim().toLowerCase()
     )
     if (duplicates.length > 0) {
-      enqueueSnackbar("Investigator with same name already exist.", { variant: "error" })
+      enqueueSnackbar(`${process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers"} with same name already exist.`, {
+        variant: "error",
+      })
       setResearcherName(!!researcher ? researcher.name : "")
     } else {
       const researcherObj = new Researcher()
@@ -117,16 +119,29 @@ export default function AddUpdateResearcher({
           refreshResearchers()
         }
         enqueueSnackbar(
-          !!researcher ? t("Successfully updated a new investigator.") : t("Successfully created a new investigator."),
+          !!researcher
+            ? t(
+                `Successfully updated a new ${(
+                  process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers"
+                ).toLowerCase()}.`
+              )
+            : t(
+                `Successfully created a new ${(
+                  process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers"
+                ).toLowerCase()}.`
+              ),
           {
             variant: "success",
           }
         )
         setOpen(false)
       } else
-        enqueueSnackbar(t("Failed to create a new investigator."), {
-          variant: "error",
-        })
+        enqueueSnackbar(
+          t(`Failed to create a new ${(process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers").toLowerCase()}.`),
+          {
+            variant: "error",
+          }
+        )
     }
   }
 

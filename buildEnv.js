@@ -2,6 +2,7 @@ const fs = require("fs-extra")
 const { exec } = require("child_process")
 const file = ".env"
 const debug = false
+var researcherAlias = process.argv[3] ?? "Researchers"
 
 var isDev = process.argv[2] === "dev"
 
@@ -66,6 +67,7 @@ function writeFile() {
                 `REACT_APP_GIT_NUM=${headCount}`,
                 `REACT_APP_GIT_SHA=${description}`,
                 `REACT_APP_LATEST_LAMP=${latest}`,
+                `REACT_APP_LAMP_RESEARCHER_ALIAS=${researcherAlias}`,
                 isDev ? "BROWSER=none" : "CI=false",
               ].join("\r\n")
             )
