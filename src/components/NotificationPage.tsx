@@ -135,6 +135,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
       setTimeout(() => {
         setOpenComplete(false)
         setResponse(true)
+        setLoading(false)
       }, 8000)
     })
   }
@@ -210,6 +211,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         onClose={() => {
           setOpenComplete(false)
           setResponse(true)
+          setLoading(false)
         }}
         setOpenComplete={setOpenComplete}
         steak={steak}
