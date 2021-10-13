@@ -2,8 +2,6 @@ const fs = require("fs-extra")
 const { exec } = require("child_process")
 const file = ".env"
 const debug = false
-var researcherAlias = process.argv[3] ?? "Researchers"
-
 var isDev = process.argv[2] === "dev"
 
 function execShellCommand(cmd) {
@@ -26,16 +24,26 @@ function prepareDestination() {
   return new Promise((resolve, reject) => {
     fs.pathExists(file).then((exists) => {
       if (exists) {
-        fs.remove(file, (err) => {
-          if (err) {
-            console.error(`error removing existing ${file} file`)
-            reject(err)
-          } else {
-            debug && console.log(`removed existing ${file} file`)
-            resolve(true)
-          }
-        })
+        ;(async() => {
+          researcherAlias = "Researchers"
+          const jsonString = await (await fs.readFile(file)).toString();
+          const envArray = jsonString.split("\r\n")
+          envArray.map((key, val) => {
+            let each = key.split("=")
+            if(each[0] === "REACT_APP_LAMP_RESEARCHER_ALIAS") researcherAlias = each[1]
+          })
+          fs.remove(file, (err) => {
+            if (err) {
+              console.error(`error removing existing ${file} file`)
+              reject(err)
+            } else {
+              debug && console.log(`removed existing ${file} file`)
+              resolve(true)
+            }
+          })
+        })()       
       } else {
+        researcherAlias = "Researchers"
         debug && console.log(`${file} file does not exist`)
         resolve(true)
       }
@@ -91,24 +99,24 @@ function writeFile() {
 }
 
 prepareDestination()
-  .then((success) => {
-    if (success) {
-      writeFile()
-        .then(() => {
-          console.log(`${file} file built successfully`)
-          process.exit(0) // Success
-        })
-        .catch((err) => {
-          console.error(`error building ${file} file`)
-          process.exit(1) // Failure
-        })
-    } else {
-      console.error(`${file} file preparation failed`)
-      process.exit(1) // Failure
-    }
-  })
-  .catch((err) => {
+.then((success) => {
+  if (success) {
+    writeFile()
+      .then(() => {
+        console.log(`${file} file built successfully`)
+        process.exit(0) // Success
+      })
+      .catch((err) => {
+        console.error(`error building ${file} file`)
+        process.exit(1) // Failure
+      })
+  } else {
     console.error(`${file} file preparation failed`)
-    console.error(err)
     process.exit(1) // Failure
-  })
+  }
+})
+.catch((err) => {
+  console.error(`${file} file preparation failed`)
+  console.error(err)
+  process.exit(1) // Failure
+})
