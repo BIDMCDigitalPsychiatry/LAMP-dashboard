@@ -361,8 +361,8 @@ export default function Learn({
           name={spec?.description ?? ""}
           activity={spec ?? []}
           participant={participant}
-          onComplete={() => {
-            showSteak(participant, spec.id)
+          onComplete={(data) => {
+            if (!!data) showSteak(participant, spec.id)
             setOpenData(false)
           }}
         />
