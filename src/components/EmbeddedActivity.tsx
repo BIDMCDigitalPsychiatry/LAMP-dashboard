@@ -40,7 +40,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
   const [currentActivity, setCurrentActivity] = useState(null)
-
+  const [dataSubmitted, setDataSubmitted] = useState(false)
   useEffect(() => {
     setCurrentActivity(activity)
   }, [activity])
@@ -85,6 +85,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               setEmbeddedActivity(undefined)
               setSettings(null)
               setActivityId(null)
+            } else {
+              LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+                .catch((e) => {
+                  console.dir(e)
+                })
+                .then((x) => {
+                  setDataSubmitted(true)
+                })
             }
           }
         }
@@ -102,9 +110,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
         setSaved(true)
         setCurrentActivity(null)
-        onComplete(data)
+        onComplete(dataSubmitted ? data : null)
       } else if (activitySpec === "lamp.tips" && data?.completed) {
-        onComplete(data)
+        onComplete(dataSubmitted ? data : null)
       } else {
         LAMP.ActivityEvent.create(participant?.id ?? participant, data)
           .catch((e) => {
