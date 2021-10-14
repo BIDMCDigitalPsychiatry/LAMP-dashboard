@@ -105,7 +105,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   }, [activity])
 
   const submitSurvey = (response, overwritingTimestamp) => {
-    if (!!response && !!response.timestamp) {
+    if (!!response) {
       setLoading(true)
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
