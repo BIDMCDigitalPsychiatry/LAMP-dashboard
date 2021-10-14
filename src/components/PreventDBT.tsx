@@ -11,7 +11,14 @@ import {
   Theme,
   createStyles,
   NativeSelect,
+  TableCell,
+  Table,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableContainer,
 } from "@material-ui/core"
+import LAMP from "lamp-core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
 import { emotions } from "./charts/emotions_chart"
@@ -152,7 +159,7 @@ function getDates(startDate, endDate) {
   return dates
 }
 
-export default function PreventDBT({ participant, selectedEvents, ...props }) {
+export default function PreventDBT({ participant, activity, selectedEvents, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [emotionsData, setEmotionsData] = useState(null)
@@ -163,9 +170,73 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [skillData, setSkillData] = useState(null)
   const [dateArray, setDateArray] = useState([])
   const [emotionrange, setEmotionrange] = useState(null)
+  const [skillRange, setSkillRange] = useState(null)
+  const [skills, setSkills] = useState(null)
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
+  const data = [
+    {
+      title: t("MINDFULNESS"),
+      data: [
+        t("WISE_MIND"),
+        t("OBSERVE_JUST_NOTICE_URGE_SURFING"),
+        t("DESCRIBE_PUT_WORDS_ON"),
+        t("PARTICIPATE_ENTER_INTO_THE_EXPERIENCE"),
+        t("NONJUDGMENTAL_STANCE"),
+        t("ONE_MINDFULLY_IN_THE_MOMENT"),
+        t("EFFECTIVENESS_FOCUS_ON_WHAT_WORKS"),
+        t("LOVING_KINDNESS_BUILD_COMPASSION"),
+      ],
+    },
+    {
+      title: t("INTERPERSONAL"),
+      data: [
+        t("OBJECTIVE_EFFECTIVENESS_DEAR_MAN"),
+        t("RELATIONSHIP_EFFECTIVENESS_GIVE"),
+        t("SELF_RESPECT_EFFECTIVENESS_FAST"),
+        t("VALIDATING_OTHERS"),
+        t("SELF_VALIDATION"),
+        t("BEHAVIOR_CHANGE_REINFORCE_EXTINGUISH"),
+        t("MINDFULNESS_OF_OTHERS"),
+        t("FIND_OTHERS_AND_GET_THEM_TO_LIKE_YOU"),
+        t("END_RELATIONSHIPS"),
+      ],
+    },
+    {
+      title: t("EMOTION_REGULATION"),
+      data: [
+        t("CHECK_THE_FACTS_TO_CHANGE_EMOTIONS"),
+        t("OPPOSITE_ACTION_TO_CHANGE_EMOTIONS"),
+        t("PROBLEM_SOLVING_TO_CHANGE_EMOTIONS"),
+        t("ACCUMULATE_POSITIVE_EMOTIONS"),
+        t("BUILD_MASTERY"),
+        t("COPE_AHEAD"),
+        t("PLEASE_TAKE_CARE_OF_YOUR_BODY"),
+      ],
+    },
+    {
+      title: t("DISTRESS_TOLERANCE"),
+      data: [
+        t("STOP_SKILL"),
+        t("PROS_AND_CONS_OF_ACTING_ON_URGES"),
+        t("TIP_CHANGE_BODY_CHEMISTRY"),
+        t("PAIRED_MUSCLE_RELAXATION"),
+        t("EFFECTIVE_RETHINKING_PAIRED_RELAX"),
+        t("DISTRACTING_WISE_MIND_ACCEPTS"),
+        t("SELF_SOOTHING"),
+        t("BODY_SCAN_MEDITATION"),
+        t("IMPROVE_THE_MOMENT"),
+        t("SENSORY_AWARENESS"),
+        t("RADICAL_ACCEPTANCE"),
+        t("TURNING_THE_MIND"),
+        t("REPLACE_WILLFULNESS_WITH_WILLINGNESS"),
+        t("HALF_SMILING_AND_WILLING_HANDS"),
+        t("DIALECTICAL_ABSTINENCE"),
+        t("ALTERNATE_REBELLION_ADAPTIVE_DENIAL"),
+      ],
+    },
+  ]
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -182,6 +253,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   }
 
   useEffect(() => {
+    data.map((v) => {
+      console.log(v)
+    })
     let summaryData = []
     let dData = []
     let skills = {}
@@ -214,6 +288,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       i++
       dateArray.push({ timestamp: timestampFormat, date: dateFormat })
     }
+    console.log(dateArray)
     setDateArray(dateArray)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
@@ -478,6 +553,65 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 <div className={classes.separator} />
                 <Box width={1} className={classes.graphSubContainer}>
                   <Typography variant="h5">Skills used:</Typography>
+
+                  <NativeSelect
+                    className={classes.selector}
+                    value={skillRange}
+                    onChange={(event) => setSkillRange(event.target.value)}
+                  >
+                    {dateArray.map((dateString) => (
+                      <option value={dateString.timestamp}>{dateString.date}</option>
+                    ))}
+                  </NativeSelect>
+                  <TableContainer>
+                    <Table stickyHeader aria-label="sticky table">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align="center" colSpan={2}>
+                            Skills
+                          </TableCell>
+                          {dateArray.map((column) => (
+                            <TableCell
+                              key={column.id}
+                              align={column.align}
+                              style={{ top: 57, minWidth: column.minWidth }}
+                            >
+                              {column.date}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      </TableHead>
+                      {/* <TableBody>
+          {skillData[key].map((detail) => (
+              <Box width={1} className={classes.accordionContentSub}>
+                {!!detail.category && <Typography variant="h6">{detail.category}</Typography>}
+                <Typography variant="body2" component="span">
+                  {detail.value}
+                </Typography>
+              </Box>
+            ))}
+
+
+            {skills.map((row) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {column.format && typeof value === 'number'
+                            ? column.format(value)
+                            : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+          </TableBody> */}
+                    </Table>
+                  </TableContainer>
+
                   {Object.keys(skillData).map((key) => (
                     <Accordion>
                       <AccordionSummary
