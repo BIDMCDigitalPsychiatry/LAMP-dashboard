@@ -177,63 +177,63 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
   const [actionrange, setActionrange] = useState(null)
   const data = [
     {
-      title: t("MINDFULNESS"),
+      title: t("Mindfulness"),
       data: [
-        t("WISE_MIND"),
-        t("OBSERVE_JUST_NOTICE_URGE_SURFING"),
-        t("DESCRIBE_PUT_WORDS_ON"),
-        t("PARTICIPATE_ENTER_INTO_THE_EXPERIENCE"),
-        t("NONJUDGMENTAL_STANCE"),
-        t("ONE_MINDFULLY_IN_THE_MOMENT"),
-        t("EFFECTIVENESS_FOCUS_ON_WHAT_WORKS"),
-        t("LOVING_KINDNESS_BUILD_COMPASSION"),
+        t("Wise Mind"),
+        t("Observe: Just notice (Urge Surfing)"),
+        t("Describe: Put words on"),
+        t("Participate: Enter into the experience"),
+        t("Nonjudgmental stance"),
+        t("One-Mindfully: In-the-moment"),
+        t("Effectiveness: Focus on what works"),
+        t("Loving Kindness: Build compassion"),
       ],
     },
     {
-      title: t("INTERPERSONAL"),
+      title: t("Interpersonal"),
       data: [
-        t("OBJECTIVE_EFFECTIVENESS_DEAR_MAN"),
-        t("RELATIONSHIP_EFFECTIVENESS_GIVE"),
-        t("SELF_RESPECT_EFFECTIVENESS_FAST"),
-        t("VALIDATING_OTHERS"),
-        t("SELF_VALIDATION"),
-        t("BEHAVIOR_CHANGE_REINFORCE_EXTINGUISH"),
-        t("MINDFULNESS_OF_OTHERS"),
-        t("FIND_OTHERS_AND_GET_THEM_TO_LIKE_YOU"),
-        t("END_RELATIONSHIPS"),
+        t("Objective effectiveness: DEAR MAN"),
+        t("Relationship effectiveness: GIVE"),
+        t("Self-respect effectiveness: FAST"),
+        t("Validating Others"),
+        t("Self-Validation"),
+        t("Behavior change: reinforce/extinguish"),
+        t("Mindfulness of others"),
+        t("Find others and get them to like you"),
+        t("End relationships"),
       ],
     },
     {
-      title: t("EMOTION_REGULATION"),
+      title: t("Emotion Regulation"),
       data: [
-        t("CHECK_THE_FACTS_TO_CHANGE_EMOTIONS"),
-        t("OPPOSITE_ACTION_TO_CHANGE_EMOTIONS"),
-        t("PROBLEM_SOLVING_TO_CHANGE_EMOTIONS"),
-        t("ACCUMULATE_POSITIVE_EMOTIONS"),
-        t("BUILD_MASTERY"),
-        t("COPE_AHEAD"),
-        t("PLEASE_TAKE_CARE_OF_YOUR_BODY"),
+        t("Check the Facts to change emotions"),
+        t("Opposite Action to change emotions"),
+        t("Problem Solving to change emotions"),
+        t("Accumulate positive emotions"),
+        t("Build Mastery"),
+        t("Cope Ahead"),
+        t("PLEASE: Take care of your body"),
       ],
     },
     {
-      title: t("DISTRESS_TOLERANCE"),
+      title: t("Distress Tolerance"),
       data: [
-        t("STOP_SKILL"),
-        t("PROS_AND_CONS_OF_ACTING_ON_URGES"),
-        t("TIP_CHANGE_BODY_CHEMISTRY"),
-        t("PAIRED_MUSCLE_RELAXATION"),
-        t("EFFECTIVE_RETHINKING_PAIRED_RELAX"),
-        t("DISTRACTING_WISE_MIND_ACCEPTS"),
-        t("SELF_SOOTHING"),
-        t("BODY_SCAN_MEDITATION"),
-        t("IMPROVE_THE_MOMENT"),
-        t("SENSORY_AWARENESS"),
-        t("RADICAL_ACCEPTANCE"),
-        t("TURNING_THE_MIND"),
-        t("REPLACE_WILLFULNESS_WITH_WILLINGNESS"),
-        t("HALF_SMILING_AND_WILLING_HANDS"),
-        t("DIALECTICAL_ABSTINENCE"),
-        t("ALTERNATE_REBELLION_ADAPTIVE_DENIAL"),
+        t("STOP skill"),
+        t("Pros and Cons of acting on urges"),
+        t("TIP: Change body chemistry"),
+        t("Paired Muscle Relaxation"),
+        t("Effective Rethinking/Paired Relax"),
+        t("Distracting: Wise Mind ACCEPTS"),
+        t("Self-Soothing"),
+        t("Body Scan Meditation"),
+        t("IMPROVE the Moment"),
+        t("Sensory Awareness"),
+        t("Radical Acceptance"),
+        t("Turning the Mind"),
+        t("Replace Willfulness with Willingness"),
+        t("Half-Smiling and Willing Hands"),
+        t("Dialectical Abstinence"),
+        t("Alternate Rebellion / Adaptive Denial"),
       ],
     },
   ]
@@ -305,7 +305,7 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
         }
       })
     })
-
+    console.log(skills)
     let categories = []
     Object.keys(skills).map((key) => {
       categories = []
@@ -436,6 +436,42 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
       setIneffectiveData(ineffectiveD)
     }
   }, [inEffectiverange])
+
+  useEffect(() => {
+    if (!!skillRange) {
+      let inEffectiveData = []
+      let timeStamp = inEffectiverange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        event.temporal_slices.map((slice) => {
+          if (!!slice.value) {
+            switch (slice.level) {
+              case "target_ineffective":
+                if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
+                  inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                break
+            }
+          }
+        })
+      })
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      dates.map((d) => {
+        if (inEffectiveData.length === 0) {
+          if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
+            inEffectiveData.push({ value: null, date: d, symbol: "None" })
+          }
+        }
+      })
+      let ineffectiveD = JSON.parse(JSON.stringify(ineffective))
+      ineffectiveD.data.values = inEffectiveData
+      ineffectiveD.title = t(ineffectiveD.title)
+      setIneffectiveData(ineffectiveD)
+    }
+  }, [skillRange])
 
   useEffect(() => {
     if (!!actionrange) {
@@ -581,6 +617,13 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                           ))}
                         </TableRow>
                       </TableHead>
+                      <TableBody>
+                        {data.map((v) => (
+                          <TableRow>
+                            <TableCell></TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
                       {/* <TableBody>
           {skillData[key].map((detail) => (
               <Box width={1} className={classes.accordionContentSub}>
