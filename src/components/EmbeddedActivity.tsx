@@ -42,12 +42,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [currentActivity, setCurrentActivity] = useState(null)
   const [dataSubmitted, setDataSubmitted] = useState(false)
   useEffect(() => {
+    setDataSubmitted(false)
     setCurrentActivity(activity)
   }, [activity])
 
   useEffect(() => {
     setActivityId(currentActivity?.id ?? null)
     if (currentActivity !== null && !!currentActivity?.spec) {
+      setDataSubmitted(false)
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
