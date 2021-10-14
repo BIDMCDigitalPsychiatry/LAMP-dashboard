@@ -105,27 +105,29 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   }, [activity])
 
   const submitSurvey = (response, overwritingTimestamp) => {
-    setLoading(true)
-    let events = response.map((x, idx) => ({
-      timestamp: new Date().getTime(),
-      duration: response.duration,
-      activity: activity.id,
-      static_data: {},
-      temporal_slices: (x || []).map((y) => ({
-        item: y !== undefined ? y.item : null,
-        value: y !== undefined ? y.value : null,
-        type: null,
-        level: null,
-        duration: y.duration,
-      })),
-    }))
-    Promise.all(
-      events
-        .filter((x) => x.temporal_slices.length > 0)
-        .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
-    ).then((x) => {
-      showSteak(participant, activity.id)
-    })
+    if (!!response && !!response.timestamp) {
+      setLoading(true)
+      let events = response.map((x, idx) => ({
+        timestamp: new Date().getTime(),
+        duration: response?.duration,
+        activity: activity.id,
+        static_data: {},
+        temporal_slices: (x || []).map((y) => ({
+          item: y !== undefined ? y.item : null,
+          value: y !== undefined ? y.value : null,
+          type: null,
+          level: null,
+          duration: y.duration,
+        })),
+      }))
+      Promise.all(
+        events
+          .filter((x) => x.temporal_slices.length > 0)
+          .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
+      ).then((x) => {
+        showSteak(participant, activity.id)
+      })
+    }
   }
 
   const showSteak = (participant, activityId) => {
@@ -181,7 +183,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             name={activity?.name}
             activity={activity}
             participant={participant}
-            onComplete={() => showSteak(participant, activity.id)}
+            onComplete={(response) => {
+              if (!!response && !!response.timestamp) showSteak(participant, activity.id)
+            }}
           />
         ) : activity?.spec === "lamp.group" ? (
           <GroupActivity
