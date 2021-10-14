@@ -153,6 +153,10 @@ const useStyles = makeStyles((theme: Theme) =>
     distress: {
       backgroundColor: "#FFF2CC",
     },
+    categoryTitle: {
+      fontSize: "16px",
+      fontWeight: "bold",
+    },
   })
 )
 
@@ -629,19 +633,24 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                             <div>
                               <TableRow>
                                 <TableCell
-                                  rowSpan={v.data.length}
+                                  //rowSpan={v.data.length}
+                                  colSpan={9}
                                   className={
-                                    kv === 0
+                                    classes.categoryTitle +
+                                    " " +
+                                    (kv === 0
                                       ? classes.mindfulness
                                       : kv === 1
                                       ? classes.Interpersonal
                                       : kv === 2
                                       ? classes.emotion
-                                      : classes.distress
+                                      : classes.distress)
                                   }
                                 >
                                   {v.title}
                                 </TableCell>
+                              </TableRow>
+                              <TableRow>
                                 <TableCell
                                   className={
                                     !!skillData[v.data[0]]
