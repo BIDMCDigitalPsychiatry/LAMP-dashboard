@@ -269,9 +269,6 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
   }
 
   useEffect(() => {
-    data.map((v) => {
-      console.log(v)
-    })
     let summaryData = []
     let dData = []
     let skills = {}
@@ -305,38 +302,14 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
       i++
       dateArray.push({ timestamp: timestampFormat, date: dateFormat })
     }
-    console.log(dateArray)
     setDateArray(dateArray)
     selectedEvents.map((event) => {
-      let date = new Date(event.timestamp)
-      // var curr_date = date.getDate().toString().padStart(2, "0")
-      // var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
       event.temporal_slices.map((slice) => {
-        // if (slice.level === "skill") {
-        //   !!skills[curr_month + "/" + curr_date]
-        //     ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-        //     : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
-        // }
         if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
           dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
         }
       })
     })
-    // console.log(skills)
-    // let categories = []
-    // Object.keys(skills).map((key) => {
-    //   categories = []
-    //   skills[key].sort((a, b) => {
-    //     return a.category.localeCompare(b.category)
-    //   })
-    //   skills[key].map((skill, index) => {
-    //     if (categories.includes(skill.category)) {
-    //       delete skills[key][index].category
-    //     }
-    //     categories.push(skill.category)
-    //   })
-    // })
-    // setSkillData(skills)
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
@@ -474,7 +447,6 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
           }
         })
       })
-      console.log(skillData)
       let dates = getDates(timeStamp[1], timeStamp[0])
       let selDates = []
       dates.map((date) => {
