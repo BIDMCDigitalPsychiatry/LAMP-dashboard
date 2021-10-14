@@ -149,7 +149,7 @@ function getDates(startDate, endDate) {
   let dates = []
   let curr = new Date(parseInt(startDate))
   let end = new Date(parseInt(endDate))
-  while (curr.getTime() <= end.getTime()) {
+  while (curr.getTime() < end.getTime()) {
     let curMonth = (curr.getMonth() + 1).toString().padStart(2, "0")
     let curDate = curr.getDate().toString().padStart(2, "0")
     let day = curr.getFullYear() + "-" + curMonth + "-" + curDate
@@ -175,6 +175,7 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
+  const [selectedDates, setSelectedDates] = useState(null)
   const data = [
     {
       title: t("Mindfulness"),
@@ -284,6 +285,7 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
         setEffectiverange(timestampFormat)
         setInEffectiverange(timestampFormat)
         setActionrange(timestampFormat)
+        setSkillRange(timestampFormat)
       }
       i++
       dateArray.push({ timestamp: timestampFormat, date: dateFormat })
@@ -292,34 +294,34 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
     setDateArray(dateArray)
     selectedEvents.map((event) => {
       let date = new Date(event.timestamp)
-      var curr_date = date.getDate().toString().padStart(2, "0")
-      var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+      // var curr_date = date.getDate().toString().padStart(2, "0")
+      // var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
       event.temporal_slices.map((slice) => {
-        if (slice.level === "skill") {
-          !!skills[curr_month + "/" + curr_date]
-            ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-            : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
-        }
+        // if (slice.level === "skill") {
+        //   !!skills[curr_month + "/" + curr_date]
+        //     ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
+        //     : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
+        // }
         if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
           dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
         }
       })
     })
-    console.log(skills)
-    let categories = []
-    Object.keys(skills).map((key) => {
-      categories = []
-      skills[key].sort((a, b) => {
-        return a.category.localeCompare(b.category)
-      })
-      skills[key].map((skill, index) => {
-        if (categories.includes(skill.category)) {
-          delete skills[key][index].category
-        }
-        categories.push(skill.category)
-      })
-    })
-    setSkillData(skills)
+    // console.log(skills)
+    // let categories = []
+    // Object.keys(skills).map((key) => {
+    //   categories = []
+    //   skills[key].sort((a, b) => {
+    //     return a.category.localeCompare(b.category)
+    //   })
+    //   skills[key].map((skill, index) => {
+    //     if (categories.includes(skill.category)) {
+    //       delete skills[key][index].category
+    //     }
+    //     categories.push(skill.category)
+    //   })
+    // })
+    // setSkillData(skills)
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
@@ -439,37 +441,28 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
 
   useEffect(() => {
     if (!!skillRange) {
-      let inEffectiveData = []
-      let timeStamp = inEffectiverange.split("-")
+      let skillData = []
+      let timeStamp = skillRange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-        var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {
-          if (!!slice.value) {
-            switch (slice.level) {
-              case "target_ineffective":
-                if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
-                break
-            }
+          if (
+            slice.level === "skill" &&
+            event.timestamp <= parseInt(timeStamp[0]) &&
+            event.timestamp >= parseInt(timeStamp[1])
+          ) {
+            !!skillData[curr_month + "/" + curr_date]
+              ? skillData[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
+              : (skillData[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
           }
         })
       })
+      // console.log
       let dates = getDates(timeStamp[1], timeStamp[0])
-      dates.map((d) => {
-        if (inEffectiveData.length === 0) {
-          if (inEffectiveData.filter((eff) => eff.date === d).length === 0) {
-            inEffectiveData.push({ value: null, date: d, symbol: "None" })
-          }
-        }
-      })
-      let ineffectiveD = JSON.parse(JSON.stringify(ineffective))
-      ineffectiveD.data.values = inEffectiveData
-      ineffectiveD.title = t(ineffectiveD.title)
-      setIneffectiveData(ineffectiveD)
+      setSelectedDates(dates)
+      setSkillData(skillData)
     }
   }, [skillRange])
 
@@ -606,23 +599,69 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                           <TableCell align="center" colSpan={2}>
                             Skills
                           </TableCell>
-                          {dateArray.map((column) => (
-                            <TableCell
-                              key={column.id}
-                              align={column.align}
-                              style={{ top: 57, minWidth: column.minWidth }}
-                            >
-                              {column.date}
+                          {selectedDates.map((date) => (
+                            <TableCell style={{ top: 57 }}>
+                              {(new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+                                "/" +
+                                new Date(date).getDate().toString().padStart(2, "0")}
                             </TableCell>
                           ))}
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {data.map((v) => (
-                          <TableRow>
-                            <TableCell></TableCell>
-                          </TableRow>
-                        ))}
+                        {data.map((v) => {
+                          return (
+                            <div>
+                              <TableRow>
+                                <TableCell rowSpan={v.data.length}>{v.title}</TableCell>
+                                <TableCell>{v.data[0]}</TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                              </TableRow>
+                              {v.data.map(
+                                (k, key) =>
+                                  key !== 0 && (
+                                    <TableRow>
+                                      <TableCell>{k}</TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+                                      <TableCell></TableCell>
+
+                                      <TableCell></TableCell>
+                                    </TableRow>
+                                  )
+                              )}
+                            </div>
+                          )
+                        })}
+
+                        {/* {data.map((v) => (
+                         
+                            v.data.map((k) => (
+                              <TableRow>
+                                <TableCell>{k}</TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+                                <TableCell></TableCell>
+
+                                <TableCell></TableCell>
+                              </TableRow>
+                           ))                           
+                        ))} */}
                       </TableBody>
                       {/* <TableBody>
           {skillData[key].map((detail) => (
