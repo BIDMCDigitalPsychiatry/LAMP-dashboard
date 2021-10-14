@@ -37,22 +37,14 @@ export default function DeleteResearcher({
   const confirmAction = async (status) => {
     if (status === "Yes") {
       if (((await LAMP.Researcher.delete(researcher.id)) as any).error === undefined) {
-        enqueueSnackbar(
-          t(
-            `Successfully deleted the ${(process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers").toLowerCase()}.`
-          ),
-          {
-            variant: "success",
-          }
-        )
+        enqueueSnackbar(t("Successfully deleted the investigator."), {
+          variant: "success",
+        })
         refreshResearchers()
       } else {
-        enqueueSnackbar(
-          t(`Failed to delete the ${(process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers").toLowerCase()}.`),
-          {
-            variant: "error",
-          }
-        )
+        enqueueSnackbar(t("Failed to delete the investigator."), {
+          variant: "error",
+        })
       }
     }
     setConfirmationDialog(0)
@@ -68,9 +60,7 @@ export default function DeleteResearcher({
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={confirmAction}
-        confirmationMsg={`Are you sure you want to delete this ${(
-          process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers"
-        ).toLowerCase()}(s)?.`}
+        confirmationMsg={`Are you sure you want to delete this investigator(s)?.`}
       />
     </span>
   )

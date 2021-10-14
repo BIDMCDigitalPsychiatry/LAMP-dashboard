@@ -191,7 +191,7 @@ export default function Root({ updateStore, adminType, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={t(process.env.REACT_APP_LAMP_RESEARCHER_ALIAS ?? "Researchers")} />
+                <ListItemText primary={t("Investigators")} />
               </ListItem>
               {adminType === "admin" && (
                 <ListItem
