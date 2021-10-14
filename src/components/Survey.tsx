@@ -239,7 +239,7 @@ export default function Survey({
       setOpenRecordSuccess(true)
       setTimeout(function () {
         setOpenRecordSuccess(false)
-        showSteak(participant, activity.id)
+        if (!!response && !!response?.timestamp) showSteak(participant, activity.id)
         setOpenData(false)
         onComplete(null)
       }, 2000)
