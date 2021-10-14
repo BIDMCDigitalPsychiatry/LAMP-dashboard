@@ -184,7 +184,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             activity={activity}
             participant={participant}
             onComplete={(response) => {
-              if (!!response && !!response.timestamp) showSteak(participant, activity.id)
+              if (!!response) showSteak(participant, activity.id)
             }}
           />
         ) : activity?.spec === "lamp.group" ? (
