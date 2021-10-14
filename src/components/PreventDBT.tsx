@@ -4,9 +4,6 @@ import {
   Icon,
   Typography,
   Grid,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   makeStyles,
   Theme,
   createStyles,
@@ -18,7 +15,6 @@ import {
   TableBody,
   TableContainer,
 } from "@material-ui/core"
-import LAMP from "lamp-core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
 import { emotions } from "./charts/emotions_chart"
@@ -141,6 +137,21 @@ const useStyles = makeStyles((theme: Theme) =>
     accordionContentSub: {
       "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
       "& span": { color: "#666" },
+    },
+    noData: {
+      backgroundColor: "#A6A6A6",
+    },
+    mindfulness: {
+      backgroundColor: "#D9E1F2",
+    },
+    Interpersonal: {
+      backgroundColor: "#FCE4D6",
+    },
+    emotion: {
+      backgroundColor: "#E2EFDA",
+    },
+    distress: {
+      backgroundColor: "#FFF2CC",
     },
   })
 )
@@ -453,15 +464,23 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
             event.timestamp <= parseInt(timeStamp[0]) &&
             event.timestamp >= parseInt(timeStamp[1])
           ) {
-            !!skillData[curr_month + "/" + curr_date]
-              ? skillData[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-              : (skillData[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
+            !!skillData[slice.item]
+              ? skillData[slice.item].push(curr_month + "/" + curr_date)
+              : (skillData[slice.item] = [curr_month + "/" + curr_date])
           }
         })
       })
-      // console.log
+      console.log(skillData)
       let dates = getDates(timeStamp[1], timeStamp[0])
-      setSelectedDates(dates)
+      let selDates = []
+      dates.map((date) => {
+        selDates.push(
+          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+            "/" +
+            new Date(date).getDate().toString().padStart(2, "0")
+        )
+      })
+      setSelectedDates(selDates)
       setSkillData(skillData)
     }
   }, [skillRange])
@@ -593,128 +612,100 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                     ))}
                   </NativeSelect>
                   <TableContainer>
-                    <Table stickyHeader aria-label="sticky table">
+                    <Table>
                       <TableHead>
                         <TableRow>
                           <TableCell align="center" colSpan={2}>
                             Skills
                           </TableCell>
                           {selectedDates.map((date) => (
-                            <TableCell style={{ top: 57 }}>
-                              {(new Date(date).getMonth() + 1).toString().padStart(2, "0") +
-                                "/" +
-                                new Date(date).getDate().toString().padStart(2, "0")}
-                            </TableCell>
+                            <TableCell>{date}</TableCell>
                           ))}
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {data.map((v) => {
+                        {data.map((v, kv) => {
                           return (
                             <div>
                               <TableRow>
-                                <TableCell rowSpan={v.data.length}>{v.title}</TableCell>
-                                <TableCell>{v.data[0]}</TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
+                                <TableCell
+                                  rowSpan={v.data.length}
+                                  className={
+                                    kv === 0
+                                      ? classes.mindfulness
+                                      : kv === 1
+                                      ? classes.Interpersonal
+                                      : kv === 2
+                                      ? classes.emotion
+                                      : classes.distress
+                                  }
+                                >
+                                  {v.title}
+                                </TableCell>
+                                <TableCell
+                                  className={
+                                    !!skillData[v.data[0]]
+                                      ? kv === 0
+                                        ? classes.mindfulness
+                                        : kv === 1
+                                        ? classes.Interpersonal
+                                        : kv === 2
+                                        ? classes.emotion
+                                        : classes.distress
+                                      : classes.noData
+                                  }
+                                >
+                                  {v.data[0]}
+                                </TableCell>
+                                {selectedDates.map((d) => (
+                                  <TableCell
+                                    className={
+                                      !!skillData[v.data[0]]
+                                        ? kv === 0
+                                          ? classes.mindfulness
+                                          : kv === 1
+                                          ? classes.Interpersonal
+                                          : kv === 2
+                                          ? classes.emotion
+                                          : classes.distress
+                                        : classes.noData
+                                    }
+                                  >
+                                    {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                  </TableCell>
+                                ))}
                               </TableRow>
                               {v.data.map(
                                 (k, key) =>
                                   key !== 0 && (
-                                    <TableRow>
+                                    <TableRow
+                                      className={
+                                        !!skillData[k]
+                                          ? kv === 0
+                                            ? classes.mindfulness
+                                            : kv === 1
+                                            ? classes.Interpersonal
+                                            : kv === 2
+                                            ? classes.emotion
+                                            : classes.distress
+                                          : classes.noData
+                                      }
+                                    >
                                       <TableCell>{k}</TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-                                      <TableCell></TableCell>
-
-                                      <TableCell></TableCell>
+                                      {selectedDates.map((d) => (
+                                        <TableCell>
+                                          {skillData[k]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                        </TableCell>
+                                      ))}
                                     </TableRow>
                                   )
                               )}
                             </div>
                           )
                         })}
-
-                        {/* {data.map((v) => (
-                         
-                            v.data.map((k) => (
-                              <TableRow>
-                                <TableCell>{k}</TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-                                <TableCell></TableCell>
-
-                                <TableCell></TableCell>
-                              </TableRow>
-                           ))                           
-                        ))} */}
                       </TableBody>
-                      {/* <TableBody>
-          {skillData[key].map((detail) => (
-              <Box width={1} className={classes.accordionContentSub}>
-                {!!detail.category && <Typography variant="h6">{detail.category}</Typography>}
-                <Typography variant="body2" component="span">
-                  {detail.value}
-                </Typography>
-              </Box>
-            ))}
-
-
-            {skills.map((row) => {
-                return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {column.format && typeof value === 'number'
-                            ? column.format(value)
-                            : value}
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-          </TableBody> */}
                     </Table>
                   </TableContainer>
-
-                  {Object.keys(skillData).map((key) => (
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<Icon>expand_more</Icon>}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography className={classes.heading}>{key}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails className={classes.accordionContent}>
-                        {skillData[key].map((detail) => (
-                          <Box width={1} className={classes.accordionContentSub}>
-                            {!!detail.category && <Typography variant="h6">{detail.category}</Typography>}
-                            <Typography variant="body2" component="span">
-                              {detail.value}
-                            </Typography>
-                          </Box>
-                        ))}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
                 </Box>
               </Box>
             )}
