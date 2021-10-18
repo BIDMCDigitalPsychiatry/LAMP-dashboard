@@ -157,6 +157,14 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: "16px",
       fontWeight: "bold",
     },
+    tableDiv: {
+      display: "contents",
+    },
+    tableOuter: {
+      maxWidth: 570,
+    },
+    skillWidth: { maxWidth: "75px" },
+    skillsContainer: { width: "100%", maxWidth: 570 },
   })
 )
 
@@ -575,54 +583,71 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
             {skillData !== null && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                 <div className={classes.separator} />
-                <Box width={1} className={classes.graphSubContainer}>
-                  <Typography variant="h5">Skills used:</Typography>
+                <div style={{ width: "100%" }} className={classes.skillsContainer}>
+                  <Box sx={{ display: "flex" }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h5">Skills used:</Typography>
+                    </Box>
+                    <Box>
+                      <NativeSelect value={skillRange} onChange={(event) => setSkillRange(event.target.value)}>
+                        {dateArray.map((dateString) => (
+                          <option value={dateString.timestamp}>{dateString.date}</option>
+                        ))}
+                      </NativeSelect>
+                    </Box>
+                  </Box>
+                </div>
 
-                  <NativeSelect
-                    className={classes.selector}
-                    value={skillRange}
-                    onChange={(event) => setSkillRange(event.target.value)}
-                  >
-                    {dateArray.map((dateString) => (
-                      <option value={dateString.timestamp}>{dateString.date}</option>
-                    ))}
-                  </NativeSelect>
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell align="center" colSpan={2}>
-                            Skills
-                          </TableCell>
-                          {selectedDates.map((date) => (
-                            <TableCell>{date}</TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {data.map((v, kv) => {
-                          return (
-                            <div>
-                              <TableRow>
-                                <TableCell
-                                  //rowSpan={v.data.length}
-                                  colSpan={9}
-                                  className={
-                                    classes.categoryTitle +
-                                    " " +
-                                    (kv === 0
+                <TableContainer className={classes.tableOuter}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell className={classes.skillWidth}>Skills</TableCell>
+                        {selectedDates.map((date) => (
+                          <TableCell>{date}</TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.map((v, kv) => {
+                        return (
+                          <div className={classes.tableDiv}>
+                            <TableRow>
+                              <TableCell
+                                //rowSpan={v.data.length}
+                                colSpan={9}
+                                className={
+                                  classes.categoryTitle +
+                                  " " +
+                                  (kv === 0
+                                    ? classes.mindfulness
+                                    : kv === 1
+                                    ? classes.Interpersonal
+                                    : kv === 2
+                                    ? classes.emotion
+                                    : classes.distress)
+                                }
+                              >
+                                {v.title}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell
+                                className={
+                                  classes.skillWidth + " " + !!skillData[v.data[0]]
+                                    ? kv === 0
                                       ? classes.mindfulness
                                       : kv === 1
                                       ? classes.Interpersonal
                                       : kv === 2
                                       ? classes.emotion
-                                      : classes.distress)
-                                  }
-                                >
-                                  {v.title}
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
+                                      : classes.distress
+                                    : classes.noData
+                                }
+                              >
+                                {v.data[0]}
+                              </TableCell>
+                              {selectedDates.map((d) => (
                                 <TableCell
                                   className={
                                     !!skillData[v.data[0]]
@@ -636,12 +661,16 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                                       : classes.noData
                                   }
                                 >
-                                  {v.data[0]}
+                                  {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
                                 </TableCell>
-                                {selectedDates.map((d) => (
-                                  <TableCell
+                              ))}
+                            </TableRow>
+                            {v.data.map(
+                              (k, key) =>
+                                key !== 0 && (
+                                  <TableRow
                                     className={
-                                      !!skillData[v.data[0]]
+                                      !!skillData[k]
                                         ? kv === 0
                                           ? classes.mindfulness
                                           : kv === 1
@@ -652,42 +681,21 @@ export default function PreventDBT({ participant, activity, selectedEvents, ...p
                                         : classes.noData
                                     }
                                   >
-                                    {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                              {v.data.map(
-                                (k, key) =>
-                                  key !== 0 && (
-                                    <TableRow
-                                      className={
-                                        !!skillData[k]
-                                          ? kv === 0
-                                            ? classes.mindfulness
-                                            : kv === 1
-                                            ? classes.Interpersonal
-                                            : kv === 2
-                                            ? classes.emotion
-                                            : classes.distress
-                                          : classes.noData
-                                      }
-                                    >
-                                      <TableCell>{k}</TableCell>
-                                      {selectedDates.map((d) => (
-                                        <TableCell>
-                                          {skillData[k]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
-                                        </TableCell>
-                                      ))}
-                                    </TableRow>
-                                  )
-                              )}
-                            </div>
-                          )
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
+                                    <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                    {selectedDates.map((d) => (
+                                      <TableCell>
+                                        {skillData[k]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                )
+                            )}
+                          </div>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Box>
             )}
 
