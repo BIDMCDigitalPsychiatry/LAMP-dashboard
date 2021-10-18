@@ -105,7 +105,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   }, [activity])
 
   const submitSurvey = (response, overwritingTimestamp) => {
-    if (!!response && !!response.timestamp) {
+    if (!!response) {
       setLoading(true)
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
@@ -184,7 +184,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             activity={activity}
             participant={participant}
             onComplete={(response) => {
-              if (!!response && !!response.timestamp) showSteak(participant, activity.id)
+              if (!!response) showSteak(participant, activity.id)
             }}
           />
         ) : activity?.spec === "lamp.group" ? (
