@@ -1360,11 +1360,7 @@ export default function Prevent({
         ) : selectedActivityName === "Goal: Water" ? (
           <PreventGoalData />
         ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (
-          <PreventDBT
-            participant={participant}
-            activity={selectedActivity}
-            selectedEvents={(activityData || {})[selectedActivityName]}
-          />
+          <PreventDBT participant={participant} selectedEvents={(activityData || {})[selectedActivityName]} />
         ) : (
           <PreventData
             participant={participant}

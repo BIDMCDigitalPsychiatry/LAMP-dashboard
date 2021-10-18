@@ -345,10 +345,6 @@ export default function SurveyCreator({
       let optionsArray = []
       {
         questions.map((x, idx) => {
-          console.log(
-            questions[idx].options,
-            (questions[idx].options || []).map((i) => console.log(i))
-          )
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
@@ -363,7 +359,6 @@ export default function SurveyCreator({
             : optionsArray.push(0)
         })
       }
-      console.log(optionsArray)
       if (optionsArray.filter((val) => val !== 0).length > 0) {
         setIsOptionNull(1)
         status = 1

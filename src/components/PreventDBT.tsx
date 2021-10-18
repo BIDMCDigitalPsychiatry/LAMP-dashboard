@@ -182,7 +182,7 @@ function getDates(startDate, endDate) {
   return dates
 }
 
-export default function PreventDBT({ participant, activity, selectedEvents, ...props }) {
+export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [emotionsData, setEmotionsData] = useState(null)
