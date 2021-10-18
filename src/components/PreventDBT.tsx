@@ -4,13 +4,16 @@ import {
   Icon,
   Typography,
   Grid,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   makeStyles,
   Theme,
   createStyles,
   NativeSelect,
+  TableCell,
+  Table,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableContainer,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
@@ -135,6 +138,33 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
       "& span": { color: "#666" },
     },
+    noData: {
+      backgroundColor: "#A6A6A6",
+    },
+    mindfulness: {
+      backgroundColor: "#D9E1F2",
+    },
+    Interpersonal: {
+      backgroundColor: "#FCE4D6",
+    },
+    emotion: {
+      backgroundColor: "#E2EFDA",
+    },
+    distress: {
+      backgroundColor: "#FFF2CC",
+    },
+    categoryTitle: {
+      fontSize: "16px",
+      fontWeight: "bold",
+    },
+    tableDiv: {
+      display: "contents",
+    },
+    tableOuter: {
+      maxWidth: 570,
+    },
+    skillWidth: { maxWidth: "75px" },
+    skillsContainer: { width: "100%", maxWidth: 570 },
   })
 )
 
@@ -142,7 +172,7 @@ function getDates(startDate, endDate) {
   let dates = []
   let curr = new Date(parseInt(startDate))
   let end = new Date(parseInt(endDate))
-  while (curr.getTime() <= end.getTime()) {
+  while (curr.getTime() < end.getTime()) {
     let curMonth = (curr.getMonth() + 1).toString().padStart(2, "0")
     let curDate = curr.getDate().toString().padStart(2, "0")
     let day = curr.getFullYear() + "-" + curMonth + "-" + curDate
@@ -163,9 +193,74 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [skillData, setSkillData] = useState(null)
   const [dateArray, setDateArray] = useState([])
   const [emotionrange, setEmotionrange] = useState(null)
+  const [skillRange, setSkillRange] = useState(null)
+  const [skills, setSkills] = useState(null)
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
+  const [selectedDates, setSelectedDates] = useState(null)
+  const data = [
+    {
+      title: t("Mindfulness"),
+      data: [
+        t("Wise Mind"),
+        t("Observe: Just notice (Urge Surfing)"),
+        t("Describe: Put words on"),
+        t("Participate: Enter into the experience"),
+        t("Nonjudgmental stance"),
+        t("One-Mindfully: In-the-moment"),
+        t("Effectiveness: Focus on what works"),
+        t("Loving Kindness: Build compassion"),
+      ],
+    },
+    {
+      title: t("Interpersonal"),
+      data: [
+        t("Objective effectiveness: DEAR MAN"),
+        t("Relationship effectiveness: GIVE"),
+        t("Self-respect effectiveness: FAST"),
+        t("Validating Others"),
+        t("Self-Validation"),
+        t("Behavior change: reinforce/extinguish"),
+        t("Mindfulness of others"),
+        t("Find others and get them to like you"),
+        t("End relationships"),
+      ],
+    },
+    {
+      title: t("Emotion Regulation"),
+      data: [
+        t("Check the Facts to change emotions"),
+        t("Opposite Action to change emotions"),
+        t("Problem Solving to change emotions"),
+        t("Accumulate positive emotions"),
+        t("Build Mastery"),
+        t("Cope Ahead"),
+        t("PLEASE: Take care of your body"),
+      ],
+    },
+    {
+      title: t("Distress Tolerance"),
+      data: [
+        t("STOP skill"),
+        t("Pros and Cons of acting on urges"),
+        t("TIP: Change body chemistry"),
+        t("Paired Muscle Relaxation"),
+        t("Effective Rethinking/Paired Relax"),
+        t("Distracting: Wise Mind ACCEPTS"),
+        t("Self-Soothing"),
+        t("Body Scan Meditation"),
+        t("IMPROVE the Moment"),
+        t("Sensory Awareness"),
+        t("Radical Acceptance"),
+        t("Turning the Mind"),
+        t("Replace Willfulness with Willingness"),
+        t("Half-Smiling and Willing Hands"),
+        t("Dialectical Abstinence"),
+        t("Alternate Rebellion / Adaptive Denial"),
+      ],
+    },
+  ]
 
   const getDateString = (date: Date) => {
     var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -210,41 +305,19 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         setEffectiverange(timestampFormat)
         setInEffectiverange(timestampFormat)
         setActionrange(timestampFormat)
+        setSkillRange(timestampFormat)
       }
       i++
       dateArray.push({ timestamp: timestampFormat, date: dateFormat })
     }
     setDateArray(dateArray)
     selectedEvents.map((event) => {
-      let date = new Date(event.timestamp)
-      var curr_date = date.getDate().toString().padStart(2, "0")
-      var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
       event.temporal_slices.map((slice) => {
-        if (slice.level === "skill") {
-          !!skills[curr_month + "/" + curr_date]
-            ? skills[curr_month + "/" + curr_date].push({ category: slice.value, value: slice.item })
-            : (skills[curr_month + "/" + curr_date] = [{ category: slice.value, value: slice.item }])
-        }
         if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
           dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
         }
       })
     })
-
-    let categories = []
-    Object.keys(skills).map((key) => {
-      categories = []
-      skills[key].sort((a, b) => {
-        return a.category.localeCompare(b.category)
-      })
-      skills[key].map((skill, index) => {
-        if (categories.includes(skill.category)) {
-          delete skills[key][index].category
-        }
-        categories.push(skill.category)
-      })
-    })
-    setSkillData(skills)
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
     })
@@ -363,6 +436,40 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   }, [inEffectiverange])
 
   useEffect(() => {
+    if (!!skillRange) {
+      let skillData = []
+      let timeStamp = skillRange.split("-")
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        event.temporal_slices.map((slice) => {
+          if (
+            slice.level === "skill" &&
+            event.timestamp <= parseInt(timeStamp[0]) &&
+            event.timestamp >= parseInt(timeStamp[1])
+          ) {
+            !!skillData[slice.item]
+              ? skillData[slice.item].push(curr_month + "/" + curr_date)
+              : (skillData[slice.item] = [curr_month + "/" + curr_date])
+          }
+        })
+      })
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      let selDates = []
+      dates.map((date) => {
+        selDates.push(
+          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+            "/" +
+            new Date(date).getDate().toString().padStart(2, "0")
+        )
+      })
+      setSelectedDates(selDates)
+      setSkillData(skillData)
+    }
+  }, [skillRange])
+
+  useEffect(() => {
     if (!!actionrange) {
       let timelineData = []
       let tData = []
@@ -476,30 +583,119 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
             {skillData !== null && (
               <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                 <div className={classes.separator} />
-                <Box width={1} className={classes.graphSubContainer}>
-                  <Typography variant="h5">Skills used:</Typography>
-                  {Object.keys(skillData).map((key) => (
-                    <Accordion>
-                      <AccordionSummary
-                        expandIcon={<Icon>expand_more</Icon>}
-                        aria-controls="panel1a-content"
-                        id="panel1a-header"
-                      >
-                        <Typography className={classes.heading}>{key}</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails className={classes.accordionContent}>
-                        {skillData[key].map((detail) => (
-                          <Box width={1} className={classes.accordionContentSub}>
-                            {!!detail.category && <Typography variant="h6">{detail.category}</Typography>}
-                            <Typography variant="body2" component="span">
-                              {detail.value}
-                            </Typography>
-                          </Box>
+                <div style={{ width: "100%" }} className={classes.skillsContainer}>
+                  <Box sx={{ display: "flex" }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h5">Skills used:</Typography>
+                    </Box>
+                    <Box>
+                      <NativeSelect value={skillRange} onChange={(event) => setSkillRange(event.target.value)}>
+                        {dateArray.map((dateString) => (
+                          <option value={dateString.timestamp}>{dateString.date}</option>
                         ))}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                </Box>
+                      </NativeSelect>
+                    </Box>
+                  </Box>
+                </div>
+
+                <TableContainer className={classes.tableOuter}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell className={classes.skillWidth}>Skills</TableCell>
+                        {selectedDates.map((date) => (
+                          <TableCell>{date}</TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.map((v, kv) => {
+                        return (
+                          <div className={classes.tableDiv}>
+                            <TableRow>
+                              <TableCell
+                                //rowSpan={v.data.length}
+                                colSpan={9}
+                                className={
+                                  classes.categoryTitle +
+                                  " " +
+                                  (kv === 0
+                                    ? classes.mindfulness
+                                    : kv === 1
+                                    ? classes.Interpersonal
+                                    : kv === 2
+                                    ? classes.emotion
+                                    : classes.distress)
+                                }
+                              >
+                                {v.title}
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell
+                                className={
+                                  classes.skillWidth + " " + !!skillData[v.data[0]]
+                                    ? kv === 0
+                                      ? classes.mindfulness
+                                      : kv === 1
+                                      ? classes.Interpersonal
+                                      : kv === 2
+                                      ? classes.emotion
+                                      : classes.distress
+                                    : classes.noData
+                                }
+                              >
+                                {v.data[0]}
+                              </TableCell>
+                              {selectedDates.map((d) => (
+                                <TableCell
+                                  className={
+                                    !!skillData[v.data[0]]
+                                      ? kv === 0
+                                        ? classes.mindfulness
+                                        : kv === 1
+                                        ? classes.Interpersonal
+                                        : kv === 2
+                                        ? classes.emotion
+                                        : classes.distress
+                                      : classes.noData
+                                  }
+                                >
+                                  {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                            {v.data.map(
+                              (k, key) =>
+                                key !== 0 && (
+                                  <TableRow
+                                    className={
+                                      !!skillData[k]
+                                        ? kv === 0
+                                          ? classes.mindfulness
+                                          : kv === 1
+                                          ? classes.Interpersonal
+                                          : kv === 2
+                                          ? classes.emotion
+                                          : classes.distress
+                                        : classes.noData
+                                    }
+                                  >
+                                    <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                    {selectedDates.map((d) => (
+                                      <TableCell>
+                                        {skillData[k]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                )
+                            )}
+                          </div>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Box>
             )}
 

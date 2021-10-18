@@ -34,6 +34,7 @@ import { useTranslation } from "react-i18next"
 import { useSnackbar } from "notistack"
 import ActivityHeader from "./ActivityHeader"
 import ActivityFooter from "./ActivityFooter"
+import { ContactsOutlined } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -343,18 +344,20 @@ export default function SurveyCreator({
     if (!!questions && questions.length > 0) {
       let optionsArray = []
       {
-        questions.map((x, idx) =>
+        questions.map((x, idx) => {
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
           questions[idx].type === "rating"
             ? questions[idx].options === null || (!!questions[idx].options && questions[idx].options.length === 0)
               ? optionsArray.push(1)
-              : (questions[idx].options || []).filter((i) => !!i && i?.value?.trim().length > 0).length > 0
+              : (questions[idx].options || []).filter(
+                  (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
+                ).length === (questions[idx].options || []).length
               ? optionsArray.push(0)
               : optionsArray.push(1)
             : optionsArray.push(0)
-        )
+        })
       }
       if (optionsArray.filter((val) => val !== 0).length > 0) {
         setIsOptionNull(1)
