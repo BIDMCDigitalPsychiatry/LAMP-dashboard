@@ -189,10 +189,6 @@ export default function QueryBuilder(props) {
       )
     }
 
-    const handleChange = (event) => {
-      props.setCheckedCategories(event.target.value)
-    }
-
     //this function load or unloads a clicked tag.
     const prepareTag = async (tagName) => {
       props.setLoadingGraphs(true)
@@ -223,14 +219,18 @@ export default function QueryBuilder(props) {
       },
     }
 
-    console.log(props.tagObject)
+    function returnSortedTagObject(array) {
+      let res = array.slice()
+      res.sort((a, b) => formatGraphName(a[0]).localeCompare(formatGraphName(b[0])))
+      return res
+    }
     return (
       <Box className={classes.categoryBox}>
         {Object.keys(props.tagObject).map((category) => (
           <React.Fragment>
             <Typography>{category}</Typography>
             <Box className={classes.tagsBox}>
-              {props.tagObject[category].map((array) => {
+              {returnSortedTagObject(props.tagObject[category]).map((array) => {
                 //let's format the names
                 console.log(array)
                 let printedName = formatGraphName(array[0])
@@ -408,6 +408,12 @@ export default function QueryBuilder(props) {
       props.setSelectedSharedTags(props.availableSharedTags)
     }
 
+    function returnSortedTags(array) {
+      let res = array.slice()
+      res.sort((a, b) => formatGraphName(a).localeCompare(formatGraphName(b)))
+      return res
+    }
+
     return (
       <span>
         {props.selectedSharedTags.length >= Math.floor(props.availableSharedTags.length) / 2 ? (
@@ -417,8 +423,9 @@ export default function QueryBuilder(props) {
         )}
         <br />
         <Box className={classes.tagsBox}>
-          {props.availableSharedTags.map((name) => {
+          {returnSortedTags(props.availableSharedTags).map((name) => {
             //let's format the names
+            console.log(name)
             let printedName = formatGraphName(name)
             return (
               <Card key={name} className={classes.tagCard}>
