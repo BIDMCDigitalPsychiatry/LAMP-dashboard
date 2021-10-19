@@ -159,6 +159,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
+
     accordionContentSub: {
       "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
       "& span": { color: "#666" },
