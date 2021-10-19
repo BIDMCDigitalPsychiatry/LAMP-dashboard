@@ -4,16 +4,23 @@ import {
   Icon,
   Typography,
   Grid,
-  makeStyles,
-  Theme,
-  createStyles,
-  NativeSelect,
   TableCell,
   Table,
   TableRow,
   TableHead,
   TableBody,
   TableContainer,
+  makeStyles,
+  Theme,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  createStyles,
+  NativeSelect,
+  useMediaQuery,
+  useTheme,
+  Backdrop,
+  CircularProgress,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
@@ -30,11 +37,24 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
     graphContainer: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       flexDirection: "column",
+      [theme.breakpoints.down("xs")]: {
+        padding: "0 15px",
+      },
+      "& canvas": {
+        [theme.breakpoints.down("xs")]: {
+          maxWidth: "100%",
+          height: "auto !important",
+        },
+      },
     },
     titleContainer: {
       display: "flex",
@@ -44,10 +64,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     separator: {
       border: "2px solid rgba(0, 0, 0, 0.1)",
-      width: 500,
+      width: "100%",
       marginTop: 50,
       marginBottom: 50,
       height: 0,
+      maxWidth: 500,
     },
     addContainer: {
       display: "flex",
@@ -101,6 +122,10 @@ const useStyles = makeStyles((theme: Theme) =>
       marginBottom: -30,
       marginRight: -300,
       zIndex: 1000,
+      [theme.breakpoints.down("xs")]: {
+        marginRight: -150,
+        marginBottom: -25,
+      },
     },
     blueBoxStyle: {
       background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
@@ -134,6 +159,7 @@ const useStyles = makeStyles((theme: Theme) =>
         },
       },
     },
+
     accordionContentSub: {
       "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
       "& span": { color: "#666" },
@@ -156,15 +182,25 @@ const useStyles = makeStyles((theme: Theme) =>
     categoryTitle: {
       fontSize: "16px",
       fontWeight: "bold",
+      "& div.MuiAccordionSummary-content": {
+        margin: "0",
+      },
+      "& td": { border: 0 },
+      "& div.MuiAccordionDetails-root": {
+        padding: "0",
+      },
     },
     tableDiv: {
       display: "contents",
     },
     tableOuter: {
       maxWidth: 570,
+      paddingTop: 10,
     },
-    skillWidth: { maxWidth: "75px" },
+    skillWidth: { maxWidth: "100px" },
     skillsContainer: { width: "100%", maxWidth: 570 },
+    accSummary: { paddingLeft: 0, paddingRight: 0 },
+    greentxt: { color: "#21a521" },
   })
 )
 
@@ -184,6 +220,9 @@ function getDates(startDate, endDate) {
 
 export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
+  const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"), {
+    noSsr: true,
+  })
   const { t } = useTranslation()
   const [emotionsData, setEmotionsData] = useState(null)
   const [effectiveData, setEffectiveData] = useState(null)
@@ -193,11 +232,11 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [skillData, setSkillData] = useState(null)
   const [dateArray, setDateArray] = useState([])
   const [emotionrange, setEmotionrange] = useState(null)
-  const [skillRange, setSkillRange] = useState(null)
-  const [skills, setSkills] = useState(null)
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
+  const [calculated, setCalculated] = useState(false)
+  const [skillRange, setSkillRange] = useState(null)
   const [selectedDates, setSelectedDates] = useState(null)
   const data = [
     {
@@ -242,7 +281,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     {
       title: t("Distress Tolerance"),
       data: [
-        t("STOP skill"),
+        t("STOP Skill"),
         t("Pros and Cons of acting on urges"),
         t("TIP: Change body chemistry"),
         t("Paired Muscle Relaxation"),
@@ -277,9 +316,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   }
 
   useEffect(() => {
+    console.log(selectedEvents)
+
     let summaryData = []
     let dData = []
-    let skills = {}
     let dateArray = []
     let weekend
     let start = new Date(selectedEvents[selectedEvents.length - 1].timestamp)
@@ -289,7 +329,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       start.setHours(0)
       start.setMinutes(0)
       start.setSeconds(0)
-      weekend.setDate(weekend.getDate() - 7)
+      weekend.setDate(weekend.getDate() - 6)
       if (weekend.getTime() < selectedEvents[0].timestamp) {
         weekend = new Date(selectedEvents[0].timestamp)
       }
@@ -299,7 +339,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timestampFormat = start.getTime() + 86400000 + "-" + weekend.getTime()
       let dateFormat =
         weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
-      start.setDate(start.getDate() - 8)
+      start.setDate(start.getDate() - 6)
       if (i === 0) {
         setEmotionrange(timestampFormat)
         setEffectiverange(timestampFormat)
@@ -324,8 +364,47 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let actionsD = actionsData
     actionsD.data.values = summaryData
     actionsD.title = t(actionsD.title)
+
+    actionsD.width.step = supportsSidebar ? 100 : 75
     setActionsData(actionsD)
+    setCalculated(true)
   }, [])
+
+  useEffect(() => {
+    if (!!skillRange) {
+      let skillData = []
+      let timeStamp = skillRange.split("-")
+      console.log(selectedEvents)
+      selectedEvents.map((event) => {
+        let date = new Date(event.timestamp)
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        event.temporal_slices.map((slice) => {
+          if (
+            slice.level === "skill" &&
+            event.timestamp <= parseInt(timeStamp[0]) &&
+            event.timestamp >= parseInt(timeStamp[1])
+          ) {
+            !!skillData[slice.item]
+              ? skillData[slice.item].push(curr_month + "/" + curr_date)
+              : (skillData[slice.item] = [curr_month + "/" + curr_date])
+          }
+        })
+      })
+      console.log(skillData)
+      let dates = getDates(timeStamp[1], timeStamp[0])
+      let selDates = []
+      dates.map((date) => {
+        selDates.push(
+          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+            "/" +
+            new Date(date).getDate().toString().padStart(2, "0")
+        )
+      })
+      setSelectedDates(selDates)
+      setSkillData(skillData)
+    }
+  }, [skillRange])
 
   useEffect(() => {
     if (!!emotionrange) {
@@ -436,40 +515,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   }, [inEffectiverange])
 
   useEffect(() => {
-    if (!!skillRange) {
-      let skillData = []
-      let timeStamp = skillRange.split("-")
-      selectedEvents.map((event) => {
-        let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-        event.temporal_slices.map((slice) => {
-          if (
-            slice.level === "skill" &&
-            event.timestamp <= parseInt(timeStamp[0]) &&
-            event.timestamp >= parseInt(timeStamp[1])
-          ) {
-            !!skillData[slice.item]
-              ? skillData[slice.item].push(curr_month + "/" + curr_date)
-              : (skillData[slice.item] = [curr_month + "/" + curr_date])
-          }
-        })
-      })
-      let dates = getDates(timeStamp[1], timeStamp[0])
-      let selDates = []
-      dates.map((date) => {
-        selDates.push(
-          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
-            "/" +
-            new Date(date).getDate().toString().padStart(2, "0")
-        )
-      })
-      setSelectedDates(selDates)
-      setSkillData(skillData)
-    }
-  }, [skillRange])
-
-  useEffect(() => {
     if (!!actionrange) {
       let timelineData = []
       let tData = []
@@ -508,221 +553,242 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={0}>
-        <Grid item xs={12} sm={3} />
-        <Grid item xs={12} sm={6}>
-          <div className={classes.graphContainer}>
-            <NativeSelect
-              className={classes.selector}
-              value={emotionrange}
-              onChange={(event) => setEmotionrange(event.target.value)}
-            >
-              {dateArray.map((dateString) => (
-                <option value={dateString.timestamp}>{dateString.date}</option>
-              ))}
-            </NativeSelect>
-            {emotionsData !== null && <Vega spec={emotionsData} />}
-            <div className={classes.separator} />
-            <NativeSelect
-              className={classes.selector}
-              value={effectiverange}
-              onChange={(event) => setEffectiverange(event.target.value)}
-            >
-              {dateArray.map((dateString) => (
-                <option value={dateString.timestamp}>{dateString.date}</option>
-              ))}
-            </NativeSelect>
-            {effectiveData !== null && <Vega spec={effectiveData} />}
-            <div className={classes.separator} />
-            <NativeSelect
-              className={classes.selector}
-              value={inEffectiverange}
-              onChange={(event) => setInEffectiverange(event.target.value)}
-            >
-              {dateArray.map((dateString) => (
-                <option value={dateString.timestamp}>{dateString.date}</option>
-              ))}
-            </NativeSelect>
-            {ineffectiveData !== null && <Vega spec={ineffectiveData} />}
-            <div className={classes.separator} />
-            <Vega spec={actionsData} />
-            <div className={classes.separator} />
-            <NativeSelect
-              className={classes.selector}
-              value={actionrange}
-              onChange={(event) => setActionrange(event.target.value)}
-            >
-              {dateArray.map((dateString) => (
-                <option value={dateString.timestamp}>{dateString.date}</option>
-              ))}
-            </NativeSelect>
-            {selfcareData !== null && <Vega spec={selfcareData} />}
+      {!!calculated ? (
+        <Grid container spacing={0}>
+          <Grid item xs={12} sm={3} />
+          <Grid item xs={12} sm={6}>
+            <div className={classes.graphContainer}>
+              <NativeSelect
+                className={classes.selector}
+                value={emotionrange}
+                onChange={(event) => setEmotionrange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+              {emotionsData !== null && <Vega spec={emotionsData} />}
+              <div className={classes.separator} />
+              <NativeSelect
+                className={classes.selector}
+                value={effectiverange}
+                onChange={(event) => setEffectiverange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+              {effectiveData !== null && <Vega spec={effectiveData} />}
+              <div className={classes.separator} />
+              <NativeSelect
+                className={classes.selector}
+                value={inEffectiverange}
+                onChange={(event) => setInEffectiverange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+              {ineffectiveData !== null && <Vega spec={ineffectiveData} />}
+              <div className={classes.separator} />
+              <Vega spec={actionsData} />
+              <div className={classes.separator} />
+              <NativeSelect
+                className={classes.selector}
+                value={actionrange}
+                onChange={(event) => setActionrange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+              {selfcareData !== null && <Vega spec={selfcareData} />}
 
-            {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
-              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                <div className={classes.separator} />
-                <Box width={1} className={classes.graphSubContainer}>
-                  <Typography variant="h5">Didn't use skills because...</Typography>
-                  {selectedEvents.map(
-                    (event) =>
-                      !!event.static_data.reason && (
-                        <Box className={classes.blueBoxStyle}>
-                          <Typography variant="caption" gutterBottom>
-                            {getDateString(new Date(event.timestamp))}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            {event.static_data.reason}
-                          </Typography>
-                        </Box>
-                      )
-                  )}
-                </Box>
-              </Box>
-            )}
-
-            {skillData !== null && (
-              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                <div className={classes.separator} />
-                <div style={{ width: "100%" }} className={classes.skillsContainer}>
-                  <Box sx={{ display: "flex" }}>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="h5">Skills used:</Typography>
-                    </Box>
-                    <Box>
-                      <NativeSelect value={skillRange} onChange={(event) => setSkillRange(event.target.value)}>
-                        {dateArray.map((dateString) => (
-                          <option value={dateString.timestamp}>{dateString.date}</option>
-                        ))}
-                      </NativeSelect>
-                    </Box>
+              {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
+                <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                  <div className={classes.separator} />
+                  <Box width={1} className={classes.graphSubContainer}>
+                    <Typography variant="h5">Didn't use skills because...</Typography>
+                    {selectedEvents.map(
+                      (event) =>
+                        !!event.static_data.reason && (
+                          <Box className={classes.blueBoxStyle}>
+                            <Typography variant="caption" gutterBottom>
+                              {getDateString(new Date(event.timestamp))}
+                            </Typography>
+                            <Typography variant="body2" component="p">
+                              {event.static_data.reason}
+                            </Typography>
+                          </Box>
+                        )
+                    )}
                   </Box>
-                </div>
+                </Box>
+              )}
 
-                <TableContainer className={classes.tableOuter}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell className={classes.skillWidth}>Skills</TableCell>
-                        {selectedDates.map((date) => (
-                          <TableCell>{date}</TableCell>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {data.map((v, kv) => {
-                        return (
-                          <div className={classes.tableDiv}>
-                            <TableRow>
-                              <TableCell
-                                //rowSpan={v.data.length}
-                                colSpan={9}
-                                className={
-                                  classes.categoryTitle +
-                                  " " +
-                                  (kv === 0
-                                    ? classes.mindfulness
-                                    : kv === 1
-                                    ? classes.Interpersonal
-                                    : kv === 2
-                                    ? classes.emotion
-                                    : classes.distress)
-                                }
-                              >
-                                {v.title}
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell
-                                className={
-                                  classes.skillWidth + " " + !!skillData[v.data[0]]
-                                    ? kv === 0
-                                      ? classes.mindfulness
-                                      : kv === 1
-                                      ? classes.Interpersonal
-                                      : kv === 2
-                                      ? classes.emotion
-                                      : classes.distress
-                                    : classes.noData
-                                }
-                              >
-                                {v.data[0]}
-                              </TableCell>
-                              {selectedDates.map((d) => (
+              {skillData !== null && (
+                <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                  <div className={classes.separator} />
+                  <div style={{ width: "100%" }} className={classes.skillsContainer}>
+                    <Box sx={{ display: "flex" }}>
+                      <Box sx={{ flexGrow: 1 }}>
+                        <Typography variant="h5">Skills used:</Typography>
+                      </Box>
+                      <Box>
+                        <NativeSelect value={skillRange} onChange={(event) => setSkillRange(event.target.value)}>
+                          {dateArray.map((dateString) => (
+                            <option value={dateString.timestamp}>{dateString.date}</option>
+                          ))}
+                        </NativeSelect>
+                      </Box>
+                    </Box>
+                  </div>
+
+                  <TableContainer className={classes.tableOuter}>
+                    {data.map((v, kv) => {
+                      return (
+                        <div className={classes.tableDiv}>
+                          <Accordion>
+                            <AccordionSummary
+                              expandIcon={<Icon>expand_more</Icon>}
+                              aria-controls="panel1a-content"
+                              id="panel1a-header"
+                              className={
+                                classes.categoryTitle +
+                                " " +
+                                (kv === 0
+                                  ? classes.mindfulness
+                                  : kv === 1
+                                  ? classes.Interpersonal
+                                  : kv === 2
+                                  ? classes.emotion
+                                  : classes.distress)
+                              }
+                            >
+                              <TableRow>
                                 <TableCell
-                                  className={
-                                    !!skillData[v.data[0]]
-                                      ? kv === 0
-                                        ? classes.mindfulness
-                                        : kv === 1
-                                        ? classes.Interpersonal
-                                        : kv === 2
-                                        ? classes.emotion
-                                        : classes.distress
-                                      : classes.noData
-                                  }
+                                  //rowSpan={v.data.length}
+                                  colSpan={9}
                                 >
-                                  {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                  {v.title}
                                 </TableCell>
-                              ))}
-                            </TableRow>
-                            {v.data.map(
-                              (k, key) =>
-                                key !== 0 && (
-                                  <TableRow
-                                    className={
-                                      !!skillData[k]
-                                        ? kv === 0
-                                          ? classes.mindfulness
-                                          : kv === 1
-                                          ? classes.Interpersonal
-                                          : kv === 2
-                                          ? classes.emotion
-                                          : classes.distress
-                                        : classes.noData
-                                    }
-                                  >
-                                    <TableCell className={classes.skillWidth}>{k}</TableCell>
+                              </TableRow>
+                            </AccordionSummary>
+                            <AccordionDetails className={classes.accSummary}>
+                              <Table>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell className={classes.skillWidth}>Skills</TableCell>
+                                    {selectedDates.map((date) => (
+                                      <TableCell>{date}</TableCell>
+                                    ))}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  <TableRow>
+                                    <TableCell
+                                      className={
+                                        classes.skillWidth +
+                                        " " +
+                                        (!!skillData[v.data[0]]
+                                          ? kv === 0
+                                            ? classes.mindfulness
+                                            : kv === 1
+                                            ? classes.Interpersonal
+                                            : kv === 2
+                                            ? classes.emotion
+                                            : classes.distress
+                                          : classes.noData)
+                                      }
+                                    >
+                                      {v.data[0]}
+                                    </TableCell>
                                     {selectedDates.map((d) => (
-                                      <TableCell>
-                                        {skillData[k]?.includes(d) ? <Icon>check</Icon> : <Icon>close</Icon>}
+                                      <TableCell
+                                        className={
+                                          !!skillData[v.data[0]]
+                                            ? kv === 0
+                                              ? classes.mindfulness
+                                              : kv === 1
+                                              ? classes.Interpersonal
+                                              : kv === 2
+                                              ? classes.emotion
+                                              : classes.distress
+                                            : classes.noData
+                                        }
+                                      >
+                                        {skillData[v.data[0]]?.includes(d) ? (
+                                          <Icon className={classes.greentxt}>check</Icon>
+                                        ) : null}
                                       </TableCell>
                                     ))}
                                   </TableRow>
-                                )
-                            )}
-                          </div>
-                        )
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Box>
-            )}
-
-            {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
-              <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                <div className={classes.separator} />
-                <Box width={1} className={classes.graphSubContainer}>
-                  <Typography variant="h5">Optional notes:</Typography>
-                  {selectedEvents.map(
-                    (event) =>
-                      !!event.static_data.notes && (
-                        <Box className={classes.blueBoxStyle}>
-                          <Typography variant="caption" gutterBottom>
-                            {getDateString(new Date(event.timestamp))}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            {event.static_data.notes}
-                          </Typography>
-                        </Box>
+                                  {v.data.map(
+                                    (k, key) =>
+                                      key !== 0 && (
+                                        <TableRow
+                                          className={
+                                            !!skillData[k]
+                                              ? kv === 0
+                                                ? classes.mindfulness
+                                                : kv === 1
+                                                ? classes.Interpersonal
+                                                : kv === 2
+                                                ? classes.emotion
+                                                : classes.distress
+                                              : classes.noData
+                                          }
+                                        >
+                                          <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                          {selectedDates.map((d) => (
+                                            <TableCell>
+                                              {skillData[k]?.includes(d) ? (
+                                                <Icon className={classes.greentxt}>check</Icon>
+                                              ) : null}
+                                            </TableCell>
+                                          ))}
+                                        </TableRow>
+                                      )
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </AccordionDetails>
+                          </Accordion>
+                        </div>
                       )
-                  )}
+                    })}
+                  </TableContainer>
                 </Box>
-              </Box>
-            )}
-          </div>
+              )}
+              {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
+                <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+                  <div className={classes.separator} />
+                  <Box width={1} className={classes.graphSubContainer}>
+                    <Typography variant="h5">Optional notes:</Typography>
+                    {selectedEvents.map(
+                      (event) =>
+                        !!event.static_data.notes && (
+                          <Box className={classes.blueBoxStyle}>
+                            <Typography variant="caption" gutterBottom>
+                              {getDateString(new Date(event.timestamp))}
+                            </Typography>
+                            <Typography variant="body2" component="p">
+                              {event.static_data.notes}
+                            </Typography>
+                          </Box>
+                        )
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </div>
+          </Grid>
         </Grid>
-      </Grid>
+      ) : (
+        <Backdrop className={classes.backdrop} open={!calculated}>
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
     </div>
   )
 }
