@@ -162,7 +162,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
-  const [timePattern, setTimePatterm] = useState("standard")
+  const [timePattern, setTimePatterm] = useState(question.type === "time" ? question.options[0].value : "standard")
   const { t } = useTranslation()
   useEffect(() => {
     onChange({
@@ -172,10 +172,10 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
       options: ["list", "select", "multiselect", "slider", "rating"].includes(type)
         ? options
         : type === "time"
-        ? { pattern: timePattern }
+        ? [{ value: timePattern, description: timePattern }]
         : null,
     })
-  }, [text, description, type, options])
+  }, [text, description, type, options, timePattern])
 
   return (
     <Step {...props}>
@@ -325,6 +325,7 @@ export default function SurveyCreator({
   const [isOptionNull, setIsOptionNull] = useState(0)
 
   useEffect(() => {
+    console.log(questions)
     setData({ ...data, settings: questions })
   }, [questions])
 
@@ -406,6 +407,7 @@ export default function SurveyCreator({
   }
 
   const checkAndSave = (data, isDuplicate) => {
+    console.log(data)
     if (
       questions.length === 0 ||
       questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length !== questions.length
