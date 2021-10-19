@@ -634,53 +634,68 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   </div>
 
                   <TableContainer className={classes.tableOuter}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className={classes.skillWidth}>Skills</TableCell>
-                          {selectedDates.map((date) => (
-                            <TableCell>{date}</TableCell>
-                          ))}
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {data.map((v, kv) => {
-                          return (
-                            <div className={classes.tableDiv}>
-                              <Accordion>
-                                <AccordionSummary
-                                  expandIcon={<Icon>expand_more</Icon>}
-                                  aria-controls="panel1a-content"
-                                  id="panel1a-header"
+                    {data.map((v, kv) => {
+                      return (
+                        <div className={classes.tableDiv}>
+                          <Accordion>
+                            <AccordionSummary
+                              expandIcon={<Icon>expand_more</Icon>}
+                              aria-controls="panel1a-content"
+                              id="panel1a-header"
+                              className={
+                                classes.categoryTitle +
+                                " " +
+                                (kv === 0
+                                  ? classes.mindfulness
+                                  : kv === 1
+                                  ? classes.Interpersonal
+                                  : kv === 2
+                                  ? classes.emotion
+                                  : classes.distress)
+                              }
+                            >
+                              <TableRow>
+                                <TableCell
+                                  //rowSpan={v.data.length}
+                                  colSpan={9}
                                 >
+                                  {v.title}
+                                </TableCell>
+                              </TableRow>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                              <Table>
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell className={classes.skillWidth}>Skills</TableCell>
+                                    {selectedDates.map((date) => (
+                                      <TableCell>{date}</TableCell>
+                                    ))}
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
                                   <TableRow>
                                     <TableCell
-                                      //rowSpan={v.data.length}
-                                      colSpan={9}
                                       className={
-                                        classes.categoryTitle +
+                                        classes.skillWidth +
                                         " " +
-                                        (kv === 0
-                                          ? classes.mindfulness
-                                          : kv === 1
-                                          ? classes.Interpersonal
-                                          : kv === 2
-                                          ? classes.emotion
-                                          : classes.distress)
+                                        (!!skillData[v.data[0]]
+                                          ? kv === 0
+                                            ? classes.mindfulness
+                                            : kv === 1
+                                            ? classes.Interpersonal
+                                            : kv === 2
+                                            ? classes.emotion
+                                            : classes.distress
+                                          : classes.noData)
                                       }
                                     >
-                                      {v.title}
+                                      {v.data[0]}
                                     </TableCell>
-                                  </TableRow>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <div>
-                                    <TableRow>
+                                    {selectedDates.map((d) => (
                                       <TableCell
                                         className={
-                                          classes.skillWidth +
-                                          " " +
-                                          (!!skillData[v.data[0]]
+                                          !!skillData[v.data[0]]
                                             ? kv === 0
                                               ? classes.mindfulness
                                               : kv === 1
@@ -688,15 +703,19 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                               : kv === 2
                                               ? classes.emotion
                                               : classes.distress
-                                            : classes.noData)
+                                            : classes.noData
                                         }
                                       >
-                                        {v.data[0]}
+                                        {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : null}
                                       </TableCell>
-                                      {selectedDates.map((d) => (
-                                        <TableCell
+                                    ))}
+                                  </TableRow>
+                                  {v.data.map(
+                                    (k, key) =>
+                                      key !== 0 && (
+                                        <TableRow
                                           className={
-                                            !!skillData[v.data[0]]
+                                            !!skillData[k]
                                               ? kv === 0
                                                 ? classes.mindfulness
                                                 : kv === 1
@@ -707,43 +726,22 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                               : classes.noData
                                           }
                                         >
-                                          {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : null}
-                                        </TableCell>
-                                      ))}
-                                    </TableRow>
-                                    {v.data.map(
-                                      (k, key) =>
-                                        key !== 0 && (
-                                          <TableRow
-                                            className={
-                                              !!skillData[k]
-                                                ? kv === 0
-                                                  ? classes.mindfulness
-                                                  : kv === 1
-                                                  ? classes.Interpersonal
-                                                  : kv === 2
-                                                  ? classes.emotion
-                                                  : classes.distress
-                                                : classes.noData
-                                            }
-                                          >
-                                            <TableCell className={classes.skillWidth}>{k}</TableCell>
-                                            {selectedDates.map((d) => (
-                                              <TableCell>
-                                                {skillData[k]?.includes(d) ? <Icon>check</Icon> : null}
-                                              </TableCell>
-                                            ))}
-                                          </TableRow>
-                                        )
-                                    )}
-                                  </div>
-                                </AccordionDetails>
-                              </Accordion>
-                            </div>
-                          )
-                        })}
-                      </TableBody>
-                    </Table>
+                                          <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                          {selectedDates.map((d) => (
+                                            <TableCell>
+                                              {skillData[k]?.includes(d) ? <Icon>check</Icon> : null}
+                                            </TableCell>
+                                          ))}
+                                        </TableRow>
+                                      )
+                                  )}
+                                </TableBody>
+                              </Table>
+                            </AccordionDetails>
+                          </Accordion>
+                        </div>
+                      )
+                    })}
                   </TableContainer>
                 </Box>
               )}
