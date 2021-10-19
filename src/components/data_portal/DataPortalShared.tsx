@@ -254,3 +254,35 @@ export const queryables_array = [
 ]
 
 export const tagged_entities = ["Researcher", "Study", "Participant"]
+
+export const queryDictionary = {
+  participantsWithName: function (id_string) {
+    return `(
+								$res := $LAMP.Participant.list('${id_string}').id;
+								$array := $map($res,function($id){{'name': $LAMP.Tag.get($id,'lamp.name'),
+																	'id':$id}})
+								)`
+  },
+}
+
+export function formatGraphName(tagName) {
+  let newName = tagName
+    .slice(tagName.lastIndexOf(".") + 1, tagName.length)
+    .replace(/_/g, " ")
+    .replace(/graph/g, "")
+  return newName
+    .split(" ")
+    .map((elem) => elem.slice(0, 1).toUpperCase() + elem.slice(1))
+    .join(" ")
+}
+
+export function formatTagName(tagName, returnCategoryOnly = true) {
+  console.log(tagName)
+  let categoryIndex = tagName.lastIndexOf(".")
+  let newName = tagName
+    .split(".")
+    .map((elem) => elem.slice(0, 1).toUpperCase() + elem.slice(1))
+    .join("-")
+  if (returnCategoryOnly) return newName.slice(0, categoryIndex)
+  else return newName
+}
