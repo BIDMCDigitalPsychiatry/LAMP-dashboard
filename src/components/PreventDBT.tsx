@@ -201,6 +201,8 @@ const useStyles = makeStyles((theme: Theme) =>
     skillsContainer: { width: "100%", maxWidth: 570 },
     accSummary: { paddingLeft: 0, paddingRight: 0 },
     greentxt: { color: "#21a521" },
+    colCheck: { borderLeft: "0.5px solid #f4f4f4" },
+    colDate: { borderLeft: "0.5px solid #c4c4c4" },
   })
 )
 
@@ -680,7 +682,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                   <TableRow>
                                     <TableCell className={classes.skillWidth}>Skills</TableCell>
                                     {selectedDates.map((date) => (
-                                      <TableCell>{date}</TableCell>
+                                      <TableCell className={classes.colDate}>{date}</TableCell>
                                     ))}
                                   </TableRow>
                                 </TableHead>
@@ -741,7 +743,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                         >
                                           <TableCell className={classes.skillWidth}>{k}</TableCell>
                                           {selectedDates.map((d) => (
-                                            <TableCell>
+                                            <TableCell className={classes.colCheck}>
                                               {skillData[k]?.includes(d) ? (
                                                 <Icon className={classes.greentxt}>check</Icon>
                                               ) : null}
