@@ -31,7 +31,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   )
   const [alphabetizedTree, setAlphabetizedTree] = React.useState(null)
   function alphabetizeTree(array) {
-    console.log(array)
     if (!Array.isArray(array) || array.length === 1) return array
     let res = array.slice().sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
     return res
@@ -148,14 +147,12 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   if (type === "Administrator") {
     React.useEffect(() => {
       if (!expanded) return
-      //console.log("Getting admin options")
       setTree(tags_object[type])
     }, [expanded])
   } else if (Object.keys(tags_object).includes(id[id.length - 1])) {
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      //console.log(`Calling API to show array of ${id[id.length - 1]}`)
       let testQuery =
         id[id.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
@@ -242,15 +239,13 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                 onClick={() => {
                   navigator.clipboard
                     .writeText(id[id.length - 1])
-                    .then((res) => {
-                      console.log(res)
+                    .then(() => {
                       setCopyText("Copied!")
                       setTimeout(() => {
                         setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)
                       }, 5000)
                     })
-                    .catch((res) => {
-                      console.log(res)
+                    .catch(() => {
                       setCopyText("Unable to copy!")
                       setTimeout(() => {
                         setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)

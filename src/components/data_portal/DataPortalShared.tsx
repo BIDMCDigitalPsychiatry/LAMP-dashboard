@@ -277,7 +277,6 @@ export function formatGraphName(tagName) {
 }
 
 export function formatTagName(tagName, returnCategoryOnly = true) {
-  console.log(tagName)
   let categoryIndex = tagName.lastIndexOf(".")
   let newName = tagName
     .split(".")

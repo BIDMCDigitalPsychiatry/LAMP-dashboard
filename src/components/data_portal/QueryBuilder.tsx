@@ -2,23 +2,17 @@ import React from "react"
 import {
   Typography,
   Card,
-  Select,
-  FormControl,
   FormControlLabel,
   FormGroup,
   Switch,
   Button,
-  InputLabel,
-  MenuItem,
   Checkbox,
   Container,
-  Input,
   Icon,
   Backdrop,
   makeStyles,
   CardHeader,
   Box,
-  IconButton,
 } from "@material-ui/core"
 import { tagged_entities, ajaxRequest, formatGraphName, formatTagName } from "./DataPortalShared"
 import { useDrop } from "react-dnd"
@@ -232,7 +226,6 @@ export default function QueryBuilder(props) {
             <Box className={classes.tagsBox}>
               {returnSortedTagObject(props.tagObject[category]).map((array) => {
                 //let's format the names
-                console.log(array)
                 let printedName = formatGraphName(array[0])
                 return (
                   <Card key={array[1]} className={classes.tagCard}>
@@ -425,7 +418,6 @@ export default function QueryBuilder(props) {
         <Box className={classes.tagsBox}>
           {returnSortedTags(props.availableSharedTags).map((name) => {
             //let's format the names
-            console.log(name)
             let printedName = formatGraphName(name)
             return (
               <Card key={name} className={classes.tagCard}>
