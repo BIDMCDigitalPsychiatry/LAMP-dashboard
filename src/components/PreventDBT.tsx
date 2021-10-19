@@ -182,15 +182,25 @@ const useStyles = makeStyles((theme: Theme) =>
     categoryTitle: {
       fontSize: "16px",
       fontWeight: "bold",
+      "& div.MuiAccordionSummary-content": {
+        margin: "0",
+      },
+      "& td": { border: 0 },
+      "& div.MuiAccordionDetails-root": {
+        padding: "0",
+      },
     },
     tableDiv: {
       display: "contents",
     },
     tableOuter: {
       maxWidth: 570,
+      paddingTop: 10,
     },
     skillWidth: { maxWidth: "100px" },
     skillsContainer: { width: "100%", maxWidth: 570 },
+    accSummary: { paddingLeft: 0, paddingRight: 0 },
+    greentxt: { color: "#21a521" },
   })
 )
 
@@ -664,7 +674,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                 </TableCell>
                               </TableRow>
                             </AccordionSummary>
-                            <AccordionDetails>
+                            <AccordionDetails className={classes.accSummary}>
                               <Table>
                                 <TableHead>
                                   <TableRow>
@@ -707,7 +717,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                             : classes.noData
                                         }
                                       >
-                                        {skillData[v.data[0]]?.includes(d) ? <Icon>check</Icon> : null}
+                                        {skillData[v.data[0]]?.includes(d) ? (
+                                          <Icon className={classes.greentxt}>check</Icon>
+                                        ) : null}
                                       </TableCell>
                                     ))}
                                   </TableRow>
@@ -730,7 +742,9 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                                           <TableCell className={classes.skillWidth}>{k}</TableCell>
                                           {selectedDates.map((d) => (
                                             <TableCell>
-                                              {skillData[k]?.includes(d) ? <Icon>check</Icon> : null}
+                                              {skillData[k]?.includes(d) ? (
+                                                <Icon className={classes.greentxt}>check</Icon>
+                                              ) : null}
                                             </TableCell>
                                           ))}
                                         </TableRow>
