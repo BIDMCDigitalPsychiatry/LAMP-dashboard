@@ -325,7 +325,6 @@ export default function SurveyCreator({
   const [isOptionNull, setIsOptionNull] = useState(0)
 
   useEffect(() => {
-    console.log(questions)
     setData({ ...data, settings: questions })
   }, [questions])
 
@@ -407,7 +406,6 @@ export default function SurveyCreator({
   }
 
   const checkAndSave = (data, isDuplicate) => {
-    console.log(data)
     if (
       questions.length === 0 ||
       questions.filter((val) => !!val.text && val.text?.trim().length !== 0).length !== questions.length
