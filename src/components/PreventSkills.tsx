@@ -168,7 +168,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "contents",
     },
     tableOuter: {
-      maxWidth: 570,
+      width: 570,
       paddingTop: 10,
     },
     skillWidth: { maxWidth: "100px" },
