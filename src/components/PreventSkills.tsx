@@ -188,10 +188,6 @@ const useStyles = makeStyles((theme: Theme) =>
       overflow: "auto",
       [theme.breakpoints.down("xs")]: {
         maxWidth: "340px",
-        minWidth: 340,
-      },
-      [theme.breakpoints.up("sm")]: {
-        minWidth: "570px",
       },
     },
   })
