@@ -30,6 +30,7 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
+import { ToggleButtonGroup, ToggleButton } from "@material-ui/lab"
 import { useTranslation } from "react-i18next"
 import { useSnackbar } from "notistack"
 import ActivityHeader from "./ActivityHeader"
@@ -162,15 +163,20 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
+  const [timePattern, setTimePatterm] = useState(question.type === "time" ? question.options[0].value : "standard")
   const { t } = useTranslation()
   useEffect(() => {
     onChange({
       text,
       type,
       description,
-      options: ["list", "select", "multiselect", "slider", "rating"].includes(type) ? options : null,
+      options: ["list", "select", "multiselect", "slider", "rating"].includes(type)
+        ? options
+        : type === "time"
+        ? [{ value: timePattern, description: timePattern }]
+        : null,
     })
-  }, [text, description, type, options])
+  }, [text, description, type, options, timePattern])
 
   return (
     <Step {...props}>
@@ -247,12 +253,32 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Button color={type === "rating" ? "primary" : "default"} onClick={() => setType("rating")}>
                 {t("Rating")}
               </Button>
+              <Button color={type === "time" ? "primary" : "default"} onClick={() => setType("time")}>
+                {t("Time")}
+              </Button>
             </ButtonGroup>
           </Grid>
           {["list", "select", "multiselect", "slider", "rating"].includes(type) && (
             <Grid item>
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <SelectList checkbox={type === "multiselect"} type={type} value={options} onChange={setOptions} />
+              </Box>
+            </Grid>
+          )}
+          {["time"].includes(type) && (
+            <Grid item>
+              <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
+                <ToggleButtonGroup
+                  color="primary"
+                  value={timePattern}
+                  exclusive
+                  onChange={(event, val) => {
+                    setTimePatterm(val)
+                  }}
+                >
+                  <ToggleButton value="standard">Standard Time</ToggleButton>
+                  <ToggleButton value="military">Military Time</ToggleButton>
+                </ToggleButtonGroup>
               </Box>
             </Grid>
           )}

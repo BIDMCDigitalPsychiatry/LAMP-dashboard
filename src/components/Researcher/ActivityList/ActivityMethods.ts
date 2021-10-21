@@ -538,7 +538,7 @@ export const SchemaList = () => {
           type: {
             type: "string",
             title: i18n.t("Question Type"),
-            enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating"],
+            enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating", "time"],
             enumNames: [
               i18n.t("Text"),
               i18n.t("Boolean"),
@@ -547,6 +547,7 @@ export const SchemaList = () => {
               i18n.t("Slider"),
               i18n.t("Short Answer"),
               i18n.t("Rating"),
+              i18n.t("Time"),
             ],
             default: "text",
           },
