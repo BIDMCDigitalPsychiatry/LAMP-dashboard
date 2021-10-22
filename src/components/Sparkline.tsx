@@ -28,7 +28,7 @@ export default function Sparkline({ ...props }) {
   }
 
   const handleClick = (...args) => {
-    console.log(args)
+    // console.log(args)
   }
   const signalListeners = { click: handleClick, mouseover: handleClick }
 
@@ -111,7 +111,7 @@ export default function Sparkline({ ...props }) {
             ],
           },
           data: {
-            values: props.data,
+            values: props.values ?? props.data,
           },
         }}
       />
