@@ -12,12 +12,13 @@ import {
   TextField,
   ClickAwayListener,
   Tooltip,
+  CardContent,
 } from "@material-ui/core"
 import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
 import { useDrag, DragPreviewImage } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
-import { generate_ids } from "./DataPortalShared"
+import { generate_ids, useLocalStorage, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
 import jsonexport from "jsonexport"
@@ -25,6 +26,16 @@ import jsonexport from "jsonexport"
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
   const [expanded, setExpanded] = React.useState(false)
+  const [isAlphabetized, toggleAlphabetized] = React.useState(
+    Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator"
+  )
+  const [alphabetizedTree, setAlphabetizedTree] = React.useState(null)
+  function alphabetizeTree(array) {
+    if (!Array.isArray(array) || array.length === 1) return array
+    let res = array.slice().sort((a, b) => (a.name ? a.name : a.id).localeCompare(b.name ? b.name : b.id))
+    return res
+  }
+
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "TARGETINFO",
     item: { target: id[id.length - 1], type, name, id_string: id },
@@ -45,6 +56,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   const [showFilter, toggleShowFilter] = React.useState(false)
   const [currentFilter, setCurrentFilter] = React.useState("")
   const filterRef = React.useRef(null)
+
   const useStyles = makeStyles((theme) => ({
     treeCard: {
       width: `${100 - 2 * (id.length > 2 ? 1 : 0)}%`,
@@ -71,21 +83,25 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    treeButtonHighlighted: {
+      background: "#7599FF",
+      borderRadius: "40px",
+      boxShadow: "none",
+      cursor: "pointer",
+      textTransform: "capitalize",
+      fontSize: "14px",
+      color: "#fff",
+      flex: "auto",
+      margin: "auto",
+      "& svg": { marginRight: 8 },
+      "&:hover": { color: "#fff", background: "#5680f9", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
     treeFilter: {
-      position: "fixed",
-      top: "50vh",
-      left: "30vw",
-      width: "50vw",
-      paddingTop: "5px",
-      height: "60px",
       background: "white",
       "&:hover": {
         backgroundColor: "#eee",
       },
-      border: "1px solid black",
       borderRadius: "3px",
-      paddingLeft: "10px",
-      zIndex: 1111,
     },
     cardHeader: {
       display: "flex",
@@ -103,6 +119,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     },
   }))
   const classes = useStyles()
+
   //let's define our function we'll use to ping the api
   const getData = async (query) => {
     try {
@@ -130,23 +147,25 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   if (type === "Administrator") {
     React.useEffect(() => {
       if (!expanded) return
-      //console.log("Getting admin options")
       setTree(tags_object[type])
     }, [expanded])
   } else if (Object.keys(tags_object).includes(id[id.length - 1])) {
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      //console.log(`Calling API to show array of ${id[id.length - 1]}`)
       let testQuery =
         id[id.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
           : id[id.length - 1] === "Study"
           ? `$LAMP.Study.list("${id[id.length - 2]}")`
           : id[id.length - 1] === "Participant"
-          ? `$LAMP.Participant.list("${id[id.length - 2]}")`
+          ? queryDictionary.participantsWithName(id[id.length - 2])
           : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")`
-      getData(testQuery).then((res) => setTree(res))
+      getData(testQuery).then((res) => {
+        if (!Array.isArray(res)) res = [res]
+        setTree(res)
+        setAlphabetizedTree(alphabetizeTree(res))
+      })
     }, [expanded])
   } else if (queryables_array.includes(id[id.length - 1])) {
     //then call the api
@@ -180,7 +199,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
 
     //first, let's generate a complete id list
     let id_list = await generate_ids(id)
-    console.log(id_list)
 
     //now, let's pull some data
     let resultsPulled = await Promise.all(
@@ -204,46 +222,89 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     if (showFilter && filterRef.current) filterRef.current.focus()
   }, [showFilter])
 
+  const [copyText, setCopyText] = React.useState(`Copy ${id.length >= 2 ? id[id.length - 2] : ""} ID to clipboard`)
+
   return (
     <Card ref={drag} key={"div" + id[id.length - 1]} raised={true} className={classes.treeCard}>
       <CardHeader
         className={classes.cardHeader}
         key={"text" + id[id.length - 1]}
         title={`${name ? name : id[id.length - 1]}`}
+        action={
+          id.length >= 2 &&
+          Object.keys(tags_object).includes(id[id.length - 2]) && (
+            <Tooltip title={copyText}>
+              <IconButton
+                className={classes.treeButton}
+                onClick={() => {
+                  navigator.clipboard
+                    .writeText(id[id.length - 1])
+                    .then(() => {
+                      setCopyText("Copied!")
+                      setTimeout(() => {
+                        setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)
+                      }, 5000)
+                    })
+                    .catch(() => {
+                      setCopyText("Unable to copy!")
+                      setTimeout(() => {
+                        setCopyText(`Copy ${id[id.length - 2]} ID to clipboard`)
+                      }, 5000)
+                    })
+                }}
+              >
+                <Icon>content_copy</Icon>
+              </IconButton>
+            </Tooltip>
+          )
+        }
       />
+
+      {showFilter && (
+        <ClickAwayListener onClickAway={() => toggleShowFilter(currentFilter.length !== 0)}>
+          <CardContent>
+            {expanded && (
+              <TextField
+                className={classes.treeFilter}
+                value={currentFilter}
+                onChange={(e) => {
+                  setCurrentFilter(e.target.value)
+                }}
+                label={`Filter ${id[id.length - 1]}s`}
+                placeholder={`Search ${id[id.length - 1]} list`}
+                inputRef={filterRef}
+                InputProps={{
+                  disableUnderline: true,
+                }}
+              />
+            )}
+          </CardContent>
+        </ClickAwayListener>
+      )}
       <CardActions className={classes.cardActions} style={{ display: "flex", flexWrap: "wrap", flexDirection: "row" }}>
-        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && (
-          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
-            <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
-              <Icon>search</Icon>
+        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
+          <Tooltip title={isAlphabetized ? `Sort by date of creation` : `Alphabetize List`}>
+            <IconButton
+              className={isAlphabetized ? classes.treeButtonHighlighted : classes.treeButton}
+              onClick={() => toggleAlphabetized(!isAlphabetized)}
+            >
+              <Icon>sort_by_alpha</Icon>
             </IconButton>
           </Tooltip>
         )}
-        {showFilter && (
-          <ClickAwayListener onClickAway={() => toggleShowFilter(!showFilter)}>
-            <TextField
-              className={classes.treeFilter}
-              value={currentFilter}
-              onChange={(e) => {
-                setCurrentFilter(e.target.value)
+
+        {Object.keys(tags_object).includes(id[id.length - 1]) && id[id.length - 1] !== "Administrator" && expanded && (
+          <Tooltip title={`Filter${currentFilter.length ? `(currently:${currentFilter})` : ""}`}>
+            <IconButton
+              className={currentFilter.length ? classes.treeButtonHighlighted : classes.treeButton}
+              onClick={() => {
+                toggleShowFilter(!showFilter)
+                setCurrentFilter("")
               }}
-              placeholder={`Search ${id[id.length - 1]} list`}
-              inputRef={filterRef}
-              InputProps={{
-                disableUnderline: true,
-                endAdornment: (
-                  <React.Fragment>
-                    <IconButton className={classes.treeButton} onClick={() => setCurrentFilter("")}>
-                      <Icon>backspace</Icon>
-                    </IconButton>
-                    <IconButton className={classes.treeButton} onClick={() => toggleShowFilter(!showFilter)}>
-                      <Icon>close</Icon>
-                    </IconButton>
-                  </React.Fragment>
-                ),
-              }}
-            />
-          </ClickAwayListener>
+            >
+              <Icon>search</Icon>
+            </IconButton>
+          </Tooltip>
         )}
 
         {!Object.keys(tags_object).includes(id[id.length - 1]) && Object.keys(tags_object).includes(id[id.length - 2]) && (
@@ -328,12 +389,12 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
 						For each branch in our tree, we output some info and create a new level
 						*/}
       {expanded &&
-        (!!treeDisplay ? treeDisplay : []).map(
+        (!!treeDisplay ? (isAlphabetized && !!alphabetizedTree ? alphabetizedTree : treeDisplay) : []).map(
           (branch, index) =>
             (!currentFilter ||
               currentFilter === "" ||
               branch.id.indexOf(currentFilter) !== -1 ||
-              (typeof branch !== "string" && branch.name.indexOf(currentFilter) !== -1)) && (
+              (typeof branch !== "string" && branch.name && branch.name.indexOf(currentFilter) !== -1)) && (
               <RenderTree
                 key={"tree" + id[id.length - 1] + index}
                 id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
