@@ -170,7 +170,10 @@ const useStyles = makeStyles((theme: Theme) =>
     tableOuter: {
       maxWidth: 570,
       paddingTop: 10,
-      width: "100%",
+      [theme.breakpoints.up("md")]: {
+        minWidth: "540px",
+        width: "100%",
+      },
     },
     skillWidth: { maxWidth: "100px" },
     skillsContainer: { width: "100%", maxWidth: 570 },
@@ -183,11 +186,14 @@ const useStyles = makeStyles((theme: Theme) =>
       "& span.MuiFormControlLabel-label": { fontSize: "13.5px" },
     },
     tableResponsive: {
-      width: "100%",
       maxWidth: "570px",
       overflow: "auto",
-      [theme.breakpoints.down("xs")]: {
-        maxWidth: "340px",
+      [theme.breakpoints.down("sm")]: {
+        maxWidth: "300px",
+      },
+      [theme.breakpoints.up("md")]: {
+        minWidth: "540px",
+        width: "100%",
       },
     },
   })
