@@ -240,7 +240,6 @@ export async function generate_ids(id_set, return_with_names = false) {
     }
     //if nothing exists, this is a researcher, so we recursively call
     else {
-      //@ts-ignore
       let res = await LAMP.Study.allByResearcher(id_set)
       return await generate_ids(
         res.map((study) => study.id),
