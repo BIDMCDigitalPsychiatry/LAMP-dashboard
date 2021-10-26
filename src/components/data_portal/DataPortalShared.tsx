@@ -219,8 +219,7 @@ export async function generate_ids(id_set, return_with_names = false) {
       if (return_with_names) {
         let result = await LAMP.Type.getAttachment(id_set, "lamp.name")
         return { [id_set]: result["data"] ? result["data"] : null }
-      } else
-        return return_with_names ? { [id_set]: (await LAMP.Type.getAttachment(id_set, "lamp.name"))["data"] } : [id_set]
+      } else return [id_set]
     }
     //else if researcher exists
     //this is a study
@@ -280,7 +279,7 @@ export async function generate_study_ids(id_set) {
       return res.map((study) => study.id)
     }
   } else if (Array.isArray(id_set)) {
-    const res = await Promise.all(id_set.map((id) => generate_ids(id)))
+    const res = await Promise.all(id_set.map((id) => generate_study_ids(id)))
     //now, res is an array of arrays. let's combine them
     return res.reduce((acc, array) => acc.concat(array), [])
   } else {
@@ -297,7 +296,9 @@ export async function generate_activity_dict(id_set, already_reduced = false) {
 
   //pull an array of arrays of studies
   const res = await Promise.all(id_list.map((id) => LAMP.Activity.allByStudy(id)))
+  //flatten the array of arrays
   let studyArray = res.reduce((acc, array) => (acc as Array<any>).concat(array), [])
+  //return a dictionary with activity ids and names
   return (studyArray as Array<any>).reduce((acc, example) => {
     return { ...acc, ...{ [example.id]: example.name } }
   }, {})

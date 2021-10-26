@@ -278,7 +278,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       }, [])
     }
 
-    debugger
     jsonexport(resultsPulled, function (err, csv) {
       if (err) return console.log(err)
       const file = new Blob([csv], { type: "text/csv" })

@@ -89,7 +89,7 @@ export default function SelectionWindow({
   const [awaitingClose, setAwaitClose] = useState(false)
 
   React.useEffect(() => {
-    runOnOpen()
+    if (open) runOnOpen()
   }, [open])
   function ConditionalCardWrap({ condition, children }) {
     return condition ? (
