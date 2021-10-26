@@ -210,23 +210,74 @@ export const standaloneStyle = makeStyles((theme: Theme) =>
 )
 
 //given a valid researcher, study, or participant id,
-//an array of ids is returned
-export async function generate_ids(id_set) {
+//an array of participant ids is returned
+export async function generate_ids(id_set, return_with_names = false) {
   if (typeof id_set === "string") {
     let { data: parents } = await LAMP.Type.parent(id_set)
     //if study exists, return id_set
-    if (parents?.Study) return [id_set]
+    if (parents?.Study) {
+      if (return_with_names) {
+        let result = await LAMP.Type.getAttachment(id_set, "lamp.name")
+        return { [id_set]: result["data"] ? result["data"] : null }
+      } else
+        return return_with_names ? { [id_set]: (await LAMP.Type.getAttachment(id_set, "lamp.name"))["data"] } : [id_set]
+    }
     //else if researcher exists
     //this is a study
     else if (parents?.Researcher) {
       let res = await LAMP.Participant.allByStudy(id_set)
-      return res.map((participant) => participant.id)
+      if (return_with_names) {
+        let resObj = (await Promise.all(
+          res.map((part) => {
+            return LAMP.Type.getAttachment(part.id, "lamp.name").then((result) => {
+              return { [part.id]: result["data"] ? result["data"] : null }
+            })
+          })
+        )) as Array<object>
+        return resObj.reduce((acc, elem) => {
+          return { ...acc, ...elem }
+        }, {})
+      } else return res.map((participant) => participant.id)
     }
     //if nothing exists, this is a researcher, so we recursively call
     else {
       //@ts-ignore
       let res = await LAMP.Study.allByResearcher(id_set)
-      return await generate_ids(res.map((study) => study.id))
+      return await generate_ids(
+        res.map((study) => study.id),
+        return_with_names
+      )
+    }
+  } else if (Array.isArray(id_set)) {
+    const res = await Promise.all(id_set.map((id) => generate_ids(id, return_with_names)))
+    //now, res is an array of arrays, or an array of objects. let's combine them
+    if (return_with_names) {
+      return res.reduce((acc, obj) => {
+        return { ...acc, ...obj }
+      }, {})
+    } else return res.reduce((acc, array) => acc.concat(array), [])
+  } else {
+    return [id_set]
+  }
+}
+
+//given a valid researcher, study, or participant id,
+//an array of study ids is returned
+export async function generate_study_ids(id_set) {
+  if (typeof id_set === "string") {
+    let { data: parents } = await LAMP.Type.parent(id_set)
+    //if study exists, return study, this is a participant
+    if (parents?.Study) return [parents.Study]
+    //else if researcher exists
+    //this is a study, so we return id_set
+    else if (parents?.Researcher) {
+      return [id_set]
+    }
+    //if nothing exists, this is a researcher, so we get the list of studies
+    //under their purview and return that
+    else {
+      let res = await LAMP.Study.allByResearcher(id_set)
+      return res.map((study) => study.id)
     }
   } else if (Array.isArray(id_set)) {
     const res = await Promise.all(id_set.map((id) => generate_ids(id)))
@@ -236,6 +287,37 @@ export async function generate_ids(id_set) {
     return [id_set]
   }
 }
+
+//given an id or array of ids, returns a dictionary containing
+//key value pairs of activity ids and activity names
+export async function generate_activity_dict(id_set, already_reduced = false) {
+  let id_list
+  if (already_reduced) id_list = id_set
+  else id_list = await generate_study_ids(id_set)
+
+  //pull an array of arrays of studies
+  const res = await Promise.all(id_list.map((id) => LAMP.Activity.allByStudy(id)))
+  let studyArray = res.reduce((acc, array) => (acc as Array<any>).concat(array), [])
+  return (studyArray as Array<any>).reduce((acc, example) => {
+    return { ...acc, ...{ [example.id]: example.name } }
+  }, {})
+}
+
+//this function takes a LAMP timestamp and returns
+//a nicely formatted UTC string
+export function ts_to_UTC_String(timestamp) {
+  let date = new Date(timestamp)
+  return date.toLocaleString()
+}
+
+//this function takes an object and returns an object
+//with the same keys where the values have been stringified
+export function stringify_obj_values(obj) {
+  let res = {}
+  Object.keys(obj).forEach((key) => (res[key] = JSON.stringify(obj[key])))
+  return res
+}
+
 export const tags_object = {
   Administrator: ["Researcher", "ActivitySpec", "SensorSpec"],
   Researcher: ["Study", "ActivitySpec", "SensorSpec"],

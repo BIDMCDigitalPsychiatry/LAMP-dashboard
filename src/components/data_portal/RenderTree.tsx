@@ -13,8 +13,16 @@ import {
   ClickAwayListener,
   Tooltip,
   CardContent,
+  Checkbox,
 } from "@material-ui/core"
-import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
+import {
+  tags_object,
+  queryables_array,
+  tagged_entities,
+  generate_activity_dict,
+  ts_to_UTC_String,
+  stringify_obj_values,
+} from "./DataPortalShared"
 import { useDrag, DragPreviewImage } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
@@ -192,25 +200,85 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   let newdate = month + "_" + day + "_" + year
   const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id.length - 1]}_Activity_Data_${newdate}.csv`
   const [downloadName, setDownloadName] = React.useState(defaultDownloadName)
-  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv", delimiter = ",", returnChar = "\n") {
+
+  const defaultExplodeParticipant = true
+  const [explodeParticipant, setExplodeParticipant] = React.useState(defaultExplodeParticipant)
+
+  const defaultExplodeTemporalSlices = true
+  const [explodeTemporalSlices, setExplodeTemporalSlices] = React.useState(defaultExplodeTemporalSlices)
+
+  async function downloadData(
+    id,
+    name = "LAMP_Activity_Data" + newdate + ".csv",
+    explode_by_participant = true,
+    explode_temporal_slices = true
+  ) {
     //TODO: add selection between one big file and multiple files
     //TODO: add json vs csv selection
     console.log(`Downloading data for ${id}`)
 
     //first, let's generate a complete id list
-    let id_list = await generate_ids(id)
+    let id_obj = await generate_ids(id, true)
+    let id_list = Object.keys(id_obj)
+    //now, let's get our lookup dict
+    let lookup_dict = await generate_activity_dict(id)
 
     //now, let's pull some data
-    let resultsPulled = await Promise.all(
+    let resultsPulled = (await Promise.all(
       id_list.map(async (id) => {
         let res = await LAMP.ActivityEvent.allByParticipant(id)
+        res = res.map((event) => {
+          return {
+            ActivityName: lookup_dict[event.activity],
+            ActivityDate: ts_to_UTC_String(event.timestamp),
+            ...event,
+          }
+        })
         return {
           userID: id,
+          userName: id_obj[id] ? id_obj[id] : null,
           activityEvents: JSON.stringify(res),
         }
       })
-    )
+    )) as Array<any>
 
+    if (explode_by_participant) {
+      resultsPulled = resultsPulled.reduce((acc, participant_object) => {
+        return (acc as Array<any>).concat(
+          JSON.parse(participant_object["activityEvents"])
+            .map((activity) => {
+              //let final_object:
+              if (explode_temporal_slices && activity?.temporal_slices?.length) {
+                return activity.temporal_slices.map((slice) => {
+                  //explode out temporal slices
+                  let obj = { ...activity }
+                  delete obj.temporal_slices
+                  obj["totalDuration"] = obj.duration
+                  delete obj.duration
+                  return {
+                    userID: participant_object["userID"],
+                    userName: participant_object["userName"],
+                    ...stringify_obj_values(slice),
+                    ...stringify_obj_values(obj),
+                  }
+                })
+              } else
+                return [
+                  {
+                    userID: participant_object["userID"],
+                    userName: participant_object["userName"],
+                    activityEvent: JSON.stringify(activity),
+                  },
+                ]
+            })
+            .reduce((acc, elem) => {
+              return acc.concat(elem)
+            }, [])
+        )
+      }, [])
+    }
+
+    debugger
     jsonexport(resultsPulled, function (err, csv) {
       if (err) return console.log(err)
       const file = new Blob([csv], { type: "text/csv" })
@@ -318,8 +386,12 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
             displaySubmitButton={true}
             runOnOpen={() => {
               setDownloadName(defaultDownloadName)
+              setExplodeTemporalSlices(defaultExplodeTemporalSlices)
+              setExplodeParticipant(defaultExplodeParticipant)
             }}
-            handleResult={() => downloadData(id[id.length - 1], downloadName)}
+            handleResult={() =>
+              downloadData(id[id.length - 1], downloadName, explodeParticipant, explodeTemporalSlices)
+            }
             closesOnSubmit={false}
             exposeButton={true}
             submitText={`Download`}
@@ -344,6 +416,30 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     </Box>
                   }
                 />
+                <br />
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  onClick={() => setExplodeParticipant(!explodeParticipant)}
+                  control={<Checkbox checked={explodeParticipant} />}
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      Separate participant data into multiple lines for each activity
+                    </Box>
+                  }
+                />
+                <br />
+                {explodeParticipant && (
+                  <FormControlLabel
+                    classes={{ root: classes.downloadFormControl }}
+                    onClick={() => setExplodeTemporalSlices(!explodeTemporalSlices)}
+                    control={<Checkbox checked={explodeTemporalSlices} />}
+                    label={
+                      <Box component="span" fontWeight={600}>
+                        Separate activity data into multiple lines for each response
+                      </Box>
+                    }
+                  />
+                )}
               </Typography>
             }
           />
