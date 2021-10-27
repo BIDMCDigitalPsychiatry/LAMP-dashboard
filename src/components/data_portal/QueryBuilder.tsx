@@ -271,7 +271,7 @@ export default function QueryBuilder(props) {
     }
     const removeTag = (name) => {
       let index = props.selectedSharedTags.indexOf(name)
-      if (index) {
+      if (index !== -1) {
         props.setSelectedSharedTags(props.selectedSharedTags.filter((elem) => elem !== name))
       }
     }
