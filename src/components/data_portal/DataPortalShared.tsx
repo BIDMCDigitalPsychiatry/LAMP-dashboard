@@ -26,13 +26,13 @@ export function useLocalStorage(key, initialValue) {
 
 //nicer ajaxRequest
 export function ajaxRequest(parameters) {
-  var method = parameters.method ? parameters.method : "GET"
-  var data = parameters.data
+  let method = parameters.method ? parameters.method : "GET"
+  let data = parameters.data
     ? typeof parameters.data === "object"
       ? JSON.stringify(parameters.data)
       : parameters.data
     : ""
-  var xmlhttp = new XMLHttpRequest()
+  let xmlhttp = new XMLHttpRequest()
   xmlhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       if (parameters.callback) parameters.callback(this.responseText)

@@ -14,7 +14,7 @@ import {
   CardHeader,
   Box,
 } from "@material-ui/core"
-import { tagged_entities, ajaxRequest, formatGraphName, formatTagName } from "./DataPortalShared"
+import { tagged_entities, ajaxRequest, formatGraphName } from "./DataPortalShared"
 import { useDrop } from "react-dnd"
 
 const useStyles = makeStyles((theme) => ({
@@ -202,16 +202,6 @@ export default function QueryBuilder(props) {
       ajaxRequest(sending)
       //if the tag is not currently in our list
     }
-    const ITEM_HEIGHT = 48
-    const ITEM_PADDING_TOP = 8
-    const MenuProps = {
-      PaperProps: {
-        style: {
-          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-          width: 250,
-        },
-      },
-    }
 
     function returnSortedTagObject(array) {
       let res = array.slice()
@@ -380,17 +370,6 @@ export default function QueryBuilder(props) {
         }
       }
     }, [])
-
-    const ITEM_HEIGHT = 48
-    const ITEM_PADDING_TOP = 8
-    const MenuProps = {
-      PaperProps: {
-        style: {
-          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-          width: 250,
-        },
-      },
-    }
 
     const uncheckAllTags = () => {
       props.setSelectedSharedTags([])

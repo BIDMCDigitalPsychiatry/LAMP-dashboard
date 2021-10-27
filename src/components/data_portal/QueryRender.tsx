@@ -4,7 +4,6 @@ import {
   LinearProgress,
   Typography,
   Card,
-  Button,
   Grid,
   Switch,
   Icon,
@@ -516,18 +515,6 @@ export default function QueryRender(props) {
     setStringFilter(filterValue)
   }
 
-  const saveAllResults = async () => {
-    let filter = groupByID ? "id" : "tag"
-    let subfilter = groupByID ? "tag" : "id"
-    let targetList = props.queryResult.reduce(
-      (acc, obj) => (acc.includes(obj[filter]) ? acc : acc.concat(obj[filter])),
-      []
-    )
-    targetList.forEach((target) => {
-      let selection = props.queryResult.filter((obj) => obj[filter] === target)
-      saveVegaQueryResToPDF(selection, subfilter)
-    })
-  }
   //depending on the type of result, we can show different things!
   switch (type(props.queryResult)) {
     //arrays must be dealt with recursively

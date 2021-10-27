@@ -18,15 +18,14 @@ import {
 import {
   tags_object,
   queryables_array,
-  tagged_entities,
   generate_activity_dict,
   ts_to_UTC_String,
   stringify_obj_values,
 } from "./DataPortalShared"
-import { useDrag, DragPreviewImage } from "react-dnd"
+import { useDrag } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
-import { generate_ids, useLocalStorage, queryDictionary } from "./DataPortalShared"
+import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
 import jsonexport from "jsonexport"
