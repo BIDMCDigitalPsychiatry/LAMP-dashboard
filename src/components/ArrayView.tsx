@@ -55,7 +55,7 @@ export default function ArrayView({
               </TableRow>
               {hasSpanningRowForIndex?.(index) && (
                 <TableRow key={`${index}-optional`}>
-                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(index)}</TableCell>
+                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(row.item)}</TableCell>
                 </TableRow>
               )}
             </React.Fragment>

@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@material-ui/core"
 // Local Imports
 import Sparkline from "./Sparkline"
@@ -29,11 +29,38 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
-
+  let each = Object.values(
+    events
+      .map((d) =>
+        d.temporal_slices.map((t) => ({
+          item: t.item,
+          [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? t.value : !!t.status ? 1 : 0,
+        }))
+      )
+      .reduce((x, y) => x.concat(y), [])
+      .groupBy("item")
+  )
+    .map((v: any) => Object.assign({}, ...v))
+    .reduce((x, y) => x.concat(y), [])
+  let eachData = []
+  each = each.map((d, key) => {
+    let keys = Object.keys(d)
+    eachData[d["item"]] = []
+    keys.map((k) => {
+      if (k !== "item") {
+        eachData[d["item"]].push({
+          x: k,
+          y: parseInt(d[k]),
+          missing: [null, "NULL"].includes(d),
+        })
+      }
+    })
+  })
   return (
     <React.Fragment>
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
-        {!Boolean(visibleSlice) ? (
+        {!Boolean(visibleSlice) && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
           <Tooltip title={t("Switch Views")}>
             <IconButton onClick={(event) => setShowGrid(!showGrid)}>
               <Icon fontSize="small">dashboard</Icon>
@@ -102,7 +129,7 @@ export default function ActivityCard({
             }))}
           />
         )
-      ) : showGrid ? (
+      ) : showGrid && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
         <ArrayView
           hiddenKeys={["x"]}
           hasSpanningRowForIndex={
@@ -114,25 +141,7 @@ export default function ActivityCard({
               minWidth={48}
               minHeight={48}
               color={colors.blue[500]}
-              data={events.map((d) => ({
-                x: new Date(d.timestamp),
-                y: strategies[activity.spec]
-                  ? strategies[activity.spec](
-                      activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                        ? d.temporal_slices
-                        : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
-                        ? d
-                        : d.static_data,
-                      selectedActivity,
-                      idx
-                    )
-                  : 0,
-                slice: d.temporal_slices,
-                missing:
-                  activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                    ? [null, "NULL"].includes(d.temporal_slices[idx]?.value ?? null)
-                    : false, // sometimes the slice itself is missing, not set to null
-              }))}
+              data={eachData[idx]}
               onClick={(datum) => setVisibleSlice(datum)}
             />
           )}

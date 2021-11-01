@@ -41,6 +41,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const { t, i18n } = useTranslation()
   const [currentActivity, setCurrentActivity] = useState(null)
   const [dataSubmitted, setDataSubmitted] = useState(false)
+  const [timestamp, setTimestamp] = useState(null)
+
   useEffect(() => {
     setDataSubmitted(false)
     setCurrentActivity(activity)
@@ -78,24 +80,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             let data = JSON.parse(e.data)
             delete data["activity"]
             data["activity"] = activityId
-            if (
-              ((currentActivity?.spec === "lamp.scratch_image" || currentActivity?.spec === "lamp.tips") &&
-                data?.completed) ||
-              (currentActivity?.spec !== "lamp.scratch_image" && currentActivity?.spec !== "lamp.tips")
-            ) {
-              setData(data)
-              setEmbeddedActivity(undefined)
-              setSettings(null)
-              setActivityId(null)
-            } else {
-              LAMP.ActivityEvent.create(participant?.id ?? participant, data)
-                .catch((e) => {
-                  console.dir(e)
-                })
-                .then((x) => {
-                  setDataSubmitted(true)
-                })
-            }
+
+            setData(data)
+            setEmbeddedActivity(undefined)
+            setSettings(null)
+            setActivityId(null)
           }
         }
       },
@@ -104,9 +93,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [settings])
 
   useEffect(() => {
-    if (embeddedActivity === undefined && data !== null && !saved) {
-      const activitySpec = currentActivity.spec
-      if (activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
+    if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
+      const activitySpec = currentActivity?.spec ?? ""
+      if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
       } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
@@ -116,16 +105,20 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       } else if (activitySpec === "lamp.tips" && data?.completed) {
         onComplete(dataSubmitted ? data : null)
       } else {
-        LAMP.ActivityEvent.create(participant?.id ?? participant, data)
-          .catch((e) => {
-            console.dir(e)
-          })
-          .then((x) => {
-            if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
-              setSaved(true)
-              onComplete(data)
-            }
-          })
+        setDataSubmitted(true)
+        if ((data?.timestamp ?? 0) !== timestamp) {
+          setTimestamp(data.timestamp)
+          LAMP.ActivityEvent.create(participant?.id ?? participant, data)
+            .catch((e) => {
+              console.dir(e)
+            })
+            .then((x) => {
+              if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
+                setSaved(true)
+                onComplete(data)
+              }
+            })
+        }
       }
     }
   }, [embeddedActivity])

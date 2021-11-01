@@ -2,22 +2,19 @@ import React from "react"
 import {
   Typography,
   Card,
-  Select,
-  FormControl,
   FormControlLabel,
   FormGroup,
   Switch,
   Button,
-  InputLabel,
-  MenuItem,
   Checkbox,
   Container,
-  Input,
   Icon,
   Backdrop,
   makeStyles,
+  CardHeader,
+  Box,
 } from "@material-ui/core"
-import { tagged_entities, ajaxRequest } from "./DataPortalShared"
+import { tagged_entities, ajaxRequest, formatGraphName, formatTagName } from "./DataPortalShared"
 import { useDrop } from "react-dnd"
 
 const useStyles = makeStyles((theme) => ({
@@ -25,6 +22,36 @@ const useStyles = makeStyles((theme) => ({
     zIndex: theme.zIndex.drawer + 1,
     //position:'relative',
     color: "#fff",
+  },
+  tagCard: {
+    flex: "25%",
+    float: "left",
+    fontSize: "10px",
+    "&:hover": { background: "#eee", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+  },
+  tagCardHeader: {
+    fontSize: "10px",
+    wordBreak: "break-word",
+  },
+  tagCheckbox: {
+    color: "#7599FF",
+    "&:checked": { color: "#7599FF" },
+    "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+  },
+  tagsBox: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    flexGrow: 1,
+    float: "left",
+    marginTop: "0px",
+  },
+  categoryBox: {
+    display: "flex",
+    flexDirection: "column",
+    flexWrap: "wrap",
+    flexGrow: 1,
+    float: "left",
   },
 }))
 
@@ -71,8 +98,7 @@ export default function QueryBuilder(props) {
       let tagObjectProcessor = {}
       availableTags.forEach(function (value) {
         let name = value.slice(value.lastIndexOf(".") + 1)
-        let category_pre = value.slice(0, value.lastIndexOf(name) - 1)
-        let category = category_pre.slice(category_pre.lastIndexOf(".") + 1)
+        let category = value.slice(0, value.lastIndexOf(".") + 1)
         if (!tagObjectProcessor[category]) tagObjectProcessor[category] = [[name.replace(/_/g, " "), value]]
         else tagObjectProcessor[category].push([name.replace(/_/g, " "), value])
       })
@@ -157,15 +183,10 @@ export default function QueryBuilder(props) {
       )
     }
 
-    const handleChange = (event) => {
-      props.setCheckedCategories(event.target.value)
-    }
-
     //this function load or unloads a clicked tag.
     const prepareTag = async (tagName) => {
+      props.setLoadingGraphs(true)
       props.resetSharedTags()
-      //TODO: disable button to prevent multiple queries
-      let identifier = `${props.currentQuery.target}-${tagName}`
       let tagQuery = `$LAMP.Tag.get('${props.currentQuery.target}','${tagName}')`
 
       let sending = {
@@ -174,12 +195,12 @@ export default function QueryBuilder(props) {
         headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
         data: tagQuery,
         callback: function (res) {
+          props.setLoadingGraphs(false)
           props.setQueryResult(JSON.parse(res))
         },
       }
       ajaxRequest(sending)
       //if the tag is not currently in our list
-      //TODO: enable button after the other todo is completed
     }
     const ITEM_HEIGHT = 48
     const ITEM_PADDING_TOP = 8
@@ -192,47 +213,37 @@ export default function QueryBuilder(props) {
       },
     }
 
+    function returnSortedTagObject(array) {
+      let res = array.slice()
+      res.sort((a, b) => formatGraphName(a[0]).localeCompare(formatGraphName(b[0])))
+      return res
+    }
     return (
-      <span>
-        <FormControl key="tagForm" style={{ minWidth: "80%", maxWidth: "90%" }}>
-          <InputLabel key="tagLabel" id="tag-selector">
-            {Object.keys(props.tagObject).length ? `Select tag categories` : `No tags found`}
-          </InputLabel>
-          <Select
-            multiple
-            value={props.checkedCategories}
-            key="tagSelect"
-            onChange={handleChange}
-            input={<Input />}
-            style={{ minWidth: "80%", maxWidth: "90%" }}
-            MenuProps={MenuProps}
-            //@ts-ignore: selected will be a array here
-            renderValue={(selected) => selected.join(", ")}
-          >
-            {Object.keys(props.tagObject).map((name) => (
-              <MenuItem key={name} value={name}>
-                <Checkbox key={name + "Checkbox"} checked={props.checkedCategories.indexOf(name) > -1} />
-                {name.slice(0, 1).toUpperCase() + name.slice(1, name.length)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <br />
-        {checkedCategories.map((name) => (
-          <span key={name + "Category"}>
-            <h3>{name.slice(0, 1).toUpperCase() + name.slice(1, name.length)}</h3>
-            {props.tagObject[name].map((array) => (
-              <span key={array[0] + "span"}>
-                <Button key={array[1] + "button"} onClick={() => prepareTag(array[1])}>
-                  {/*<Checkbox checked={isTagQueriedForUser(array[1],currentQuery.target)} />*/ array[0]}
-                </Button>
-                <br />
-              </span>
-            ))}
+      <Box className={classes.categoryBox}>
+        {Object.keys(props.tagObject).map((category) => (
+          <React.Fragment>
+            <Typography>{category}</Typography>
+            <Box className={classes.tagsBox}>
+              {returnSortedTagObject(props.tagObject[category]).map((array) => {
+                //let's format the names
+                let printedName = formatGraphName(array[0])
+                return (
+                  <Card key={array[1]} className={classes.tagCard}>
+                    <CardHeader
+                      onClick={async () => {
+                        await prepareTag(array[1])
+                      }}
+                      classes={{ title: classes.tagCardHeader }}
+                      title={printedName}
+                    />
+                  </Card>
+                )
+              })}
+            </Box>
             <br />
-          </span>
+          </React.Fragment>
         ))}
-      </span>
+      </Box>
     )
   }
 
@@ -252,11 +263,17 @@ export default function QueryBuilder(props) {
       )
     }
 
-    //Here, we query the db for study-wide tags
-    const handleChange = (event) => {
-      //if we are loading new data, set loading to true
-      if (props.selectedSharedTags.length < event.target.value.length) props.setLoadingGraphs(true)
-      props.setSelectedSharedTags(event.target.value)
+    const addTag = (name) => {
+      if (props.selectedSharedTags.indexOf(name) === -1) {
+        props.setLoadingGraphs(true)
+        props.setSelectedSharedTags(props.selectedSharedTags.concat([name]))
+      }
+    }
+    const removeTag = (name) => {
+      let index = props.selectedSharedTags.indexOf(name)
+      if (index) {
+        props.setSelectedSharedTags(props.selectedSharedTags.filter((elem) => elem !== name))
+      }
     }
 
     React.useEffect(() => {
@@ -384,6 +401,12 @@ export default function QueryBuilder(props) {
       props.setSelectedSharedTags(props.availableSharedTags)
     }
 
+    function returnSortedTags(array) {
+      let res = array.slice()
+      res.sort((a, b) => formatGraphName(a).localeCompare(formatGraphName(b)))
+      return res
+    }
+
     return (
       <span>
         {props.selectedSharedTags.length >= Math.floor(props.availableSharedTags.length) / 2 ? (
@@ -392,37 +415,30 @@ export default function QueryBuilder(props) {
           <Button onClick={checkAllTags}>Select all shared tags</Button>
         )}
         <br />
-        <FormControl key="tagForm" style={{ minWidth: "80%", maxWidth: "100%" }}>
-          <InputLabel key="tagLabel" id="tag-selector">
-            {props.availableSharedTags.length
-              ? `Select ${props.currentQuery.id_string[props.currentQuery.id_string.length - 2]}-wide tags`
-              : `No ${props.currentQuery.id_string[props.currentQuery.id_string.length - 2]}-wide tags found`}
-          </InputLabel>
-          <Select
-            multiple
-            value={props.selectedSharedTags}
-            key="tagSelect"
-            onChange={handleChange}
-            input={<Input />}
-            style={{ minWidth: "80%", maxWidth: "90%" }}
-            MenuProps={MenuProps}
-            //@ts-ignore: selected will be an array here, so the join method exists
-            renderValue={(selected) => selected.join(", ")}
-          >
-            {props.availableSharedTags.map((name) => {
-              //let's format the names
-              let printedName = name.slice(name.lastIndexOf(".") + 1, name.length)
-
-              //@ts-ignore:
-              return (
-                <MenuItem key={name} value={name}>
-                  <Checkbox key={name + "Checkbox"} checked={props.selectedSharedTags.indexOf(name) > -1} />
-                  {printedName}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </FormControl>
+        <Box className={classes.tagsBox}>
+          {returnSortedTags(props.availableSharedTags).map((name) => {
+            //let's format the names
+            let printedName = formatGraphName(name)
+            return (
+              <Card key={name} className={classes.tagCard}>
+                <CardHeader
+                  onClick={() => {
+                    props.selectedSharedTags.indexOf(name) === -1 ? addTag(name) : removeTag(name)
+                  }}
+                  classes={{ title: classes.tagCardHeader }}
+                  title={printedName}
+                  action={
+                    <Checkbox
+                      className={classes.tagCheckbox}
+                      color={"primary"}
+                      checked={props.selectedSharedTags.indexOf(name) !== -1}
+                    />
+                  }
+                />
+              </Card>
+            )
+          })}
+        </Box>
         <br />
       </span>
     )
@@ -465,7 +481,6 @@ export default function QueryBuilder(props) {
               <DisplaySharedData
                 style={{ flex: "1", minWidth: "80%" }}
                 currentQuery={currentQuery}
-                tagObject={tagObject}
                 setLoadingGraphs={props.setLoadingGraphs}
                 availableSharedTags={availableSharedTags}
                 selectedSharedTags={selectedSharedTags}
@@ -484,6 +499,7 @@ export default function QueryBuilder(props) {
                 currentQuery={currentQuery}
                 tagObject={tagObject}
                 resetSharedTags={() => setSelectedSharedTags([])}
+                setLoadingGraphs={props.setLoadingGraphs}
                 checkedCategories={checkedCategories}
                 setCheckedCategories={setCheckedCategories}
                 queryResult={props.queryResult}
