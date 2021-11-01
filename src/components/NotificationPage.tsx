@@ -138,7 +138,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         setOpenComplete(false)
         setResponse(true)
         setLoading(false)
-      }, 8000)
+      }, 6000)
     })
   }
 

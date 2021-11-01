@@ -93,8 +93,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [settings])
 
   useEffect(() => {
-    if (embeddedActivity === undefined && data !== null && !saved) {
-      const activitySpec = currentActivity.spec
+    if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
+      const activitySpec = currentActivity?.spec ?? ""
       if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
@@ -106,7 +106,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         onComplete(dataSubmitted ? data : null)
       } else {
         setDataSubmitted(true)
-        if (data.timestamp !== timestamp) {
+        if ((data?.timestamp ?? 0) !== timestamp) {
           setTimestamp(data.timestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
@@ -121,7 +121,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         }
       }
     }
-  }, [embeddedActivity, data])
+  }, [embeddedActivity])
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
