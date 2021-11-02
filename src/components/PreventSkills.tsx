@@ -176,7 +176,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     skillWidth: { maxWidth: "100px" },
-    skillsContainer: { width: "100%", maxWidth: 570 },
+    skillsContainer: { width: "100%", maxWidth: 570, minWidth: 570 },
     accSummary: { paddingLeft: 0, paddingRight: 0 },
     greentxt: { color: "#21a521" },
     colCheck: { borderLeft: "0.5px solid #f4f4f4" },
@@ -363,7 +363,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                     name="skillset"
                   />
                 }
-                label="Filter Checked"
+                label="Show Only Skills Used"
               />
             </Grid>
           </Grid>
