@@ -363,7 +363,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                     name="skillset"
                   />
                 }
-                label="Filter Checked"
+                label="Show Only Skills Used"
               />
             </Grid>
           </Grid>
