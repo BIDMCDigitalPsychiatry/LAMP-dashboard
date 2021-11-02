@@ -308,15 +308,13 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
   const handleExpansion = (key) => {
     let data = expandedSkills
     let index = data.indexOf(key)
-    console.log(index, key)
     if (index >= 0) {
       data.splice(index, 1)
     } else {
       data.push(key)
     }
-    console.log(data)
     setExpanded(data.length > 0)
-    setExpandedSkills(data)
+    setExpandedSkills([...data])
   }
 
   return (
@@ -374,40 +372,10 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
             {data.map((v, kv) => {
               return (
                 <div className={classes.tableDiv}>
-                  <Box
-                    className={
-                      classes.categoryTitle +
-                      " " +
-                      (kv === 0
-                        ? classes.mindfulness
-                        : kv === 1
-                        ? classes.Interpersonal
-                        : kv === 2
-                        ? classes.emotion
-                        : classes.distress)
-                    }
-                  >
-                    <FormControlLabel
-                      className={classes.checkboxLabel}
-                      control={
-                        <Checkbox
-                          checked={expanded && expandedSkills.includes(kv)}
-                          onChange={(evt) => {
-                            console.log(kv)
-                            handleExpansion(kv)
-                          }}
-                          name={v.title}
-                        />
-                      }
-                      label={v.title}
-                    />
-                  </Box>
-
-                  {/* <Accordion
+                  <Accordion
                     expanded={expanded && expandedSkills.includes(kv)}
                     onChange={(evt, exp) => {
-                      setExpanded(exp)
-                      if (exp) setExpandedSkills([kv])
+                      handleExpansion(kv)
                     }}
                   >
                     <AccordionSummary
@@ -429,51 +397,33 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                       <TableRow>
                         <TableCell colSpan={9}>{v.title}</TableCell>
                       </TableRow>
-                    </AccordionSummary> */}
-                  <Grow in={expanded && expandedSkills.includes(kv)}>
-                    <div className={classes.tableResponsive + " " + classes.accSummary}>
-                      <Table>
-                        <TableHead>
-                          {(v.data.filter((each) => !!skillData[each]).length > 0 && filterChecked) ||
-                          !filterChecked ? (
-                            <TableRow>
-                              <TableCell className={classes.skillWidth}>Skills</TableCell>
-                              {selectedDates.map((date) => (
-                                <TableCell className={classes.colDate}>{date}</TableCell>
-                              ))}
-                            </TableRow>
-                          ) : (
-                            <TableRow>
-                              <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
-                                No records found
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </TableHead>
-                        <TableBody>
-                          {((!!skillData[v.data[0]] && filterChecked) || !filterChecked) && (
-                            <TableRow>
-                              <TableCell
-                                className={
-                                  classes.skillWidth +
-                                  " " +
-                                  (!!skillData[v.data[0]]
-                                    ? kv === 0
-                                      ? classes.mindfulness
-                                      : kv === 1
-                                      ? classes.Interpersonal
-                                      : kv === 2
-                                      ? classes.emotion
-                                      : classes.distress
-                                    : classes.noData)
-                                }
-                              >
-                                {v.data[0]}
-                              </TableCell>
-                              {selectedDates.map((d) => (
+                    </AccordionSummary>
+                    <AccordionDetails className={classes.accSummary}>
+                      <div className={classes.tableResponsive + " " + classes.accSummary}>
+                        <Table>
+                          <TableHead>
+                            {(v.data.filter((each) => !!skillData[each]).length > 0 && filterChecked) ||
+                            !filterChecked ? (
+                              <TableRow>
+                                <TableCell className={classes.skillWidth}>Skills</TableCell>
+                                {selectedDates.map((date) => (
+                                  <TableCell className={classes.colDate}>{date}</TableCell>
+                                ))}
+                              </TableRow>
+                            ) : (
+                              <TableRow>
+                                <TableCell className={classes.skillWidth} colSpan={selectedDates.length + 1}>
+                                  No records found
+                                </TableCell>
+                              </TableRow>
+                            )}
+                          </TableHead>
+                          <TableBody>
+                            {((!!skillData[v.data[0]] && filterChecked) || !filterChecked) && (
+                              <TableRow>
                                 <TableCell
                                   className={
-                                    classes.colCheck +
+                                    classes.skillWidth +
                                     " " +
                                     (!!skillData[v.data[0]]
                                       ? kv === 0
@@ -486,46 +436,64 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                                       : classes.noData)
                                   }
                                 >
-                                  {skillData[v.data[0]]?.includes(d) ? (
-                                    <Icon className={classes.greentxt}>check</Icon>
-                                  ) : null}
+                                  {v.data[0]}
                                 </TableCell>
-                              ))}
-                            </TableRow>
-                          )}
-                          {v.data.map(
-                            (k, key) =>
-                              ((!!skillData[k] && filterChecked) || !filterChecked) &&
-                              key !== 0 && (
-                                <TableRow
-                                  className={
-                                    !!skillData[k]
-                                      ? kv === 0
-                                        ? classes.mindfulness
-                                        : kv === 1
-                                        ? classes.Interpersonal
-                                        : kv === 2
-                                        ? classes.emotion
-                                        : classes.distress
-                                      : classes.noData
-                                  }
-                                >
-                                  <TableCell className={classes.skillWidth}>{k}</TableCell>
-                                  {selectedDates.map((d) => (
-                                    <TableCell className={classes.colCheck}>
-                                      {skillData[k]?.includes(d) ? (
-                                        <Icon className={classes.greentxt}>check</Icon>
-                                      ) : null}
-                                    </TableCell>
-                                  ))}
-                                </TableRow>
-                              )
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  </Grow>
-                  {/* </Accordion> */}
+                                {selectedDates.map((d) => (
+                                  <TableCell
+                                    className={
+                                      classes.colCheck +
+                                      " " +
+                                      (!!skillData[v.data[0]]
+                                        ? kv === 0
+                                          ? classes.mindfulness
+                                          : kv === 1
+                                          ? classes.Interpersonal
+                                          : kv === 2
+                                          ? classes.emotion
+                                          : classes.distress
+                                        : classes.noData)
+                                    }
+                                  >
+                                    {skillData[v.data[0]]?.includes(d) ? (
+                                      <Icon className={classes.greentxt}>check</Icon>
+                                    ) : null}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            )}
+                            {v.data.map(
+                              (k, key) =>
+                                ((!!skillData[k] && filterChecked) || !filterChecked) &&
+                                key !== 0 && (
+                                  <TableRow
+                                    className={
+                                      !!skillData[k]
+                                        ? kv === 0
+                                          ? classes.mindfulness
+                                          : kv === 1
+                                          ? classes.Interpersonal
+                                          : kv === 2
+                                          ? classes.emotion
+                                          : classes.distress
+                                        : classes.noData
+                                    }
+                                  >
+                                    <TableCell className={classes.skillWidth}>{k}</TableCell>
+                                    {selectedDates.map((d) => (
+                                      <TableCell className={classes.colCheck}>
+                                        {skillData[k]?.includes(d) ? (
+                                          <Icon className={classes.greentxt}>check</Icon>
+                                        ) : null}
+                                      </TableCell>
+                                    ))}
+                                  </TableRow>
+                                )
+                            )}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </AccordionDetails>
+                  </Accordion>
                 </div>
               )
             })}
