@@ -11,7 +11,6 @@ import {
   TableContainer,
   makeStyles,
   Theme,
-  Grow,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -399,7 +398,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                       </TableRow>
                     </AccordionSummary>
                     <AccordionDetails className={classes.accSummary}>
-                      <div className={classes.tableResponsive + " " + classes.accSummary}>
+                      <div className={classes.tableResponsive}>
                         <Table>
                           <TableHead>
                             {(v.data.filter((each) => !!skillData[each]).length > 0 && filterChecked) ||
