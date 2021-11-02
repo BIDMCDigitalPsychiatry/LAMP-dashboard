@@ -281,20 +281,23 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
       )
         return -4
     } else if (mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
-      if (!!((await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any).error) return -3
+      let result = (await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any
+      if (!!result.error) {
+        return result.error
+      }
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
         [data.emailAddress]:
           !data.role && !data.photo && !data.name ? undefined : { role: data.role, name: data.name, photo: data.photo },
       })
     } else if (mode === "update-profile" && !!data.name && !!data.emailAddress && !!data.password) {
-      if (
-        !!((await LAMP.Credential.update(id, data.credential.access_key, {
-          ...data.credential,
-          secret_key: data.password,
-        })) as any).error
-      )
-        return -4
+      let result = (await LAMP.Credential.update(id, data.credential.access_key, {
+        ...data.credential,
+        secret_key: data.password,
+      })) as any
+      if (!!result.error) {
+        return result.error
+      }
       let attachmentName = type === 1 ? "lamp.dashboard.credential_roles.external" : "lamp.dashboard.credential_roles"
       await LAMP.Type.setAttachment(id, "me", attachmentName, {
         ...allRoles,
@@ -399,8 +402,8 @@ export const CredentialManager: React.FunctionComponent<{
         variant: "error",
       })
     }
-    if (result === -3) {
-      enqueueSnackbar("Could not create credential.", {
+    if (typeof result === "string") {
+      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
         variant: "error",
       })
     }
