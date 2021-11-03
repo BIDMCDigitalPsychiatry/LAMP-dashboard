@@ -188,7 +188,6 @@ export default function ParticipantList({
     let searchTxt = searchVal ?? search
     if (selectedStudies.length > 0) {
       const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
-      console.log(selected)
       if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)
