@@ -72,24 +72,33 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   const { t } = useTranslation()
   const classes = useStyles()
   const [selectedActivities, setSelectedActivities] = useState<any>([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [paginatedActivities, setPaginatedActivities] = useState([])
   const [selected, setSelected] = useState(selectedStudies)
   const [allActivities, setAllActivities] = useState(null)
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [loadTime, setLoadTime] = useState(false)
+
+  useInterval(
+    () => {
+      getAllActivities()
+    },
+    allActivities !== null && !!loadTime ? null : 3000,
+    true
+  )
 
   useEffect(() => {
     setTimeout(() => {
-      getAllActivities()
-      searchActivities()
-    }, 10000)
+      setLoadTime(true)
+    }, 9000)
   }, [])
 
   const getAllActivities = () => {
     Service.getAll("activities").then((data) => {
       setAllActivities(data || [])
+      if ((data || []).length > 0) setLoadTime(true)
     })
   }
 
@@ -103,19 +112,18 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
   }
 
   useEffect(() => {
-    if (selectedStudies.length > 0) searchActivities()
-  }, [studies])
+    if (!!loadTime) searchActivities()
+  }, [loadTime])
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies) {
+    if (selectedStudies && loadTime) {
       searchActivities()
     }
   }, [selectedStudies])
 
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    getAllActivities()
     if (selected.length > 0) {
       const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {

@@ -123,7 +123,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function Tips({
-  activities,
+  value,
   onSave,
   onCancel,
   studies,
@@ -133,7 +133,7 @@ export default function Tips({
   openWindow,
   ...props
 }: {
-  activities?: any
+  value?: any
   onSave?: Function
   onCancel?: Function
   studies?: any
@@ -146,14 +146,14 @@ export default function Tips({
   const { enqueueSnackbar } = useSnackbar()
   const [category, setCategory] = useState("")
   const [categoryImage, setCategoryImage] = useState("")
-  const [text, setText] = useState(!!activities ? activities.name : undefined)
+  const [text, setText] = useState(!!value ? value.name : undefined)
   const [loading, setLoading] = useState(false)
   const [categoryArray, setCategoryArray] = useState([])
   const [newTipText, setNewTipText] = useState("")
   const [duplicateTipText, setDuplicateTipText] = useState("")
   const [selectedCategory, setSelectedCategory]: any = useState({})
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
-  const [studyId, setStudyId] = useState(!!activities ? activities.study_id : study)
+  const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [isDuplicate, setIsDuplicate] = useState(false)
   const [isError, setIsError] = useState(false)
   const [newSchemaList, setNewSchemaList] = useState({})
@@ -175,17 +175,17 @@ export default function Tips({
   const { t } = useTranslation()
   const [settings, setSettings]: Array<any> = useState([])
   const [data, setData] = useState({
-    id: activities?.id ?? undefined,
-    name: activities?.name ?? "",
-    spec: activities?.spec ?? activitySpecId,
-    schedule: [],
+    id: value?.id ?? undefined,
+    name: value?.name ?? "",
+    spec: value?.spec ?? activitySpecId,
+    schedule: value?.schedule ?? [],
     description: "",
     settings: settings ?? [],
-    studyID: !!activities ? activities.study_id : study,
+    studyID: !!value ? value.study_id : study,
   })
 
   useEffect(() => {
-    setSettings(activities)
+    setSettings(value)
   }, [openWindow])
 
   useEffect(() => {
@@ -214,7 +214,7 @@ export default function Tips({
                 setCategoryImage(iconsData.data.icon)
               }
             }
-            if (!activities) {
+            if (!value) {
               let settingsData = await LAMP.Activity.view(existsData.id)
               if (settingsData) {
                 settingsData.settings = settingsData.settings.reduce((ds, d) => {
@@ -236,7 +236,7 @@ export default function Tips({
           }
         }
       } else {
-        if (!activities) {
+        if (!value) {
           let existsData = { settings: defaultSettingsArray }
           setSelectedCategory(existsData)
           setTipsDataArray(defaultSettingsArray)
@@ -258,8 +258,8 @@ export default function Tips({
           setCategoryArray(tipActivities)
         })
       }
-      if (!!activities) {
-        let activitiesData = JSON.parse(JSON.stringify(activities))
+      if (!!value) {
+        let activitiesData = JSON.parse(JSON.stringify(value))
         setCategory(activitiesData.id)
         if (Object.keys(activitiesData.settings).length > 0) {
           setSelectedCategory(activitiesData)
@@ -357,7 +357,7 @@ export default function Tips({
       (typeof duplicateTipText !== "undefined" && duplicateTipText?.trim() !== "")
     ) {
       duplicates = categoryArray.filter((x) =>
-        !!activities
+        !!value
           ? x.name?.toLowerCase() === duplicateTipText?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       )
@@ -381,7 +381,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            schedule: [],
+            schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
           },
@@ -389,11 +389,11 @@ export default function Tips({
         )
       : onSave(
           {
-            id: activities?.id || category ? category : undefined,
+            id: value?.id || category ? category : undefined,
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            schedule: [],
+            schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
           },
@@ -419,16 +419,16 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            schedule: [],
+            schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
           }
         : {
-            id: activities?.id || category ? category : undefined,
+            id: value?.id || category ? category : undefined,
             //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            schedule: [],
+            schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
           }
@@ -472,7 +472,7 @@ export default function Tips({
       (typeof duplicateTipText !== "undefined" && duplicateTipText?.trim() !== "")
     ) {
       duplicates = categoryArray.filter((x) => {
-        return !!activities
+        return !!value
           ? x.name?.toLowerCase() === duplicateTipText?.trim().toLowerCase()
           : x.name?.toLowerCase() === newTipText?.trim().toLowerCase()
       })
@@ -600,7 +600,7 @@ export default function Tips({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!activities || !!study ? true : false}
+                    disabled={!!value || !!study ? true : false}
                   >
                     {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
@@ -626,7 +626,7 @@ export default function Tips({
                         : ""
                     }
                     variant="filled"
-                    disabled={!!activities ? true : false}
+                    disabled={!!value ? true : false}
                   >
                     <MenuItem value="add_new" key="add_new">
                       {t("Add New")}
@@ -657,7 +657,7 @@ export default function Tips({
                     ""
                   )}
                 </Grid>
-                {!!activities ? (
+                {!!value ? (
                   <Grid container spacing={2}>
                     <Grid item xs sm={6} md={6} lg={4}>
                       <Box mt={2}>
@@ -720,7 +720,7 @@ export default function Tips({
               </Grid>
             </Grid>
           )}
-          {((activities?.spec && Object.keys(newSchemaList).includes(activities.spec)) ||
+          {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
             Object.keys(newSchemaList).includes(activitySpecId)) && (
             <DynamicForm
               schema={newSchemaList[activitySpecId]}
@@ -731,7 +731,7 @@ export default function Tips({
         </Container>
       </MuiThemeProvider>
       <TipFooter
-        activities={activities}
+        value={value}
         isError={isError}
         isDuplicate={isDuplicate}
         duplicateTipText={duplicateTipText}

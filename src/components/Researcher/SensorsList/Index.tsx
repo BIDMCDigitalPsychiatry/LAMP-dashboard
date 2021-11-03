@@ -58,7 +58,7 @@ export default function SensorsList({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
   const [selectedSensors, setSelectedSensors] = useState([])
   const [paginatedSensors, setPaginatedSensors] = useState([])
