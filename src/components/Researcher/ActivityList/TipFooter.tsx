@@ -37,15 +37,7 @@ const theme = createMuiTheme({
   },
 })
 
-export default function TipFooter({
-  activities,
-  isError,
-  isDuplicate,
-  duplicateTipText,
-  validate,
-  handleType,
-  ...props
-}) {
+export default function TipFooter({ value, isError, isDuplicate, duplicateTipText, validate, handleType, ...props }) {
   const { t } = useTranslation()
   const classes = useStyles()
 
@@ -65,7 +57,7 @@ export default function TipFooter({
       spacing={1}
       style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
     >
-      {!!activities ? (
+      {!!value ? (
         <Grid item>
           <Tooltip title={t("Duplicate this activity.")}>
             <ThemeProvider theme={theme}>
@@ -76,9 +68,7 @@ export default function TipFooter({
                 onClick={() => {
                   if (validate()) handleType(1)
                 }}
-                disabled={
-                  !isError || (activities && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""
-                }
+                disabled={!isError || (value && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""}
               >
                 {t("Duplicate")}
                 <span style={{ width: 8 }} />

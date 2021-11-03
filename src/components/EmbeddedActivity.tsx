@@ -121,7 +121,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         }
       }
     }
-  }, [embeddedActivity])
+  }, [embeddedActivity, data])
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)

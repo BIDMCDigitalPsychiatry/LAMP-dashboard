@@ -70,26 +70,15 @@ export default function Activity({
   const { t } = useTranslation()
   const classes = useStyles()
   // Create a new tip activity object & survey descriptions if set.
-  const saveTipsActivity = async (x) => {
-    setLoading(true)
-    let result = await saveTipActivity(x)
-    if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-        variant: "error",
-      })
-    else {
-      x["id"] = result["data"]
-      updateDb(x)
-      enqueueSnackbar(t("Successfully updated the Activity."), {
-        variant: "success",
-      })
-      onClose()
-    }
-  }
   // Create a new Activity object & survey descriptions or activity details if set.
   const saveActivity = async (x) => {
     setLoading(true)
-    let newItem = x.spec === "lamp.survey" ? await saveSurveyActivity(x) : await saveCTestActivity(x)
+    let newItem =
+      x.spec === "lamp.survey"
+        ? await saveSurveyActivity(x)
+        : x.spec === "lamp.tips"
+        ? await saveTipActivity(x)
+        : await saveCTestActivity(x)
     if (!!newItem.error)
       enqueueSnackbar(t("Failed to create a new Activity."), {
         variant: "error",
@@ -134,8 +123,8 @@ export default function Activity({
       )}
       {isTip && (
         <Tips
-          activities={activity}
-          onSave={activity && activity.id ? updateActivity : saveTipsActivity}
+          value={activity}
+          onSave={activity && activity.id ? updateActivity : saveActivity}
           studies={studies}
           allActivities={allActivities}
           activitySpecId={activitySpecId ?? activity.spec}
