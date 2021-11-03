@@ -81,7 +81,7 @@ export default function SensorsList({
   useEffect(() => {
     setTimeout(() => {
       setLoadTime(true)
-    }, 9000)
+    }, 10000)
   }, [])
 
   const getAllSensors = () => {
@@ -99,17 +99,23 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
+  useEffect(() => {
+    setSelected(selectedStudies)
+  }, [selectedStudies])
+
+  useEffect(() => {
+    setLoadTime(false)
+    if ((selectedStudies || []).length > 0) {
+      setLoadTime(true)
+      searchFilterSensors()
+    } else {
+      setSensors([])
+    }
+  }, [selected])
 
   useEffect(() => {
     if (!!loadTime) searchFilterSensors()
   }, [loadTime])
-
-  useEffect(() => {
-    setSelected(selectedStudies)
-    if (selectedStudies && loadTime) {
-      searchFilterSensors()
-    }
-  }, [selectedStudies])
 
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
