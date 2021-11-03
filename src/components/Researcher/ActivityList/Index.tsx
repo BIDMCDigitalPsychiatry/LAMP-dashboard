@@ -117,8 +117,8 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies && loadTime) {
-      searchActivities()
+    if (selectedStudies) {
+      setLoadTime(true)
     }
   }, [selectedStudies])
 

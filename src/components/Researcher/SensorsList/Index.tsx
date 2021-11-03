@@ -6,6 +6,7 @@ import SensorListItem from "./SensorListItem"
 import { Service } from "../../DBService/DBService"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -66,6 +67,29 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [loadTime, setLoadTime] = useState(false)
+  const [allSensors, setAllSensors] = useState(null)
+
+  useInterval(
+    () => {
+      getAllSensors()
+    },
+    allSensors !== null && !!loadTime ? null : 3000,
+    true
+  )
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadTime(true)
+    }, 9000)
+  }, [])
+
+  const getAllSensors = () => {
+    Service.getAll("sensors").then((data) => {
+      setAllSensors(data || [])
+      if ((data || []).length > 0) setLoadTime(true)
+    })
+  }
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -77,12 +101,12 @@ export default function SensorsList({
   }
 
   useEffect(() => {
-    if (selectedStudies.length > 0) searchFilterSensors()
-  }, [studies])
+    if (!!loadTime) searchFilterSensors()
+  }, [loadTime])
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies) {
+    if (selectedStudies && loadTime) {
       searchFilterSensors()
     }
   }, [selectedStudies])
@@ -93,7 +117,6 @@ export default function SensorsList({
       const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {
         let result = []
-        setLoading(true)
         selectedData.map((study) => {
           Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
             if ((sensorData || []).length > 0) {
