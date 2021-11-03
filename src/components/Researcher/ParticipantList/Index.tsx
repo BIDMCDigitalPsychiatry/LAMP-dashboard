@@ -133,14 +133,15 @@ export default function ParticipantList({
   const classes = useStyles()
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [updateCount, setUpdateCount] = useState(0)
   const [selected, setSelected] = useState(selectedStudies)
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
-  const [studiesData, setStudiesData] = useState(studies)
+  const [studiesData, setStudiesData] = useState([])
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [loadTime, setLoadTime] = useState(false)
 
   const { t } = useTranslation()
 
@@ -151,16 +152,26 @@ export default function ParticipantList({
     studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
     true
   )
+
+  useEffect(() => {
+    if (!!loadTime) searchParticipants()
+  }, [loadTime])
+
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies) {
-      setLoading(false)
-      searchParticipants()
-    }
   }, [selectedStudies])
 
   useEffect(() => {
-    setLoading(false)
+    setLoadTime(false)
+    if ((selectedStudies || []).length > 0) {
+      setLoadTime(true)
+      searchParticipants()
+    } else {
+      setParticipants([])
+    }
+  }, [selected])
+
+  useEffect(() => {
     setStudiesData(studies)
   }, [studies])
 
@@ -176,7 +187,7 @@ export default function ParticipantList({
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     if (selectedStudies.length > 0) {
-      const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)
@@ -200,6 +211,8 @@ export default function ParticipantList({
             setLoading(false)
           })
         })
+      } else {
+        setLoading(false)
       }
     } else {
       setParticipants([])

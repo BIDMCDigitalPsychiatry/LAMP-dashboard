@@ -6,6 +6,7 @@ import SensorListItem from "./SensorListItem"
 import { Service } from "../../DBService/DBService"
 import { sortData } from "../Dashboard"
 import Pagination from "../../PaginatedElement"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -58,7 +59,7 @@ export default function SensorsList({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [sensors, setSensors] = useState(null)
   const [selectedSensors, setSelectedSensors] = useState([])
   const [paginatedSensors, setPaginatedSensors] = useState([])
@@ -66,6 +67,29 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
+  const [loadTime, setLoadTime] = useState(false)
+  const [allSensors, setAllSensors] = useState(null)
+
+  useInterval(
+    () => {
+      getAllSensors()
+    },
+    allSensors !== null && !!loadTime ? null : 3000,
+    true
+  )
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadTime(true)
+    }, 10000)
+  }, [])
+
+  const getAllSensors = () => {
+    Service.getAll("sensors").then((data) => {
+      setAllSensors(data || [])
+      if ((data || []).length > 0) setLoadTime(true)
+    })
+  }
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -75,17 +99,23 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
-
-  useEffect(() => {
-    if (selectedStudies.length > 0) searchFilterSensors()
-  }, [studies])
-
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies) {
-      searchFilterSensors()
-    }
   }, [selectedStudies])
+
+  useEffect(() => {
+    setLoadTime(false)
+    if ((selectedStudies || []).length > 0) {
+      setLoadTime(true)
+      searchFilterSensors()
+    } else {
+      setSensors([])
+    }
+  }, [selected])
+
+  useEffect(() => {
+    if (!!loadTime) searchFilterSensors()
+  }, [loadTime])
 
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
@@ -93,7 +123,6 @@ export default function SensorsList({
       const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {
         let result = []
-        setLoading(true)
         selectedData.map((study) => {
           Service.getDataByKey("sensors", [study], "study_name").then((sensorData) => {
             if ((sensorData || []).length > 0) {

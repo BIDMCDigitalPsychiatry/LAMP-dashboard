@@ -304,6 +304,18 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
     }
   }, [skillRange])
 
+  const handleExpansion = (key) => {
+    let data = expandedSkills
+    let index = data.indexOf(key)
+    if (index >= 0) {
+      data.splice(index, 1)
+    } else {
+      data.push(key)
+    }
+    setExpanded(data.length > 0)
+    setExpandedSkills([...data])
+  }
+
   return (
     <Box>
       {skillData !== null && (
@@ -351,7 +363,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                     name="skillset"
                   />
                 }
-                label="Filter Checked"
+                label="Show Only Skills Used"
               />
             </Grid>
           </Grid>
@@ -362,8 +374,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                   <Accordion
                     expanded={expanded && expandedSkills.includes(kv)}
                     onChange={(evt, exp) => {
-                      setExpanded(exp)
-                      if (exp) setExpandedSkills([kv])
+                      handleExpansion(kv)
                     }}
                   >
                     <AccordionSummary

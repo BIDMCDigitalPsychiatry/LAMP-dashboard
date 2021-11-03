@@ -37,6 +37,12 @@ export default function DeleteResearcher({
   const confirmAction = async (status) => {
     if (status === "Yes") {
       if (((await LAMP.Researcher.delete(researcher.id)) as any).error === undefined) {
+        LAMP.Credential.list(researcher.id).then((cred) => {
+          cred = cred.filter((c) => c.hasOwnProperty("origin"))
+          cred.map((each) => {
+            LAMP.Credential.delete(researcher.id, each["access_key"])
+          })
+        })
         enqueueSnackbar(t("Successfully deleted the investigator."), {
           variant: "success",
         })

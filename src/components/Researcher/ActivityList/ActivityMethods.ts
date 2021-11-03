@@ -1029,15 +1029,12 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         studyID: selectedActivity?.study_id,
         spec: "lamp.tips",
         settings: x.settings,
-        schedule: selectedActivity?.schedule,
+        schedule: [],
       }
       result = await saveTipActivity(tipObj)
       return result
     } else {
-      let obj = {
-        settings: x.settings,
-      }
-      result = (await LAMP.Activity.update(selectedActivity?.id, obj)) as any
+      result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
       })
