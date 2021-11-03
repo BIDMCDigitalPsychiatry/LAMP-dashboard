@@ -153,8 +153,11 @@ export default function StudyFilterList({
                     </section>
                   }
                   color={
-                    (getFilterTypeStorage() === 1 && item === "Select All") ||
-                    (getFilterTypeStorage() === 2 && item === "Deselect All")
+                    (getFilterTypeStorage() === 1 &&
+                      item === "Select All" &&
+                      selectedStudies.length === studies.length) ||
+                    (getFilterTypeStorage() === 2 && item === "Deselect All" && selectedStudies.length === 0) ||
+                    (item === "Deselect All" && selectedStudies.length === 0)
                       ? "primary"
                       : undefined
                   }
