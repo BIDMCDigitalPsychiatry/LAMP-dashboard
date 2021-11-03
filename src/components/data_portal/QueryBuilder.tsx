@@ -454,7 +454,6 @@ export default function QueryBuilder(props) {
   }
 
   const updateVisibleTags = (tagList) => {
-    console.log(tagList)
     setSharedTags(tagList)
   }
 
@@ -491,7 +490,6 @@ export default function QueryBuilder(props) {
                     )
                   }}
                   handleResult={async () => {
-                    console.log(sharedTagsUpdateList)
                     updateVisibleTags(sharedTagsUpdateList)
                   }}
                   closesOnSubmit={false}

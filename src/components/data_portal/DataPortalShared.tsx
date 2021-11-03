@@ -351,9 +351,10 @@ export function ts_to_UTC_String(timestamp) {
 
 //this function takes an object and returns an object
 //with the same keys where the values have been stringified
-export function stringify_obj_values(obj) {
+export function stringify_obj_values(obj, omit_on_return: Array<string> = []) {
   let res = {}
   Object.keys(obj).forEach((key) => (res[key] = JSON.stringify(obj[key])))
+  omit_on_return.forEach((key) => delete res[key])
   return res
 }
 

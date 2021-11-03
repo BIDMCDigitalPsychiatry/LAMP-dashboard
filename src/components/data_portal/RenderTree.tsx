@@ -259,7 +259,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         let res: Array<any> = await LAMP.ActivityEvent.allByParticipant(id)
         res = res.reduce((acc, event) => {
           let activity_obj = {
-            ActivityName: lookup_dict[event.activity]?.name,
+            ActivityName: lookup_dict[event.activity]?.name ?? "UNKNOWN",
             ActivityDate: ts_to_UTC_String(event.timestamp),
             ...event,
           }
@@ -294,8 +294,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   return {
                     userID: participant_object["userID"],
                     userName: participant_object["userName"],
-                    ...stringify_obj_values(slice),
-                    ...stringify_obj_values(obj),
+                    ActivityName: obj["ActivityName"],
+                    ActivityDate: obj["ActivityDate"],
+                    ...stringify_obj_values(slice, ["ActivityName", "ActivityDate"]),
+                    ...stringify_obj_values(obj, ["ActivityName", "ActivityDate"]),
                   }
                 })
               } else
@@ -303,7 +305,9 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                   {
                     userID: participant_object["userID"],
                     userName: participant_object["userName"],
-                    activityEvent: JSON.stringify(activity),
+                    ActivityName: activity["ActivityName"],
+                    ActivityDate: activity["ActivityDate"],
+                    ...stringify_obj_values(activity, ["ActivityName", "ActivityDate"]),
                   },
                 ]
             })
@@ -313,8 +317,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )
       }, [])
     }
-
-    debugger
     jsonexport(resultsPulled, function (err, csv) {
       if (err) return console.log(err)
       const file = new Blob([csv], { type: "text/csv" })
@@ -511,7 +513,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                         }, [])
                         .sort((a, b) => a.localeCompare(b))
                         .map((spec) => {
-                          console.log(spec)
                           return (
                             <Card key={spec} className={classes.tagCard}>
                               <CardHeader

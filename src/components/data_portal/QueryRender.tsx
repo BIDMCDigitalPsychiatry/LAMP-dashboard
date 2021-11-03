@@ -150,7 +150,6 @@ export default function QueryRender({ height = 0, ...props }) {
     queryRes = queryRes.filter((elem) => elem["result"] !== null)
     const promises = []
     //add our queries in to array
-    console.log(queryRes)
     for (let index = 0; index < queryRes.length; index++) {
       let spec = queryRes[index]["result"]
       let canvas = document.createElement("div")
@@ -194,9 +193,7 @@ export default function QueryRender({ height = 0, ...props }) {
     }
     //after promises complete, store all data in pdf
     await Promise.all(promises).then((res: Array<any>) => {
-      console.log(res)
       res = res.filter((obj) => !(obj["type"] === "invalid"))
-      console.log(res)
       let graphArray
       switch (sortMethod) {
         case "height":

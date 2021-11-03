@@ -61,7 +61,6 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const onMonacoMount = (ref) => {
     editorRef.current = ref
     if (!!editorRef.current) editorRef.current.editor.getModel().setValue(query)
-    debugger
   }
   React.useEffect(() => {
     if (!!editorRef.current) {
