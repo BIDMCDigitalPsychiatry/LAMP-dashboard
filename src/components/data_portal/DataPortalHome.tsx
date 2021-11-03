@@ -225,7 +225,12 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
               className={focusBuilder ? classes.renderStyleUnfocus : classes.renderStyleFocus}
               onClick={() => toggleFocus(false)}
             >
-              <QueryRender focusMe={() => toggleFocus(false)} loading={loadingGraphs} queryResult={result} />
+              <QueryRender
+                className={classes.queryRender}
+                focusMe={() => toggleFocus(false)}
+                loading={loadingGraphs}
+                queryResult={result}
+              />
             </Grid>
           </Grid>
         </Grid>

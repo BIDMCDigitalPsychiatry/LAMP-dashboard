@@ -13,9 +13,20 @@ import {
   makeStyles,
   CardHeader,
   Box,
+  Tooltip,
+  IconButton,
+  TextField,
 } from "@material-ui/core"
-import { tagged_entities, ajaxRequest, formatGraphName } from "./DataPortalShared"
+import {
+  tagged_entities,
+  ajaxRequest,
+  formatGraphName,
+  tags_object,
+  generate_participant_tag_info,
+} from "./DataPortalShared"
 import { useDrop } from "react-dnd"
+import SelectionWindow from "./SelectionWindow"
+import LAMP from "lamp-core"
 
 const useStyles = makeStyles((theme) => ({
   loadingBackdrop: {
@@ -33,6 +44,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: "10px",
     wordBreak: "break-word",
   },
+  selectionBoxHeader: {
+    fontSize: "15px",
+    wordBreak: "break-word",
+    marginBottom: "20px",
+  },
   tagCheckbox: {
     color: "#7599FF",
     "&:checked": { color: "#7599FF" },
@@ -45,6 +61,19 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     float: "left",
     marginTop: "0px",
+    fontSize: "15px",
+  },
+
+  cardHeader: {
+    display: "flex",
+    flexGrow: 3,
+    flexDirection: "row",
+    marginBottom: "0px",
+    marginRight: "5px",
+    fontSize: "16px",
+    wordBreak: "break-word",
+    height: "100%",
+    "& span.MuiCardHeader-title": { fontSize: "16px", fontWeight: 500 },
   },
   categoryBox: {
     display: "flex",
@@ -80,6 +109,9 @@ export default function QueryBuilder(props) {
       currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant"
     )
   )
+
+  const [participantTagInfo, setParticipantTagInfo] = React.useState({})
+  const [sharedTagsUpdateList, setSharedTagsUpdateList] = React.useState([])
 
   const [availableSharedTags, setSharedTags] = React.useState([])
   const [sharedTagsLoading, setSharedTagsLoadingStatus] = React.useState(false)
@@ -200,7 +232,6 @@ export default function QueryBuilder(props) {
         },
       }
       ajaxRequest(sending)
-      //if the tag is not currently in our list
     }
 
     function returnSortedTagObject(array) {
@@ -211,7 +242,7 @@ export default function QueryBuilder(props) {
     return (
       <Box className={classes.categoryBox}>
         {Object.keys(props.tagObject).map((category) => (
-          <React.Fragment>
+          <React.Fragment key={category}>
             <Typography>{category}</Typography>
             <Box className={classes.tagsBox}>
               {returnSortedTagObject(props.tagObject[category]).map((array) => {
@@ -376,8 +407,10 @@ export default function QueryBuilder(props) {
     }
 
     const checkAllTags = () => {
-      props.setLoadingGraphs(true)
-      props.setSelectedSharedTags(props.availableSharedTags)
+      if (selectedSharedTags.length < props.availableSharedTags.length) {
+        props.setLoadingGraphs(true)
+        props.setSelectedSharedTags(props.availableSharedTags)
+      }
     }
 
     function returnSortedTags(array) {
@@ -388,11 +421,8 @@ export default function QueryBuilder(props) {
 
     return (
       <span>
-        {props.selectedSharedTags.length >= Math.floor(props.availableSharedTags.length) / 2 ? (
-          <Button onClick={uncheckAllTags}>Deselect all shared tags</Button>
-        ) : (
-          <Button onClick={checkAllTags}>Select all shared tags</Button>
-        )}
+        <Button onClick={checkAllTags}>Select all shared tags</Button>
+        <Button onClick={uncheckAllTags}>Deselect all shared tags</Button>
         <br />
         <Box className={classes.tagsBox}>
           {returnSortedTags(props.availableSharedTags).map((name) => {
@@ -423,6 +453,11 @@ export default function QueryBuilder(props) {
     )
   }
 
+  const updateVisibleTags = (tagList) => {
+    console.log(tagList)
+    setSharedTags(tagList)
+  }
+
   return (
     <Container
       ref={drop}
@@ -432,12 +467,105 @@ export default function QueryBuilder(props) {
       <Backdrop className={classes.loadingBackdrop} open={tagsLoading || sharedTagsLoading || props.loadingGraphs} />
       {currentQuery.target.length > 0 ? (
         <Card variant="outlined" style={{ margin: "0% 5%" }}>
-          <Typography style={{ fontWeight: 600, userSelect: "text" }}>
-            {`${
+          <CardHeader
+            title={`${
               currentQuery.id_string.length > 1 ? `${currentQuery.id_string[currentQuery.id_string.length - 2]}:` : ""
             }
-												 ${currentQuery.name ? `${currentQuery.name} - (ID:${currentQuery.target})` : currentQuery.target}`}
-          </Typography>
+              ${currentQuery.name ? `${currentQuery.name} - (ID:${currentQuery.target})` : currentQuery.target}`}
+            classes={{ title: classes.cardHeader }}
+            action={
+              analyzeShared && (
+                <SelectionWindow
+                  openButtonText={`Adjust Toggleable Shared Tags`}
+                  customButton={
+                    <IconButton>
+                      <Icon>add_box</Icon>
+                    </IconButton>
+                  }
+                  displaySubmitButton={true}
+                  runOnOpen={async () => {
+                    setParticipantTagInfo({})
+                    setSharedTagsUpdateList(availableSharedTags)
+                    setParticipantTagInfo(
+                      await generate_participant_tag_info(currentQuery.id_string[currentQuery.id_string.length - 1])
+                    )
+                  }}
+                  handleResult={async () => {
+                    console.log(sharedTagsUpdateList)
+                    updateVisibleTags(sharedTagsUpdateList)
+                  }}
+                  closesOnSubmit={false}
+                  exposeButton={true}
+                  submitText={`Set Tags`}
+                  children={
+                    <Box className={classes.tagsBox}>
+                      <Box className={classes.selectionBoxHeader}>
+                        All Participant Tags
+                        <br />
+                        This is a list of all tags present on at least one participant in this
+                        {" " + currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase()}. <br />
+                        Use the checkboxes to toggle on or off any tags you want to see or hide, respectively, then
+                        press the 'Set Tags' button.
+                      </Box>
+                      <Box style={{ width: "100%", display: "flex", flexDirection: "row" }}>
+                        <Button
+                          onClick={() => {
+                            setSharedTagsUpdateList(Object.keys(participantTagInfo))
+                          }}
+                        >
+                          Select all tags
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSharedTagsUpdateList([])
+                          }}
+                        >
+                          Deselect all tags
+                        </Button>
+                      </Box>
+                      <Box className={classes.tagsBox}>
+                        {Object.keys(participantTagInfo).length
+                          ? Object.keys(participantTagInfo)
+                              .sort((a, b) => a.localeCompare(b))
+                              .map((tag) => {
+                                return (
+                                  <Tooltip
+                                    key={tag}
+                                    title={`${participantTagInfo[tag].length} participants have this tag`}
+                                  >
+                                    <Card className={classes.tagCard}>
+                                      <CardHeader
+                                        onClick={() => {
+                                          //toggle the clicked tag in the pending update list
+                                          let index = sharedTagsUpdateList.indexOf(tag)
+                                          if (index !== -1) {
+                                            setSharedTagsUpdateList(sharedTagsUpdateList.filter((elem) => elem !== tag))
+                                          } else {
+                                            setSharedTagsUpdateList(sharedTagsUpdateList.concat([tag]))
+                                          }
+                                        }}
+                                        classes={{ title: classes.tagCardHeader }}
+                                        title={tag}
+                                        action={
+                                          <Checkbox
+                                            className={classes.tagCheckbox}
+                                            color={"primary"}
+                                            checked={sharedTagsUpdateList.indexOf(tag) !== -1}
+                                          />
+                                        }
+                                      />
+                                    </Card>
+                                  </Tooltip>
+                                )
+                              })
+                          : "Loading Tags"}
+                      </Box>
+                    </Box>
+                  }
+                />
+              )
+            }
+          />
           {currentQuery.id_string[currentQuery.id_string.length - 2].toLowerCase() !== "participant" && (
             <FormGroup>
               <FormControlLabel

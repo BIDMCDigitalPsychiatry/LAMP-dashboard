@@ -52,6 +52,23 @@ export function ajaxRequest(parameters) {
   else if (method === "POST") xmlhttp.send(data)
 }
 
+//jsonata fetch
+export const jsonataFetch = async (query, access_key, secret_key, server) => {
+  try {
+    let res = await fetch(`https://${server}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${access_key}:${secret_key}`,
+      },
+      body: query,
+    })
+    let text = await res.text()
+    return JSON.parse(text)
+  } catch (err) {
+    console.log(`Query ${query} failed - data could not be loaded or perhaps parsed. Err: ${err}.`)
+  }
+}
+
 export const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -199,6 +216,10 @@ export const portalHomeStyle = makeStyles((theme) => ({
       height: unfocusedQueryRenderHeight,
     },
   },
+  queryRender: {
+    width: "100%",
+    height: "100%",
+  },
 }))
 
 export const standaloneStyle = makeStyles((theme: Theme) =>
@@ -288,18 +309,36 @@ export async function generate_study_ids(id_set) {
 
 //given an id or array of ids, returns a dictionary containing
 //key value pairs of activity ids and activity names
-export async function generate_activity_dict(id_set, already_reduced = false) {
+export async function generate_activity_dict(
+  id_set,
+  token,
+  included_details = ["name", "spec"],
+  already_reduced = false
+) {
   let id_list
   if (already_reduced) id_list = id_set
   else id_list = await generate_study_ids(id_set)
 
   //pull an array of arrays of studies
-  const res = await Promise.all(id_list.map((id) => LAMP.Activity.allByStudy(id)))
+  //turns out we don't want to do this with LAMP.Activity.allByStudy
+  //it fetches too much information and is inefficient.
+  //Let's use a jsonata query instead!
+  const res = await Promise.all(
+    id_list.map((id) =>
+      jsonataFetch(queryDictionary["activityFromStudy"](id), token.username, token.password, token.server)
+    )
+  )
   //flatten the array of arrays
-  let studyArray = res.reduce((acc, array) => (acc as Array<any>).concat(array), [])
+  let studyArray = res
+    .filter((elem) => Array.isArray(elem))
+    .reduce((acc, array) => (acc as Array<any>).concat(array), [])
   //return a dictionary with activity ids and names
   return (studyArray as Array<any>).reduce((acc, example) => {
-    return { ...acc, ...{ [example.id]: example.name } }
+    let result_obj = {}
+    included_details.forEach((key) => {
+      if (example[key]) result_obj[key] = example[key]
+    })
+    return { ...acc, ...{ [example["id"]]: result_obj } }
   }, {})
 }
 
@@ -316,6 +355,31 @@ export function stringify_obj_values(obj) {
   let res = {}
   Object.keys(obj).forEach((key) => (res[key] = JSON.stringify(obj[key])))
   return res
+}
+
+//this function takes a single or array of researcher/study/participant ids
+//(any valid input to generate_ids, essentially)
+//by default, returns an object where the key-value pairs are tag names and an array
+//of participants who have those tags.
+//set keys_are_tagnames to false and keys will be participant ids, with arrays of their tags
+export async function generate_participant_tag_info(id_set, keys_are_tagnames = true) {
+  let id_list = await generate_ids(id_set)
+  let result_dict = {}
+  await Promise.all(
+    id_list.map(async (id) => {
+      let res = await LAMP.Type.listAttachments(id)
+      if (res["data"]) {
+        keys_are_tagnames
+          ? res["data"].forEach((tag) => {
+              result_dict[tag] ? (result_dict[tag] = result_dict[tag].concat([id])) : (result_dict[tag] = [id])
+            })
+          : (result_dict[id] = res["data"])
+      } else {
+        console.log("No tags found for " + id)
+      }
+    })
+  )
+  return result_dict
 }
 
 export const tags_object = {
@@ -339,11 +403,12 @@ export const tagged_entities = ["Researcher", "Study", "Participant"]
 
 export const queryDictionary = {
   participantsWithName: function (id_string) {
-    return `(
-								$res := $LAMP.Participant.list('${id_string}').id;
-								$array := $map($res,function($id){{'name': $LAMP.Tag.get($id,'lamp.name'),
-																	'id':$id}})
-								)`
+    return `($res := $LAMP.Participant.list('${id_string}').id;
+			$array := $map($res,function($id){{'name': $LAMP.Tag.get($id,'lamp.name'),'id':$id}})
+			)`
+  },
+  activityFromStudy: function (id_string) {
+    return `($LAMP.Activity.list('${id_string}'))`
   },
 }
 

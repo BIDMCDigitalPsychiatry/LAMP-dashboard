@@ -21,6 +21,7 @@ import {
   generate_activity_dict,
   ts_to_UTC_String,
   stringify_obj_values,
+  generate_participant_tag_info,
 } from "./DataPortalShared"
 import { useDrag } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
@@ -124,6 +125,30 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     downloadFormControl: {
       width: "100%",
     },
+
+    tagCheckbox: {
+      color: "#7599FF",
+      "&:checked": { color: "#7599FF" },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    tagCard: {
+      flex: "25%",
+      float: "left",
+      fontSize: "10px",
+      "&:hover": { background: "#eee", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    tagCardHeader: {
+      fontSize: "10px",
+      wordBreak: "break-word",
+    },
+    categoryBox: {
+      display: "flex",
+      width: "100%",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      flexGrow: 1,
+      float: "left",
+    },
   }))
   const classes = useStyles()
 
@@ -206,11 +231,17 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   const defaultExplodeTemporalSlices = true
   const [explodeTemporalSlices, setExplodeTemporalSlices] = React.useState(defaultExplodeTemporalSlices)
 
+  const defaultDownloadAllActivities = true
+  const [downloadAllActivities, setDownloadAllActivities] = React.useState(defaultExplodeTemporalSlices)
+  const [activityList, setActivityList] = React.useState([])
+  const [chosenActivityList, setChosenActivities] = React.useState([])
+
   async function downloadData(
     id,
     name = "LAMP_Activity_Data" + newdate + ".csv",
     explode_by_participant = true,
-    explode_temporal_slices = true
+    explode_temporal_slices = true,
+    chosen_activities: Array<string> = []
   ) {
     //TODO: add selection between one big file and multiple files
     //TODO: add json vs csv selection
@@ -220,19 +251,25 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     let id_obj = await generate_ids(id, true)
     let id_list = Object.keys(id_obj)
     //now, let's get our lookup dict
-    let lookup_dict = await generate_activity_dict(id)
+    let lookup_dict = await generate_activity_dict(id, token)
 
     //now, let's pull some data
     let resultsPulled = (await Promise.all(
       id_list.map(async (id) => {
-        let res = await LAMP.ActivityEvent.allByParticipant(id)
-        res = res.map((event) => {
-          return {
-            ActivityName: lookup_dict[event.activity],
+        let res: Array<any> = await LAMP.ActivityEvent.allByParticipant(id)
+        res = res.reduce((acc, event) => {
+          let activity_obj = {
+            ActivityName: lookup_dict[event.activity]?.name,
             ActivityDate: ts_to_UTC_String(event.timestamp),
             ...event,
           }
-        })
+          if (chosen_activities.length === 0) return acc.concat([activity_obj])
+          else {
+            return activity_obj["ActivityName"] && chosen_activities.indexOf(activity_obj["ActivityName"]) !== -1
+              ? acc.concat([activity_obj])
+              : acc
+          }
+        }, [])
         return {
           userID: id,
           userName: id_obj[id] ? id_obj[id] : null,
@@ -277,6 +314,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
       }, [])
     }
 
+    debugger
     jsonexport(resultsPulled, function (err, csv) {
       if (err) return console.log(err)
       const file = new Blob([csv], { type: "text/csv" })
@@ -382,19 +420,32 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               </IconButton>
             }
             displaySubmitButton={true}
-            runOnOpen={() => {
+            runOnOpen={async () => {
               setDownloadName(defaultDownloadName)
               setExplodeTemporalSlices(defaultExplodeTemporalSlices)
               setExplodeParticipant(defaultExplodeParticipant)
+              setDownloadAllActivities(defaultDownloadAllActivities)
+              setChosenActivities([])
+              setActivityList(
+                (Object.values(await generate_activity_dict(id[id.length - 1], token)).reduce((acc, elem) => {
+                  return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>).concat([elem])
+                }, []) as Array<any>).sort((a, b) => a["name"].localeCompare(b["name"]))
+              )
             }}
             handleResult={() =>
-              downloadData(id[id.length - 1], downloadName, explodeParticipant, explodeTemporalSlices)
+              downloadData(
+                id[id.length - 1],
+                downloadName,
+                explodeParticipant,
+                explodeTemporalSlices,
+                downloadAllActivities ? activityList.map((elem) => elem["name"]) : chosenActivityList
+              )
             }
             closesOnSubmit={false}
             exposeButton={true}
             submitText={`Download`}
             children={
-              <Typography>
+              <React.Fragment>
                 Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
                 <br />
                 <FormControlLabel
@@ -425,7 +476,6 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     </Box>
                   }
                 />
-                <br />
                 {explodeParticipant && (
                   <FormControlLabel
                     classes={{ root: classes.downloadFormControl }}
@@ -438,7 +488,93 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     }
                   />
                 )}
-              </Typography>
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  onClick={() => setDownloadAllActivities(!downloadAllActivities)}
+                  control={<Checkbox checked={downloadAllActivities} />}
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      Download data for all activities for this {id[id.length - 2]}
+                    </Box>
+                  }
+                />
+                {activityList.length > 0 && !downloadAllActivities && (
+                  <Box>
+                    <Box className={classes.categoryBox}>
+                      {activityList
+                        .reduce((acc, activity) => {
+                          //we return a list of all unique activity specs
+                          return acc.indexOf(activity["spec"]) === -1 &&
+                            activityList.filter((elem) => elem["spec"] == activity["spec"]).length > 1
+                            ? acc.concat([activity["spec"]])
+                            : acc
+                        }, [])
+                        .sort((a, b) => a.localeCompare(b))
+                        .map((spec) => {
+                          console.log(spec)
+                          return (
+                            <Card key={spec} className={classes.tagCard}>
+                              <CardHeader
+                                onClick={() => {
+                                  //toggle the clicked tag in the pending update list
+                                  //first, get a list of all activity names that fit this spec
+                                  let toggleList = activityList.reduce((acc, activity) => {
+                                    return activity["spec"] == spec && acc.indexOf(activity["name"]) === -1
+                                      ? acc.concat([activity["name"]])
+                                      : acc
+                                  }, [])
+
+                                  //copy the chosen activity list and push to it
+                                  let currentList = chosenActivityList.slice()
+                                  toggleList.forEach((name) => {
+                                    let index = currentList.indexOf(name)
+                                    if (index === -1) {
+                                      currentList.push(name)
+                                    }
+                                  })
+                                  setChosenActivities(currentList)
+                                }}
+                                classes={{ title: classes.tagCardHeader }}
+                                title={`Select all ${spec} activities`}
+                              />
+                            </Card>
+                          )
+                        })}
+                    </Box>
+
+                    <Box className={classes.categoryBox}>
+                      {activityList
+                        .reduce((acc, elem) => (acc.indexOf(elem["name"]) !== -1 ? acc : acc.concat(elem["name"])), [])
+                        .map((name) => {
+                          return (
+                            <Card key={name} className={classes.tagCard}>
+                              <CardHeader
+                                onClick={() => {
+                                  //toggle the clicked tag in the pending update list
+                                  let index = chosenActivityList.indexOf(name)
+                                  if (index !== -1) {
+                                    setChosenActivities(chosenActivityList.filter((elem) => elem !== name))
+                                  } else {
+                                    setChosenActivities(chosenActivityList.concat([name]))
+                                  }
+                                }}
+                                classes={{ title: classes.tagCardHeader }}
+                                title={name}
+                                action={
+                                  <Checkbox
+                                    className={classes.tagCheckbox}
+                                    color={"primary"}
+                                    checked={chosenActivityList.indexOf(name) !== -1}
+                                  />
+                                }
+                              />
+                            </Card>
+                          )
+                        })}
+                    </Box>
+                  </Box>
+                )}
+              </React.Fragment>
             }
           />
         )}
@@ -479,16 +615,16 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
           )}
         </IconButton>
       </CardActions>
-      {/*
-						For each branch in our tree, we output some info and create a new level
-						*/}
+      {/*For each branch in our tree, we output some info and create a new level*/}
       {expanded &&
         (!!treeDisplay ? (isAlphabetized && !!alphabetizedTree ? alphabetizedTree : treeDisplay) : []).map(
           (branch, index) =>
             (!currentFilter ||
               currentFilter === "" ||
-              branch.id.indexOf(currentFilter) !== -1 ||
-              (typeof branch !== "string" && branch.name && branch.name.indexOf(currentFilter) !== -1)) && (
+              branch.id.toLowerCase().indexOf(currentFilter.toLowerCase()) !== -1 ||
+              (typeof branch !== "string" &&
+                branch.name &&
+                branch.name.toLowerCase().indexOf(currentFilter.toLowerCase()) !== -1)) && (
               <RenderTree
                 key={"tree" + id[id.length - 1] + index}
                 id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}

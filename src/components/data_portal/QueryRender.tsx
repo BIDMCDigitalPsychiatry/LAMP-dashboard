@@ -15,6 +15,7 @@ import {
   TextField,
   Checkbox,
   makeStyles,
+  Container,
 } from "@material-ui/core"
 import { jsPDF } from "jspdf"
 import vegaEmbed from "vega-embed"
@@ -22,7 +23,7 @@ import Vega from "./Vega"
 import Editor from "./Editor"
 import SelectionWindow from "./SelectionWindow"
 
-export default function QueryRender(props) {
+export default function QueryRender({ height = 0, ...props }) {
   if (!("queryResult" in props) || !props.queryResult) {
     return (
       <Box style={{ flexGrow: 1, height: "100%", width: "100%" }}>
@@ -149,6 +150,7 @@ export default function QueryRender(props) {
     queryRes = queryRes.filter((elem) => elem["result"] !== null)
     const promises = []
     //add our queries in to array
+    console.log(queryRes)
     for (let index = 0; index < queryRes.length; index++) {
       let spec = queryRes[index]["result"]
       let canvas = document.createElement("div")
@@ -157,32 +159,44 @@ export default function QueryRender(props) {
         vegaEmbed(canvas, spec, {
           renderer: "canvas",
           actions: false,
-        }).then(() => {
-          let imgStream, cHeight, cWidth
-          let targetCanvas = canvas.getElementsByTagName("canvas")[0]
-          imgStream = targetCanvas.toDataURL("image/png")
-          let imgHeight = targetCanvas.height
-          let imgWidth = targetCanvas.width
-          if (imgWidth >= imgHeight) {
-            let scale = chunkWidth / imgWidth
-            cHeight = scale * imgHeight
-            cWidth = chunkWidth
-          } else if (imgHeight > imgWidth) {
-            let scale = chunkWidth / imgHeight
-            cWidth = imgWidth * scale
-            cHeight = chunkWidth
-          }
-          return {
-            imgStream: imgStream,
-            name: queryRes[index][groupBy].slice(queryRes[index][groupBy].lastIndexOf(".") + 1).replace("_graph", ""),
-            width: cWidth,
-            height: cHeight,
-          }
         })
+          .then(() => {
+            let imgStream, cHeight, cWidth
+            let targetCanvas = canvas.getElementsByTagName("canvas")[0]
+            imgStream = targetCanvas.toDataURL("image/png")
+            let imgHeight = targetCanvas.height
+            let imgWidth = targetCanvas.width
+            if (imgWidth >= imgHeight) {
+              let scale = chunkWidth / imgWidth
+              cHeight = scale * imgHeight
+              cWidth = chunkWidth
+            } else if (imgHeight > imgWidth) {
+              let scale = chunkWidth / imgHeight
+              cWidth = imgWidth * scale
+              cHeight = chunkWidth
+            }
+            return {
+              type: "image",
+              imgStream: imgStream,
+              name: queryRes[index][groupBy].slice(queryRes[index][groupBy].lastIndexOf(".") + 1).replace("_graph", ""),
+              width: cWidth,
+              height: cHeight,
+            }
+          })
+          .catch((e) => {
+            console.log(`Something went wrong: ${e}`)
+            console.log(spec)
+            return {
+              type: "invalid",
+            }
+          })
       )
     }
     //after promises complete, store all data in pdf
-    Promise.all(promises).then((res) => {
+    await Promise.all(promises).then((res: Array<any>) => {
+      console.log(res)
+      res = res.filter((obj) => !(obj["type"] === "invalid"))
+      console.log(res)
       let graphArray
       switch (sortMethod) {
         case "height":
@@ -451,6 +465,7 @@ export default function QueryRender(props) {
                 if (!groupByID && stringFilter.length && !(subFilterName.indexOf(stringFilter) !== -1)) return null
 
                 let result = elem["result"]
+                let height = 0
                 if (elem["result"] !== null && typeof elem["result"] === "object" && "$schema" in elem["result"]) {
                   result = { ...elem["result"] }
                   result["width"] = "container"
@@ -469,7 +484,10 @@ export default function QueryRender(props) {
                   }
                   //we alter the image height
                   result["height"] = `${50 * (parseInt(scale) / 3)}`
+                } else {
+                  height = 90 * (parseInt(scale) / 3)
                 }
+
                 return (
                   <Grid
                     key={`${subFilterName}-box`}
@@ -495,6 +513,7 @@ export default function QueryRender(props) {
                     <QueryRender
                       key={`${subFilterName}-render`}
                       style={{ width: "100%", float: "top", paddingTop: "0%" }}
+                      height={height}
                       queryResult={result}
                     />
                   </Grid>
@@ -526,8 +545,7 @@ export default function QueryRender(props) {
         props.queryResult.length
       ) {
         return (
-          //@ts-ignore: We need to be able to reference this box to adjust sizing option availability
-          <Box ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%" }}>
+          <Container ref={boxRef} style={{ flexGrow: 1, height: "100%", width: "100%", maxHeight: "100%" }}>
             <SelectionWindow
               openButtonText={`Adjust Graph Display`}
               displaySubmitButton={true}
@@ -605,8 +623,8 @@ export default function QueryRender(props) {
                 </React.Fragment>
               }
             />
-            <div>{result}</div>
-          </Box>
+            {result}
+          </Container>
         )
       }
     //we intentionally fall through
@@ -632,12 +650,17 @@ export default function QueryRender(props) {
       return (
         <Editor
           //@ts-ignore
-          path="result"
           wordWrapBreakAfterCharacters="},"
           wordWrap="bounded"
-          style={{ minHeight: "50px", height: "50%" }}
+          height={height ? height : "100%"}
           value={typeof props.queryResult === "string" ? props.queryResult : JSON.stringify(props.queryResult)}
-          options={{ readOnly: true, wordWrapBreakAfterCharacters: ",", wordWrap: "bounded", automaticLayout: true }}
+          options={{
+            readOnly: true,
+            wordWrapBreakAfterCharacters: ",",
+            wordWrap: "bounded",
+            automaticLayout: true,
+            fixedOverflowWidgets: true,
+          }}
         />
       )
   }
