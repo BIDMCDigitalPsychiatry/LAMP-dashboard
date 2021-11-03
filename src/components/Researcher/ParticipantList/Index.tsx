@@ -159,10 +159,17 @@ export default function ParticipantList({
 
   useEffect(() => {
     setSelected(selectedStudies)
+  }, [selectedStudies])
+
+  useEffect(() => {
+    setLoadTime(false)
     if ((selectedStudies || []).length > 0) {
       setLoadTime(true)
+      searchParticipants()
+    } else {
+      setParticipants([])
     }
-  }, [selectedStudies])
+  }, [selected])
 
   useEffect(() => {
     setStudiesData(studies)
@@ -180,7 +187,8 @@ export default function ParticipantList({
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     if (selectedStudies.length > 0) {
-      const selectedData = selectedStudies.filter((o) => studiesData.some(({ name }) => o === name))
+      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
+      console.log(selected)
       if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)

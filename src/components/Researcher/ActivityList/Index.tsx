@@ -117,10 +117,17 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
 
   useEffect(() => {
     setSelected(selectedStudies)
-    if (selectedStudies) {
-      setLoadTime(true)
-    }
   }, [selectedStudies])
+
+  useEffect(() => {
+    setLoadTime(false)
+    if ((selectedStudies || []).length > 0) {
+      setLoadTime(true)
+      searchActivities()
+    } else {
+      setActivities([])
+    }
+  }, [selected])
 
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
