@@ -484,7 +484,7 @@ export default function QueryBuilder(props) {
                   displaySubmitButton={true}
                   runOnOpen={async () => {
                     setParticipantTagInfo({})
-                    setSharedTagsUpdateList(availableSharedTags)
+                    setSharedTagsUpdateList(Array.isArray(availableSharedTags) ? availableSharedTags : [])
                     setParticipantTagInfo(
                       await generate_participant_tag_info(currentQuery.id_string[currentQuery.id_string.length - 1])
                     )
