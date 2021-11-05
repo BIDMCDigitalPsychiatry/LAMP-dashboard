@@ -193,7 +193,8 @@ export default function QueryBuilder(props) {
           headers: [["Authorization", `Basic ${props.token.username}:${props.token.password}`]],
           data: sharedQuery,
           callback: function (res) {
-            setSharedTags(JSON.parse(res))
+            let tagList = JSON.parse(res)
+            setSharedTags(Array.isArray(tagList) ? tagList : [])
             setSharedTagsLoadingStatus(false)
           },
         }
@@ -271,7 +272,11 @@ export default function QueryBuilder(props) {
   //This function handles displaying shared tag
   //data for a single study
   const DisplaySharedData = (props) => {
-    if (!props.availableSharedTags) {
+    if (
+      !props.availableSharedTags ||
+      !Array.isArray(props.availableSharedTags) ||
+      props.availableSharedTags.length === 0
+    ) {
       return (
         <Typography>
           There are no shared tags set for this {currentQuery.id_string[currentQuery.id_string.length - 2]}. To display
@@ -453,10 +458,6 @@ export default function QueryBuilder(props) {
     )
   }
 
-  const updateVisibleTags = (tagList) => {
-    setSharedTags(tagList)
-  }
-
   return (
     <Container
       ref={drop}
@@ -484,13 +485,13 @@ export default function QueryBuilder(props) {
                   displaySubmitButton={true}
                   runOnOpen={async () => {
                     setParticipantTagInfo({})
-                    setSharedTagsUpdateList(availableSharedTags)
+                    setSharedTagsUpdateList(Array.isArray(availableSharedTags) ? availableSharedTags : [])
                     setParticipantTagInfo(
                       await generate_participant_tag_info(currentQuery.id_string[currentQuery.id_string.length - 1])
                     )
                   }}
                   handleResult={async () => {
-                    updateVisibleTags(sharedTagsUpdateList)
+                    setSharedTags(sharedTagsUpdateList)
                   }}
                   closesOnSubmit={false}
                   exposeButton={true}
