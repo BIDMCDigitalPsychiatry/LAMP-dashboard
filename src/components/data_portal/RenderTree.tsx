@@ -13,12 +13,20 @@ import {
   ClickAwayListener,
   Tooltip,
   CardContent,
+  Checkbox,
 } from "@material-ui/core"
-import { tags_object, queryables_array, tagged_entities } from "./DataPortalShared"
-import { useDrag, DragPreviewImage } from "react-dnd"
+import {
+  tags_object,
+  queryables_array,
+  generate_activity_dict,
+  ts_to_UTC_String,
+  stringify_obj_values,
+  generate_participant_tag_info,
+} from "./DataPortalShared"
+import { useDrag } from "react-dnd"
 import SelectionWindow from "./SelectionWindow"
 import LAMP from "lamp-core"
-import { generate_ids, useLocalStorage, queryDictionary } from "./DataPortalShared"
+import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
 import jsonexport from "jsonexport"
@@ -117,6 +125,30 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     downloadFormControl: {
       width: "100%",
     },
+
+    tagCheckbox: {
+      color: "#7599FF",
+      "&:checked": { color: "#7599FF" },
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    tagCard: {
+      flex: "25%",
+      float: "left",
+      fontSize: "10px",
+      "&:hover": { background: "#eee", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
+    tagCardHeader: {
+      fontSize: "10px",
+      wordBreak: "break-word",
+    },
+    categoryBox: {
+      display: "flex",
+      width: "100%",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      flexGrow: 1,
+      float: "left",
+    },
   }))
   const classes = useStyles()
 
@@ -192,25 +224,99 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
   let newdate = month + "_" + day + "_" + year
   const defaultDownloadName = `LAMP_${name ? name.replace(" ", "_") : id[id.length - 1]}_Activity_Data_${newdate}.csv`
   const [downloadName, setDownloadName] = React.useState(defaultDownloadName)
-  async function downloadData(id, name = "LAMP_Activity_Data" + newdate + ".csv", delimiter = ",", returnChar = "\n") {
+
+  const defaultExplodeParticipant = true
+  const [explodeParticipant, setExplodeParticipant] = React.useState(defaultExplodeParticipant)
+
+  const defaultExplodeTemporalSlices = true
+  const [explodeTemporalSlices, setExplodeTemporalSlices] = React.useState(defaultExplodeTemporalSlices)
+
+  const defaultDownloadAllActivities = true
+  const [downloadAllActivities, setDownloadAllActivities] = React.useState(defaultExplodeTemporalSlices)
+  const [activityList, setActivityList] = React.useState([])
+  const [chosenActivityList, setChosenActivities] = React.useState([])
+
+  async function downloadData(
+    id,
+    name = "LAMP_Activity_Data" + newdate + ".csv",
+    explode_by_participant = true,
+    explode_temporal_slices = true,
+    chosen_activities: Array<string> = []
+  ) {
     //TODO: add selection between one big file and multiple files
     //TODO: add json vs csv selection
     console.log(`Downloading data for ${id}`)
 
     //first, let's generate a complete id list
-    let id_list = await generate_ids(id)
+    let id_obj = await generate_ids(id, true)
+    let id_list = Object.keys(id_obj)
+    //now, let's get our lookup dict
+    let lookup_dict = await generate_activity_dict(id, token)
 
     //now, let's pull some data
-    let resultsPulled = await Promise.all(
+    let resultsPulled = (await Promise.all(
       id_list.map(async (id) => {
-        let res = await LAMP.ActivityEvent.allByParticipant(id)
+        let res: Array<any> = await LAMP.ActivityEvent.allByParticipant(id)
+        res = res.reduce((acc, event) => {
+          let activity_obj = {
+            ActivityName: lookup_dict[event.activity]?.name ?? "UNKNOWN",
+            ActivityDate: ts_to_UTC_String(event.timestamp),
+            ...event,
+          }
+          if (chosen_activities.length === 0) return acc.concat([activity_obj])
+          else {
+            return activity_obj["ActivityName"] && chosen_activities.indexOf(activity_obj["ActivityName"]) !== -1
+              ? acc.concat([activity_obj])
+              : acc
+          }
+        }, [])
         return {
           userID: id,
+          userName: id_obj[id] ? id_obj[id] : null,
           activityEvents: JSON.stringify(res),
         }
       })
-    )
+    )) as Array<any>
 
+    if (explode_by_participant) {
+      resultsPulled = resultsPulled.reduce((acc, participant_object) => {
+        return (acc as Array<any>).concat(
+          JSON.parse(participant_object["activityEvents"])
+            .map((activity) => {
+              //let final_object:
+              if (explode_temporal_slices && activity?.temporal_slices?.length) {
+                return activity.temporal_slices.map((slice) => {
+                  //explode out temporal slices
+                  let obj = { ...activity }
+                  delete obj.temporal_slices
+                  obj["totalDuration"] = obj.duration
+                  delete obj.duration
+                  return {
+                    userID: participant_object["userID"],
+                    userName: participant_object["userName"],
+                    ActivityName: obj["ActivityName"],
+                    ActivityDate: obj["ActivityDate"],
+                    ...stringify_obj_values(slice, ["ActivityName", "ActivityDate"]),
+                    ...stringify_obj_values(obj, ["ActivityName", "ActivityDate"]),
+                  }
+                })
+              } else
+                return [
+                  {
+                    userID: participant_object["userID"],
+                    userName: participant_object["userName"],
+                    ActivityName: activity["ActivityName"],
+                    ActivityDate: activity["ActivityDate"],
+                    ...stringify_obj_values(activity, ["ActivityName", "ActivityDate"]),
+                  },
+                ]
+            })
+            .reduce((acc, elem) => {
+              return acc.concat(elem)
+            }, [])
+        )
+      }, [])
+    }
     jsonexport(resultsPulled, function (err, csv) {
       if (err) return console.log(err)
       const file = new Blob([csv], { type: "text/csv" })
@@ -316,15 +422,32 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
               </IconButton>
             }
             displaySubmitButton={true}
-            runOnOpen={() => {
+            runOnOpen={async () => {
               setDownloadName(defaultDownloadName)
+              setExplodeTemporalSlices(defaultExplodeTemporalSlices)
+              setExplodeParticipant(defaultExplodeParticipant)
+              setDownloadAllActivities(defaultDownloadAllActivities)
+              setChosenActivities([])
+              setActivityList(
+                (Object.values(await generate_activity_dict(id[id.length - 1], token)).reduce((acc, elem) => {
+                  return (acc as Array<any>).indexOf(elem) !== -1 ? acc : (acc as Array<any>).concat([elem])
+                }, []) as Array<any>).sort((a, b) => a["name"].localeCompare(b["name"]))
+              )
             }}
-            handleResult={() => downloadData(id[id.length - 1], downloadName)}
+            handleResult={() =>
+              downloadData(
+                id[id.length - 1],
+                downloadName,
+                explodeParticipant,
+                explodeTemporalSlices,
+                downloadAllActivities ? activityList.map((elem) => elem["name"]) : chosenActivityList
+              )
+            }
             closesOnSubmit={false}
             exposeButton={true}
             submitText={`Download`}
             children={
-              <Typography>
+              <React.Fragment>
                 Download Data for {id[id.length - 2]} {name ? name : id[id.length - 1]}
                 <br />
                 <FormControlLabel
@@ -344,7 +467,115 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
                     </Box>
                   }
                 />
-              </Typography>
+                <br />
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  onClick={() => setExplodeParticipant(!explodeParticipant)}
+                  control={<Checkbox checked={explodeParticipant} />}
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      Separate participant data into multiple lines for each activity
+                    </Box>
+                  }
+                />
+                {explodeParticipant && (
+                  <FormControlLabel
+                    classes={{ root: classes.downloadFormControl }}
+                    onClick={() => setExplodeTemporalSlices(!explodeTemporalSlices)}
+                    control={<Checkbox checked={explodeTemporalSlices} />}
+                    label={
+                      <Box component="span" fontWeight={600}>
+                        Separate activity data into multiple lines for each response
+                      </Box>
+                    }
+                  />
+                )}
+                <FormControlLabel
+                  classes={{ root: classes.downloadFormControl }}
+                  onClick={() => setDownloadAllActivities(!downloadAllActivities)}
+                  control={<Checkbox checked={downloadAllActivities} />}
+                  label={
+                    <Box component="span" fontWeight={600}>
+                      Download data for all activities for this {id[id.length - 2]}
+                    </Box>
+                  }
+                />
+                {activityList.length > 0 && !downloadAllActivities && (
+                  <Box>
+                    <Box className={classes.categoryBox}>
+                      {activityList
+                        .reduce((acc, activity) => {
+                          //we return a list of all unique activity specs
+                          return acc.indexOf(activity["spec"]) === -1 &&
+                            activityList.filter((elem) => elem["spec"] == activity["spec"]).length > 1
+                            ? acc.concat([activity["spec"]])
+                            : acc
+                        }, [])
+                        .sort((a, b) => a.localeCompare(b))
+                        .map((spec) => {
+                          return (
+                            <Card key={spec} className={classes.tagCard}>
+                              <CardHeader
+                                onClick={() => {
+                                  //toggle the clicked tag in the pending update list
+                                  //first, get a list of all activity names that fit this spec
+                                  let toggleList = activityList.reduce((acc, activity) => {
+                                    return activity["spec"] == spec && acc.indexOf(activity["name"]) === -1
+                                      ? acc.concat([activity["name"]])
+                                      : acc
+                                  }, [])
+
+                                  //copy the chosen activity list and push to it
+                                  let currentList = chosenActivityList.slice()
+                                  toggleList.forEach((name) => {
+                                    let index = currentList.indexOf(name)
+                                    if (index === -1) {
+                                      currentList.push(name)
+                                    }
+                                  })
+                                  setChosenActivities(currentList)
+                                }}
+                                classes={{ title: classes.tagCardHeader }}
+                                title={`Select all ${spec} activities`}
+                              />
+                            </Card>
+                          )
+                        })}
+                    </Box>
+
+                    <Box className={classes.categoryBox}>
+                      {activityList
+                        .reduce((acc, elem) => (acc.indexOf(elem["name"]) !== -1 ? acc : acc.concat(elem["name"])), [])
+                        .map((name) => {
+                          return (
+                            <Card key={name} className={classes.tagCard}>
+                              <CardHeader
+                                onClick={() => {
+                                  //toggle the clicked tag in the pending update list
+                                  let index = chosenActivityList.indexOf(name)
+                                  if (index !== -1) {
+                                    setChosenActivities(chosenActivityList.filter((elem) => elem !== name))
+                                  } else {
+                                    setChosenActivities(chosenActivityList.concat([name]))
+                                  }
+                                }}
+                                classes={{ title: classes.tagCardHeader }}
+                                title={name}
+                                action={
+                                  <Checkbox
+                                    className={classes.tagCheckbox}
+                                    color={"primary"}
+                                    checked={chosenActivityList.indexOf(name) !== -1}
+                                  />
+                                }
+                              />
+                            </Card>
+                          )
+                        })}
+                    </Box>
+                  </Box>
+                )}
+              </React.Fragment>
             }
           />
         )}
@@ -385,16 +616,16 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
           )}
         </IconButton>
       </CardActions>
-      {/*
-						For each branch in our tree, we output some info and create a new level
-						*/}
+      {/*For each branch in our tree, we output some info and create a new level*/}
       {expanded &&
         (!!treeDisplay ? (isAlphabetized && !!alphabetizedTree ? alphabetizedTree : treeDisplay) : []).map(
           (branch, index) =>
             (!currentFilter ||
               currentFilter === "" ||
-              branch.id.indexOf(currentFilter) !== -1 ||
-              (typeof branch !== "string" && branch.name && branch.name.indexOf(currentFilter) !== -1)) && (
+              branch.id.toLowerCase().indexOf(currentFilter.toLowerCase()) !== -1 ||
+              (typeof branch !== "string" &&
+                branch.name &&
+                branch.name.toLowerCase().indexOf(currentFilter.toLowerCase()) !== -1)) && (
               <RenderTree
                 key={"tree" + id[id.length - 1] + index}
                 id={typeof branch === "string" ? [...id, branch] : [...id, branch.id]}
