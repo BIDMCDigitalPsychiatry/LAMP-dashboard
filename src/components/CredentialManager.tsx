@@ -349,7 +349,7 @@ export const CredentialManager: React.FunctionComponent<{
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       setAllCreds(cred)
     })
-    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
+    LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       setPermissions(!!res.data ? res.data : [])
     })
     setRoles()
@@ -390,7 +390,7 @@ export const CredentialManager: React.FunctionComponent<{
       let newData = {}
       newData[data.emailAddress] = data.role
       permissions.push(newData)
-      LAMP.Type.setAttachment(null, "me", "gov.lacounty.dmh.admin_permissions", permissions)
+      LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", permissions)
     }
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {
