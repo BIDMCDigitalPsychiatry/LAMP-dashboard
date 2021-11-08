@@ -388,7 +388,7 @@ export const CredentialManager: React.FunctionComponent<{
     let result = await updateDetails(id, data, selected.mode, allRoles, typeEmail, type)
     if (!!permissions) {
       let newData = {}
-      newData[data.emailAddress] = data.role
+      newData[data.emailAddress !== "" ? data.emailAddress : data.credential.access_key] = data.role
       permissions.push(newData)
       LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", permissions)
     }
