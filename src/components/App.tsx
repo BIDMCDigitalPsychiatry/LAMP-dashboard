@@ -141,7 +141,7 @@ function AppRouter({ ...props }) {
   }, [])
 
   const getAdminType = () => {
-    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
+    LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
       if (!!res.data) {
         let checked = false
         Object.keys(res.data).map((key) => {
