@@ -61,7 +61,6 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
   const onMonacoMount = (ref) => {
     editorRef.current = ref
     if (!!editorRef.current) editorRef.current.editor.getModel().setValue(query)
-    debugger
   }
   React.useEffect(() => {
     if (!!editorRef.current) {
@@ -225,7 +224,12 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
               className={focusBuilder ? classes.renderStyleUnfocus : classes.renderStyleFocus}
               onClick={() => toggleFocus(false)}
             >
-              <QueryRender focusMe={() => toggleFocus(false)} loading={loadingGraphs} queryResult={result} />
+              <QueryRender
+                className={classes.queryRender}
+                focusMe={() => toggleFocus(false)}
+                loading={loadingGraphs}
+                queryResult={result}
+              />
             </Grid>
           </Grid>
         </Grid>

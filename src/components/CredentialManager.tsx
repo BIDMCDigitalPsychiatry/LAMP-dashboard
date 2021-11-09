@@ -338,7 +338,7 @@ export const CredentialManager: React.FunctionComponent<{
   const { t } = useTranslation()
   const [ext, setExt] = useState([])
   const [int, setInt] = useState([])
-  const [permissions, setPermissions] = useState(null)
+  const [permissions, setPermissions] = useState([])
 
   useEffect(() => {
     LAMP.Type.parent(id)
@@ -349,8 +349,8 @@ export const CredentialManager: React.FunctionComponent<{
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       setAllCreds(cred)
     })
-    LAMP.Type.getAttachment(null, "gov.lacounty.dmh.admin_permissions").then((res: any) => {
-      setPermissions(!!res.data ? res.data : null)
+    LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
+      setPermissions(!!res.data ? res.data : [])
     })
     setRoles()
   }, [])
@@ -386,11 +386,11 @@ export const CredentialManager: React.FunctionComponent<{
   const _submitCredential = async (data) => {
     let typeEmail = ext.includes(data.emailAddress) ? 1 : 2
     let result = await updateDetails(id, data, selected.mode, allRoles, typeEmail, type)
-    if (!!type && !!permissions) {
+    if (!!permissions) {
       let newData = {}
-      newData[data.emailAddress] = data.role
+      newData[data.emailAddress !== "" ? data.emailAddress : data.credential.access_key] = data.role
       permissions.push(newData)
-      LAMP.Type.setAttachment(null, "me", "gov.lacounty.dmh.admin_permissions", permissions)
+      LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", permissions)
     }
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {

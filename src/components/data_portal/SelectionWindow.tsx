@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import {
   Backdrop,
   Card,
@@ -89,8 +89,7 @@ export default function SelectionWindow({
   const [awaitingClose, setAwaitClose] = useState(false)
 
   React.useEffect(() => {
-    if (open) console.log("Ran a function on open")
-    runOnOpen()
+    if (open) runOnOpen()
   }, [open])
   function ConditionalCardWrap({ condition, children }) {
     return condition ? (
