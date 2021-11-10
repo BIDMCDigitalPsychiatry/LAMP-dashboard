@@ -40,7 +40,15 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-
+  const [tab, setTab] = useState(!!value ? value.tab : "default")
+  const tabs = {
+    default: "Default",
+    learn: "Learn",
+    assess: "Assess",
+    manage: "Manage",
+    prevent: "Prevent",
+    none: "None",
+  }
   useEffect(() => {
     onChange({
       text,
@@ -119,6 +127,28 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          <Grid item lg={8} sm={8} xs={12}>
+            <Box mb={3}>
+              <TextField
+                error={typeof tab == "undefined" || tab === null || tab === "" ? true : false}
+                id="filled-select-currency"
+                select
+                label={t("Tab")}
+                value={tab}
+                onChange={(e) => {
+                  setTab(e.target.value)
+                }}
+                helperText={typeof tab == "undefined" || tab === null || tab === "" ? t("Please select the tab") : ""}
+                variant="filled"
+              >
+                {Object.keys(tabs).map((key) => (
+                  <MenuItem key={key} value={key}>
+                    {t(tabs[key])}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
           </Grid>
           <Grid item lg={8} sm={8} xs={12}>
             <Box mb={3}>
