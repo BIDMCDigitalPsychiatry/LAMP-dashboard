@@ -40,7 +40,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-  const [tab, setTab] = useState(!!value ? value.tab : "default")
+  const [tab, setTab] = useState(value?.tab ?? "default")
   const tabs = {
     default: "Default",
     learn: "Learn",
@@ -55,8 +55,9 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
       photo,
       description,
       studyId,
+      tab,
     })
-  }, [text, description, photo, studyId])
+  }, [text, description, photo, studyId, tab])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {

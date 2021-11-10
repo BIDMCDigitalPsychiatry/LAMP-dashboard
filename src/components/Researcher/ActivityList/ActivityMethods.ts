@@ -823,6 +823,7 @@ export function spliceActivity({ raw, tag }) {
   return {
     id: raw.id,
     study_id: raw.study_id,
+    tab: raw.tab,
     spec: "lamp.survey",
     name: raw.name,
     description: tag?.description,
@@ -855,6 +856,7 @@ export function unspliceTipsActivity(x) {
       schedule: x.schedule,
       settings: x.settings,
       studyID: x.studyID,
+      tab: x.tab,
     },
   }
 }
@@ -865,6 +867,7 @@ export function unspliceActivity(x) {
     raw: {
       id: x.id,
       study_id: x.study_id,
+      tab: x.tab,
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
@@ -894,6 +897,7 @@ export function unspliceCTActivity(x) {
       name: x.name,
       schedule: x.schedule,
       settings: x.settings,
+      tab: x.tab,
     },
     tag: {
       description: x.description,
@@ -912,6 +916,7 @@ export function spliceCTActivity({ raw, tag }) {
     photo: tag?.photo,
     schedule: raw.schedule,
     settings: raw.settings,
+    tab: raw.tab,
   }
 }
 
@@ -948,6 +953,7 @@ export async function saveCTestActivity(x) {
 export async function saveSurveyActivity(x) {
   // FIXME: ensure this is a lamp.survey only!
   const { raw, tag } = unspliceActivity(x)
+  console.log(x, raw, tag)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
   return newItem

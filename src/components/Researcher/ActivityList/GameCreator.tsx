@@ -78,6 +78,7 @@ export default function GameCreator({
     photo: details?.photo ?? null,
     settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
+    tab: value?.tab ?? "default",
   })
 
   const validate = () => {
@@ -277,6 +278,7 @@ export default function GameCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
+      tab: details?.tab ?? "default",
     })
   }
 

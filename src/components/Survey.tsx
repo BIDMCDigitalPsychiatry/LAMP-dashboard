@@ -258,11 +258,13 @@ export default function Survey({
     setLoading(true)
     let gActivities = (activities || []).filter(
       (x) =>
-        games.includes(x.spec) ||
-        x.spec === "lamp.group" ||
-        x.spec === "lamp.dbt_diary_card" ||
-        x.spec === "lamp.recording" ||
-        x.spec === "lamp.survey"
+        ((games.includes(x.spec) ||
+          x.spec === "lamp.group" ||
+          x.spec === "lamp.dbt_diary_card" ||
+          x.spec === "lamp.recording" ||
+          x.spec === "lamp.survey") &&
+          (x?.tab === "default" || !!x?.tab)) ||
+        x?.tab === "assess"
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
@@ -291,6 +293,7 @@ export default function Survey({
   // const formattedDate = year + "-" + month + "-" + day
   const getActivity = (y: any) => {
     LAMP.Activity.view(y.id).then((data) => {
+      console.log(data)
       setSpec(y.spec)
       setActivity(data)
       y.spec === "lamp.dbt_diary_card"

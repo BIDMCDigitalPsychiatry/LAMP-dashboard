@@ -131,6 +131,7 @@ export default function GroupCreator({
     photo: !!details ? details?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
+    tab: value?.tab ?? "default",
   })
 
   useEffect(() => {
@@ -154,6 +155,7 @@ export default function GroupCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
+      tab: details?.tab ?? "default",
     })
   }
 
