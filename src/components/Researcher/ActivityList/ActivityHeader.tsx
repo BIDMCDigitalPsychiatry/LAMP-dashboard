@@ -40,14 +40,13 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-  const [tab, setTab] = useState(value?.tab ?? "default")
+  const [tab, setTab] = useState(value?.category ?? [])
   const tabs = {
-    default: "Default",
     learn: "Learn",
     assess: "Assess",
     manage: "Manage",
     prevent: "Prevent",
-    none: "None",
+    "": "None",
   }
   useEffect(() => {
     onChange({
@@ -58,6 +57,10 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
       tab,
     })
   }, [text, description, photo, studyId, tab])
+
+  useEffect(() => {
+    //
+  }, [])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -136,9 +139,9 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 id="filled-select-currency"
                 select
                 label={t("Tab")}
-                value={tab}
+                value={tab[0]}
                 onChange={(e) => {
-                  setTab(e.target.value)
+                  setTab(e.target.value === "" ? [] : [e.target.value])
                 }}
                 helperText={typeof tab == "undefined" || tab === null || tab === "" ? t("Please select the tab") : ""}
                 variant="filled"

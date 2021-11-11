@@ -321,7 +321,7 @@ export default function SurveyCreator({
     photo: !!value ? value?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
-    tab: value?.tab ?? "default",
+    tab: value?.category ?? ["assess"],
   })
 
   const [isOptionNull, setIsOptionNull] = useState(0)
@@ -340,7 +340,7 @@ export default function SurveyCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
-      tab: details?.tab ?? "default",
+      tab: details?.category ?? ["assess"],
     })
   }
 
@@ -438,7 +438,7 @@ export default function SurveyCreator({
             studies={studies}
             value={value}
             details={details}
-            activitySpecId={null}
+            activitySpecId="lamp.survey"
             study={data.studyID}
             onChange={handleChange}
             image={null}
