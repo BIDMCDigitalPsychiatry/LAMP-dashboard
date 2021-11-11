@@ -60,7 +60,7 @@ export default function Sensors({
       Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
         let result = sortData(sensors, [participant.study_name], "name")
         setSensors(result)
-        setPaginatedSensors(result.slice(page, rowCount))
+        setPaginatedSensors(result.slice(page * rowCount, page * rowCount + rowCount))
       })
     })()
     setSelectedSensors([])
@@ -159,7 +159,14 @@ export default function Sensors({
                 />
               </Grid>
             ))}
-            <Pagination data={sensors} updatePage={handleChangePage} defaultCount={10} />
+            <Pagination
+              data={sensors}
+              updatePage={handleChangePage}
+              defaultCount={10}
+              currentRowCount={rowCount}
+              currentPage={page}
+              type={1}
+            />
           </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />

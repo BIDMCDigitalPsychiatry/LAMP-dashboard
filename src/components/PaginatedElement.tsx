@@ -10,6 +10,7 @@ export default function Pagination({
   defaultCount,
   currentPage,
   currentRowCount,
+  type,
   ...props
 }: {
   data: Array<any>
@@ -18,9 +19,10 @@ export default function Pagination({
   defaultCount?: number
   currentPage?: number
   currentRowCount?: number
+  type?: number
 }) {
   const [page, setPage] = useState(currentPage)
-  const [rowCount, setRowCount] = useState(currentRowCount ?? defaultCount ?? 40)
+  const [rowCount, setRowCount] = useState(currentRowCount ?? defaultCount ?? (type ? 10 : 40))
   const { t } = useTranslation()
 
   const handleRowChange = (event) => {
@@ -45,7 +47,7 @@ export default function Pagination({
   }, [currentPage])
 
   useEffect(() => {
-    setRowCount(currentRowCount ?? 40)
+    setRowCount(currentRowCount ?? (type ? 10 : 40))
   }, [currentRowCount])
 
   return (
