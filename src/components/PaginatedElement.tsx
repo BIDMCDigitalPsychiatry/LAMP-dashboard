@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from "react"
 import { Grid, TablePagination } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
+import { colorSignalConfig } from "vega-lite/build/src/config"
 
 export default function Pagination({
   data,
   updatePage,
   rowPerPage,
   defaultCount,
+  currentPage,
+  currentRowCount,
   ...props
 }: {
   data: Array<any>
   updatePage: Function
   rowPerPage?: Array<number>
   defaultCount?: number
+  currentPage?: number
+  currentRowCount?: number
 }) {
-  const [page, setPage] = useState(0)
-  const [rowCount, setRowCount] = useState(defaultCount ?? 40)
+  const [page, setPage] = useState(currentPage)
+  const [rowCount, setRowCount] = useState(currentRowCount ?? defaultCount ?? 40)
   const { t } = useTranslation()
 
   const handleRowChange = (event) => {
@@ -31,9 +36,17 @@ export default function Pagination({
   }, [page])
 
   useEffect(() => {
-    setPage(0)
-    updatePage(0, rowCount)
+    setPage(page)
+    updatePage(page, rowCount)
   }, [rowCount])
+
+  useEffect(() => {
+    setPage(currentPage ?? 0)
+  }, [currentPage])
+
+  useEffect(() => {
+    setRowCount(currentRowCount ?? 40)
+  }, [currentRowCount])
 
   return (
     <Grid item xs={12}>

@@ -126,7 +126,6 @@ export default function ParticipantList({
   selectedStudies,
   setSelectedStudies,
   getAllStudies,
-  setData,
   mode,
   ...props
 }) {
@@ -135,13 +134,12 @@ export default function ParticipantList({
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [updateCount, setUpdateCount] = useState(0)
-  const [selected, setSelected] = useState(selectedStudies)
+  const [selected, setSelected] = useState([])
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
   const [studiesData, setStudiesData] = useState([])
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
-  const [loadTime, setLoadTime] = useState(false)
 
   const { t } = useTranslation()
 
@@ -154,26 +152,24 @@ export default function ParticipantList({
   )
 
   useEffect(() => {
-    if (!!loadTime) searchParticipants()
-  }, [loadTime])
-
-  useEffect(() => {
-    setSelected(selectedStudies)
+    if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
   useEffect(() => {
-    setLoadTime(false)
+    loadData()
+  }, [selected])
+
+  useEffect(() => {
+    if (studies !== studiesData) setStudiesData(studies)
+  }, [studies])
+
+  const loadData = () => {
     if ((selectedStudies || []).length > 0) {
-      setLoadTime(true)
       searchParticipants()
     } else {
       setParticipants([])
     }
-  }, [selected])
-
-  useEffect(() => {
-    setStudiesData(studies)
-  }, [studies])
+  }
 
   const handleChange = (participant, checked) => {
     if (checked) {
@@ -187,7 +183,7 @@ export default function ParticipantList({
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     if (selectedStudies.length > 0) {
-      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
+      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name)).sort()
       if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)
@@ -202,9 +198,11 @@ export default function ParticipantList({
                 result = result.concat(participantData)
                 setParticipants(sortData(result, selectedData, "id"))
               }
-              result = sortData(result, selectedData, "id")
-              setPaginatedParticipants(sortData(result, selectedData, "id").slice(0, rowCount))
-              setPage(0)
+              setPaginatedParticipants(
+                sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+              )
+              setPage(page)
+              setRowCount(rowCount)
             } else {
               if (result.length === 0) setParticipants([])
             }
@@ -230,7 +228,10 @@ export default function ParticipantList({
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
-    setPaginatedParticipants(participants.slice(page * rowCount, page * rowCount + rowCount))
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    setPaginatedParticipants(
+      sortData(participants, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+    )
     setLoading(false)
   }
 
@@ -247,7 +248,7 @@ export default function ParticipantList({
         selectedStudies={selected}
         setSelectedStudies={setSelectedStudies}
         setParticipants={searchParticipants}
-        setData={setData}
+        setData={getAllStudies}
         mode={mode}
       />
       <Box className={classes.tableContainer} py={4}>
@@ -267,7 +268,13 @@ export default function ParticipantList({
                   />
                 </Grid>
               ))}
-              <Pagination data={participants} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+              <Pagination
+                data={participants}
+                updatePage={handleChangePage}
+                rowPerPage={[20, 40, 60, 80]}
+                currentPage={page}
+                currentRowCount={rowCount}
+              />
             </Grid>
           ) : (
             <Box className={classes.norecordsmain}>
