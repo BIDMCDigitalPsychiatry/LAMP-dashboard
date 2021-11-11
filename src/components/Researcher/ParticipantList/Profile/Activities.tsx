@@ -68,7 +68,7 @@ export default function PatientProfile({
       Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
         let result = sortData(activities, [participant.study_name], "name")
         setActivities(result)
-        setPaginatedActivities(result.slice(page, rowCount))
+        setPaginatedActivities(result.slice(page * rowCount, page * rowCount + rowCount))
       })
     })()
     setSelectedActivities([])
@@ -158,7 +158,14 @@ export default function PatientProfile({
                 />
               </Grid>
             ))}
-            <Pagination data={activities} updatePage={handleChangePage} defaultCount={10} />
+            <Pagination
+              data={activities}
+              updatePage={handleChangePage}
+              defaultCount={10}
+              currentRowCount={rowCount}
+              currentPage={page}
+              type={1}
+            />
           </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />
