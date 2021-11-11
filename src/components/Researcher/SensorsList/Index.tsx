@@ -134,8 +134,11 @@ export default function SensorsList({
                 result = result.concat(sensorData)
                 setSensors(sortData(result, selectedData, "name"))
               }
-              setPaginatedSensors(sortData(result, selectedData, "name").slice(0, rowCount))
-              setPage(0)
+              setPaginatedSensors(
+                sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+              )
+              setPage(page)
+              setRowCount(rowCount)
             } else {
               if (result.length === 0) setSensors([])
             }
@@ -161,7 +164,8 @@ export default function SensorsList({
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
-    setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    setPaginatedSensors(sortData(sensors, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
   }
 
@@ -194,7 +198,13 @@ export default function SensorsList({
                   />
                 </Grid>
               ))}
-              <Pagination data={sensors} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+              <Pagination
+                data={sensors}
+                updatePage={handleChangePage}
+                rowPerPage={[20, 40, 60, 80]}
+                currentPage={page}
+                currentRowCount={rowCount}
+              />
             </Grid>
           ) : (
             <Box className={classes.norecordsmain}>

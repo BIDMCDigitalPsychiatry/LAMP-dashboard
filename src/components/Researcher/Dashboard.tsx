@@ -133,6 +133,11 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
+const sortStudies = (studies) => {
+  return studies.sort((a, b) => {
+    return a["name"] > b["name"] ? 1 : a["name"] < b["name"] ? -1 : 0
+  })
+}
 
 export const sortData = (data, studies, key) => {
   let result = []
@@ -191,8 +196,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
 
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
+      setStudies(sortStudies(studies))
       setCurrentTab(0)
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
@@ -203,10 +207,13 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
 
   const getAllStudies = async () => {
     Service.getAll("studies").then((studies) => {
-      setStudies(studies)
-      filterStudies(studies)
+      setStudies(sortStudies(studies))
     })
   }
+
+  useEffect(() => {
+    filterStudies(studies)
+  }, [studies])
 
   const filterStudies = async (studies) => {
     if (studies !== null && (studies || []).length > 0) {
@@ -222,10 +229,9 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 return study.name
               })
             : filtered
-        selected.sort()
       }
+      selected.sort()
       setSelectedStudies(selected)
-      setStudies(studies)
     }
   }
 
@@ -325,7 +331,6 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 getAllStudies={getAllStudies}
-                setData={getDBStudies}
                 mode={mode}
               />
             )}
