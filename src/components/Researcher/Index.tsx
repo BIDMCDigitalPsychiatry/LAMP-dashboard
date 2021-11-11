@@ -29,7 +29,6 @@ export default function Researcher({ researcher, onParticipantSelect, mode, ...p
     ;(async () => {
       let lampAuthId = LAMP.Auth._auth.id
       let lampAuthPswd = LAMP.Auth._auth.password
-      // console.log(LAMP.Auth._auth)
       // if (LAMP.Auth._type === "researcher") {
       //   lampAuthId === "researcher@demo.lamp.digital"
       //     ? demoWorker()

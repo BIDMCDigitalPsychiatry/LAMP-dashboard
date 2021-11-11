@@ -147,8 +147,11 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                 result = result.concat(activitiesData)
                 setActivities(sortData(result, selectedData, "name"))
               }
-              setPaginatedActivities(sortData(result, selectedData, "name").slice(0, rowCount))
-              setPage(0)
+              setPaginatedActivities(
+                sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+              )
+              setPage(page)
+              setRowCount(rowCount)
             } else {
               if (result.length === 0) setActivities([])
             }
@@ -174,7 +177,10 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
-    setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    setPaginatedActivities(
+      sortData(activities, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+    )
     setLoading(false)
   }
 
@@ -211,7 +217,13 @@ export default function ActivityList({ researcher, title, studies, selectedStudi
                   />
                 </Grid>
               ))}
-              <Pagination data={activities} updatePage={handleChangePage} rowPerPage={[20, 40, 60, 80]} />
+              <Pagination
+                data={activities}
+                updatePage={handleChangePage}
+                rowPerPage={[20, 40, 60, 80]}
+                currentPage={page}
+                currentRowCount={rowCount}
+              />
             </Grid>
           ) : (
             <Box className={classes.norecordsmain}>

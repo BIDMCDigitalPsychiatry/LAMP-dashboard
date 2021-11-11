@@ -99,16 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({
-  researcher,
-  studies,
-  setUpdateCount,
-  setParticipants,
-  setSelectedStudies,
-  setData,
-  mode,
-  ...props
-}) {
+export default function AddButton({ researcher, studies, setUpdateCount, setParticipants, setData, mode, ...props }) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
@@ -217,7 +208,6 @@ export default function AddButton({
         open={addParticipantStudy}
         handleNewStudy={handleNewStudyData}
         closePopUp={handleClosePopUp}
-        setSelectedStudies={setSelectedStudies}
       />
     </Box>
   )

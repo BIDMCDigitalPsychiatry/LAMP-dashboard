@@ -308,7 +308,6 @@ export default function BottomMenu({ ...props }) {
   ])
 
   useEffect(() => {
-    console.log(supportsSidebar, "sidebar")
     openTabUpdate()
   }, [])
 

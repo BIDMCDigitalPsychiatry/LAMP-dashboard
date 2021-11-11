@@ -313,7 +313,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     if (!!skillRange) {
       let skillData = []
       let timeStamp = skillRange.split("-")
-      console.log(selectedEvents)
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
@@ -330,7 +329,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           }
         })
       })
-      console.log(skillData)
       let dates = getDates(timeStamp[1], timeStamp[0])
       let selDates = []
       dates.map((date) => {

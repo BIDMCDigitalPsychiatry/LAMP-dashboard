@@ -61,14 +61,12 @@ export default function PatientStudyCreator({
   researcher,
   handleNewStudy,
   closePopUp,
-  setSelectedStudies,
   ...props
 }: {
   studies: any
   researcher: any
   handleNewStudy: Function
   closePopUp: Function
-  setSelectedStudies?: Function
 } & DialogProps) {
   const [studyName, setStudyName] = useState("")
   const classes = useStyles()
@@ -201,7 +199,6 @@ export default function PatientStudyCreator({
       localStorage.getItem("studies_" + authId) !== null ? JSON.parse(localStorage.getItem("studies_" + authId)) : []
     studiesSelected.push(studyName)
     localStorage.setItem("studies_" + authId, JSON.stringify(studiesSelected))
-    !!setSelectedStudies ? setSelectedStudies(studiesSelected) : {}
   }
 
   const createStudy = async (studyName: string) => {
