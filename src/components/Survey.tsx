@@ -293,7 +293,6 @@ export default function Survey({
   // const formattedDate = year + "-" + month + "-" + day
   const getActivity = (y: any) => {
     LAMP.Activity.view(y.id).then((data) => {
-      console.log(data)
       setSpec(y.spec)
       setActivity(data)
       y.spec === "lamp.dbt_diary_card"

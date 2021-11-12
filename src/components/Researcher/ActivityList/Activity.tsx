@@ -55,7 +55,6 @@ export default function Activity({
   setUpdateCount?: Function
   openWindow?: Boolean
 }) {
-  console.log(activity)
   const [loading, setLoading] = useState(false)
   const isTip = (activity || {}).spec === "lamp.tips" || activitySpecId === "lamp.tips"
   const isGroup = (activity || {}).spec === "lamp.group" || activitySpecId === "lamp.group"

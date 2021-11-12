@@ -869,9 +869,7 @@ export default function Prevent({
   }
 
   const setTabActivities = () => {
-    console.log(allActivities)
     let gActivities = allActivities.filter((x: any) => !!x?.category && (x?.category[0] || "") === "prevent")
-    console.log(gActivities)
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
