@@ -740,7 +740,6 @@ export default function Feed({
   const getFeedByDate = (date: Date) => {
     setLoading(true)
     let feeds = activities.filter((activity) => (activity?.schedule || [])?.length > 0)
-    console.log(feeds)
     setFeeds(feeds)
     changeDate(new Date(date))
     getEvents(date).then(setEvents)
