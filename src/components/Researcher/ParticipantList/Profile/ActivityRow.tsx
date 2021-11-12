@@ -31,6 +31,7 @@ export default function ActivityRow({
   activities,
   handleSelected,
   setActivities,
+  updateActivities,
   ...props
 }: {
   activity: any
@@ -39,6 +40,7 @@ export default function ActivityRow({
   activities: any
   handleSelected: Function
   setActivities: Function
+  updateActivities: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -92,7 +94,7 @@ export default function ActivityRow({
             setActivities={setActivities}
             profile={true}
           />
-          <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
+          <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} />
         </Grid>
       </Grid>
     </Box>
