@@ -34,7 +34,7 @@ export interface Researcher {
 export interface Studies {
   name?: string
 }
-export default function StudyFilter({ setShowFilterStudies, ...props }) {
+export default function StudyFilter({ setShowFilterStudies, setOrder, ...props }) {
   const [showFilter, setShowFilter] = useState(false)
   const classes = useStyles()
   const { t } = useTranslation()
@@ -55,6 +55,13 @@ export default function StudyFilter({ setShowFilterStudies, ...props }) {
         <Icon>filter_alt</Icon>
         <span className={classes.filterText}>{t("Filter results")}</span>{" "}
         {showFilter === true ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
+      </Fab>
+      <Fab
+        variant="extended"
+        className={classes.btnFilter + " " + (showFilter === true ? classes.tagFilteredBg : "")}
+        onClick={setOrder}
+      >
+        <Icon>sort_by_alpha</Icon>
       </Fab>
     </Box>
   )

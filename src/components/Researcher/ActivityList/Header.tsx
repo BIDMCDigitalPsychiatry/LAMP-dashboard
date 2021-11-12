@@ -40,6 +40,7 @@ export default function Header({
   setSelectedStudies,
   selectedStudies,
   setActivities,
+  setOrder,
   ...props
 }) {
   const classes = useStyles()
@@ -62,7 +63,7 @@ export default function Header({
           <Typography variant="h5">{t("Activities")}</Typography>
         </Box>
         <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} />
         </Box>
         <SearchBox searchData={searchData} />
         <Box>
