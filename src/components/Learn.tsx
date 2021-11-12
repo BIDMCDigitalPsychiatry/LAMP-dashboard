@@ -218,7 +218,9 @@ export default function Learn({
   const { t } = useTranslation()
 
   useEffect(() => {
-    let gActivities = activities.filter((x: any) => x.spec === "lamp.tips")
+    let gActivities = activities.filter(
+      (x: any) => (x.spec === "lamp.tips" && !x?.category) || (!!x?.category && (x?.category[0] || "") === "learn")
+    )
     if (gActivities.length > 0) {
       ;(async () => {
         let activityResult = await Promise.all(

@@ -174,7 +174,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-async function getImage(activityId: string) {
+export async function getImage(activityId: string) {
   return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
     !!y.error ? undefined : y.data
   )[0]
@@ -196,7 +196,9 @@ export default function Manage({ participant, activities, showSteak, ...props })
   useEffect(() => {
     setLoading(true)
     let gActivities = activities.filter(
-      (x: any) => x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image"
+      (x: any) =>
+        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") && !x?.category) ||
+        (!!x?.category && (x?.category[0] || "") === "manage")
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {

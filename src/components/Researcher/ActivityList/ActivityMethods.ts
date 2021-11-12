@@ -1,7 +1,7 @@
 import LAMP from "lamp-core"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
-
+import { games } from "./Activity"
 export const SchemaList = () => {
   return {
     "lamp.balloon_risk": {
@@ -823,6 +823,7 @@ export function spliceActivity({ raw, tag }) {
   return {
     id: raw.id,
     study_id: raw.study_id,
+    category: raw.category,
     spec: "lamp.survey",
     name: raw.name,
     description: tag?.description,
@@ -855,6 +856,7 @@ export function unspliceTipsActivity(x) {
       schedule: x.schedule,
       settings: x.settings,
       studyID: x.studyID,
+      category: x.category,
     },
   }
 }
@@ -865,6 +867,7 @@ export function unspliceActivity(x) {
     raw: {
       id: x.id,
       study_id: x.study_id,
+      category: x.category,
       spec: "lamp.survey",
       name: x.name,
       schedule: x.schedule,
@@ -894,6 +897,7 @@ export function unspliceCTActivity(x) {
       name: x.name,
       schedule: x.schedule,
       settings: x.settings,
+      category: x.category,
     },
     tag: {
       description: x.description,
@@ -912,6 +916,7 @@ export function spliceCTActivity({ raw, tag }) {
     photo: tag?.photo,
     schedule: raw.schedule,
     settings: raw.settings,
+    category: raw.category,
   }
 }
 
@@ -950,6 +955,32 @@ export async function saveSurveyActivity(x) {
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
   return newItem
+}
+
+export async function getActivitySpec(spec) {
+  let result = await LAMP.ActivitySpec.view(spec)
+  return result
+}
+
+export async function getDefaultTab(spec) {
+  let activitySpec = await getActivitySpec(spec)
+  if (!!activitySpec?.category) {
+    return activitySpec?.category[0]
+  } else {
+    if (
+      games.includes(spec) ||
+      spec === "lamp.group" ||
+      spec === "lamp.dbt_diary_card" ||
+      spec === "lamp.recording" ||
+      spec === "lamp.survey"
+    ) {
+      return "assess"
+    }
+    if (spec === "lamp.journal" || spec === "lamp.breathe" || spec === "lamp.scratch_image") {
+      return "manage"
+    }
+    if (spec === "lamp.tips") return "learn"
+  }
 }
 
 export const updateSchedule = async (activity) => {

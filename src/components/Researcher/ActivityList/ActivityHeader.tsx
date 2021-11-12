@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
+import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Select, OutlinedInput } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
+import ActivityTab from "./ActivityTab"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -33,7 +34,17 @@ function compress(file, width, height) {
 }
 const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 
-export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
+export default function ActivityHeader({
+  studies,
+  value,
+  details,
+  activitySpecId,
+  study,
+  onChange,
+  image,
+  onTabChange,
+  ...props
+}) {
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
@@ -49,6 +60,10 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
       studyId,
     })
   }, [text, description, photo, studyId])
+
+  useEffect(() => {
+    //
+  }, [])
 
   const { acceptedFiles, getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
     onDropAccepted: useCallback((acceptedFiles) => {
@@ -119,6 +134,9 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
                 </MenuItem>
               ))}
             </TextField>
+          </Grid>
+          <Grid item lg={8} sm={8} xs={12}>
+            <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
           </Grid>
           <Grid item lg={8} sm={8} xs={12}>
             <Box mb={3}>

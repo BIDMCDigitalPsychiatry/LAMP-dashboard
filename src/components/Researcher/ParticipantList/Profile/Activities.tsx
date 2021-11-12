@@ -155,6 +155,7 @@ export default function PatientProfile({
                   index={index}
                   handleSelected={handleActivitySelected}
                   setActivities={onChangeActivities}
+                  updateActivities={setActivities}
                 />
               </Grid>
             ))}

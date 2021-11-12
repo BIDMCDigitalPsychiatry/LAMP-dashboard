@@ -131,6 +131,7 @@ export default function GroupCreator({
     photo: !!details ? details?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
+    category: value?.category ?? null,
   })
 
   useEffect(() => {
@@ -154,6 +155,7 @@ export default function GroupCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
+      category: data?.category ?? null,
     })
   }
 
@@ -172,6 +174,10 @@ export default function GroupCreator({
       !data.name.trim().length
     )
   }
+
+  const handleTabChange = (tab) => {
+    setData({ ...data, category: tab })
+  }
   return (
     <div>
       <Container className={classes.containerWidth}>
@@ -183,6 +189,7 @@ export default function GroupCreator({
             activitySpecId={null}
             study={data.studyID}
             onChange={handleChange}
+            onTabChange={handleTabChange}
             image={null}
           />
 

@@ -9,7 +9,7 @@ import { saveTipActivity, saveSurveyActivity, saveCTestActivity, addActivity } f
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 
-const games = [
+export const games = [
   "lamp.jewels_a",
   "lamp.jewels_b",
   "lamp.spatial_span",

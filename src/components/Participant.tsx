@@ -305,8 +305,10 @@ export default function Participant({
               <Prevent
                 participant={participant}
                 activeTab={activeTab}
+                allActivities={activities}
                 hiddenEvents={hiddenEvents}
                 enableEditMode={!_patientMode()}
+                showSteak={showSteak}
                 onEditAction={(activity, data) => {
                   setSurveyName(activity.name)
                   setVisibleActivities([
