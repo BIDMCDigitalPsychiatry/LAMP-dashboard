@@ -78,7 +78,7 @@ export default function GameCreator({
     photo: details?.photo ?? null,
     settings: !!value ? value.settings : {},
     studyID: !!value ? value.study_id : study,
-    tab: value?.tab ?? "default",
+    category: value?.category ?? null,
   })
 
   const validate = () => {
@@ -278,8 +278,12 @@ export default function GameCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
-      tab: details?.tab ?? "default",
+      category: data?.category ?? [],
     })
+  }
+
+  const handleTabChange = (tab) => {
+    setData({ ...data, category: tab })
   }
 
   const validateAudioSize = () => {
@@ -313,6 +317,7 @@ export default function GameCreator({
           activitySpecId={activitySpecId}
           study={data?.studyID ?? ""}
           onChange={handleChange}
+          onTabChange={handleTabChange}
           image={
             (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
             ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)

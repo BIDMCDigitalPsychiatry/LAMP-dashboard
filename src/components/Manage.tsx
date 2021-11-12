@@ -197,9 +197,8 @@ export default function Manage({ participant, activities, showSteak, ...props })
     setLoading(true)
     let gActivities = activities.filter(
       (x: any) =>
-        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
-          (x?.tab === "default" || !!x?.tab)) ||
-        x?.tab === "manage"
+        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") && !x?.category) ||
+        (!!x?.category && (x?.category[0] || "") === "manage")
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {

@@ -321,7 +321,7 @@ export default function SurveyCreator({
     photo: !!value ? value?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
-    tab: value?.category ?? ["assess"],
+    category: value?.category ?? null,
   })
 
   const [isOptionNull, setIsOptionNull] = useState(0)
@@ -340,7 +340,7 @@ export default function SurveyCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
-      tab: details?.category ?? ["assess"],
+      category: data?.category ?? [],
     })
   }
 
@@ -430,6 +430,10 @@ export default function SurveyCreator({
     }
   }
 
+  const handleTabChange = (tab) => {
+    setData({ ...data, category: tab })
+  }
+
   return (
     <div>
       <Container className={classes.containerWidth}>
@@ -441,6 +445,7 @@ export default function SurveyCreator({
             activitySpecId="lamp.survey"
             study={data.studyID}
             onChange={handleChange}
+            onTabChange={handleTabChange}
             image={null}
           />
           <Grid item sm={12}>

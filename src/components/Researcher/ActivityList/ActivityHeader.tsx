@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
+import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Select, OutlinedInput } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
+import ActivityTab from "./ActivityTab"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -33,30 +34,32 @@ function compress(file, width, height) {
 }
 const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 
-export default function ActivityHeader({ studies, value, details, activitySpecId, study, onChange, image, ...props }) {
+export default function ActivityHeader({
+  studies,
+  value,
+  details,
+  activitySpecId,
+  study,
+  onChange,
+  image,
+  onTabChange,
+  ...props
+}) {
   const { t } = useTranslation()
   const [text, setText] = useState(!!value ? value.name : "")
   const [description, setDescription] = useState(details?.description ?? null)
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-  const [tab, setTab] = useState(value?.category ?? [])
-  const tabs = {
-    learn: "Learn",
-    assess: "Assess",
-    manage: "Manage",
-    prevent: "Prevent",
-    "": "None",
-  }
+
   useEffect(() => {
     onChange({
       text,
       photo,
       description,
       studyId,
-      tab,
     })
-  }, [text, description, photo, studyId, tab])
+  }, [text, description, photo, studyId])
 
   useEffect(() => {
     //
@@ -133,26 +136,7 @@ export default function ActivityHeader({ studies, value, details, activitySpecId
             </TextField>
           </Grid>
           <Grid item lg={8} sm={8} xs={12}>
-            <Box mb={3}>
-              <TextField
-                error={typeof tab == "undefined" || tab === null || tab === "" ? true : false}
-                id="filled-select-currency"
-                select
-                label={t("Tab")}
-                value={tab[0]}
-                onChange={(e) => {
-                  setTab(e.target.value === "" ? [] : [e.target.value])
-                }}
-                helperText={typeof tab == "undefined" || tab === null || tab === "" ? t("Please select the tab") : ""}
-                variant="filled"
-              >
-                {Object.keys(tabs).map((key) => (
-                  <MenuItem key={key} value={key}>
-                    {t(tabs[key])}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
+            <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
           </Grid>
           <Grid item lg={8} sm={8} xs={12}>
             <Box mb={3}>

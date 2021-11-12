@@ -65,6 +65,7 @@ import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { Vega, VegaLite } from "react-vega"
 import classnames from "classnames"
+import EmbeddedActivity from "./EmbeddedActivity"
 
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
@@ -83,7 +84,15 @@ const useStyles = makeStyles((theme: Theme) =>
         height: 150,
       },
     },
+    linkButton: {
+      padding: "15px 25px 15px 25px",
+    },
 
+    dialogueStyle: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
     cardlabel: {
       fontSize: 16,
 
@@ -149,6 +158,40 @@ const useStyles = makeStyles((theme: Theme) =>
         maxHeight: 240,
       },
     },
+
+    btnprevent: {
+      background: "#ECF4FF",
+      borderRadius: "40px",
+      minWidth: "200px",
+      boxShadow: " 0px 10px 15px rgba(255, 172, 152, 0.25)",
+      lineHeight: "22px",
+      display: "inline-block",
+      textTransform: "capitalize",
+      fontSize: "16px",
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: "bold",
+      marginBottom: 20,
+      cursor: "pointer",
+      "& span": { cursor: "pointer" },
+      "&:hover": {
+        boxShadow:
+          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
+      },
+    },
+    topicon: {
+      minWidth: 150,
+      minHeight: 150,
+      [theme.breakpoints.up("lg")]: {
+        width: 150,
+        height: 150,
+      },
+    },
+    dialogueContent: {
+      padding: "20px 40px 40px",
+      "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
+    },
+    dialogtitle: { padding: 0 },
+
     preventFull: {
       background: "#ECF4FF",
       padding: "10px 0",
@@ -201,6 +244,9 @@ const useStyles = makeStyles((theme: Theme) =>
         color: "rgba(0, 0, 0, 0.4)",
       },
     },
+    marBottom10: {
+      marginBottom: 10,
+    },
     closeButton: {
       position: "absolute",
       right: theme.spacing(1),
@@ -221,7 +267,7 @@ const useStyles = makeStyles((theme: Theme) =>
       margin: "0 0 15px 0",
     },
     header: {
-      background: "#FFEFEC",
+      background: "#ECF4FF",
       padding: "35px 40px 10px",
       textAlign: "center",
 
@@ -629,6 +675,7 @@ export default function Prevent({
   allActivities,
   hiddenEvents,
   enableEditMode,
+  showSteak,
   onEditAction,
   onCopyAction,
   onDeleteAction,
@@ -639,6 +686,7 @@ export default function Prevent({
   allActivities: any
   hiddenEvents: string[]
   enableEditMode: boolean
+  showSteak: Function
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
@@ -654,6 +702,7 @@ export default function Prevent({
   const [tag, setTag] = React.useState([])
   const [classType, setClassType] = React.useState("")
   const [spec, setSpec] = React.useState(null)
+  const [launchedActivity, setLaunchedActivity] = React.useState<string>()
 
   const getCurrentLanguage = () => {
     let lang
@@ -791,7 +840,7 @@ export default function Prevent({
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
   const [cortex, setCortex] = React.useState({})
   const [activity, setActivity] = React.useState(null)
-
+  const [activityOpen, setActivityOpen] = React.useState(false)
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
@@ -821,7 +870,8 @@ export default function Prevent({
 
   const setTabActivities = () => {
     console.log(allActivities)
-    let gActivities = allActivities.filter((x: any) => x?.tab === "prevent")
+    let gActivities = allActivities.filter((x: any) => !!x?.category && (x?.category[0] || "") === "prevent")
+    console.log(gActivities)
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
@@ -847,7 +897,7 @@ export default function Prevent({
     setClassType(classT)
     LAMP.Activity.view(y.id).then((data) => {
       setActivity(data)
-      setOpen(true)
+      setActivityOpen(true)
     })
   }
 
@@ -978,7 +1028,7 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} className={classes.marBottom10}>
         {savedActivities.length > 0 &&
           savedActivities.map((activity) => (
             <Grid
@@ -989,7 +1039,7 @@ export default function Prevent({
               lg={3}
               onClick={() => {
                 setSpec(activity.spec)
-                handleClickOpen(activity)
+                handleActivityClickOpen(activity)
               }}
               className={classes.thumbMain}
             >
@@ -1393,7 +1443,7 @@ export default function Prevent({
         </Box>
       )}
       <Dialog
-        open={open}
+        open={open && typeof dialogueType === "string"}
         onClose={handleClose}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
@@ -1501,6 +1551,115 @@ export default function Prevent({
           />
         )}
       </ResponsiveDialog>
+
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={!!launchedActivity}
+        onClose={() => {
+          setLaunchedActivity(undefined)
+        }}
+      >
+        {
+          {
+            embed: (
+              <EmbeddedActivity
+                name={activity?.name ?? ""}
+                activity={activity ?? []}
+                participant={participant}
+                onComplete={(response) => {
+                  if (!!response && (!!response?.completed || !!response.timestamp)) showSteak(participant, activity.id)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
+            // Medication_tracker: (
+            //   <NewMedication
+            //     participant={participant}
+            //     onComplete={() => {
+            //       setLaunchedActivity(undefined)
+            //     }}
+            //   />
+            // ),
+          }[launchedActivity ?? ""]
+        }
+      </ResponsiveDialog>
+      <Dialog
+        open={activityOpen}
+        onClose={() => setActivityOpen(false)}
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
+      >
+        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
+          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setActivityOpen(false)}>
+            <Icon>close</Icon>
+          </IconButton>
+          <div className={classType}>
+            <Box mt={2} mb={1}>
+              <Box
+                className={classes.topicon}
+                style={{
+                  margin: "auto",
+                  background: tag[activity?.id]?.photo
+                    ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                    : activity?.spec === "lamp.breathe"
+                    ? `url(${BreatheIcon}) center center/contain no-repeat`
+                    : activity?.spec === "lamp.journal"
+                    ? `url(${JournalIcon}) center center/contain no-repeat`
+                    : activity?.spec === "lamp.scrath_image"
+                    ? `url(${ScratchCard}) center center/contain no-repeat`
+                    : `url(${InfoIcon}) center center/contain no-repeat`,
+                }}
+              ></Box>
+
+              {/* {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
+              {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
+              {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />} */}
+            </Box>
+            <Box>
+              <Typography variant="body2" align="left">
+                {t("Prevent")}
+              </Typography>
+              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+            </Box>
+          </div>
+        </DialogTitle>
+        <DialogContent className={classes.dialogueContent}>
+          {tag[activity?.id]?.description && (
+            <Box>
+              <Typography variant="h4" gutterBottom>
+                {t(tag[activity.id]?.description.split(".")[0])}
+              </Typography>
+              {tag[activity?.id]?.description.split(".").length > 1 && (
+                <Typography variant="body2" component="p">
+                  {t(tag[activity?.id]?.description.split(".").slice(1).join("."))}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="center" width={1} mt={1} mb={4}>
+            <Link
+              onClick={() => {
+                setOpen(false)
+                setLaunchedActivity("embed")
+              }}
+              underline="none"
+              className={classnames(classes.btnprevent, classes.linkButton)}
+            >
+              {t("Begin")}
+            </Link>
+          </Box>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }
