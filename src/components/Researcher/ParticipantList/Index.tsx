@@ -127,6 +127,7 @@ export default function ParticipantList({
   setSelectedStudies,
   getAllStudies,
   mode,
+  setOrder,
   ...props
 }) {
   const classes = useStyles()
@@ -183,7 +184,7 @@ export default function ParticipantList({
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
     if (selectedStudies.length > 0) {
-      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name)).sort()
+      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {
         let result = []
         setLoading(true)
@@ -250,6 +251,7 @@ export default function ParticipantList({
         setParticipants={searchParticipants}
         setData={getAllStudies}
         mode={mode}
+        setOrder={setOrder}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

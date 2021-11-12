@@ -38,6 +38,7 @@ export default function Header({
   selectedStudies,
   setSensors,
   setChangeCount,
+  setOrder,
   ...props
 }: {
   studies?: Array<Object>
@@ -48,6 +49,7 @@ export default function Header({
   selectedStudies: Array<string>
   setSensors?: Function
   setChangeCount?: Function
+  setOrder?: Function
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
@@ -65,7 +67,7 @@ export default function Header({
           <Typography variant="h5">{t("Sensors")}</Typography>
         </Box>
         <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} />
         </Box>
         <SearchBox searchData={searchData} />
         <Box>
@@ -86,6 +88,7 @@ export default function Header({
           />
         </Box>
       )}
+
       {(selectedSensors || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>

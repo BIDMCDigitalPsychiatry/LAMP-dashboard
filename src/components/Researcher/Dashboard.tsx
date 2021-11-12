@@ -133,9 +133,19 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const sortStudies = (studies) => {
+const sortStudies = (studies, order) => {
   return studies.sort((a, b) => {
-    return a["name"] > b["name"] ? 1 : a["name"] < b["name"] ? -1 : 0
+    return !!order
+      ? a["name"] > b["name"]
+        ? 1
+        : a["name"] < b["name"]
+        ? -1
+        : 0
+      : a["name"] < b["name"]
+      ? 1
+      : a["name"] > b["name"]
+      ? -1
+      : 0
   })
 }
 
@@ -167,6 +177,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   const [deletedData, setDeletedData] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
   const [search, setSearch] = useState(null)
+  const [order, setOrder] = useState(true)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -196,7 +207,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
 
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
-      setStudies(sortStudies(studies))
+      setStudies(sortStudies(studies, order))
       setCurrentTab(0)
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
@@ -207,9 +218,13 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
 
   const getAllStudies = async () => {
     Service.getAll("studies").then((studies) => {
-      setStudies(sortStudies(studies))
+      setStudies(sortStudies(studies, order))
     })
   }
+
+  useEffect(() => {
+    getAllStudies()
+  }, [order])
 
   useEffect(() => {
     filterStudies(studies)
@@ -231,6 +246,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
             : filtered
       }
       selected.sort()
+      if (!order) selected.reverse()
       setSelectedStudies(selected)
     }
   }
@@ -332,6 +348,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 setSelectedStudies={setSelectedStudies}
                 getAllStudies={getAllStudies}
                 mode={mode}
+                setOrder={() => setOrder(!order)}
               />
             )}
             {currentTab === 1 && (
@@ -341,6 +358,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                setOrder={() => setOrder(!order)}
               />
             )}
             {currentTab === 2 && (
@@ -350,6 +368,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
+                setOrder={() => setOrder(!order)}
               />
             )}
             {currentTab === 3 && (
