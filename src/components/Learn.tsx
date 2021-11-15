@@ -155,6 +155,10 @@ const useStyles = makeStyles((theme: Theme) =>
         width: 150,
         height: 150,
       },
+      [theme.breakpoints.down("sm")]: {
+        minWidth: 105,
+        minHeight: 105,
+      },
     },
     tipicon: {
       minWidth: 200,

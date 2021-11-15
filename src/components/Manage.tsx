@@ -43,12 +43,16 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "15px 25px 15px 25px",
     },
     cardlabel: {
-      fontSize: 16,
+      fontSize: 14,
 
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
       width: "100%",
+      [theme.breakpoints.down("sm")]: {
+        fontSize: 12,
+        padding: "0 5px",
+      },
     },
 
     closeButton: {
@@ -71,12 +75,17 @@ const useStyles = makeStyles((theme: Theme) =>
       background: "#FFEFEC",
       padding: "35px 40px 10px",
       textAlign: "center",
-
+      [theme.breakpoints.down("lg")]: {
+        padding: "35px 20px 10px",
+      },
       "& h2": {
         fontSize: 25,
         fontWeight: 600,
         color: "rgba(0, 0, 0, 0.75)",
         textAlign: "left",
+        [theme.breakpoints.down("sm")]: {
+          fontSize: 18,
+        },
       },
       "& h6": {
         fontSize: "14px",
@@ -105,6 +114,9 @@ const useStyles = makeStyles((theme: Theme) =>
       fontWeight: "bold",
       marginBottom: 20,
       cursor: "pointer",
+      [theme.breakpoints.down("sm")]: {
+        marginBottom: 0,
+      },
       "& span": { cursor: "pointer" },
       "&:hover": {
         boxShadow:
@@ -118,10 +130,17 @@ const useStyles = makeStyles((theme: Theme) =>
         width: 150,
         height: 150,
       },
+      [theme.breakpoints.down("sm")]: {
+        minWidth: 105,
+        minHeight: 105,
+      },
     },
     dialogueContent: {
       padding: "20px 40px 40px",
       "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
+      [theme.breakpoints.down("lg")]: {
+        padding: "20px 20px 10px",
+      },
     },
     dialogtitle: { padding: 0 },
     manage: {
@@ -145,11 +164,15 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     mainIcons: {
-      width: 100,
-      height: 100,
+      width: 80,
+      height: 80,
       [theme.breakpoints.up("lg")]: {
-        width: 150,
-        height: 150,
+        width: 130,
+        height: 130,
+      },
+      [theme.breakpoints.down("sm")]: {
+        width: 75,
+        height: 75,
       },
     },
     thumbMain: { maxWidth: 255 },
@@ -423,7 +446,7 @@ export default function Manage({ participant, activities, showSteak, ...props })
           )}
         </DialogContent>
         <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={4}>
+          <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               onClick={() => {
                 setOpen(false)
