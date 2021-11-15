@@ -692,16 +692,6 @@ async function getVisualizations(participant: ParticipantObj) {
   for (let attachmentID of ((await LAMP.Type.listAttachments(participant.id)) as any).data || []) {
     if (!attachmentID.startsWith("lamp.dashboard.experimental")) continue
     let bstr = ((await LAMP.Type.getAttachment(participant.id, attachmentID)) as any).data
-
-    // if(typeof bstr === "object") {
-    //   bstr.config.view={}
-    //   bstr.height=400
-
-    //   bstr.width="container"
-
-    // }
-    console.log(attachmentID, bstr, typeof bstr === "object", typeof bstr === "string" && bstr.startsWith("data:"))
-
     visualizations[attachmentID] =
       typeof bstr === "object"
         ? bstr
@@ -709,7 +699,6 @@ async function getVisualizations(participant: ParticipantObj) {
         ? bstr
         : `data:image/svg+xml;base64,${bstr}` // defaults
   }
-  console.log(visualizations)
   return visualizations
 }
 export default function Prevent({
