@@ -131,7 +131,7 @@ export default function GroupCreator({
     photo: !!details ? details?.photo : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
-    category: value?.category ?? null,
+    category: value?.category ?? [],
   })
 
   useEffect(() => {
@@ -186,7 +186,7 @@ export default function GroupCreator({
             studies={studies}
             value={value}
             details={details}
-            activitySpecId={null}
+            activitySpecId="lamp.group"
             study={data.studyID}
             onChange={handleChange}
             onTabChange={handleTabChange}
