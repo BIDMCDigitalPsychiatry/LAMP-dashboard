@@ -556,6 +556,46 @@ export default function Feed({
                 }
                 if (feedCheck) currentFeed.push(schedule)
                 break
+              case "fortnightly":
+                schedule.completed = savedData.length > 0 ? true : false
+                if (first.getTime() > scheduleStartDate.getTime()) {
+                  let found = false
+                  while (first.getTime() <= end.getTime()) {
+                    let diff = first.getTime() - new Date(scheduleStartDate).getTime()
+                    let weeksBetweenDates = Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
+                    if (!!found) {
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                      feedCheck = date.getDate() === first.getDate() ? true : false
+                      if (feedCheck) currentFeed.push(schedule)
+                      first.setDate(first.getDate() + 14)
+                    } else {
+                      if (weeksBetweenDates % 2 === 0) {
+                        let dayNo = getDayNumber(new Date(scheduleStartDate))
+                        let firstDayNo = getDayNumber(first)
+                        if (firstDayNo === dayNo) {
+                          selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                          feedCheck = date.getDate() === first.getDate() ? true : false
+                          if (feedCheck) currentFeed.push(schedule)
+                          first.setDate(first.getDate() + 14)
+                          found = true
+                          continue
+                        }
+                      }
+                      if (!found) {
+                        first.setDate(first.getDate() + 1)
+                      }
+                    }
+                  }
+                } else {
+                  let firstDate = new Date(scheduleStartDate)
+                  while (firstDate.getTime() <= end.getTime()) {
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
+                    feedCheck = date.getDate() === firstDate.getDate() ? true : false
+                    if (feedCheck) currentFeed.push(schedule)
+                    firstDate.setDate(firstDate.getDate() + 14)
+                  }
+                }
+                break
               case "daily":
               case "hourly":
               case "every3h":

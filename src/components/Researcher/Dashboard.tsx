@@ -177,7 +177,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   const [deletedData, setDeletedData] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
   const [search, setSearch] = useState(null)
-  const [order, setOrder] = useState(true)
+  const [order, setOrder] = useState(localStorage.getItem("order") ? JSON.parse(localStorage.getItem("order")) : true)
   const classes = useStyles()
   const { t } = useTranslation()
 
@@ -223,6 +223,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   }
 
   useEffect(() => {
+    localStorage.setItem("order", JSON.stringify(order))
     getAllStudies()
   }, [order])
 
@@ -349,6 +350,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 getAllStudies={getAllStudies}
                 mode={mode}
                 setOrder={() => setOrder(!order)}
+                order={order}
               />
             )}
             {currentTab === 1 && (
@@ -359,6 +361,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 setOrder={() => setOrder(!order)}
+                order={order}
               />
             )}
             {currentTab === 2 && (
@@ -369,6 +372,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 setOrder={() => setOrder(!order)}
+                order={order}
               />
             )}
             {currentTab === 3 && (

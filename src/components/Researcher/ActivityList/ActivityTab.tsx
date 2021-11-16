@@ -55,7 +55,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
         {Object.keys(tabs).map((key) => (
           <MenuItem key={key} value={key}>
             <Checkbox checked={category.indexOf(key) > -1} />
-            <ListItemText primary={key} />
+            <ListItemText primary={tabs[key]} />
           </MenuItem>
         ))}
       </Select>
