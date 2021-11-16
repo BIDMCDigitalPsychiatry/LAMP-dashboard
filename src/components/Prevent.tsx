@@ -32,6 +32,8 @@ import LAMP, {
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
+import SurveyInstrument from "./SurveyInstrument"
+import GroupActivity from "./GroupActivity"
 import MultipleSelect from "./MultipleSelect"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
@@ -708,6 +710,7 @@ export default function Prevent({
   hiddenEvents,
   enableEditMode,
   showSteak,
+  submitSurvey,
   onEditAction,
   onCopyAction,
   onDeleteAction,
@@ -722,6 +725,7 @@ export default function Prevent({
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
+  submitSurvey: Function
 }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
@@ -1606,6 +1610,25 @@ export default function Prevent({
                 }}
               />
             ),
+            "lamp.group": (
+              <GroupActivity
+                activity={activity}
+                participant={participant}
+                submitSurvey={submitSurvey}
+                onComplete={() => {
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.survey": (
+              <SurveyInstrument
+                type={activity?.name ?? ""}
+                fromPrevent={false}
+                group={[activity]}
+                participant={participant}
+                onComplete={submitSurvey}
+              />
+            ),
             // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
             // Medication_tracker: (
             //   <NewMedication
@@ -1682,7 +1705,9 @@ export default function Prevent({
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity("embed")
+                setLaunchedActivity(
+                  activity.spec !== "lamp.survey" && activity.spec !== "lamp.group" ? "embed" : activity.spec
+                )
               }}
               underline="none"
               className={classnames(classes.btnprevent, classes.linkButton)}

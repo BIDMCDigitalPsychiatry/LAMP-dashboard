@@ -36,6 +36,8 @@ import classnames from "classnames"
 import NewMedication from "./NewMedication"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
+import SurveyInstrument from "./SurveyInstrument"
+import GroupActivity from "./GroupActivity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -44,7 +46,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     cardlabel: {
       fontSize: 14,
-
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
@@ -203,7 +204,7 @@ export async function getImage(activityId: string) {
   )[0]
 }
 
-export default function Manage({ participant, activities, showSteak, ...props }) {
+export default function Manage({ participant, activities, showSteak, submitSurvey, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
@@ -370,6 +371,36 @@ export default function Manage({ participant, activities, showSteak, ...props })
                 participant={participant}
                 onComplete={(response) => {
                   if (!!response && (!!response?.completed || !!response.timestamp)) showSteak(participant, activity.id)
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.group": (
+              <GroupActivity
+                activity={activity}
+                participant={participant}
+                submitSurvey={submitSurvey}
+                onComplete={() => {
+                  setLaunchedActivity(undefined)
+                }}
+              />
+            ),
+            "lamp.survey": (
+              <SurveyInstrument
+                type={activity?.name ?? ""}
+                fromPrevent={false}
+                group={[activity]}
+                participant={participant}
+                onComplete={submitSurvey}
+              />
+            ),
+            "lamp.tips": (
+              <EmbeddedActivity
+                name={activity?.description ?? ""}
+                activity={activity ?? []}
+                participant={participant}
+                onComplete={(data) => {
+                  if (!!data) showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)
                 }}
               />

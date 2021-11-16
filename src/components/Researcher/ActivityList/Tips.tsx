@@ -24,6 +24,7 @@ import TipFooter from "./TipFooter"
 import { Service } from "../../DBService/DBService"
 import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
+import ActivityTab from "./ActivityTab"
 
 const theme = createMuiTheme({
   palette: {
@@ -158,15 +159,7 @@ export default function Tips({
   const [isError, setIsError] = useState(false)
   const [newSchemaList, setNewSchemaList] = useState({})
   const [isImagError, setIsImagError] = useState(false)
-  const [tab, setTab] = useState(value?.tab ?? "default")
-  const tabs = {
-    default: "Default",
-    learn: "Learn",
-    assess: "Assess",
-    manage: "Manage",
-    prevent: "Prevent",
-    none: "None",
-  }
+
   const toBinary = (string) => {
     const codeUnits = new Uint16Array(string.length)
     for (let i = 0; i < codeUnits.length; i++) {
@@ -191,9 +184,12 @@ export default function Tips({
     description: "",
     settings: settings ?? [],
     studyID: !!value ? value.study_id : study,
-    tab: value?.tab ?? "default",
+    category: value?.category ?? [],
   })
 
+  const handleTabChange = (tab) => {
+    setData({ ...data, category: tab })
+  }
   useEffect(() => {
     setSettings(value)
   }, [openWindow])
@@ -394,7 +390,7 @@ export default function Tips({
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
-            tab: tab,
+            category: data.category,
           },
           false
         )
@@ -407,7 +403,7 @@ export default function Tips({
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
-            tab: tab,
+            category: data.category,
           },
           false
         )
@@ -434,7 +430,7 @@ export default function Tips({
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
-            tab: tab,
+            category: data.category,
           }
         : {
             id: value?.id || category ? category : undefined,
@@ -444,7 +440,7 @@ export default function Tips({
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
-            tab: tab,
+            category: data.category,
           }
     onSave(dataObj, duplicate)
   }
@@ -624,28 +620,7 @@ export default function Tips({
                   </TextField>
                 </Grid>
                 <Grid item lg={4} sm={4} xs={12}>
-                  <Box mb={3}>
-                    <TextField
-                      error={typeof tab == "undefined" || tab === null || tab === "" ? true : false}
-                      id="filled-select-currency"
-                      select
-                      label={t("Tab")}
-                      value={tab}
-                      onChange={(e) => {
-                        setTab(e.target.value)
-                      }}
-                      helperText={
-                        typeof tab == "undefined" || tab === null || tab === "" ? t("Please select the tab") : ""
-                      }
-                      variant="filled"
-                    >
-                      {Object.keys(tabs).map((key) => (
-                        <MenuItem key={key} value={key}>
-                          {t(tabs[key])}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  </Box>
+                  <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
                 </Grid>
                 <Grid item lg={4} sm={4} xs={12}>
                   {" "}
