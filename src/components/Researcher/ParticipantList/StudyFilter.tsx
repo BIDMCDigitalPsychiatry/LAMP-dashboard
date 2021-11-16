@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: "none",
       background: "transparent",
       margin: "0 15px",
-      paddingRight: 0,
+      padding: "0 10px",
       "& svg": { marginRight: 10 },
     },
     filterText: {
@@ -34,7 +34,7 @@ export interface Researcher {
 export interface Studies {
   name?: string
 }
-export default function StudyFilter({ setShowFilterStudies, setOrder, ...props }) {
+export default function StudyFilter({ setShowFilterStudies, setOrder, order, ...props }) {
   const [showFilter, setShowFilter] = useState(false)
   const classes = useStyles()
   const { t } = useTranslation()
@@ -62,6 +62,7 @@ export default function StudyFilter({ setShowFilterStudies, setOrder, ...props }
         onClick={setOrder}
       >
         <Icon>sort_by_alpha</Icon>
+        {order === true ? <Icon>arrow_downward</Icon> : <Icon>arrow_upward</Icon>}
       </Fab>
     </Box>
   )

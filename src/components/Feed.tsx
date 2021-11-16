@@ -473,6 +473,7 @@ export default function Feed({
     let selectedWeekViewDays = []
     let scheduleTime, scheduleStartDate
     let savedData = []
+    console.log(feeds)
     if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
@@ -528,6 +529,7 @@ export default function Feed({
             let end = new Date(endDate)
             end.setHours(12)
             let feedCheck = false
+            console.log(schedule)
             switch (schedule.repeat_interval) {
               case "triweekly":
               case "biweekly":
@@ -555,6 +557,46 @@ export default function Feed({
                   first.setDate(first.getDate() + 1)
                 }
                 if (feedCheck) currentFeed.push(schedule)
+                break
+              case "fortnightly":
+                schedule.completed = savedData.length > 0 ? true : false
+                if (first.getTime() > scheduleStartDate.getTime()) {
+                  let found = false
+                  while (first.getTime() <= end.getTime()) {
+                    let diff = first.getTime() - new Date(scheduleStartDate).getTime()
+                    let weeksBetweenDates = Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
+                    if (!!found) {
+                      selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                      feedCheck = date.getDate() === first.getDate() ? true : false
+                      if (feedCheck) currentFeed.push(schedule)
+                      first.setDate(first.getDate() + 14)
+                    } else {
+                      if (weeksBetweenDates % 2 === 0) {
+                        let dayNo = getDayNumber(new Date(scheduleStartDate))
+                        let firstDayNo = getDayNumber(first)
+                        if (firstDayNo === dayNo) {
+                          selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
+                          feedCheck = date.getDate() === first.getDate() ? true : false
+                          if (feedCheck) currentFeed.push(schedule)
+                          first.setDate(first.getDate() + 14)
+                          found = true
+                          continue
+                        }
+                      }
+                      if (!found) {
+                        first.setDate(first.getDate() + 1)
+                      }
+                    }
+                  }
+                } else {
+                  let firstDate = new Date(scheduleStartDate)
+                  while (firstDate.getTime() <= end.getTime()) {
+                    selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
+                    feedCheck = date.getDate() === firstDate.getDate() ? true : false
+                    if (feedCheck) currentFeed.push(schedule)
+                    firstDate.setDate(firstDate.getDate() + 14)
+                  }
+                }
                 break
               case "daily":
               case "hourly":

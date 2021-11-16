@@ -74,6 +74,7 @@ export default function ActivityList({
   selectedStudies,
   setSelectedStudies,
   setOrder,
+  order,
   ...props
 }) {
   const [activities, setActivities] = useState(null)
@@ -207,6 +208,7 @@ export default function ActivityList({
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
         setOrder={setOrder}
+        order={order}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

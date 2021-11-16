@@ -41,6 +41,7 @@ export default function Header({
   setParticipants,
   setData,
   mode,
+  order,
   setOrder,
   ...props
 }) {
@@ -60,7 +61,7 @@ export default function Header({
           <Typography variant="h5">{t("Users")}</Typography>
         </Box>
         <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} order={order} />
         </Box>
         <SearchBox searchData={searchData} />
         <Box>
