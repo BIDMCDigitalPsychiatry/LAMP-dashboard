@@ -475,7 +475,7 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-        {spec === "lamp.dbt_diary_card" || spec === "lamp.recording" || games.includes(spec) ? (
+        {spec !== "lamp.group" && spec === "lamp.survey" ? (
           <EmbeddedActivity
             name={activity?.name ?? ""}
             activity={activity ?? []}

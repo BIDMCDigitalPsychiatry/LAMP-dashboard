@@ -28,6 +28,8 @@ import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import InfoIcon from "../icons/Info.svg"
 import EmbeddedActivity from "./EmbeddedActivity"
+import SurveyInstrument from "./SurveyInstrument"
+import GroupActivity from "./GroupActivity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -201,12 +203,14 @@ export default function Learn({
   participant,
   activities,
   showSteak,
+  submitSurvey,
   ...props
 }: {
   participant: ParticipantObj
   activities: any
   activeTab: Function
   showSteak: Function
+  submitSurvey: Function
 }) {
   const classes = useStyles()
   const [details, setDetails] = useState(null)
@@ -363,15 +367,34 @@ export default function Learn({
           setOpenData(false)
         }}
       >
-        <EmbeddedActivity
-          name={spec?.description ?? ""}
-          activity={spec ?? []}
-          participant={participant}
-          onComplete={(data) => {
-            if (!!data) showSteak(participant, spec.id)
-            setOpenData(false)
-          }}
-        />
+        {(spec?.spec || "") === "lamp.survey" ? (
+          <SurveyInstrument
+            type={spec?.name ?? ""}
+            fromPrevent={false}
+            group={[spec]}
+            participant={participant}
+            onComplete={submitSurvey}
+          />
+        ) : (spec?.spec || "") === "lamp.group" ? (
+          <GroupActivity
+            activity={spec}
+            participant={participant}
+            submitSurvey={submitSurvey}
+            onComplete={() => {
+              setOpenData(false)
+            }}
+          />
+        ) : (
+          <EmbeddedActivity
+            name={spec?.description ?? ""}
+            activity={spec ?? []}
+            participant={participant}
+            onComplete={(data) => {
+              if (!!data) showSteak(participant, spec.id)
+              setOpenData(false)
+            }}
+          />
+        )}
       </ResponsiveDialog>
     </Container>
   )

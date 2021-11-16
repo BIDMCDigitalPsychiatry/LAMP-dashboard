@@ -280,7 +280,13 @@ export default function Participant({
         <Box>
           <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Learn participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
+              <Learn
+                participant={participant}
+                activities={activities}
+                submitSurvey={submitSurvey}
+                activeTab={activeTab}
+                showSteak={showSteak}
+              />
             </Box>
           </Slide>
           <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
@@ -297,13 +303,20 @@ export default function Participant({
           </Slide>
           <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Manage participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
+              <Manage
+                participant={participant}
+                activities={activities}
+                submitSurvey={submitSurvey}
+                activeTab={activeTab}
+                showSteak={showSteak}
+              />
             </Box>
           </Slide>
           <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
               <Prevent
                 participant={participant}
+                submitSurvey={submitSurvey}
                 activeTab={activeTab}
                 allActivities={activities}
                 hiddenEvents={hiddenEvents}
