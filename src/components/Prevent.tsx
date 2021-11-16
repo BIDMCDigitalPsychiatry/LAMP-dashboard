@@ -112,14 +112,14 @@ const useStyles = makeStyles((theme: Theme) =>
     inlineHeader: {
       background: "#FFFFFF",
       boxShadow: "none",
-
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
     },
     vega: {
       "& .vega-embed": {
         width: "100%",
-        "& vega-actions": { paddingRight: "0 !important", top: "-25px" },
-        "& vega-summary": { paddingRight: "0 !important", top: "15px" },
+        paddingRight: "0 !important",
+        "& summary": { top: "-25px" },
+        "& .vega-actions": { top: "15px" },
       },
       "& canvas": { width: "100% !important", height: "auto !important" },
     },
