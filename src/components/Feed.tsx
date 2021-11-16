@@ -473,7 +473,6 @@ export default function Feed({
     let selectedWeekViewDays = []
     let scheduleTime, scheduleStartDate
     let savedData = []
-    console.log(feeds)
     if ((feeds || []).length > 0) {
       let dayNumber = getDayNumber(date)
       feeds.map((feed) => {
@@ -529,7 +528,6 @@ export default function Feed({
             let end = new Date(endDate)
             end.setHours(12)
             let feedCheck = false
-            console.log(schedule)
             switch (schedule.repeat_interval) {
               case "triweekly":
               case "biweekly":
