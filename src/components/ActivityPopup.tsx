@@ -88,8 +88,19 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: "center",
       justifyContent: "center",
     },
+    assessH: {
+      background: "#E7F8F2 !important",
+    },
+    learnH: {
+      background: "#FFF9E5 !important",
+    },
+    manageH: {
+      background: "#FFEFEC !important",
+    },
+    preventH: {
+      background: "#ECF4FF !important",
+    },
     header: {
-      background: "#E7F8F2",
       padding: "35px 40px 10px",
       textAlign: "center",
       [theme.breakpoints.down("lg")]: {
@@ -111,8 +122,19 @@ const useStyles = makeStyles((theme: Theme) =>
         textAlign: "left",
       },
     },
+    btnAsses: {
+      background: "#92E7CA !important",
+    },
+    btnLearn: {
+      background: "#FFD645 !important",
+    },
+    btnManage: {
+      background: "#FFAC98 !important",
+    },
+    btnPrevent: {
+      background: "#7DB2FF !important",
+    },
     btngreen: {
-      background: "#92E7CA",
       borderRadius: "40px",
       minWidth: "200px",
       boxShadow: " 0px 10px 15px rgba(146, 231, 202, 0.25)",
@@ -246,7 +268,19 @@ export default function ActivityPopup({
         <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
           <Icon>close</Icon>
         </IconButton>
-        <div className={classes.header}>
+        <div
+          className={
+            classes.header +
+            " " +
+            (type === "Manage"
+              ? classes.manageH
+              : type === "Assess"
+              ? classes.assessH
+              : type === "Learn"
+              ? classes.learnH
+              : classes.preventH)
+          }
+        >
           <Box
             className={classes.topicon}
             style={{
@@ -308,7 +342,17 @@ export default function ActivityPopup({
               setOpen(false)
             }}
             underline="none"
-            className={classnames(classes.btngreen, classes.linkButton)}
+            className={classnames(
+              classes.btngreen,
+              classes.linkButton,
+              type === "Manage"
+                ? classes.btnManage
+                : type === "Assess"
+                ? classes.btnAsses
+                : type === "Learn"
+                ? classes.btnLearn
+                : classes.btnPrevent
+            )}
           >
             {spec === "lamp.survey" ? t("Start survey") : t("Begin")}
           </Link>

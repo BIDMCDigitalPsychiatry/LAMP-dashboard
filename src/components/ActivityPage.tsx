@@ -239,10 +239,19 @@ export default function ActivityPage({
           activity={activity ?? []}
           participant={participant}
           onComplete={(data) => {
-            if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
-            if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
-              showSteak(participant, activity.id)
-            setOpenData(false)
+            if (activity?.spec === "lamp.recording") {
+              setOpenRecordSuccess(true)
+              setTimeout(function () {
+                setOpenRecordSuccess(false)
+                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+                setOpenData(false)
+              }, 2000)
+            } else {
+              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
+              if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
+                showSteak(participant, activity.id)
+              setOpenData(false)
+            }
           }}
         />
       )}

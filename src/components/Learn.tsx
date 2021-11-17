@@ -27,119 +27,11 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import InfoIcon from "../icons/Info.svg"
-import ActivityPage from "./ActivityPage"
+import ActivityBox from "./ActivityBox"
 import ActivityPopup from "./ActivityPopup"
 import { changeCase } from "./App"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    cardlabel: {
-      fontSize: 14,
-      lineHeight: "18px",
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-      [theme.breakpoints.up("lg")]: {
-        fontSize: 12,
-        lineHeight: "22px",
-      },
-    },
-    header: {
-      background: "#FFF9E5",
-      padding: 20,
-      textAlign: "center",
-
-      "& h2": {
-        fontSize: 25,
-        fontWeight: 600,
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "left",
-      },
-      "& img": {
-        maxWidth: 175,
-        margin: "20px 0 10px",
-      },
-    },
-    linkButton: {
-      padding: "15px 40px 15px 40px",
-    },
-    dialogueContent: {
-      padding: 20,
-      "& h4": { fontSize: 16, fontWeight: "bold", marginBottom: 15 },
-    },
-    inlineHeader: {
-      background: "#FFFFFF",
-      boxShadow: "none",
-
-      "& h5": { fontSize: 25, paddingLeft: 20, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600 },
-    },
-    toolbardashboard: {
-      minHeight: 65,
-      [theme.breakpoints.down("xs")]: {
-        display: "block",
-      },
-      "& h5": {
-        color: "rgba(0, 0, 0, 0.75)",
-        textAlign: "left",
-        fontWeight: "600",
-        fontSize: 18,
-        width: "calc(100% - 96px)",
-        [theme.breakpoints.down("xs")]: {
-          paddingLeft: 0,
-        },
-      },
-    },
-    closeButton: {
-      position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    dialogtitle: { padding: 0 },
-    backbtn: {
-      [theme.breakpoints.down("xs")]: {
-        paddingLeft: 0,
-      },
-    },
-    learn: {
-      background: "#FFF9E5",
-      padding: "10px 0",
-      minHeight: 180,
-      textAlign: "center",
-      boxShadow: "none",
-      borderRadius: 18,
-      position: "relative",
-      width: "100%",
-      "& svg": {
-        [theme.breakpoints.down("md")]: {
-          width: 100,
-          height: 100,
-        },
-        [theme.breakpoints.up("lg")]: {
-          width: 150,
-          height: 150,
-        },
-      },
-      "& img": {
-        [theme.breakpoints.down("md")]: {
-          width: 100,
-          height: 100,
-        },
-        [theme.breakpoints.up("lg")]: {
-          width: 140,
-          height: 140,
-        },
-      },
-      [theme.breakpoints.up("lg")]: {
-        minHeight: 240,
-      },
-    },
-    thumbMain: { maxWidth: 255 },
     thumbContainer: {
       maxWidth: 1055,
       width: "80%",
@@ -148,52 +40,9 @@ const useStyles = makeStyles((theme: Theme) =>
         paddingBottom: 80,
       },
     },
-    fullwidthBtn: { width: "100%" },
-    topicon: {
-      minWidth: 150,
-      minHeight: 150,
-      [theme.breakpoints.up("lg")]: {
-        width: 150,
-        height: 150,
-      },
-      [theme.breakpoints.down("sm")]: {
-        minWidth: 105,
-        minHeight: 105,
-      },
-    },
-    tipicon: {
-      minWidth: 200,
-      minHeight: 200,
-
-      [theme.breakpoints.down("xs")]: {
-        minWidth: 180,
-        minHeight: 180,
-      },
-    },
-    btnyellow: {
-      background: "#FFD645",
-      borderRadius: "40px",
-      minWidth: "200px",
-      boxShadow: "0px 10px 15px rgba(255, 214, 69, 0.25)",
-      lineHeight: "38px",
-      marginTop: "15%",
-      cursor: "pointer",
-      textTransform: "capitalize",
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      "&:hover": {
-        boxShadow:
-          "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)",
-      },
-    },
-    dialogueCurve: { borderRadius: 10, maxWidth: 335, minWidth: 335 },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
-    },
-    blankMsg: {
-      "& path": { fill: "#666" },
-      "& p": { margin: "2px 5px" },
     },
   })
 )
@@ -212,17 +61,9 @@ export default function Learn({
   submitSurvey: Function
 }) {
   const classes = useStyles()
-  const [details, setDetails] = useState(null)
-  const [openData, setOpenData] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [tip, setTip] = useState(null)
-  const [icon, setIcon] = useState(null)
   const [loading, setLoading] = useState(true)
   const [savedActivities, setSavedActivities] = useState([])
   const [activitiesArray, setActivitiesArray] = useState({})
-  const [spec, setSpec] = useState("")
-  const [activity, setActivity] = useState(null)
-  const [questionCount, setQuestionCount] = React.useState(0)
 
   const { t } = useTranslation()
 
@@ -269,89 +110,20 @@ export default function Learn({
     })()
   }, [savedActivities])
 
-  const setData = (type: string) => {
-    setTip(type.replace(/_/g, " "))
-    setSpec(activitiesArray[type].spec)
-    setIcon(activitiesArray[type].icon)
-    Object.keys(activitiesArray[type])?.forEach((key) => {
-      setDetails(activitiesArray[type][key])
-    })
-    LAMP.Activity.view(activitiesArray[type].id).then((data) => {
-      setActivity(data)
-      activitiesArray[type].spec === "lamp.dbt_diary_card"
-        ? setQuestionCount(6)
-        : activitiesArray[type].spec === "lamp.survey"
-        ? setQuestionCount(data.settings?.length ?? 0)
-        : setQuestionCount(0)
-    })
-  }
-
   return (
     <Container className={classes.thumbContainer}>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
-        {Object.keys(activitiesArray).length > 0 ? (
-          Object.keys(activitiesArray).map((key, index) => (
-            <Grid
-              item
-              key={index}
-              xs={6}
-              sm={4}
-              md={3}
-              lg={3}
-              className={classes.thumbMain}
-              onClick={() => {
-                setData(key)
-                setOpen(true)
-              }}
-            >
-              <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.learn}>
-                  <Box mt={2} mb={1}>
-                    {activitiesArray[key].icon ? <img src={activitiesArray[key].icon} /> : ""}
-                  </Box>
-                  <Typography className={classes.cardlabel}>{t(key)}</Typography>
-                </Card>
-              </ButtonBase>
-            </Grid>
-          ))
-        ) : (
-          <Box display="flex" className={classes.blankMsg} ml={1}>
-            <Icon>info</Icon> <p>{t("There are no Learn activities available.")}</p>
-          </Box>
-        )}
-      </Grid>
 
-      <ActivityPopup
-        spec={spec}
-        activity={activity}
+      <ActivityBox
+        participant={participant}
+        savedActivities={savedActivities}
         tag={activitiesArray}
-        questionCount={questionCount}
-        open={open}
-        setOpen={setOpen}
+        showSteak={showSteak}
+        submitSurvey={submitSurvey}
         type="Learn"
-        setOpenData={setOpenData}
       />
-
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={openData}
-        onClose={() => {
-          setOpenData(false)
-        }}
-      >
-        <ActivityPage
-          activity={activity}
-          participant={participant}
-          setOpenData={setOpenData}
-          submitSurvey={submitSurvey}
-          showSteak={showSteak}
-        />
-      </ResponsiveDialog>
     </Container>
   )
 }
