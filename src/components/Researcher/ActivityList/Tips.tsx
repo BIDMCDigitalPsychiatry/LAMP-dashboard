@@ -189,6 +189,7 @@ export default function Tips({
 
   const handleTabChange = (tab) => {
     setData({ ...data, category: tab })
+    validate()
   }
   useEffect(() => {
     setSettings(value)
@@ -591,7 +592,7 @@ export default function Tips({
             </Grid>
             <Grid item sm={8} md={9} lg={10}>
               <Grid container spacing={2}>
-                <Grid item xs sm={6} md={6} lg={4}>
+                <Grid item xs sm={6} md={6} lg={6}>
                   <TextField
                     error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
                     id="filled-select-currency"
@@ -619,11 +620,10 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item lg={4} sm={4} xs={12}>
+                <Grid item lg={4} sm={6} xs={12}>
                   <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
                 </Grid>
-                <Grid item lg={4} sm={4} xs={12}>
-                  {" "}
+                <Grid item lg={6} sm={4} xs={12}>
                   <TextField
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
                     id="filled-select-currency"
