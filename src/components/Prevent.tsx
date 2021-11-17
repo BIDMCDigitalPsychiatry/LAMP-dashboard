@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useEffect } from "react"
+import React from "react"
 import {
   Container,
   Typography,
@@ -32,20 +32,11 @@ import LAMP, {
   ActivityEvent as ActivityEventObj,
   SensorEvent as SensorEventObj,
 } from "lamp-core"
-import SurveyInstrument from "./SurveyInstrument"
-import GroupActivity from "./GroupActivity"
+import ActivityBox from "./ActivityBox"
 import MultipleSelect from "./MultipleSelect"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
 import PreventDBT from "./PreventDBT"
-import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
-import JournalImg from "../icons/Journal.svg"
-import { ReactComponent as GoalIcon } from "../icons/Goal.svg"
-import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
-import { ReactComponent as HopeBoxIcon } from "../icons/HopeBox.svg"
-import { ReactComponent as MedicationIcon } from "../icons/Medication.svg"
-import InfoIcon from "../icons/Info.svg"
-import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
 import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
 import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
@@ -59,7 +50,6 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
-import { changeCase } from "./App"
 import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -67,9 +57,6 @@ import es from "javascript-time-ago/locale/es"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import { Vega, VegaLite } from "react-vega"
-import classnames from "classnames"
-import EmbeddedActivity from "./EmbeddedActivity"
-
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -77,40 +64,6 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: "100%",
-    },
-    thumbMain: { maxWidth: 255 },
-    mainIcons: {
-      width: 80,
-      height: 80,
-      [theme.breakpoints.up("lg")]: {
-        width: 130,
-        height: 130,
-      },
-      [theme.breakpoints.down("sm")]: {
-        width: 75,
-        height: 75,
-      },
-    },
-    linkButton: {
-      padding: "15px 25px 15px 25px",
-    },
-
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    cardlabel: {
-      fontSize: 14,
-
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-      [theme.breakpoints.down("sm")]: {
-        fontSize: 12,
-        padding: "0 5px",
-      },
     },
     inlineHeader: {
       background: "#FFFFFF",
@@ -295,6 +248,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     activityhd: {
       margin: "0 0 15px 0",
+    },
+    marginTop10: {
+      marginTop: "10px",
     },
     header: {
       background: "#ECF4FF",
@@ -731,16 +687,14 @@ export default function Prevent({
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
+  const [disabledData, setDisabled] = React.useState(true)
+
   const [openData, setOpenData] = React.useState(false)
   const [activityData, setActivityData] = React.useState(null)
   const [graphType, setGraphType] = React.useState(0)
   const { t, i18n } = useTranslation()
   const [savedActivities, setSavedActivities] = React.useState([])
   const [tag, setTag] = React.useState([])
-  const [classType, setClassType] = React.useState("")
-  const [spec, setSpec] = React.useState(null)
-  const [launchedActivity, setLaunchedActivity] = React.useState<string>()
-  const [questionCount, setQuestionCount] = React.useState(0)
 
   const getCurrentLanguage = () => {
     let lang
@@ -870,15 +824,11 @@ export default function Prevent({
   const [activityEvents, setActivityEvents] = React.useState({})
   const [selectedActivity, setSelectedActivity] = React.useState(null)
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
-  const [journalCount, setJournalCount] = React.useState(0)
   const [timeSpans, setTimeSpans] = React.useState({})
   const [loading, setLoading] = React.useState(true)
-  const [disabledData, setDisabled] = React.useState(true)
   const [visualizations, setVisualizations] = React.useState({})
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
   const [cortex, setCortex] = React.useState({})
-  const [activity, setActivity] = React.useState(null)
-  const [activityOpen, setActivityOpen] = React.useState(false)
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
   let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
@@ -925,21 +875,6 @@ export default function Prevent({
     } else {
       setLoading(false)
     }
-  }
-
-  const handleActivityClickOpen = (y: any) => {
-    setDialogueType(y.spec)
-    let classT = classes.header
-    setClassType(classT)
-    LAMP.Activity.view(y.id).then((data) => {
-      setActivity(data)
-      setActivityOpen(true)
-      y.spec === "lamp.dbt_diary_card"
-        ? setQuestionCount(6)
-        : y.spec === "lamp.survey"
-        ? setQuestionCount(data.settings?.length ?? 0)
-        : setQuestionCount(0)
-    })
   }
 
   React.useEffect(() => {
@@ -1069,48 +1004,16 @@ export default function Prevent({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Grid container spacing={2} className={classes.marBottom10}>
-        {savedActivities.length > 0 &&
-          savedActivities.map((activity) => (
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={3}
-              lg={3}
-              onClick={() => {
-                setSpec(activity.spec)
-                handleActivityClickOpen(activity)
-              }}
-              className={classes.thumbMain}
-            >
-              <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.prevent}>
-                  <Box mt={2} mb={1}>
-                    <Box
-                      className={classes.mainIcons}
-                      style={{
-                        margin: "auto",
-                        background: tag[activity.id]?.photo
-                          ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                          : activity.spec === "lamp.breathe"
-                          ? `url(${BreatheIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.journal"
-                          ? `url(${JournalIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.scratch_image"
-                          ? `url(${ScratchCard}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Box>
-                  <Typography className={classes.cardlabel}>{t(activity.name)}</Typography>
-                </Card>
-              </ButtonBase>
-            </Grid>
-          ))}
-      </Grid>
+      <ActivityBox
+        participant={participant}
+        savedActivities={savedActivities}
+        tag={tag}
+        showSteak={showSteak}
+        submitSurvey={submitSurvey}
+        type="Prevent"
+      />
       {!loading && (
-        <Box>
+        <Box className={classes.marginTop10}>
           <Grid container xs={12} spacing={0} className={classes.activityhd}>
             <Grid item xs className={classes.preventHeader}>
               <Typography variant="h5">{t("Activity")}</Typography>
@@ -1594,143 +1497,6 @@ export default function Prevent({
           />
         )}
       </ResponsiveDialog>
-
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={!!launchedActivity}
-        onClose={() => {
-          setLaunchedActivity(undefined)
-        }}
-      >
-        {
-          {
-            embed: (
-              <EmbeddedActivity
-                name={activity?.name ?? ""}
-                activity={activity ?? []}
-                participant={participant}
-                onComplete={(response) => {
-                  if (spec === "lamp.tips" && !!response) showSteak(participant, activity.id)
-                  if (spec !== "lamp.tips" && !!response && (!!response?.completed || !!response.timestamp))
-                    showSteak(participant, activity.id)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.group": (
-              <GroupActivity
-                activity={activity}
-                participant={participant}
-                submitSurvey={submitSurvey}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.survey": (
-              <SurveyInstrument
-                type={activity?.name ?? ""}
-                fromPrevent={false}
-                group={[activity]}
-                participant={participant}
-                onComplete={submitSurvey}
-              />
-            ),
-            // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            // Medication_tracker: (
-            //   <NewMedication
-            //     participant={participant}
-            //     onComplete={() => {
-            //       setLaunchedActivity(undefined)
-            //     }}
-            //   />
-            // ),
-          }[launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
-      <Dialog
-        open={activityOpen}
-        onClose={() => setActivityOpen(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-        }}
-      >
-        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setActivityOpen(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-          <div className={classType}>
-            <Box mt={2} mb={1}>
-              <Box
-                className={classes.topicon}
-                style={{
-                  margin: "auto",
-                  background: tag[activity?.id]?.photo
-                    ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.breathe"
-                    ? `url(${BreatheIcon}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.journal"
-                    ? `url(${JournalIcon}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.scrath_image"
-                    ? `url(${ScratchCard}) center center/contain no-repeat`
-                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                }}
-              ></Box>
-
-              {/* {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
-              {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
-              {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />} */}
-            </Box>
-            <Box>
-              <Typography variant="body2" align="left">
-                {t("Prevent")}
-              </Typography>
-              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
-            </Box>
-          </div>
-        </DialogTitle>
-        <DialogContent className={classes.dialogueContent}>
-          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
-            <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-            </Typography>
-          )}
-          {tag[activity?.id]?.description && (
-            <Box>
-              <Typography variant="h4" gutterBottom>
-                {t(tag[activity.id]?.description.split(".")[0])}
-              </Typography>
-              {tag[activity?.id]?.description.split(".").length > 1 && (
-                <Typography variant="body2" component="p">
-                  {t(tag[activity?.id]?.description.split(".").slice(1).join("."))}
-                </Typography>
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={3}>
-            <Link
-              onClick={() => {
-                setActivityOpen(false)
-                setLaunchedActivity(
-                  activity.spec !== "lamp.survey" && activity.spec !== "lamp.group" ? "embed" : activity.spec
-                )
-              }}
-              underline="none"
-              className={classnames(classes.btnprevent, classes.linkButton)}
-            >
-              {t("Begin")}
-            </Link>
-          </Box>
-        </DialogActions>
-      </Dialog>
     </Container>
   )
 }

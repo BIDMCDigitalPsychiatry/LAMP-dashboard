@@ -135,7 +135,7 @@ export default function ActivityHeader({
               ))}
             </TextField>
           </Grid>
-          <Grid item lg={8} sm={8} xs={12}>
+          <Grid item lg={4} sm={6} xs={12}>
             <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
           </Grid>
           <Grid item lg={8} sm={8} xs={12}>

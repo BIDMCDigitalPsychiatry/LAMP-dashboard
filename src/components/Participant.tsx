@@ -230,7 +230,7 @@ export default function Participant({
     }
   }
 
-  const submitSurvey = (response, overwritingTimestamp) => {
+  const submitSurvey = (response, activityId, overwritingTimestamp) => {
     setLoading(true)
     if (!!!response || response === null) {
       setLoading(false)
@@ -239,7 +239,7 @@ export default function Participant({
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
         duration: response.duration,
-        activity: visibleActivities[idx].id,
+        activity: activityId,
         static_data: {},
         temporal_slices: (x || []).map((y) => ({
           item: y !== undefined ? y.item : null,
@@ -254,10 +254,10 @@ export default function Participant({
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, visibleActivities[0].id)
+        showSteak(participant, activityId)
         setVisibleActivities([])
         // If a timestamp was provided to overwrite data, hide the original event too.
-        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
+        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activityId)
         else hideEvent() // trigger a reload of dependent components anyway
       })
     }
