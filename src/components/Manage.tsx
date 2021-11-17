@@ -370,7 +370,9 @@ export default function Manage({ participant, activities, showSteak, submitSurve
                 activity={activity ?? []}
                 participant={participant}
                 onComplete={(response) => {
-                  if (!!response && (!!response?.completed || !!response.timestamp)) showSteak(participant, activity.id)
+                  if (spec === "lamp.tips" && !!response) showSteak(participant, activity.id)
+                  if (spec !== "lamp.tips" && !!response && (!!response?.completed || !!response.timestamp))
+                    showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)
                 }}
               />
@@ -394,26 +396,15 @@ export default function Manage({ participant, activities, showSteak, submitSurve
                 onComplete={submitSurvey}
               />
             ),
-            "lamp.tips": (
-              <EmbeddedActivity
-                name={activity?.description ?? ""}
-                activity={activity ?? []}
-                participant={participant}
-                onComplete={(data) => {
-                  if (!!data) showSteak(participant, activity.id)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            Medication_tracker: (
-              <NewMedication
-                participant={participant}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
+            // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
+            // Medication_tracker: (
+            //   <NewMedication
+            //     participant={participant}
+            //     onComplete={() => {
+            //       setLaunchedActivity(undefined)
+            //     }}
+            //   />
+            // ),
           }[launchedActivity ?? ""]
         }
       </ResponsiveDialog>
@@ -481,9 +472,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
             <Link
               onClick={() => {
                 setOpen(false)
-                setLaunchedActivity(
-                  spec === "lamp.scratch_image" || spec === "lamp.journal" || spec === "lamp.breathe" ? "embed" : spec
-                )
+                setLaunchedActivity(spec !== "lamp.group" && spec !== "lamp.survey" ? "embed" : spec)
               }}
               underline="none"
               className={classnames(classes.btnpeach, classes.linkButton)}
