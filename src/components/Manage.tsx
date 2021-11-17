@@ -38,7 +38,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
 import SurveyInstrument from "./SurveyInstrument"
 import GroupActivity from "./GroupActivity"
-
+import { changeCase } from "./App"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     linkButton: {
@@ -449,7 +449,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
               <Typography variant="body2" align="left">
                 {t("Manage")}
               </Typography>
-              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
             </Box>
           </div>
         </DialogTitle>

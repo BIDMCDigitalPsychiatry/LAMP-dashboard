@@ -30,7 +30,7 @@ import InfoIcon from "../icons/Info.svg"
 import EmbeddedActivity from "./EmbeddedActivity"
 import SurveyInstrument from "./SurveyInstrument"
 import GroupActivity from "./GroupActivity"
-
+import { changeCase } from "./App"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     cardlabel: {
@@ -222,7 +222,8 @@ export default function Learn({
   const [savedActivities, setSavedActivities] = useState([])
   const [activitiesArray, setActivitiesArray] = useState({})
   const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [spec, setSpec] = useState(null)
+  const [spec, setSpec] = useState("")
+  const [activity, setActivity] = useState(null)
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -259,7 +260,7 @@ export default function Learn({
           id: a.id,
           name: a.name,
           icon: a.icon,
-          spec: "lamp.tips",
+          spec: a.spec,
         }
         setLoading(false)
         return r
@@ -270,12 +271,13 @@ export default function Learn({
 
   const setData = (type: string) => {
     setTip(type.replace(/_/g, " "))
+    setSpec(activitiesArray[type].spec)
     setIcon(activitiesArray[type].icon)
     Object.keys(activitiesArray[type])?.forEach((key) => {
       setDetails(activitiesArray[type][key])
     })
     LAMP.Activity.view(activitiesArray[type].id).then((data) => {
-      setSpec(data)
+      setActivity(data)
     })
   }
 
@@ -335,24 +337,29 @@ export default function Learn({
             <Box mt={2} mb={1}>
               {icon ? <img src={icon} /> : ""}
             </Box>
-            <Typography variant="h2">{t(tip)}</Typography>
+            <Typography variant="body2" align="left">
+              {t("Learn")}
+            </Typography>
+            <Typography variant="h2">{t(tip + "(" + t(changeCase(spec?.substr(5))) + ")")}</Typography>
           </div>
         </DialogTitle>
-        <DialogContent className={classes.dialogueContent}>
-          {t("Quick Tips to Improve Your")} {t(tip)}
-        </DialogContent>
+        {activity?.spec === "lamp.tips" && (
+          <DialogContent className={classes.dialogueContent}>
+            {t("Quick Tips to Improve Your")} {t(tip)}
+          </DialogContent>
+        )}
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
               onClick={() => {
                 setOpen(false)
                 setOpenData(true)
-                setLaunchedActivity(spec)
+                setLaunchedActivity(activity)
               }}
               underline="none"
               className={classnames(classes.btnyellow, classes.linkButton)}
             >
-              {t("Read")}
+              {t("Begin")}
             </Link>
           </Box>
         </DialogActions>
@@ -367,17 +374,17 @@ export default function Learn({
           setOpenData(false)
         }}
       >
-        {(spec?.spec || "") === "lamp.survey" ? (
+        {(activity?.spec || "") === "lamp.survey" ? (
           <SurveyInstrument
-            type={spec?.name ?? ""}
+            type={activity?.name ?? ""}
             fromPrevent={false}
-            group={[spec]}
+            group={[activity]}
             participant={participant}
             onComplete={submitSurvey}
           />
-        ) : (spec?.spec || "") === "lamp.group" ? (
+        ) : (activity?.spec || "") === "lamp.group" ? (
           <GroupActivity
-            activity={spec}
+            activity={activity}
             participant={participant}
             submitSurvey={submitSurvey}
             onComplete={() => {
@@ -386,13 +393,13 @@ export default function Learn({
           />
         ) : (
           <EmbeddedActivity
-            name={spec?.description ?? ""}
-            activity={spec ?? []}
+            name={activity?.description ?? ""}
+            activity={activity ?? []}
             participant={participant}
             onComplete={(data) => {
-              if (spec?.spec === "lamp.tips" && !!data) showSteak(participant, spec.id)
-              if (spec?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
-                showSteak(participant, spec.id)
+              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
+              if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
+                showSteak(participant, activity.id)
               setOpenData(false)
             }}
           />

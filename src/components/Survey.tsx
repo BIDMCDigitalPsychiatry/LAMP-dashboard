@@ -31,6 +31,8 @@ import GroupActivity from "./GroupActivity"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
+import { changeCase } from "./App"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -407,11 +409,11 @@ export default function Survey({
               }}
             ></Box>
             {games.includes(spec) ? (
-              <Typography variant="h6">{t("Games")} </Typography>
+              <Typography variant="h6">{t("Games (" + changeCase(spec?.substr(5)) + ")")} </Typography>
             ) : spec === "lamp.recording" ? (
               <Typography variant="h6">{t("Voice Recording")}</Typography>
             ) : (
-              <Typography variant="h6">{spec === "lamp.group" ? t("Group") : t("Survey")}</Typography>
+              <Typography variant="h6">{t(changeCase(spec?.substr(5)))}</Typography>
             )}
             <Typography variant="h2">
               <ReactMarkdown
@@ -425,11 +427,12 @@ export default function Survey({
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {!games.includes(spec) && spec !== "lamp.group" && spec !== "lamp.recording" && (
-            <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-            </Typography>
-          )}
+          {spec === "lamp.survey" ||
+            (spec === "lamp.dbt_diary_card" && (
+              <Typography variant="h4" gutterBottom>
+                {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+              </Typography>
+            ))}
           <Typography variant="body2" component="p">
             <ReactMarkdown
               source={

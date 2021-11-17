@@ -59,6 +59,7 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
+import { changeCase } from "./App"
 import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -1684,7 +1685,7 @@ export default function Prevent({
               <Typography variant="body2" align="left">
                 {t("Prevent")}
               </Typography>
-              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
             </Box>
           </div>
         </DialogTitle>
