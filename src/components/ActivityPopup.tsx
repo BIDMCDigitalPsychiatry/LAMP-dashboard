@@ -1,33 +1,22 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React from "react"
 import {
-  Container,
   Typography,
-  Grid,
   Icon,
-  Card,
   Box,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
-  ButtonBase,
   makeStyles,
   Theme,
   createStyles,
   Link,
 } from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
-import SurveyInstrument from "./SurveyInstrument"
-import LAMP from "lamp-core"
 import classnames from "classnames"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import { DatePicker } from "@material-ui/pickers"
-import EmbeddedActivity from "./EmbeddedActivity"
 import InfoIcon from "../icons/Info.svg"
-import GroupActivity from "./GroupActivity"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -43,17 +32,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     linkButton: {
       padding: "15px 25px 15px 25px",
-    },
-    cardlabel: {
-      fontSize: 14,
-      padding: "0 18px",
-      bottom: 15,
-      position: "absolute",
-      width: "100%",
-      [theme.breakpoints.down("sm")]: {
-        fontSize: 12,
-        padding: "0 5px",
-      },
     },
     assess: {
       background: "#E7F8F2",
@@ -73,9 +51,6 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.up("lg")]: {
         minHeight: 240,
       },
-    },
-    MuiDialogPaperScrollPaper: {
-      maxHeight: "100% !important",
     },
     closeButton: {
       position: "absolute",
@@ -174,57 +149,9 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     dialogtitle: { padding: 0 },
-
-    ribbonText: {
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: 600,
-      marginBottom: "30px",
-      padding: "0 42px",
-    },
-    thumbMain: { maxWidth: 255 },
-    thumbContainer: {
-      maxWidth: 1055,
-      width: "80%",
-      [theme.breakpoints.down("sm")]: {
-        width: "100%",
-        paddingBottom: 80,
-      },
-    },
-    fullwidthBtn: { width: "100%" },
     dialogueCurve: { borderRadius: 10, maxWidth: 400 },
     niceWork: {
       "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-    },
-    calendatInput: {
-      width: "100%",
-      "& input": {
-        textAlign: "center",
-        fontSize: 18,
-        fontWeight: 600,
-        color: "rgba(0, 0, 0, 0.75)",
-      },
-    },
-    mainIcons: {
-      width: 100,
-      height: 100,
-      [theme.breakpoints.up("lg")]: {
-        width: 150,
-        height: 150,
-      },
-    },
-    blankMsg: {
-      "& path": { fill: "#666" },
-      "& p": { margin: "2px 5px" },
-    },
-    niceWorkbadge: { position: "relative", "& span": { fontSize: "110px", color: "#2F9D7E" } },
-    dayNotification: {
-      position: "absolute",
-      top: 0,
-      width: "100%",
-      paddingTop: 50,
-      "& h4": { fontSize: 40, fontWeight: 700, color: "#00765C", lineHeight: "38px" },
-      "& h6": { color: "#00765C", fontSize: 16, fontWeight: 600 },
     },
   })
 )
