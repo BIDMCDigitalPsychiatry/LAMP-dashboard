@@ -40,11 +40,15 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: "15px 25px 15px 25px",
     },
     cardlabel: {
-      fontSize: 16,
+      fontSize: 14,
       padding: "0 18px",
       bottom: 15,
       position: "absolute",
       width: "100%",
+      [theme.breakpoints.down("sm")]: {
+        fontSize: 12,
+        padding: "0 5px",
+      },
     },
     assess: {
       background: "#E7F8F2",
