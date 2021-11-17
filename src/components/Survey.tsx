@@ -32,7 +32,8 @@ import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import { changeCase } from "./App"
-
+import ActivityPage from "./ActivityPage"
+import ActivityPopup from "./ActivityPopup"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -382,101 +383,16 @@ export default function Survey({
         )}
       </Grid>
 
-      <Dialog
+      <ActivityPopup
+        spec={spec}
+        activity={activity}
+        tag={tag}
+        questionCount={questionCount}
         open={open}
-        maxWidth="xs"
-        onClose={() => setOpen(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-        }}
-      >
-        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-          <div className={classes.header}>
-            <Box
-              className={classes.topicon}
-              style={{
-                margin: "auto",
-                background: tag[activity?.id]?.photo
-                  ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                  : `url(${InfoIcon}) center center/contain no-repeat`,
-              }}
-            ></Box>
-            {games.includes(spec) ? (
-              <Typography variant="h6">{t("Games (" + changeCase(spec?.substr(5)) + ")")} </Typography>
-            ) : spec === "lamp.recording" ? (
-              <Typography variant="h6">{t("Voice Recording")}</Typography>
-            ) : (
-              <Typography variant="h6">{t(changeCase(spec?.substr(5)))}</Typography>
-            )}
-            <Typography variant="h2">
-              <ReactMarkdown
-                source={t(activity?.name ?? null)}
-                escapeHtml={false}
-                plugins={[gfm, emoji]}
-                renderers={{ link: LinkRenderer }}
-              />
-              {games.includes(spec) && spec !== null && " (" + spec.replace("lamp.", "") + ")"}
-            </Typography>
-          </div>
-        </DialogTitle>
-        <DialogContent className={classes.surveytextarea}>
-          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
-            <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-            </Typography>
-          )}
-          <Typography variant="body2" component="p">
-            <ReactMarkdown
-              source={
-                spec !== "lamp.dbt_diary_card"
-                  ? t(tag[activity?.id]?.description ?? null)
-                  : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
-              }
-              escapeHtml={false}
-              plugins={[gfm, emoji]}
-              renderers={{ link: LinkRenderer }}
-            />
-          </Typography>
-          {/* {spec === "lamp.dbt_diary_card" && (
-            <Box mt={5}>
-              <React.Fragment>
-                <DatePicker
-                  className={classes.calendatInput}
-                  autoOk
-                  format="MMMM d, yyyy "
-                  minDate={formattedDate}
-                  disableFuture
-                  value={selectedDate}
-                  onChange={handleDateChange}
-                />
-              </React.Fragment>
-            </Box> 
-          )}*/}
-        </DialogContent>
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={3}>
-            <Link
-              onClick={() => {
-                setOpenData(true)
-                setOpen(false)
-              }}
-              underline="none"
-              className={classnames(classes.btngreen, classes.linkButton)}
-            >
-              {!games.includes(spec) && spec !== "lamp.group" && spec !== "lamp.recording"
-                ? t("Start survey")
-                : t("Begin")}
-            </Link>
-          </Box>
-        </DialogActions>
-      </Dialog>
+        setOpen={setOpen}
+        type="Assess"
+        setOpenData={setOpenData}
+      />
       <ResponsiveDialog
         transient={false}
         animate
@@ -486,61 +402,13 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-        {spec !== "lamp.group" && spec !== "lamp.survey" ? (
-          <EmbeddedActivity
-            name={activity?.name ?? ""}
-            activity={activity ?? []}
-            participant={participant}
-            onComplete={submitEmbeddedActivity}
-          />
-        ) : spec === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            onComplete={() => {
-              setOpenData(false)
-            }}
-          />
-        ) : (
-          <SurveyInstrument
-            type={dialogueType}
-            fromPrevent={false}
-            group={visibleActivities}
-            participant={participant}
-            onComplete={submitSurveyType}
-          />
-        )}
-        <Dialog
-          open={openRecordSuccess}
-          onClose={() => setOpenRecordSuccess(false)}
-          scroll="paper"
-          aria-labelledby="alert-dialog-slide-title"
-          aria-describedby="alert-dialog-slide-description"
-          classes={{
-            root: classes.dialogueStyle,
-            paper: classes.dialogueCurve,
-            paperScrollPaper: classes.MuiDialogPaperScrollPaper,
-          }}
-        >
-          <DialogTitle>
-            <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenRecordSuccess(false)}>
-              <Icon>close</Icon>
-            </IconButton>
-          </DialogTitle>
-          <DialogContent>
-            <Box textAlign="center" pb={4} className={classes.niceWork}>
-              <Typography variant="h5" gutterBottom>
-                {t("Success") + "!"}
-              </Typography>
-              <Typography className={classes.ribbonText} component="p">
-                {t("Voice Recorded has been submitted Successfully.")}
-              </Typography>
-              <Box textAlign="center" className={classes.niceWorkbadge}>
-                <Icon>check_circle</Icon>
-              </Box>
-            </Box>
-          </DialogContent>
-        </Dialog>
+        <ActivityPage
+          activity={activity}
+          participant={participant}
+          setOpenData={setOpenData}
+          submitSurvey={submitSurveyType}
+          showSteak={showSteak}
+        />
       </ResponsiveDialog>
     </Container>
   )

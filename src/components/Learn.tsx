@@ -27,9 +27,8 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import classnames from "classnames"
 import { useTranslation } from "react-i18next"
 import InfoIcon from "../icons/Info.svg"
-import EmbeddedActivity from "./EmbeddedActivity"
-import SurveyInstrument from "./SurveyInstrument"
-import GroupActivity from "./GroupActivity"
+import ActivityPage from "./ActivityPage"
+import ActivityPopup from "./ActivityPopup"
 import { changeCase } from "./App"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -221,7 +220,6 @@ export default function Learn({
   const [loading, setLoading] = useState(true)
   const [savedActivities, setSavedActivities] = useState([])
   const [activitiesArray, setActivitiesArray] = useState({})
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [spec, setSpec] = useState("")
   const [activity, setActivity] = useState(null)
   const [questionCount, setQuestionCount] = React.useState(0)
@@ -325,58 +323,17 @@ export default function Learn({
           </Box>
         )}
       </Grid>
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-        }}
-      >
-        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-          <div className={classes.header}>
-            <Box mt={2} mb={1}>
-              {icon ? <img src={icon} /> : ""}
-            </Box>
-            <Typography variant="body2" align="left">
-              {t("Learn")}
-            </Typography>
-            <Typography variant="h2">{t(tip + "(" + t(changeCase(spec?.substr(5))) + ")")}</Typography>
-          </div>
-        </DialogTitle>
-        {activity?.spec === "lamp.tips" && (
-          <DialogContent className={classes.dialogueContent}>
-            {t("Quick Tips to Improve Your")} {t(tip)}
-          </DialogContent>
-        )}
-        {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
-          <Typography variant="h4" gutterBottom>
-            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-          </Typography>
-        )}
 
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={4}>
-            <Link
-              onClick={() => {
-                setOpen(false)
-                setOpenData(true)
-                setLaunchedActivity(activity)
-              }}
-              underline="none"
-              className={classnames(classes.btnyellow, classes.linkButton)}
-            >
-              {t("Begin")}
-            </Link>
-          </Box>
-        </DialogActions>
-      </Dialog>
+      <ActivityPopup
+        spec={spec}
+        activity={activity}
+        tag={activitiesArray}
+        questionCount={questionCount}
+        open={open}
+        setOpen={setOpen}
+        type="Learn"
+        setOpenData={setOpenData}
+      />
 
       <ResponsiveDialog
         transient={false}
@@ -387,42 +344,13 @@ export default function Learn({
           setOpenData(false)
         }}
       >
-        {(activity?.spec || "") === "lamp.survey" ? (
-          <SurveyInstrument
-            type={activity?.name ?? ""}
-            fromPrevent={false}
-            group={[activity]}
-            participant={participant}
-            onComplete={(response) => {
-              submitSurvey(response, activity.id)
-              setOpenData(false)
-            }}
-          />
-        ) : (activity?.spec || "") === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            submitSurvey={(response) => {
-              submitSurvey(response, activity.id)
-              setOpenData(false)
-            }}
-            onComplete={() => {
-              setOpenData(false)
-            }}
-          />
-        ) : (
-          <EmbeddedActivity
-            name={activity?.description ?? ""}
-            activity={activity ?? []}
-            participant={participant}
-            onComplete={(data) => {
-              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
-              if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
-                showSteak(participant, activity.id)
-              setOpenData(false)
-            }}
-          />
-        )}
+        <ActivityPage
+          activity={activity}
+          participant={participant}
+          setOpenData={setOpenData}
+          submitSurvey={submitSurvey}
+          showSteak={showSteak}
+        />
       </ResponsiveDialog>
     </Container>
   )

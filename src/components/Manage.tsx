@@ -34,11 +34,10 @@ import ResponsiveDialog from "./ResponsiveDialog"
 import Resources from "./Resources"
 import classnames from "classnames"
 import NewMedication from "./NewMedication"
-import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
-import SurveyInstrument from "./SurveyInstrument"
-import GroupActivity from "./GroupActivity"
+import ActivityPage from "./ActivityPage"
 import { changeCase } from "./App"
+import ActivityPopup from "./ActivityPopup"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     linkButton: {
@@ -208,7 +207,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState("")
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
+  const [openData, setOpenData] = useState(false)
   const [classType, setClassType] = useState("")
   const [activityName, setActivityName] = useState(null)
   const [activity, setActivity] = useState(null)
@@ -364,142 +363,30 @@ export default function Manage({ participant, activities, showSteak, submitSurve
         transient={false}
         animate
         fullScreen
-        open={!!launchedActivity}
+        open={!!openData}
         onClose={() => {
-          setLaunchedActivity(undefined)
+          setOpenData(false)
         }}
       >
-        {
-          {
-            embed: (
-              <EmbeddedActivity
-                name={activity?.name ?? ""}
-                activity={activity ?? []}
-                participant={participant}
-                onComplete={(response) => {
-                  if (spec === "lamp.tips" && !!response) showSteak(participant, activity.id)
-                  if (spec !== "lamp.tips" && !!response && (!!response?.completed || !!response.timestamp))
-                    showSteak(participant, activity.id)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.group": (
-              <GroupActivity
-                activity={activity}
-                participant={participant}
-                submitSurvey={(response) => {
-                  submitSurvey(response, activity.id)
-                  setLaunchedActivity(undefined)
-                }}
-                onComplete={() => {
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            "lamp.survey": (
-              <SurveyInstrument
-                type={activity?.name ?? ""}
-                fromPrevent={false}
-                group={[activity]}
-                participant={participant}
-                onComplete={(response) => {
-                  submitSurvey(response, activity.id)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-            // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,
-            // Medication_tracker: (
-            //   <NewMedication
-            //     participant={participant}
-            //     onComplete={() => {
-            //       setLaunchedActivity(undefined)
-            //     }}
-            //   />
-            // ),
-          }[launchedActivity ?? ""]
-        }
+        <ActivityPage
+          activity={activity}
+          participant={participant}
+          setOpenData={setOpenData}
+          submitSurvey={submitSurvey}
+          showSteak={showSteak}
+        />
       </ResponsiveDialog>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-        }}
-      >
-        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
-            <Icon>close</Icon>
-          </IconButton>
-          <div className={classType}>
-            <Box mt={2} mb={1}>
-              <Box
-                className={classes.topicon}
-                style={{
-                  margin: "auto",
-                  background: tag[activity?.id]?.photo
-                    ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.breathe"
-                    ? `url(${BreatheIcon}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.journal"
-                    ? `url(${JournalIcon}) center center/contain no-repeat`
-                    : activity?.spec === "lamp.scrath_image"
-                    ? `url(${ScratchCard}) center center/contain no-repeat`
-                    : `url(${InfoIcon}) center center/contain no-repeat`,
-                }}
-              ></Box>
 
-              {/* {dialogueType === "Goals" && <GoalIcon className={classes.topicon} />}
-              {dialogueType === "HopeBox" && <HopeBoxIcon className={classes.topicon} />}
-              {dialogueType === "Medication_tracker" && <MedicationIcon className={classes.topicon} />} */}
-            </Box>
-            <Box>
-              <Typography variant="body2" align="left">
-                {t("Manage")}
-              </Typography>
-              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
-            </Box>
-          </div>
-        </DialogTitle>
-        <DialogContent className={classes.dialogueContent}>
-          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
-            <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-            </Typography>
-          )}
-          {tag[activity?.id]?.description && (
-            <Box>
-              <Typography variant="h4" gutterBottom>
-                {t(tag[activity.id]?.description.split(".")[0])}
-              </Typography>
-              {tag[activity?.id]?.description.split(".").length > 1 && (
-                <Typography variant="body2" component="p">
-                  {t(tag[activity?.id]?.description.split(".").slice(1).join("."))}
-                </Typography>
-              )}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Box textAlign="center" width={1} mt={1} mb={3}>
-            <Link
-              onClick={() => {
-                setOpen(false)
-                setLaunchedActivity(spec !== "lamp.group" && spec !== "lamp.survey" ? "embed" : spec)
-              }}
-              underline="none"
-              className={classnames(classes.btnpeach, classes.linkButton)}
-            >
-              {t("Begin")}
-            </Link>
-          </Box>
-        </DialogActions>
-      </Dialog>
+      <ActivityPopup
+        spec={spec}
+        activity={activity}
+        tag={tag}
+        questionCount={questionCount}
+        open={open}
+        setOpen={handleClose}
+        type="Manage"
+        setOpenData={setOpenData}
+      />
     </Container>
   )
 }
