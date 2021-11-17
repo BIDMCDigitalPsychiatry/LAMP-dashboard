@@ -475,7 +475,7 @@ export default function Survey({
           setOpenData(false)
         }}
       >
-        {spec !== "lamp.group" && spec === "lamp.survey" ? (
+        {spec !== "lamp.group" && spec !== "lamp.survey" ? (
           <EmbeddedActivity
             name={activity?.name ?? ""}
             activity={activity ?? []}
