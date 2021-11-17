@@ -283,7 +283,7 @@ export default function GameCreator({
   }
 
   const handleTabChange = (tab) => {
-    setData({ ...data, category: tab })
+    setData({ ...data, category: tab.sort() })
   }
 
   const validateAudioSize = () => {

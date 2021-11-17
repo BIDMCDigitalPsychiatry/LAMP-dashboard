@@ -1623,7 +1623,10 @@ export default function Prevent({
               <GroupActivity
                 activity={activity}
                 participant={participant}
-                submitSurvey={submitSurvey}
+                submitSurvey={(response) => {
+                  submitSurvey(response, activity.id)
+                  setLaunchedActivity(undefined)
+                }}
                 onComplete={() => {
                   setLaunchedActivity(undefined)
                 }}
@@ -1635,7 +1638,10 @@ export default function Prevent({
                 fromPrevent={false}
                 group={[activity]}
                 participant={participant}
-                onComplete={submitSurvey}
+                onComplete={(response) => {
+                  submitSurvey(response, activity.id)
+                  setLaunchedActivity(undefined)
+                }}
               />
             ),
             // resources: <Resources onComplete={() => setLaunchedActivity(undefined)} />,

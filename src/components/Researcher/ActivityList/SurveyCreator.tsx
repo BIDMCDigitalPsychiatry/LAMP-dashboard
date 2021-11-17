@@ -431,7 +431,7 @@ export default function SurveyCreator({
   }
 
   const handleTabChange = (tab) => {
-    setData({ ...data, category: tab })
+    setData({ ...data, category: tab.sort() })
   }
 
   return (

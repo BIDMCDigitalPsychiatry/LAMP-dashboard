@@ -393,13 +393,19 @@ export default function Learn({
             fromPrevent={false}
             group={[activity]}
             participant={participant}
-            onComplete={submitSurvey}
+            onComplete={(response) => {
+              submitSurvey(response, activity.id)
+              setOpenData(false)
+            }}
           />
         ) : (activity?.spec || "") === "lamp.group" ? (
           <GroupActivity
             activity={activity}
             participant={participant}
-            submitSurvey={submitSurvey}
+            submitSurvey={(response) => {
+              submitSurvey(response, activity.id)
+              setOpenData(false)
+            }}
             onComplete={() => {
               setOpenData(false)
             }}

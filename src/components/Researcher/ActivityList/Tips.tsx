@@ -188,7 +188,7 @@ export default function Tips({
   })
 
   const handleTabChange = (tab) => {
-    setData({ ...data, category: tab })
+    setData({ ...data, category: tab.sort() })
     validate()
   }
   useEffect(() => {

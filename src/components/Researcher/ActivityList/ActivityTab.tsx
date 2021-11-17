@@ -41,11 +41,11 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   const { t } = useTranslation()
   const [category, setCategory] = useState(value?.category ?? [])
   const tabs = {
-    learn: "Learn",
     assess: "Assess",
+    learn: "Learn",
     manage: "Manage",
-    prevent: "Prevent",
     "": "None",
+    prevent: "Prevent",
   }
 
   useEffect(() => {

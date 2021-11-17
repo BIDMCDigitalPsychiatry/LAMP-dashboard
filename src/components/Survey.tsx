@@ -250,7 +250,7 @@ export default function Survey({
 
   const submitSurveyType = (response) => {
     setOpenData(false)
-    onComplete(response)
+    onComplete(response, activity.id)
   }
 
   const submitEmbeddedActivity = (response) => {
