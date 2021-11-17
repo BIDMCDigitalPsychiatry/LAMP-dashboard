@@ -1605,7 +1605,9 @@ export default function Prevent({
                 activity={activity ?? []}
                 participant={participant}
                 onComplete={(response) => {
-                  if (!!response && (!!response?.completed || !!response.timestamp)) showSteak(participant, activity.id)
+                  if (spec === "lamp.tips" && !!response) showSteak(participant, activity.id)
+                  if (spec !== "lamp.tips" && !!response && (!!response?.completed || !!response.timestamp))
+                    showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)
                 }}
               />

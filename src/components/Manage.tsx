@@ -370,7 +370,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
                 activity={activity ?? []}
                 participant={participant}
                 onComplete={(response) => {
-                  if (spec === "lamp.tips" && !!response) showSteak(participant, spec.id)
+                  if (spec === "lamp.tips" && !!response) showSteak(participant, activity.id)
                   if (spec !== "lamp.tips" && !!response && (!!response?.completed || !!response.timestamp))
                     showSteak(participant, activity.id)
                   setLaunchedActivity(undefined)

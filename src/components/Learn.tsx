@@ -391,7 +391,9 @@ export default function Learn({
             participant={participant}
             onComplete={(data) => {
               if (spec?.spec === "lamp.tips" && !!data) showSteak(participant, spec.id)
-              if (spec?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp)) setOpenData(false)
+              if (spec?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
+                showSteak(participant, spec.id)
+              setOpenData(false)
             }}
           />
         )}

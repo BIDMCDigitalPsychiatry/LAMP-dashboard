@@ -248,6 +248,11 @@ export default function Survey({
   }
 
   const submitEmbeddedActivity = (response) => {
+    if (spec === "lamp.tips" && !!response) {
+      showSteak(participant, activity.id)
+      setOpenData(false)
+      onComplete(null)
+    }
     if (!!response?.clickBack || spec !== "lamp.recording") {
       if (!!response?.timestamp) showSteak(participant, activity.id)
       setOpenData(false)
