@@ -62,10 +62,11 @@ export default function ActivityScheduler({ activity, activities, setActivities,
     }
     setNewRow(null)
     setSchedule(activityData["schedule"])
-    updateSchedule(activityData)
-    let data = activities
-    data[index] = activityData
-    setActivities(data)
+    updateSchedule(activityData).then((res) => {
+      let data = activities
+      data[index] = activityData
+      setActivities()
+    })
   }
 
   const addRow = () => {

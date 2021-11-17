@@ -59,6 +59,7 @@ import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
+import { changeCase } from "./App"
 import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
 import hi from "javascript-time-ago/locale/hi"
@@ -739,6 +740,7 @@ export default function Prevent({
   const [classType, setClassType] = React.useState("")
   const [spec, setSpec] = React.useState(null)
   const [launchedActivity, setLaunchedActivity] = React.useState<string>()
+  const [questionCount, setQuestionCount] = React.useState(0)
 
   const getCurrentLanguage = () => {
     let lang
@@ -932,6 +934,11 @@ export default function Prevent({
     LAMP.Activity.view(y.id).then((data) => {
       setActivity(data)
       setActivityOpen(true)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : y.spec === "lamp.survey"
+        ? setQuestionCount(data.settings?.length ?? 0)
+        : setQuestionCount(0)
     })
   }
 
@@ -1684,11 +1691,16 @@ export default function Prevent({
               <Typography variant="body2" align="left">
                 {t("Prevent")}
               </Typography>
-              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
             </Box>
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
+          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
           {tag[activity?.id]?.description && (
             <Box>
               <Typography variant="h4" gutterBottom>
@@ -1706,7 +1718,7 @@ export default function Prevent({
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               onClick={() => {
-                setOpen(false)
+                setActivityOpen(false)
                 setLaunchedActivity(
                   activity.spec !== "lamp.survey" && activity.spec !== "lamp.group" ? "embed" : activity.spec
                 )

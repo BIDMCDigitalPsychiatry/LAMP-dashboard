@@ -38,7 +38,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
 import SurveyInstrument from "./SurveyInstrument"
 import GroupActivity from "./GroupActivity"
-
+import { changeCase } from "./App"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     linkButton: {
@@ -216,6 +216,8 @@ export default function Manage({ participant, activities, showSteak, submitSurve
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [spec, setSpec] = useState(null)
+  const [questionCount, setQuestionCount] = React.useState(0)
+
   const { t } = useTranslation()
   useEffect(() => {
     setLoading(true)
@@ -250,6 +252,11 @@ export default function Manage({ participant, activities, showSteak, submitSurve
     LAMP.Activity.view(y.id).then((data) => {
       setActivity(data)
       setOpen(true)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : y.spec === "lamp.survey"
+        ? setQuestionCount(data.settings?.length ?? 0)
+        : setQuestionCount(0)
     })
   }
 
@@ -449,11 +456,16 @@ export default function Manage({ participant, activities, showSteak, submitSurve
               <Typography variant="body2" align="left">
                 {t("Manage")}
               </Typography>
-              <Typography variant="h2">{t(activity?.name) ?? (spec !== null ? " (" + spec + ")" : "")}</Typography>
+              <Typography variant="h2">{t(activity?.name) + "(" + t(changeCase(spec?.substr(5))) + ")"}</Typography>
             </Box>
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
+          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
           {tag[activity?.id]?.description && (
             <Box>
               <Typography variant="h4" gutterBottom>

@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Box, Typography, Grid, Checkbox, makeStyles, createStyles } from "@material-ui/core"
 import { Service } from "../../../DBService/DBService"
 import UpdateActivity from "../../ActivityList/UpdateActivity"
@@ -31,7 +31,6 @@ export default function ActivityRow({
   activities,
   handleSelected,
   setActivities,
-  updateActivities,
   ...props
 }: {
   activity: any
@@ -40,10 +39,10 @@ export default function ActivityRow({
   activities: any
   handleSelected: Function
   setActivities: Function
-  updateActivities: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
+
   const types = {
     "lamp.survey": t("Survey"),
     "lamp.group": t("Group"),
@@ -94,7 +93,7 @@ export default function ActivityRow({
             setActivities={setActivities}
             profile={true}
           />
-          <ScheduleActivity activity={activity} setActivities={updateActivities} activities={activities} />
+          <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
         </Grid>
       </Grid>
     </Box>
