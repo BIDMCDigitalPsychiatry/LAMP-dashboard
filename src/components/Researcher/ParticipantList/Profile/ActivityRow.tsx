@@ -41,14 +41,7 @@ export default function ActivityRow({
   setActivities: Function
 }) {
   const classes = useStyles()
-  const [activitiesData, setActivitiesData] = useState(activities ?? [])
-  const [activityData, setActivitydata] = useState(activity ?? null)
   const { t } = useTranslation()
-
-  useEffect(() => {
-    setActivitydata(activities[index])
-    setActivitiesData(activity)
-  }, [activities])
 
   const types = {
     "lamp.survey": t("Survey"),
@@ -77,12 +70,12 @@ export default function ActivityRow({
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {activityData.name}
+            {activity.name}
           </Typography>
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {types[activityData.spec] ?? t("Cognitive Test")}
+            {types[activity.spec] ?? t("Cognitive Test")}
           </Typography>
         </Grid>
         <Grid item xs>
