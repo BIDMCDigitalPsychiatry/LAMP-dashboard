@@ -851,6 +851,7 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
+                        console.log(feed)
                         if (
                           !feed.completed &&
                           feed.clickable &&
