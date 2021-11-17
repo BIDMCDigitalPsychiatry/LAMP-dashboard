@@ -427,12 +427,11 @@ export default function Survey({
           </div>
         </DialogTitle>
         <DialogContent className={classes.surveytextarea}>
-          {spec === "lamp.survey" ||
-            (spec === "lamp.dbt_diary_card" && (
-              <Typography variant="h4" gutterBottom>
-                {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-              </Typography>
-            ))}
+          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
           <Typography variant="body2" component="p">
             <ReactMarkdown
               source={

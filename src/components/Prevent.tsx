@@ -740,6 +740,7 @@ export default function Prevent({
   const [classType, setClassType] = React.useState("")
   const [spec, setSpec] = React.useState(null)
   const [launchedActivity, setLaunchedActivity] = React.useState<string>()
+  const [questionCount, setQuestionCount] = React.useState(0)
 
   const getCurrentLanguage = () => {
     let lang
@@ -933,6 +934,11 @@ export default function Prevent({
     LAMP.Activity.view(y.id).then((data) => {
       setActivity(data)
       setActivityOpen(true)
+      y.spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : y.spec === "lamp.survey"
+        ? setQuestionCount(data.settings?.length ?? 0)
+        : setQuestionCount(0)
     })
   }
 
@@ -1690,6 +1696,11 @@ export default function Prevent({
           </div>
         </DialogTitle>
         <DialogContent className={classes.dialogueContent}>
+          {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
           {tag[activity?.id]?.description && (
             <Box>
               <Typography variant="h4" gutterBottom>

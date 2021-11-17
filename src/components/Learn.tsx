@@ -224,6 +224,8 @@ export default function Learn({
   const [launchedActivity, setLaunchedActivity] = useState<string>()
   const [spec, setSpec] = useState("")
   const [activity, setActivity] = useState(null)
+  const [questionCount, setQuestionCount] = React.useState(0)
+
   const { t } = useTranslation()
 
   useEffect(() => {
@@ -278,6 +280,11 @@ export default function Learn({
     })
     LAMP.Activity.view(activitiesArray[type].id).then((data) => {
       setActivity(data)
+      activitiesArray[type].spec === "lamp.dbt_diary_card"
+        ? setQuestionCount(6)
+        : activitiesArray[type].spec === "lamp.survey"
+        ? setQuestionCount(data.settings?.length ?? 0)
+        : setQuestionCount(0)
     })
   }
 
@@ -348,6 +355,12 @@ export default function Learn({
             {t("Quick Tips to Improve Your")} {t(tip)}
           </DialogContent>
         )}
+        {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
+          <Typography variant="h4" gutterBottom>
+            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+          </Typography>
+        )}
+
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={4}>
             <Link
