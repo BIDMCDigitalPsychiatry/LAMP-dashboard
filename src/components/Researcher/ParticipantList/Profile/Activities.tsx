@@ -64,15 +64,17 @@ export default function PatientProfile({
   }, [])
 
   const onChangeActivities = () => {
-    ;(async () => {
-      Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
-        let result = sortData(activities, [participant.study_name], "name")
-        setActivities(result)
-        setPaginatedActivities(result.slice(page * rowCount, page * rowCount + rowCount))
-      })
-    })()
+    Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
+      let result = sortData(activities, [participant.study_name], "name")
+      setActivities(result)
+      setPaginatedActivities(result.slice(page * rowCount, page * rowCount + rowCount))
+    })
     setSelectedActivities([])
   }
+
+  useEffect(() => {
+    setPaginatedActivities((activities || []).slice(page * rowCount, page * rowCount + rowCount))
+  }, [activities])
 
   const handleActivitySelected = (activity, checked) => {
     if (!!checked) {
@@ -155,7 +157,6 @@ export default function PatientProfile({
                   index={index}
                   handleSelected={handleActivitySelected}
                   setActivities={onChangeActivities}
-                  updateActivities={setActivities}
                 />
               </Grid>
             ))}

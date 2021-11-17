@@ -1706,7 +1706,7 @@ export default function Prevent({
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
               onClick={() => {
-                setOpen(false)
+                setActivityOpen(false)
                 setLaunchedActivity(
                   activity.spec !== "lamp.survey" && activity.spec !== "lamp.group" ? "embed" : activity.spec
                 )
