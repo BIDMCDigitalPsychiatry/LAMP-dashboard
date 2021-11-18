@@ -129,69 +129,69 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
   return (
     <Box>
       <Grid container spacing={2}>
-        {savedActivities.length ? (
-          savedActivities.map((activity) => (
-            <Grid
-              item
-              xs={6}
-              sm={4}
-              md={3}
-              lg={3}
-              onClick={() => {
-                setSpec(activity.spec)
-                handleClickOpen(activity)
-              }}
-              className={classes.thumbMain}
-            >
-              <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card
-                  className={
-                    classes.manage +
-                    " " +
-                    (type === "Manage"
-                      ? classes.manageH
-                      : type === "Assess"
-                      ? classes.assessH
-                      : type === "Learn"
-                      ? classes.learnH
-                      : classes.preventH)
-                  }
-                >
-                  <Box mt={2} mb={1}>
-                    <Box
-                      className={classes.mainIcons}
-                      style={{
-                        margin: "auto",
-                        background: tag[activity.id]?.photo
-                          ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                          : activity.spec === "lamp.breathe"
-                          ? `url(${BreatheIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.journal"
-                          ? `url(${JournalIcon}) center center/contain no-repeat`
-                          : activity.spec === "lamp.scratch_image"
-                          ? `url(${ScratchCard}) center center/contain no-repeat`
-                          : `url(${InfoIcon}) center center/contain no-repeat`,
-                      }}
-                    ></Box>
-                  </Box>
-                  <Typography className={classes.cardlabel}>
-                    <ReactMarkdown
-                      source={t(activity.name)}
-                      escapeHtml={false}
-                      plugins={[gfm, emoji]}
-                      renderers={{ link: LinkRenderer }}
-                    />
-                  </Typography>
-                </Card>
-              </ButtonBase>
-            </Grid>
-          ))
-        ) : (
-          <Box display="flex" className={classes.blankMsg} ml={1}>
-            <Icon>info</Icon>
-            <p>{t("There are no " + type + " activities available.")}</p>
-          </Box>
-        )}
+        {savedActivities.length
+          ? savedActivities.map((activity) => (
+              <Grid
+                item
+                xs={6}
+                sm={4}
+                md={3}
+                lg={3}
+                onClick={() => {
+                  setSpec(activity.spec)
+                  handleClickOpen(activity)
+                }}
+                className={classes.thumbMain}
+              >
+                <ButtonBase focusRipple className={classes.fullwidthBtn}>
+                  <Card
+                    className={
+                      classes.manage +
+                      " " +
+                      (type === "Manage"
+                        ? classes.manageH
+                        : type === "Assess"
+                        ? classes.assessH
+                        : type === "Learn"
+                        ? classes.learnH
+                        : classes.preventH)
+                    }
+                  >
+                    <Box mt={2} mb={1}>
+                      <Box
+                        className={classes.mainIcons}
+                        style={{
+                          margin: "auto",
+                          background: tag[activity.id]?.photo
+                            ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                            : activity.spec === "lamp.breathe"
+                            ? `url(${BreatheIcon}) center center/contain no-repeat`
+                            : activity.spec === "lamp.journal"
+                            ? `url(${JournalIcon}) center center/contain no-repeat`
+                            : activity.spec === "lamp.scratch_image"
+                            ? `url(${ScratchCard}) center center/contain no-repeat`
+                            : `url(${InfoIcon}) center center/contain no-repeat`,
+                        }}
+                      ></Box>
+                    </Box>
+                    <Typography className={classes.cardlabel}>
+                      <ReactMarkdown
+                        source={t(activity.name)}
+                        escapeHtml={false}
+                        plugins={[gfm, emoji]}
+                        renderers={{ link: LinkRenderer }}
+                      />
+                    </Typography>
+                  </Card>
+                </ButtonBase>
+              </Grid>
+            ))
+          : type !== "Prevent" && (
+              <Box display="flex" className={classes.blankMsg} ml={1}>
+                <Icon>info</Icon>
+                <p>{t("There are no " + type + " activities available.")}</p>
+              </Box>
+            )}
       </Grid>
       <ActivityPopup
         spec={spec}
