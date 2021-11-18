@@ -1061,6 +1061,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         spec: "lamp.tips",
         settings: x.settings,
         schedule: [],
+        category: x.category,
       }
       result = await saveTipActivity(tipObj)
       return result

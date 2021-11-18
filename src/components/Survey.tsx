@@ -71,57 +71,15 @@ export const games = [
   "lamp.balloon_risk",
 ]
 
-export default function Survey({
-  participant,
-  activities,
-  visibleActivities,
-  setVisibleActivities,
-  onComplete,
-  showSteak,
-  ...props
-}) {
+export default function Survey({ participant, activities, onComplete, showSteak, submitSurvey, ...props }) {
   const classes = useStyles()
   const [open, setOpen] = React.useState(false)
-  const [dialogueType, setDialogueType] = React.useState("")
-  const [openData, setOpenData] = React.useState(false)
-  const [questionCount, setQuestionCount] = useState(0)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const { t } = useTranslation()
   const [spec, setSpec] = useState(null)
   const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
-  const handleClickOpen = (type: string) => {
-    setDialogueType(type)
-    setOpen(true)
-  }
-
-  const submitSurveyType = (response) => {
-    setOpenData(false)
-    onComplete(response, activity.id)
-  }
-
-  const submitEmbeddedActivity = (response) => {
-    if (spec === "lamp.tips" && !!response) {
-      showSteak(participant, activity.id)
-      setOpenData(false)
-      onComplete(null)
-    }
-    if (!!response?.clickBack || spec !== "lamp.recording") {
-      if (!!response?.timestamp) showSteak(participant, activity.id)
-      setOpenData(false)
-      onComplete(null)
-    } else {
-      setOpenRecordSuccess(true)
-      setTimeout(function () {
-        setOpenRecordSuccess(false)
-        if (!!response && !!response?.timestamp) showSteak(participant, activity.id)
-        setOpenData(false)
-        onComplete(null)
-      }, 2000)
-    }
-  }
 
   useEffect(() => {
     setLoading(true)
@@ -132,7 +90,7 @@ export default function Survey({
           x.spec === "lamp.dbt_diary_card" ||
           x.spec === "lamp.recording" ||
           x.spec === "lamp.survey") &&
-          (!x?.category || (!!x?.category && !x?.category[0]))) ||
+          (!x?.category || (!!x?.category && x?.category.length === 0))) ||
         (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "assess")
     )
     setSavedActivities(gActivities)
@@ -164,7 +122,7 @@ export default function Survey({
         savedActivities={savedActivities}
         tag={tag}
         showSteak={showSteak}
-        submitSurvey={submitSurveyType}
+        submitSurvey={submitSurvey}
         type="Assess"
       />
     </Container>

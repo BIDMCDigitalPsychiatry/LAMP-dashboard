@@ -155,7 +155,7 @@ export default function GroupCreator({
       description: details.description,
       photo: details.photo,
       studyID: details.studyId,
-      category: data?.category ?? null,
+      category: data?.category ?? [],
     })
   }
 

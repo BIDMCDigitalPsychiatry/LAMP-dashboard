@@ -125,7 +125,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         : setQuestionCount(0)
     })
   }
-  console.log(type)
 
   return (
     <Box>

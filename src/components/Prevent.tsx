@@ -22,7 +22,6 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
 import { getImage } from "./Manage"
 import LAMP, {
   Participant as ParticipantObj,

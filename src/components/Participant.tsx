@@ -294,9 +294,8 @@ export default function Participant({
               <Survey
                 participant={participant}
                 activities={activities}
-                visibleActivities={visibleActivities}
+                submitSurvey={submitSurvey}
                 onComplete={submitSurvey}
-                setVisibleActivities={setVisibleActivities}
                 showSteak={showSteak}
               />
             </Box>
