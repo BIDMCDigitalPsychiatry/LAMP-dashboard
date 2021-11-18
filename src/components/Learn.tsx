@@ -69,7 +69,9 @@ export default function Learn({
 
   useEffect(() => {
     let gActivities = activities.filter(
-      (x: any) => (x.spec === "lamp.tips" && !x?.category) || (!!x?.category && (x?.category[0] || "") === "learn")
+      (x: any) =>
+        (x.spec === "lamp.tips" && (!x?.category || (!!x?.category && !x?.category[0]))) ||
+        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "learn")
     )
     if (gActivities.length > 0) {
       ;(async () => {
