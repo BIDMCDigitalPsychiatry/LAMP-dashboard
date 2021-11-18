@@ -1009,10 +1009,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         //   photo: x?.photo ?? "",
         // })
       } else {
-        result = (await LAMP.Activity.update(x.id, {
-          name: x.name,
-          settings: x.settings ?? [],
-        })) as any
+        result = (await LAMP.Activity.update(x.id, x)) as any
         await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
           description: x.description,
           photo: x.photo,
@@ -1029,10 +1026,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       })
       return result
     } else {
-      result = (await LAMP.Activity.update(selectedActivity?.id, {
-        name: x.name,
-        settings: x.settings,
-      })) as any
+      result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
 
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         description: x.description,
