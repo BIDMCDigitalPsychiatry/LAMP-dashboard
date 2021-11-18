@@ -23,8 +23,9 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
       [theme.breakpoints.down("sm")]: {
-        fontSize: 12,
+        fontSize: 13,
         padding: "0 5px",
+        "& p": { marginBottom: "0", lineHeight: "16px" },
       },
     },
     scratch: {
@@ -71,6 +72,7 @@ const useStyles = makeStyles((theme: Theme) =>
     fullwidthBtn: { width: "100%" },
     blankMsg: {
       marginBottom: "15px",
+      marginTop: "5px",
       "& path": { fill: "#666" },
       "& p": { margin: "2px 5px" },
     },

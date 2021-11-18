@@ -39,8 +39,9 @@ export default function Manage({ participant, activities, showSteak, submitSurve
     setLoading(true)
     let gActivities = activities.filter(
       (x: any) =>
-        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") && !x?.category) ||
-        (!!x?.category && (x?.category[0] || "") === "manage")
+        ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
+          (!x?.category || (!!x?.category && !x?.category[0]))) ||
+        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "manage")
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {

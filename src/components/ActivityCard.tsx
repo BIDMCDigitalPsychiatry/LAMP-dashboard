@@ -5,7 +5,7 @@ import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@ma
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 import { useTranslation } from "react-i18next"
-import { strategies } from "./Prevent"
+import { strategies } from "./PreventSelectedActivities"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
