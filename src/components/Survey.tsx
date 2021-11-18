@@ -133,7 +133,7 @@ export default function Survey({
           x.spec === "lamp.recording" ||
           x.spec === "lamp.survey") &&
           (!x?.category || (!!x?.category && !x?.category[0]))) ||
-        (!!x?.category && (x?.category[0] || "") === "assess")
+        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "assess")
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
