@@ -73,10 +73,7 @@ export const games = [
 
 export default function Survey({ participant, activities, onComplete, showSteak, submitSurvey, ...props }) {
   const classes = useStyles()
-  const [open, setOpen] = React.useState(false)
   const { t } = useTranslation()
-  const [spec, setSpec] = useState(null)
-  const [activity, setActivity] = useState(null)
   const [tag, setTag] = useState([])
   const [savedActivities, setSavedActivities] = useState([])
   const [loading, setLoading] = useState(true)
