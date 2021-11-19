@@ -834,6 +834,7 @@ export function spliceActivity({ raw, tag }) {
       : raw.settings.map((question, idx) => ({
           text: question.text,
           type: question.type,
+          required: question.required ?? false,
           description: tag?.questions?.[idx]?.description,
           options:
             question.options === null
@@ -875,6 +876,7 @@ export function unspliceActivity(x) {
         text: y?.text,
         type: y?.type,
         options: y?.options === null ? null : y?.options?.map((z) => z?.value),
+        required: y?.required ?? false,
       })),
     },
     tag: {
@@ -950,7 +952,6 @@ export async function saveCTestActivity(x) {
 }
 
 export async function saveSurveyActivity(x) {
-  // FIXME: ensure this is a lamp.survey only!
   const { raw, tag } = unspliceActivity(x)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
