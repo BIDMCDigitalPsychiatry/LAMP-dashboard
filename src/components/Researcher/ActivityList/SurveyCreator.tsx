@@ -463,7 +463,6 @@ export default function SurveyCreator({
           </Grid>
           <Grid item>
             <Stepper nonLinear activeStep={activeStep} orientation="vertical">
-              {console.log(questions)}
               {questions?.map((x, idx) => (
                 <QuestionCreator
                   key={`${x.text}-${idx}`}
