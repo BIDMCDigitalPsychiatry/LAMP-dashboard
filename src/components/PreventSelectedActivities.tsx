@@ -1,23 +1,15 @@
 // Core Imports
 import React from "react"
 import {
-  Container,
   Typography,
   Grid,
   Card,
   Icon,
   Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
   IconButton,
-  DialogActions,
   AppBar,
   Toolbar,
   ButtonBase,
-  Link,
-  Backdrop,
-  CircularProgress,
   makeStyles,
   Theme,
   createStyles,
@@ -25,28 +17,10 @@ import {
 import ResponsiveDialog from "./ResponsiveDialog"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import PreventData from "./PreventData"
-import { getImage } from "./Manage"
-import LAMP, {
-  Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-  SensorEvent as SensorEventObj,
-} from "lamp-core"
-import ActivityBox from "./ActivityBox"
-import MultipleSelect from "./MultipleSelect"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import Journal from "./Journal"
 import PreventGoalData from "./PreventGoalData"
 import PreventDBT from "./PreventDBT"
-import { ReactComponent as PreventExercise } from "../icons/PreventExercise.svg"
-import { ReactComponent as PreventReading } from "../icons/PreventReading.svg"
-import { ReactComponent as PreventSleeping } from "../icons/PreventSleeping.svg"
-import { ReactComponent as PreventNutrition } from "../icons/PreventNutrition.svg"
-import { ReactComponent as PreventMeditation } from "../icons/PreventMeditation.svg"
-import { ReactComponent as PreventEmotions } from "../icons/PreventEmotions.svg"
-import { ReactComponent as PreventBreatheIcon } from "../icons/PreventBreathe.svg"
-import { ReactComponent as PreventSavings } from "../icons/PreventSavings.svg"
-import { ReactComponent as PreventWeight } from "../icons/PreventWeight.svg"
-import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -278,8 +252,6 @@ export default function PreventSelectedActivities({
     setActivityData(data)
     setOpenData(true)
   }
-
-  const [selectedSpec, setSelectedSpec] = React.useState("")
   const [selectedActivity, setSelectedActivity] = React.useState(null)
   const [selectedActivityName, setSelectedActivityName] = React.useState(null)
 
@@ -300,7 +272,6 @@ export default function PreventSelectedActivities({
                 <Card
                   className={classes.prevent}
                   onClick={() => {
-                    setSelectedSpec(activity.spec)
                     if (activity.spec === "lamp.dbt_diary_card") {
                       openDetails(activity, activityEvents, 0)
                     } else {

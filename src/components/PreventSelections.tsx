@@ -15,23 +15,12 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import LAMP, {
-  Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-  SensorEvent as SensorEventObj,
-} from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import MultipleSelect from "./MultipleSelect"
-import en from "javascript-time-ago/locale/en"
-import hi from "javascript-time-ago/locale/hi"
-import es from "javascript-time-ago/locale/es"
-import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
 import PreventSelectedActivities from "./PreventSelectedActivities"
 import PreventSelectedSensors from "./PreventSelectedSensors"
 import PreventSelectedExperimental from "./PreventSelectedExperimental"
-TimeAgo.addLocale(en)
-const timeAgo = new TimeAgo("en-US")
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

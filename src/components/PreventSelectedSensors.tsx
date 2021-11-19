@@ -16,14 +16,9 @@ import {
 } from "@material-ui/core"
 import ResponsiveDialog from "./ResponsiveDialog"
 import PreventData from "./PreventData"
-import LAMP, {
-  Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-  SensorEvent as SensorEventObj,
-} from "lamp-core"
+import LAMP, { Participant as ParticipantObj, Activity as ActivityObj, SensorEvent as SensorEventObj } from "lamp-core"
 import { useTranslation } from "react-i18next"
-import { Vega, VegaLite } from "react-vega"
+import { VegaLite } from "react-vega"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
