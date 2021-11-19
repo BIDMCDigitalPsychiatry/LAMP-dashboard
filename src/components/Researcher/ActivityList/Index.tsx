@@ -101,8 +101,12 @@ export default function ActivityList({
   useEffect(() => {
     setTimeout(() => {
       setLoadTime(true)
-    }, 9000)
+    }, 12000)
   }, [])
+
+  useEffect(() => {
+    setLoading(!loadTime)
+  }, [loadTime])
 
   const getAllActivities = () => {
     Service.getAll("activities").then((data) => {
@@ -129,9 +133,7 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    setLoadTime(false)
     if ((selectedStudies || []).length > 0) {
-      setLoadTime(true)
       searchActivities()
     } else {
       setActivities([])
