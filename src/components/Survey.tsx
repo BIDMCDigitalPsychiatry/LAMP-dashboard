@@ -1,41 +1,9 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import {
-  Container,
-  Backdrop,
-  CircularProgress,
-  Typography,
-  Grid,
-  Icon,
-  Card,
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  ButtonBase,
-  makeStyles,
-  Theme,
-  createStyles,
-  Link,
-} from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
-import SurveyInstrument from "./SurveyInstrument"
-import LAMP from "lamp-core"
-import classnames from "classnames"
-import { useSnackbar } from "notistack"
+import { Container, Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { DatePicker } from "@material-ui/pickers"
-import EmbeddedActivity from "./EmbeddedActivity"
-import InfoIcon from "../icons/Info.svg"
-import GroupActivity from "./GroupActivity"
-import ReactMarkdown from "react-markdown"
-import emoji from "remark-emoji"
-import gfm from "remark-gfm"
-import { changeCase } from "./App"
 import ActivityBox from "./ActivityBox"
-
+import { getImage } from "./Manage"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -52,15 +20,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
-async function getDetails(activityId: string, spec: string) {
-  return [
-    await LAMP.Type.getAttachment(
-      activityId,
-      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
-    ),
-  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
-}
 
 export const games = [
   "lamp.jewels_a",
@@ -95,7 +54,7 @@ export default function Survey({ participant, activities, onComplete, showSteak,
       let tags = []
       let count = 0
       gActivities.map((activity, index) => {
-        getDetails(activity.id, activity.spec).then((img) => {
+        getImage(activity.id, activity.spec).then((img) => {
           tags[activity.id] = img
           if (count === gActivities.length - 1) {
             setTag(tags)

@@ -91,12 +91,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export async function getImage(activityId: string) {
-  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
-    !!y.error ? undefined : y.data
-  )[0]
-}
-
 export function LinkRenderer(data: any) {
   return (
     <a href={data.href} target="_blank">
