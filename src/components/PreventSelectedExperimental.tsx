@@ -1,12 +1,7 @@
 // Core Imports
 import React from "react"
 import { Typography, Grid, Card, Box, makeStyles, Theme, createStyles } from "@material-ui/core"
-import LAMP, {
-  Participant as ParticipantObj,
-  Activity as ActivityObj,
-  ActivityEvent as ActivityEventObj,
-  SensorEvent as SensorEventObj,
-} from "lamp-core"
+import { Participant as ParticipantObj } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Vega } from "react-vega"
 
