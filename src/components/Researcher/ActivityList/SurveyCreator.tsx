@@ -163,6 +163,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
+  const [optional, setOptional] = useState(question.required ? !question.required : true)
   const [timePattern, setTimePatterm] = useState(question.type === "time" ? question.options[0].value : "standard")
   const { t } = useTranslation()
   useEffect(() => {
@@ -175,8 +176,9 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
         : type === "time"
         ? [{ value: timePattern, description: timePattern }]
         : null,
+      required: !optional,
     })
-  }, [text, description, type, options, timePattern])
+  }, [text, description, type, options, timePattern, optional])
 
   return (
     <Step {...props}>
@@ -185,38 +187,45 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
           {isSelected ? (
             text
           ) : (
-            <TextField
-              fullWidth
-              variant="outlined"
-              label={t("Question Title")}
-              error={typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false}
-              helperText={
-                typeof text == "undefined" || text === null || text === "" || !text.trim().length
-                  ? t("Please enter Question Title")
-                  : ""
-              }
-              defaultValue={text}
-              onBlur={(event) => setText(removeExtraSpace(event.target.value))}
-              InputProps={{
-                endAdornment: [
-                  <InputAdornment position="end" variant="filled" key="adornment">
-                    <Tooltip title={t("Delete question from survey instrument.")}>
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => onDelete()}
-                        onMouseDown={(event) => event.preventDefault()}
-                      >
-                        <Icon>delete_forever</Icon>
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>,
-                ],
-              }}
-            />
+            <Box>
+              <TextField
+                fullWidth
+                variant="outlined"
+                label={t("Question Title")}
+                error={typeof text == "undefined" || text === null || text === "" || !text.trim().length ? true : false}
+                helperText={
+                  typeof text == "undefined" || text === null || text === "" || !text.trim().length
+                    ? t("Please enter Question Title")
+                    : ""
+                }
+                defaultValue={text}
+                onBlur={(event) => setText(removeExtraSpace(event.target.value))}
+                InputProps={{
+                  endAdornment: [
+                    <InputAdornment position="end" variant="filled" key="adornment">
+                      <Tooltip title={t("Delete question from survey instrument.")}>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => onDelete()}
+                          onMouseDown={(event) => event.preventDefault()}
+                        >
+                          <Icon>delete_forever</Icon>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>,
+                  ],
+                }}
+              />
+              <FormControlLabel
+                control={<Checkbox checked={optional} onChange={(evt) => setOptional(!optional)} name="optional" />}
+                label="Optional"
+              />
+            </Box>
           )}
         </StepLabel>
       </StepButton>
+
       <StepContent>
         <Grid container direction="column" spacing={2}>
           <Grid item>
@@ -454,6 +463,7 @@ export default function SurveyCreator({
           </Grid>
           <Grid item>
             <Stepper nonLinear activeStep={activeStep} orientation="vertical">
+              {console.log(questions)}
               {questions?.map((x, idx) => (
                 <QuestionCreator
                   key={`${x.text}-${idx}`}
