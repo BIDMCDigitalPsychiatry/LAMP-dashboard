@@ -104,10 +104,6 @@ export default function ActivityList({
     }, 12000)
   }, [])
 
-  useEffect(() => {
-    setLoading(!loadTime)
-  }, [loadTime])
-
   const getAllActivities = () => {
     Service.getAll("activities").then((data) => {
       setAllActivities(data || [])
@@ -125,6 +121,7 @@ export default function ActivityList({
   }
 
   useEffect(() => {
+    setLoading(!loadTime)
     if (!!loadTime) searchActivities()
   }, [loadTime])
 
