@@ -53,7 +53,7 @@ export default function Learn({
       let tags = []
       let count = 0
       gActivities.map((activity, index) => {
-        getImage(activity.id).then((img) => {
+        getImage(activity.id, activity.spec).then((img) => {
           tags[activity.id] = img
           if (count === gActivities.length - 1) {
             setLoading(false)

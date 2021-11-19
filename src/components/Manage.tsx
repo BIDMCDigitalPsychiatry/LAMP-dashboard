@@ -22,10 +22,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export async function getImage(activityId: string) {
-  return [await LAMP.Type.getAttachment(activityId, "lamp.dashboard.activity_details")].map((y: any) =>
-    !!y.error ? undefined : y.data
-  )[0]
+export async function getImage(activityId: string, spec: string) {
+  return [
+    await LAMP.Type.getAttachment(
+      activityId,
+      spec === "lamp.survey" ? "lamp.dashboard.survey_description" : "lamp.dashboard.activity_details"
+    ),
+  ].map((y: any) => (!!y.error ? undefined : y.data))[0]
 }
 
 export default function Manage({ participant, activities, showSteak, submitSurvey, ...props }) {
@@ -48,7 +51,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
       let tags = []
       let count = 0
       gActivities.map((activity, index) => {
-        getImage(activity.id).then((img) => {
+        getImage(activity.id, activity.spec).then((img) => {
           tags[activity.id] = img
           if (count === gActivities.length - 1) {
             setLoading(false)
