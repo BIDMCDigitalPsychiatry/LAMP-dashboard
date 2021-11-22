@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Typography,
   Grid,
@@ -92,6 +92,20 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+async function getSelected(participant: ParticipantObj, type) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""] ?? []
+  )
+}
+
 export default function PreventSelections({
   participant,
   activities,
@@ -136,6 +150,12 @@ export default function PreventSelections({
   const handleClose = () => {
     setOpen(false)
   }
+
+  useEffect(() => {
+    getSelected(participant, "lamp.selectedActivities").then(setSelectedActivities)
+    getSelected(participant, "lamp.selectedSensors").then(setSelectedSensors)
+    getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
+  })
 
   const earliestDate = () =>
     (activities || [])
