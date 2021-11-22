@@ -320,14 +320,11 @@ export default function Prevent({
         getImage(activity.id, activity.spec).then((img) => {
           tags[activity.id] = img
           if (count === gActivities.length - 1) {
-            setLoading(false)
             setTag(tags)
           }
           count++
         })
       })
-    } else {
-      setLoading(false)
     }
   }
 
@@ -372,8 +369,8 @@ export default function Prevent({
                   .filter((sensor) => sensorEventCount[sensor] > 0)
                   .concat(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
               )
+              setLoading(false)
             })
-            setLoading(false)
           })
         })
       } else {
@@ -383,8 +380,8 @@ export default function Prevent({
             .map((x) => x.replace("lamp.dashboard.experimental.", ""))
             .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
           setSensorCounts(Object.assign({}, visualizationCount))
+          setLoading(false)
         })
-        setLoading(false)
       }
     })()
   }, [])
