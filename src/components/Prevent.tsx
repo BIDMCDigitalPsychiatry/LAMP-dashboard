@@ -30,8 +30,11 @@ import LAMP, {
   SensorEvent as SensorEventObj,
 } from "lamp-core"
 import ActivityBox from "./ActivityBox"
-import PreventSelections from "./PreventSelections"
 import { useTranslation } from "react-i18next"
+import PreventSelectedActivities from "./PreventSelectedActivities"
+import PreventSelectedSensors from "./PreventSelectedSensors"
+import PreventSelectedExperimental from "./PreventSelectedExperimental"
+import MultipleSelect from "./MultipleSelect"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,6 +50,69 @@ const useStyles = makeStyles((theme: Theme) =>
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
     },
+
+    vega: {
+      "& .vega-embed": {
+        width: "100%",
+        paddingRight: "0 !important",
+        "& summary": { top: "-25px" },
+        "& .vega-actions": { top: "15px" },
+      },
+      "& canvas": { width: "100% !important", height: "auto !important" },
+    },
+    preventlabel: {
+      fontSize: 16,
+      minHeight: 48,
+      padding: "0 0 0 15px",
+      marginTop: 8,
+      width: "100%",
+      textAlign: "left",
+      "& span": { color: "#618EF7" },
+    },
+    addicon: { float: "right", color: "#6083E7" },
+    preventHeader: {
+      [theme.breakpoints.up("sm")]: {
+        flexGrow: "initial",
+        paddingRight: 10,
+      },
+      "& h5": {
+        fontWeight: 600,
+        fontSize: 18,
+        color: "rgba(0, 0, 0, 0.4)",
+      },
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+    addbtnmain: {
+      maxWidth: 24,
+      "& button": { padding: 0 },
+    },
+    sensorhd: {
+      margin: "80px 0 15px 0",
+      [theme.breakpoints.down("xs")]: {
+        marginTop: 50,
+      },
+    },
+    activityhd: {
+      margin: "0 0 15px 0",
+    },
+    marginTop10: {
+      marginTop: "10px",
+    },
+    activitydatapop: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    activityContent: {
+      maxHeight: "280px",
+    },
+    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
+    linkBlue: { color: "#6083E7", cursor: "pointer" },
   })
 )
 
@@ -144,62 +210,6 @@ async function getActivityEvents(
   return Object.fromEntries([...Object.entries(original), ...customGroups])
 }
 
-async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id, null, true)
-  let originalFiltered = original.filter((data) => data.spec !== "lamp.recording")
-  return [...originalFiltered]
-}
-
-async function getSelectedActivities(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedActivities").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-async function getSelectedSensors(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedSensors").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-
-async function getSelectedExperimental(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedExperimental").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
   return Object.assign(
     {},
@@ -234,6 +244,20 @@ function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventOb
   }
 }
 
+async function getSelected(participant: ParticipantObj, type) {
+  return (
+    Object.fromEntries(
+      (
+        await Promise.all(
+          [participant.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, type).catch((e) => [])])
+        )
+      )
+        .filter((x: any) => x[1].message !== "404.object-not-found")
+        .map((x: any) => [x[0], x[1].data])
+    )[participant.id || ""] ?? []
+  )
+}
+
 export default function Prevent({
   participant,
   activeTab,
@@ -263,6 +287,9 @@ export default function Prevent({
   const [savedActivities, setSavedActivities] = React.useState([])
   const [tag, setTag] = React.useState([])
   const [disabled, setDisabled] = React.useState(true)
+  const [open, setOpen] = React.useState(false)
+  const [dialogueType, setDialogueType] = React.useState(0)
+
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
   const [sensorEvents, setSensorEvents] = React.useState({})
@@ -272,6 +299,9 @@ export default function Prevent({
   const [loading, setLoading] = React.useState(true)
   const [visualizations, setVisualizations] = React.useState({})
   const [cortex, setCortex] = React.useState({})
+  const [selectedActivities, setSelectedActivities] = React.useState([])
+  const [selectedSensors, setSelectedSensors] = React.useState([])
+  const [selectedExperimental, setSelectedExperimental] = React.useState([])
 
   const setTabActivities = () => {
     let gActivities = allActivities.filter(
@@ -304,6 +334,9 @@ export default function Prevent({
   React.useEffect(() => {
     setTabActivities()
     ;(async () => {
+      getSelected(participant, "lamp.selectedActivities").then(setSelectedActivities)
+      getSelected(participant, "lamp.selectedSensors").then(setSelectedSensors)
+      getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
@@ -324,7 +357,6 @@ export default function Prevent({
               activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
           )
           setActivities(activities)
-          setLoading(false)
           getSensorEvents(participant).then((sensorEvents) => {
             let sensorEventCount = getSensorEventCount(sensorEvents)
             setSensorEvents(sensorEvents)
@@ -341,6 +373,7 @@ export default function Prevent({
                   .concat(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
               )
             })
+            setLoading(false)
           })
         })
       } else {
@@ -356,6 +389,24 @@ export default function Prevent({
     })()
   }, [])
 
+  const earliestDate = () =>
+    (activities || [])
+      .filter((x) => (selectedActivities || []).includes(x.name))
+      .map((x) => (activityEvents || {})[x.name] || [])
+      .map((x) => (x.length === 0 ? 0 : x.slice(0, 1)[0].timestamp))
+      .sort((a, b) => (a > b ? 1 : a < b ? -1 : 0))
+      .slice(0, 1)
+      .map((x) => (x === 0 ? undefined : new Date(x)))[0]
+
+  const handleClickOpen = (type: number) => {
+    setDialogueType(type)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+  }
+
   return (
     <Container className={classes.thumbContainer}>
       <Backdrop className={classes.backdrop} open={loading}>
@@ -370,20 +421,123 @@ export default function Prevent({
         type="Prevent"
       />
       {!loading && (
-        <PreventSelections
-          participant={participant}
-          activities={activities}
-          activityCounts={activityCounts}
-          sensorCounts={sensorCounts}
-          visualizations={visualizations}
-          cortex={cortex}
-          activityEvents={activityEvents}
-          timeSpans={timeSpans}
-          sensorEvents={sensorEvents}
-          onEditAction={onEditAction}
-          onCopyAction={onCopyAction}
-          onDeleteAction={onDeleteAction}
-        />
+        <Box>
+          <Box className={classes.marginTop10}>
+            <Grid container xs={12} spacing={0} className={classes.activityhd}>
+              <Grid item xs className={classes.preventHeader}>
+                <Typography variant="h5">{t("Activity")}</Typography>
+              </Grid>
+              <Grid item xs className={classes.addbtnmain}>
+                <IconButton onClick={() => handleClickOpen(0)}>
+                  <Icon className={classes.addicon}>add_circle_outline</Icon>
+                </IconButton>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <PreventSelectedActivities
+                activities={activities}
+                participant={participant}
+                selectedActivities={selectedActivities}
+                activityEvents={activityEvents}
+                activityCounts={activityCounts}
+                timeSpans={timeSpans}
+                onEditAction={onEditAction}
+                onCopyAction={onCopyAction}
+                onDeleteAction={onDeleteAction}
+                earliestDate={earliestDate}
+              />
+            </Grid>
+            <Grid container xs={12} spacing={0} className={classes.sensorhd}>
+              <Grid item xs className={classes.preventHeader}>
+                <Typography variant="h5">{t("Cortex")}</Typography>
+              </Grid>
+              <Grid item xs className={classes.addbtnmain}>
+                <IconButton onClick={() => handleClickOpen(1)}>
+                  <Icon className={classes.addicon}>add_circle_outline</Icon>
+                </IconButton>
+              </Grid>
+            </Grid>
+            <Grid container spacing={2}>
+              <PreventSelectedSensors
+                participant={participant}
+                selectedSensors={selectedSensors}
+                sensorCounts={sensorCounts}
+                sensorEvents={sensorEvents}
+                onEditAction={onEditAction}
+                onCopyAction={onCopyAction}
+                onDeleteAction={onDeleteAction}
+                earliestDate={earliestDate}
+              />
+
+              <Grid container xs={12} spacing={2}>
+                <PreventSelectedExperimental
+                  participant={participant}
+                  visualizations={visualizations}
+                  selectedExperimental={selectedExperimental}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+          <Dialog
+            open={open}
+            onClose={handleClose}
+            scroll="paper"
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+            classes={{
+              root: classes.activitydatapop,
+              paper: classes.dialogueCurve,
+            }}
+          >
+            <DialogTitle id="alert-dialog-slide-title">
+              {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
+              <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
+                <Icon>close</Icon>
+              </IconButton>
+              <Box mt={2}>
+                <Typography>{t("Choose the data you want to see in your dashboard.")}</Typography>
+              </Box>
+            </DialogTitle>
+            <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
+              {dialogueType === 0 && (
+                <MultipleSelect
+                  selected={selectedActivities}
+                  items={(activities || []).map((x) => x.name)}
+                  showZeroBadges={false}
+                  badges={activityCounts}
+                  onChange={(x) => {
+                    LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedActivities", x)
+                    setSelectedActivities(x)
+                  }}
+                />
+              )}
+              {dialogueType === 1 && (
+                <MultipleSelect
+                  selected={selectedSensors.concat(selectedExperimental) || []}
+                  items={cortex}
+                  showZeroBadges={false}
+                  badges={sensorCounts}
+                  onChange={(x) => {
+                    if ([`Environmental Context`, `Step Count`, `Social Context`].includes(x[x.length - 1])) {
+                      LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
+                      setSelectedSensors(x)
+                    } else {
+                      LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)
+                      setSelectedExperimental(x)
+                    }
+                  }}
+                />
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Box textAlign="center" width={1} mt={3} mb={3}>
+                <Link onClick={handleClose} className={classes.linkBlue}>
+                  {t("Done")}
+                </Link>
+              </Box>
+            </DialogActions>
+          </Dialog>
+        </Box>
       )}
     </Container>
   )
