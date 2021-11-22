@@ -144,62 +144,6 @@ async function getActivityEvents(
   return Object.fromEntries([...Object.entries(original), ...customGroups])
 }
 
-async function getActivities(participant: ParticipantObj) {
-  let original = await LAMP.Activity.allByParticipant(participant.id, null, true)
-  let originalFiltered = original.filter((data) => data.spec !== "lamp.recording")
-  return [...originalFiltered]
-}
-
-async function getSelectedActivities(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedActivities").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-async function getSelectedSensors(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedSensors").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-
-async function getSelectedExperimental(participant: ParticipantObj) {
-  return (
-    Object.fromEntries(
-      (
-        await Promise.all(
-          [participant.id || ""].map(async (x) => [
-            x,
-            await LAMP.Type.getAttachment(x, "lamp.selectedExperimental").catch((e) => []),
-          ])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )[participant.id || ""] ?? []
-  )
-}
-
 function getActivityEventCount(activity_events: { [groupName: string]: ActivityEventObj[] }) {
   return Object.assign(
     {},
