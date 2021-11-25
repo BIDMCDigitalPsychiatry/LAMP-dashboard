@@ -45,7 +45,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
     learn: "Learn",
     manage: "Manage",
     "": "None",
-    prevent: "Prevent",
+    prevent: "Portal",
   }
 
   useEffect(() => {
