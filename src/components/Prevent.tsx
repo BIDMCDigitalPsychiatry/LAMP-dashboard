@@ -305,7 +305,7 @@ export default function Prevent({
 
   const setTabActivities = () => {
     let gActivities = allActivities.filter(
-      (x: any) => !!x?.category && !!x?.category[0] && (x?.category[0] || "") === "prevent"
+      (x: any) => !!x?.category && x?.category.includes("prevent")
     )
     ;(async () => {
       let disabled =

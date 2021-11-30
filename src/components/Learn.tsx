@@ -46,7 +46,7 @@ export default function Learn({
     let gActivities = activities.filter(
       (x: any) =>
         (x.spec === "lamp.tips" && (!x?.category || (!!x?.category && x?.category.length === 0))) ||
-        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "learn")
+        (!!x?.category && x?.category.includes("learn"))
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {

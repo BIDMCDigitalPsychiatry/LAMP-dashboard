@@ -47,7 +47,7 @@ export default function Survey({ participant, activities, onComplete, showSteak,
           x.spec === "lamp.recording" ||
           x.spec === "lamp.survey") &&
           (!x?.category || (!!x?.category && x?.category.length === 0))) ||
-        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "assess")
+        (!!x?.category && x?.category.includes("assess"))
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
