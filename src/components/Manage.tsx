@@ -44,7 +44,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
       (x: any) =>
         ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
           (!x?.category || (!!x?.category && x?.category.length === 0))) ||
-        (!!x?.category && !!x?.category[0] && (x?.category[0] || "") === "manage")
+        (!!x?.category && x?.category.includes("manage"))
     )
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
