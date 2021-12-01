@@ -125,6 +125,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
               user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
             },
           } as any).then((res) => console.dir(res))
+          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.dashboard.timezone", timezoneVal())
         }
         if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
           let studiesSelected =
@@ -161,6 +162,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
           enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), { variant: "info" })
         setLoginClick(false)
       })
+  }
+  const timezoneVal = () => {
+    var tzo = -new Date().getTimezoneOffset(),
+      dif = tzo >= 0 ? '+' : '-',
+      pad = function(num) {
+          var norm = Math.floor(Math.abs(num));
+          return (norm < 10 ? '0' : '') + norm;
+      };
+
+  return dif + pad(tzo / 60) +
+      ':' + pad(tzo % 60);
   }
 
   return (
