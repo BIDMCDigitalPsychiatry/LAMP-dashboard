@@ -266,6 +266,7 @@ export default function Prevent({
   enableEditMode,
   showSteak,
   submitSurvey,
+  activitySubmitted,
   onEditAction,
   onCopyAction,
   onDeleteAction,
@@ -277,6 +278,7 @@ export default function Prevent({
   hiddenEvents: string[]
   enableEditMode: boolean
   showSteak: Function
+  activitySubmitted:boolean,
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
@@ -302,6 +304,7 @@ export default function Prevent({
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
+  const [newEvent, setNewEvent] = React.useState(false)
 
   const setTabActivities = () => {
     let gActivities = allActivities.filter(
@@ -324,7 +327,20 @@ export default function Prevent({
   }
 
   React.useEffect(() => {
+    setNewEvent(activitySubmitted)
+  }, [activitySubmitted])
+
+  React.useEffect(() => {
+    if(!!newEvent) loadEvents()
+  }, [newEvent])
+
+  React.useEffect(() => {
+    setNewEvent(activitySubmitted)
     setTabActivities()
+    loadEvents()
+  }, [])
+
+  const loadEvents = () => {
     ;(async () => {
       getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
@@ -381,7 +397,7 @@ export default function Prevent({
         })
       }
     })()
-  }, [])
+  }
 
   const earliestDate = () =>
     (activities || [])
