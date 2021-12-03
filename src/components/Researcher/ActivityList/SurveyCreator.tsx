@@ -163,9 +163,10 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
   const [description, setDescription] = useState(question.description)
   const [type, setType] = useState(question.type || "text")
   const [options, setOptions] = useState(question.options)
-  const [optional, setOptional] = useState(!!question ? !question.required : false)
+  const [optional, setOptional] = useState(!!question.text ? !question.required : false)
   const [timePattern, setTimePatterm] = useState(question.type === "time" ? question.options[0].value : "standard")
   const { t } = useTranslation()
+
   useEffect(() => {
     onChange({
       text,
