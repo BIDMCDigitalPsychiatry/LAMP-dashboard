@@ -307,11 +307,6 @@ export default function Prevent({
     let gActivities = allActivities.filter(
       (x: any) => !!x?.category && x?.category.includes("prevent")
     )
-    ;(async () => {
-      let disabled =
-        ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
-      setDisabled(disabled)
-    })()
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
@@ -331,8 +326,6 @@ export default function Prevent({
   React.useEffect(() => {
     setTabActivities()
     ;(async () => {
-      getSelected(participant, "lamp.selectedActivities").then(setSelectedActivities)
-      getSelected(participant, "lamp.selectedSensors").then(setSelectedSensors)
       getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
@@ -354,6 +347,10 @@ export default function Prevent({
               activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
           )
           setActivities(activities)
+          setSelectedActivities(activities.map((activity) => activity.name))
+          LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
+            setSelectedSensors(sensors.map((sensor) => sensor.name))
+          })
           getSensorEvents(participant).then((sensorEvents) => {
             let sensorEventCount = getSensorEventCount(sensorEvents)
             setSensorEvents(sensorEvents)
@@ -503,7 +500,6 @@ export default function Prevent({
                   showZeroBadges={false}
                   badges={activityCounts}
                   onChange={(x) => {
-                    LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedActivities", x)
                     setSelectedActivities(x)
                   }}
                 />
@@ -516,7 +512,6 @@ export default function Prevent({
                   badges={sensorCounts}
                   onChange={(x) => {
                     if ([`Environmental Context`, `Step Count`, `Social Context`].includes(x[x.length - 1])) {
-                      LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
                       setSelectedSensors(x)
                     } else {
                       LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)
