@@ -1,4 +1,5 @@
 import LAMP from "lamp-core"
+import { zero } from "vega"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
@@ -839,10 +840,10 @@ export function spliceActivity({ raw, tag }) {
           options:
             question.options === null
               ? null
-              : question.options?.map((z, idx2) => ({
+              :  question.type !== "matrix" ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
-                })),
+                })) :  question.options,
         })),
   }
 }
@@ -875,7 +876,7 @@ export function unspliceActivity(x) {
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.value),
+        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
         required: y?.required ?? false,
       })),
     },
@@ -885,7 +886,7 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
+        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? ""): null,
       })),
     },
   }
