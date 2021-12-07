@@ -212,7 +212,7 @@ function MatrixList({ value, onChange, ...props }) {
                   onBlur={(event) =>
                     setQuestions((questions) =>
                       Object.assign([...questions], {
-                        [idx]:  removeExtraSpace(event.target.value)                        
+                        [idx]:  removeExtraSpace(event.target.value),
                       })
                     )
                   }
@@ -256,8 +256,8 @@ function MatrixList({ value, onChange, ...props }) {
 
         {options.map((x, idx) => (
           <FormControlLabel
-            key={`${x}-${idx}`}
-            value={x}
+            key={`${x.value}-${idx}`}
+            value={x.value}
             style={{ width: "100%", alignItems: "flex-start" }}
             control={
               <TypeComponent
@@ -272,17 +272,20 @@ function MatrixList({ value, onChange, ...props }) {
                 <TextField
                   fullWidth
                   variant="outlined"
-                  defaultValue={x || ""}
+                  defaultValue={x.value || ""}
                   label={t("Answer Option")}
                   style={{ marginBottom: 16 }}
-                  error={typeof x == "undefined" || x === null || x === "" ? true : false}
+                  error={typeof x.value == "undefined" || x.value === null || x.value === "" ? true : false}
                   helperText={
-                    typeof x == "undefined" || x === null || x === "" ? t("Please enter Option") : ""
+                    typeof x.value == "undefined" || x.value === null || x.value === "" ? t("Please enter Option") : ""
                   }
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
-                        [idx]: removeExtraSpace(event.target.value)                        
+                        [idx]: {
+                          value: removeExtraSpace(event.target.value),
+                          description: removeExtraSpace(options[idx].description),
+                        }                       
                       })
                     )
                   }
@@ -306,7 +309,24 @@ function MatrixList({ value, onChange, ...props }) {
                     ],
                   }}
                 />
-               
+               <TextField
+                  fullWidth
+                  margin="dense"
+                  variant="filled"
+                  style={{ marginBottom: 16 }}
+                  defaultValue={x.description || ""}
+                  label={t("Option Description")}
+                  onBlur={(event) =>
+                    setOptions((options) =>
+                      Object.assign([...options], {
+                        [idx]: {
+                          value: removeExtraSpace(options[idx].value),
+                          description: removeExtraSpace(event.target.value),
+                        },
+                      })
+                    )
+                  }
+                />
               </React.Fragment>
             }
             labelPlacement="end"
