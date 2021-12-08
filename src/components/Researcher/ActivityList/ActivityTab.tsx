@@ -44,7 +44,6 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
     assess: "Assess",
     learn: "Learn",
     manage: "Manage",
-    "": "None",
     prevent: "Portal",
   }
 
@@ -54,7 +53,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
 
   useEffect(() => {
     ;(async () => {
-      if (category === null || category.length === 0) {
+      if (category === null) {
         let defaultTab = await getDefaultTab(activitySpecId)
         if (!!defaultTab) setCategory([defaultTab])
       }
