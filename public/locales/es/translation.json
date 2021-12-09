@@ -723,5 +723,8 @@
 	"Half-Smiling and Willing Hands": "Half-Smiling and Willing Hands",
 	"Dialectical Abstinence": "Dialectical Abstinence",
 	"Alternate Rebellion / Adaptive Denial":
-		"rebellión alternativa"
+		"rebellión alternativa",
+	"Customize which Tab this Activity appears in":	"Personalizar en qué pestaña aparece esta actividad",
+	"This Activity will only appear in the Feed tab if a schedule is configured." : "Esta actividad solo aparecerá en la pestaña Feed si se configura un horario."
+		
 }

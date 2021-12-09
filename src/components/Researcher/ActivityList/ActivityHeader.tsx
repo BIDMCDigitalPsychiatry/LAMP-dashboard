@@ -112,7 +112,7 @@ export default function ActivityHeader({
       </Grid>
       <Grid item lg={10} md={9} xs={12}>
         <Grid container spacing={2}>
-          <Grid item lg={4} sm={4} xs={12}>
+          <Grid item lg={6} sm={6} xs={12}>
             <TextField
               error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
               id="filled-select-currency"
@@ -134,12 +134,9 @@ export default function ActivityHeader({
                 </MenuItem>
               ))}
             </TextField>
+              
           </Grid>
-          <Grid item lg={4} sm={6} xs={12}>
-            <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
-          </Grid>
-          <Grid item lg={8} sm={8} xs={12}>
-            <Box mb={3}>
+          <Grid item lg={6} sm={6} xs={12}>
               <TextField
                 error={
                   typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false
@@ -151,11 +148,13 @@ export default function ActivityHeader({
                 onChange={(event) => setText(removeExtraSpace(event.target.value))}
                 inputProps={{ maxLength: 80 }}
               />
-            </Box>
           </Grid>
+          <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
+
+          
         </Grid>
 
-        <Box>
+        <Box style={{marginTop:"15px"}}>
           <TextField
             fullWidth
             multiline
