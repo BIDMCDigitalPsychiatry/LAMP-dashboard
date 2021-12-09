@@ -43,8 +43,9 @@ const MenuProps = {
 export default function ActivityTab({ value, activitySpecId, onChange, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [category, setCategory] = useState(value?.category ?? [])
+  const [category, setCategory] = useState(value?.category ?? null)
   const [customize, setCustomize] = useState(false)
+  const [defaultTab, setDefaultTab] = useState(null)
   const tabs = {
     assess: "Assess",
     learn: "Learn",
@@ -53,26 +54,29 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   }
 
   useEffect(() => {
+    if((category || []).length === 1 && category[0] === defaultTab) setCustomize(false)
+    else setCustomize(true)
     onChange(category)
   }, [category])
 
   useEffect(() => {
-    ;(async () => {
-      if (category === null) {
-        setDefault()
-      }
-    })()
+    if (category === null) {
+      setDefault()      
+    }   
   }, [])
 
   useEffect(() => {
-    if(!customize) {
+    if(!customize && category === null) {
       setDefault()
     }
   }, [customize])
 
   const setDefault = async () => {
     let defaultTab = await getDefaultTab(activitySpecId)
-    if (!!defaultTab) setCategory([defaultTab])
+    if (!!defaultTab) {
+      setCategory([defaultTab])
+      setDefaultTab(defaultTab)
+    }
   }
 
   return (
@@ -101,23 +105,23 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
             id="demo-multiple-name"
             multiple
             disabled={!customize}
-            value={category}
+            value={category || []}
             onChange={(event) => {
               setCategory(typeof event.target.value === "string" ? event.target.value.split(",") : event.target.value)
             }}
             input={<OutlinedInput />}
             MenuProps={MenuProps}
             className={classes.menuitemsul}
-            renderValue={(selected) => category.map((c) => tabs[c]).join(", ")}
+            renderValue={(selected) => (category || []).map((c) => tabs[c]).join(", ")}
           >
             {Object.keys(tabs).map((key) => (
               <MenuItem key={key} value={key}>
-                <Checkbox checked={category.indexOf(key) > -1} />
+                <Checkbox checked={(category || []).indexOf(key) > -1} />
                 <ListItemText primary={tabs[key]} />
               </MenuItem>
             ))}
           </Select>
-          {category.length === 0 && (
+          {(category || []).length === 0 && (
             <Typography variant="caption">
               {t("This Activity will only appear in the Feed tab if a schedule is configured.")}
             </Typography>)}
