@@ -149,11 +149,8 @@ export default function ActivityHeader({
                 inputProps={{ maxLength: 80 }}
               />
           </Grid>
-          <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
-
-          
+          <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />          
         </Grid>
-
         <Box style={{marginTop:"15px"}}>
           <TextField
             fullWidth

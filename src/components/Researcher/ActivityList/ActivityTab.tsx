@@ -59,58 +59,70 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   useEffect(() => {
     ;(async () => {
       if (category === null) {
-        let defaultTab = await getDefaultTab(activitySpecId)
-        if (!!defaultTab) setCategory([defaultTab])
+        setDefault()
       }
     })()
   }, [])
 
+  useEffect(() => {
+    if(!customize) {
+      setDefault()
+    }
+  }, [customize])
+
+  const setDefault = async () => {
+    let defaultTab = await getDefaultTab(activitySpecId)
+    if (!!defaultTab) setCategory([defaultTab])
+  }
+
   return (
     <Grid item lg={12} md={9} xs={12}>
-        <Grid container spacing={2}>
-          <Grid item lg={6} sm={6} xs={12}>
-      <FormControlLabel
-        className={classes.marginTop10}
-        control={
-          <Checkbox
-            checked={customize}
-            onChange={() => setCustomize(!customize)}
-            name="customize"
-            color="primary"
+      <Grid container spacing={2}>
+        <Grid item lg={6} sm={6} xs={12}>
+          <FormControlLabel
+            className={classes.marginTop10}
+            control={
+              <Checkbox
+                checked={customize}
+                onChange={() => {
+                  setCustomize(!customize)
+                }}
+                name="customize"
+                color="primary"
+              />
+            }
+            label={t("Customize which Tab this Activity appears in")}
           />
-        }
-        label={t("Customize which Tab this Activity appears in")}
-      />
-      </Grid>
-      <Grid item lg={6} sm={6} xs={12}>
+          </Grid>
+          <Grid item lg={6} sm={6} xs={12}>
 
-      <Select
-        labelId="demo-multiple-name-label"
-        id="demo-multiple-name"
-        multiple
-        disabled={!customize}
-        value={category}
-        onChange={(event) => {
-          setCategory(typeof event.target.value === "string" ? event.target.value.split(",") : event.target.value)
-        }}
-        input={<OutlinedInput />}
-        MenuProps={MenuProps}
-        className={classes.menuitemsul}
-        renderValue={(selected) => category.map((c) => tabs[c]).join(", ")}
-      >
-        {Object.keys(tabs).map((key) => (
-          <MenuItem key={key} value={key}>
-            <Checkbox checked={category.indexOf(key) > -1} />
-            <ListItemText primary={tabs[key]} />
-          </MenuItem>
-        ))}
-      </Select>
-      {category.length === 0 && (
-        <Typography variant="caption">
-          {t("This Activity will only appear in the Feed tab if a schedule is configured.")}
-        </Typography>)}
+          <Select
+            labelId="demo-multiple-name-label"
+            id="demo-multiple-name"
+            multiple
+            disabled={!customize}
+            value={category}
+            onChange={(event) => {
+              setCategory(typeof event.target.value === "string" ? event.target.value.split(",") : event.target.value)
+            }}
+            input={<OutlinedInput />}
+            MenuProps={MenuProps}
+            className={classes.menuitemsul}
+            renderValue={(selected) => category.map((c) => tabs[c]).join(", ")}
+          >
+            {Object.keys(tabs).map((key) => (
+              <MenuItem key={key} value={key}>
+                <Checkbox checked={category.indexOf(key) > -1} />
+                <ListItemText primary={tabs[key]} />
+              </MenuItem>
+            ))}
+          </Select>
+          {category.length === 0 && (
+            <Typography variant="caption">
+              {t("This Activity will only appear in the Feed tab if a schedule is configured.")}
+            </Typography>)}
         </Grid>
-        </Grid>
-        </Grid>
+      </Grid>
+    </Grid>
   )
 }
