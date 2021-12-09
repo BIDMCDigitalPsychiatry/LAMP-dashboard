@@ -854,7 +854,7 @@ export default function Feed({
                         if (
                           !feed.completed &&
                           feed.clickable &&
-                          (!feed.activityData?.category ||
+                          (feed.activityData?.category === null ||
                             (!!feed.activityData?.category &&
                               feed.activityData?.category.length !== 0)) &&
                           ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&

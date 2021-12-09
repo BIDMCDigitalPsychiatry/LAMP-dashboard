@@ -45,7 +45,7 @@ export default function Learn({
   useEffect(() => {
     let gActivities = activities.filter(
       (x: any) =>
-        (x.spec === "lamp.tips" && !x?.category) ||
+        (x.spec === "lamp.tips" && x?.category === null) ||
         (!!x?.category && x?.category.includes("learn"))
     )
     setSavedActivities(gActivities)
