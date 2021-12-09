@@ -722,5 +722,8 @@
 	"Half-Smiling and Willing Hands": "Half-Smiling and Willing Hands",
 	"Dialectical Abstinence": "Dialectical Abstinence",
 	"Alternate Rebellion / Adaptive Denial":
-        "Alternate Rebellion / Adaptive Denial"
+        "Alternate Rebellion / Adaptive Denial",
+	"Customize which Tab this Activity appears in":"अनुकूलित करें कि यह गतिविधि किस टैब में दिखाई देती है",
+	"This Activity will only appear in the Feed tab if a schedule is configured." : "यह गतिविधि फ़ीड टैब में केवल तभी दिखाई देगी जब कोई शेड्यूल कॉन्फ़िगर किया गया हो."
+		
 }
