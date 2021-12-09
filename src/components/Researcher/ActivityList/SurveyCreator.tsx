@@ -458,9 +458,9 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Button color={type === "time" ? "primary" : "default"} onClick={() => setType("time")}>
                 {t("Time")}
               </Button>
-              <Button color={type === "matrix" ? "primary" : "default"} onClick={() => setType("matrix")}>
+              {/* <Button color={type === "matrix" ? "primary" : "default"} onClick={() => setType("matrix")}>
                 {t("Matrix")}
-              </Button>
+              </Button> */}
             </ButtonGroup>
           </Grid>
           {["list", "select", "multiselect", "slider", "rating"].includes(type) && (
