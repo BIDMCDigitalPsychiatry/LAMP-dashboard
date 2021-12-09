@@ -158,6 +158,198 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
   )
 }
 
+
+function MatrixList({ value, onChange, ...props }) {
+  const [options, setOptions] = useState(value?.options || [])
+  const [questions, setQuestions] = useState(value?.questions || [])
+  const [multiple, setMultile] = useState(typeof value?.multiple !== 'undefined' ? value?.multiple: false)
+
+  useEffect(() => {
+    onChange({options , questions, multiple})
+  }, [options, questions, multiple])
+
+  // Toggle certain components/icons between Checkbox/Radio variants.
+
+  
+  const TypeGroup = multiple ? FormGroup : RadioGroup
+  const TypeComponent = multiple ? Checkbox : Radio
+  const AddIcon = multiple ? "add_box" : "add_circle"
+  const CheckedIcon = multiple ? "check_box" : "radio_button_checked"
+  const UncheckedIcon = multiple ? "check_box_outline_blank" : "radio_button_unchecked"
+  const { t } = useTranslation()
+  return (
+    <React.Fragment>
+      <FormControlLabel
+        control={<Checkbox checked={multiple} onChange={(evt) => setMultile(!multiple)} name="optional" />}
+        label="Enable multiple option selections"
+      />
+      <TypeGroup name="option">
+        {questions.map((x, idx) => (
+          <FormControlLabel
+            key={`${x}-${idx}`}
+            value={x}
+            style={{ width: "100%", alignItems: "flex-start" }}
+            control={
+              <TypeComponent
+                disabled
+                color="secondary"
+                icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
+              />
+            }
+            label={
+              <React.Fragment>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={x || ""}
+                  style={{ marginBottom: 16 }}
+                  label={t("Question")}
+                  error={typeof x == "undefined" || x === null || x === "" ? true : false}
+                  helperText={
+                    typeof x == "undefined" || x === null || x === "" ? t("Please enter question") : ""
+                  }
+                  onBlur={(event) =>
+                    setQuestions((questions) =>
+                      Object.assign([...questions], {
+                        [idx]:  removeExtraSpace(event.target.value),
+                      })
+                    )
+                  }
+                  type={"text"}
+                  InputProps={{
+                    endAdornment: [
+                      <InputAdornment position="end" key="adornment">
+                        <Tooltip title={t("Delete this quesion.")}>
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() =>
+                              setOptions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
+                            }
+                            onMouseDown={(event) => event.preventDefault()}
+                          >
+                            <Icon>delete_forever</Icon>
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>,
+                    ],
+                  }}
+                />
+              </React.Fragment>
+            }
+            labelPlacement="end"
+          />
+        ))}
+         <FormControlLabel
+          control={
+            <TypeComponent
+              checked
+              color="primary"
+              onClick={() => setQuestions((questions) => [...questions, ""])}
+              checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
+            />
+          }
+          label={<Typography>{t("Add Question")}</Typography>}
+          labelPlacement="end"
+        />
+
+        {options.map((x, idx) => (
+          <FormControlLabel
+            key={`${x.value}-${idx}`}
+            value={x.value}
+            style={{ width: "100%", alignItems: "flex-start" }}
+            control={
+              <TypeComponent
+                disabled
+                color="secondary"
+                icon={<Icon fontSize="small">{UncheckedIcon}</Icon>}
+                checkedIcon={<Icon fontSize="small">{CheckedIcon}</Icon>}
+              />
+            }
+            label={
+              <React.Fragment>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  defaultValue={x.value || ""}
+                  label={t("Answer Option")}
+                  style={{ marginBottom: 16 }}
+                  error={typeof x.value == "undefined" || x.value === null || x.value === "" ? true : false}
+                  helperText={
+                    typeof x.value == "undefined" || x.value === null || x.value === "" ? t("Please enter Option") : ""
+                  }
+                  onBlur={(event) =>
+                    setOptions((options) =>
+                      Object.assign([...options], {
+                        [idx]: {
+                          value: removeExtraSpace(event.target.value),
+                          description: removeExtraSpace(options[idx].description),
+                        }                       
+                      })
+                    )
+                  }
+                  type={"text"}
+                  InputProps={{
+                    endAdornment: [
+                      <InputAdornment position="end" key="adornment">
+                        <Tooltip title={t("Delete this option from the question's list of options.")}>
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() =>
+                              setOptions((options) => [...options.slice(0, idx), ...options.slice(idx + 1)])
+                            }
+                            onMouseDown={(event) => event.preventDefault()}
+                          >
+                            <Icon>delete_forever</Icon>
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>,
+                    ],
+                  }}
+                />
+               <TextField
+                  fullWidth
+                  margin="dense"
+                  variant="filled"
+                  style={{ marginBottom: 16 }}
+                  defaultValue={x.description || ""}
+                  label={t("Option Description")}
+                  onBlur={(event) =>
+                    setOptions((options) =>
+                      Object.assign([...options], {
+                        [idx]: {
+                          value: removeExtraSpace(options[idx].value),
+                          description: removeExtraSpace(event.target.value),
+                        },
+                      })
+                    )
+                  }
+                />
+              </React.Fragment>
+            }
+            labelPlacement="end"
+          />
+        ))}
+        <FormControlLabel
+          control={
+            <TypeComponent
+              checked
+              color="primary"
+              onClick={() => setOptions((options) => [...options, ""])}
+              checkedIcon={<Icon fontSize="small">{AddIcon}</Icon>}
+            />
+          }
+          label={<Typography>{t("Add Option")}</Typography>}
+          labelPlacement="end"
+        />
+        
+      </TypeGroup>
+    </React.Fragment>
+  )
+}
+
 function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected, ...props }) {
   const [text, setText] = useState(question.text)
   const [description, setDescription] = useState(question.description)
@@ -172,7 +364,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
       text,
       type,
       description,
-      options: ["list", "select", "multiselect", "slider", "rating"].includes(type)
+      options: ["list", "select", "multiselect", "slider", "rating", "matrix"].includes(type)
         ? options
         : type === "time"
         ? [{ value: timePattern, description: timePattern }]
@@ -266,12 +458,22 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               <Button color={type === "time" ? "primary" : "default"} onClick={() => setType("time")}>
                 {t("Time")}
               </Button>
+              <Button color={type === "matrix" ? "primary" : "default"} onClick={() => setType("matrix")}>
+                {t("Matrix")}
+              </Button>
             </ButtonGroup>
           </Grid>
           {["list", "select", "multiselect", "slider", "rating"].includes(type) && (
             <Grid item>
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <SelectList checkbox={type === "multiselect"} type={type} value={options} onChange={setOptions} />
+              </Box>
+            </Grid>
+          )}
+           {type === "matrix" && (
+            <Grid item>
+              <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
+                <MatrixList value={options} onChange={setOptions} />
               </Box>
             </Grid>
           )}

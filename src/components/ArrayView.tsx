@@ -1,5 +1,5 @@
 import React from "react"
-import { Table, TableBody, TableHead, TableCell, TableRow } from "@material-ui/core"
+import { Table, TableBody, TableHead, TableCell, TableRow, Box } from "@material-ui/core"
 import { humanize } from "./Utils"
 
 import ReactMarkdown from "react-markdown"
@@ -20,6 +20,7 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const { t } = useTranslation()
+  console.log(value)
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
   return (
     <div style={{ overflowX: "auto" }}>
@@ -28,7 +29,7 @@ export default function ArrayView({
           <TableRow>
             {displayKeys().map((key) => (
               <TableCell key={key} title={humanize(key)}>
-                {humanize(key)}
+                {humanize(key)} { console.log(typeof key)}
               </TableCell>
             ))}
           </TableRow>
@@ -41,7 +42,14 @@ export default function ArrayView({
                   Array.isArray(row[key]) ? (
                     <ArrayView value={row[key]} />
                   ) : !!row[key] && typeof row[key] === "object" ? (
+                    !!row[key]?.question ? (
+                      <TableCell key={row[key]}>
+                          <ReactMarkdown source={t(row[key]?.question) + " : " + row[key].value.join(", ")} escapeHtml={false} plugins={[gfm, emoji]} />
+                       
+                      </TableCell>
+                    ) : (
                     <ArrayView value={[row[key]]} />
+                    )
                   ) : (
                     <TableCell key={row[key]}>
                       {typeof row[key] === "string" ? (

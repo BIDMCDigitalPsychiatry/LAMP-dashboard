@@ -61,7 +61,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
 
   useEffect(() => {
     if (category === null) {
-      setDefault()      
+      setDefault()
     }   
   }, [])
 
