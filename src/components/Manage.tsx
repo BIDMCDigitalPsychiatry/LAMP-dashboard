@@ -43,7 +43,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
     let gActivities = activities.filter(
       (x: any) =>
         ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
-         x?.category === null) ||
+        (typeof x?.category === "undefined" || x?.category === null)) ||
         (!!x?.category && x?.category.includes("manage"))
     )
     setSavedActivities(gActivities)

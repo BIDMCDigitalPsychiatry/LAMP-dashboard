@@ -39,6 +39,7 @@ export default function Survey({ participant, activities, onComplete, showSteak,
 
   useEffect(() => {
     setLoading(true)
+    console.log(activities)
     let gActivities = (activities || []).filter(
       (x) =>
         ((games.includes(x.spec) ||
@@ -46,9 +47,10 @@ export default function Survey({ participant, activities, onComplete, showSteak,
           x.spec === "lamp.dbt_diary_card" ||
           x.spec === "lamp.recording" ||
           x.spec === "lamp.survey") &&
-          x?.category === null) ||
+          (typeof x?.category === "undefined" || x?.category === null)) ||
         (!!x?.category && x?.category.includes("assess"))
     )
+    console.log(gActivities)
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
