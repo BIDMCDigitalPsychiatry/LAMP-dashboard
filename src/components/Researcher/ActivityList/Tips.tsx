@@ -620,9 +620,7 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-                {/* <Grid item lg={4} sm={6} xs={12}> */}
-                  <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
-                {/* </Grid> */}
+                <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
                 <Grid item lg={6} sm={4} xs={12}>
                   <TextField
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
