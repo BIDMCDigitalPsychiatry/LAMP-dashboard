@@ -167,9 +167,6 @@ function MatrixList({ value, onChange, ...props }) {
   useEffect(() => {
     onChange({options , questions, multiple})
   }, [options, questions, multiple])
-
-  // Toggle certain components/icons between Checkbox/Radio variants.
-
   
   const TypeGroup = multiple ? FormGroup : RadioGroup
   const TypeComponent = multiple ? Checkbox : Radio
