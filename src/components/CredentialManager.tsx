@@ -83,7 +83,10 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     window.location.href.split("#")[0] +
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-  const roles = [
+  const roles = title === "User Administrator" ? [
+    { value: "edit", label: "User Administrator" },
+    { value: "view", label: "Practice Lead" },
+  ] : [
     { value: "admin", label: "System Admin" },
     { value: "edit", label: "User Administrator" },
     { value: "view", label: "Practice Lead" },
@@ -347,13 +350,26 @@ export const CredentialManager: React.FunctionComponent<{
     id = !!type ? null : id
     LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      setAllCreds(cred)
-    })
-    LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
-      setPermissions(!!res.data ? res.data : [])
-    })
+      LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
+        setPermissions(!!res.data ? res.data : [])
+        setCredentials(cred, res.data)        
+      })
+    })    
     setRoles()
   }, [])
+
+  const setCredentials = (cred, permissions) => {
+    if(type === "User Administrator") {
+      let selectedCred = cred
+      selectedCred.map((credent, index) => {
+        let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] && Object.keys(d)[0] !== "admin")
+        if(selected.length === 0) delete selectedCred[index]
+        setAllCreds(selectedCred)  
+      })
+    } else {
+      setAllCreds(cred)
+    }
+  }
 
   const setRoles = () => {
     if (LAMP.Auth._type === "researcher" || LAMP.Auth._type === "admin") {
@@ -388,9 +404,22 @@ export const CredentialManager: React.FunctionComponent<{
     let result = await updateDetails(id, data, selected.mode, allRoles, typeEmail, type)
     if (!!permissions) {
       let newData = {}
-      newData[data.emailAddress !== "" ? data.emailAddress : data.credential.access_key] = data.role
-      permissions.push(newData)
-      LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", permissions)
+      let dataPermissions = permissions
+      let found = false
+      Object.keys(permissions).map((key) => {
+        if(!found) {
+          const accKey = data.emailAddress !== "" ? data.emailAddress : data.credential.access_key
+          if (permissions[key].hasOwnProperty(accKey)) {
+            dataPermissions[key][accKey] = data.role
+            found = true
+          }
+        }
+      })
+      if(!found) {
+        newData[data.emailAddress !== "" ? data.emailAddress : data.credential.access_key] = data.role
+        dataPermissions.push(newData)
+      }
+      LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", dataPermissions)
     }
     if (result === -4) {
       return enqueueSnackbar(t("Could not change password."), {
@@ -416,7 +445,7 @@ export const CredentialManager: React.FunctionComponent<{
       id = !!type ? null : id
       LAMP.Credential.list(id).then((cred) => {
         cred = cred.filter((c) => c.hasOwnProperty("origin"))
-        setAllCreds(cred)
+        setCredentials(cred, permissions)        
       })
       setRoles()
       return setSelected({
