@@ -158,7 +158,7 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
   )
 }
 
-
+/* Matrix oquestion type component */
 function MatrixList({ value, onChange, ...props }) {
   const [options, setOptions] = useState(value?.options || [])
   const [questions, setQuestions] = useState(value?.questions || [])
