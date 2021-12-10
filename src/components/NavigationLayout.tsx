@@ -357,7 +357,7 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {authType === "admin" && title === "Administrator" && (
+                    {authType === "admin" && (title === "Administrator"  ||  title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}
