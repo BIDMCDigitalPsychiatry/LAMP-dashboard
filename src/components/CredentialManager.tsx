@@ -470,7 +470,7 @@ export const CredentialManager: React.FunctionComponent<{
     }
     LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      setAllCreds(cred)
+      setCredentials(cred, permissions)        
     })
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : [])
