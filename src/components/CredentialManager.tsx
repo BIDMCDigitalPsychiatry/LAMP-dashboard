@@ -352,20 +352,24 @@ export const CredentialManager: React.FunctionComponent<{
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
         setPermissions(!!res.data ? res.data : [])
-        if(type === "User Administrator") {
-          let selectedCred = cred
-          selectedCred.map((credent, index) => {
-            let selected = res.data.filter((d) => Object.keys(d)[0] === credent['access_key'] && Object.keys(d)[0] !== "admin")
-            if(selected.length === 0) delete selectedCred[index]
-            setAllCreds(selectedCred)  
-          })
-        } else {
-          setAllCreds(cred)
-        }
+        setCredentials(cred, res.data)        
       })
     })    
     setRoles()
   }, [])
+
+  const setCredentials = (cred, permissions) => {
+    if(type === "User Administrator") {
+      let selectedCred = cred
+      selectedCred.map((credent, index) => {
+        let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] && Object.keys(d)[0] !== "admin")
+        if(selected.length === 0) delete selectedCred[index]
+        setAllCreds(selectedCred)  
+      })
+    } else {
+      setAllCreds(cred)
+    }
+  }
 
   const setRoles = () => {
     if (LAMP.Auth._type === "researcher" || LAMP.Auth._type === "admin") {
@@ -441,7 +445,7 @@ export const CredentialManager: React.FunctionComponent<{
       id = !!type ? null : id
       LAMP.Credential.list(id).then((cred) => {
         cred = cred.filter((c) => c.hasOwnProperty("origin"))
-        setAllCreds(cred)
+        setCredentials(cred, permissions)        
       })
       setRoles()
       return setSelected({
