@@ -20,7 +20,6 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const { t } = useTranslation()
-  console.log(value)
   const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
   return (
     <div style={{ overflowX: "auto" }}>
@@ -29,7 +28,7 @@ export default function ArrayView({
           <TableRow>
             {displayKeys().map((key) => (
               <TableCell key={key} title={humanize(key)}>
-                {humanize(key)} { console.log(typeof key)}
+                {humanize(key)} 
               </TableCell>
             ))}
           </TableRow>

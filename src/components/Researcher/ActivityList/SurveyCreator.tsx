@@ -180,6 +180,7 @@ function MatrixList({ value, onChange, ...props }) {
         control={<Checkbox checked={multiple} onChange={(evt) => setMultile(!multiple)} name="optional" />}
         label="Enable multiple option selections"
       />
+      <Divider />
       <TypeGroup name="option">
         {questions.map((x, idx) => (
           <FormControlLabel
@@ -214,7 +215,8 @@ function MatrixList({ value, onChange, ...props }) {
                     )
                   }
                   type={"text"}
-                  InputProps={{
+                  inputProps={{ maxLength: 50 }}
+                  InputProps={{                                      
                     endAdornment: [
                       <InputAdornment position="end" key="adornment">
                         <Tooltip title={t("Delete this quesion.")}>
@@ -222,7 +224,7 @@ function MatrixList({ value, onChange, ...props }) {
                             edge="end"
                             aria-label="delete"
                             onClick={() =>
-                              setOptions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
+                              setQuestions((questions) => [...questions.slice(0, idx), ...questions.slice(idx + 1)])
                             }
                             onMouseDown={(event) => event.preventDefault()}
                           >
@@ -250,6 +252,7 @@ function MatrixList({ value, onChange, ...props }) {
           label={<Typography>{t("Add Question")}</Typography>}
           labelPlacement="end"
         />
+        <Divider />
 
         {options.map((x, idx) => (
           <FormControlLabel
@@ -287,6 +290,7 @@ function MatrixList({ value, onChange, ...props }) {
                     )
                   }
                   type={"text"}
+                  inputProps={{ maxLength: 50 }}
                   InputProps={{
                     endAdornment: [
                       <InputAdornment position="end" key="adornment">
@@ -313,6 +317,7 @@ function MatrixList({ value, onChange, ...props }) {
                   style={{ marginBottom: 16 }}
                   defaultValue={x.description || ""}
                   label={t("Option Description")}
+                  inputProps={{ maxLength: 100 }}
                   onBlur={(event) =>
                     setOptions((options) =>
                       Object.assign([...options], {
@@ -581,7 +586,9 @@ export default function SurveyCreator({
     if (!!questions && questions.length > 0) {
       let optionsArray = []
       {
-        questions.map((x, idx) => {
+        (questions || []).map((x, idx) => {
+          console.log(questions[idx])
+
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
@@ -594,6 +601,24 @@ export default function SurveyCreator({
               ? optionsArray.push(0)
               : optionsArray.push(1)
             : optionsArray.push(0)
+           if(questions[idx]?.type === "matrix") {
+            ( questions[idx].options?.options === null || questions[idx].options?.questions === null ||
+               (!! questions[idx].options?.options &&  questions[idx].options?.options?.length === 0) ||
+               (!! questions[idx].options?.questions &&  questions[idx].options?.questions?.length === 0) 
+               ) ?
+                optionsArray.push(1) :
+                (questions[idx]?.options?.questions || []).filter(
+                  (i) => !!i && ((!!i && i?.trim().length > 0) || i === "")
+                ).length === (questions[idx].options.questions || []).length
+              ? optionsArray.push(0)
+              : optionsArray.push(1)
+              
+              (questions[idx].options?.options || []).filter(
+                (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
+              ).length === (questions[idx].options?.options || []).length
+            ? optionsArray.push(0)
+            : optionsArray.push(1)
+           }
         })
       }
       if (optionsArray.filter((val) => val !== 0).length > 0) {
