@@ -587,8 +587,6 @@ export default function SurveyCreator({
       let optionsArray = []
       {
         (questions || []).map((x, idx) => {
-          console.log(questions[idx])
-
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
@@ -602,20 +600,20 @@ export default function SurveyCreator({
               : optionsArray.push(1)
             : optionsArray.push(0)
            if(questions[idx]?.type === "matrix") {
-            ( questions[idx].options?.options === null || questions[idx].options?.questions === null ||
-               (!! questions[idx].options?.options &&  questions[idx].options?.options?.length === 0) ||
-               (!! questions[idx].options?.questions &&  questions[idx].options?.questions?.length === 0) 
+            ( questions[idx]?.options?.options === null || questions[idx]?.options?.questions === null ||
+               (!! questions[idx]?.options?.options &&  questions[idx]?.options?.options?.length === 0) ||
+               (!! questions[idx]?.options?.questions &&  questions[idx]?.options?.questions?.length === 0) 
                ) ?
                 optionsArray.push(1) :
                 (questions[idx]?.options?.questions || []).filter(
                   (i) => !!i && ((!!i && i?.trim().length > 0) || i === "")
-                ).length === (questions[idx].options.questions || []).length
+                ).length === (questions[idx]?.options?.questions || []).length
               ? optionsArray.push(0)
               : optionsArray.push(1)
               
-              (questions[idx].options?.options || []).filter(
+              (questions[idx]?.options?.options || []).filter(
                 (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
-              ).length === (questions[idx].options?.options || []).length
+              ).length === (questions[idx]?.options?.options || []).length
             ? optionsArray.push(0)
             : optionsArray.push(1)
            }
