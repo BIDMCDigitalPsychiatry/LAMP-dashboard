@@ -607,15 +607,12 @@ export default function SurveyCreator({
                 optionsArray.push(1) :
                 (questions[idx]?.options?.questions || []).filter(
                   (i) => !!i && ((!!i && i?.trim().length > 0) || i === "")
-                ).length === (questions[idx]?.options?.questions || []).length
+                ).length === (questions[idx]?.options?.questions || []).length &&
+                (questions[idx]?.options?.options || []).filter(
+                  (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
+                ).length === (questions[idx]?.options?.options || []).length
               ? optionsArray.push(0)
               : optionsArray.push(1)
-              
-              (questions[idx]?.options?.options || []).filter(
-                (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
-              ).length === (questions[idx]?.options?.options || []).length
-            ? optionsArray.push(0)
-            : optionsArray.push(1)
            }
         })
       }
