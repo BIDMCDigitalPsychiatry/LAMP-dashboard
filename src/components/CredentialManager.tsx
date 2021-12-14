@@ -364,8 +364,8 @@ export const CredentialManager: React.FunctionComponent<{
       selectedCred.map((credent, index) => {
         let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] && Object.keys(d)[0] !== "admin")
         if(selected.length === 0) delete selectedCred[index]
-        setAllCreds(selectedCred)  
       })
+      setAllCreds(selectedCred)
     } else {
       setAllCreds(cred)
     }

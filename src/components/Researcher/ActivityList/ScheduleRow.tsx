@@ -99,7 +99,9 @@ export default function ScheduleRow({
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.time}
-            onChange={(date) => date?.isValid() && setData({ ...data, time: date })}
+            onChange={(date) => {
+              date?.isValid() && setData({ ...data, time: date })
+            }}
           />
         )}
       </TableCell>
