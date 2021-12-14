@@ -110,7 +110,8 @@ export default function ActivityPage({
               }, 2000)
             } else {
               if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
-              if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
+              else if(activity?.spec === "lamp.dbt_diary_card" && !!data && !!data?.timestamp) showSteak(participant, activity.id)
+              else if (activity?.spec !== "lamp.tips" && activity?.spec !== "lamp.dbt_diary_card" && !!data && (!!data?.completed || !!data.timestamp))
                 showSteak(participant, activity.id)
               setOpenData(false)
             }

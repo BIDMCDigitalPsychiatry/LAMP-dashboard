@@ -180,7 +180,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 </ButtonBase>
               </Grid>
             ))
-          : type !== "Prevent" && (
+          : type !== "Portal" && (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
                 <p>{t("There are no " + type + " activities available.")}</p>

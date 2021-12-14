@@ -428,7 +428,7 @@ export default function Prevent({
         tag={tag}
         showSteak={showSteak}
         submitSurvey={submitSurvey}
-        type="Prevent"
+        type="Portal"
       />
       {!loading && (
         <Box>
