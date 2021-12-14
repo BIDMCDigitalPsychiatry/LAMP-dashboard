@@ -352,6 +352,7 @@ export const CredentialManager: React.FunctionComponent<{
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
         setPermissions(!!res.data ? res.data : [])
+        console.log(res.data)
         setCredentials(cred, res.data)        
       })
     })    
@@ -362,7 +363,8 @@ export const CredentialManager: React.FunctionComponent<{
     if(type === "User Administrator") {
       let selectedCred = cred
       selectedCred.map((credent, index) => {
-        let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] && Object.keys(d)[0] !== "admin")
+        let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] &&
+         d[credent['access_key']] !== "admin")        
         if(selected.length === 0) delete selectedCred[index]
       })
       setAllCreds(selectedCred)
