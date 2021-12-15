@@ -233,7 +233,6 @@ export default function ActivityPopup({
               plugins={[gfm, emoji]}
               renderers={{ link: LinkRenderer }}
             />
-            {" (" + t(changeCase(spec?.substr(5))) + ")"}
           </Typography>
         </div>
       </DialogTitle>
