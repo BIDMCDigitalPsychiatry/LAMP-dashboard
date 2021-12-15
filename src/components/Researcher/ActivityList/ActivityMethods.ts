@@ -1,4 +1,5 @@
 import LAMP from "lamp-core"
+import { zero } from "vega"
 import { Service } from "../../DBService/DBService"
 import i18n from "./../../../i18n"
 import { games } from "./Activity"
@@ -834,14 +835,15 @@ export function spliceActivity({ raw, tag }) {
       : raw.settings.map((question, idx) => ({
           text: question.text,
           type: question.type,
+          required: question.required ?? false,
           description: tag?.questions?.[idx]?.description,
           options:
             question.options === null
               ? null
-              : question.options?.map((z, idx2) => ({
+              :  question.type !== "matrix" ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
-                })),
+                })) :  question.options,
         })),
   }
 }
@@ -874,7 +876,8 @@ export function unspliceActivity(x) {
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.value),
+        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
+        required: y?.required ?? false,
       })),
     },
     tag: {
@@ -883,7 +886,7 @@ export function unspliceActivity(x) {
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        options: y?.options === null ? null : y?.options?.map((z) => z?.description),
+        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? ""): null,
       })),
     },
   }
@@ -950,7 +953,6 @@ export async function saveCTestActivity(x) {
 }
 
 export async function saveSurveyActivity(x) {
-  // FIXME: ensure this is a lamp.survey only!
   const { raw, tag } = unspliceActivity(x)
   let newItem = (await LAMP.Activity.create(x.studyID, raw)) as any
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.survey_description", tag)
@@ -1009,10 +1011,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         //   photo: x?.photo ?? "",
         // })
       } else {
-        result = (await LAMP.Activity.update(x.id, {
-          name: x.name,
-          settings: x.settings ?? [],
-        })) as any
+        result = (await LAMP.Activity.update(x.id, x)) as any
         await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
           description: x.description,
           photo: x.photo,
@@ -1029,10 +1028,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       })
       return result
     } else {
-      result = (await LAMP.Activity.update(selectedActivity?.id, {
-        name: x.name,
-        settings: x.settings,
-      })) as any
+      result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
 
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         description: x.description,
@@ -1061,6 +1057,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         spec: "lamp.tips",
         settings: x.settings,
         schedule: [],
+        category: x.category,
       }
       result = await saveTipActivity(tipObj)
       return result

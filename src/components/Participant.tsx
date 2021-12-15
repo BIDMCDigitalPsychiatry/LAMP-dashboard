@@ -158,7 +158,7 @@ export default function Participant({
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const { t, i18n } = useTranslation()
-
+  const [activitySubmitted, setActivitySubmited] = React.useState(false)
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -230,7 +230,7 @@ export default function Participant({
     }
   }
 
-  const submitSurvey = (response, overwritingTimestamp) => {
+  const submitSurvey = (response, activityId, overwritingTimestamp) => {
     setLoading(true)
     if (!!!response || response === null) {
       setLoading(false)
@@ -239,7 +239,7 @@ export default function Participant({
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
         duration: response.duration,
-        activity: visibleActivities[idx].id,
+        activity: activityId,
         static_data: {},
         temporal_slices: (x || []).map((y) => ({
           item: y !== undefined ? y.item : null,
@@ -254,10 +254,10 @@ export default function Participant({
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, visibleActivities[0].id)
+        showSteak(participant, activityId)
         setVisibleActivities([])
         // If a timestamp was provided to overwrite data, hide the original event too.
-        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, visibleActivities[0 /* assumption made here */].id)
+        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activityId)
         else hideEvent() // trigger a reload of dependent components anyway
       })
     }
@@ -280,7 +280,13 @@ export default function Participant({
         <Box>
           <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Learn participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
+              <Learn
+                participant={participant}
+                activities={activities}
+                submitSurvey={submitSurvey}
+                activeTab={activeTab}
+                showSteak={showSteak}
+              />
             </Box>
           </Slide>
           <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
@@ -288,27 +294,34 @@ export default function Participant({
               <Survey
                 participant={participant}
                 activities={activities}
-                visibleActivities={visibleActivities}
+                submitSurvey={submitSurvey}
                 onComplete={submitSurvey}
-                setVisibleActivities={setVisibleActivities}
                 showSteak={showSteak}
               />
             </Box>
           </Slide>
           <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Manage participant={participant} activities={activities} activeTab={activeTab} showSteak={showSteak} />
+              <Manage
+                participant={participant}
+                activities={activities}
+                submitSurvey={submitSurvey}
+                activeTab={activeTab}
+                showSteak={showSteak}
+              />
             </Box>
           </Slide>
           <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
               <Prevent
                 participant={participant}
+                submitSurvey={submitSurvey}
                 activeTab={activeTab}
                 allActivities={activities}
                 hiddenEvents={hiddenEvents}
                 enableEditMode={!_patientMode()}
                 showSteak={showSteak}
+                activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
                   setSurveyName(activity.name)
                   setVisibleActivities([

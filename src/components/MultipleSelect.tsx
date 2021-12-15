@@ -1,6 +1,7 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Box, Chip, Tooltip, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
+import { id } from "vega"
 // TODO: Change the items prop to: { name: string; selected: bool; badge: string; tooltip: string; }
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,9 +40,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function MultipleSelect({ ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
+  const [items, setItems] = React.useState([])
+  useEffect(() => {
+    if (props.items.length > 0) setItems(props.items)
+  }, [])
+
   return (
     <Box className={classes.filterChips}>
-      {(props.items || []).map((item) => (
+      {(items || []).map((item) => (
         <Tooltip
           key={item}
           style={{ margin: 4 }}

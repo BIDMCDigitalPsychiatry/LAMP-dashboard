@@ -56,6 +56,7 @@ export default function ScheduleRow({
     { key: "triweekly", value: t("Three times every week (Mon, Wed, Fri)") },
     { key: "weekly", value: t("Every week") },
     { key: "bimonthly", value: t("Two times every month") },
+    { key: "fortnightly", value: t("Every 2 weeks") },
     { key: "monthly", value: t("Every month") },
     { key: "custom", value: t("Use custom times instead") },
     { key: "none", value: t("Do not repeat") },
@@ -98,7 +99,9 @@ export default function ScheduleRow({
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.time}
-            onChange={(date) => date?.isValid() && setData({ ...data, time: date })}
+            onChange={(date) => {
+              date?.isValid() && setData({ ...data, time: date })
+            }}
           />
         )}
       </TableCell>

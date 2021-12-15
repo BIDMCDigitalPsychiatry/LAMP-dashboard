@@ -128,6 +128,7 @@ export default function ParticipantList({
   getAllStudies,
   mode,
   setOrder,
+  order,
   ...props
 }) {
   const classes = useStyles()
@@ -252,6 +253,7 @@ export default function ParticipantList({
         setData={getAllStudies}
         mode={mode}
         setOrder={setOrder}
+        order={order}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

@@ -67,7 +67,15 @@ function PageTitle({ children, ...props }) {
   })
   return <React.Fragment />
 }
-
+export const changeCase = (text) => {
+  if (!!text) {
+    let result = text.replace(/([A-Z])/g, " $1")
+    result = text.replace(/_/g, " ")
+    result = result.charAt(0).toUpperCase() + result.slice(1)
+    return result
+  }
+  return ""
+}
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
 

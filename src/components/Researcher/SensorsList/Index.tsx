@@ -49,6 +49,7 @@ export default function SensorsList({
   setSelectedStudies,
   getDBStudies,
   setOrder,
+  order,
   ...props
 }: {
   title?: string
@@ -58,6 +59,7 @@ export default function SensorsList({
   setSelectedStudies?: Function
   getDBStudies?: Function
   setOrder?: Function
+  order?: boolean
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -185,6 +187,7 @@ export default function SensorsList({
         selectedStudies={selected}
         setSensors={searchFilterSensors}
         setOrder={setOrder}
+        order={order}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>

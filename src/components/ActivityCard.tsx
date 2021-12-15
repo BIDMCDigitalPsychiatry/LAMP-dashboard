@@ -5,7 +5,7 @@ import { Box, Icon, IconButton, Tooltip, Typography, Divider, colors } from "@ma
 import Sparkline from "./Sparkline"
 import ArrayView from "./ArrayView"
 import { useTranslation } from "react-i18next"
-import { strategies } from "./Prevent"
+import { strategies } from "./PreventSelectedActivities"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -29,13 +29,27 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
+
+  const getValue = (val) => {
+    let retValue = ""
+    let index = 1
+    for (let x in val) {
+      retValue += index + ". " + t(val[x]?.question) + ": " + val[x].value.join(", ")+ ", " 
+      index++
+    }
+    return retValue.substr(0, retValue.length - 2)
+  }
+
   let each = Object.values(
     events
       .map((d) =>
         d.temporal_slices.map((t) => ({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? t.value : !!t.status ? 1 : 0,
+            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? 
+            typeof t.value !== "string" && typeof t.value !== "number"? 
+            getValue(t.value)
+            : t.value : !!t.status ? 1 : 0,
         }))
       )
       .reduce((x, y) => x.concat(y), [])
@@ -43,6 +57,7 @@ export default function ActivityCard({
   )
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
+    
   let eachData = []
   each = each.map((d, key) => {
     let keys = Object.keys(d)
@@ -124,7 +139,8 @@ export default function ActivityCard({
             hiddenKeys={["x"]}
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
-              value: `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
+              value:  typeof x.value !== "string" &&  typeof x.value !== "number"? 
+                getValue(x.value): `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
@@ -150,7 +166,8 @@ export default function ActivityCard({
               .map((d) =>
                 d.temporal_slices.map((t) => ({
                   item: t.item,
-                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value,
+                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+                   typeof t.value !== "string" &&  typeof t.value !== "number" ? getValue(t.value) : t.value,
                 }))
               )
               .reduce((x, y) => x.concat(y), [])

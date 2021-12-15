@@ -39,6 +39,7 @@ export default function Header({
   setSensors,
   setChangeCount,
   setOrder,
+  order,
   ...props
 }: {
   studies?: Array<Object>
@@ -50,6 +51,7 @@ export default function Header({
   setSensors?: Function
   setChangeCount?: Function
   setOrder?: Function
+  order?: boolean
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
@@ -67,7 +69,7 @@ export default function Header({
           <Typography variant="h5">{t("Sensors")}</Typography>
         </Box>
         <Box>
-          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} />
+          <StudyFilter setShowFilterStudies={handleShowFilterStudies} setOrder={setOrder} order={order} />
         </Box>
         <SearchBox searchData={searchData} />
         <Box>

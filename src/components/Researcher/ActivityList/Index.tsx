@@ -74,6 +74,7 @@ export default function ActivityList({
   selectedStudies,
   setSelectedStudies,
   setOrder,
+  order,
   ...props
 }) {
   const [activities, setActivities] = useState(null)
@@ -100,7 +101,7 @@ export default function ActivityList({
   useEffect(() => {
     setTimeout(() => {
       setLoadTime(true)
-    }, 9000)
+    }, 12000)
   }, [])
 
   const getAllActivities = () => {
@@ -120,6 +121,7 @@ export default function ActivityList({
   }
 
   useEffect(() => {
+    setLoading(!loadTime)
     if (!!loadTime) searchActivities()
   }, [loadTime])
 
@@ -128,9 +130,7 @@ export default function ActivityList({
   }, [selectedStudies])
 
   useEffect(() => {
-    setLoadTime(false)
     if ((selectedStudies || []).length > 0) {
-      setLoadTime(true)
       searchActivities()
     } else {
       setActivities([])
@@ -207,6 +207,7 @@ export default function ActivityList({
         setSelectedStudies={setSelectedStudies}
         setActivities={searchActivities}
         setOrder={setOrder}
+        order={order}
       />
       <Box className={classes.tableContainer} py={4}>
         <Grid container spacing={3}>
