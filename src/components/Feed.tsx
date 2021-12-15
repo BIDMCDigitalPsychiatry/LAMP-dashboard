@@ -851,6 +851,7 @@ export default function Feed({
                       className={feed.completed ? classes[feed.group + "Completed"] : classes[feed.group]}
                       variant="outlined"
                       onClick={() => {
+                        console.log(feed.activityData)
                         if (
                           !feed.completed &&
                           feed.clickable &&
@@ -953,10 +954,14 @@ export default function Feed({
                 name={activityName}
                 activity={visibleActivities}
                 participant={participant}
-                onComplete={(response) => {
-                  if (!!response && (!!response?.completed || !!response.timestamp))
-                    showSteak(participant, visibleActivities.id)
-                  completeFeed(index)
+                onComplete={(data) => {
+                  if (visibleActivities?.spec === "lamp.tips" && !!data) showSteak(participant, visibleActivities.id)
+                  else if(visibleActivities?.spec === "lamp.dbt_diary_card" && !!data && !!data?.timestamp) showSteak(participant, visibleActivities.id)
+                  else if (visibleActivities?.spec !== "lamp.tips" && visibleActivities?.spec !== "lamp.dbt_diary_card" && !!data && (!!data?.completed || !!data.timestamp))
+                    {
+                      showSteak(participant, visibleActivities.id)   
+                      completeFeed(index)
+                    }              
                   setLaunchedActivity(undefined)
                 }}
               />
