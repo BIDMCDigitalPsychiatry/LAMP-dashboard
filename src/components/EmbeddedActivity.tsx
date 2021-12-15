@@ -95,12 +95,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
       const activitySpec = currentActivity?.spec ?? ""
-      if (activitySpec !== "lamp.scratch_image") setCurrentActivity(null)
+      if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
       } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
         setSaved(true)
         setCurrentActivity(null)
+        onComplete(dataSubmitted ? data : null)
+      } else if (activitySpec === "lamp.tips" && data?.completed) {
         onComplete(dataSubmitted ? data : null)
       } else {
         setDataSubmitted(true)
