@@ -113,7 +113,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               console.dir(e)
             })
             .then((x) => {
-              if (activitySpec !== "lamp.scratch_image") {
+              if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
                 setSaved(true)
                 onComplete(data)
               }
