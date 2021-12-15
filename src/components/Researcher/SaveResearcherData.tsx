@@ -80,6 +80,19 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
+console.log('($studyList := $LAMP.Study.list(\''+id+'\');'+
+' $list := $map($studyList,function($study){{\'name\': $study.name,\'id\':$study.id,'+
+'\'participants\':[$map($LAMP.Participant.list($study.id).id,function($id){{\'name\': '+
+'$LAMP.Tag.get($id,\'lamp.name\'),\'id\':$id}})]}}))')
+  ;(async() => {
+    let data = await LAMP.API.query('($studyList := $LAMP.Study.list(\''+id+'\');'+
+         ' $list := $map($studyList,function($study){{\'name\': $study.name,\'id\':$study.id,'+
+         '\'participants\':[$map($LAMP.Participant.list($study.id).id,function($id){{\'name\': '+
+         '$LAMP.Tag.get($id,\'lamp.name\'),\'id\':$id}})],\'activities\':[$map($LAMP.Activity.list_activities($study.id).id,function($id){{\'name\': '+
+         '$name,\'id\':$id, \'spec\': $spec}})]}}))')
+    console.log(data)
+})()
+
   Service.getAll("researcher").then((data) => {
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
       fetchResult(authString, id, "participant", "researcher").then((result) => {
@@ -100,6 +113,7 @@ export const saveDataToCache = (authString, id) => {
             }
             if (flag === 0) {
               fetchResult(authString, id, "activity", "researcher").then((activities) => {
+                console.log(activities)
                 saveStudyData(activities, "activities")
                 fetchResult(authString, id, "sensor", "researcher").then((sensors) => {
                   saveStudyData(sensors, "sensors")
