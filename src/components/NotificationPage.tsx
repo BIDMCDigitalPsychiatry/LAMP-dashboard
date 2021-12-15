@@ -183,8 +183,11 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             name={activity?.name}
             activity={activity}
             participant={participant}
-            onComplete={(response) => {
-              if (!!response) showSteak(participant, activity.id)
+            onComplete={(data) => {
+              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
+              else if(activity?.spec === "lamp.dbt_diary_card" && !!data && !!data?.timestamp) showSteak(participant, activity.id)
+              else if (activity?.spec !== "lamp.tips" && activity?.spec !== "lamp.dbt_diary_card" && !!data && (!!data?.completed || !!data.timestamp))
+                showSteak(participant, activity.id)              
             }}
           />
         ) : activity?.spec === "lamp.group" ? (
