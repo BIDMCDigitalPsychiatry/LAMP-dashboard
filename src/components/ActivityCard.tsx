@@ -34,32 +34,40 @@ export default function ActivityCard({
     let retValue = ""
     let index = 1
     for (let x in val) {
-      retValue += index + ". " + t(val[x]?.question) + ": " + val[x].value.join(", ")+ ", " 
+      retValue += index + ". " + t(val[x]?.question) + ": " + val[x].value.join(", ") + ", "
       index++
     }
     return retValue.substr(0, retValue.length - 2)
   }
-
-  let each = Object.values(
-    events
-      .map((d) =>
-        d.temporal_slices.map((t) => ({
+  let values = []
+  events.map((d) =>
+    d.temporal_slices.map((t) => {
+      if (typeof t.value !== "string" && typeof t.value !== "number") {
+        Object.keys(t.value).map((val) => {
+          if (!!t.value[val].question) {
+            values.push({
+              item: t.item + " - " + t.value[val].question,
+              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value.join(
+                ", "
+              ),
+            })
+          }
+        })
+      } else {
+        values.push({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? 
-            typeof t.value !== "string" && typeof t.value !== "number"? 
-            getValue(t.value)
-            : t.value : !!t.status ? 1 : 0,
-        }))
-      )
-      .reduce((x, y) => x.concat(y), [])
-      .groupBy("item")
+            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? t.value : !!t.type ? 1 : 0,
+        })
+      }
+    })
   )
+  values = Object.values(values.reduce((x, y) => x.concat(y), []).groupBy("item"))
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
-    
+
   let eachData = []
-  each = each.map((d, key) => {
+  values.map((d, key) => {
     let keys = Object.keys(d)
     eachData[d["item"]] = []
     keys.map((k) => {
@@ -139,8 +147,10 @@ export default function ActivityCard({
             hiddenKeys={["x"]}
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
-              value:  typeof x.value !== "string" &&  typeof x.value !== "number"? 
-                getValue(x.value): `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
+              value:
+                typeof x.value !== "string" && typeof x.value !== "number"
+                  ? getValue(x.value)
+                  : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
@@ -161,20 +171,7 @@ export default function ActivityCard({
               onClick={(datum) => setVisibleSlice(datum)}
             />
           )}
-          value={Object.values(
-            events
-              .map((d) =>
-                d.temporal_slices.map((t) => ({
-                  item: t.item,
-                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-                   typeof t.value !== "string" &&  typeof t.value !== "number" ? getValue(t.value) : t.value,
-                }))
-              )
-              .reduce((x, y) => x.concat(y), [])
-              .groupBy("item")
-          )
-            .map((v: any) => Object.assign({}, ...v))
-            .reduce((x, y) => x.concat(y), [])}
+          value={values}
         />
       ) : (
         <Sparkline
