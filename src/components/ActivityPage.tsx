@@ -17,6 +17,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import SurveyInstrument from "./SurveyInstrument"
 import GroupActivity from "./GroupActivity"
 import { useTranslation } from "react-i18next"
+import VoiceRecordingResult from "./VoiceRecordingResult"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -100,55 +101,30 @@ export default function ActivityPage({
           name={activity?.description ?? ""}
           activity={activity ?? []}
           participant={participant}
+          noBack={false}
           onComplete={(data) => {
-            if (activity?.spec === "lamp.recording") {
-              setOpenRecordSuccess(true)
-              setTimeout(function () {
-                setOpenRecordSuccess(false)
-                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
-                setOpenData(false)
-              }, 2000)
+            if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
+              if (!!data && !!data?.timestamp) {
+                setOpenRecordSuccess(true)
+                setTimeout(function () {
+                  setOpenRecordSuccess(false)
+                  showSteak(participant, activity.id)
+                  setOpenData(false)
+                }, 2000)
+              } else setOpenData(false)
             } else {
-              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
-              else if(activity?.spec === "lamp.dbt_diary_card" && !!data && !!data?.timestamp) showSteak(participant, activity.id)
-              else if (activity?.spec !== "lamp.tips" && activity?.spec !== "lamp.dbt_diary_card" && !!data && (!!data?.completed || !!data.timestamp))
-                showSteak(participant, activity.id)
+              if (activity?.spec === "lamp.tips" ||  activity?.spec === "lamp.breathe") showSteak(participant, activity.id)
+              else if(!!data && !!data?.timestamp) showSteak(participant, activity.id)  
               setOpenData(false)
             }
           }}
         />
       )}
-      <Dialog
-        open={openRecordSuccess}
-        onClose={() => setOpenRecordSuccess(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+      <VoiceRecordingResult open={openRecordSuccess}
+        onClose={() => {
+          setOpenRecordSuccess(false)
         }}
-      >
-        <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenRecordSuccess(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Success") + "!"}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("Voice Recorded has been submitted Successfully.")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Icon>check_circle</Icon>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        setOpenRecordSuccess={setOpenRecordSuccess} />     
     </Box>
   )
 }
