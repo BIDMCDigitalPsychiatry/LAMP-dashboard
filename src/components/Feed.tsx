@@ -26,6 +26,7 @@ import InfoIcon from "../icons/Info.svg"
 import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
 import SurveyInstrument from "./SurveyInstrument"
+import VoiceRecordingResult from "./VoiceRecordingResult"
 import EmbeddedActivity from "./EmbeddedActivity"
 import GroupActivity from "./GroupActivity"
 import LAMP, {
@@ -403,6 +404,8 @@ export default function Feed({
   const [activityName, setActivityName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
+  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
+
   const { t } = useTranslation()
   const completeFeed = (index: number) => {
     let feed = currentFeed
@@ -953,15 +956,29 @@ export default function Feed({
                 name={activityName}
                 activity={visibleActivities}
                 participant={participant}
+                noBack={false}
                 onComplete={(data) => {
-                  if (visibleActivities?.spec === "lamp.tips" && !!data) showSteak(participant, visibleActivities.id)
-                  else if(visibleActivities?.spec === "lamp.dbt_diary_card" && !!data && !!data?.timestamp) showSteak(participant, visibleActivities.id)
-                  else if (visibleActivities?.spec !== "lamp.tips" && visibleActivities?.spec !== "lamp.dbt_diary_card" && !!data && (!!data?.completed || !!data.timestamp))
-                    {
+                  if (visibleActivities?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
+                    if (!!data && !!data?.timestamp) {
+                      setOpenRecordSuccess(true)
+                      setTimeout(function () {
+                        setOpenRecordSuccess(false)
+                        showSteak(participant, visibleActivities.id)
+                        completeFeed(index)
+                        setLaunchedActivity(undefined)
+                      }, 2000)
+                    } else setLaunchedActivity(undefined)
+                  } else {
+                    if (visibleActivities?.spec === "lamp.tips" ||  visibleActivities?.spec === "lamp.breathe") {
                       showSteak(participant, visibleActivities.id)   
                       completeFeed(index)
-                    }              
-                  setLaunchedActivity(undefined)
+                    }   
+                    else if(!!data && !!data?.timestamp) {
+                      showSteak(participant, visibleActivities.id)   
+                      completeFeed(index)
+                    }    
+                    setLaunchedActivity(undefined) 
+                  }
                 }}
               />
             ),
@@ -992,6 +1009,12 @@ export default function Feed({
           </Button>
         </DialogActions>
       </Dialog>
+      <VoiceRecordingResult open={openRecordSuccess}
+        onClose={() => {
+          setOpenRecordSuccess(false)
+        }}
+       setOpenRecordSuccess={setOpenRecordSuccess} />    
+
     </div>
   )
 }
