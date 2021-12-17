@@ -37,7 +37,7 @@ export default function ActivityPage({
   useEffect(() => {
     if (data !== null) {
       if (activity?.spec === "lamp.survey") {
-        if (!!data && !!data?.timestamp) submitSurvey(data, activity.id)
+        if (!!data) submitSurvey(data, activity.id)
       } else if (activity?.spec === "lamp.recording") {
         if (!!data && !!data?.timestamp) {
           setOpenRecordSuccess(true)
