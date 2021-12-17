@@ -168,6 +168,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             fromPrevent={false}
             group={[activity]}
             onComplete={submitSurvey}
+            noBack={true}
           />
         ) : activity?.spec === "lamp.cats_and_dogs" ||
           activity?.spec === "lamp.jewels_a" ||
@@ -194,11 +195,12 @@ export default function NotificationPage({ participant, activityId, ...props }) 
                     setOpenRecordSuccess(false)
                     showSteak(participant, activity.id)
                   }, 2000)
-                } 
+                }
               } else {
-                if (activity?.spec === "lamp.tips" ||  activity?.spec === "lamp.breathe") showSteak(participant, activity.id)
-                else if(!!data && !!data?.timestamp) showSteak(participant, activity.id)                  
-              }            
+                if (activity?.spec === "lamp.tips" || activity?.spec === "lamp.breathe")
+                  showSteak(participant, activity.id)
+                else if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+              }
             }}
           />
         ) : activity?.spec === "lamp.group" ? (
@@ -223,11 +225,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             </DialogActions>
           </Dialog>
         ))}
-      <VoiceRecordingResult open={openRecordSuccess}
+      <VoiceRecordingResult
+        open={openRecordSuccess}
         onClose={() => {
           setOpenRecordSuccess(false)
         }}
-       setOpenRecordSuccess={setOpenRecordSuccess} />  
+        setOpenRecordSuccess={setOpenRecordSuccess}
+      />
       <Steak
         open={openComplete}
         onClose={() => {

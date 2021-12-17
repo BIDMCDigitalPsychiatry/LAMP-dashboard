@@ -6,9 +6,7 @@ import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
 import InfoIcon from "../icons/Info.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
-import ResponsiveDialog from "./ResponsiveDialog"
 import { useTranslation } from "react-i18next"
-import ActivityPage from "./ActivityPage"
 import ActivityPopup from "./ActivityPopup"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -188,33 +186,16 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
             )}
       </Grid>
       <ActivityPopup
-        spec={spec}
         activity={activity}
         tag={tag}
         questionCount={questionCount}
         open={open}
-        setOpen={setOpen}
+        onClose={() => setOpen(false)}
         type={type}
-        setOpenData={setOpenData}
+        submitSurvey={submitSurvey}
+        showSteak={showSteak}
+        participant={participant}
       />
-
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={openData}
-        onClose={() => {
-          setOpenData(false)
-        }}
-      >
-        <ActivityPage
-          activity={activity}
-          participant={participant}
-          setOpenData={setOpenData}
-          submitSurvey={submitSurvey}
-          showSteak={showSteak}
-        />
-      </ResponsiveDialog>
     </Box>
   )
 }
