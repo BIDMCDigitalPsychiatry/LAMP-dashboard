@@ -88,18 +88,36 @@ export const saveDataToCache = (authString, id) => {
       "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
       "$LAMP.Tag.get($id,'lamp.name'),'id':$id}})]}}))"
   )
-  ;(async () => {
-    let data = await LAMP.API.query(
-      "($studyList := $LAMP.Study.list('" +
-        id +
-        "');" +
-        " $list := $map($studyList,function($study){{'name': $study.name,'id':$study.id," +
-        "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
-        "$LAMP.Tag.get($id,'lamp.name'),'id':$id}})],'activities':[$map($LAMP.Activity.list($study.id)], 'sensors':[$map($LAMP.Sensor.list($study.id).id,function($id){{'name': " +
-        "$name,'id':$id}})]}}))"
+  LAMP.API.query(
+    "($studyList := $LAMP.Study.list('" +
+      id +
+      "');" +
+      " $list := $map($studyList,function($study){{'name': $study.name,'id':$study.id," +
+      "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
+      "$LAMP.Tag.get($id,'lamp.name'),'id':$id}})],'activities':[$LAMP.Activity.list($study.id)]," +
+      "'sensors':[$LAMP.Sensor.list($study.id)]}}))"
+  ).then((data) => {
+    console.log(
+      data,
+      Object.values(data).map((s) => {
+        return {
+          id: s?.id,
+          name: s?.name,
+          participant_count: s?.participants.length,
+          activity_count: s?.activities.length,
+          sensor_count: s?.sensors.length,
+        }
+      })
     )
-    console.log(data)
-  })()
+    // Object.keys(data || []).map((study) => {
+    //   console.log(study)
+    //   const studies = data.map(({ id, name, participant_count }) => ({ id, name, participant_count }))
+
+    // })
+  })
+
+  // console.log(data)
+  // })()
 
   Service.getAll("researcher").then((data) => {
     if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
