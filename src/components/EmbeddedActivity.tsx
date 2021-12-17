@@ -98,12 +98,12 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
-      } else if(activitySpec === "lamp.scratch_image" && data.temporal_slices.length === 0) {
+      } else if (activitySpec === "lamp.scratch_image" && data.temporal_slices.length === 0) {
         setSaved(true)
-        onComplete(null) 
+        onComplete(null)
       } else {
-        setDataSubmitted(true)
-        if ((data?.timestamp ?? 0) !== timestamp) {
+        if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
+          setDataSubmitted(true)
           setTimestamp(data.timestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
@@ -111,8 +111,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             })
             .then((x) => {
               setSaved(true)
-              onComplete(data)               
+              onComplete(data)
             })
+        } else {
+          onComplete(null)
         }
       }
     }

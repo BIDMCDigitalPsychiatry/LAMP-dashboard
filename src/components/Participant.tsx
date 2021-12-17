@@ -386,23 +386,6 @@ export default function Participant({
               }}
             />
           </ResponsiveDialog>
-          <ResponsiveDialog
-            transient
-            animate
-            fullScreen
-            open={tab === 3 && visibleActivities.length > 0}
-            onClose={() => {
-              setVisibleActivities([])
-            }}
-          >
-            <SurveyInstrument
-              participant={participant}
-              fromPrevent={true}
-              type={surveyName}
-              group={visibleActivities}
-              onComplete={submitSurvey}
-            />
-          </ResponsiveDialog>
         </Box>
       )}
       <Steak

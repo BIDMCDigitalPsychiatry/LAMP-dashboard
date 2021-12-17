@@ -857,9 +857,9 @@ export default function Feed({
                         if (
                           !feed.completed &&
                           feed.clickable &&
-                          ((typeof feed.activityData?.category === "undefined" || feed.activityData?.category === null) ||
-                            (!!feed.activityData?.category &&
-                              feed.activityData?.category.length !== 0)) &&
+                          (typeof feed.activityData?.category === "undefined" ||
+                            feed.activityData?.category === null ||
+                            (!!feed.activityData?.category && feed.activityData?.category.length !== 0)) &&
                           ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&
                             feed.time >= new Date().getTime()) ||
                             (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
@@ -949,6 +949,7 @@ export default function Feed({
                 fromPrevent={false}
                 group={visibleActivities}
                 onComplete={submitSurvey}
+                noBack={false}
               />
             ),
             game: (
@@ -969,15 +970,11 @@ export default function Feed({
                       }, 2000)
                     } else setLaunchedActivity(undefined)
                   } else {
-                    if (visibleActivities?.spec === "lamp.tips" ||  visibleActivities?.spec === "lamp.breathe") {
-                      showSteak(participant, visibleActivities.id)   
+                    if (!!data && !!data?.timestamp) {
+                      showSteak(participant, visibleActivities.id)
                       completeFeed(index)
-                    }   
-                    else if(!!data && !!data?.timestamp) {
-                      showSteak(participant, visibleActivities.id)   
-                      completeFeed(index)
-                    }    
-                    setLaunchedActivity(undefined) 
+                    }
+                    setLaunchedActivity(undefined)
                   }
                 }}
               />
@@ -1009,12 +1006,13 @@ export default function Feed({
           </Button>
         </DialogActions>
       </Dialog>
-      <VoiceRecordingResult open={openRecordSuccess}
+      <VoiceRecordingResult
+        open={openRecordSuccess}
         onClose={() => {
           setOpenRecordSuccess(false)
         }}
-       setOpenRecordSuccess={setOpenRecordSuccess} />    
-
+        setOpenRecordSuccess={setOpenRecordSuccess}
+      />
     </div>
   )
 }
