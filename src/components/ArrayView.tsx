@@ -20,15 +20,22 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const { t } = useTranslation()
-  const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
+  const keys = ["item"]
+  Object.keys(value).map((val) => {
+    Object.keys(value[val]).map((p) => {
+      if (p !== "item") {
+        if (keys.indexOf(p) < 0) keys.push(p)
+      }
+    })
+  })
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>
         <TableHead>
           <TableRow>
-            {displayKeys().map((key) => (
+            {keys.map((key) => (
               <TableCell key={key} title={humanize(key)}>
-                {humanize(key)} 
+                {humanize(key)}
               </TableCell>
             ))}
           </TableRow>
@@ -37,17 +44,20 @@ export default function ArrayView({
           {value.map((row, index) => (
             <React.Fragment>
               <TableRow hover key={index}>
-                {displayKeys().map((key) =>
+                {keys.map((key) =>
                   Array.isArray(row[key]) ? (
                     <ArrayView value={row[key]} />
                   ) : !!row[key] && typeof row[key] === "object" ? (
                     !!row[key]?.question ? (
                       <TableCell key={row[key]}>
-                          <ReactMarkdown source={t(row[key]?.question) + " : " + row[key].value.join(", ")} escapeHtml={false} plugins={[gfm, emoji]} />
-                       
+                        <ReactMarkdown
+                          source={t(row[key]?.question) + " : " + row[key].value.join(", ")}
+                          escapeHtml={false}
+                          plugins={[gfm, emoji]}
+                        />
                       </TableCell>
                     ) : (
-                    <ArrayView value={[row[key]]} />
+                      <ArrayView value={[row[key]]} />
                     )
                   ) : (
                     <TableCell key={row[key]}>
@@ -62,7 +72,7 @@ export default function ArrayView({
               </TableRow>
               {hasSpanningRowForIndex?.(index) && (
                 <TableRow key={`${index}-optional`}>
-                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(row.item)}</TableCell>
+                  <TableCell colSpan={keys.length}>{spanningRowForIndex?.(row.item)}</TableCell>
                 </TableRow>
               )}
             </React.Fragment>
