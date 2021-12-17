@@ -47,8 +47,9 @@ export default function ActivityCard({
           if (!!t.value[val].question) {
             values.push({
               item: t.item + " - " + t.value[val].question,
-              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value.join(
-                ", "
+              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value.reduce(
+                (sum, current) => sum + parseInt(current),
+                0
               ),
             })
           }
