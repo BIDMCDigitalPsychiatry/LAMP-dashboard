@@ -28,6 +28,7 @@ export default function ArrayView({
       }
     })
   })
+  console.log(keys, value)
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>

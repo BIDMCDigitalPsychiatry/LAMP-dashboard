@@ -47,10 +47,12 @@ export default function ActivityCard({
           if (!!t.value[val].question) {
             values.push({
               item: t.item + " - " + t.value[val].question,
-              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value.reduce(
-                (sum, current) => sum + parseInt(current),
-                0
-              ),
+              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value
+                .map((elt) => {
+                  // assure the value can be converted into an integer
+                  return parseInt(elt) ? parseInt(elt) : elt
+                })
+                .reduce((sum, current) => sum + (parseInt(current) || current)),
             })
           }
         })
@@ -58,7 +60,15 @@ export default function ActivityCard({
         values.push({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles" ? t.value : !!t.type ? 1 : 0,
+            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              ? typeof t.value === "string"
+                ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
+                  ? 1
+                  : 0
+                : t.value
+              : !!t.type
+              ? 1
+              : 0,
         })
       }
     })
@@ -75,7 +85,7 @@ export default function ActivityCard({
       if (k !== "item") {
         eachData[d["item"]].push({
           x: k,
-          y: parseInt(d[k]),
+          y: parseInt(d[k]) ?? d[k],
           missing: [null, "NULL"].includes(d),
         })
       }

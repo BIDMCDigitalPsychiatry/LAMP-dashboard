@@ -185,7 +185,12 @@ export const strategies = {
         else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
-            sum += x.value[val].value.reduce((sum, current) => sum + parseInt(current), 0)
+            sum += x.value[val].value
+              .map((elt) => {
+                // assure the value can be converted into an integer
+                return parseInt(elt) ? parseInt(elt) : 0
+              })
+              .reduce((sum, current) => sum + parseInt(current))
           })
           return sum
         } else return parseInt(x?.value ?? 0) || 0
