@@ -197,9 +197,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
                   }, 2000)
                 }
               } else {
-                if (activity?.spec === "lamp.tips" || activity?.spec === "lamp.breathe")
-                  showSteak(participant, activity.id)
-                else if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
               }
             }}
           />
