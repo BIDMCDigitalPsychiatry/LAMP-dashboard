@@ -118,7 +118,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
       Promise.all(
         events
           .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
+          .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
       ).then((x) => {
         completeActivity()
       })
