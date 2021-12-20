@@ -207,6 +207,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             participant={participant}
             submitSurvey={submitSurvey}
             onComplete={() => setResponse(true)}
+            noBack={true}
           />
         ) : (
           <Dialog
