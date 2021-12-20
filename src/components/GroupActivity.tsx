@@ -30,7 +30,8 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
   },
 }))
-export default function GroupActivity({ participant, activity, ...props }) {
+
+export default function GroupActivity({ participant, activity, noBack, ...props }) {
   const classes = useStyles()
   const [currentActivity, setCurrentActivity] = useState(null)
   const [groupActivities, setGroupActivities] = useState([])
@@ -98,6 +99,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
     setCurrentActivity(null)
     if (!!!response || response === null) {
       props.onComplete()
+      iterateActivity()
       setLoading(false)
     } else {
       let events = response.map((x, idx) => ({
@@ -116,7 +118,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
       Promise.all(
         events
           .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.log(e)))
+          .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
       ).then((x) => {
         completeActivity()
       })
@@ -164,6 +166,7 @@ export default function GroupActivity({ participant, activity, ...props }) {
               fromPrevent={false}
               group={[currentActivity]}
               onComplete={submitSurvey}
+              noBack={noBack}
             />
           ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
             currentActivity?.spec === "lamp.jewels_a" ||
@@ -181,9 +184,11 @@ export default function GroupActivity({ participant, activity, ...props }) {
               name={currentActivity?.name}
               activity={currentActivity}
               participant={participant}
-              onComplete={() => {
-                completeActivity()
+              onComplete={(data) => {
+                if (!!data && data !== null) completeActivity()
+                else iterateActivity()
               }}
+              noBack={noBack}
             />
           ) : (
             <Dialog
