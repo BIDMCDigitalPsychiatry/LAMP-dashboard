@@ -33,13 +33,13 @@ export const fetchPostData = async (authString, id, type, modal, methodType, bod
 
 const saveStudiesAndParticipants = (result, studies, researcherId) => {
   let participants = []
+  let activities = []
+  let sensors = []
   let studiesList = []
   result.studies.map((study) => {
-    // let data = study.participants
-    // data.map((d, key) => {
-    //   data[key][study_id] =
-    // })
     participants = participants.concat(study.participants)
+    activities = activities.concat(study.activities)
+    sensors = sensors.concat(study.sensors)
   })
   studies.map((study) => {
     studiesList = studiesList.concat(study.name)
@@ -55,6 +55,8 @@ const saveStudiesAndParticipants = (result, studies, researcherId) => {
   }
   Service.addData("studies", studies)
   Service.addData("participants", participants)
+  Service.addData("sensors", sensors)
+  Service.addData("activities", activities)
 }
 
 export const saveStudyData = (result, type) => {
@@ -86,14 +88,6 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
-  console.log(
-    "($studyList := $LAMP.Study.list('" +
-      id +
-      "');" +
-      " $list := $map($studyList,function($study){{'name': $study.name,'id':$study.id," +
-      "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
-      "$LAMP.Tag.get($id,'lamp.name'),'id':$id}})]}}))"
-  )
   LAMP.API.query(
     "($studyList := $LAMP.Study.list('" +
       id +
@@ -108,70 +102,31 @@ export const saveDataToCache = (authString, id) => {
       "'participants':[$map($LAMP.Participant.list($study.id).id,function($id){{'name': " +
       "$LAMP.Tag.get($id,'lamp.name'), 'unity_settings' : $unitySettings ? " +
       "$LAMP.Tag.get($id,'to.unityhealth.psychiatry.settings') : null,'id':$id, 'study_id' : $study.id, 'study_name': $study.name }})]," +
-      "'activities':[$LAMP.Activity.list($study.id) & {'study_id': $study.id, 'study_name': $study.name} ]," +
-      "'sensors':[$LAMP.Sensor.list($study.id) & {'study_id': $study.id, 'study_name': $study.name}]}})]})"
+      "'activities':[$map($LAMP.Activity.list($study.id),function($activity){{'name': " +
+      " $activity.name, 'spec': $activity.spec, 'schedule': $activity.schedule, 'settings': $activity.settings,  'id':$activity.id, 'study_id' " +
+      ": $study.id, 'study_name': $study.name, 'category': $category}})]," +
+      "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
+      " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"
   ).then((data) => {
-    console.log(data)
-    let studies = Object.values(data.studies).map((s) => {
+    let studies = Object.values(data.studies || []).map((study) => {
       return {
-        id: s?.id,
-        name: s?.name,
-        participant_count: s?.participants.length,
-        activity_count: s?.activities.length,
-        sensor_count: s?.sensors.length,
+        id: study?.id || "",
+        name: study?.name || "",
+        participant_count: (study?.participants || []).length,
+        activity_count: (study?.activities || []).length,
+        sensor_count: (study?.sensors || []).length,
       }
     })
     saveStudiesAndParticipants(data, studies, id)
-
-    // Object.keys(data || []).map((study) => {
-    //   console.log(study)
-    //   const studies = data.map(({ id, name, participant_count }) => ({ id, name, participant_count }))
-
-    // })
+    studies.map((study) => {
+      fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
+        saveSettings(sensors, "accelerometer")
+        saveSettings(sensors, "analytics")
+        saveSettings(sensors, "gps")
+        fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
+          saveSettings(events, "active")
+        })
+      })
+    })
   })
-
-  // console.log(data)
-  // })()
-
-  // Service.getAll("researcher").then((data) => {
-  //   if ((data || []).length == 0 || ((data || []).length > 0 && (data || [])[0]?.id !== id)) {
-  //     fetchResult(authString, id, "participant", "researcher").then((result) => {
-  //       if (!!result.studies) {
-  //         let flag = 0
-  //         saveStudiesAndParticipants(result, id)
-  //         Service.addData("researcher", [{ id: id, notification: result.unityhealth_settings }])
-  //         result.studies.map((study) => {
-  //           if (result.unityhealth_settings) {
-  //             fetchResult(authString, study.id, "participant/mode/3", "study").then((settings) => {
-  //               saveSettings(settings, "name")
-  //               saveSettings(settings, "unity_settings")
-  //             })
-  //           } else {
-  //             fetchResult(authString, study.id, "participant/mode/4", "study").then((settings) => {
-  //               saveSettings(settings, "name")
-  //             })
-  //           }
-  //           if (flag === 0) {
-  //             fetchResult(authString, id, "activity", "researcher").then((activities) => {
-  //               console.log(activities)
-  //               saveStudyData(activities, "activities")
-  //               fetchResult(authString, id, "sensor", "researcher").then((sensors) => {
-  //                 saveStudyData(sensors, "sensors")
-  //               })
-  //             })
-  //             flag = 1
-  //           }
-  //           fetchResult(authString, study.id, "participant/mode/1", "study").then((sensors) => {
-  //             saveSettings(sensors, "accelerometer")
-  //             saveSettings(sensors, "analytics")
-  //             saveSettings(sensors, "gps")
-  //             fetchResult(authString, study.id, "participant/mode/2", "study").then((events) => {
-  //               saveSettings(events, "active")
-  //             })
-  //           })
-  //         })
-  //       }
-  //     })
-  //   }
-  // })
 }
