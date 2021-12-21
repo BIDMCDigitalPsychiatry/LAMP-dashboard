@@ -188,32 +188,23 @@ export default function ParticipantList({
       const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
       if (selectedData.length > 0 && !loading) {
         let result = []
-        setLoading(true)
-        selectedData.map((study) => {
-          Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
-            if ((participantData || []).length > 0) {
-              if (!!searchTxt && searchTxt.trim().length > 0) {
-                result = result.concat(participantData)
-                result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
-                setParticipants(sortData(result, selectedData, "id"))
-              } else {
-                result = result.concat(participantData)
-                setParticipants(sortData(result, selectedData, "id"))
-              }
-              setPaginatedParticipants(
-                sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
-              )
-              setPage(page)
-              setRowCount(rowCount)
-            } else {
-              if (result.length === 0) setParticipants([])
-            }
-            setLoading(false)
-          })
+        Service.getAll("participants").then((participantData) => {
+          if (!!searchTxt && searchTxt.trim().length > 0) {
+            result = result.concat(participantData)
+            result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
+            setParticipants(sortData(result, selectedData, "id"))
+          } else {
+            result = result.concat(participantData)
+            setParticipants(sortData(result, selectedData, "id"))
+          }
+          setPaginatedParticipants(
+            sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+          )
+          setPage(page)
+          setRowCount(rowCount)
         })
-      } else {
-        setLoading(false)
       }
+      setLoading(false)
     } else {
       setParticipants([])
       setLoading(false)
