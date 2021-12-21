@@ -42,7 +42,7 @@ export default function ActivityCard({
   let values = []
   events.map((d) =>
     d.temporal_slices.map((t) => {
-      if (typeof t.value !== "string" && typeof t.value !== "number") {
+      if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
         Object.keys(t.value).map((val) => {
           if (!!t.value[val].question) {
             values.push({
@@ -64,7 +64,9 @@ export default function ActivityCard({
               ? typeof t.value === "string"
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
                   ? 1
-                  : 0
+                  : typeof t.value === "string" && ["No", "False"].includes(t.value)
+                  ? 0
+                  : t.value
                 : t.value
               : !!t.type
               ? 1
