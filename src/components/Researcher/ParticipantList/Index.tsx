@@ -184,9 +184,10 @@ export default function ParticipantList({
 
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
-    if (selectedStudies.length > 0) {
+    if (selected.length > 0) {
+      setLoading(true)
       const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
-      if (selectedData.length > 0 && !loading) {
+      if (selectedData.length > 0) {
         let result = []
         Service.getAll("participants").then((participantData) => {
           if (!!searchTxt && searchTxt.trim().length > 0) {
@@ -202,12 +203,11 @@ export default function ParticipantList({
           )
           setPage(page)
           setRowCount(rowCount)
+          setLoading(false)
         })
+      } else {
+        setParticipants([])
       }
-      setLoading(false)
-    } else {
-      setParticipants([])
-      setLoading(false)
     }
     setSelectedParticipants([])
   }
