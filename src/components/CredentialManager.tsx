@@ -15,6 +15,9 @@ import {
   Typography,
   InputAdornment,
   useTheme,
+  makeStyles,
+  createStyles,
+  Theme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -25,6 +28,17 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    passwordRule: {
+      marginLeft: "14px",
+      marginRight: "14px",
+      color: "red",
+      textAlign: "left",
+      display: "inline-block",
+    },
+  })
+)
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -45,6 +59,22 @@ function compress(file, width, height) {
     }
   })
 }
+
+const checkPasswordRule = async (value: string) => {
+  let rule = (await LAMP.Type.getAttachment(null, "lamp.dashboard.security_preferences")) as any
+  if (!!rule.error) return true
+  else {
+    if (!!rule.data?.password_rule ?? "") {
+      try {
+        const exp = new RegExp(rule.data)
+        return exp.test(value)
+      } catch (e) {
+        return true
+      }
+    }
+    return true
+  }
+}
 export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
@@ -52,9 +82,11 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
   const [role, setRole] = useState(credential?.tooltip ?? "")
   const [emailAddress, setEmailAddress] = useState(credential?.email ?? "")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [accepted, setAccepted] = useState(true)
   const [showLink, setShowLink] = useState(false)
   const { t } = useTranslation()
-
+  const classes = useStyles()
   useEffect(() => {
     setPhoto(auxData.photo)
     setRole(auxData.role)
@@ -83,14 +115,25 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     window.location.href.split("#")[0] +
     "#/?a=" +
     btoa([credID, password, LAMP.Auth._auth.serverAddress].filter((x) => !!x).join(":"))
-  const roles = title === "User Administrator" ? [
-    { value: "edit", label: "User Administrator" },
-    { value: "view", label: "Practice Lead" },
-  ] : [
-    { value: "admin", label: "System Admin" },
-    { value: "edit", label: "User Administrator" },
-    { value: "view", label: "Practice Lead" },
-  ]
+  const roles =
+    title === "User Administrator"
+      ? [
+          { value: "edit", label: "User Administrator" },
+          { value: "view", label: "Practice Lead" },
+        ]
+      : [
+          { value: "admin", label: "System Admin" },
+          { value: "edit", label: "User Administrator" },
+          { value: "view", label: "Practice Lead" },
+        ]
+
+  useEffect(() => {
+    ;(async () => {
+      const valid = await checkPasswordRule(password)
+      setAccepted(valid)
+    })()
+  }, [password])
+
   return (
     <Grid container justify="center" alignItems="center">
       {["create-new", "change-role", "update-profile"].includes(mode) && (
@@ -197,60 +240,76 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
         />
       )}
       {["create-new", "reset-password", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          label={t("Password")}
-          type="password"
-          variant="outlined"
-          helperText={t(
-            "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+        <Box>
+          <TextField
+            fullWidth
+            label={t("Password")}
+            type="password"
+            variant="outlined"
+            helperText={t(
+              "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+            )}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            InputProps={{
+              endAdornment: [
+                ["create-new"].includes(mode) ? undefined : (
+                  <InputAdornment position="end" key="a">
+                    <Tooltip
+                      title={t("Copy one-time access link that can be used to log in without entering credentials.")}
+                    >
+                      <IconButton
+                        edge="end"
+                        aria-label="copy link"
+                        onClick={() => setShowLink((showLink) => !showLink)}
+                        onMouseDown={(event) => event.preventDefault()}
+                      >
+                        <Icon>save</Icon>
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+                !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
+                  <InputAdornment position="end" key="b">
+                    <Tooltip title={t("Save Credential")}>
+                      <IconButton
+                        edge="end"
+                        aria-label="submit credential"
+                        onClick={() =>
+                          onChange({
+                            credential,
+                            photo,
+                            name,
+                            role,
+                            emailAddress,
+                            password,
+                          })
+                        }
+                        onMouseDown={(event) => event.preventDefault()}
+                      >
+                        <Icon>check_circle</Icon>
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>
+                ),
+              ],
+            }}
+          />
+          {!accepted && (
+            <Typography variant="caption" className={classes.passwordRule}>
+              {t("Password is not complex enough and does not comply with organization password requirement.")}
+            </Typography>
           )}
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          InputProps={{
-            endAdornment: [
-              ["create-new"].includes(mode) ? undefined : (
-                <InputAdornment position="end" key="a">
-                  <Tooltip
-                    title={t("Copy one-time access link that can be used to log in without entering credentials.")}
-                  >
-                    <IconButton
-                      edge="end"
-                      aria-label="copy link"
-                      onClick={() => setShowLink((showLink) => !showLink)}
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>save</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-              !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
-                <InputAdornment position="end" key="b">
-                  <Tooltip title={t("Save Credential")}>
-                    <IconButton
-                      edge="end"
-                      aria-label="submit credential"
-                      onClick={() =>
-                        onChange({
-                          credential,
-                          photo,
-                          name,
-                          role,
-                          emailAddress,
-                          password,
-                        })
-                      }
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>check_circle</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            ],
-          }}
-        />
+          <TextField
+            fullWidth
+            label={t("Confirm Password")}
+            type="password"
+            variant="outlined"
+            helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+          />
+        </Box>
       )}
       {showLink && password.length > 0 && (
         <Grid item>
@@ -352,20 +411,20 @@ export const CredentialManager: React.FunctionComponent<{
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
       LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
         setPermissions(!!res.data ? res.data : [])
-        console.log(res.data)
-        setCredentials(cred, res.data)        
+        setCredentials(cred, res.data)
       })
-    })    
+    })
     setRoles()
   }, [])
 
   const setCredentials = (cred, permissions) => {
-    if(type === "User Administrator") {
+    if (type === "User Administrator") {
       let selectedCred = cred
       selectedCred.map((credent, index) => {
-        let selected = permissions.filter((d) => Object.keys(d)[0] === credent['access_key'] &&
-         d[credent['access_key']] !== "admin")        
-        if(selected.length === 0) delete selectedCred[index]
+        let selected = permissions.filter(
+          (d) => Object.keys(d)[0] === credent["access_key"] && d[credent["access_key"]] !== "admin"
+        )
+        if (selected.length === 0) delete selectedCred[index]
       })
       setAllCreds(selectedCred)
     } else {
@@ -409,7 +468,7 @@ export const CredentialManager: React.FunctionComponent<{
       let dataPermissions = permissions
       let found = false
       Object.keys(permissions).map((key) => {
-        if(!found) {
+        if (!found) {
           const accKey = data.emailAddress !== "" ? data.emailAddress : data.credential.access_key
           if (permissions[key].hasOwnProperty(accKey)) {
             dataPermissions[key][accKey] = data.role
@@ -417,7 +476,7 @@ export const CredentialManager: React.FunctionComponent<{
           }
         }
       })
-      if(!found) {
+      if (!found) {
         newData[data.emailAddress !== "" ? data.emailAddress : data.credential.access_key] = data.role
         dataPermissions.push(newData)
       }
@@ -447,7 +506,7 @@ export const CredentialManager: React.FunctionComponent<{
       id = !!type ? null : id
       LAMP.Credential.list(id).then((cred) => {
         cred = cred.filter((c) => c.hasOwnProperty("origin"))
-        setCredentials(cred, permissions)        
+        setCredentials(cred, permissions)
       })
       setRoles()
       return setSelected({
@@ -472,7 +531,7 @@ export const CredentialManager: React.FunctionComponent<{
     }
     LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
-      setCredentials(cred, permissions)        
+      setCredentials(cred, permissions)
     })
     LAMP.Type.getAttachment(id, "lamp.dashboard.credential_roles").then((res: any) =>
       setAllRoles(!!res.data ? res.data : [])

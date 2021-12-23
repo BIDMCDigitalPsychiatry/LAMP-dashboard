@@ -725,6 +725,7 @@
 	"Alternate Rebellion / Adaptive Denial":
 		"rebellión alternativa",
 	"Customize which Tab this Activity appears in":	"Personalizar en qué pestaña aparece esta actividad",
-	"This Activity will only appear in the Feed tab if a schedule is configured." : "Esta actividad solo aparecerá en la pestaña Feed si se configura un horario."
-		
+	"This Activity will only appear in the Feed tab if a schedule is configured." : "Esta actividad solo aparecerá en la pestaña Feed si se configura un horario.",
+	"Does not match the password you entered above.": "No coincide con la contraseña que ingresó anteriormente",
+	"Password is not complex enough and does not comply with organization password requirement.": "La contraseña no es lo suficientemente compleja y no cumple con el requisito de contraseña de la organización."
 }
