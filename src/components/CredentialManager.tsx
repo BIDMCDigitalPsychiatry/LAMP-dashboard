@@ -246,11 +246,17 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             label={t("Password")}
             type="password"
             variant="outlined"
-            helperText={t(
-              "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
-            )}
+            error={!accepted ? true : false}
+            helperText={
+              !accepted
+                ? t("Password is not complex enough and does not comply with organization password requirement.")
+                : t(
+                    "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
+                  )
+            }
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            style={{ marginBottom: 16 }}
             InputProps={{
               endAdornment: [
                 ["create-new"].includes(mode) ? undefined : (
@@ -275,6 +281,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
                       <IconButton
                         edge="end"
                         aria-label="submit credential"
+                        disabled={confirmPassword !== password || !accepted}
                         onClick={() =>
                           onChange({
                             credential,
@@ -295,16 +302,12 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
               ],
             }}
           />
-          {!accepted && (
-            <Typography variant="caption" className={classes.passwordRule}>
-              {t("Password is not complex enough and does not comply with organization password requirement.")}
-            </Typography>
-          )}
           <TextField
             fullWidth
             label={t("Confirm Password")}
             type="password"
             variant="outlined"
+            error={password !== confirmPassword ? true : false}
             helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
