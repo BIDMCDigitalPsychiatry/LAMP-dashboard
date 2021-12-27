@@ -66,7 +66,7 @@ const checkPasswordRule = async (value: string) => {
   else {
     if (!!rule.data?.password_rule ?? "") {
       try {
-        const exp = new RegExp(rule.data)
+        const exp = new RegExp(rule.data?.password_rule)
         return exp.test(value)
       } catch (e) {
         return true
@@ -418,6 +418,7 @@ export const CredentialManager: React.FunctionComponent<{
       })
     })
     setRoles()
+    LAMP.Type.setAttachment(null, "me", "lamp.dashboard.security_preferences", { password_rule: "ab+c" })
   }, [])
 
   const setCredentials = (cred, permissions) => {
