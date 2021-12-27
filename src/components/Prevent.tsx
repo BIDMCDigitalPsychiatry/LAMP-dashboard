@@ -266,6 +266,7 @@ export default function Prevent({
   enableEditMode,
   showSteak,
   submitSurvey,
+  activitySubmitted,
   onEditAction,
   onCopyAction,
   onDeleteAction,
@@ -277,6 +278,7 @@ export default function Prevent({
   hiddenEvents: string[]
   enableEditMode: boolean
   showSteak: Function
+  activitySubmitted:boolean,
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
@@ -302,16 +304,12 @@ export default function Prevent({
   const [selectedActivities, setSelectedActivities] = React.useState([])
   const [selectedSensors, setSelectedSensors] = React.useState([])
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
+  const [newEvent, setNewEvent] = React.useState(false)
 
   const setTabActivities = () => {
     let gActivities = allActivities.filter(
-      (x: any) => !!x?.category && !!x?.category[0] && (x?.category[0] || "") === "prevent"
+      (x: any) => !!x?.category && x?.category.includes("prevent")
     )
-    ;(async () => {
-      let disabled =
-        ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
-      setDisabled(disabled)
-    })()
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
@@ -329,10 +327,21 @@ export default function Prevent({
   }
 
   React.useEffect(() => {
+    setNewEvent(activitySubmitted)
+  }, [activitySubmitted])
+
+  React.useEffect(() => {
+    if(!!newEvent) loadEvents()
+  }, [newEvent])
+
+  React.useEffect(() => {
+    setNewEvent(activitySubmitted)
     setTabActivities()
+    loadEvents()
+  }, [])
+
+  const loadEvents = () => {
     ;(async () => {
-      getSelected(participant, "lamp.selectedActivities").then(setSelectedActivities)
-      getSelected(participant, "lamp.selectedSensors").then(setSelectedSensors)
       getSelected(participant, "lamp.selectedExperimental").then(setSelectedExperimental)
       let disabled =
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
@@ -354,6 +363,10 @@ export default function Prevent({
               activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
           )
           setActivities(activities)
+          setSelectedActivities(activities.map((activity) => activity.name))
+          LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
+            setSelectedSensors(sensors.map((sensor) => sensor.name))
+          })
           getSensorEvents(participant).then((sensorEvents) => {
             let sensorEventCount = getSensorEventCount(sensorEvents)
             setSensorEvents(sensorEvents)
@@ -384,7 +397,7 @@ export default function Prevent({
         })
       }
     })()
-  }, [])
+  }
 
   const earliestDate = () =>
     (activities || [])
@@ -415,7 +428,7 @@ export default function Prevent({
         tag={tag}
         showSteak={showSteak}
         submitSurvey={submitSurvey}
-        type="Prevent"
+        type="Portal"
       />
       {!loading && (
         <Box>
@@ -503,7 +516,6 @@ export default function Prevent({
                   showZeroBadges={false}
                   badges={activityCounts}
                   onChange={(x) => {
-                    LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedActivities", x)
                     setSelectedActivities(x)
                   }}
                 />
@@ -516,7 +528,6 @@ export default function Prevent({
                   badges={sensorCounts}
                   onChange={(x) => {
                     if ([`Environmental Context`, `Step Count`, `Social Context`].includes(x[x.length - 1])) {
-                      LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedSensors", x)
                       setSelectedSensors(x)
                     } else {
                       LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)

@@ -29,7 +29,7 @@ const demoActivities = {
   "lamp.tips": "tips",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, ...props }) {
+export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, ...props }) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -95,29 +95,26 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
       const activitySpec = currentActivity?.spec ?? ""
-      if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") setCurrentActivity(null)
+      setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
-      } else if (activitySpec === "lamp.scratch_image" && data?.completed) {
+      } else if (activitySpec === "lamp.scratch_image" && data.temporal_slices.length === 0) {
         setSaved(true)
-        setCurrentActivity(null)
-        onComplete(dataSubmitted ? data : null)
-      } else if (activitySpec === "lamp.tips" && data?.completed) {
-        onComplete(dataSubmitted ? data : null)
+        onComplete(null)
       } else {
-        setDataSubmitted(true)
-        if ((data?.timestamp ?? 0) !== timestamp) {
+        if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
+          setDataSubmitted(true)
           setTimestamp(data.timestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               console.dir(e)
             })
             .then((x) => {
-              if (activitySpec !== "lamp.scratch_image" && activitySpec !== "lamp.tips") {
-                setSaved(true)
-                onComplete(data)
-              }
+              setSaved(true)
+              onComplete(data)
             })
+        } else {
+          onComplete(null)
         }
       }
     }
@@ -125,7 +122,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
-    setSettings({ ...settings, activity: activity, configuration: { language: i18n.language } })
+    setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
     activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
     let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)

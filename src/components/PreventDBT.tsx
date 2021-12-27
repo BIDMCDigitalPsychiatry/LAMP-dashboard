@@ -541,7 +541,14 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               </NativeSelect>
               {selfcareData !== null && <Vega spec={selfcareData} />}
 
-              {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
+              <PreventSkills
+                skillRange={skillRange}
+                setSkillRange={setSkillRange}
+                selectedEvents={selectedEvents}
+                dateArray={dateArray}
+              />
+              
+               {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
                 <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                   <div className={classes.separator} />
                   <Box width={1} className={classes.graphSubContainer}>
@@ -562,13 +569,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   </Box>
                 </Box>
               )}
-              <PreventSkills
-                skillRange={skillRange}
-                setSkillRange={setSkillRange}
-                selectedEvents={selectedEvents}
-                dateArray={dateArray}
-              />
-
+             
               {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
                 <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                   <div className={classes.separator} />

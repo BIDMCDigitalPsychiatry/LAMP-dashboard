@@ -139,40 +139,33 @@ export default function ActivityList({
 
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    if (selected.length > 0) {
-      const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-      if (selectedData.length > 0 && !loading) {
-        let result = []
-        setLoading(true)
-        selectedData.map((study) => {
-          Service.getDataByKey("activities", [study], "study_name").then((activitiesData) => {
-            if ((activitiesData || []).length > 0) {
-              if (!!searchTxt && searchTxt.trim().length > 0) {
-                result = result.concat(activitiesData)
-                result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
-                setActivities(sortData(result, selectedData, "name"))
-              } else {
-                result = result.concat(activitiesData)
-                setActivities(sortData(result, selectedData, "name"))
-              }
-              setPaginatedActivities(
-                sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
-              )
-              setPage(page)
-              setRowCount(rowCount)
-            } else {
-              if (result.length === 0) setActivities([])
-            }
-            setLoading(false)
-          })
-        })
-      } else {
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData.length > 0 && !loading) {
+      let result = []
+      setLoading(true)
+      Service.getAll("activities").then((activitiesData) => {
+        if ((activitiesData || []).length > 0) {
+          if (!!searchTxt && searchTxt.trim().length > 0) {
+            result = result.concat(activitiesData)
+            result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
+            setActivities(sortData(result, selectedData, "name"))
+          } else {
+            result = result.concat(activitiesData)
+            setActivities(sortData(result, selectedData, "name"))
+          }
+          setPaginatedActivities(
+            sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+          )
+          setPage(page)
+          setRowCount(rowCount)
+        }
         setLoading(false)
-      }
+      })
     } else {
       setActivities([])
       setLoading(false)
     }
+
     setSelectedActivities([])
   }
 

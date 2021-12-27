@@ -1,5 +1,5 @@
 // Core Imports
-import React from "react"
+import React, { useEffect } from "react"
 import {
   Typography,
   Icon,
@@ -12,10 +12,13 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  DialogProps,
   Link,
 } from "@material-ui/core"
 import classnames from "classnames"
+import ResponsiveDialog from "./ResponsiveDialog"
 import { useTranslation } from "react-i18next"
+import ActivityPage from "./ActivityPage"
 import InfoIcon from "../icons/Info.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
@@ -159,17 +162,25 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function ActivityPopup({
   activity,
   questionCount,
-  spec,
-  open,
-  setOpen,
-  setOpenData,
   tag,
   type,
+  participant,
+  showSteak,
+  submitSurvey,
   ...props
-}) {
+}: {
+  activity: any
+  questionCount: number
+  tag: any
+  type: string
+  participant: any
+  showSteak: Function
+  submitSurvey: Function
+} & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
-
+  const [openData, setOpenData] = React.useState(false)
+  const [currentActivity, setCurrentActivity] = React.useState(null)
   function LinkRenderer(data: any) {
     return (
       <a href={data.href} target="_blank">
@@ -178,113 +189,129 @@ export default function ActivityPopup({
     )
   }
 
+  useEffect(() => {
+    setCurrentActivity(activity)
+  }, [activity])
+
   return (
-    <Dialog
-      open={open}
-      maxWidth="xs"
-      onClose={() => setOpen(false)}
-      scroll="paper"
-      aria-labelledby="alert-dialog-slide-title"
-      aria-describedby="alert-dialog-slide-description"
-      classes={{
-        root: classes.dialogueStyle,
-        paper: classes.dialogueCurve,
-      }}
-    >
-      <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpen(false)}>
-          <Icon>close</Icon>
-        </IconButton>
-        <div
-          className={
-            classes.header +
-            " " +
-            (type === "Manage"
-              ? classes.manageH
-              : type === "Assess"
-              ? classes.assessH
-              : type === "Learn"
-              ? classes.learnH
-              : classes.preventH)
-          }
-        >
-          <Box
-            className={classes.topicon}
-            style={{
-              margin: "auto",
-              background: tag[activity?.id]?.photo
-                ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
-                : activity?.spec === "lamp.breathe"
-                ? `url(${BreatheIcon}) center center/contain no-repeat`
-                : activity?.spec === "lamp.journal"
-                ? `url(${JournalIcon}) center center/contain no-repeat`
-                : activity?.spec === "lamp.scrath_image"
-                ? `url(${ScratchCard}) center center/contain no-repeat`
-                : `url(${InfoIcon}) center center/contain no-repeat`,
-            }}
-          ></Box>
-          <Typography variant="body2" align="left">
-            {t(type)}
-          </Typography>
-          <Typography variant="h2">
+    <React.Fragment>
+      <Dialog
+        {...props}
+        maxWidth="xs"
+        scroll="paper"
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+        classes={{
+          root: classes.dialogueStyle,
+          paper: classes.dialogueCurve,
+        }}
+      >
+        <DialogTitle id="alert-dialog-slide-title" className={classes.dialogtitle}>
+          <IconButton
+            aria-label="close"
+            className={classes.closeButton}
+            onClick={(evt) => props.onClose(evt, "backdropClick")}
+          >
+            <Icon>close</Icon>
+          </IconButton>
+          <div
+            className={
+              classes.header +
+              " " +
+              (type === "Manage"
+                ? classes.manageH
+                : type === "Assess"
+                ? classes.assessH
+                : type === "Learn"
+                ? classes.learnH
+                : classes.preventH)
+            }
+          >
+            <Box
+              className={classes.topicon}
+              style={{
+                margin: "auto",
+                background: tag[activity?.id]?.photo
+                  ? `url(${tag[activity?.id]?.photo}) center center/contain no-repeat`
+                  : activity?.spec === "lamp.breathe"
+                  ? `url(${BreatheIcon}) center center/contain no-repeat`
+                  : activity?.spec === "lamp.journal"
+                  ? `url(${JournalIcon}) center center/contain no-repeat`
+                  : activity?.spec === "lamp.scrath_image"
+                  ? `url(${ScratchCard}) center center/contain no-repeat`
+                  : `url(${InfoIcon}) center center/contain no-repeat`,
+              }}
+            ></Box>
+            <Typography variant="body2" align="left">
+              {t(type)}
+            </Typography>
+            <Typography variant="h2">
+              <ReactMarkdown
+                source={t(activity?.name ?? null)}
+                escapeHtml={false}
+                plugins={[gfm, emoji]}
+                renderers={{ link: LinkRenderer }}
+              />
+            </Typography>
+          </div>
+        </DialogTitle>
+        <DialogContent className={classes.surveytextarea}>
+          {activity?.spec === "lamp.tips" && (
+            <Typography variant="h4" gutterBottom>
+              {t("Quick Tips to Improve Your")} {t(activity?.name)}
+            </Typography>
+          )}
+          {(activity?.spec === "lamp.survey" || activity?.spec === "lamp.dbt_diary_card") && (
+            <Typography variant="h4" gutterBottom>
+              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+            </Typography>
+          )}
+          <Typography variant="body2" component="p">
             <ReactMarkdown
-              source={t(activity?.name ?? null)}
+              source={
+                activity?.spec !== "lamp.dbt_diary_card"
+                  ? t(tag[activity?.id]?.description ?? null)
+                  : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
+              }
               escapeHtml={false}
               plugins={[gfm, emoji]}
               renderers={{ link: LinkRenderer }}
             />
-            {" (" + t(changeCase(spec?.substr(5))) + ")"}
           </Typography>
-        </div>
-      </DialogTitle>
-      <DialogContent className={classes.surveytextarea}>
-        {spec === "lamp.tips" && (
-          <Typography variant="h4" gutterBottom>
-            {t("Quick Tips to Improve Your")} {t(activity?.name)}
-          </Typography>
-        )}
-        {(spec === "lamp.survey" || spec === "lamp.dbt_diary_card") && (
-          <Typography variant="h4" gutterBottom>
-            {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
-          </Typography>
-        )}
-        <Typography variant="body2" component="p">
-          <ReactMarkdown
-            source={
-              spec !== "lamp.dbt_diary_card"
-                ? t(tag[activity?.id]?.description ?? null)
-                : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
-            }
-            escapeHtml={false}
-            plugins={[gfm, emoji]}
-            renderers={{ link: LinkRenderer }}
-          />
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Box textAlign="center" width={1} mt={1} mb={3}>
-          <Link
-            onClick={() => {
-              setOpenData(true)
-              setOpen(false)
-            }}
-            underline="none"
-            className={classnames(
-              classes.btngreen,
-              classes.linkButton,
-              type === "Manage"
-                ? classes.btnManage
-                : type === "Assess"
-                ? classes.btnAsses
-                : type === "Learn"
-                ? classes.btnLearn
-                : classes.btnPrevent
-            )}
-          >
-            {spec === "lamp.survey" ? t("Start survey") : t("Begin")}
-          </Link>
-        </Box>
-      </DialogActions>
-    </Dialog>
+        </DialogContent>
+        <DialogActions>
+          <Box textAlign="center" width={1} mt={1} mb={3}>
+            <Link
+              onClick={(evt) => {
+                setOpenData(true)
+                props.onClose(evt, "backdropClick")
+              }}
+              underline="none"
+              className={classnames(
+                classes.btngreen,
+                classes.linkButton,
+                type === "Manage"
+                  ? classes.btnManage
+                  : type === "Assess"
+                  ? classes.btnAsses
+                  : type === "Learn"
+                  ? classes.btnLearn
+                  : classes.btnPrevent
+              )}
+            >
+              {activity?.spec === "lamp.survey" ? t("Start survey") : t("Begin")}
+            </Link>
+          </Box>
+        </DialogActions>
+      </Dialog>
+      <ActivityPage
+        activity={currentActivity}
+        participant={participant}
+        setOpenData={setOpenData}
+        submitSurvey={submitSurvey}
+        showSteak={showSteak}
+        openData={openData}
+      />
+    </React.Fragment>
   )
 }

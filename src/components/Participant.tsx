@@ -158,7 +158,7 @@ export default function Participant({
   const [openComplete, setOpenComplete] = React.useState(false)
   const [steak, setSteak] = useState(1)
   const { t, i18n } = useTranslation()
-
+  const [activitySubmitted, setActivitySubmited] = React.useState(false)
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }
@@ -321,6 +321,7 @@ export default function Participant({
                 hiddenEvents={hiddenEvents}
                 enableEditMode={!_patientMode()}
                 showSteak={showSteak}
+                activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
                   setSurveyName(activity.name)
                   setVisibleActivities([
@@ -383,23 +384,6 @@ export default function Participant({
                 setOpen(false)
                 setShowWelcome(participant)
               }}
-            />
-          </ResponsiveDialog>
-          <ResponsiveDialog
-            transient
-            animate
-            fullScreen
-            open={tab === 3 && visibleActivities.length > 0}
-            onClose={() => {
-              setVisibleActivities([])
-            }}
-          >
-            <SurveyInstrument
-              participant={participant}
-              fromPrevent={true}
-              type={surveyName}
-              group={visibleActivities}
-              onComplete={submitSurvey}
             />
           </ResponsiveDialog>
         </Box>

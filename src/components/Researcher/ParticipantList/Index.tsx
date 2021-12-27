@@ -184,39 +184,30 @@ export default function ParticipantList({
 
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
-    if (selectedStudies.length > 0) {
+    if (selected.length > 0) {
+      setLoading(true)
       const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
-      if (selectedData.length > 0 && !loading) {
+      if (selectedData.length > 0) {
         let result = []
-        setLoading(true)
-        selectedData.map((study) => {
-          Service.getDataByKey("participants", [study], "study_name").then((participantData) => {
-            if ((participantData || []).length > 0) {
-              if (!!searchTxt && searchTxt.trim().length > 0) {
-                result = result.concat(participantData)
-                result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
-                setParticipants(sortData(result, selectedData, "id"))
-              } else {
-                result = result.concat(participantData)
-                setParticipants(sortData(result, selectedData, "id"))
-              }
-              setPaginatedParticipants(
-                sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
-              )
-              setPage(page)
-              setRowCount(rowCount)
-            } else {
-              if (result.length === 0) setParticipants([])
-            }
-            setLoading(false)
-          })
+        Service.getAll("participants").then((participantData) => {
+          if (!!searchTxt && searchTxt.trim().length > 0) {
+            result = result.concat(participantData)
+            result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
+            setParticipants(sortData(result, selectedData, "id"))
+          } else {
+            result = result.concat(participantData)
+            setParticipants(sortData(result, selectedData, "id"))
+          }
+          setPaginatedParticipants(
+            sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+          )
+          setPage(page)
+          setRowCount(rowCount)
+          setLoading(false)
         })
       } else {
-        setLoading(false)
+        setParticipants([])
       }
-    } else {
-      setParticipants([])
-      setLoading(false)
     }
     setSelectedParticipants([])
   }

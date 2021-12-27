@@ -20,6 +20,7 @@ import { getEvents } from "./Participant"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
+import VoiceRecordingResult from "./VoiceRecordingResult"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -78,6 +79,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [activityDetails, setActivityDetails] = useState(null)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
+  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -166,6 +168,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             fromPrevent={false}
             group={[activity]}
             onComplete={submitSurvey}
+            noBack={true}
           />
         ) : activity?.spec === "lamp.cats_and_dogs" ||
           activity?.spec === "lamp.jewels_a" ||
@@ -183,8 +186,19 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             name={activity?.name}
             activity={activity}
             participant={participant}
-            onComplete={(response) => {
-              if (!!response) showSteak(participant, activity.id)
+            noBack={true}
+            onComplete={(data) => {
+              if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
+                if (!!data && !!data?.timestamp) {
+                  setOpenRecordSuccess(true)
+                  setTimeout(function () {
+                    setOpenRecordSuccess(false)
+                    showSteak(participant, activity.id)
+                  }, 2000)
+                }
+              } else {
+                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+              }
             }}
           />
         ) : activity?.spec === "lamp.group" ? (
@@ -193,6 +207,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             participant={participant}
             submitSurvey={submitSurvey}
             onComplete={() => setResponse(true)}
+            noBack={true}
           />
         ) : (
           <Dialog
@@ -209,7 +224,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             </DialogActions>
           </Dialog>
         ))}
-
+      <VoiceRecordingResult
+        open={openRecordSuccess}
+        onClose={() => {
+          setOpenRecordSuccess(false)
+        }}
+        setOpenRecordSuccess={setOpenRecordSuccess}
+      />
       <Steak
         open={openComplete}
         onClose={() => {

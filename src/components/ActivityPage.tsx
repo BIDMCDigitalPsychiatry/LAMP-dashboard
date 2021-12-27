@@ -1,56 +1,14 @@
 // Core Imports
-import React from "react"
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  makeStyles,
-  createStyles,
-  IconButton,
-  Icon,
-  Typography,
-  Theme,
-} from "@material-ui/core"
+import React, { useEffect } from "react"
+import { Box } from "@material-ui/core"
 import { Participant as ParticipantObj } from "lamp-core"
 import EmbeddedActivity from "./EmbeddedActivity"
 import SurveyInstrument from "./SurveyInstrument"
 import GroupActivity from "./GroupActivity"
 import { useTranslation } from "react-i18next"
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: "100%",
-    },
-    MuiDialogPaperScrollPaper: {
-      maxHeight: "100% !important",
-    },
-    closeButton: {
-      position: "absolute",
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500],
-    },
-    dialogueStyle: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    ribbonText: {
-      fontSize: "16px",
-      color: "rgba(0, 0, 0, 0.75)",
-      fontWeight: 600,
-      marginBottom: "30px",
-      padding: "0 42px",
-    },
-    dialogueCurve: { borderRadius: 10, maxWidth: 400 },
-    niceWork: {
-      "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
-    },
-    niceWorkbadge: { position: "relative", "& span": { fontSize: "110px", color: "#2F9D7E" } },
-  })
-)
+import VoiceRecordingResult from "./VoiceRecordingResult"
+import { openDB } from "idb"
+import ResponsiveDialog from "./ResponsiveDialog"
 
 export default function ActivityPage({
   participant,
@@ -58,6 +16,7 @@ export default function ActivityPage({
   submitSurvey,
   setOpenData,
   showSteak,
+  openData,
   ...props
 }: {
   participant: ParticipantObj
@@ -65,89 +24,91 @@ export default function ActivityPage({
   submitSurvey: Function
   setOpenData: Function
   showSteak: Function
+  openData: boolean
 }) {
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
-  const classes = useStyles()
+  const [data, setResponse] = React.useState(null)
   const { t } = useTranslation()
+
+  useEffect(() => {
+    setResponse(null)
+  }, [])
+
+  useEffect(() => {
+    if (data !== null) {
+      if (activity?.spec === "lamp.survey") {
+        if (!!data) submitSurvey(data, activity.id)
+      } else if (activity?.spec === "lamp.recording") {
+        if (!!data && !!data?.timestamp) {
+          setOpenRecordSuccess(true)
+          setTimeout(function () {
+            setOpenRecordSuccess(false)
+            showSteak(participant, activity.id)
+            setOpenData(false)
+          }, 2000)
+        } else setOpenData(false)
+      } else if (activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.recording") {
+        if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+      }
+      setResponse(null)
+    }
+  }, [data])
 
   return (
     <Box>
-      {(activity?.spec || "") === "lamp.survey" ? (
-        <SurveyInstrument
-          type={activity?.name ?? ""}
-          fromPrevent={false}
-          group={[activity]}
-          participant={participant}
-          onComplete={(response) => {
-            submitSurvey(response, activity.id)
-            setOpenData(false)
-          }}
-        />
-      ) : (activity?.spec || "") === "lamp.group" ? (
-        <GroupActivity
-          activity={activity}
-          participant={participant}
-          submitSurvey={(response) => {
-            submitSurvey(response, activity.id)
-            setOpenData(false)
-          }}
-          onComplete={() => {
-            setOpenData(false)
-          }}
-        />
-      ) : (
-        <EmbeddedActivity
-          name={activity?.description ?? ""}
-          activity={activity ?? []}
-          participant={participant}
-          onComplete={(data) => {
-            if (activity?.spec === "lamp.recording") {
-              setOpenRecordSuccess(true)
-              setTimeout(function () {
-                setOpenRecordSuccess(false)
-                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
-                setOpenData(false)
-              }, 2000)
-            } else {
-              if (activity?.spec === "lamp.tips" && !!data) showSteak(participant, activity.id)
-              if (activity?.spec !== "lamp.tips" && !!data && (!!data?.completed || !!data.timestamp))
-                showSteak(participant, activity.id)
-              setOpenData(false)
-            }
-          }}
-        />
-      )}
-      <Dialog
-        open={openRecordSuccess}
-        onClose={() => setOpenRecordSuccess(false)}
-        scroll="paper"
-        aria-labelledby="alert-dialog-slide-title"
-        aria-describedby="alert-dialog-slide-description"
-        classes={{
-          root: classes.dialogueStyle,
-          paper: classes.dialogueCurve,
-          paperScrollPaper: classes.MuiDialogPaperScrollPaper,
+      <ResponsiveDialog
+        transient={false}
+        animate
+        fullScreen
+        open={openData}
+        onClose={() => {
+          setOpenData(false)
         }}
       >
-        <DialogTitle>
-          <IconButton aria-label="close" className={classes.closeButton} onClick={() => setOpenRecordSuccess(false)}>
-            <Icon>close</Icon>
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Box textAlign="center" pb={4} className={classes.niceWork}>
-            <Typography variant="h5" gutterBottom>
-              {t("Success") + "!"}
-            </Typography>
-            <Typography className={classes.ribbonText} component="p">
-              {t("Voice Recorded has been submitted Successfully.")}
-            </Typography>
-            <Box textAlign="center" className={classes.niceWorkbadge}>
-              <Icon>check_circle</Icon>
-            </Box>
-          </Box>
-        </DialogContent>
-      </Dialog>
+        {!!activity && activity?.spec === "lamp.survey" ? (
+          <SurveyInstrument
+            type={activity?.name ?? ""}
+            fromPrevent={false}
+            group={[activity]}
+            participant={participant}
+            onComplete={(response) => {
+              setResponse(response)
+              setOpenData(false)
+            }}
+            noBack={false}
+          />
+        ) : !!activity && activity?.spec === "lamp.group" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            submitSurvey={(response) => {
+              if (!!response) submitSurvey(response, activity.id)
+              setOpenData(false)
+            }}
+            onComplete={() => {
+              setOpenData(false)
+            }}
+          />
+        ) : !!activity && activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.group" ? (
+          <EmbeddedActivity
+            name={activity?.description ?? ""}
+            activity={activity ?? []}
+            participant={participant}
+            noBack={false}
+            onComplete={(data) => {
+              setResponse(data)
+              setOpenData(false)
+            }}
+          />
+        ) : null}
+      </ResponsiveDialog>
+      <VoiceRecordingResult
+        open={openRecordSuccess}
+        onClose={() => {
+          setOpenRecordSuccess(false)
+        }}
+        setOpenRecordSuccess={setOpenRecordSuccess}
+      />
     </Box>
   )
 }
