@@ -15,9 +15,6 @@ import {
   Typography,
   InputAdornment,
   useTheme,
-  makeStyles,
-  createStyles,
-  Theme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 
@@ -28,17 +25,6 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    passwordRule: {
-      marginLeft: "14px",
-      marginRight: "14px",
-      color: "red",
-      textAlign: "left",
-      display: "inline-block",
-    },
-  })
-)
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -86,7 +72,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
   const [accepted, setAccepted] = useState(true)
   const [showLink, setShowLink] = useState(false)
   const { t } = useTranslation()
-  const classes = useStyles()
+
   useEffect(() => {
     setPhoto(auxData.photo)
     setRole(auxData.role)
@@ -418,7 +404,6 @@ export const CredentialManager: React.FunctionComponent<{
       })
     })
     setRoles()
-    LAMP.Type.setAttachment(null, "me", "lamp.dashboard.security_preferences", { password_rule: "ab+c" })
   }, [])
 
   const setCredentials = (cred, permissions) => {
