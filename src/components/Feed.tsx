@@ -37,6 +37,7 @@ import LAMP, {
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
+import { getDate } from "./Researcher/ActivityList/ScheduleRow"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -496,7 +497,7 @@ export default function Feed({
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = new Date(schedule.time)
+            scheduleTime = getDate(schedule.time)
             let timeVal = getTimeValue(scheduleTime)
             startD.setHours(scheduleTime.getHours())
             startD.setMinutes(scheduleTime.getMinutes())
@@ -523,7 +524,7 @@ export default function Feed({
                 ? true
                 : false
             schedule.timeValue = timeVal
-            schedule.time = startD.getTime()
+            // schedule.time = startD.getTime()
             let first = new Date(currentDate)
             first.setHours(0)
             first.setMinutes(0)
@@ -988,6 +989,7 @@ export default function Feed({
                   completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
+                noBack={true}
               />
             ),
           }[launchedActivity ?? ""]

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   MenuItem,
   Icon,
@@ -24,6 +24,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+export const getDate = (val) => {
+  const newDate = new Date(val.substr(0, 10))
+  newDate.setHours(val.substr(11, 2))
+  newDate.setMinutes(val.substr(14, 2))
+  newDate.setSeconds(0)
+  return newDate
+}
+
 const manyDates = (items) =>
   items?.length > 0
     ? items
@@ -31,6 +39,23 @@ const manyDates = (items) =>
         .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
+
+export const dateInUTCformat = (val) => {
+  const dateVal =
+    val.getFullYear() +
+    "-" +
+    (val.getMonth() + 1) +
+    "-" +
+    val.getDate() +
+    "T" +
+    (val.getHours() > 9 ? val.getHours() : "0" + val.getHours()) +
+    ":" +
+    (val.getMinutes() > 9 ? val.getMinutes() : "0" + val.getMinutes()) +
+    ":" +
+    (val.getSeconds() > 9 ? val.getSeconds() : "0" + val.getSeconds()) +
+    ".000Z"
+  return dateVal
+}
 
 export default function ScheduleRow({
   scheduleRow,
@@ -86,7 +111,7 @@ export default function ScheduleRow({
       </TableCell>
       <TableCell>
         {!isEdit ? (
-          <span>{new Date(data.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
+          <span>{getDate(data.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
         ) : (
           <KeyboardTimePicker
             className={classes.datePicker}
@@ -98,9 +123,9 @@ export default function ScheduleRow({
             label={t("Time")}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
-            value={data.time}
+            value={getDate(data.time)}
             onChange={(date) => {
-              date?.isValid() && setData({ ...data, time: date })
+              date?.isValid() && setData({ ...data, time: dateInUTCformat(date) })
             }}
           />
         )}
