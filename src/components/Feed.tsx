@@ -524,7 +524,7 @@ export default function Feed({
                 ? true
                 : false
             scheduleData.timeValue = timeVal
-            scheduleData.time = startD.getTime()
+            scheduleData.timestamp = startD.getTime()
             let first = new Date(currentDate)
             first.setHours(0)
             first.setMinutes(0)
@@ -652,7 +652,7 @@ export default function Feed({
                             clickable: clickableVal,
                             completed: completedVal,
                             timeValue: time,
-                            time: newDateVal.getTime(),
+                            timestamp: newDateVal.getTime(),
                           }
                           currentFeed.push(each)
                         }
@@ -694,7 +694,7 @@ export default function Feed({
                             : true),
                         completed: completedVal,
                         timeValue: getTimeValue(new Date(time)),
-                        time: scheduledDate.getTime(),
+                        timestamp: scheduledDate.getTime(),
                       }
 
                       currentFeed.push(each)
@@ -765,7 +765,7 @@ export default function Feed({
       })
       setSelectedDays(selectedWeekViewDays)
       currentFeed = currentFeed.sort((x, y) => {
-        return x.time > y.time ? 1 : x.time < y.time ? -1 : 0
+        return x.timestamp > y.timestamp ? 1 : x.timestamp < y.timestamp ? -1 : 0
       })
       return currentFeed
     } else {
@@ -862,9 +862,9 @@ export default function Feed({
                             feed.activityData?.category === null ||
                             (!!feed.activityData?.category && feed.activityData?.category.length !== 0)) &&
                           ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&
-                            feed.time >= new Date().getTime()) ||
+                            feed.timestamp >= new Date().getTime()) ||
                             (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
-                              feed.time <= new Date().getTime()))
+                              feed.timestamp <= new Date().getTime()))
                         ) {
                           setIndex(index)
                           if (feed.type == "lamp.survey") {
