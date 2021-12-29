@@ -483,21 +483,21 @@ export default function Feed({
         let currentDate = new Date(date)
         let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
-        feed.schedule.map((schedule) => {
-          scheduleStartDate = new Date(schedule.start_date)
+        feed.schedule.map((scheduleData) => {
+          scheduleStartDate = new Date(scheduleData.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
           if (currentDate.getTime() < scheduleStartDate.getTime()) {
-            currentDate = new Date(schedule.start_date)
+            currentDate = new Date(scheduleData.start_date)
           }
           currentDate.setHours(0)
           currentDate.setMinutes(0)
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = getDate(schedule.time)
+            scheduleTime = getDate(scheduleData.time)
             let timeVal = getTimeValue(scheduleTime)
             startD.setHours(scheduleTime.getHours())
             startD.setMinutes(scheduleTime.getMinutes())
@@ -509,22 +509,22 @@ export default function Feed({
             scDate.setSeconds(0)
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
-            schedule.group =
+            scheduleData.group =
               feed.spec === "lamp.survey" || feed.spec === "lamp.group"
                 ? "assess"
                 : feed.spec === "lamp.tips"
                 ? "learn"
                 : "manage"
-            schedule.type = feed.spec
-            schedule.title = feed.name
-            schedule.activityData = JSON.parse(JSON.stringify(feed))
-            schedule.clickable =
+            scheduleData.type = feed.spec
+            scheduleData.title = feed.name
+            scheduleData.activityData = JSON.parse(JSON.stringify(feed))
+            scheduleData.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() <= new Date().getTime()
                 ? true
                 : false
-            schedule.timeValue = timeVal
-            // schedule.time = startD.getTime()
+            scheduleData.timeValue = timeVal
+            scheduleData.time = startD.getTime()
             let first = new Date(currentDate)
             first.setHours(0)
             first.setMinutes(0)
@@ -532,11 +532,11 @@ export default function Feed({
             let end = new Date(endDate)
             end.setHours(12)
             let feedCheck = false
-            switch (schedule.repeat_interval) {
+            switch (scheduleData.repeat_interval) {
               case "triweekly":
               case "biweekly":
-                schedule.completed = savedData.length > 0 ? true : false
-                let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
+                scheduleData.completed = savedData.length > 0 ? true : false
+                let type = scheduleData.repeat_interval === "triweekly" ? triweekly : biweekly
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
@@ -545,10 +545,10 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(schedule)
+                if (feedCheck) currentFeed.push(scheduleData)
                 break
               case "weekly":
-                schedule.completed = savedData.length > 0 ? true : false
+                scheduleData.completed = savedData.length > 0 ? true : false
                 let dayNo = getDayNumber(new Date(scheduleStartDate))
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
@@ -558,10 +558,10 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(schedule)
+                if (feedCheck) currentFeed.push(scheduleData)
                 break
               case "fortnightly":
-                schedule.completed = savedData.length > 0 ? true : false
+                scheduleData.completed = savedData.length > 0 ? true : false
                 if (first.getTime() > scheduleStartDate.getTime()) {
                   let found = false
                   while (first.getTime() <= end.getTime()) {
@@ -570,7 +570,7 @@ export default function Feed({
                     if (!!found) {
                       selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                       feedCheck = date.getDate() === first.getDate() ? true : false
-                      if (feedCheck) currentFeed.push(schedule)
+                      if (feedCheck) currentFeed.push(scheduleData)
                       first.setDate(first.getDate() + 14)
                     } else {
                       if (weeksBetweenDates % 2 === 0) {
@@ -579,7 +579,7 @@ export default function Feed({
                         if (firstDayNo === dayNo) {
                           selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                           feedCheck = date.getDate() === first.getDate() ? true : false
-                          if (feedCheck) currentFeed.push(schedule)
+                          if (feedCheck) currentFeed.push(scheduleData)
                           first.setDate(first.getDate() + 14)
                           found = true
                           continue
@@ -595,7 +595,7 @@ export default function Feed({
                   while (firstDate.getTime() <= end.getTime()) {
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
                     feedCheck = date.getDate() === firstDate.getDate() ? true : false
-                    if (feedCheck) currentFeed.push(schedule)
+                    if (feedCheck) currentFeed.push(scheduleData)
                     firstDate.setDate(firstDate.getDate() + 14)
                   }
                 }
@@ -607,17 +607,17 @@ export default function Feed({
               case "every12h":
                 while (first.getTime() <= end.getTime()) {
                   if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    if (schedule.repeat_interval === "daily") {
-                      schedule.completed = savedData.length > 0 ? true : false
-                      currentFeed.push(schedule)
+                    if (scheduleData.repeat_interval === "daily") {
+                      scheduleData.completed = savedData.length > 0 ? true : false
+                      currentFeed.push(scheduleData)
                     } else {
                       let startTime = scheduledDate.getTime()
                       const hourVal =
-                        schedule.repeat_interval === "hourly"
+                        scheduleData.repeat_interval === "hourly"
                           ? 1 * 60 * 60 * 1000
-                          : schedule.repeat_interval === "every3h"
+                          : scheduleData.repeat_interval === "every3h"
                           ? 3 * 60 * 60 * 1000
-                          : schedule.repeat_interval === "every6h"
+                          : scheduleData.repeat_interval === "every6h"
                           ? 6 * 60 * 60 * 1000
                           : 12 * 60 * 60 * 1000
 
@@ -648,7 +648,7 @@ export default function Feed({
                               ? true
                               : false
                           let each = {
-                            ...schedule,
+                            ...scheduleData,
                             clickable: clickableVal,
                             completed: completedVal,
                             timeValue: time,
@@ -666,30 +666,30 @@ export default function Feed({
               case "custom":
                 while (first.getTime() <= end.getTime()) {
                   if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    schedule.custom_time.map((time, index) => {
+                    scheduleData.custom_time.map((time, index) => {
                       let scheduledDate = new Date(first)
                       scheduledDate.setHours(new Date(time).getHours())
                       scheduledDate.setMinutes(new Date(time).getMinutes())
                       let nextScheduleDate = new Date(first)
-                      if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
-                        nextScheduleDate.setHours(new Date(schedule.custom_time[index + 1]).getHours())
-                        nextScheduleDate.setMinutes(new Date(schedule.custom_time[index + 1]).getMinutes())
+                      if (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]) {
+                        nextScheduleDate.setHours(new Date(scheduleData.custom_time[index + 1]).getHours())
+                        nextScheduleDate.setMinutes(new Date(scheduleData.custom_time[index + 1]).getMinutes())
                       }
 
                       let filteredData = savedData.filter(
                         (item) =>
                           item.timestamp >= scheduledDate.getTime() &&
-                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                          (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]
                             ? item.timestamp <= nextScheduleDate.getTime()
                             : true)
                       )
                       let completedVal = filteredData.length > 0 ? true : false
                       let each = {
-                        ...schedule,
+                        ...scheduleData,
                         clickable:
                           new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
                           scheduledDate.getTime() <= new Date().getTime() &&
-                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
+                          (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]
                             ? new Date().getTime() <= nextScheduleDate.getTime()
                             : true),
                         completed: completedVal,
@@ -705,10 +705,10 @@ export default function Feed({
                 }
                 break
               case "monthly":
-                schedule.completed = savedData.length > 0 ? true : false
+                scheduleData.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
+                    scheduleData.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       new Date(date).getDate() === new Date(scheduleStartDate).getDate() &&
                       date.getTime() >= scDate.getTime()
@@ -718,13 +718,13 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(schedule)
+                if (feedCheck) currentFeed.push(scheduleData)
                 break
               case "bimonthly":
-                schedule.completed = savedData.length > 0 ? true : false
+                scheduleData.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
+                    scheduleData.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       [10, 20].indexOf(new Date(date).getDate()) > -1 && date.getTime() >= scDate.getTime()
                         ? true
@@ -742,13 +742,13 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(schedule)
+                if (feedCheck) currentFeed.push(scheduleData)
                 break
               case "none":
-                schedule.completed = savedData.length > 0 ? true : false
+                scheduleData.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
-                    schedule.timeValue = getTimeValue(scheduleTime)
+                    scheduleData.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
                         ? true
@@ -757,7 +757,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(schedule)
+                if (feedCheck) currentFeed.push(scheduleData)
                 break
             }
           }
