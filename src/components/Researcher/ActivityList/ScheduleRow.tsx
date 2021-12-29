@@ -25,18 +25,21 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export const getDate = (val) => {
-  const newDate = new Date(val.substr(0, 10))
-  newDate.setHours(val.substr(11, 2))
-  newDate.setMinutes(val.substr(14, 2))
-  newDate.setSeconds(0)
-  return newDate
+  if (val.length > 0) {
+    const newDate = new Date(val.substr(0, 10))
+    newDate.setHours(val.substr(11, 2))
+    newDate.setMinutes(val.substr(14, 2))
+    newDate.setSeconds(0)
+    return newDate
+  }
+  return new Date()
 }
 
-const manyDates = (items) =>
+export const manyDates = (items) =>
   items?.length > 0
     ? items
         ?.slice(0, 3)
-        .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
+        .map((x) => getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
 
@@ -105,13 +108,18 @@ export default function ScheduleRow({
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.start_date}
-            onChange={(date) => date?.isValid() && setData({ ...data, start_date: date })}
+            onChange={(date) => {
+              date.setHours(0)
+              date.setMinutes(0)
+              date.setSeconds(0)
+              date?.isValid() && setData({ ...data, start_date: date })
+            }}
           />
         )}
       </TableCell>
       <TableCell>
         {!isEdit ? (
-          <span>{getDate(data.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
+          <span>{getDate(data.time ?? "").toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
         ) : (
           <KeyboardTimePicker
             className={classes.datePicker}
@@ -123,7 +131,8 @@ export default function ScheduleRow({
             label={t("Time")}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
-            value={getDate(data.time)}
+            value={getDate(data.time ?? "")}
+            defaultValue={getDate(data.time ?? "")}
             onChange={(date) => {
               date?.isValid() && setData({ ...data, time: dateInUTCformat(date) })
             }}

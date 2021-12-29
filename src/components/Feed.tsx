@@ -668,14 +668,13 @@ export default function Feed({
                   if (date.toLocaleDateString() === first.toLocaleDateString()) {
                     scheduleData.custom_time.map((time, index) => {
                       let scheduledDate = new Date(first)
-                      scheduledDate.setHours(new Date(time).getHours())
-                      scheduledDate.setMinutes(new Date(time).getMinutes())
+                      scheduledDate.setHours(getDate(time).getHours())
+                      scheduledDate.setMinutes(getDate(time).getMinutes())
                       let nextScheduleDate = new Date(first)
                       if (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]) {
-                        nextScheduleDate.setHours(new Date(scheduleData.custom_time[index + 1]).getHours())
-                        nextScheduleDate.setMinutes(new Date(scheduleData.custom_time[index + 1]).getMinutes())
+                        nextScheduleDate.setHours(getDate(scheduleData.custom_time[index + 1]).getHours())
+                        nextScheduleDate.setMinutes(getDate(scheduleData.custom_time[index + 1]).getMinutes())
                       }
-
                       let filteredData = savedData.filter(
                         (item) =>
                           item.timestamp >= scheduledDate.getTime() &&
@@ -693,7 +692,7 @@ export default function Feed({
                             ? new Date().getTime() <= nextScheduleDate.getTime()
                             : true),
                         completed: completedVal,
-                        timeValue: getTimeValue(new Date(time)),
+                        timeValue: getTimeValue(getDate(time)),
                         timestamp: scheduledDate.getTime(),
                       }
 
