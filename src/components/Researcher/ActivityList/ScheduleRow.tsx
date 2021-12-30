@@ -16,6 +16,7 @@ import {
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
+import { isDate } from "date-fns"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export const getDate = (val) => {
-  if (val.length > 0) {
+  if ((val || "").length > 0) {
     const newDate = new Date(val.substr(0, 10))
     newDate.setHours(val.substr(11, 2))
     newDate.setMinutes(val.substr(14, 2))
@@ -44,18 +45,19 @@ export const manyDates = (items) =>
     : "No custom times"
 
 export const dateInUTCformat = (val) => {
+  // if(isDate?)
   const dateVal =
-    val.getFullYear() +
+    (val || new Date()).getFullYear() +
     "-" +
-    (val.getMonth() + 1) +
+    ((val || new Date()).getMonth() + 1) +
     "-" +
-    val.getDate() +
+    (val || new Date()).getDate() +
     "T" +
-    (val.getHours() > 9 ? val.getHours() : "0" + val.getHours()) +
+    ((val || new Date()).getHours() > 9 ? (val || new Date()).getHours() : "0" + (val || new Date()).getHours()) +
     ":" +
-    (val.getMinutes() > 9 ? val.getMinutes() : "0" + val.getMinutes()) +
+    ((val || new Date()).getMinutes() > 9 ? (val || new Date()).getMinutes() : "0" + (val || new Date()).getMinutes()) +
     ":" +
-    (val.getSeconds() > 9 ? val.getSeconds() : "0" + val.getSeconds()) +
+    ((val || new Date()).getSeconds() > 9 ? (val || new Date()).getSeconds() : "0" + (val || new Date()).getSeconds()) +
     ".000Z"
   return dateVal
 }
