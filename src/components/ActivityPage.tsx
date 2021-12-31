@@ -43,12 +43,12 @@ export default function ActivityPage({
           setOpenRecordSuccess(true)
           setTimeout(function () {
             setOpenRecordSuccess(false)
-            showSteak(participant, activity.id)
+            showSteak(participant, activity)
             setOpenData(false)
           }, 2000)
         } else setOpenData(false)
       } else if (activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.recording") {
-        if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+        if (!!data && !!data?.timestamp) showSteak(participant, activity)
       }
       setResponse(null)
     }
@@ -88,6 +88,7 @@ export default function ActivityPage({
             onComplete={() => {
               setOpenData(false)
             }}
+            noBack={false}
           />
         ) : !!activity && activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.group" ? (
           <EmbeddedActivity

@@ -21,7 +21,7 @@ import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import VoiceRecordingResult from "./VoiceRecordingResult"
-
+import { getImage } from "./Manage"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -80,6 +80,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
+  const [steakActivity, setSteakActivity] = useState(null)
 
   useEffect(() => {
     ;(async () => {
@@ -127,20 +128,25 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, activity.id)
+        showSteak(participant, activity)
       })
     }
   }
 
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setTimeout(() => {
-        setOpenComplete(false)
-        setResponse(true)
-        setLoading(false)
-      }, 6000)
+  const showSteak = (participant, activity) => {
+    getImage(activity?.id, activity?.spec).then((tag) => {
+      setSteakActivity(tag?.steak ?? null)
+      if (!!tag?.steak?.steak || typeof tag?.steak === "undefined") {
+        getEvents(participant, activity.id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setTimeout(() => {
+            setOpenComplete(false)
+            setResponse(true)
+            setLoading(false)
+          }, 6000)
+        })
+      } else setLoading(false)
     })
   }
 
@@ -193,11 +199,11 @@ export default function NotificationPage({ participant, activityId, ...props }) 
                   setOpenRecordSuccess(true)
                   setTimeout(function () {
                     setOpenRecordSuccess(false)
-                    showSteak(participant, activity.id)
+                    showSteak(participant, activity)
                   }, 2000)
                 }
               } else {
-                if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+                if (!!data && !!data?.timestamp) showSteak(participant, activity)
               }
             }}
           />
@@ -240,6 +246,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         }}
         setOpenComplete={setOpenComplete}
         steak={steak}
+        activity={steakActivity}
       />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />

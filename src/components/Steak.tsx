@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Dialog,
   DialogProps,
@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
+import { getImage } from "./Manage"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -59,15 +60,22 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function Steak({
   steak,
+  activity,
   setOpenComplete,
   ...props
 }: {
   steak?: number
+  activity?: any
   setOpenComplete?: Function
 } & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   const classes = useStyles()
   const { t } = useTranslation()
+  const [activityDetails, setActivityDetails] = useState(null)
+
+  useEffect(() => {
+    console.log(activity)
+  }, [activity])
 
   return (
     <Dialog
@@ -95,10 +103,14 @@ export default function Steak({
       <DialogContent>
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
-            {t("Nice work!")}
+            {t(!!activity?.steakTitle && activity?.steakTitle.trim().length > 0 ? activity?.steakTitle : "Nice work!")}
           </Typography>
           <Typography className={classes.ribbonText} component="p">
-            {t("You’re on a streak, keep it going")}
+            {t(
+              !!activity?.steakDesc && activity?.steakDesc.trim().length > 0
+                ? activity?.steakDesc
+                : "You’re on a streak, keep it going"
+            )}
           </Typography>
           <Box textAlign="center" className={classes.niceWorkbadge}>
             <Ribbon width="170" height="226" />

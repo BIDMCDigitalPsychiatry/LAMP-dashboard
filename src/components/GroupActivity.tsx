@@ -17,6 +17,7 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import { getEvents } from "./Participant"
+import { getImage } from "./Manage"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -45,6 +46,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
   const [index, setIndex] = useState(0)
+  const [steakActivity, setSteakActivity] = useState(null)
 
   useEffect(() => {
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
@@ -73,7 +75,8 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   }, [activity])
 
   const completeActivity = () => {
-    showSteak(participant, currentActivity.id)
+    setSteakActivity(currentActivity)
+    showSteak(participant, currentActivity)
   }
 
   const iterateActivity = () => {
@@ -125,15 +128,20 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
     }
   }
 
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setTimeout(() => {
-        setOpenComplete(false)
-        iterateActivity()
-        setLoading(false)
-      }, 5000)
+  const showSteak = (participant, activity) => {
+    getImage(activity?.id, activity?.spec).then((tag) => {
+      setSteakActivity(tag?.steak ?? null)
+      if (!!tag?.steak?.steak || typeof tag?.steak === "undefined") {
+        getEvents(participant, activity.id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setTimeout(() => {
+            setOpenComplete(false)
+            iterateActivity()
+            setLoading(false)
+          }, 5000)
+        })
+      } else setLoading(false)
     })
   }
 
@@ -220,6 +228,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         }}
         setOpenComplete={setOpenComplete}
         steak={steak}
+        activity={steakActivity}
       />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />

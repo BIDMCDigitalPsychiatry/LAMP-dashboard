@@ -26,6 +26,7 @@ import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
 import { useTranslation } from "react-i18next"
 import Steak from "./Steak"
+import { getImage } from "./Manage"
 
 import locale_lang from "../locale_map.json"
 import { ShowChart } from "@material-ui/icons"
@@ -121,6 +122,7 @@ export default function Participant({
 }) {
   const [activities, setActivities] = useState(null)
   const [visibleActivities, setVisibleActivities] = useState([])
+  const [steakActivity, setSteakActivity] = useState(null)
   const getTab = () => {
     let tabNum
     switch (props.tabValue) {
@@ -254,7 +256,7 @@ export default function Participant({
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, activityId)
+        showSteak(participant, visibleActivities[0])
         setVisibleActivities([])
         // If a timestamp was provided to overwrite data, hide the original event too.
         if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activityId)
@@ -263,11 +265,16 @@ export default function Participant({
     }
   }
 
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setLoading(false)
+  const showSteak = (participant, activity) => {
+    getImage(activity?.id, activity?.spec).then((tag) => {
+      setSteakActivity(tag?.steak ?? null)
+      if (!!tag?.steak?.steak || typeof tag?.steak === "undefined") {
+        getEvents(participant, activity.id).then((steak) => {
+          setSteak(steak)
+          setOpenComplete(true)
+          setLoading(false)
+        })
+      } else setLoading(false)
     })
   }
 
@@ -393,6 +400,7 @@ export default function Participant({
         onClose={() => {
           setOpenComplete(false)
         }}
+        activity={steakActivity}
         setOpenComplete={setOpenComplete}
         steak={steak}
       />

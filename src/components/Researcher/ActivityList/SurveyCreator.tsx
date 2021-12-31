@@ -162,12 +162,12 @@ function SelectList({ checkbox, type, value, onChange, ...props }) {
 function MatrixList({ value, onChange, ...props }) {
   const [options, setOptions] = useState(value?.options || [])
   const [questions, setQuestions] = useState(value?.questions || [])
-  const [multiple, setMultile] = useState(typeof value?.multiple !== 'undefined' ? value?.multiple: false)
+  const [multiple, setMultile] = useState(typeof value?.multiple !== "undefined" ? value?.multiple : false)
 
   useEffect(() => {
-    onChange({options , questions, multiple})
+    onChange({ options, questions, multiple })
   }, [options, questions, multiple])
-  
+
   const TypeGroup = multiple ? FormGroup : RadioGroup
   const TypeComponent = multiple ? Checkbox : Radio
   const AddIcon = multiple ? "add_box" : "add_circle"
@@ -204,19 +204,17 @@ function MatrixList({ value, onChange, ...props }) {
                   style={{ marginBottom: 16 }}
                   label={t("Question")}
                   error={typeof x == "undefined" || x === null || x === "" ? true : false}
-                  helperText={
-                    typeof x == "undefined" || x === null || x === "" ? t("Please enter question") : ""
-                  }
+                  helperText={typeof x == "undefined" || x === null || x === "" ? t("Please enter question") : ""}
                   onBlur={(event) =>
                     setQuestions((questions) =>
                       Object.assign([...questions], {
-                        [idx]:  removeExtraSpace(event.target.value),
+                        [idx]: removeExtraSpace(event.target.value),
                       })
                     )
                   }
                   type={"text"}
                   inputProps={{ maxLength: 50 }}
-                  InputProps={{                                      
+                  InputProps={{
                     endAdornment: [
                       <InputAdornment position="end" key="adornment">
                         <Tooltip title={t("Delete this quesion.")}>
@@ -240,7 +238,7 @@ function MatrixList({ value, onChange, ...props }) {
             labelPlacement="end"
           />
         ))}
-         <FormControlLabel
+        <FormControlLabel
           control={
             <TypeComponent
               checked
@@ -285,7 +283,7 @@ function MatrixList({ value, onChange, ...props }) {
                         [idx]: {
                           value: removeExtraSpace(event.target.value),
                           description: removeExtraSpace(options[idx].description),
-                        }                       
+                        },
                       })
                     )
                   }
@@ -310,7 +308,7 @@ function MatrixList({ value, onChange, ...props }) {
                     ],
                   }}
                 />
-               <TextField
+                <TextField
                   fullWidth
                   margin="dense"
                   variant="filled"
@@ -346,7 +344,6 @@ function MatrixList({ value, onChange, ...props }) {
           label={<Typography>{t("Add Option")}</Typography>}
           labelPlacement="end"
         />
-        
       </TypeGroup>
     </React.Fragment>
   )
@@ -472,7 +469,7 @@ function QuestionCreator({ question, onChange, onDelete, isSelected, setSelected
               </Box>
             </Grid>
           )}
-           {type === "matrix" && (
+          {type === "matrix" && (
             <Grid item>
               <Box borderColor="grey.400" border={1} borderRadius={4} p={2}>
                 <MatrixList value={options} onChange={setOptions} />
@@ -533,6 +530,7 @@ export default function SurveyCreator({
     schedule: !!value ? value?.schedule : [],
     description: !!value ? value?.description : undefined,
     photo: !!value ? value?.photo : null,
+    steak: !!value ? value?.steak : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? null,
@@ -553,6 +551,7 @@ export default function SurveyCreator({
       settings: questions,
       description: details.description,
       photo: details.photo,
+      steak: details.steak,
       studyID: details.studyId,
       category: data?.category ?? [],
     })
@@ -586,7 +585,7 @@ export default function SurveyCreator({
     if (!!questions && questions.length > 0) {
       let optionsArray = []
       {
-        (questions || []).map((x, idx) => {
+        ;(questions || []).map((x, idx) => {
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
@@ -599,13 +598,13 @@ export default function SurveyCreator({
               ? optionsArray.push(0)
               : optionsArray.push(1)
             : optionsArray.push(0)
-           if(questions[idx]?.type === "matrix") {
-            ( questions[idx]?.options?.options === null || questions[idx]?.options?.questions === null ||
-               (!! questions[idx]?.options?.options &&  questions[idx]?.options?.options?.length === 0) ||
-               (!! questions[idx]?.options?.questions &&  questions[idx]?.options?.questions?.length === 0) 
-               ) ?
-                optionsArray.push(1) :
-                (questions[idx]?.options?.questions || []).filter(
+          if (questions[idx]?.type === "matrix") {
+            questions[idx]?.options?.options === null ||
+            questions[idx]?.options?.questions === null ||
+            (!!questions[idx]?.options?.options && questions[idx]?.options?.options?.length === 0) ||
+            (!!questions[idx]?.options?.questions && questions[idx]?.options?.questions?.length === 0)
+              ? optionsArray.push(1)
+              : (questions[idx]?.options?.questions || []).filter(
                   (i) => !!i && ((!!i && i?.trim().length > 0) || i === "")
                 ).length === (questions[idx]?.options?.questions || []).length &&
                 (questions[idx]?.options?.options || []).filter(
@@ -613,7 +612,7 @@ export default function SurveyCreator({
                 ).length === (questions[idx]?.options?.options || []).length
               ? optionsArray.push(0)
               : optionsArray.push(1)
-           }
+          }
         })
       }
       if (optionsArray.filter((val) => val !== 0).length > 0) {

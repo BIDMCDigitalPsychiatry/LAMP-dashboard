@@ -1,9 +1,21 @@
 import React, { useCallback, useState, useEffect } from "react"
-import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem, Select, OutlinedInput } from "@material-ui/core"
+import {
+  Grid,
+  ButtonBase,
+  Icon,
+  TextField,
+  Tooltip,
+  Box,
+  MenuItem,
+  Select,
+  OutlinedInput,
+  Divider,
+} from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 import ActivityTab from "./ActivityTab"
+import ActivitySteak from "./ActivitySteak"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -32,7 +44,7 @@ function compress(file, width, height) {
     }
   })
 }
-const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
+export const removeExtraSpace = (s) => s?.trim().split(/ +/).join(" ")
 
 export default function ActivityHeader({
   studies,
@@ -51,6 +63,7 @@ export default function ActivityHeader({
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
+  const [steak, setSteak] = useState(details?.steak ? details?.steak : null)
 
   useEffect(() => {
     onChange({
@@ -58,8 +71,9 @@ export default function ActivityHeader({
       photo,
       description,
       studyId,
+      steak,
     })
-  }, [text, description, photo, studyId])
+  }, [text, description, photo, studyId, steak])
 
   useEffect(() => {
     //
@@ -134,24 +148,21 @@ export default function ActivityHeader({
                 </MenuItem>
               ))}
             </TextField>
-              
           </Grid>
           <Grid item lg={6} sm={6} xs={12}>
-              <TextField
-                error={
-                  typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false
-                }
-                fullWidth
-                variant="filled"
-                label={t("Activity Title")}
-                defaultValue={text}
-                onChange={(event) => setText(removeExtraSpace(event.target.value))}
-                inputProps={{ maxLength: 80 }}
-              />
+            <TextField
+              error={typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false}
+              fullWidth
+              variant="filled"
+              label={t("Activity Title")}
+              defaultValue={text}
+              onChange={(event) => setText(removeExtraSpace(event.target.value))}
+              inputProps={{ maxLength: 80 }}
+            />
           </Grid>
-          <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />          
+          <ActivityTab onChange={onTabChange} activitySpecId={activitySpecId} value={value} />
         </Grid>
-        <Box style={{marginTop:"15px"}}>
+        <Box style={{ marginTop: "15px" }}>
           <TextField
             fullWidth
             multiline
@@ -164,6 +175,7 @@ export default function ActivityHeader({
           />
         </Box>
       </Grid>
+      <ActivitySteak onChange={(val) => setSteak(val)} value={details?.steak} />
     </Grid>
   )
 }
