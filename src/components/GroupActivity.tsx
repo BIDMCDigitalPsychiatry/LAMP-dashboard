@@ -39,7 +39,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(1)
+  const [steak, setSteak] = useState(null)
   const [loading, setLoading] = useState(true)
   const [activityDetails, setActivityDetails] = useState(null)
   const [activityId, setActivityId] = useState(null)
@@ -75,8 +75,11 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   }, [activity])
 
   const completeActivity = () => {
-    setSteakActivity(currentActivity)
-    showSteak(participant, currentActivity)
+    setLoading(true)
+    iterateActivity()
+    setTimeout(() => {
+      setLoading(false)
+    }, 5000)
   }
 
   const iterateActivity = () => {
@@ -91,6 +94,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         activity: activity.id,
         static_data: {},
       })
+      showSteak(participant, activity)
       props.onComplete()
     }
   }
@@ -137,7 +141,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
           setOpenComplete(true)
           setTimeout(() => {
             setOpenComplete(false)
-            iterateActivity()
             setLoading(false)
           }, 5000)
         })
