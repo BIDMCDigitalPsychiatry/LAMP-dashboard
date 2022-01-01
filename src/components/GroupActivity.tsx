@@ -38,15 +38,10 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [groupActivities, setGroupActivities] = useState([])
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [activityDetails, setActivityDetails] = useState(null)
-  const [activityId, setActivityId] = useState(null)
   const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
   const [index, setIndex] = useState(0)
-  const [steakActivity, setSteakActivity] = useState(null)
 
   useEffect(() => {
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
@@ -63,7 +58,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
 
   useEffect(() => {
     if (currentActivity !== null) {
-      setActivityId(currentActivity.id)
       setActivityRun(false)
     }
   }, [currentActivity])
@@ -94,8 +88,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         activity: activity.id,
         static_data: {},
       })
-      showSteak(participant, activity)
-      props.onComplete()
+      props.onComplete({ timestamp: new Date().getTime() })
     }
   }
 
@@ -131,40 +124,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
       })
     }
   }
-
-  const showSteak = (participant, activity) => {
-    getImage(activity?.id, activity?.spec).then((tag) => {
-      setSteakActivity(tag?.steak ?? null)
-      if (!!tag?.steak?.steak || typeof tag?.steak === "undefined") {
-        getEvents(participant, activity.id).then((steak) => {
-          setSteak(steak)
-          setOpenComplete(true)
-          setTimeout(() => {
-            setOpenComplete(false)
-            setLoading(false)
-          }, 5000)
-        })
-      } else setLoading(false)
-    })
-  }
-
-  useEffect(() => {
-    if (activity !== null) {
-      ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
-        let activityData = {
-          id: activity.id,
-          spec: activity.spec,
-          name: activity.name,
-          settings: activity.settings,
-          schedule: activity.schedule,
-          icon: iconData.data ? iconData.data.icon : undefined,
-        }
-        setActivityDetails(activityData)
-      })()
-      setLoading(false)
-    }
-  }, [activity])
 
   return (
     <div style={{ height: "100%" }}>
@@ -224,15 +183,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
           )}
         </Box>
       )}
-      <Steak
-        open={openComplete}
-        onClose={() => {
-          setOpenComplete(false)
-        }}
-        setOpenComplete={setOpenComplete}
-        steak={steak}
-        activity={steakActivity}
-      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

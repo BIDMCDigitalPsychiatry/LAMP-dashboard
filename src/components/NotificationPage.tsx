@@ -244,7 +244,6 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           setResponse(true)
           setLoading(false)
         }}
-        setOpenComplete={setOpenComplete}
         steak={steak}
         activity={steakActivity}
       />

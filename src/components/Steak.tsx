@@ -17,7 +17,6 @@ import {
 } from "@material-ui/core"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import { getImage } from "./Manage"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -61,21 +60,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Steak({
   steak,
   activity,
-  setOpenComplete,
   ...props
 }: {
   steak?: number
   activity?: any
-  setOpenComplete?: Function
 } & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   const classes = useStyles()
   const { t } = useTranslation()
-  const [activityDetails, setActivityDetails] = useState(null)
-
-  useEffect(() => {
-    console.log(activity)
-  }, [activity])
 
   return (
     <Dialog
@@ -90,13 +82,7 @@ export default function Steak({
       }}
     >
       <DialogTitle>
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={() => {
-            setOpenComplete(false)
-          }}
-        >
+        <IconButton aria-label="close" className={classes.closeButton} onClick={props.onClose as any}>
           <Icon>close</Icon>
         </IconButton>
       </DialogTitle>

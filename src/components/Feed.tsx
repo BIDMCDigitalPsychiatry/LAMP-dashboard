@@ -797,7 +797,7 @@ export default function Feed({
   }
   const submitSurvey = (response) => {
     completeFeed(index)
-    onComplete(response, visibleActivities[0].id)
+    onComplete(response, visibleActivities)
     setLaunchedActivity(undefined)
   }
 
