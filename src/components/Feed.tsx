@@ -797,7 +797,7 @@ export default function Feed({
   }
   const submitSurvey = (response) => {
     completeFeed(index)
-    onComplete(response, visibleActivities)
+    onComplete(response, visibleActivities[0])
     setLaunchedActivity(undefined)
   }
 
@@ -986,6 +986,7 @@ export default function Feed({
                 submitSurvey={submitSurvey}
                 onComplete={() => {
                   completeFeed(index)
+                  showStreak(participant, visibleActivities)
                   setLaunchedActivity(undefined)
                 }}
                 noBack={false}
