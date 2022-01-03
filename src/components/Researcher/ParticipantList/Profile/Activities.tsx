@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-export default function PatientProfile({
+export default function Activities({
   participant,
   studies,
   setUpdateCount,
@@ -49,7 +49,7 @@ export default function PatientProfile({
 }: {
   participant: any
   studies: any
-  setUpdateCount: Function
+  setUpdateCount?: Function
 }) {
   const classes = useStyles()
   const [activities, setActivities] = useState([])

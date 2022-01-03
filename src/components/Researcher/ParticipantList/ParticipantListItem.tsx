@@ -14,8 +14,8 @@ import {
   Theme,
   createStyles,
   Checkbox,
+  Link,
 } from "@material-ui/core"
-import PatientProfile from "./PatientProfile"
 // Local Imports
 import LAMP from "lamp-core"
 import ParticipantName from "./ParticipantName"
@@ -86,7 +86,6 @@ export default function ParticipantListItem({
   studies,
   notificationColumn,
   handleSelectionChange,
-  setUpdateCount,
   selectedParticipants,
   ...props
 }) {
@@ -103,7 +102,6 @@ export default function ParticipantListItem({
   }
 
   const updateParticipant = (nameVal: string) => {
-    setUpdateCount(1)
     setName({ ...user, name: nameVal })
   }
 
@@ -139,13 +137,9 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} />
-            <PatientProfile
-              participant={participant}
-              studies={studies}
-              onClose={updateParticipant}
-              setUpdateCount={setUpdateCount}
-              openSettings={setOpenSettings}
-            />
+            <Link href={`/#/participant/${participant?.id}/settings`} underline="none">
+              <Icon>settings</Icon>
+            </Link>
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}

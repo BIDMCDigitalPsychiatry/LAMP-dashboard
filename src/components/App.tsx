@@ -402,7 +402,7 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
-        path="/researcher/:id/participant/:pid/settings"
+        path="/participant/:id/settings"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -415,12 +415,27 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PatientProfile
-                participantId={props.match.params.pid}
-                studies={null}
-                onClose={null}
-                setUpdateCount={null}
+              <PatientProfile participantId={props.match.params.id} />
+            </React.Fragment>
+          )
+        }
+      />
+      <Route
+        exact
+        path="/activity/:id"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
               />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PatientProfile participantId={props.match.params.id} />
             </React.Fragment>
           )
         }

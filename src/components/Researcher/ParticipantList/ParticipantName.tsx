@@ -22,16 +22,11 @@ export default function ParticipantName({ participant, updateParticipant, openSe
   const [name, setName] = useState(participant.name ?? "")
 
   useEffect(() => {
-    setAliasName(participant.name ?? participant.id ?? "")
-    setName(participant.name ?? participant.id ?? "")
-    if (!participant.name) {
-      setTimeout(() => {
-        Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-          setAliasName(data[0]?.name ?? participant.id ?? "")
-          setName(data[0]?.name ?? participant.id ?? "")
-        })
-      }, 2000)
-    }
+    Service.getDataByKey("participants", [participant.id], "id").then((data) => {
+      console.log(data)
+      setAliasName(data[0]?.name ?? participant.id ?? "")
+      setName(data[0]?.name ?? participant.id ?? "")
+    })
   }, [participant])
 
   useEffect(() => {

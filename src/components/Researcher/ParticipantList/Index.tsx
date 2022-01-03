@@ -135,7 +135,6 @@ export default function ParticipantList({
   const [participants, setParticipants] = useState(null)
   const [selectedParticipants, setSelectedParticipants] = useState([])
   const [loading, setLoading] = useState(true)
-  const [updateCount, setUpdateCount] = useState(0)
   const [selected, setSelected] = useState([])
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
   const [studiesData, setStudiesData] = useState([])
@@ -258,7 +257,6 @@ export default function ParticipantList({
                     studies={studiesData}
                     notificationColumn={notificationColumn}
                     handleSelectionChange={handleChange}
-                    setUpdateCount={setUpdateCount}
                     selectedParticipants={selectedParticipants}
                   />
                 </Grid>

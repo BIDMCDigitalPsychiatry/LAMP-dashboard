@@ -10,13 +10,20 @@ import {
   CircularProgress,
   makeStyles,
   createStyles,
+  Fab,
+  AppBar,
+  Toolbar,
+  Icon,
+  Link,
+  IconButton,
+  Divider,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import UpdateCredential from "./UpdateCredential"
 import MessageDialog from "./MessageDialog"
-import Activties from "./Activities"
+import Activities from "./Activities"
 import Sensors from "./Sensors"
 import { Service } from "../../../DBService/DBService"
 
@@ -31,6 +38,18 @@ const useStyles = makeStyles((theme) =>
       zIndex: 111111,
       color: "#fff",
     },
+    toolbardashboard: {
+      minHeight: 100,
+      padding: "0 10px",
+      "& h5": {
+        color: "rgba(0, 0, 0, 0.75)",
+        textAlign: "left",
+        fontWeight: "600",
+        fontSize: 30,
+        width: "calc(100% - 96px)",
+      },
+    },
+
     buttonContainer: {
       width: 200,
       height: 50,
@@ -85,22 +104,12 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
-export default function PatientProfile({
-  participantId,
-  studies,
-  onClose,
-  setUpdateCount,
-  ...props
-}: {
-  participantId: any
-  studies: any
-  onClose: Function
-  setUpdateCount: Function
-}) {
+export default function PatientProfile({ participantId, ...props }: { participantId: any }) {
   const [nickname, setNickname] = useState("")
   const [loading, setLoading] = React.useState(false)
   const [ext, setExt] = useState([])
   const [participant, setParticipant] = useState(null)
+  const [studies, setStudies] = useState(null)
   const [allRoles, setAllRoles] = useState({})
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -122,6 +131,9 @@ export default function PatientProfile({
       console.log(data)
       setParticipant(data[0])
     })
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+    })
     onChangeAccounts()
     LAMP.Type.getAttachment(participantId, "lamp.name").then((res: any) => {
       setNickname(!!res.data ? res.data : null)
@@ -134,51 +146,64 @@ export default function PatientProfile({
       variant: "success",
     })
     Service.update("participants", { participants: [{ name: nickname ?? null, id: participantId }] }, "name", "id")
-    onClose(nickname ?? "")
   }
 
   return (
     <div className={classes.root}>
-      <Container className={classes.containerWidth}>
-        <Button className={classes.headerButton} onClick={() => updateName()}>
-          <Typography className={classes.buttonText}>{t("Save")}</Typography>
-        </Button>
+      <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
+        <Toolbar className={classes.toolbardashboard}>
+          <Link onClick={() => history.back()} underline="none">
+            <Icon>arrow_back</Icon>
+          </Link>
+          <Typography variant="h5">
+            {t("Profile")} {participant?.id ?? ""}
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Divider />
+      <Box py={8} px={4}>
+        <Container className={classes.containerWidth}>
+          <Button className={classes.headerButton} onClick={() => updateName()}>
+            <Typography className={classes.buttonText}>{t("Save")}</Typography>
+          </Button>
 
-        <Grid container spacing={0}>
-          <Box mb={4} width={1}>
-            <Grid container direction="row" justify="space-between" alignItems="center">
-              <Grid item lg={6}>
-                <Box>
-                  <TextField
-                    fullWidth
-                    label={t("Nickname(optional)")}
-                    variant="filled"
-                    value={nickname}
-                    defaultValue={nickname}
-                    onChange={(event) => setNickname(event.target.value)}
-                    inputProps={{ maxLength: 2500 }}
-                  />
-                </Box>
+          <Grid container spacing={0}>
+            <Box mb={4} width={1}>
+              <Grid container direction="row" justify="space-between" alignItems="center">
+                <Grid item lg={6}>
+                  <Box>
+                    <TextField
+                      fullWidth
+                      label={t("Nickname(optional)")}
+                      variant="filled"
+                      value={nickname}
+                      defaultValue={nickname}
+                      onChange={(event) => setNickname(event.target.value)}
+                      inputProps={{ maxLength: 2500 }}
+                    />
+                  </Box>
+                </Grid>
+                <Grid item>
+                  {!!participant && <UpdateCredential allRoles={allRoles} ext={ext} participant={participant} />}
+                </Grid>
               </Grid>
-              <Grid item>
-                {!!participant && <UpdateCredential allRoles={allRoles} ext={ext} participant={participant} />}
-              </Grid>
-            </Grid>
-          </Box>
-          <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
-          {!!participant && <Activties participant={participant} studies={studies} setUpdateCount={setUpdateCount} />}
-          <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
-          {!!participant && <Sensors participant={participant} studies={studies} setUpdateCount={setUpdateCount} />}
-          <div className={classes.buttonsContainer}>
-            <Button className={classes.buttonContainer} onClick={() => updateName()}>
-              <Typography className={classes.buttonText}>{t("Save")}</Typography>
-            </Button>
-            <Button className={classes.backContainer} onClick={() => onClose(nickname ?? "")}>
-              <Typography className={classes.backText}>{t("Cancel")}</Typography>
-            </Button>
-          </div>
-        </Grid>
-      </Container>
+            </Box>
+            <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
+            {!!participant && <Activities participant={participant} studies={studies} />}
+            <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
+            {!!participant && <Sensors participant={participant} studies={studies} />}
+            <div className={classes.buttonsContainer}>
+              <Button className={classes.buttonContainer} onClick={() => updateName()}>
+                <Typography className={classes.buttonText}>{t("Save")}</Typography>
+              </Button>
+              <Button className={classes.backContainer}>
+                {/* onClick={() => onClose(nickname ?? "")} */}
+                <Typography className={classes.backText}>{t("Cancel")}</Typography>
+              </Button>
+            </div>
+          </Grid>
+        </Container>
+      </Box>
       {!!participant && <MessageDialog participant={participant} />}
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
