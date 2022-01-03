@@ -86,20 +86,21 @@ const useStyles = makeStyles((theme) =>
 )
 
 export default function PatientProfile({
-  participant,
+  participantId,
   studies,
   onClose,
   setUpdateCount,
   ...props
 }: {
-  participant: any
+  participantId: any
   studies: any
   onClose: Function
   setUpdateCount: Function
 }) {
-  const [nickname, setNickname] = useState(participant?.name ?? "")
+  const [nickname, setNickname] = useState("")
   const [loading, setLoading] = React.useState(false)
   const [ext, setExt] = useState([])
+  const [participant, setParticipant] = useState(null)
   const [allRoles, setAllRoles] = useState({})
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -108,8 +109,8 @@ export default function PatientProfile({
   const onChangeAccounts = () => {
     ;(async function () {
       const prefix = "lamp.dashboard.credential_roles"
-      let ext = ((await LAMP.Type.getAttachment(participant.id, `${prefix}.external`)) as any).data
-      let int = ((await LAMP.Type.getAttachment(participant.id, `${prefix}`)) as any).data
+      let ext = ((await LAMP.Type.getAttachment(participantId, `${prefix}.external`)) as any).data
+      let int = ((await LAMP.Type.getAttachment(participantId, `${prefix}`)) as any).data
       setExt(Object.keys(ext ?? {}))
       setAllRoles(Object.assign(ext ?? {}, int ?? {}))
       setLoading(false)
@@ -117,18 +118,22 @@ export default function PatientProfile({
   }
 
   useEffect(() => {
+    Service.getDataByKey("participants", [participantId], "id").then((data) => {
+      console.log(data)
+      setParticipant(data[0])
+    })
     onChangeAccounts()
-    LAMP.Type.getAttachment(participant.id, "lamp.name").then((res: any) => {
+    LAMP.Type.getAttachment(participantId, "lamp.name").then((res: any) => {
       setNickname(!!res.data ? res.data : null)
     })
   }, [])
 
   const updateName = () => {
-    LAMP.Type.setAttachment(participant.id, "me", "lamp.name", nickname ?? null)
+    LAMP.Type.setAttachment(participantId, "me", "lamp.name", nickname ?? null)
     enqueueSnackbar(t("Successfully updated user profile."), {
       variant: "success",
     })
-    Service.update("participants", { participants: [{ name: nickname ?? null, id: participant.id }] }, "name", "id")
+    Service.update("participants", { participants: [{ name: nickname ?? null, id: participantId }] }, "name", "id")
     onClose(nickname ?? "")
   }
 
@@ -156,14 +161,14 @@ export default function PatientProfile({
                 </Box>
               </Grid>
               <Grid item>
-                <UpdateCredential allRoles={allRoles} ext={ext} participant={participant} />
+                {!!participant && <UpdateCredential allRoles={allRoles} ext={ext} participant={participant} />}
               </Grid>
             </Grid>
           </Box>
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
-          <Activties participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
+          {!!participant && <Activties participant={participant} studies={studies} setUpdateCount={setUpdateCount} />}
           <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
-          <Sensors participant={participant} studies={studies} setUpdateCount={setUpdateCount} />
+          {!!participant && <Sensors participant={participant} studies={studies} setUpdateCount={setUpdateCount} />}
           <div className={classes.buttonsContainer}>
             <Button className={classes.buttonContainer} onClick={() => updateName()}>
               <Typography className={classes.buttonText}>{t("Save")}</Typography>
@@ -174,7 +179,7 @@ export default function PatientProfile({
           </div>
         </Grid>
       </Container>
-      <MessageDialog participant={participant} />
+      {!!participant && <MessageDialog participant={participant} />}
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

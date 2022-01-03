@@ -16,6 +16,7 @@ import DataPortal from "./data_portal/DataPortal"
 import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
+import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -395,6 +396,31 @@ function AppRouter({ ...props }) {
           ) : (
             <React.Fragment>
               <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
+            </React.Fragment>
+          )
+        }
+      />
+      <Route
+        exact
+        path="/researcher/:id/participant/:pid/settings"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PatientProfile
+                participantId={props.match.params.pid}
+                studies={null}
+                onClose={null}
+                setUpdateCount={null}
+              />
             </React.Fragment>
           )
         }
