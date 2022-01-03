@@ -159,6 +159,14 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+export const LinkRenderer = (data: any) => {
+  return (
+    <a href={data.href} target="_blank">
+      {data.children}
+    </a>
+  )
+}
+
 export default function ActivityPopup({
   activity,
   questionCount,
@@ -181,13 +189,6 @@ export default function ActivityPopup({
   const { t } = useTranslation()
   const [openData, setOpenData] = React.useState(false)
   const [currentActivity, setCurrentActivity] = React.useState(null)
-  function LinkRenderer(data: any) {
-    return (
-      <a href={data.href} target="_blank">
-        {data.children}
-      </a>
-    )
-  }
 
   useEffect(() => {
     setCurrentActivity(activity)

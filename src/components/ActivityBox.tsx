@@ -11,6 +11,7 @@ import ActivityPopup from "./ActivityPopup"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
+import { LinkRenderer } from "./ActivityPopup"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -88,14 +89,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-
-export function LinkRenderer(data: any) {
-  return (
-    <a href={data.href} target="_blank">
-      {data.children}
-    </a>
-  )
-}
 
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, submitSurvey, ...props }) {
   const classes = useStyles()

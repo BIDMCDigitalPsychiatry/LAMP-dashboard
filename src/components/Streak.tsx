@@ -17,6 +17,10 @@ import {
 } from "@material-ui/core"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
+import { LinkRenderer } from "./ActivityPopup"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -89,16 +93,28 @@ export default function Streak({
       <DialogContent>
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
-            {t(
-              !!activity?.streakTitle && activity?.streakTitle.trim().length > 0 ? activity?.streakTitle : "Nice work!"
-            )}
+            <ReactMarkdown
+              source={t(
+                !!activity?.streakTitle && activity?.streakTitle.trim().length > 0
+                  ? activity?.streakTitle
+                  : "Nice work!"
+              )}
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+              renderers={{ link: LinkRenderer }}
+            />
           </Typography>
           <Typography className={classes.ribbonText} component="p">
-            {t(
-              !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
-                ? activity?.streakDesc
-                : "You’re on a streak, keep it going"
-            )}
+            <ReactMarkdown
+              source={t(
+                !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
+                  ? activity?.streakDesc
+                  : "You’re on a streak, keep it going"
+              )}
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+              renderers={{ link: LinkRenderer }}
+            />
           </Typography>
           <Box textAlign="center" className={classes.niceWorkbadge}>
             <Ribbon width="170" height="226" />
