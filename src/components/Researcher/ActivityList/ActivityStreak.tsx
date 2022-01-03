@@ -52,6 +52,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
             label={t("Streak title")}
             variant="filled"
             defaultValue={streakTitle}
+            disabled={!streak}
             onChange={(event) => setStreakTitle(removeExtraSpace(event.target.value))}
             inputProps={{ maxLength: 2500 }}
           />
@@ -63,6 +64,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
             label={t("Streak Description")}
             variant="filled"
             rows={2}
+            disabled={!streak}
             defaultValue={streakDesc}
             onChange={(event) => setStreakDesc(removeExtraSpace(event.target.value))}
             inputProps={{ maxLength: 2500 }}
