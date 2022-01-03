@@ -24,35 +24,35 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ActivitySteak({ value, onChange, ...props }) {
+export default function ActivityStreak({ value, onChange, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [steak, setSteak] = useState(value?.steak ?? true)
-  const [steakTitle, setSteakTitle] = useState(value?.steakTitle ?? "")
-  const [steakDesc, setSteakDesc] = useState(value?.steakDesc ?? "")
+  const [streak, setStreak] = useState(value?.streak ?? true)
+  const [streakTitle, setStreakTitle] = useState(value?.streakTitle ?? "")
+  const [streakDesc, setStreakDesc] = useState(value?.streakDesc ?? "")
 
   useEffect(() => {
-    onChange({ steak, steakTitle, steakDesc })
-  }, [steak, steakDesc, steakTitle])
+    onChange({ streak, streakTitle, streakDesc })
+  }, [streak, streakDesc, streakTitle])
 
   return (
     <Grid item lg={12} md={9} xs={12}>
-      <Typography variant="h6">{t("Steak popup settings")}</Typography>
+      <Typography variant="h6">{t("Streak popup settings")}</Typography>
       <Divider classes={{ root: classes.dividerRoot }} />
       <Grid container spacing={2}>
         <Grid item alignItems="center" lg={3} sm={3} xs={12} className={classes.gridFlex}>
           <FormControlLabel
-            control={<Switch checked={steak} onChange={() => setSteak(!steak)} name="steak" />}
-            label={!!steak ? "Steak popup on" : "Steak popup off"}
+            control={<Switch checked={streak} onChange={() => setStreak(!streak)} name="streak" />}
+            label={!!streak ? "Streak popup on" : "Streak popup off"}
           />
         </Grid>
         <Grid item lg={9} sm={9} xs={12}>
           <TextField
             fullWidth
-            label={t("Steak title")}
+            label={t("Streak title")}
             variant="filled"
-            defaultValue={steakTitle}
-            onChange={(event) => setSteakTitle(removeExtraSpace(event.target.value))}
+            defaultValue={streakTitle}
+            onChange={(event) => setStreakTitle(removeExtraSpace(event.target.value))}
             inputProps={{ maxLength: 2500 }}
           />
         </Grid>
@@ -60,11 +60,11 @@ export default function ActivitySteak({ value, onChange, ...props }) {
           <TextField
             fullWidth
             multiline
-            label={t("Steak Description")}
+            label={t("Streak Description")}
             variant="filled"
             rows={2}
-            defaultValue={steakDesc}
-            onChange={(event) => setSteakDesc(removeExtraSpace(event.target.value))}
+            defaultValue={streakDesc}
+            onChange={(event) => setStreakDesc(removeExtraSpace(event.target.value))}
             inputProps={{ maxLength: 2500 }}
           />
         </Grid>

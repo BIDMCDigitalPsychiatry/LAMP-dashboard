@@ -17,7 +17,7 @@ import {
 } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
-import ActivitySteak from "./ActivitySteak"
+import ActivityStreak from "./ActivityStreak"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -179,14 +179,14 @@ export default function Tips({
   ]
   const { t } = useTranslation()
   const [settings, setSettings]: Array<any> = useState([])
-  const [steak, setSteak] = useState()
+  const [streak, setStreak] = useState()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
     spec: value?.spec ?? activitySpecId,
     schedule: value?.schedule ?? [],
     description: "",
-    steak: details?.steak ?? null,
+    streak: details?.streak ?? null,
     settings: settings ?? [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
@@ -393,7 +393,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            steak: steak,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -407,7 +407,7 @@ export default function Tips({
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            steak: steak,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -435,7 +435,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            steak: steak,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -446,7 +446,7 @@ export default function Tips({
             //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            steak: steak,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -727,7 +727,7 @@ export default function Tips({
             </Grid>
           </Grid>
 
-          <ActivitySteak onChange={(val) => setSteak(val)} value={details?.steak} />
+          <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
 
           {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
             <Grid container spacing={2}>

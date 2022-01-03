@@ -829,7 +829,7 @@ export function spliceActivity({ raw, tag }) {
     name: raw.name,
     description: tag?.description,
     photo: tag?.photo,
-    steak: tag?.steak,
+    streak: tag?.streak,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
@@ -886,7 +886,7 @@ export function unspliceActivity(x) {
     tag: {
       description: x.description,
       photo: x.photo,
-      steak: x.steak,
+      streak: x.streak,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
@@ -910,7 +910,7 @@ export function unspliceCTActivity(x) {
     tag: {
       description: x.description,
       photo: x.photo,
-      steak: x.steak,
+      streak: x.streak,
     },
   }
 }
@@ -923,7 +923,7 @@ export function spliceCTActivity({ raw, tag }) {
     name: raw.name,
     description: tag?.description,
     photo: tag?.photo,
-    steak: tag?.steak,
+    streak: tag?.streak,
     schedule: raw.schedule,
     settings: raw.settings,
     category: raw.category,
@@ -938,7 +938,7 @@ export async function saveTipActivity(x) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
-      steak: x.steak,
+      streak: x.streak,
     })
   } else {
     result = (await LAMP.Activity.update(x.id, {
@@ -946,7 +946,7 @@ export async function saveTipActivity(x) {
     })) as any
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
-      steak: x.steak,
+      streak: x.streak,
     })
   }
   return result
@@ -957,7 +957,7 @@ export async function saveCTestActivity(x) {
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
     description: x.description,
     photo: x.photo,
-    steak: x.steak,
+    streak: x.streak,
   })
   return newItem
 }
@@ -1009,7 +1009,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
-        steak: x?.steak ?? null,
+        streak: x?.streak ?? null,
       })
       return result
     } else {
@@ -1026,7 +1026,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
           description: x.description,
           photo: x.photo,
-          steak: x.steak,
+          streak: x.streak,
         })
         return result
       }
@@ -1037,7 +1037,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         description: x.description,
         photo: x.photo,
-        steak: x.steak,
+        streak: x.streak,
       })
       return result
     } else {
@@ -1046,7 +1046,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         description: x.description,
         photo: x.photo,
-        steak: x.steak,
+        streak: x.streak,
       })
       return result
     }
@@ -1079,7 +1079,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
-        steak: x.steak,
+        streak: x.streak,
       })
       return result
     }

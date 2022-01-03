@@ -13,7 +13,7 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Steak from "./Steak"
+import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
@@ -74,13 +74,13 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [loaded, setLoaded] = useState(false)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(1)
+  const [streak, setStreak] = useState(1)
   const [loading, setLoading] = useState(true)
   const [activityDetails, setActivityDetails] = useState(null)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
-  const [steakActivity, setSteakActivity] = useState(null)
+  const [streakActivity, setStreakActivity] = useState(null)
 
   useEffect(() => {
     ;(async () => {
@@ -128,17 +128,17 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, activity)
+        showStreak(participant, activity)
       })
     }
   }
 
-  const showSteak = (participant, activity) => {
+  const showStreak = (participant, activity) => {
     getImage(activity?.id, activity?.spec).then((tag) => {
-      setSteakActivity(tag?.steak ?? null)
-      if (!!tag?.steak?.steak || typeof tag?.steak === "undefined") {
-        getEvents(participant, activity.id).then((steak) => {
-          setSteak(steak)
+      setStreakActivity(tag?.streak ?? null)
+      if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+        getEvents(participant, activity.id).then((streak) => {
+          setStreak(streak)
           setOpenComplete(true)
           setTimeout(() => {
             setOpenComplete(false)
@@ -199,11 +199,11 @@ export default function NotificationPage({ participant, activityId, ...props }) 
                   setOpenRecordSuccess(true)
                   setTimeout(function () {
                     setOpenRecordSuccess(false)
-                    showSteak(participant, activity)
+                    showStreak(participant, activity)
                   }, 2000)
                 }
               } else {
-                if (!!data && !!data?.timestamp) showSteak(participant, activity)
+                if (!!data && !!data?.timestamp) showStreak(participant, activity)
               }
             }}
           />
@@ -237,15 +237,15 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         }}
         setOpenRecordSuccess={setOpenRecordSuccess}
       />
-      <Steak
+      <Streak
         open={openComplete}
         onClose={() => {
           setOpenComplete(false)
           setResponse(true)
           setLoading(false)
         }}
-        steak={steak}
-        activity={steakActivity}
+        streak={streak}
+        activity={streakActivity}
       />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />

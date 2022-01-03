@@ -97,7 +97,7 @@ export function LinkRenderer(data: any) {
   )
 }
 
-export default function ActivityBox({ type, savedActivities, tag, participant, showSteak, submitSurvey, ...props }) {
+export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, submitSurvey, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [spec, setSpec] = useState(null)
@@ -193,7 +193,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         onClose={() => setOpen(false)}
         type={type}
         submitSurvey={submitSurvey}
-        showSteak={showSteak}
+        showStreak={showStreak}
         participant={participant}
       />
     </Box>

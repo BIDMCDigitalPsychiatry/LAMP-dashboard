@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Steak from "./Steak"
+import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"

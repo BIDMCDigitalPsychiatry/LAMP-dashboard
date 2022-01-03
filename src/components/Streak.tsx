@@ -57,12 +57,12 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Steak({
-  steak,
+export default function Streak({
+  streak,
   activity,
   ...props
 }: {
-  steak?: number
+  streak?: number
   activity?: any
 } & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
@@ -89,20 +89,22 @@ export default function Steak({
       <DialogContent>
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
-            {t(!!activity?.steakTitle && activity?.steakTitle.trim().length > 0 ? activity?.steakTitle : "Nice work!")}
+            {t(
+              !!activity?.streakTitle && activity?.streakTitle.trim().length > 0 ? activity?.streakTitle : "Nice work!"
+            )}
           </Typography>
           <Typography className={classes.ribbonText} component="p">
             {t(
-              !!activity?.steakDesc && activity?.steakDesc.trim().length > 0
-                ? activity?.steakDesc
+              !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
+                ? activity?.streakDesc
                 : "You’re on a streak, keep it going"
             )}
           </Typography>
           <Box textAlign="center" className={classes.niceWorkbadge}>
             <Ribbon width="170" height="226" />
             <Box className={classes.dayNotification}>
-              <Typography variant="h4"> {steak}</Typography>{" "}
-              <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
+              <Typography variant="h4"> {streak}</Typography>{" "}
+              <Typography variant="h6">{streak > 1 ? " " + t("days") : t("day")}</Typography>
             </Box>
           </Box>
         </Box>

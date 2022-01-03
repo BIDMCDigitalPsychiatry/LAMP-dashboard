@@ -129,7 +129,7 @@ export default function GroupCreator({
     schedule: !!value ? value.schedule : [],
     description: !!details ? details?.description : undefined,
     photo: !!details ? details?.photo : null,
-    steak: !!details ? details?.steak : null,
+    streak: !!details ? details?.streak : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
@@ -155,7 +155,7 @@ export default function GroupCreator({
       settings: (items || []).filter((i) => i !== null),
       description: details.description,
       photo: details.photo,
-      steak: details.steak,
+      streak: details.streak,
       studyID: details.studyId,
       category: data?.category ?? [],
     })

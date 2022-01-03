@@ -382,7 +382,7 @@ export default function Feed({
   activities,
   visibleActivities,
   setVisibleActivities,
-  showSteak,
+  showStreak,
   ...props
 }) {
   const classes = useStyles()
@@ -964,14 +964,14 @@ export default function Feed({
                       setOpenRecordSuccess(true)
                       setTimeout(function () {
                         setOpenRecordSuccess(false)
-                        showSteak(participant, visibleActivities)
+                        showStreak(participant, visibleActivities)
                         completeFeed(index)
                         setLaunchedActivity(undefined)
                       }, 2000)
                     } else setLaunchedActivity(undefined)
                   } else {
                     if (!!data && !!data?.timestamp) {
-                      showSteak(participant, visibleActivities)
+                      showStreak(participant, visibleActivities)
                       completeFeed(index)
                     }
                     setLaunchedActivity(undefined)

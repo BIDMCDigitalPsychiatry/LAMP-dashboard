@@ -15,7 +15,7 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
 import ActivityTab from "./ActivityTab"
-import ActivitySteak from "./ActivitySteak"
+import ActivityStreak from "./ActivityStreak"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -63,7 +63,7 @@ export default function ActivityHeader({
   const [photo, setPhoto] = useState(details?.photo ? details?.photo : !!image ? image : null)
   const { enqueueSnackbar } = useSnackbar()
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
-  const [steak, setSteak] = useState(details?.steak ? details?.steak : null)
+  const [streak, setStreak] = useState(details?.streak ? details?.streak : null)
 
   useEffect(() => {
     onChange({
@@ -71,9 +71,9 @@ export default function ActivityHeader({
       photo,
       description,
       studyId,
-      steak,
+      streak,
     })
-  }, [text, description, photo, studyId, steak])
+  }, [text, description, photo, studyId, streak])
 
   useEffect(() => {
     //
@@ -175,7 +175,7 @@ export default function ActivityHeader({
           />
         </Box>
       </Grid>
-      <ActivitySteak onChange={(val) => setSteak(val)} value={details?.steak} />
+      <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
     </Grid>
   )
 }

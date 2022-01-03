@@ -530,7 +530,7 @@ export default function SurveyCreator({
     schedule: !!value ? value?.schedule : [],
     description: !!value ? value?.description : undefined,
     photo: !!value ? value?.photo : null,
-    steak: !!value ? value?.steak : null,
+    streak: !!value ? value?.streak : null,
     settings: !!value ? value.settings : [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? null,
@@ -551,7 +551,7 @@ export default function SurveyCreator({
       settings: questions,
       description: details.description,
       photo: details.photo,
-      steak: details.steak,
+      streak: details.streak,
       studyID: details.studyId,
       category: data?.category ?? [],
     })

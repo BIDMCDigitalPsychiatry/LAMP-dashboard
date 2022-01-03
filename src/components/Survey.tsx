@@ -30,7 +30,7 @@ export const games = [
   "lamp.balloon_risk",
 ]
 
-export default function Survey({ participant, activities, onComplete, showSteak, submitSurvey, ...props }) {
+export default function Survey({ participant, activities, onComplete, showStreak, submitSurvey, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [tag, setTag] = useState([])
@@ -77,7 +77,7 @@ export default function Survey({ participant, activities, onComplete, showSteak,
         participant={participant}
         savedActivities={savedActivities}
         tag={tag}
-        showSteak={showSteak}
+        showStreak={showStreak}
         submitSurvey={submitSurvey}
         type="Assess"
       />

@@ -165,7 +165,7 @@ export default function ActivityPopup({
   tag,
   type,
   participant,
-  showSteak,
+  showStreak,
   submitSurvey,
   ...props
 }: {
@@ -174,7 +174,7 @@ export default function ActivityPopup({
   tag: any
   type: string
   participant: any
-  showSteak: Function
+  showStreak: Function
   submitSurvey: Function
 } & DialogProps) {
   const classes = useStyles()
@@ -309,7 +309,7 @@ export default function ActivityPopup({
         participant={participant}
         setOpenData={setOpenData}
         submitSurvey={submitSurvey}
-        showSteak={showSteak}
+        showStreak={showStreak}
         openData={openData}
       />
     </React.Fragment>
