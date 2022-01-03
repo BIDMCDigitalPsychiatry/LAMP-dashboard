@@ -274,7 +274,9 @@ export default function Participant({
           setOpenComplete(true)
           setLoading(false)
         })
-      } else setLoading(false)
+      } else {
+        setLoading(false)
+      }
     })
   }
 
