@@ -25,14 +25,14 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Learn({
   participant,
   activities,
-  showSteak,
+  showStreak,
   submitSurvey,
   ...props
 }: {
   participant: ParticipantObj
   activities: any
   activeTab: Function
-  showSteak: Function
+  showStreak: Function
   submitSurvey: Function
 }) {
   const classes = useStyles()
@@ -76,7 +76,7 @@ export default function Learn({
         participant={participant}
         savedActivities={savedActivities}
         tag={tag}
-        showSteak={showSteak}
+        showStreak={showStreak}
         submitSurvey={submitSurvey}
         type="Learn"
       />

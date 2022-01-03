@@ -25,7 +25,8 @@ import Learn from "./Learn"
 import Feed from "./Feed"
 import SurveyInstrument from "./SurveyInstrument"
 import { useTranslation } from "react-i18next"
-import Steak from "./Steak"
+import Streak from "./Streak"
+import { getImage } from "./Manage"
 
 import locale_lang from "../locale_map.json"
 import { ShowChart } from "@material-ui/icons"
@@ -89,7 +90,7 @@ async function getHiddenEvents(participant: ParticipantObj): Promise<string[]> {
 export async function getEvents(participant: any, activityId: string) {
   let activityEvents = await LAMP.ActivityEvent.allByParticipant(participant?.id ?? participant, activityId)
   let dates = []
-  let steak = 0
+  let streak = 0
   activityEvents.map((activityEvent, i) => {
     let date = new Date(activityEvent.timestamp)
     if (!dates.includes(date.toLocaleDateString())) {
@@ -99,13 +100,13 @@ export async function getEvents(participant: any, activityId: string) {
   let currentDate = new Date()
   for (let date of dates) {
     if (date === currentDate.toLocaleDateString()) {
-      steak++
+      streak++
     } else {
       break
     }
     currentDate.setDate(currentDate.getDate() - 1)
   }
-  return steak > 0 ? steak : 1
+  return streak > 0 ? streak : 1
 }
 
 export default function Participant({
@@ -121,6 +122,7 @@ export default function Participant({
 }) {
   const [activities, setActivities] = useState(null)
   const [visibleActivities, setVisibleActivities] = useState([])
+  const [streakActivity, setStreakActivity] = useState(null)
   const getTab = () => {
     let tabNum
     switch (props.tabValue) {
@@ -156,7 +158,7 @@ export default function Participant({
   const classes = useStyles()
   const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(1)
+  const [streak, setStreak] = useState(1)
   const { t, i18n } = useTranslation()
   const [activitySubmitted, setActivitySubmited] = React.useState(false)
   const tabDirection = (currentTab) => {
@@ -230,7 +232,7 @@ export default function Participant({
     }
   }
 
-  const submitSurvey = (response, activityId, overwritingTimestamp) => {
+  const submitSurvey = (response, activity, overwritingTimestamp) => {
     setLoading(true)
     if (!!!response || response === null) {
       setLoading(false)
@@ -239,7 +241,7 @@ export default function Participant({
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
         duration: response.duration,
-        activity: activityId,
+        activity: activity.id,
         static_data: {},
         temporal_slices: (x || []).map((y) => ({
           item: y !== undefined ? y.item : null,
@@ -254,20 +256,27 @@ export default function Participant({
           .filter((x) => x.temporal_slices.length > 0)
           .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
       ).then((x) => {
-        showSteak(participant, activityId)
+        showStreak(participant, activity)
         setVisibleActivities([])
         // If a timestamp was provided to overwrite data, hide the original event too.
-        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activityId)
+        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activity.id)
         else hideEvent() // trigger a reload of dependent components anyway
       })
     }
   }
 
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setLoading(false)
+  const showStreak = (participant, activity) => {
+    getImage(activity?.id, activity?.spec).then((tag) => {
+      setStreakActivity(tag?.streak ?? null)
+      if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
+        getEvents(participant, activity.id).then((streak) => {
+          setStreak(streak)
+          setOpenComplete(true)
+          setLoading(false)
+        })
+      } else {
+        setLoading(false)
+      }
     })
   }
 
@@ -285,7 +294,7 @@ export default function Participant({
                 activities={activities}
                 submitSurvey={submitSurvey}
                 activeTab={activeTab}
-                showSteak={showSteak}
+                showStreak={showStreak}
               />
             </Box>
           </Slide>
@@ -296,7 +305,7 @@ export default function Participant({
                 activities={activities}
                 submitSurvey={submitSurvey}
                 onComplete={submitSurvey}
-                showSteak={showSteak}
+                showStreak={showStreak}
               />
             </Box>
           </Slide>
@@ -307,7 +316,7 @@ export default function Participant({
                 activities={activities}
                 submitSurvey={submitSurvey}
                 activeTab={activeTab}
-                showSteak={showSteak}
+                showStreak={showStreak}
               />
             </Box>
           </Slide>
@@ -320,7 +329,7 @@ export default function Participant({
                 allActivities={activities}
                 hiddenEvents={hiddenEvents}
                 enableEditMode={!_patientMode()}
-                showSteak={showSteak}
+                showStreak={showStreak}
                 activitySubmitted={openComplete}
                 onEditAction={(activity, data) => {
                   setSurveyName(activity.name)
@@ -366,7 +375,7 @@ export default function Participant({
                 visibleActivities={visibleActivities}
                 onComplete={submitSurvey}
                 setVisibleActivities={setVisibleActivities}
-                showSteak={showSteak}
+                showStreak={showStreak}
               />
             </Box>
           </Slide>
@@ -388,13 +397,13 @@ export default function Participant({
           </ResponsiveDialog>
         </Box>
       )}
-      <Steak
+      <Streak
         open={openComplete}
         onClose={() => {
           setOpenComplete(false)
         }}
-        setOpenComplete={setOpenComplete}
-        steak={steak}
+        activity={streakActivity}
+        streak={streak}
       />
     </React.Fragment>
   )

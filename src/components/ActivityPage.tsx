@@ -15,7 +15,7 @@ export default function ActivityPage({
   activity,
   submitSurvey,
   setOpenData,
-  showSteak,
+  showStreak,
   openData,
   ...props
 }: {
@@ -23,7 +23,7 @@ export default function ActivityPage({
   activity: any
   submitSurvey: Function
   setOpenData: Function
-  showSteak: Function
+  showStreak: Function
   openData: boolean
 }) {
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
@@ -37,18 +37,18 @@ export default function ActivityPage({
   useEffect(() => {
     if (data !== null) {
       if (activity?.spec === "lamp.survey") {
-        if (!!data) submitSurvey(data, activity.id)
+        if (!!data) submitSurvey(data, activity)
       } else if (activity?.spec === "lamp.recording") {
         if (!!data && !!data?.timestamp) {
           setOpenRecordSuccess(true)
           setTimeout(function () {
             setOpenRecordSuccess(false)
-            showSteak(participant, activity.id)
+            showStreak(participant, activity)
             setOpenData(false)
           }, 2000)
         } else setOpenData(false)
       } else if (activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.recording") {
-        if (!!data && !!data?.timestamp) showSteak(participant, activity.id)
+        if (!!data && !!data?.timestamp) showStreak(participant, activity)
       }
       setResponse(null)
     }
@@ -85,9 +85,11 @@ export default function ActivityPage({
               if (!!response) submitSurvey(response, activity.id)
               setOpenData(false)
             }}
-            onComplete={() => {
+            onComplete={(res) => {
+              setResponse(res)
               setOpenData(false)
             }}
+            noBack={false}
           />
         ) : !!activity && activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.group" ? (
           <EmbeddedActivity

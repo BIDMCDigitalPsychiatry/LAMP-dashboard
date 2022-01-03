@@ -829,6 +829,7 @@ export function spliceActivity({ raw, tag }) {
     name: raw.name,
     description: tag?.description,
     photo: tag?.photo,
+    streak: tag?.streak,
     schedule: raw.schedule,
     settings: !Array.isArray(raw.settings)
       ? raw.settings
@@ -840,10 +841,12 @@ export function spliceActivity({ raw, tag }) {
           options:
             question.options === null
               ? null
-              :  question.type !== "matrix" ? question.options?.map((z, idx2) => ({
+              : question.type !== "matrix"
+              ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
-                })) :  question.options,
+                }))
+              : question.options,
         })),
   }
 }
@@ -883,10 +886,12 @@ export function unspliceActivity(x) {
     tag: {
       description: x.description,
       photo: x.photo,
+      streak: x.streak,
       questions: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         multiselect: y?.type,
         description: y?.description,
-        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? ""): null,
+        options:
+          y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? "") : null,
       })),
     },
   }
@@ -905,6 +910,7 @@ export function unspliceCTActivity(x) {
     tag: {
       description: x.description,
       photo: x.photo,
+      streak: x.streak,
     },
   }
 }
@@ -917,6 +923,7 @@ export function spliceCTActivity({ raw, tag }) {
     name: raw.name,
     description: tag?.description,
     photo: tag?.photo,
+    streak: tag?.streak,
     schedule: raw.schedule,
     settings: raw.settings,
     category: raw.category,
@@ -931,6 +938,7 @@ export async function saveTipActivity(x) {
     result = (await LAMP.Activity.create(x.studyID, raw)) as any
     await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
+      streak: x.streak,
     })
   } else {
     result = (await LAMP.Activity.update(x.id, {
@@ -938,6 +946,7 @@ export async function saveTipActivity(x) {
     })) as any
     await LAMP.Type.setAttachment(x.id, "me", "lamp.dashboard.activity_details", {
       photo: x.icon,
+      streak: x.streak,
     })
   }
   return result
@@ -948,6 +957,7 @@ export async function saveCTestActivity(x) {
   await LAMP.Type.setAttachment(newItem.data, "me", "lamp.dashboard.activity_details", {
     description: x.description,
     photo: x.photo,
+    streak: x.streak,
   })
   return newItem
 }
@@ -999,6 +1009,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         description: x?.description ?? "",
         photo: x?.photo ?? "",
+        streak: x?.streak ?? null,
       })
       return result
     } else {
@@ -1015,6 +1026,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
           description: x.description,
           photo: x.photo,
+          streak: x.streak,
         })
         return result
       }
@@ -1025,6 +1037,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(result.data, "me", "lamp.dashboard.activity_details", {
         description: x.description,
         photo: x.photo,
+        streak: x.streak,
       })
       return result
     } else {
@@ -1033,6 +1046,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         description: x.description,
         photo: x.photo,
+        streak: x.streak,
       })
       return result
     }
@@ -1065,6 +1079,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
       result = (await LAMP.Activity.update(selectedActivity?.id, x)) as any
       await LAMP.Type.setAttachment(selectedActivity?.id, "me", "lamp.dashboard.activity_details", {
         photo: x.icon,
+        streak: x.streak,
       })
       return result
     }

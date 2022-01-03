@@ -11,12 +11,13 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Steak from "./Steak"
+import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import { getEvents } from "./Participant"
+import { getImage } from "./Manage"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -37,11 +38,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [groupActivities, setGroupActivities] = useState([])
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(1)
   const [loading, setLoading] = useState(true)
-  const [activityDetails, setActivityDetails] = useState(null)
-  const [activityId, setActivityId] = useState(null)
   const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
   const [index, setIndex] = useState(0)
@@ -61,7 +58,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
 
   useEffect(() => {
     if (currentActivity !== null) {
-      setActivityId(currentActivity.id)
       setActivityRun(false)
     }
   }, [currentActivity])
@@ -73,7 +69,11 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   }, [activity])
 
   const completeActivity = () => {
-    showSteak(participant, currentActivity.id)
+    setLoading(true)
+    iterateActivity()
+    setTimeout(() => {
+      setLoading(false)
+    }, 5000)
   }
 
   const iterateActivity = () => {
@@ -88,7 +88,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         activity: activity.id,
         static_data: {},
       })
-      props.onComplete()
+      props.onComplete({ timestamp: new Date().getTime() })
     }
   }
 
@@ -124,36 +124,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
       })
     }
   }
-
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setTimeout(() => {
-        setOpenComplete(false)
-        iterateActivity()
-        setLoading(false)
-      }, 5000)
-    })
-  }
-
-  useEffect(() => {
-    if (activity !== null) {
-      ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
-        let activityData = {
-          id: activity.id,
-          spec: activity.spec,
-          name: activity.name,
-          settings: activity.settings,
-          schedule: activity.schedule,
-          icon: iconData.data ? iconData.data.icon : undefined,
-        }
-        setActivityDetails(activityData)
-      })()
-      setLoading(false)
-    }
-  }, [activity])
 
   return (
     <div style={{ height: "100%" }}>
@@ -213,14 +183,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
           )}
         </Box>
       )}
-      <Steak
-        open={openComplete}
-        onClose={() => {
-          setOpenComplete(false)
-        }}
-        setOpenComplete={setOpenComplete}
-        steak={steak}
-      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

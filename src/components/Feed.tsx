@@ -382,7 +382,7 @@ export default function Feed({
   activities,
   visibleActivities,
   setVisibleActivities,
-  showSteak,
+  showStreak,
   ...props
 }) {
   const classes = useStyles()
@@ -797,7 +797,7 @@ export default function Feed({
   }
   const submitSurvey = (response) => {
     completeFeed(index)
-    onComplete(response, visibleActivities[0].id)
+    onComplete(response, visibleActivities)
     setLaunchedActivity(undefined)
   }
 
@@ -964,14 +964,14 @@ export default function Feed({
                       setOpenRecordSuccess(true)
                       setTimeout(function () {
                         setOpenRecordSuccess(false)
-                        showSteak(participant, visibleActivities.id)
+                        showStreak(participant, visibleActivities)
                         completeFeed(index)
                         setLaunchedActivity(undefined)
                       }, 2000)
                     } else setLaunchedActivity(undefined)
                   } else {
                     if (!!data && !!data?.timestamp) {
-                      showSteak(participant, visibleActivities.id)
+                      showStreak(participant, visibleActivities)
                       completeFeed(index)
                     }
                     setLaunchedActivity(undefined)
@@ -988,6 +988,7 @@ export default function Feed({
                   completeFeed(index)
                   setLaunchedActivity(undefined)
                 }}
+                noBack={false}
               />
             ),
           }[launchedActivity ?? ""]
