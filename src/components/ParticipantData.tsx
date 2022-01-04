@@ -12,28 +12,12 @@ import MultipleSelect from "./MultipleSelect"
 import Sparkline from "./Sparkline"
 // import MultiPieChart from "./MultiPieChart"
 import { useTranslation } from "react-i18next"
-
+import { strategies } from "./PreventSelectedActivities"
 // TODO: all SensorEvents?
 
 function _hideExperimental() {
   return (LAMP.Auth._auth.serverAddress || "").includes(".psych.digital")
 }
-
-export const strategies = {
-  "lamp.survey": (slices, activity, scopedItem) =>
-    (slices ?? [])
-      .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
-      .map((x, idx) => {
-        let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question && question.type === "boolean") return ["Yes", "True"].includes(x.value) ? 1 : 0
-        else if (!!question && question.type === "list") return Math.max(question.options.indexOf(x.value), 0)
-        else return parseInt(x.value) || 0
-      })
-      .reduce((prev, curr) => prev + curr, 0),
-  "lamp.jewels_a": (slices, activity, scopedItem) =>
-    slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
-}
-
 async function getActivities(participant: ParticipantObj) {
   let original = await LAMP.Activity.allByParticipant(participant.id, null, true)
   return [...original]

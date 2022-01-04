@@ -221,6 +221,10 @@ export const strategies = {
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
       : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
+  "lamp.tips": (slices, activity, scopedItem) =>
+    ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
@@ -346,6 +350,10 @@ export default function PreventSelectedActivities({
                               ? strategies[activity.spec](
                                   activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
+                                    : activity.spec === "lamp.scratch_image" ||
+                                      activity.spec === "lamp.breathe" ||
+                                      activity.spec === "lamp.tips"
+                                    ? d
                                     : d.static_data,
                                   activity,
                                   undefined

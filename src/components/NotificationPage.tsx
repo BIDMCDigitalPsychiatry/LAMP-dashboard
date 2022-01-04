@@ -130,7 +130,10 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             setLoading(false)
           }, 6000)
         })
-      } else setLoading(false)
+      } else {
+        setResponse(true)
+        setLoading(false)
+      }
     })
   }
 
