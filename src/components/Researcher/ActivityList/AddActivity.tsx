@@ -14,6 +14,7 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  Link,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
@@ -21,6 +22,7 @@ import { availableActivitySpecs } from "./Index"
 import ResponsiveDialog from "../../ResponsiveDialog"
 import ImportActivity from "./ImportActivity"
 import Activity from "./Activity"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbardashboard: {
@@ -198,100 +200,24 @@ export default function AddActivity({
           <MenuItem disabled divider>
             <b>{t("Create a new...")}</b>
           </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setPopover(null)
-              setCreate(true)
-              setShowActivityImport(false)
-              setActivitySpecId("lamp.group")
-              setCreateMenu(true)
-            }}
-          >
+          <Link href={`/#/activity/add/group`} underline="none">
             {t("Activity Group")}
-          </MenuItem>
-          <MenuItem
-            divider
-            onClick={() => {
-              setPopover(null)
-              setCreate(true)
-              setCreateMenu(true)
-              setShowActivityImport(false)
-              setActivitySpecId("lamp.survey")
-            }}
-          >
+          </Link>
+          <Link href={`/#/activity/add/survey`} underline="none">
             {t("Survey Instrument")}
-          </MenuItem>
+          </Link>
           {[
             <MenuItem key="head" disabled>
               <b>{t("Smartphone Cognitive Tests")}</b>
             </MenuItem>,
             ...activitySpecs.map((x) => (
-              <MenuItem
-                key={x?.id}
-                onClick={() => {
-                  setPopover(null)
-                  setCreateMenu(true)
-                  setActivitySpecId(x.id)
-                  setShowActivityImport(false)
-                  setCreate(true)
-                }}
-              >
+              <Link href={`/#/activity/add/${x?.id?.replace("lamp.", "")}`} underline="none">
                 {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", ""))}
-              </MenuItem>
+              </Link>
             )),
           ]}
         </React.Fragment>
       </Popover>
-      <ResponsiveDialog
-        fullScreen
-        transient={false}
-        animate
-        open={!!createDialogue}
-        onClose={() => {
-          setShowActivityImport(false)
-          setCreateMenu(false)
-          setCreate(false)
-        }}
-      >
-        <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton onClick={() => setCreate(false)} color="default" aria-label="Menu">
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">{t("Create a new activity")}</Typography>
-          </Toolbar>
-        </AppBar>
-        <Divider className={classes.dividerMain} />
-        <Box py={8} px={4}>
-          {!!showActivityImport && (
-            <ImportActivity
-              studies={studies}
-              activities={activities}
-              setActivities={setActivities}
-              onClose={() => {
-                setShowActivityImport(false)
-                setCreate(false)
-              }}
-              setUpdateCount={setUpdateCount}
-            />
-          )}
-          {!!createMenu && (
-            <Activity
-              allActivities={activities}
-              studyId={studyId ?? undefined}
-              activitySpecId={activitySpecId}
-              studies={studies}
-              onClose={() => {
-                setCreateMenu(false)
-                setCreate(false)
-              }}
-              openWindow={createDialogue}
-              setActivities={setActivities}
-              setUpdateCount={setUpdateCount}
-            />
-          )}
-        </Box>
-      </ResponsiveDialog>
     </Box>
   )
 }

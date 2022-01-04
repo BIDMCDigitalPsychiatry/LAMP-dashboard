@@ -77,6 +77,15 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    settingslink: {
+      background: "#fff",
+      width: 40,
+      height: 40,
+      borderRadius: "50%",
+      padding: 8,
+      color: "#7599FF",
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -137,7 +146,7 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} />
-            <Link href={`/#/participant/${participant?.id}/settings`} underline="none">
+            <Link href={`/#/participant/${participant?.id}/settings`} underline="none" className={classes.settingslink}>
               <Icon>settings</Icon>
             </Link>
             <Fab

@@ -101,6 +101,14 @@ const useStyles = makeStyles((theme) =>
       "&:hover": { background: "#5680f9" },
     },
     containerWidth: { maxWidth: 1055 },
+    backbtnlink: {
+      width: 48,
+      height: 48,
+      color: "rgba(0, 0, 0, 0.54)",
+      padding: 12,
+      borderRadius: "50%",
+      "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
+    },
   })
 )
 
@@ -152,7 +160,7 @@ export default function PatientProfile({ participantId, ...props }: { participan
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Link onClick={() => history.back()} underline="none">
+          <Link onClick={() => history.back()} underline="none" className={classes.backbtnlink}>
             <Icon>arrow_back</Icon>
           </Link>
           <Typography variant="h5">

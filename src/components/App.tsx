@@ -17,6 +17,7 @@ import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
+import Activity from "./Researcher/ActivityList/Activity"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -435,7 +436,7 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PatientProfile participantId={props.match.params.id} />
+              <Activity id={props.match.params.id} />
             </React.Fragment>
           )
         }

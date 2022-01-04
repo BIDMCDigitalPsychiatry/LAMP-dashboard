@@ -132,7 +132,6 @@ export default function Tips({
   allActivities,
   activitySpecId,
   study,
-  openWindow,
   details,
   ...props
 }: {
@@ -143,7 +142,6 @@ export default function Tips({
   allActivities?: any
   activitySpecId: string
   study?: string
-  openWindow: Boolean
   details: any
 }) {
   const classes = useStyles()
@@ -196,9 +194,6 @@ export default function Tips({
     setData({ ...data, category: tab })
     validate()
   }
-  useEffect(() => {
-    setSettings(value)
-  }, [openWindow])
 
   useEffect(() => {
     validate()
