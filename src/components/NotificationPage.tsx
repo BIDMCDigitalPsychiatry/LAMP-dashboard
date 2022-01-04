@@ -71,12 +71,10 @@ const useStyles = makeStyles((theme) => ({
 export default function NotificationPage({ participant, activityId, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
-  const [loaded, setLoaded] = useState(false)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const [loading, setLoading] = useState(true)
-  const [activityDetails, setActivityDetails] = useState(null)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
@@ -84,28 +82,12 @@ export default function NotificationPage({ participant, activityId, ...props }) 
 
   useEffect(() => {
     ;(async () => {
-      LAMP.Activity.view(activityId).then(setActivity)
+      LAMP.Activity.view(activityId).then((data) => {
+        setActivity(data)
+        setLoading(false)
+      })
     })()
   }, [])
-
-  useEffect(() => {
-    if (!!activity) {
-      ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity?.id, "lamp.dashboard.activity_details")) as any
-        let activityData = {
-          id: activity.id,
-          spec: activity.spec,
-          name: activity.name,
-          settings: activity.settings,
-          schedule: activity.schedule,
-          icon: iconData.data ? iconData.data.icon : undefined,
-        }
-        setActivityDetails(activityData)
-      })()
-      setLoaded(true)
-      setLoading(false)
-    }
-  }, [activity])
 
   const submitSurvey = (response, overwritingTimestamp) => {
     if (!!response) {
@@ -130,6 +112,8 @@ export default function NotificationPage({ participant, activityId, ...props }) 
       ).then((x) => {
         showStreak(participant, activity)
       })
+    } else {
+      window.location.href = "/#/"
     }
   }
 
@@ -166,7 +150,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         </Box>
       )}
       {!response &&
-        loaded &&
+        !loading &&
         (activity?.spec === "lamp.survey" ? (
           <SurveyInstrument
             participant={participant}
@@ -174,7 +158,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             fromPrevent={false}
             group={[activity]}
             onComplete={submitSurvey}
-            noBack={true}
+            noBack={false}
           />
         ) : activity?.spec === "lamp.cats_and_dogs" ||
           activity?.spec === "lamp.jewels_a" ||
@@ -192,18 +176,20 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             name={activity?.name}
             activity={activity}
             participant={participant}
-            noBack={true}
+            noBack={false}
             onComplete={(data) => {
-              if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
-                if (!!data && !!data?.timestamp) {
-                  setOpenRecordSuccess(true)
-                  setTimeout(function () {
-                    setOpenRecordSuccess(false)
-                    showStreak(participant, activity)
-                  }, 2000)
-                }
+              if (data === null) {
+                window.location.href = "/#/"
               } else {
-                if (!!data && !!data?.timestamp) showStreak(participant, activity)
+                if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
+                  if (!!data && !!data?.timestamp) {
+                    setOpenRecordSuccess(true)
+                    setTimeout(function () {
+                      setOpenRecordSuccess(false)
+                      showStreak(participant, activity)
+                    }, 2000)
+                  }
+                } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
               }
             }}
           />
@@ -213,7 +199,7 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             participant={participant}
             submitSurvey={submitSurvey}
             onComplete={() => setResponse(true)}
-            noBack={true}
+            noBack={false}
           />
         ) : (
           <Dialog
