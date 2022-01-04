@@ -98,9 +98,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
     const activityId = currentActivity.id
     setCurrentActivity(null)
     if (!!!response || response === null) {
-      props.onComplete()
-      iterateActivity()
-      setLoading(false)
+      completeActivity()
     } else {
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
@@ -154,10 +152,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
               name={currentActivity?.name}
               activity={currentActivity}
               participant={participant}
-              onComplete={(data) => {
-                if (!!data && data !== null) completeActivity()
-                else iterateActivity()
-              }}
+              onComplete={completeActivity}
               noBack={noBack}
             />
           ) : (

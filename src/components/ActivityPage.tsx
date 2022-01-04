@@ -47,9 +47,7 @@ export default function ActivityPage({
             setOpenData(false)
           }, 2000)
         } else setOpenData(false)
-      } else if (activity?.spec !== "lamp.survey" && activity?.spec !== "lamp.recording") {
-        if (!!data && !!data?.timestamp) showStreak(participant, activity)
-      }
+      } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
       setResponse(null)
     }
   }, [data])

@@ -201,7 +201,9 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             activity={activity}
             participant={participant}
             submitSurvey={submitSurvey}
-            onComplete={() => setResponse(true)}
+            onComplete={() => {
+              showStreak(participant, activity)
+            }}
             noBack={false}
           />
         ) : (
