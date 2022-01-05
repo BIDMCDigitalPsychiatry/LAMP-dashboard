@@ -31,6 +31,7 @@ export default function ActivityPage({
   const { t } = useTranslation()
 
   useEffect(() => {
+    console.log(openData)
     setResponse(null)
   }, [])
 
@@ -79,10 +80,6 @@ export default function ActivityPage({
           <GroupActivity
             activity={activity}
             participant={participant}
-            submitSurvey={(response) => {
-              if (!!response) submitSurvey(response, activity.id)
-              setOpenData(false)
-            }}
             onComplete={(res) => {
               setResponse(res)
               setOpenData(false)
