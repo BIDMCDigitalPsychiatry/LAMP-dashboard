@@ -104,8 +104,8 @@ export const saveDataToCache = (authString, id) => {
       "$LAMP.Tag.get($id,'lamp.name'), 'unity_settings' : $unitySettings ? " +
       "$LAMP.Tag.get($id,'to.unityhealth.psychiatry.settings') : null,'id':$id, 'study_id' : $study.id, 'study_name': $study.name }})]," +
       "'activities':[$map($LAMP.Activity.list($study.id),function($activity){{'name': " +
-      " $activity.name, 'spec': $activity.spec, 'schedule': $activity.schedule, 'settings': $activity.settings,  'id':$activity.id, 'study_id' " +
-      ": $study.id, 'study_name': $study.name, 'category': $category}})]," +
+      " $activity.name, 'spec': $activity.spec, 'category': $activity.category, 'schedule': $activity.schedule, 'settings': $activity.settings,  'id':$activity.id, 'study_id' " +
+      ": $study.id, 'study_name': $study.name}})]," +
       "'sensors':[$map($LAMP.Sensor.list($study.id),function($sensor){{'name': " +
       " $sensor.name,'id':$sensor.id,'spec': $sensor.spec,'study_id': $study.id,'study_name': $study.name}})]}})]})"
   ).then((data) => {
