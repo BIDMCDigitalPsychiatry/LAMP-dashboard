@@ -88,6 +88,7 @@ export const saveDemoData = () => {
 }
 
 export const saveDataToCache = (authString, id) => {
+  Service.deleteDB()
   LAMP.API.query(
     "($studyList := $LAMP.Study.list('" +
       id +
