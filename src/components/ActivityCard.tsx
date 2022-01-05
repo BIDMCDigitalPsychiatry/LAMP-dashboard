@@ -168,7 +168,10 @@ export default function ActivityCard({
             }))}
           />
         )
-      ) : showGrid && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
+      ) : showGrid &&
+        activity.spec !== "lamp.scratch_image" &&
+        activity.spec !== "lamp.breathe" &&
+        activity.spec !== "lamp.tips" ? (
         <ArrayView
           hiddenKeys={["x"]}
           hasSpanningRowForIndex={
@@ -200,7 +203,9 @@ export default function ActivityCard({
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                     ? d.temporal_slices
-                    : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
+                    : activity.spec === "lamp.scratch_image" ||
+                      activity.spec === "lamp.breathe" ||
+                      activity.spec === "lamp.tips"
                     ? d
                     : d.static_data,
                   selectedActivity,
@@ -213,7 +218,11 @@ export default function ActivityCard({
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}
-          onClick={(datum) => (activity.spec !== "lamp.scratch_image" ? setVisibleSlice(datum) : setVisibleSlice(null))}
+          onClick={(datum) =>
+            activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" && activity.spec !== "lamp.tips"
+              ? setVisibleSlice(datum)
+              : setVisibleSlice(null)
+          }
         />
       )}
     </React.Fragment>

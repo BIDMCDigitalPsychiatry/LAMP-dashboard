@@ -159,13 +159,21 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
+export const LinkRenderer = (data: any) => {
+  return (
+    <a href={data.href} target="_blank">
+      {data.children}
+    </a>
+  )
+}
+
 export default function ActivityPopup({
   activity,
   questionCount,
   tag,
   type,
   participant,
-  showSteak,
+  showStreak,
   submitSurvey,
   ...props
 }: {
@@ -174,20 +182,13 @@ export default function ActivityPopup({
   tag: any
   type: string
   participant: any
-  showSteak: Function
+  showStreak: Function
   submitSurvey: Function
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [openData, setOpenData] = React.useState(false)
   const [currentActivity, setCurrentActivity] = React.useState(null)
-  function LinkRenderer(data: any) {
-    return (
-      <a href={data.href} target="_blank">
-        {data.children}
-      </a>
-    )
-  }
 
   useEffect(() => {
     setCurrentActivity(activity)
@@ -309,7 +310,7 @@ export default function ActivityPopup({
         participant={participant}
         setOpenData={setOpenData}
         submitSurvey={submitSurvey}
-        showSteak={showSteak}
+        showStreak={showStreak}
         openData={openData}
       />
     </React.Fragment>

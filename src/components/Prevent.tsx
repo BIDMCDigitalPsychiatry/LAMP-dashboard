@@ -264,7 +264,7 @@ export default function Prevent({
   allActivities,
   hiddenEvents,
   enableEditMode,
-  showSteak,
+  showStreak,
   submitSurvey,
   activitySubmitted,
   onEditAction,
@@ -277,8 +277,8 @@ export default function Prevent({
   allActivities: any
   hiddenEvents: string[]
   enableEditMode: boolean
-  showSteak: Function
-  activitySubmitted:boolean,
+  showStreak: Function
+  activitySubmitted: boolean
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
@@ -307,9 +307,7 @@ export default function Prevent({
   const [newEvent, setNewEvent] = React.useState(false)
 
   const setTabActivities = () => {
-    let gActivities = allActivities.filter(
-      (x: any) => !!x?.category && x?.category.includes("prevent")
-    )
+    let gActivities = allActivities.filter((x: any) => !!x?.category && x?.category.includes("prevent"))
     setSavedActivities(gActivities)
     if (gActivities.length > 0) {
       let tags = []
@@ -331,7 +329,7 @@ export default function Prevent({
   }, [activitySubmitted])
 
   React.useEffect(() => {
-    if(!!newEvent) loadEvents()
+    if (!!newEvent) loadEvents()
   }, [newEvent])
 
   React.useEffect(() => {
@@ -347,43 +345,26 @@ export default function Prevent({
         ((await LAMP.Type.getAttachment(participant.id, "lamp.dashboard.disable_data")) as any)?.data ?? false
       setDisabled(disabled)
       if (!disabled) {
-        let activities = !disabled
-          ? allActivities.filter((activity) => activity.spec !== "lamp.recording")
-          : allActivities.filter((activity) => activity.spec === "lamp.journal" || activity.spec !== "lamp.recording")
-        getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
-          let timeSpans = Object.fromEntries(
-            Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]])
-          )
-          setActivityEvents(activityEvents)
-          let activityEventCount = getActivityEventCount(activityEvents)
-          setTimeSpans(timeSpans)
-          setActivityCounts(activityEventCount)
-          activities = activities.filter(
-            (activity) =>
-              activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" && activity.spec !== "lamp.tips"
-          )
-          setActivities(activities)
-          setSelectedActivities(activities.map((activity) => activity.name))
-          LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
-            setSelectedSensors(sensors.map((sensor) => sensor.name))
-          })
-          getSensorEvents(participant).then((sensorEvents) => {
-            let sensorEventCount = getSensorEventCount(sensorEvents)
-            setSensorEvents(sensorEvents)
+        await loadActivityEvents()
+        LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
+          setSelectedSensors(sensors.map((sensor) => sensor.name))
+        })
+        getSensorEvents(participant).then((sensorEvents) => {
+          let sensorEventCount = getSensorEventCount(sensorEvents)
+          setSensorEvents(sensorEvents)
 
-            getVisualizations(participant).then((data) => {
-              setVisualizations(data)
-              let visualizationCount = Object.keys(data)
-                .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-                .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-              setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
-              setCortex(
-                [`Environmental Context`, `Step Count`, `Social Context`]
-                  .filter((sensor) => sensorEventCount[sensor] > 0)
-                  .concat(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
-              )
-              setLoading(false)
-            })
+          getVisualizations(participant).then((data) => {
+            setVisualizations(data)
+            let visualizationCount = Object.keys(data)
+              .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+              .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+            setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
+            setCortex(
+              [`Environmental Context`, `Step Count`, `Social Context`]
+                .filter((sensor) => sensorEventCount[sensor] > 0)
+                .concat(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+            )
+            setLoading(false)
           })
         })
       } else {
@@ -397,6 +378,24 @@ export default function Prevent({
         })
       }
     })()
+  }
+
+  const loadActivityEvents = () => {
+    let activities = !disabled
+      ? allActivities.filter((activity) => activity.spec !== "lamp.recording")
+      : allActivities.filter((activity) => activity.spec === "lamp.journal" || activity.spec !== "lamp.recording")
+    getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
+      let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
+      setActivityEvents(activityEvents)
+      let activityEventCount = getActivityEventCount(activityEvents)
+      setTimeSpans(timeSpans)
+      setActivityCounts(activityEventCount)
+      activities = activities.filter(
+        (activity) => activityEventCount[activity.name] > 0 && activity.spec !== "lamp.group" // && activity.spec !== "lamp.tips"
+      )
+      setActivities(activities)
+      setSelectedActivities(activities.map((activity) => activity.name))
+    })
   }
 
   const earliestDate = () =>
@@ -426,7 +425,10 @@ export default function Prevent({
         participant={participant}
         savedActivities={savedActivities}
         tag={tag}
-        showSteak={showSteak}
+        showStreak={(participant, activity) => {
+          loadActivityEvents()
+          showStreak(participant, activity)
+        }}
         submitSurvey={submitSurvey}
         type="Portal"
       />

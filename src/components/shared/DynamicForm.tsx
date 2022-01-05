@@ -73,6 +73,7 @@ const formTheme = createMuiTheme({
       variant: "outlined",
     },
   },
+
   overrides: {
     MuiFilledInput: {
       root: {
@@ -87,6 +88,9 @@ const formTheme = createMuiTheme({
           borderBottom: "none",
         },
       },
+    },
+    MuiTypography: {
+      h5: { fontSize: 16, fontWeight: 600, fontFamily: "inter", marginBottom: 10 },
     },
   },
 })

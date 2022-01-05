@@ -11,7 +11,6 @@ export default function Vega({ spec, config, ...props }) {
     vegaEmbed(ref.current, spec, config)
       .then(() => setRenderedState(true))
       .catch((e) => {
-        console.log(e)
         ;(ref.current as HTMLElement).textContent = `This vega graph failed to render. ${e}`
       })
   }, [spec])

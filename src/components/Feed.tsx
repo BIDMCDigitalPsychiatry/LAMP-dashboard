@@ -37,6 +37,7 @@ import LAMP, {
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
+import ActivityPage from "./ActivityPage"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -382,7 +383,7 @@ export default function Feed({
   activities,
   visibleActivities,
   setVisibleActivities,
-  showSteak,
+  showStreak,
   ...props
 }) {
   const classes = useStyles()
@@ -390,23 +391,18 @@ export default function Feed({
   const [date, changeDate] = useState(new Date())
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [surveyName, setSurveyName] = useState<string>()
+  const [launchedActivity, setLaunchedActivity] = useState(false)
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
   const daily = [0, 1, 2, 3, 4, 5, 6]
-  const [details, setDetails] = useState(null)
-  const [title, setTitle] = useState(null)
-  const [icon, setIcon] = useState(null)
   const [index, setIndex] = useState(null)
   const [events, setEvents] = useState(null)
-  const [activityName, setActivityName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
 
   const { t } = useTranslation()
+
   const completeFeed = (index: number) => {
     let feed = currentFeed
     feed[index].completed = true
@@ -788,25 +784,12 @@ export default function Feed({
     getEvents(date).then(setEvents)
   }
 
-  const showFeedDetails = (type) => {
-    ;(async () => {
-      // let iconData = ((await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any) || []
-      // setIcon(iconData.data ? iconData.data.icon : undefined)
-      setLaunchedActivity(type)
-    })()
-  }
-  const submitSurvey = (response) => {
-    completeFeed(index)
-    onComplete(response, visibleActivities[0].id)
-    setLaunchedActivity(undefined)
-  }
-
   const getActivity = (y: any) => {
     setLoading(true)
+    setLaunchedActivity(false)
     LAMP.Activity.view(y).then((data) => {
-      data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
-      data.spec === "lamp.survey" || data.spec === "lamp.group" ? showFeedDetails(data.spec) : showFeedDetails("game")
-      setLaunchedActivity(data.spec === "lamp.survey" || data.spec === "lamp.group" ? data.spec : "game")
+      setVisibleActivities(data)
+      setLaunchedActivity(true)
       setLoading(false)
     })
   }
@@ -820,18 +803,13 @@ export default function Feed({
       </Backdrop>
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
-          {loading == false ? (
-            currentFeed.length != 0 ? (
-              ""
-            ) : (
+          {loading == false &&
+            (currentFeed.length === 0 ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
                 <p>{t("There are no scheduled activities available.")}</p>
               </Box>
-            )
-          ) : (
-            " "
-          )}
+            ) : null)}
           <Stepper
             orientation="vertical"
             classes={{ root: classes.customstepper }}
@@ -865,21 +843,8 @@ export default function Feed({
                             (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
                               feed.time <= new Date().getTime()))
                         ) {
-                          setIndex(index)
-                          if (feed.type == "lamp.survey") {
-                            setSurveyName(feed.title)
-                          } else if (
-                            games.includes(feed.type) ||
-                            feed.type === "lamp.journal" ||
-                            feed.type === "lamp.recording" ||
-                            feed.type === "lamp.breathe" ||
-                            feed.type === "lamp.dbt_diary_card" ||
-                            feed.type === "lamp.scratch_image" ||
-                            feed.type === "lamp.tips"
-                          ) {
-                            setActivityName(feed.title)
-                          }
                           getActivity(feed.activityData.id)
+                          setIndex(index)
                         }
                       }}
                     >
@@ -931,68 +896,17 @@ export default function Feed({
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />
         </Grid>
       </Grid>
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={!!launchedActivity}
-        onClose={() => {
-          setLaunchedActivity(undefined)
+      <ActivityPage
+        activity={visibleActivities}
+        participant={participant}
+        setOpenData={setLaunchedActivity}
+        submitSurvey={props.onComplete}
+        showStreak={(participant, activity) => {
+          completeFeed(index)
+          showStreak(participant, activity)
         }}
-      >
-        {
-          {
-            "lamp.survey": (
-              <SurveyInstrument
-                participant={participant}
-                type={surveyName}
-                fromPrevent={false}
-                group={visibleActivities}
-                onComplete={submitSurvey}
-                noBack={false}
-              />
-            ),
-            game: (
-              <EmbeddedActivity
-                name={activityName}
-                activity={visibleActivities}
-                participant={participant}
-                noBack={false}
-                onComplete={(data) => {
-                  if (visibleActivities?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
-                    if (!!data && !!data?.timestamp) {
-                      setOpenRecordSuccess(true)
-                      setTimeout(function () {
-                        setOpenRecordSuccess(false)
-                        showSteak(participant, visibleActivities.id)
-                        completeFeed(index)
-                        setLaunchedActivity(undefined)
-                      }, 2000)
-                    } else setLaunchedActivity(undefined)
-                  } else {
-                    if (!!data && !!data?.timestamp) {
-                      showSteak(participant, visibleActivities.id)
-                      completeFeed(index)
-                    }
-                    setLaunchedActivity(undefined)
-                  }
-                }}
-              />
-            ),
-            "lamp.group": (
-              <GroupActivity
-                activity={visibleActivities}
-                participant={participant}
-                submitSurvey={submitSurvey}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-              />
-            ),
-          }[launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
+        openData={launchedActivity}
+      />
       <Dialog
         open={openNotImplemented}
         onClose={() => setOpenNotImplemented(false)}
@@ -1006,13 +920,6 @@ export default function Feed({
           </Button>
         </DialogActions>
       </Dialog>
-      <VoiceRecordingResult
-        open={openRecordSuccess}
-        onClose={() => {
-          setOpenRecordSuccess(false)
-        }}
-        setOpenRecordSuccess={setOpenRecordSuccess}
-      />
     </div>
   )
 }

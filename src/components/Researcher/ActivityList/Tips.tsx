@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
+import ActivityStreak from "./ActivityStreak"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -132,6 +133,7 @@ export default function Tips({
   activitySpecId,
   study,
   openWindow,
+  details,
   ...props
 }: {
   value?: any
@@ -142,6 +144,7 @@ export default function Tips({
   activitySpecId: string
   study?: string
   openWindow: Boolean
+  details: any
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -176,12 +179,14 @@ export default function Tips({
   ]
   const { t } = useTranslation()
   const [settings, setSettings]: Array<any> = useState([])
+  const [streak, setStreak] = useState()
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
     spec: value?.spec ?? activitySpecId,
     schedule: value?.schedule ?? [],
     description: "",
+    streak: details?.streak ?? null,
     settings: settings ?? [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
@@ -388,6 +393,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -401,6 +407,7 @@ export default function Tips({
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -428,6 +435,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -438,6 +446,7 @@ export default function Tips({
             //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -620,7 +629,7 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-                <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
+
                 <Grid item lg={6} sm={4} xs={12}>
                   <TextField
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
@@ -648,8 +657,7 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-
-                <Grid item xs sm={6} md={6} lg={6}>
+                <Grid item xs sm={12}>
                   {category === "add_new" ? (
                     <TextField
                       error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
@@ -671,8 +679,8 @@ export default function Tips({
                   )}
                 </Grid>
                 {!!value ? (
-                  <Grid container spacing={2}>
-                    <Grid item xs sm={6} md={6} lg={4}>
+                  <Grid container>
+                    <Grid item xs sm={6} md={4} lg={3}>
                       <Box mt={2}>
                         <Checkbox
                           onChange={(event) => {
@@ -685,9 +693,9 @@ export default function Tips({
                         {t("Duplicate")}
                       </Box>
                     </Grid>
-                    <Grid item xs sm={6} md={6} lg={4}>
+                    <Grid item xs sm={6} md={8} lg={9}>
                       {isDuplicate ? (
-                        <Box mb={3}>
+                        <Box mb={3} pr={1}>
                           <TextField
                             fullWidth
                             error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
@@ -715,8 +723,12 @@ export default function Tips({
                   ""
                 )}
               </Grid>
+              <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
             </Grid>
           </Grid>
+
+          <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
+
           {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
             <Grid container spacing={2}>
               <Grid item xs sm={12}>

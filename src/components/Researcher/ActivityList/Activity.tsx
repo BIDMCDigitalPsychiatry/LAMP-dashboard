@@ -123,6 +123,7 @@ export default function Activity({
       {isTip && (
         <Tips
           value={activity}
+          details={details ?? null}
           onSave={activity && activity.id ? updateActivity : saveActivity}
           studies={studies}
           allActivities={allActivities}
