@@ -240,7 +240,7 @@ export default function Participant({
     } else {
       let events = response.map((x, idx) => ({
         timestamp: new Date().getTime(),
-        duration: response.duration,
+        duration: x.reduce((sum, item) => sum + item.duration, 0),
         activity: activity.id,
         static_data: {},
         temporal_slices: (x || []).map((y) => ({

@@ -69,17 +69,16 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
-      const activityId = currentActivity.id
-      setCurrentActivity(null)
       if (
-        (currentActivity?.spec === "lamp.survey" && typeof data?.duration === "undefined") ||
+        (currentActivity?.spec === "lamp.survey" && typeof data.length === "undefined") ||
         currentActivity?.spec !== "lamp.survey"
       ) {
         iterateActivity()
       } else {
-        let events = (data || {}).map((x, idx) => ({
+        const activityId = currentActivity.id
+        let events = data.map((x, idx) => ({
           timestamp: new Date().getTime(),
-          duration: data.duration,
+          duration: x.reduce((sum, item) => sum + item.duration, 0),
           activity: activityId,
           static_data: {},
           temporal_slices: (x || []).map((y) => ({
