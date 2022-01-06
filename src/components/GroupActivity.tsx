@@ -39,9 +39,9 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(-1)
+  const [data, setResponse] = useState(null)
 
   useEffect(() => {
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
@@ -54,33 +54,56 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         })
       }
     }
-  }, [groupActivities, index])
+  }, [index])
 
   useEffect(() => {
-    if (currentActivity !== null) {
-      setActivityRun(false)
-    }
-  }, [currentActivity])
+    if (groupActivities.length > 0) setIndex(0)
+  }, [groupActivities])
 
   useEffect(() => {
     LAMP.Activity.view(activity.id).then((data) => {
       setGroupActivities(data.settings)
     })
-  }, [activity])
+  }, [])
 
-  const completeActivity = () => {
-    setLoading(true)
-    iterateActivity()
-    setTimeout(() => {
-      setLoading(false)
-    }, 5000)
-  }
+  useEffect(() => {
+    if (index >= 0 && currentActivity !== null) {
+      setLoading(true)
+      if (
+        (currentActivity?.spec === "lamp.survey" && typeof data.length === "undefined") ||
+        currentActivity?.spec !== "lamp.survey"
+      ) {
+        iterateActivity()
+      } else {
+        const activityId = currentActivity.id
+        let events = data.map((x, idx) => ({
+          timestamp: new Date().getTime(),
+          duration: x.reduce((sum, item) => sum + item.duration, 0),
+          activity: activityId,
+          static_data: {},
+          temporal_slices: (x || []).map((y) => ({
+            item: y !== undefined ? y.item : null,
+            value: y !== undefined ? y.value : null,
+            type: null,
+            level: null,
+            duration: y.duration,
+          })),
+        }))
+        Promise.all(
+          events
+            .filter((x) => x.temporal_slices.length > 0)
+            .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
+        ).then((x) => {
+          iterateActivity()
+        })
+      }
+    }
+  }, [data])
 
   const iterateActivity = () => {
     let val = index + 1
     setCurrentActivity(null)
     setIndex(val)
-    setActivityRun(true)
     if (groupActivities.length === val) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
@@ -93,41 +116,12 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   }
 
   const submitSurvey = (response) => {
-    setActivityRun(true)
-    setLoading(true)
-    const activityId = currentActivity.id
-    setCurrentActivity(null)
-    if (!!!response || response === null) {
-      props.onComplete()
-      iterateActivity()
-      setLoading(false)
-    } else {
-      let events = response.map((x, idx) => ({
-        timestamp: new Date().getTime(),
-        duration: response.duration,
-        activity: activityId,
-        static_data: {},
-        temporal_slices: (x || []).map((y) => ({
-          item: y !== undefined ? y.item : null,
-          value: y !== undefined ? y.value : null,
-          type: null,
-          level: null,
-          duration: y.duration,
-        })),
-      }))
-      Promise.all(
-        events
-          .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
-      ).then((x) => {
-        completeActivity()
-      })
-    }
+    setResponse(!!!response || response === null ? {} : response)
   }
 
   return (
     <div style={{ height: "100%" }}>
-      {!activityRun && (
+      {!!currentActivity && (
         <Box>
           {currentActivity?.spec === "lamp.survey" ? (
             <SurveyInstrument
@@ -154,9 +148,8 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
               name={currentActivity?.name}
               activity={currentActivity}
               participant={participant}
-              onComplete={(data) => {
-                if (!!data && data !== null) completeActivity()
-                else iterateActivity()
+              onComplete={(a) => {
+                setResponse({})
               }}
               noBack={noBack}
             />
@@ -172,7 +165,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
                 <Button
                   onClick={() => {
                     setOpenNotImplemented(false)
-                    completeActivity()
+                    iterateActivity()
                   }}
                   color="primary"
                 >
