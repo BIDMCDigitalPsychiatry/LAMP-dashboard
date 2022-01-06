@@ -13,6 +13,7 @@ import {
   createStyles,
   Backdrop,
   CircularProgress,
+  Link,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
@@ -72,36 +73,6 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
   const defaultBase64 = toBinary("data:image/png;base64,")
   const [loading, setLoading] = useState(false)
 
-  // Commit an update to an Activity object (ONLY DESCRIPTIONS).
-  const updateActivity = async (x, isDuplicated) => {
-    setLoading(true)
-    let result = await updateActivityData(x, isDuplicated, selectedActivity)
-    if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
-        variant: "error",
-      })
-    else {
-      if (isDuplicated || (!x.id && x.name)) {
-        x["id"] = result.data
-        addActivity(x, studies)
-        enqueueSnackbar(t("Successfully duplicated the Activity."), {
-          variant: "success",
-        })
-      } else {
-        x["study_id"] = x.studyID
-        x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
-        delete x["studyID"]
-        Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
-        enqueueSnackbar(t("Successfully updated the Activity."), {
-          variant: "success",
-        })
-      }
-      setActivities()
-    }
-    setSelectedActivity(undefined)
-    setLoading(false)
-  }
-
   // Begin an Activity object modification (ONLY DESCRIPTIONS).
   const modifyActivity = async () => {
     let data = await LAMP.Activity.view(activity.id)
@@ -147,7 +118,7 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
 
   const confirmAction = (status: string) => {
     if (status === "Yes") {
-      modifyActivity()
+      window.location.href = `/#/activity/${activity.id}`
     }
     setConfirmationDialog(0)
   }
@@ -157,16 +128,22 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Fab
-        size="small"
-        color="primary"
-        classes={{ root: classes.btnWhite }}
-        onClick={(event) => {
-          !!profile ? setConfirmationDialog(3) : modifyActivity()
-        }}
-      >
-        <Icon>mode_edit</Icon>
-      </Fab>
+      {!!profile ? (
+        <Fab
+          size="small"
+          color="primary"
+          classes={{ root: classes.btnWhite }}
+          onClick={(event) => {
+            setConfirmationDialog(3)
+          }}
+        >
+          <Icon>mode_edit</Icon>
+        </Fab>
+      ) : (
+        <Link href={`/#/activity/${activity.id}`} underline="none">
+          <Icon>mode_edit</Icon>
+        </Link>
+      )}
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
         open={confirmationDialog > 0 ? true : false}
@@ -178,45 +155,6 @@ export default function UpdateActivity({ activity, activities, studies, setActiv
             : ""
         }
       />
-      <ResponsiveDialog
-        fullScreen
-        transient={false}
-        animate
-        open={!!selectedActivity}
-        onClose={() => {
-          setSelectedActivity(undefined)
-        }}
-      >
-        <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => {
-                setSelectedActivity(undefined)
-                setcreateDialogue(false)
-              }}
-              color="default"
-              aria-label="Menu"
-            >
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">{t("Modify an existing activity")}</Typography>
-          </Toolbar>
-        </AppBar>
-        <Divider />
-        <Box py={8} px={4}>
-          <Activity
-            allActivities={activities}
-            activity={selectedActivity}
-            onSave={updateActivity}
-            studies={studies}
-            details={gameDetails}
-            onCancel={() => {
-              setSelectedActivity(undefined)
-            }}
-            openWindow={createDialogue}
-          />
-        </Box>
-      </ResponsiveDialog>
     </span>
   )
 }

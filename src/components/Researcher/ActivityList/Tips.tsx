@@ -130,7 +130,6 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
-  activitySpecId,
   study,
   details,
   ...props
@@ -140,7 +139,6 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
-  activitySpecId: string
   study?: string
   details: any
 }) {
@@ -181,7 +179,7 @@ export default function Tips({
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
-    spec: value?.spec ?? activitySpecId,
+    spec: "lamp.tips",
     schedule: value?.schedule ?? [],
     description: "",
     streak: details?.streak ?? null,
@@ -410,7 +408,6 @@ export default function Tips({
           },
           false
         )
-    openWindow = false
     setLoading(true)
   }
 
@@ -741,9 +738,9 @@ export default function Tips({
             </Grid>
           )}
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
-            Object.keys(newSchemaList).includes(activitySpecId)) && (
+            Object.keys(newSchemaList).includes("lamp.tips")) && (
             <DynamicForm
-              schema={newSchemaList[activitySpecId]}
+              schema={newSchemaList["lamp.tips"]}
               initialData={settings}
               onChange={(x) => updateSettings({ ...settings, ...x })}
             />

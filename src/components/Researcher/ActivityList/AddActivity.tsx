@@ -88,6 +88,13 @@ const useStyles = makeStyles((theme: Theme) =>
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
       "& *": { cursor: "pointer" },
+      "& a": {
+        display: "block",
+        fontSize: "1rem",
+        color: "rgba(0, 0, 0, 0.87)",
+        padding: "8px 30px",
+        "&:hover": { backgroundColor: "#ECF4FF" },
+      },
     },
     popexpand: {
       backgroundColor: "#fff",
@@ -206,6 +213,7 @@ export default function AddActivity({
           <Link href={`/#/activity/add/survey`} underline="none">
             {t("Survey Instrument")}
           </Link>
+          <Divider />
           {[
             <MenuItem key="head" disabled>
               <b>{t("Smartphone Cognitive Tests")}</b>

@@ -5,7 +5,7 @@ import {
   AppBar,
   Toolbar,
   Icon,
-  Link,
+  Box,
   IconButton,
   Divider,
   Typography,
@@ -66,8 +66,8 @@ const toBinary = (string) => {
 }
 const defaultBase64 = toBinary("data:image/png;base64,")
 
-export default function Activity({ id, activitySpecId, ...props }: { id?: string; activitySpecId?: string }) {
-  const [loading, setLoading] = useState(false)
+export default function Activity({ id, type, ...props }: { id?: string; type?: string }) {
+  const [loading, setLoading] = useState(true)
   const [activity, setActivity] = useState(null)
   const [studies, setStudies] = useState(null)
   const [allActivities, setAllActivities] = useState(null)
@@ -79,60 +79,67 @@ export default function Activity({ id, activitySpecId, ...props }: { id?: string
   // Create a new Activity object & survey descriptions or activity details if set.
 
   useEffect(() => {
-    if (!!id) {
-      Service.getDataByKey("activities", [id], "id").then((data) => {
-        setActivity(data[0])
-      })
-    }
+    setLoading(true)
     Service.getAll("studies").then((studies) => {
       setStudies(studies)
-    })
-    Service.getAll("activities").then((activities) => {
-      setAllActivities(activities)
+      Service.getAll("activities").then((activities) => {
+        setAllActivities(activities)
+        if (!!id) {
+          Service.getDataByKey("activities", [id], "id").then((data) => {
+            setActivity(data[0])
+            setLoading(false)
+          })
+        } else setLoading(false)
+      })
     })
   }, [])
 
   useEffect(() => {
-    ;(async () => {
-      let data = await LAMP.Activity.view(activity.id)
-      activity.settings = data.settings
-      if (activity.spec === "lamp.survey") {
-        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0]
-        let dataActivity = spliceActivity({ raw: activity, tag: tag })
-        setActivity(dataActivity)
-        setDetails(tag)
-      } else if (
-        games.includes(activity.spec) ||
-        activity.spec === "lamp.journal" ||
-        activity.spec === "lamp.scratch_image" ||
-        activity.spec === "lamp.breathe" ||
-        activity.spec === "lamp.group" ||
-        activity.spec === "lamp.dbt_diary_card" ||
-        activity.spec === "lamp.recording"
-      ) {
-        if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
-          delete activity.settings.audio
-        }
-        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0]
-        setDetails(tag)
-      } else if (activity.spec === "lamp.tips") {
-        activity.settings = activity.settings.reduce((ds, d) => {
-          let newD = d
-          if (d.image === "") {
-            newD = Object.assign({}, d, { image: defaultBase64 })
+    if (!!activity) {
+      setLoading(false)
+      ;(async () => {
+        let data = await LAMP.Activity.view(activity.id)
+        activity.settings = data.settings
+        if (activity.spec === "lamp.survey") {
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.survey_description")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0]
+          let dataActivity = spliceActivity({ raw: activity, tag: tag })
+          setActivity(dataActivity)
+          setDetails(tag)
+          console.log(tag)
+        } else if (
+          games.includes(activity.spec) ||
+          activity.spec === "lamp.journal" ||
+          activity.spec === "lamp.scratch_image" ||
+          activity.spec === "lamp.breathe" ||
+          activity.spec === "lamp.group" ||
+          activity.spec === "lamp.dbt_diary_card" ||
+          activity.spec === "lamp.recording"
+        ) {
+          if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
+            delete activity.settings.audio
           }
-          return ds.concat(newD)
-        }, [])
-        let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-          !!y.error ? undefined : y.data
-        )[0]
-        setDetails(tag)
-      }
-    })()
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0]
+          setDetails(tag)
+        } else if (activity.spec === "lamp.tips") {
+          activity.settings = activity.settings.reduce((ds, d) => {
+            let newD = d
+            if (d.image === "") {
+              newD = Object.assign({}, d, { image: defaultBase64 })
+            }
+            return ds.concat(newD)
+          }, [])
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0]
+          setDetails(tag)
+        }
+        setLoading(false)
+      })()
+    }
   }, [activity])
 
   const saveActivity = async (x) => {
@@ -196,67 +203,72 @@ export default function Activity({ id, activitySpecId, ...props }: { id?: string
   }
 
   return (
-    <div>
+    <Box>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
-        <Toolbar className={classes.toolbardashboard}>
-          <IconButton
-            onClick={() => {
-              // setSelectedActivity(undefined)
-              // setcreateDialogue(false)
-            }}
-            color="default"
-            aria-label="Menu"
-          >
-            <Icon>arrow_back</Icon>
-          </IconButton>
-          <Typography variant="h5">
-            {!!activitySpecId ? t("Create a new activity") : t("Modify an existing activity")}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Divider />
-      {activity?.spec === "lamp.group" ? (
-        <GroupCreator
-          activities={allActivities}
-          value={activity ?? null}
-          onSave={activity.spec ? saveActivity : updateActivity}
-          studies={studies}
-          study={activity?.study_id ?? null}
-          details={details ?? null}
-        />
-      ) : activity?.spec === "lamp.tips" ? (
-        <Tips
-          value={activity}
-          details={details ?? null}
-          onSave={activity && activity.id ? updateActivity : saveActivity}
-          studies={studies}
-          allActivities={allActivities}
-          activitySpecId={activity.spec ?? activity.spec}
-          study={activity?.study_id ?? null}
-        />
-      ) : activity?.spec === "lamp.survey" ? (
-        <SurveyCreator
-          value={activity ?? null}
-          activities={allActivities}
-          studies={studies}
-          onSave={activity.spec ? saveActivity : updateActivity}
-          study={activity?.study_id ?? null}
-          details={details ?? null}
-        />
-      ) : (
-        <GameCreator
-          activities={allActivities}
-          value={activity ?? null}
-          details={details ?? null}
-          onSave={activity.spec ? saveActivity : updateActivity}
-          studies={studies}
-          activitySpecId={activity.spec ?? activity.spec}
-          study={activity?.study_id ?? null}
-        />
+      {console.log(loading, studies)}
+      {!loading && !!studies && (!!type || (!!activity && !!details)) && (
+        <Box>
+          {console.log("check", studies, type)}
+          <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
+            <Toolbar className={classes.toolbardashboard}>
+              <IconButton
+                onClick={() => {
+                  // setSelectedActivity(undefined)
+                  // setcreateDialogue(false)
+                }}
+                color="default"
+                aria-label="Menu"
+              >
+                <Icon>arrow_back</Icon>
+              </IconButton>
+              <Typography variant="h5">
+                {!!type ? t("Create a new activity") : t("Modify an existing activity")}
+              </Typography>
+            </Toolbar>
+          </AppBar>
+          <Divider />
+          {(!!type && type === "group") || activity?.spec === "lamp.group" ? (
+            <GroupCreator
+              activities={allActivities}
+              value={activity ?? null}
+              onSave={!!type ? saveActivity : updateActivity}
+              studies={studies}
+              study={activity?.study_id ?? null}
+              details={details ?? null}
+            />
+          ) : (!!type && type === "tips") || activity?.spec === "lamp.tips" ? (
+            <Tips
+              value={activity}
+              details={details ?? null}
+              onSave={activity && activity?.id ? updateActivity : saveActivity}
+              studies={studies}
+              allActivities={allActivities}
+              study={activity?.study_id ?? null}
+            />
+          ) : (!!type && type === "survey") || activity?.spec === "lamp.survey" ? (
+            <SurveyCreator
+              value={activity ?? null}
+              activities={allActivities}
+              studies={studies}
+              onSave={!!type ? saveActivity : updateActivity}
+              study={activity?.study_id ?? null}
+              details={details ?? null}
+            />
+          ) : (
+            <GameCreator
+              activities={allActivities}
+              value={activity ?? null}
+              details={details ?? null}
+              onSave={!!type ? saveActivity : updateActivity}
+              studies={studies}
+              activitySpecId={!!type ? "lamp." + type : activity.spec ?? activity.spec}
+              study={activity?.study_id ?? null}
+            />
+          )}
+        </Box>
       )}
-    </div>
+    </Box>
   )
 }

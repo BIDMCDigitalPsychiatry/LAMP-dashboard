@@ -18,7 +18,7 @@ import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
-
+import ActivityList from "./Researcher/ActivityList/Index"
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -401,6 +401,49 @@ function AppRouter({ ...props }) {
           )
         }
       />
+
+      {/* <Route
+        exact
+        path="/researcher/:id/activities"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <ActivityList id={props.match.params.id} />
+            </React.Fragment>
+          )
+        }
+      /> */}
+
+      <Route
+        exact
+        path="/activity/add/:type"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Activity type={props.match.params.type} />
+            </React.Fragment>
+          )
+        }
+      />
+
       <Route
         exact
         path="/participant/:id/settings"
