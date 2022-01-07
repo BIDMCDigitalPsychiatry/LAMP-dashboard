@@ -203,7 +203,7 @@ export default function PatientProfile({
               </Grid>
             </Box>
             <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%" }} />
-            {!!participant && <Activities participant={participant} studies={studies} />}
+            {!!participant && <Activities participant={participant} studies={studies} researcherId={researcherId} />}
             <div style={{ border: " 1px solid rgba(0, 0, 0, 0.1)", height: 0, width: "100%", marginTop: 30 }} />
             {!!participant && <Sensors participant={participant} studies={studies} />}
             <div className={classes.buttonsContainer}>

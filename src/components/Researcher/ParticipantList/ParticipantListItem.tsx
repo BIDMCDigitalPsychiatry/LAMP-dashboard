@@ -149,7 +149,11 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} />
-            <Link href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`} underline="none">
+            <Link
+              href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`}
+              underline="none"
+              className={classes.settingslink}
+            >
               <Icon>settings</Icon>
             </Link>
             <Fab

@@ -31,12 +31,11 @@ export default function UpdateActivity({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const { enqueueSnackbar } = useSnackbar()
   const [confirmationDialog, setConfirmationDialog] = useState(0)
 
   const confirmAction = (status: string) => {
     if (status === "Yes") {
-      window.location.href = `/#/activity/${activity.id}`
+      window.location.href = `/#/researcher/${researcherId}/activity/${activity.id}`
     }
     setConfirmationDialog(0)
   }
@@ -66,7 +65,9 @@ export default function UpdateActivity({
         confirmAction={confirmAction}
         confirmationMsg={
           !!profile
-            ? "Changes done to this activity will reflect for all the participants under the study. Are you sure you want to proceed?."
+            ? t(
+                "Changes done to this activity will reflect for all the participants under the study. Are you sure you want to proceed?."
+              )
             : ""
         }
       />

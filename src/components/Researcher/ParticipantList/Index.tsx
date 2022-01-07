@@ -153,6 +153,12 @@ export default function ParticipantList({
   )
 
   useEffect(() => {
+    let params = JSON.parse(localStorage.getItem("participants"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 40)
+  }, [])
+
+  useEffect(() => {
     if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
@@ -269,7 +275,6 @@ export default function ParticipantList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
-                dataHead="participants"
               />
             </Grid>
           ) : (

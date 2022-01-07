@@ -28,7 +28,6 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { Service } from "../../DBService/DBService"
-import Activities from "../ParticipantList/Profile/Activities"
 
 export const games = [
   "lamp.jewels_a",
@@ -44,6 +43,14 @@ const useStyles = makeStyles((theme: Theme) =>
     backdrop: {
       zIndex: 111111,
       color: "#fff",
+    },
+    backbtnlink: {
+      width: 48,
+      height: 48,
+      color: "rgba(0, 0, 0, 0.54)",
+      padding: 12,
+      borderRadius: "50%",
+      "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
     },
     toolbardashboard: {
       minHeight: 100,
@@ -222,9 +229,10 @@ export default function Activity({
             <Toolbar className={classes.toolbardashboard}>
               <Link
                 onClick={() => {
-                  window.location.href = `/#/researcher/${researcherId}/1`
+                  history.back()
                 }}
                 underline="none"
+                className={classes.backbtnlink}
               >
                 <Icon>arrow_back</Icon>
               </Link>

@@ -45,11 +45,13 @@ export default function Activities({
   participant,
   studies,
   setUpdateCount,
+  researcherId,
   ...props
 }: {
   participant: any
   studies: any
   setUpdateCount?: Function
+  researcherId?: string
 }) {
   const classes = useStyles()
   const [activities, setActivities] = useState([])
@@ -157,6 +159,8 @@ export default function Activities({
                   index={index}
                   handleSelected={handleActivitySelected}
                   setActivities={onChangeActivities}
+                  researcherId={researcherId}
+                  participantId={participant.id}
                 />
               </Grid>
             ))}
@@ -167,7 +171,6 @@ export default function Activities({
               currentRowCount={rowCount}
               currentPage={page}
               type={1}
-              dataHead="activities"
             />
           </Grid>
         </Grid>

@@ -1,27 +1,8 @@
 import React, { useState, useEffect } from "react"
-import {
-  Box,
-  MenuItem,
-  AppBar,
-  Toolbar,
-  Icon,
-  IconButton,
-  Divider,
-  Grid,
-  Fab,
-  Typography,
-  Popover,
-  makeStyles,
-  Theme,
-  createStyles,
-  Link,
-} from "@material-ui/core"
+import { Box, MenuItem, Icon, Grid, Fab, Popover, makeStyles, Theme, createStyles, Link } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { availableActivitySpecs } from "./Index"
-import ResponsiveDialog from "../../ResponsiveDialog"
-import ImportActivity from "./ImportActivity"
-import Activity from "./Activity"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -111,6 +92,7 @@ const useStyles = makeStyles((theme: Theme) =>
     dividerMain: {
       margin: 0,
     },
+    borderTop: { borderTop: "1px solid rgba(0, 0, 0, 0.20)" },
   })
 )
 
@@ -215,9 +197,9 @@ export default function AddActivity({
           <Link href={`/#/researcher/${researcherId}/activity/add/survey`} underline="none">
             {t("Survey Instrument")}
           </Link>
-          <Divider />
+
           {[
-            <MenuItem key="head" disabled>
+            <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{t("Smartphone Cognitive Tests")}</b>
             </MenuItem>,
             ...activitySpecs.map((x) => (

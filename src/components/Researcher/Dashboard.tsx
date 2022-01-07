@@ -299,7 +299,10 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
                     selected={currentTab === 1}
-                    onClick={(event) => setCurrentTab(1)}
+                    onClick={(event) => {
+                      window.location.href = `/#/researcher/${researcherId}/1`
+                      setCurrentTab(1)
+                    }}
                   >
                     <ListItemIcon className={classes.menuIcon}>
                       <Activities />
