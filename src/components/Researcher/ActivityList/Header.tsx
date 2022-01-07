@@ -74,6 +74,7 @@ export default function Header({
             studyId={null}
             setUpdateCount={setUpdateCount}
             setActivities={setActivities}
+            researcherId={researcher?.id}
           />
         </Box>
       </Box>

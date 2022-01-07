@@ -23,7 +23,6 @@ export default function ParticipantName({ participant, updateParticipant, openSe
 
   useEffect(() => {
     Service.getDataByKey("participants", [participant.id], "id").then((data) => {
-      console.log(data)
       setAliasName(data[0]?.name ?? participant.id ?? "")
       setName(data[0]?.name ?? participant.id ?? "")
     })

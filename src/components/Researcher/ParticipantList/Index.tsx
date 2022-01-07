@@ -258,6 +258,7 @@ export default function ParticipantList({
                     notificationColumn={notificationColumn}
                     handleSelectionChange={handleChange}
                     selectedParticipants={selectedParticipants}
+                    researcherId={researcher.id}
                   />
                 </Grid>
               ))}

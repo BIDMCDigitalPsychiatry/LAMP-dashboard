@@ -8,7 +8,7 @@ import { saveDataToCache, saveDemoData } from "../../components/Researcher/SaveR
 // import { useWorker } from "@koale/useworker"
 import { Service } from "../DBService/DBService"
 
-export default function Researcher({ researcher, onParticipantSelect, mode, ...props }) {
+export default function Researcher({ researcher, onParticipantSelect, mode, tab, ...props }) {
   const { t, i18n } = useTranslation()
   // const [dataWorker] = useWorker(saveDataToCache)
   // const [demoWorker] = useWorker(saveDemoData)
@@ -52,7 +52,7 @@ export default function Researcher({ researcher, onParticipantSelect, mode, ...p
 
   return (
     <React.Fragment>
-      <Dashboard onParticipantSelect={onParticipantSelect} researcher={researcher} mode={mode} />
+      <Dashboard onParticipantSelect={onParticipantSelect} researcherId={researcher.id} mode={mode} tab={tab} />
     </React.Fragment>
   )
 }

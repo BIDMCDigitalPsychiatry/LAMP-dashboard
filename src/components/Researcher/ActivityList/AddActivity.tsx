@@ -120,6 +120,7 @@ export default function AddActivity({
   studyId,
   setActivities,
   setUpdateCount,
+  researcherId,
   ...props
 }: {
   activities?: any
@@ -127,6 +128,7 @@ export default function AddActivity({
   studyId?: string
   setActivities?: Function
   setUpdateCount?: Function
+  researcherId?: string
 }) {
   const [activitySpecs, setActivitySpecs] = useState([])
   const [createMenu, setCreateMenu] = useState(false)
@@ -207,10 +209,10 @@ export default function AddActivity({
           <MenuItem disabled divider>
             <b>{t("Create a new...")}</b>
           </MenuItem>
-          <Link href={`/#/activity/add/group`} underline="none">
+          <Link href={`/#/researcher/${researcherId}/activity/add/group`} underline="none">
             {t("Activity Group")}
           </Link>
-          <Link href={`/#/activity/add/survey`} underline="none">
+          <Link href={`/#/researcher/${researcherId}/activity/add/survey`} underline="none">
             {t("Survey Instrument")}
           </Link>
           <Divider />
@@ -219,7 +221,7 @@ export default function AddActivity({
               <b>{t("Smartphone Cognitive Tests")}</b>
             </MenuItem>,
             ...activitySpecs.map((x) => (
-              <Link href={`/#/activity/add/${x?.id?.replace("lamp.", "")}`} underline="none">
+              <Link href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`} underline="none">
                 {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", ""))}
               </Link>
             )),

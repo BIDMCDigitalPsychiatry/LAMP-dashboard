@@ -167,7 +167,7 @@ export const sortData = (data, studies, key) => {
 //   activity_count?: number
 //   sensor_count?: number
 // }
-export default function Dashboard({ onParticipantSelect, researcher, mode, ...props }) {
+export default function Dashboard({ onParticipantSelect, researcherId, mode, tab, ...props }) {
   const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
@@ -177,6 +177,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   const [deletedData, setDeletedData] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
   const [search, setSearch] = useState(null)
+  const [researcher, setResearcher] = useState(null)
   const [order, setOrder] = useState(localStorage.getItem("order") ? JSON.parse(localStorage.getItem("order")) : true)
   const classes = useStyles()
   const { t } = useTranslation()
@@ -190,7 +191,16 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   )
 
   useEffect(() => {
-    if (mode === "clinician") setCurrentTab(0)
+    LAMP.Researcher.view(researcherId).then(setResearcher)
+    setCurrentTab(parseInt(tab))
+  }, [])
+
+  useEffect(() => {
+    getAllStudies()
+  }, [researcher])
+
+  useEffect(() => {
+    if (mode === "clinician") setCurrentTab(parseInt(tab))
   }, [mode])
 
   useEffect(() => {
@@ -208,7 +218,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(sortStudies(studies, order))
-      setCurrentTab(0)
+      setCurrentTab(parseInt(tab))
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
         setNotification(researcherNotification)
@@ -232,7 +242,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
   }, [studies])
 
   const filterStudies = async (studies) => {
-    if (studies !== null && (studies || []).length > 0) {
+    if (!!researcher && studies !== null && (studies || []).length > 0) {
       let selected =
         localStorage.getItem("studies_" + researcher.id) !== null
           ? JSON.parse(localStorage.getItem("studies_" + researcher.id))
@@ -361,6 +371,7 @@ export default function Dashboard({ onParticipantSelect, researcher, mode, ...pr
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 setOrder={() => setOrder(!order)}
+                getAllStudies={getAllStudies}
                 order={order}
               />
             )}

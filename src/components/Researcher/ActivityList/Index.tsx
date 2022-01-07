@@ -75,6 +75,7 @@ export default function ActivityList({
   setSelectedStudies,
   setOrder,
   order,
+  getAllStudies,
   ...props
 }) {
   const [activities, setActivities] = useState(null)
@@ -88,28 +89,26 @@ export default function ActivityList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
-  const [loadTime, setLoadTime] = useState(false)
 
   useInterval(
     () => {
-      getAllActivities()
+      getAllStudies()
     },
-    allActivities !== null && !!loadTime ? null : 3000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoadTime(true)
-    }, 12000)
-  }, [])
+    if (selected !== selectedStudies) setSelected(selectedStudies)
+  }, [selectedStudies])
 
-  const getAllActivities = () => {
-    Service.getAll("activities").then((data) => {
-      setAllActivities(data || [])
-      if ((data || []).length > 0) setLoadTime(true)
-    })
-  }
+  useEffect(() => {
+    if ((selected || []).length > 0) {
+      searchActivities()
+    } else {
+      setActivities([])
+    }
+  }, [selected])
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -120,29 +119,12 @@ export default function ActivityList({
     }
   }
 
-  useEffect(() => {
-    setLoading(!loadTime)
-    if (!!loadTime) searchActivities()
-  }, [loadTime])
-
-  useEffect(() => {
-    setSelected(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    if ((selectedStudies || []).length > 0) {
-      searchActivities()
-    } else {
-      setActivities([])
-    }
-  }, [selected])
-
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0 && !loading) {
-      let result = []
+    if (selectedData.length > 0) {
       setLoading(true)
+      let result = []
       Service.getAll("activities").then((activitiesData) => {
         if ((activitiesData || []).length > 0) {
           if (!!searchTxt && searchTxt.trim().length > 0) {
@@ -158,14 +140,12 @@ export default function ActivityList({
           )
           setPage(page)
           setRowCount(rowCount)
+          setLoading(false)
         }
-        setLoading(false)
       })
     } else {
       setActivities([])
-      setLoading(false)
     }
-
     setSelectedActivities([])
   }
 

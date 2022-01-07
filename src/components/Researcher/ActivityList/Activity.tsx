@@ -9,6 +9,7 @@ import {
   IconButton,
   Divider,
   Typography,
+  Link,
 } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import SurveyCreator from "./SurveyCreator"
@@ -66,7 +67,16 @@ const toBinary = (string) => {
 }
 const defaultBase64 = toBinary("data:image/png;base64,")
 
-export default function Activity({ id, type, ...props }: { id?: string; type?: string }) {
+export default function Activity({
+  id,
+  type,
+  researcherId,
+  ...props
+}: {
+  id?: string
+  type?: string
+  researcherId?: string
+}) {
   const [loading, setLoading] = useState(true)
   const [activity, setActivity] = useState(null)
   const [studies, setStudies] = useState(null)
@@ -107,7 +117,6 @@ export default function Activity({ id, type, ...props }: { id?: string; type?: s
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
           setActivity(dataActivity)
           setDetails(tag)
-          console.log(tag)
         } else if (
           games.includes(activity.spec) ||
           activity.spec === "lamp.journal" ||
@@ -207,22 +216,18 @@ export default function Activity({ id, type, ...props }: { id?: string; type?: s
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {console.log(loading, studies)}
       {!loading && !!studies && (!!type || (!!activity && !!details)) && (
         <Box>
-          {console.log("check", studies, type)}
           <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
             <Toolbar className={classes.toolbardashboard}>
-              <IconButton
+              <Link
                 onClick={() => {
-                  // setSelectedActivity(undefined)
-                  // setcreateDialogue(false)
+                  window.location.href = `/#/researcher/${researcherId}/1`
                 }}
-                color="default"
-                aria-label="Menu"
+                underline="none"
               >
                 <Icon>arrow_back</Icon>
-              </IconButton>
+              </Link>
               <Typography variant="h5">
                 {!!type ? t("Create a new activity") : t("Modify an existing activity")}
               </Typography>

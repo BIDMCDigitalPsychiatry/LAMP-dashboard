@@ -18,7 +18,7 @@ import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
-import ActivityList from "./Researcher/ActivityList/Index"
+import Dashboard from "./Researcher/Dashboard"
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -402,30 +402,9 @@ function AppRouter({ ...props }) {
         }
       />
 
-      {/* <Route
-        exact
-        path="/researcher/:id/activities"
-        render={(props) =>
-          !state.identity ? (
-            <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
-              <Login
-                setIdentity={async (identity) => await reset(identity)}
-                lastDomain={state.lastDomain}
-                onComplete={() => props.history.replace("/")}
-              />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              <ActivityList id={props.match.params.id} />
-            </React.Fragment>
-          )
-        }
-      /> */}
-
       <Route
         exact
-        path="/activity/add/:type"
+        path="/researcher/:rid/activity/add/:type"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -438,7 +417,7 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Activity type={props.match.params.type} />
+              <Activity type={props.match.params.type} researcherId={props.match.params.rid} />
             </React.Fragment>
           )
         }
@@ -446,7 +425,7 @@ function AppRouter({ ...props }) {
 
       <Route
         exact
-        path="/participant/:id/settings"
+        path="/researcher/:rid/participant/:id/settings"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -459,14 +438,14 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PatientProfile participantId={props.match.params.id} />
+              <PatientProfile researcherId={props.match.params.rid} participantId={props.match.params.id} />
             </React.Fragment>
           )
         }
       />
       <Route
         exact
-        path="/activity/:id"
+        path="/researcher/:rid/activity/:id"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -479,7 +458,7 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <Activity id={props.match.params.id} />
+              <Activity id={props.match.params.id} researcherId={props.match.params.rid} />
             </React.Fragment>
           )
         }
@@ -549,7 +528,7 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
-        path="/researcher/:id"
+        path="/researcher/:id/:tab"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -585,6 +564,7 @@ function AppRouter({ ...props }) {
                     props.history.push(`/participant/${id}`)
                   }}
                   mode={state.researcherType}
+                  tab={props.match.params.tab}
                 />
               </NavigationLayout>
             </React.Fragment>

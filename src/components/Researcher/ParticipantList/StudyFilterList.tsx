@@ -80,7 +80,7 @@ export default function StudyFilterList({
   const [allStudies, setAllStudies] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [deSelectAll, setDeselectAll] = useState(false)
-  const [researcherId, setResearcherId] = useState(researcher.id)
+  const [researcherId, setResearcherId] = useState(researcher?.id)
 
   useEffect(() => {
     refreshStudies()

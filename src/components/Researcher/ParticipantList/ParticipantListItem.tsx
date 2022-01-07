@@ -96,6 +96,7 @@ export default function ParticipantListItem({
   notificationColumn,
   handleSelectionChange,
   selectedParticipants,
+  researcherId,
   ...props
 }) {
   const classes = useStyles()
@@ -117,6 +118,8 @@ export default function ParticipantListItem({
   useEffect(() => {
     setName(user)
   }, [user])
+
+  useEffect(() => {}, [])
 
   return (
     <Card className={classes.cardMain}>
@@ -146,7 +149,7 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} />
-            <Link href={`/#/participant/${participant?.id}/settings`} underline="none" className={classes.settingslink}>
+            <Link href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`} underline="none">
               <Icon>settings</Icon>
             </Link>
             <Fab

@@ -112,7 +112,14 @@ const useStyles = makeStyles((theme) =>
   })
 )
 
-export default function PatientProfile({ participantId, ...props }: { participantId: any }) {
+export default function PatientProfile({
+  participantId,
+  researcherId,
+  ...props
+}: {
+  participantId: string
+  researcherId?: string
+}) {
   const [nickname, setNickname] = useState("")
   const [loading, setLoading] = React.useState(false)
   const [ext, setExt] = useState([])
@@ -136,7 +143,6 @@ export default function PatientProfile({ participantId, ...props }: { participan
 
   useEffect(() => {
     Service.getDataByKey("participants", [participantId], "id").then((data) => {
-      console.log(data)
       setParticipant(data[0])
     })
     Service.getAll("studies").then((studies) => {
@@ -160,7 +166,7 @@ export default function PatientProfile({ participantId, ...props }: { participan
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Link onClick={() => history.back()} underline="none" className={classes.backbtnlink}>
+          <Link href={`/#/researcher/${researcherId}`} underline="none" className={classes.backbtnlink}>
             <Icon>arrow_back</Icon>
           </Link>
           <Typography variant="h5">
