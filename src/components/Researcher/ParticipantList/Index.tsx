@@ -224,6 +224,7 @@ export default function ParticipantList({
     setPaginatedParticipants(
       sortData(participants, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
     )
+    localStorage.setItem("participants", JSON.stringify({ page: page, rowCount: rowCount }))
     setLoading(false)
   }
 
@@ -268,6 +269,7 @@ export default function ParticipantList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                dataHead="participants"
               />
             </Grid>
           ) : (

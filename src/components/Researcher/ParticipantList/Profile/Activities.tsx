@@ -167,6 +167,7 @@ export default function Activities({
               currentRowCount={rowCount}
               currentPage={page}
               type={1}
+              dataHead="activities"
             />
           </Grid>
         </Grid>

@@ -166,7 +166,7 @@ export default function PatientProfile({
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Link href={`/#/researcher/${researcherId}`} underline="none" className={classes.backbtnlink}>
+          <Link href={`/#/researcher/${researcherId}/0`} underline="none" className={classes.backbtnlink}>
             <Icon>arrow_back</Icon>
           </Link>
           <Typography variant="h5">

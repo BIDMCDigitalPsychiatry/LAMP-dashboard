@@ -85,7 +85,7 @@ export default function ResearcherRow({
                 size="small"
                 classes={{ root: classes.btnWhite }}
                 onClick={() => {
-                  history.push(`/researcher/${researcher.id}`)
+                  history.push(`/researcher/${researcher.id}/0`)
                 }}
               >
                 <Icon>arrow_forward</Icon>

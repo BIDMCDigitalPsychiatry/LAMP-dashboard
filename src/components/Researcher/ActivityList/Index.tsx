@@ -156,8 +156,10 @@ export default function ActivityList({
 
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
+    console.log(page, rowCount)
     setRowCount(rowCount)
     setPage(page)
+    localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
     setPaginatedActivities(
       sortData(activities, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
@@ -206,6 +208,7 @@ export default function ActivityList({
                 rowPerPage={[20, 40, 60, 80]}
                 currentPage={page}
                 currentRowCount={rowCount}
+                dataHead="activities"
               />
             </Grid>
           ) : (
