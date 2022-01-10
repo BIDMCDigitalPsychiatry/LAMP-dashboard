@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
+import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -80,6 +80,7 @@ export const changeCase = (text) => {
 }
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const search = useLocation().search
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: any) => {
@@ -117,11 +118,17 @@ function AppRouter({ ...props }) {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       //
+      console.log(query)
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
         enqueueSnackbar(t("You're using the src server to log into mindLAMP.", { src: src }), { variant: "info" })
       }
       //
+      console.log(Object.fromEntries(new URLSearchParams(query[1])))
+      let values = Object.fromEntries(new URLSearchParams(query[1]))
+      if (!!values["mode"]) {
+        return
+      }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
@@ -137,6 +144,7 @@ function AppRouter({ ...props }) {
         window.location.href = query[0]
       })
     } else if (!state.identity) {
+      console.log("check")
       LAMP.Auth.refresh_identity().then((x) => {
         getAdminType()
         setState((state) => ({
@@ -396,7 +404,11 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
+              <NotificationPage
+                participant={props.match.params.id}
+                activityId={props.match.params.activityId}
+                mode={new URLSearchParams(search).get("mode")}
+              />
             </React.Fragment>
           )
         }

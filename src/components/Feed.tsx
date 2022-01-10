@@ -23,12 +23,7 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
-import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
-import SurveyInstrument from "./SurveyInstrument"
-import VoiceRecordingResult from "./VoiceRecordingResult"
-import EmbeddedActivity from "./EmbeddedActivity"
-import GroupActivity from "./GroupActivity"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -37,7 +32,6 @@ import LAMP, {
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import DateFnsUtils from "@date-io/date-fns"
 import { useTranslation } from "react-i18next"
-import ActivityPage from "./ActivityPage"
 
 class LocalizedUtils extends DateFnsUtils {
   getWeekdays() {
@@ -213,17 +207,7 @@ const useStyles = makeStyles((theme: Theme) =>
         fill: "#FFD645 !important",
       },
     },
-    goalIcon: {
-      border: "3px solid #FE8470",
-    },
 
-    goalCompletedIcon: {
-      color: "#FE8470 !important",
-      border: "0px solid #FE8470",
-      "& text": {
-        fill: "#FE8470 !important",
-      },
-    },
     customstepper: {
       position: "relative",
       maxWidth: 500,
@@ -329,14 +313,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const games = [
-  "lamp.jewels_a",
-  "lamp.jewels_b",
-  "lamp.spatial_span",
-  "lamp.cats_and_dogs",
-  "lamp.pop_the_bubbles",
-  "lamp.balloon_risk",
-]
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
@@ -391,23 +367,15 @@ export default function Feed({
   const [date, changeDate] = useState(new Date())
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
-  const [launchedActivity, setLaunchedActivity] = useState(false)
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
   const daily = [0, 1, 2, 3, 4, 5, 6]
-  const [index, setIndex] = useState(null)
   const [events, setEvents] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
 
   const { t } = useTranslation()
-
-  const completeFeed = (index: number) => {
-    let feed = currentFeed
-    feed[index].completed = true
-    setCurrentFeed(feed)
-  }
 
   useEffect(() => {
     getFeedByDate(new Date())
@@ -426,32 +394,6 @@ export default function Feed({
     var minutes = minute < 10 ? "0" + minute : minute
     var strTime = hours + ":" + minutes + ampm
     return strTime
-  }
-
-  const getDates = (type: any, seldate: Date) => {
-    var curr = new Date(seldate)
-    let month = curr.getMonth()
-    let days = []
-    if (curr.getTime() <= new Date(date).getTime()) {
-      if (curr.getTime() <= new Date(date).getTime() && new Date(date).getMonth() !== month) {
-        curr.setDate(1)
-      }
-      curr.setMonth(new Date(date).getMonth())
-      curr.setFullYear(new Date(date).getFullYear())
-      while (new Date(curr).getMonth() === new Date(date).getMonth()) {
-        if (type === daily) {
-          days.push(new Date(curr).toLocaleDateString())
-        }
-        if (
-          (type === triweekly && triweekly.includes(curr.getDay())) ||
-          (type === biweekly && biweekly.includes(curr.getDay()))
-        ) {
-          days.push(new Date(curr).toLocaleDateString())
-        }
-        curr.setDate(curr.getDate() + 1)
-      }
-    }
-    return days
   }
 
   const getEvents = async (date: Date) => {
@@ -784,16 +726,6 @@ export default function Feed({
     getEvents(date).then(setEvents)
   }
 
-  const getActivity = (y: any) => {
-    setLoading(true)
-    setLaunchedActivity(false)
-    LAMP.Activity.view(y).then((data) => {
-      setVisibleActivities(data)
-      setLaunchedActivity(true)
-      setLoading(false)
-    })
-  }
-
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
@@ -843,8 +775,7 @@ export default function Feed({
                             (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
                               feed.time <= new Date().getTime()))
                         ) {
-                          getActivity(feed.activityData.id)
-                          setIndex(index)
+                          window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
                         }
                       }}
                     >
@@ -896,17 +827,7 @@ export default function Feed({
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />
         </Grid>
       </Grid>
-      <ActivityPage
-        activity={visibleActivities}
-        participant={participant}
-        setOpenData={setLaunchedActivity}
-        submitSurvey={props.onComplete}
-        showStreak={(participant, activity) => {
-          completeFeed(index)
-          showStreak(participant, activity)
-        }}
-        openData={launchedActivity}
-      />
+
       <Dialog
         open={openNotImplemented}
         onClose={() => setOpenNotImplemented(false)}
