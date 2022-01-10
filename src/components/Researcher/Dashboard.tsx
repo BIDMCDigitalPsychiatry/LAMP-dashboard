@@ -168,7 +168,6 @@ export const sortData = (data, studies, key) => {
 //   sensor_count?: number
 // }
 export default function Dashboard({ onParticipantSelect, researcherId, mode, tab, ...props }) {
-  const [currentTab, setCurrentTab] = useState(-1)
   const [studies, setStudies] = useState(null)
   const [notificationColumn, setNotification] = useState(false)
   const [selectedStudies, setSelectedStudies] = useState([])
@@ -192,16 +191,11 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
 
   useEffect(() => {
     LAMP.Researcher.view(researcherId).then(setResearcher)
-    setCurrentTab(parseInt(tab))
   }, [])
 
   useEffect(() => {
     getAllStudies()
   }, [researcher])
-
-  useEffect(() => {
-    if (mode === "clinician") setCurrentTab(parseInt(tab))
-  }, [mode])
 
   useEffect(() => {
     if (!!newStudy) getAllStudies()
@@ -218,7 +212,6 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(sortStudies(studies, order))
-      setCurrentTab(parseInt(tab))
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
         setNotification(researcherNotification)
@@ -266,7 +259,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
     <Container maxWidth={false}>
       <Container
         className={
-          currentTab !== 4
+          tab !== "portal"
             ? window.innerWidth >= 1280 && window.innerWidth <= 1350
               ? classes.tableContainerWidthPad
               : classes.tableContainerWidth
@@ -274,7 +267,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
         }
       >
         {!!studies && (
-          <ResponsivePaper className={currentTab === 4 ? classes.dataPortalPaper : null} elevation={0}>
+          <ResponsivePaper className={tab === "portal" ? classes.dataPortalPaper : null} elevation={0}>
             <Drawer
               anchor={supportsSidebar ? "left" : "bottom"}
               variant="permanent"
@@ -286,8 +279,8 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 <ListItem
                   className={classes.menuItems + " " + classes.btnCursor}
                   button
-                  selected={currentTab === 0}
-                  onClick={(event) => setCurrentTab(0)}
+                  selected={tab === "users"}
+                  onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/users`)}
                 >
                   <ListItemIcon className={classes.menuIcon}>
                     <Patients />
@@ -298,10 +291,9 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
-                    selected={currentTab === 1}
+                    selected={tab === "activities"}
                     onClick={(event) => {
-                      window.location.href = `/#/researcher/${researcherId}/1`
-                      setCurrentTab(1)
+                      window.location.href = `/#/researcher/${researcherId}/activities`
                     }}
                   >
                     <ListItemIcon className={classes.menuIcon}>
@@ -314,8 +306,10 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
-                    selected={currentTab === 2}
-                    onClick={(event) => setCurrentTab(2)}
+                    selected={tab === "sensors"}
+                    onClick={(event) => {
+                      window.location.href = `/#/researcher/${researcherId}/sensors`
+                    }}
                   >
                     <ListItemIcon className={classes.menuIcon}>
                       <Sensors />
@@ -327,8 +321,8 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
-                    selected={currentTab === 3}
-                    onClick={(event) => setCurrentTab(3)}
+                    selected={tab === "studies"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/studies`)}
                   >
                     <ListItemIcon className={classes.menuIcon}>
                       <Studies />
@@ -340,8 +334,8 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   <ListItem
                     className={classes.menuItems + " " + classes.btnCursor}
                     button
-                    selected={currentTab === 4}
-                    onClick={(event) => setCurrentTab(4)}
+                    selected={tab === "portal"}
+                    onClick={(event) => (window.location.href = `/#/researcher/${researcherId}/portal`)}
                   >
                     <ListItemIcon className={classes.menuIcon}>
                       <DataPortalIcon />
@@ -351,7 +345,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 )}
               </List>
             </Drawer>
-            {currentTab === 0 && (
+            {tab === "users" && (
               <ParticipantList
                 title={null}
                 onParticipantSelect={onParticipantSelect}
@@ -366,7 +360,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 order={order}
               />
             )}
-            {currentTab === 1 && (
+            {tab === "activities" && (
               <ActivityList
                 title={null}
                 researcher={researcher}
@@ -378,7 +372,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 order={order}
               />
             )}
-            {currentTab === 2 && (
+            {tab === "sensors" && (
               <SensorsList
                 title={null}
                 researcher={researcher}
@@ -389,7 +383,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 order={order}
               />
             )}
-            {currentTab === 3 && (
+            {tab === "studies" && (
               <StudiesList
                 title={null}
                 researcher={researcher}
@@ -400,7 +394,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 newAdddeStudy={setNewStudy}
               />
             )}
-            {currentTab === 4 && (
+            {tab === "portal" && (
               <DataPortal
                 onLogout={null}
                 token={{

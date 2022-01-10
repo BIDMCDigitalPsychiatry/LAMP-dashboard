@@ -137,7 +137,6 @@ export default function ParticipantList({
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState([])
   const [paginatedParticipants, setPaginatedParticipants] = useState([])
-  const [studiesData, setStudiesData] = useState([])
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
@@ -146,9 +145,10 @@ export default function ParticipantList({
 
   useInterval(
     () => {
+      setLoading(true)
       getAllStudies()
     },
-    studiesData !== null && (studiesData || []).length > 0 ? null : 2000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
@@ -163,20 +163,12 @@ export default function ParticipantList({
   }, [selectedStudies])
 
   useEffect(() => {
-    loadData()
-  }, [selected])
-
-  useEffect(() => {
-    if (studies !== studiesData) setStudiesData(studies)
-  }, [studies])
-
-  const loadData = () => {
-    if ((selectedStudies || []).length > 0) {
+    if ((selected || []).length > 0) {
       searchParticipants()
     } else {
       setParticipants([])
     }
-  }
+  }, [selected])
 
   const handleChange = (participant, checked) => {
     if (checked) {
@@ -189,30 +181,27 @@ export default function ParticipantList({
 
   const searchParticipants = (searchVal?: string) => {
     let searchTxt = searchVal ?? search
-    if (selected.length > 0) {
-      setLoading(true)
-      const selectedData = selected.filter((o) => studiesData.some(({ name }) => o === name))
-      if (selectedData.length > 0) {
-        let result = []
-        Service.getAll("participants").then((participantData) => {
-          if (!!searchTxt && searchTxt.trim().length > 0) {
-            result = result.concat(participantData)
-            result = result.filter((i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt))
-            setParticipants(sortData(result, selectedData, "id"))
-          } else {
-            result = result.concat(participantData)
-            setParticipants(sortData(result, selectedData, "id"))
-          }
-          setPaginatedParticipants(
-            sortData(result, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData.length > 0) {
+      Service.getAll("participants").then((participantData) => {
+        if (!!searchTxt && searchTxt.trim().length > 0) {
+          participantData = (participantData || []).filter(
+            (i) => i.name?.includes(searchTxt) || i.id?.includes(searchTxt)
           )
-          setPage(page)
-          setRowCount(rowCount)
-          setLoading(false)
-        })
-      } else {
-        setParticipants([])
-      }
+          setParticipants(sortData(participantData, selectedData, "id"))
+        } else {
+          setParticipants(sortData(participantData, selectedData, "id"))
+        }
+        setPaginatedParticipants(
+          sortData(participantData, selectedData, "id").slice(page * rowCount, page * rowCount + rowCount)
+        )
+        setPage(page)
+        setRowCount(rowCount)
+        setLoading(false)
+      })
+    } else {
+      setParticipants([])
+      setLoading(false)
     }
     setSelectedParticipants([])
   }
@@ -236,11 +225,11 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading || participants === null}>
+      <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header
-        studies={studiesData}
+        studies={studies}
         researcher={researcher}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
@@ -261,7 +250,7 @@ export default function ParticipantList({
                   <ParticipantListItem
                     participant={eachParticipant}
                     onParticipantSelect={onParticipantSelect}
-                    studies={studiesData}
+                    studies={studies}
                     notificationColumn={notificationColumn}
                     handleSelectionChange={handleChange}
                     selectedParticipants={selectedParticipants}

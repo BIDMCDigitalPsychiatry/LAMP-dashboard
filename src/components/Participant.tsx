@@ -126,19 +126,19 @@ export default function Participant({
   const getTab = () => {
     let tabNum
     switch (props.tabValue) {
-      case "Learn":
+      case "learn":
         tabNum = 0
         break
-      case "Assess":
+      case "assess":
         tabNum = 1
         break
-      case "Manage":
+      case "manage":
         tabNum = 2
         break
-      case "Portal":
+      case "portal":
         tabNum = 3
         break
-      case "Feed":
+      case "feed":
         tabNum = 4
         break
       default:
@@ -160,7 +160,6 @@ export default function Participant({
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const { t, i18n } = useTranslation()
-  const [activitySubmitted, setActivitySubmited] = React.useState(false)
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
   }

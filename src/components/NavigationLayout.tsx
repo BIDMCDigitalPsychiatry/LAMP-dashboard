@@ -35,6 +35,8 @@ import Messages from "./Messages"
 import LAMP from "lamp-core"
 import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
+import { Service } from "./DBService/DBService"
+import Researcher from "./Researcher/Index"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -219,9 +221,18 @@ export default function NavigationLayout({
   const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
-
+  const [researcherId, setResId] = useState(null)
   useEffect(() => {
     refresh()
+    if (
+      (authType === "researcher" || authType === "admin") &&
+      typeof title != "undefined" &&
+      title.startsWith("Patient")
+    ) {
+      Service.getAll("researcher").then((researcher) => {
+        setResId(researcher[0]["id"])
+      })
+    }
     setInterval(refresh, 60000)
   }, [])
 
@@ -308,7 +319,12 @@ export default function NavigationLayout({
             <Toolbar className={classes.logResearcherToolbar}>
               {typeof title != "undefined" && title.startsWith("Patient") ? (
                 <Box>
-                  <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
+                  <IconButton
+                    className={classes.backbtn}
+                    onClick={() => (window.location.href = `/#/researcher/${researcherId}/users`)}
+                    color="default"
+                    aria-label="Menu"
+                  >
                     <Icon>arrow_back</Icon>
                   </IconButton>
                   {t("Patient View")}: {id}
@@ -317,7 +333,9 @@ export default function NavigationLayout({
                 <Box>
                   {authType === "admin" && !roles.includes(title) && (
                     <IconButton
-                      onClick={goBack}
+                      onClick={() => {
+                        window.location.href = `/#/researcher`
+                      }}
                       color="default"
                       className={classes.backbtn}
                       aria-label="Menu"
@@ -357,7 +375,7 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {authType === "admin" && (title === "Administrator"  ||  title === "User Administrator") && (
+                    {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}

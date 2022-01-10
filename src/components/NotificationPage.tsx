@@ -85,7 +85,6 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
   useEffect(() => {
     // let url = new URL(window.location.href)
     // var params = new URLSearchParams(url.search);
-    console.log(mode)
     ;(async () => {
       LAMP.Activity.view(activityId).then((data) => {
         setActivity(data)

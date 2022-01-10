@@ -39,7 +39,7 @@ export default function Researcher({ researcher, onParticipantSelect, mode, tab,
       //   }
       // }
       if (LAMP.Auth._type === "researcher") {
-        lampAuthId === "researcher@demo.lamp.digital"
+        lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital"
           ? saveDemoData()
           : saveDataToCache(lampAuthId + ":" + lampAuthPswd, researcher.id)
       } else if (LAMP.Auth._type === "admin") {

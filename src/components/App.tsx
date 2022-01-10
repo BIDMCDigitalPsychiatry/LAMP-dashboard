@@ -117,14 +117,10 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
-      //
-      console.log(query)
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
         enqueueSnackbar(t("You're using the src server to log into mindLAMP.", { src: src }), { variant: "info" })
       }
-      //
-      console.log(Object.fromEntries(new URLSearchParams(query[1])))
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
         return
@@ -144,7 +140,6 @@ function AppRouter({ ...props }) {
         window.location.href = query[0]
       })
     } else if (!state.identity) {
-      console.log("check")
       LAMP.Auth.refresh_identity().then((x) => {
         getAdminType()
         setState((state) => ({
@@ -493,9 +488,9 @@ function AppRouter({ ...props }) {
             ) : state.authType === "admin" ? (
               <Redirect to="/researcher" />
             ) : state.authType === "researcher" ? (
-              <Redirect to="/researcher/me" />
+              <Redirect to="/researcher/me/users" />
             ) : (
-              <Redirect to="/participant/me" />
+              <Redirect to="/participant/me/assess" />
             )
           ) : (
             <React.Fragment />
@@ -573,7 +568,7 @@ function AppRouter({ ...props }) {
                       ...state,
                       activeTab: 3,
                     }))
-                    props.history.push(`/participant/${id}`)
+                    props.history.push(`/participant/${id}/portal`)
                   }}
                   mode={state.researcherType}
                   tab={props.match.params.tab}
@@ -621,7 +616,7 @@ function AppRouter({ ...props }) {
 
       <Route
         exact
-        path="/participant/:id"
+        path="/participant/:id/:tab"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -648,7 +643,7 @@ function AppRouter({ ...props }) {
                 <Participant
                   participant={getParticipant(props.match.params.id)}
                   activeTab={activeTab}
-                  tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
+                  tabValue={props.match.params.tab}
                   surveyDone={state.surveyDone}
                   submitSurvey={submitSurvey}
                   setShowDemoMessage={(val) => {

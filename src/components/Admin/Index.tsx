@@ -148,6 +148,8 @@ export default function Root({ updateStore, adminType, ...props }) {
 
   useEffect(() => {
     Service.deleteDB()
+    localStorage.setItem("participants", JSON.stringify({ page: 0, rowCount: 40 }))
+    localStorage.setItem("activities", JSON.stringify({ page: 0, rowCount: 40 }))
     if (LAMP.Auth._type !== "admin") return
   }, [])
 

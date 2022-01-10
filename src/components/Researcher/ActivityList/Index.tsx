@@ -132,25 +132,24 @@ export default function ActivityList({
       setLoading(true)
       let result = []
       Service.getAll("activities").then((activitiesData) => {
-        if ((activitiesData || []).length > 0) {
-          if (!!searchTxt && searchTxt.trim().length > 0) {
-            result = result.concat(activitiesData)
-            result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
-            setActivities(sortData(result, selectedData, "name"))
-          } else {
-            result = result.concat(activitiesData)
-            setActivities(sortData(result, selectedData, "name"))
-          }
-          setPaginatedActivities(
-            sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
-          )
-          setPage(page)
-          setRowCount(rowCount)
-          setLoading(false)
+        if (!!searchTxt && searchTxt.trim().length > 0) {
+          result = result.concat(activitiesData)
+          result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
+          setActivities(sortData(result, selectedData, "name"))
+        } else {
+          result = result.concat(activitiesData)
+          setActivities(sortData(result, selectedData, "name"))
         }
+        setPaginatedActivities(
+          sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+        )
+        setPage(page)
+        setRowCount(rowCount)
+        setLoading(false)
       })
     } else {
       setActivities([])
+      setLoading(false)
     }
     setSelectedActivities([])
   }
@@ -162,7 +161,6 @@ export default function ActivityList({
 
   const handleChangePage = (page: number, rowCount: number) => {
     setLoading(true)
-    console.log(page, rowCount)
     setRowCount(rowCount)
     setPage(page)
     localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))
