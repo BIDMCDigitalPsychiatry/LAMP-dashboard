@@ -42,36 +42,38 @@ export default function ActivityCard({
   let values = []
   events.map((d) =>
     d.temporal_slices.map((t) => {
-      if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
-        Object.keys(t.value).map((val) => {
-          if (!!t.value[val].question) {
-            values.push({
-              item: t.item + " - " + t.value[val].question,
-              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value
-                .map((elt) => {
-                  // assure the value can be converted into an integer
-                  return parseInt(elt) ? parseInt(elt) : elt
-                })
-                .reduce((sum, current) => sum + (parseInt(current) || current)),
-            })
-          }
-        })
-      } else {
-        values.push({
-          item: t.item,
-          [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-              ? typeof t.value === "string"
-                ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
-                  ? 1
-                  : typeof t.value === "string" && ["No", "False"].includes(t.value)
-                  ? 0
+      if (typeof t.value !== "undefined") {
+        if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
+          Object.keys(t.value).map((val) => {
+            if (!!t.value[val].question) {
+              values.push({
+                item: t.item + " - " + t.value[val].question,
+                [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value
+                  .map((elt) => {
+                    // assure the value can be converted into an integer
+                    return parseInt(elt) ? parseInt(elt) : elt
+                  })
+                  .reduce((sum, current) => sum + (parseInt(current) || current)),
+              })
+            }
+          })
+        } else {
+          values.push({
+            item: t.item,
+            [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                ? typeof t.value === "string"
+                  ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
+                    ? 1
+                    : typeof t.value === "string" && ["No", "False"].includes(t.value)
+                    ? 0
+                    : t.value
                   : t.value
-                : t.value
-              : !!t.type
-              ? 1
-              : 0,
-        })
+                : !!t.type
+                ? 1
+                : 0,
+          })
+        }
       }
     })
   )
