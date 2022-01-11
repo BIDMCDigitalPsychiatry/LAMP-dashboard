@@ -379,7 +379,7 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
 }
 export default function Feed({
   participant,
-  onComplete,
+  submitSurvey,
   activities,
   visibleActivities,
   setVisibleActivities,
@@ -900,7 +900,7 @@ export default function Feed({
         activity={visibleActivities}
         participant={participant}
         setOpenData={setLaunchedActivity}
-        submitSurvey={props.onComplete}
+        submitSurvey={submitSurvey}
         showStreak={(participant, activity) => {
           completeFeed(index)
           showStreak(participant, activity)
