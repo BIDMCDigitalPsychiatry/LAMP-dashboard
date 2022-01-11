@@ -373,7 +373,7 @@ export default function Participant({
                 activeTab={activeTab}
                 activities={activities}
                 visibleActivities={visibleActivities}
-                onComplete={submitSurvey}
+                submitSurvey={submitSurvey}
                 setVisibleActivities={setVisibleActivities}
                 showStreak={showStreak}
               />
