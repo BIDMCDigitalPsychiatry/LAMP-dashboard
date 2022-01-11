@@ -179,7 +179,7 @@ export default function Tips({
   ]
   const { t } = useTranslation()
   const [settings, setSettings]: Array<any> = useState([])
-  const [streak, setStreak] = useState()
+
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
@@ -196,6 +196,12 @@ export default function Tips({
     setData({ ...data, category: tab })
     validate()
   }
+
+  const handleStreakChange = (val) => {
+    setData({ ...data, streak: val })
+    validate()
+  }
+
   useEffect(() => {
     setSettings(value)
   }, [openWindow])
@@ -393,7 +399,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            streak: streak,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -407,7 +413,7 @@ export default function Tips({
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            streak: streak,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: selectedCategory.settings,
             studyID: studyId,
@@ -435,7 +441,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
-            streak: streak,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -446,7 +452,7 @@ export default function Tips({
             //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
-            streak: streak,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -727,7 +733,7 @@ export default function Tips({
             </Grid>
           </Grid>
 
-          <ActivityStreak onChange={(val) => setStreak(val)} value={details?.streak} />
+          <ActivityStreak onChange={handleStreakChange} value={details?.streak} />
 
           {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
             <Grid container spacing={2}>
