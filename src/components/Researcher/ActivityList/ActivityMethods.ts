@@ -1070,6 +1070,7 @@ export async function updateActivityData(x, isDuplicated, selectedActivity) {
         studyID: selectedActivity?.study_id,
         spec: "lamp.tips",
         settings: x.settings,
+        streak: x.streak,
         schedule: [],
         category: x.category,
       }
