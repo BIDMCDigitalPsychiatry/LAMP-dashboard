@@ -101,6 +101,7 @@ export default function Activity({
       setStudies(studies)
       Service.getAll("activities").then((activities) => {
         setAllActivities(activities)
+        console.log(id)
         if (!!id) {
           Service.getDataByKey("activities", [id], "id").then((data) => {
             setActivity(data[0])
@@ -112,6 +113,7 @@ export default function Activity({
   }, [])
 
   useEffect(() => {
+    console.log(activity)
     if (!!activity) {
       setLoading(false)
       ;(async () => {
@@ -176,6 +178,7 @@ export default function Activity({
       enqueueSnackbar(t("Successfully created a new Activity."), {
         variant: "success",
       })
+      history.back()
     }
   }
 
@@ -205,6 +208,7 @@ export default function Activity({
         enqueueSnackbar(t("Successfully duplicated the Activity."), {
           variant: "success",
         })
+        history.back()
       } else {
         x["study_id"] = x.studyID
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
@@ -213,6 +217,7 @@ export default function Activity({
         enqueueSnackbar(t("Successfully updated the Activity."), {
           variant: "success",
         })
+        history.back()
       }
     }
     setLoading(false)

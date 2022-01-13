@@ -14,6 +14,7 @@ import {
   createStyles,
   withStyles,
   Tooltip,
+  Popper,
 } from "@material-ui/core"
 import { ReactComponent as Feed } from "../icons/Feed.svg"
 import { ReactComponent as Learn } from "../icons/Learn.svg"
@@ -294,20 +295,32 @@ export default function BottomMenu({ ...props }) {
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [tabVal, _setTab] = useState(props.tabValue)
   const { t } = useTranslation()
-  const [viewedTabs, setViewedTabs] = useState([])
   const [tabValues, setTabValues] = useState(
     localStorage.getItem("bottom-menu-tabs" + props.participant.id) !== null
       ? JSON.parse(localStorage.getItem("bottom-menu-tabs" + props.participant.id))
       : []
   )
 
-  useEffect(() => {
-    openTabUpdate()
-  }, [])
+  const tabs = ["learn", "assess", "manage", "prevent", "feed"]
 
-  const openTabUpdate = () => {
-    setTabValues({ ...tabValues, tabVal: false })
-    switch (tabVal) {
+  const openTabUpdate = (val) => {
+    _setTab(val)
+
+    ;(async () => {
+      await LAMP.SensorEvent.create(props.participant.id, {
+        timestamp: new Date().getTime(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "open_page",
+          page: tabs[val],
+          duration:
+            new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
+        },
+      })
+      localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
+    })()
+    props.activeTab(val)
+    switch (parseInt(val)) {
       case 0:
         window.location.href = `/#/participant/${props.participant.id}/learn`
         break
@@ -324,41 +337,16 @@ export default function BottomMenu({ ...props }) {
         window.location.href = `/#/participant/${props.participant.id}/feed`
         break
     }
+    props.setShowDemoMessage(false)
+  }
+
+  const updateLocalStorage = (tab) => {
+    setTabValues({ ...tabValues, [tab]: false })
   }
 
   useEffect(() => {
     localStorage.setItem("bottom-menu-tabs" + props.participant.id, JSON.stringify(tabValues))
   }, [tabValues])
-
-  useEffect(() => {
-    openTabUpdate()
-  }, [tabVal])
-
-  const tabs = ["learn", "assess", "manage", "prevent", "feed"]
-
-  const setTab = (newTab) => {
-    _setTab(newTab)
-    if (newTab !== tabVal) {
-      ;(async () => {
-        await LAMP.SensorEvent.create(props.participant.id, {
-          timestamp: new Date().getTime(),
-          sensor: "lamp.analytics",
-          data: {
-            type: "open_page",
-            page: tabs[tabVal],
-            duration:
-              new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
-          },
-        })
-        localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
-      })()
-    }
-    props.setShowDemoMessage(false)
-    if (!viewedTabs.includes(newTab)) {
-      setViewedTabs(viewedTabs.concat(newTab))
-    }
-    props.activeTab(newTab)
-  }
 
   return (
     <div>
@@ -380,12 +368,12 @@ export default function BottomMenu({ ...props }) {
           }}
         >
           <FeedTooltip
-            open={tabVal === 4}
+            open={parseInt(tabVal) == 4 && (typeof tabValues[4] === "undefined" || !!tabValues[4])}
             interactive={true}
             className={classes.btnCursor}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setTab(4)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(4)}>
                   <Icon>close</Icon>
                 </IconButton>
                 <Typography variant="h6">{t("Welcome to the Feed section")}</Typography>
@@ -397,7 +385,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 4}
+              selected={parseInt(tabVal) === 4}
               label={t("Feed")}
               value={4}
               classes={{
@@ -410,16 +398,16 @@ export default function BottomMenu({ ...props }) {
                   <Feed />
                 </Box>
               }
-              onChange={(_, newTab) => setTab(newTab)}
+              onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </FeedTooltip>
           <LearnTooltip
-            open={tabVal === 0}
+            open={parseInt(tabVal) == 0 && (typeof tabValues[0] === "undefined" || !!tabValues[0])}
             interactive={true}
             className={classes.btnCursor}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setTab(0)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(0)}>
                   <Icon>close</Icon>
                 </IconButton>
                 <Typography variant="h6">{t("Welcome to the Learn section")}</Typography>
@@ -431,7 +419,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 0}
+              selected={parseInt(tabVal) === 0}
               label={t("Learn")}
               value={0}
               classes={{
@@ -440,16 +428,16 @@ export default function BottomMenu({ ...props }) {
                 label: classes.navigationLabel,
               }}
               icon={<Learn />}
-              onChange={(_, newTab) => setTab(newTab)}
+              onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </LearnTooltip>
           <AssesTooltip
-            open={tabVal === 1}
+            open={parseInt(tabVal) == 1 && (typeof tabValues[1] === "undefined" || !!tabValues[1])}
             interactive={true}
             className={classes.btnCursor}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setTab(1)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(1)}>
                   <Icon>close</Icon>
                 </IconButton>
                 <Typography variant="h6">{t("Welcome to the Assess section")}</Typography>
@@ -461,7 +449,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 1}
+              selected={parseInt(tabVal) === 1}
               label={t("Assess")}
               value={1}
               classes={{
@@ -470,17 +458,16 @@ export default function BottomMenu({ ...props }) {
                 label: classes.navigationLabel,
               }}
               icon={<Assess />}
-              onChange={(_, newTab) => setTab(newTab)}
+              onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </AssesTooltip>
-
           <ManageTooltip
-            open={tabVal === 2}
+            open={parseInt(tabVal) == 2 && (typeof tabValues[2] === "undefined" || !!tabValues[2])}
             interactive={true}
             className={classes.btnCursor}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setTab(2)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(2)}>
                   <Icon>close</Icon>
                 </IconButton>
                 <Typography variant="h6">{t("Welcome to the Manage section")}</Typography>
@@ -492,7 +479,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 2}
+              selected={parseInt(tabVal) === 2}
               label={t("Manage")}
               value={2}
               classes={{
@@ -501,16 +488,16 @@ export default function BottomMenu({ ...props }) {
                 label: classes.navigationLabel,
               }}
               icon={<Manage />}
-              onChange={(_, newTab) => setTab(newTab)}
+              onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </ManageTooltip>
           <PreventTooltip
-            open={tabVal === 3}
+            open={parseInt(tabVal) == 3 && (typeof tabValues[3] === "undefined" || !!tabValues[3])}
             interactive={true}
             className={classes.btnCursor}
             title={
               <React.Fragment>
-                <IconButton aria-label="close" className={classes.closeButton} onClick={() => setTab(3)}>
+                <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(3)}>
                   <Icon>close</Icon>
                 </IconButton>
                 <Typography variant="h6">{t("Welcome to the Portal section")}</Typography>
@@ -522,7 +509,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={tabVal === 3}
+              selected={parseInt(tabVal) === 3}
               label={t("Portal")}
               value={3}
               classes={{
@@ -531,7 +518,7 @@ export default function BottomMenu({ ...props }) {
                 label: classes.navigationLabel,
               }}
               icon={<PreventIcon />}
-              onChange={(_, newTab) => setTab(newTab)}
+              onChange={(_, newTab) => openTabUpdate(newTab)}
             />
           </PreventTooltip>
         </Drawer>

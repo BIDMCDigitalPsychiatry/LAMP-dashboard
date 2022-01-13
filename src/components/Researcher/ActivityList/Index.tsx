@@ -92,6 +92,7 @@ export default function ActivityList({
 
   useInterval(
     () => {
+      setLoading(true)
       getAllStudies()
     },
     studies !== null && (studies || []).length > 0 ? null : 2000,

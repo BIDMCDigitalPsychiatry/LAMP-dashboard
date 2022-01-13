@@ -47,8 +47,8 @@ export default function SensorsList({
   studies,
   selectedStudies,
   setSelectedStudies,
-  getDBStudies,
   setOrder,
+  getAllStudies,
   order,
   ...props
 }: {
@@ -57,7 +57,7 @@ export default function SensorsList({
   studies: Array<any>
   selectedStudies: Array<any>
   setSelectedStudies?: Function
-  getDBStudies?: Function
+  getAllStudies?: Function
   setOrder?: Function
   order?: boolean
 }) {
@@ -71,29 +71,26 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
-  const [loadTime, setLoadTime] = useState(false)
-  const [allSensors, setAllSensors] = useState(null)
 
   useInterval(
     () => {
-      getAllSensors()
+      getAllStudies()
     },
-    allSensors !== null && !!loadTime ? null : 3000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoadTime(true)
-    }, 10000)
-  }, [])
+    if (selected !== selectedStudies) setSelected(selectedStudies)
+  }, [selectedStudies])
 
-  const getAllSensors = () => {
-    Service.getAll("sensors").then((data) => {
-      setAllSensors(data || [])
-      if ((data || []).length > 0) setLoadTime(true)
-    })
-  }
+  useEffect(() => {
+    if ((selected || []).length > 0) {
+      searchFilterSensors()
+    } else {
+      setSensors([])
+    }
+  }, [selected])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -103,24 +100,6 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
-  useEffect(() => {
-    setSelected(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    setLoadTime(false)
-    if ((selectedStudies || []).length > 0) {
-      setLoadTime(true)
-      searchFilterSensors()
-    } else {
-      setSensors([])
-    }
-  }, [selected])
-
-  useEffect(() => {
-    if (!!loadTime) searchFilterSensors()
-  }, [loadTime])
-
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
     setLoading(true)

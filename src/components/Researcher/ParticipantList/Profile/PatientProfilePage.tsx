@@ -160,6 +160,7 @@ export default function PatientProfile({
       variant: "success",
     })
     Service.update("participants", { participants: [{ name: nickname ?? null, id: participantId }] }, "name", "id")
+    history.back()
   }
 
   return (

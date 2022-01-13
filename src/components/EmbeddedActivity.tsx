@@ -140,7 +140,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
           srcDoc={embeddedActivity}
-          // sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation "
+          sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation "
         />
       )}
       <Backdrop className={classes.backdrop} open={loading}>

@@ -11,6 +11,8 @@ import {
   makeStyles,
   Theme,
   createStyles,
+  CircularProgress,
+  Backdrop,
 } from "@material-ui/core"
 import ParticipantList from "./ParticipantList/Index"
 import ActivityList from "./ActivityList/Index"
@@ -73,6 +75,10 @@ const useStyles = makeStyles((theme: Theme) =>
       [theme.breakpoints.down("sm")]: {
         width: "100%",
       },
+    },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
     },
     tableContainerWidthPad: {
       maxWidth: 1055,
@@ -180,9 +186,11 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const [order, setOrder] = useState(localStorage.getItem("order") ? JSON.parse(localStorage.getItem("order")) : true)
   const classes = useStyles()
   const { t } = useTranslation()
+  const [loading, setLoading] = useState(true)
 
   useInterval(
     () => {
+      setLoading(true)
       getDBStudies()
     },
     studies !== null && (studies || []).length > 0 ? null : 2000,
@@ -212,6 +220,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   const getDBStudies = async () => {
     Service.getAll("studies").then((studies) => {
       setStudies(sortStudies(studies, order))
+      setLoading(false)
       Service.getAll("researcher").then((data) => {
         let researcherNotification = !!data ? data[0]?.notification ?? false : false
         setNotification(researcherNotification)
@@ -257,6 +266,9 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
 
   return (
     <Container maxWidth={false}>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Container
         className={
           tab !== "portal"
@@ -380,6 +392,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
                 setOrder={() => setOrder(!order)}
+                getAllStudies={getAllStudies}
                 order={order}
               />
             )}
@@ -392,6 +405,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                 deletedDataStudy={(data) => setDeletedData(data)}
                 searchData={(data) => setSearch(data)}
                 newAdddeStudy={setNewStudy}
+                getAllStudies={getAllStudies}
               />
             )}
             {tab === "portal" && (

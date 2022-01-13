@@ -62,22 +62,13 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Header({
-  studies,
-  researcher,
-  searchData,
-  setUpdateCount,
-  setParticipants,
-  newStudyObj,
-  ...props
-}) {
+export default function Header({ studies, researcher, searchData, setParticipants, newStudyObj, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
 
   const handleNewStudyData = (data) => {
-    setUpdateCount(1)
     setParticipants()
     newStudyObj(data)
   }
