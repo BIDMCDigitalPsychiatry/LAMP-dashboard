@@ -104,7 +104,6 @@ export default function Activity({
         if (!!id) {
           Service.getDataByKey("activities", [id], "id").then((data) => {
             setActivity(data[0])
-            setLoading(false)
           })
         } else setLoading(false)
       })
@@ -112,8 +111,7 @@ export default function Activity({
   }, [])
 
   useEffect(() => {
-    if (!!activity) {
-      setLoading(false)
+    if (!!activity && details === null) {
       ;(async () => {
         let data = await LAMP.Activity.view(activity.id)
         activity.settings = data.settings
@@ -123,7 +121,7 @@ export default function Activity({
           )[0]
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
           setActivity(dataActivity)
-          setDetails(tag)
+          setDetails(tag ?? [])
         } else if (
           games.includes(activity.spec) ||
           activity.spec === "lamp.journal" ||
@@ -139,7 +137,7 @@ export default function Activity({
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
             !!y.error ? undefined : y.data
           )[0]
-          setDetails(tag)
+          setDetails(tag ?? [])
         } else if (activity.spec === "lamp.tips") {
           activity.settings = activity.settings.reduce((ds, d) => {
             let newD = d
@@ -151,7 +149,7 @@ export default function Activity({
           let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
             !!y.error ? undefined : y.data
           )[0]
-          setDetails(tag)
+          setDetails(tag ?? [])
         }
         setLoading(false)
       })()
