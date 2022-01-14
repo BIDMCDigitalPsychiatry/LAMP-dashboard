@@ -80,7 +80,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             let data = JSON.parse(e.data)
             delete data["activity"]
             data["activity"] = activityId
-            console.log(data)
             setData(data)
             setEmbeddedActivity(undefined)
             setSettings(null)

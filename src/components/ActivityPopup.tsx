@@ -16,14 +16,11 @@ import {
   Link,
 } from "@material-ui/core"
 import classnames from "classnames"
-import ResponsiveDialog from "./ResponsiveDialog"
 import { useTranslation } from "react-i18next"
-import ActivityPage from "./ActivityPage"
 import InfoIcon from "../icons/Info.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
-import { changeCase } from "./App"
 import { ReactComponent as BreatheIcon } from "../icons/Breathe.svg"
 import ScratchCard from "../icons/ScratchCard.svg"
 import { ReactComponent as JournalIcon } from "../icons/Goal.svg"
@@ -283,10 +280,7 @@ export default function ActivityPopup({
         <DialogActions>
           <Box textAlign="center" width={1} mt={1} mb={3}>
             <Link
-              onClick={(evt) => {
-                setOpenData(true)
-                props.onClose(evt, "backdropClick")
-              }}
+              href={`/#/participant/${participant?.id}/activity/${activity?.id}?mode=dashboard`}
               underline="none"
               className={classnames(
                 classes.btngreen,
@@ -305,14 +299,6 @@ export default function ActivityPopup({
           </Box>
         </DialogActions>
       </Dialog>
-      <ActivityPage
-        activity={currentActivity}
-        participant={participant}
-        setOpenData={setOpenData}
-        submitSurvey={submitSurvey}
-        showStreak={showStreak}
-        openData={openData}
-      />
     </React.Fragment>
   )
 }

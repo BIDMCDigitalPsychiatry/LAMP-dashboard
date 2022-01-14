@@ -68,13 +68,14 @@ export const games = [
   "lamp.balloon_risk",
 ]
 export default function ActivityList({
-  researcher,
+  researcherId,
   title,
   studies,
   selectedStudies,
   setSelectedStudies,
   setOrder,
   order,
+  getAllStudies,
   ...props
 }) {
   const [activities, setActivities] = useState(null)
@@ -88,28 +89,33 @@ export default function ActivityList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
-  const [loadTime, setLoadTime] = useState(false)
 
   useInterval(
     () => {
-      getAllActivities()
+      setLoading(true)
+      getAllStudies()
     },
-    allActivities !== null && !!loadTime ? null : 3000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoadTime(true)
-    }, 12000)
+    let params = JSON.parse(localStorage.getItem("activities"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 40)
   }, [])
 
-  const getAllActivities = () => {
-    Service.getAll("activities").then((data) => {
-      setAllActivities(data || [])
-      if ((data || []).length > 0) setLoadTime(true)
-    })
-  }
+  useEffect(() => {
+    if (selected !== selectedStudies) setSelected(selectedStudies)
+  }, [selectedStudies])
+
+  useEffect(() => {
+    if ((selected || []).length > 0) {
+      searchActivities()
+    } else {
+      setActivities([])
+    }
+  }, [selected])
 
   const handleChange = (activity, checked) => {
     if (checked) {
@@ -120,52 +126,32 @@ export default function ActivityList({
     }
   }
 
-  useEffect(() => {
-    setLoading(!loadTime)
-    if (!!loadTime) searchActivities()
-  }, [loadTime])
-
-  useEffect(() => {
-    setSelected(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    if ((selectedStudies || []).length > 0) {
-      searchActivities()
-    } else {
-      setActivities([])
-    }
-  }, [selected])
-
   const searchActivities = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0 && !loading) {
-      let result = []
+    if (selectedData.length > 0) {
       setLoading(true)
+      let result = []
       Service.getAll("activities").then((activitiesData) => {
-        if ((activitiesData || []).length > 0) {
-          if (!!searchTxt && searchTxt.trim().length > 0) {
-            result = result.concat(activitiesData)
-            result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
-            setActivities(sortData(result, selectedData, "name"))
-          } else {
-            result = result.concat(activitiesData)
-            setActivities(sortData(result, selectedData, "name"))
-          }
-          setPaginatedActivities(
-            sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
-          )
-          setPage(page)
-          setRowCount(rowCount)
+        if (!!searchTxt && searchTxt.trim().length > 0) {
+          result = result.concat(activitiesData)
+          result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
+          setActivities(sortData(result, selectedData, "name"))
+        } else {
+          result = result.concat(activitiesData)
+          setActivities(sortData(result, selectedData, "name"))
         }
+        setPaginatedActivities(
+          sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
+        )
+        setPage(page)
+        setRowCount(rowCount)
         setLoading(false)
       })
     } else {
       setActivities([])
       setLoading(false)
     }
-
     setSelectedActivities([])
   }
 
@@ -178,6 +164,7 @@ export default function ActivityList({
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
+    localStorage.setItem("activities", JSON.stringify({ page: page, rowCount: rowCount }))
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
     setPaginatedActivities(
       sortData(activities, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
@@ -192,7 +179,7 @@ export default function ActivityList({
       </Backdrop>
       <Header
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         activities={allActivities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
@@ -210,7 +197,7 @@ export default function ActivityList({
                 <Grid item lg={6} xs={12} key={activity.id}>
                   <ActivityItem
                     activity={activity}
-                    researcher={researcher}
+                    researcherId={researcherId}
                     studies={studies}
                     activities={allActivities}
                     handleSelectionChange={handleChange}

@@ -53,13 +53,13 @@ const useStyles = makeStyles((theme) => ({
 }))
 export default function StudyCreator({
   studies,
-  researcher,
+  researcherId,
   handleNewStudy,
   closePopUp,
   ...props
 }: {
   studies: any
-  researcher: any
+  researcherId: any
   handleNewStudy: Function
   closePopUp: Function
 } & DialogProps) {
@@ -90,7 +90,7 @@ export default function StudyCreator({
     setLoading(true)
     let study = new Study()
     study.name = studyName
-    LAMP.Study.create(researcher.id, study).then(async (res) => {
+    LAMP.Study.create(researcherId, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
       let studiesData = { id: result.data, name: studyName, participant_count: 1, activity_count: 0, sensor_count: 0 }
       Service.addData("studies", [studiesData])

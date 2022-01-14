@@ -6,8 +6,7 @@ interface LampDB extends DBSchema {
   researcher: {
     key: string
     value: {
-      name: string
-      notification: boolean
+      id: string
     }
     indexes: { id: string }
   }

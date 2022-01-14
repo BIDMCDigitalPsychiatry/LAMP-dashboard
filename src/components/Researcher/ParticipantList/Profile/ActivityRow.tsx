@@ -31,6 +31,8 @@ export default function ActivityRow({
   activities,
   handleSelected,
   setActivities,
+  researcherId,
+  participantId,
   ...props
 }: {
   activity: any
@@ -39,6 +41,8 @@ export default function ActivityRow({
   activities: any
   handleSelected: Function
   setActivities: Function
+  researcherId: string
+  participantId?: string
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -91,7 +95,8 @@ export default function ActivityRow({
             activities={activities}
             studies={studies}
             setActivities={setActivities}
-            profile={true}
+            profile={participantId}
+            researcherId={researcherId}
           />
           <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
         </Grid>

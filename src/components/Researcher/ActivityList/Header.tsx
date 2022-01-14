@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 export default function Header({
-  researcher,
+  researcherId,
   activities,
   studies,
   selectedActivities,
@@ -74,13 +74,14 @@ export default function Header({
             studyId={null}
             setUpdateCount={setUpdateCount}
             setActivities={setActivities}
+            researcherId={researcherId}
           />
         </Box>
       </Box>
       <Box>
         <StudyFilterList
           studies={studies}
-          researcher={researcher}
+          researcherId={researcherId}
           type="activities"
           showFilterStudies={showFilterStudies}
           selectedStudies={selectedStudies}

@@ -14,8 +14,8 @@ import {
   Theme,
   createStyles,
   Checkbox,
+  Link,
 } from "@material-ui/core"
-import PatientProfile from "./PatientProfile"
 // Local Imports
 import LAMP from "lamp-core"
 import ParticipantName from "./ParticipantName"
@@ -77,6 +77,15 @@ const useStyles = makeStyles((theme: Theme) =>
       "& svg": { marginRight: 8 },
       "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
     },
+    settingslink: {
+      background: "#fff",
+      width: 40,
+      height: 40,
+      borderRadius: "50%",
+      padding: 8,
+      color: "#7599FF",
+      "&:hover": { color: "#5680f9", background: "#fff", boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.20)" },
+    },
   })
 )
 
@@ -86,8 +95,8 @@ export default function ParticipantListItem({
   studies,
   notificationColumn,
   handleSelectionChange,
-  setUpdateCount,
   selectedParticipants,
+  researcherId,
   ...props
 }) {
   const classes = useStyles()
@@ -103,13 +112,14 @@ export default function ParticipantListItem({
   }
 
   const updateParticipant = (nameVal: string) => {
-    setUpdateCount(1)
     setName({ ...user, name: nameVal })
   }
 
   useEffect(() => {
     setName(user)
   }, [user])
+
+  useEffect(() => {}, [])
 
   return (
     <Card className={classes.cardMain}>
@@ -139,13 +149,13 @@ export default function ParticipantListItem({
           <CardActions>
             {!!notificationColumn && <NotificationSettings participant={participant} />}
             <Credentials user={participant} />
-            <PatientProfile
-              participant={participant}
-              studies={studies}
-              onClose={updateParticipant}
-              setUpdateCount={setUpdateCount}
-              openSettings={setOpenSettings}
-            />
+            <Link
+              href={`/#/researcher/${researcherId}/participant/${participant?.id}/settings`}
+              underline="none"
+              className={classes.settingslink}
+            >
+              <Icon>settings</Icon>
+            </Link>
             <Fab
               size="small"
               classes={{ root: classes.btnWhite }}

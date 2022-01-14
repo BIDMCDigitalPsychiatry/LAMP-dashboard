@@ -41,18 +41,20 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-export default function PatientProfile({
+export default function Activities({
   participant,
   studies,
   setUpdateCount,
+  researcherId,
   ...props
 }: {
   participant: any
   studies: any
-  setUpdateCount: Function
+  setUpdateCount?: Function
+  researcherId?: string
 }) {
   const classes = useStyles()
-  const [activities, setActivities] = useState([])
+  const [activities, setActivities] = useState(null)
   const { t } = useTranslation()
   const [selectedActivities, setSelectedActivities] = useState([])
   const [paginatedActivities, setPaginatedActivities] = useState([])
@@ -60,6 +62,9 @@ export default function PatientProfile({
   const [page, setPage] = useState(0)
 
   useEffect(() => {
+    let params = JSON.parse(localStorage.getItem("profile-activities"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 10)
     onChangeActivities()
   }, [])
 
@@ -67,7 +72,6 @@ export default function PatientProfile({
     Service.getDataByKey("activities", [participant.study_name], "study_name").then((activities) => {
       let result = sortData(activities, [participant.study_name], "name")
       setActivities(result)
-      setPaginatedActivities(result.slice(page * rowCount, page * rowCount + rowCount))
     })
     setSelectedActivities([])
   }
@@ -90,6 +94,7 @@ export default function PatientProfile({
     setRowCount(rowCount)
     setPage(page)
     setPaginatedActivities(activities.slice(page * rowCount, page * rowCount + rowCount))
+    localStorage.setItem("profile-activities", JSON.stringify({ page: page, rowCount: rowCount }))
   }
 
   return (
@@ -157,17 +162,21 @@ export default function PatientProfile({
                   index={index}
                   handleSelected={handleActivitySelected}
                   setActivities={onChangeActivities}
+                  researcherId={researcherId}
+                  participantId={participant.id}
                 />
               </Grid>
             ))}
-            <Pagination
-              data={activities}
-              updatePage={handleChangePage}
-              defaultCount={10}
-              currentRowCount={rowCount}
-              currentPage={page}
-              type={1}
-            />
+            {activities !== null && (
+              <Pagination
+                data={activities}
+                updatePage={handleChangePage}
+                defaultCount={10}
+                currentRowCount={rowCount}
+                currentPage={page}
+                type={1}
+              />
+            )}
           </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />

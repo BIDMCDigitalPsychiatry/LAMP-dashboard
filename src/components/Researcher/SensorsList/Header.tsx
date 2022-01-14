@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function Header({
   studies,
-  researcher,
+  researcherId,
   selectedSensors,
   searchData,
   setSelectedStudies,
@@ -43,7 +43,7 @@ export default function Header({
   ...props
 }: {
   studies?: Array<Object>
-  researcher?: Object
+  researcherId?: string
   selectedSensors?: Array<Object>
   searchData?: Function
   setSelectedStudies?: Function
@@ -80,7 +80,7 @@ export default function Header({
         <Box>
           <StudyFilterList
             studies={studies}
-            researcher={researcher}
+            researcherId={researcherId}
             type="sensors"
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}

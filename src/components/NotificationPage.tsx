@@ -12,6 +12,7 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
+import { URLSearchParams } from "url"
 import LAMP from "lamp-core"
 import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function NotificationPage({ participant, activityId, ...props }) {
+export default function NotificationPage({ participant, activityId, mode, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
@@ -79,8 +80,11 @@ export default function NotificationPage({ participant, activityId, ...props }) 
   const [response, setResponse] = useState(false)
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
+  // const [searchParams] = new URLSearchParams();
 
   useEffect(() => {
+    // let url = new URL(window.location.href)
+    // var params = new URLSearchParams(url.search);
     ;(async () => {
       LAMP.Activity.view(activityId).then((data) => {
         setActivity(data)
@@ -113,11 +117,18 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         showStreak(participant, activity)
       })
     } else {
-      window.location.href = "/#/"
+      if (mode === null) window.location.href = "/#/"
+      else history.back()
     }
   }
 
+  const returnResult = () => {
+    if (mode === null) setResponse(true)
+    else history.back()
+  }
+
   const showStreak = (participant, activity) => {
+    setLoading(true)
     getImage(activity?.id, activity?.spec).then((tag) => {
       setStreakActivity(tag?.streak ?? null)
       if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
@@ -126,12 +137,12 @@ export default function NotificationPage({ participant, activityId, ...props }) 
           setOpenComplete(true)
           setTimeout(() => {
             setOpenComplete(false)
-            setResponse(true)
+            returnResult()
             setLoading(false)
           }, 6000)
         })
       } else {
-        setResponse(true)
+        returnResult()
         setLoading(false)
       }
     })
@@ -182,7 +193,8 @@ export default function NotificationPage({ participant, activityId, ...props }) 
             noBack={false}
             onComplete={(data) => {
               if (data === null) {
-                window.location.href = "/#/"
+                if (mode === null) window.location.href = "/#/"
+                else history.back()
               } else {
                 if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
                   if (!!data && !!data?.timestamp) {
@@ -232,8 +244,12 @@ export default function NotificationPage({ participant, activityId, ...props }) 
         open={openComplete}
         onClose={() => {
           setOpenComplete(false)
-          setResponse(true)
+          returnResult()
           setLoading(false)
+        }}
+        popupClose={() => {
+          setOpenComplete(false)
+          setLoading(true)
         }}
         streak={streak}
         activity={streakActivity}

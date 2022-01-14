@@ -36,16 +36,7 @@ const useStyles = makeStyles((theme) =>
     },
   })
 )
-export default function Sensors({
-  participant,
-  studies,
-  setUpdateCount,
-  ...props
-}: {
-  participant: any
-  studies: any
-  setUpdateCount: Function
-}) {
+export default function Sensors({ participant, studies, ...props }: { participant: any; studies: any }) {
   const classes = useStyles()
   const [sensors, setSensors] = useState([])
   const { enqueueSnackbar } = useSnackbar()
@@ -103,12 +94,7 @@ export default function Sensors({
           </Typography>
         </Box>
         <Box className={classes.secAdd}>
-          <AddSensor
-            studies={studies}
-            studyId={participant.study_id}
-            setSensors={onChangeSensors}
-            setUpdateCount={setUpdateCount}
-          />
+          <AddSensor studies={studies} studyId={participant.study_id} setSensors={onChangeSensors} />
         </Box>
       </Box>
       {(selectedSensors || []).length > 0 && (
@@ -118,7 +104,6 @@ export default function Sensors({
             selectedStudyArray={() => {}}
             newDeletedIds={deleteSensors}
             setSensors={onChangeSensors}
-            setUpdateCount={setUpdateCount}
             profile={true}
           />
         </Box>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch } from "react-router-dom"
+import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -16,7 +16,9 @@ import DataPortal from "./data_portal/DataPortal"
 import NavigationLayout from "./NavigationLayout"
 import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
-
+import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
+import Activity from "./Researcher/ActivityList/Activity"
+import Dashboard from "./Researcher/Dashboard"
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -78,6 +80,7 @@ export const changeCase = (text) => {
 }
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
+  const search = useLocation().search
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: any) => {
@@ -114,12 +117,14 @@ function AppRouter({ ...props }) {
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
-      //
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
         enqueueSnackbar(t("You're using the src server to log into mindLAMP.", { src: src }), { variant: "info" })
       }
-      //
+      let values = Object.fromEntries(new URLSearchParams(query[1]))
+      if (!!values["mode"]) {
+        return
+      }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
       if (a === undefined) window.location.href = "/#/"
       let x = atob(a).split(":")
@@ -394,7 +399,73 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <NotificationPage participant={props.match.params.id} activityId={props.match.params.activityId} />
+              <NotificationPage
+                participant={props.match.params.id}
+                activityId={props.match.params.activityId}
+                mode={new URLSearchParams(search).get("mode")}
+              />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/researcher/:rid/activity/add/:type"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Activity type={props.match.params.type} researcherId={props.match.params.rid} />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/researcher/:rid/participant/:id/settings"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PatientProfile researcherId={props.match.params.rid} participantId={props.match.params.id} />
+            </React.Fragment>
+          )
+        }
+      />
+      <Route
+        exact
+        path="/researcher/:rid/activity/:id"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <Activity id={props.match.params.id} researcherId={props.match.params.rid} />
             </React.Fragment>
           )
         }
@@ -417,9 +488,9 @@ function AppRouter({ ...props }) {
             ) : state.authType === "admin" ? (
               <Redirect to="/researcher" />
             ) : state.authType === "researcher" ? (
-              <Redirect to="/researcher/me" />
+              <Redirect to="/researcher/me/users" />
             ) : (
-              <Redirect to="/participant/me" />
+              <Redirect to="/participant/me/assess" />
             )
           ) : (
             <React.Fragment />
@@ -464,7 +535,7 @@ function AppRouter({ ...props }) {
       />
       <Route
         exact
-        path="/researcher/:id"
+        path="/researcher/:id/:tab"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -497,9 +568,10 @@ function AppRouter({ ...props }) {
                       ...state,
                       activeTab: 3,
                     }))
-                    props.history.push(`/participant/${id}`)
+                    props.history.push(`/participant/${id}/portal`)
                   }}
                   mode={state.researcherType}
+                  tab={props.match.params.tab}
                 />
               </NavigationLayout>
             </React.Fragment>
@@ -544,7 +616,7 @@ function AppRouter({ ...props }) {
 
       <Route
         exact
-        path="/participant/:id"
+        path="/participant/:id/:tab"
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
@@ -571,7 +643,7 @@ function AppRouter({ ...props }) {
                 <Participant
                   participant={getParticipant(props.match.params.id)}
                   activeTab={activeTab}
-                  tabValue={props.match.params.tabVal > -1 ? props.match.params.tabVal : state.activeTab}
+                  tabValue={props.match.params.tab}
                   surveyDone={state.surveyDone}
                   submitSurvey={submitSurvey}
                   setShowDemoMessage={(val) => {

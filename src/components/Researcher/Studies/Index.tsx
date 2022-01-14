@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react"
-import { Box, Icon, Grid, makeStyles, Theme, createStyles } from "@material-ui/core"
-import { useSnackbar } from "notistack"
+import { Box, Icon, Grid, makeStyles, Theme, createStyles, Backdrop, CircularProgress } from "@material-ui/core"
 import Header from "./Header"
 import { useTranslation } from "react-i18next"
 import DeleteStudy from "./DeleteStudy"
 import EditStudy from "./EditStudy"
 import { Service } from "../../DBService/DBService"
+import useInterval from "../../useInterval"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -39,21 +39,30 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StudiesList({
   title,
-  researcher,
+  researcherId,
   studies,
   upatedDataStudy,
   deletedDataStudy,
   searchData,
+  getAllStudies,
   newAdddeStudy,
   ...props
 }) {
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const { t } = useTranslation()
   const [search, setSearch] = useState(null)
-  const [allStudies, setAllStudies] = useState(studies)
-  const [updateCount, setUpdateCount] = useState(0)
+  const [allStudies, setAllStudies] = useState(null)
   const [newStudy, setNewStudy] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useInterval(
+    () => {
+      setLoading(true)
+      getAllStudies()
+    },
+    studies !== null && (studies || []).length > 0 ? null : 2000,
+    true
+  )
 
   useEffect(() => {
     getAllStudies()
@@ -61,13 +70,9 @@ export default function StudiesList({
   }, [newStudy])
 
   useEffect(() => {
-    setAllStudies(studies)
+    if ((studies || []).length > 0) setAllStudies(studies)
+    else setAllStudies(null)
   }, [studies])
-
-  const getAllStudies = async () => {
-    let studies = await Service.getAll("studies")
-    setAllStudies(studies)
-  }
 
   const searchFilterStudies = async () => {
     if (!!search && search !== "") {
@@ -78,6 +83,10 @@ export default function StudiesList({
       getAllStudies()
     }
   }
+
+  useEffect(() => {
+    if (allStudies !== null) setLoading(false)
+  }, [allStudies])
 
   useEffect(() => {
     searchFilterStudies()
@@ -98,42 +107,48 @@ export default function StudiesList({
 
   return (
     <React.Fragment>
-      <Header
-        studies={allStudies}
-        researcher={researcher}
-        searchData={handleSearchData}
-        setParticipants={searchFilterStudies}
-        setUpdateCount={setUpdateCount}
-        newStudyObj={setNewStudy}
-      />
-      <Box className={classes.tableContainer} py={4}>
-        <Grid container spacing={3}>
-          {allStudies !== null && (allStudies || []).length > 0 ? (
-            (allStudies || []).map((study) => (
-              <Grid item lg={6} xs={12} key={study.id}>
-                <Box display="flex" p={1} className={classes.studyMain}>
-                  <Box flexGrow={1}>
-                    <EditStudy
-                      study={study}
-                      upatedDataStudy={handleUpdatedStudyObject}
-                      allStudies={allStudies}
-                      researcherId={researcher.id}
-                    />
+      <Backdrop className={classes.backdrop} open={loading || allStudies === null}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      {allStudies !== null && (allStudies || []).length > 0 && (
+        <Box>
+          <Header
+            studies={allStudies ?? null}
+            researcherId={researcherId}
+            searchData={handleSearchData}
+            setParticipants={searchFilterStudies}
+            newStudyObj={setNewStudy}
+          />
+          <Box className={classes.tableContainer} py={4}>
+            <Grid container spacing={3}>
+              {allStudies !== null && (allStudies || []).length > 0 ? (
+                (allStudies || []).map((study) => (
+                  <Grid item lg={6} xs={12} key={study.id}>
+                    <Box display="flex" p={1} className={classes.studyMain}>
+                      <Box flexGrow={1}>
+                        <EditStudy
+                          study={study}
+                          upatedDataStudy={handleUpdatedStudyObject}
+                          allStudies={allStudies}
+                          researcherId={researcherId}
+                        />
+                      </Box>
+                      <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
+                    </Box>
+                  </Grid>
+                ))
+              ) : (
+                <Grid item lg={6} xs={12}>
+                  <Box display="flex" alignItems="center" className={classes.norecords}>
+                    <Icon>info</Icon>
+                    {t("No Records Found")}
                   </Box>
-                  <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcher.id} />
-                </Box>
-              </Grid>
-            ))
-          ) : (
-            <Grid item lg={6} xs={12}>
-              <Box display="flex" alignItems="center" className={classes.norecords}>
-                <Icon>info</Icon>
-                {t("No Records Found")}
-              </Box>
+                </Grid>
+              )}
             </Grid>
-          )}
-        </Grid>
-      </Box>
+          </Box>
+        </Box>
+      )}
     </React.Fragment>
   )
 }
