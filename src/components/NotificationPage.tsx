@@ -192,7 +192,8 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
             noBack={false}
             onComplete={(data) => {
               if (data === null) {
-                window.location.href = "/#/"
+                if (mode === null) window.location.href = "/#/"
+                else history.back()
               } else {
                 if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
                   if (!!data && !!data?.timestamp) {

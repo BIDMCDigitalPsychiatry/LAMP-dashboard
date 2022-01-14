@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StudiesList({
   title,
-  researcher,
+  researcherId,
   studies,
   upatedDataStudy,
   deletedDataStudy,
@@ -114,7 +114,7 @@ export default function StudiesList({
         <Box>
           <Header
             studies={allStudies ?? null}
-            researcher={researcher}
+            researcherId={researcherId}
             searchData={handleSearchData}
             setParticipants={searchFilterStudies}
             newStudyObj={setNewStudy}
@@ -130,14 +130,10 @@ export default function StudiesList({
                           study={study}
                           upatedDataStudy={handleUpdatedStudyObject}
                           allStudies={allStudies}
-                          researcherId={researcher?.id ?? null}
+                          researcherId={researcherId}
                         />
                       </Box>
-                      <DeleteStudy
-                        study={study}
-                        deletedStudy={handleDeletedStudy}
-                        researcherId={researcher?.id ?? null}
-                      />
+                      <DeleteStudy study={study} deletedStudy={handleDeletedStudy} researcherId={researcherId} />
                     </Box>
                   </Grid>
                 ))

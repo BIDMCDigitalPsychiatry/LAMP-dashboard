@@ -121,7 +121,7 @@ export default function ParticipantList({
   studies,
   title,
   onParticipantSelect,
-  researcher,
+  researcherId,
   notificationColumn,
   selectedStudies,
   setSelectedStudies,
@@ -230,7 +230,7 @@ export default function ParticipantList({
       </Backdrop>
       <Header
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         selectedParticipants={selectedParticipants}
         searchData={handleSearchData}
         selectedStudies={selected}
@@ -254,7 +254,7 @@ export default function ParticipantList({
                     notificationColumn={notificationColumn}
                     handleSelectionChange={handleChange}
                     selectedParticipants={selectedParticipants}
-                    researcherId={researcher.id}
+                    researcherId={researcherId}
                   />
                 </Grid>
               ))}

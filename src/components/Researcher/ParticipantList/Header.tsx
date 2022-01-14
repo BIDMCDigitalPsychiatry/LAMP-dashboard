@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Header({
   studies,
-  researcher,
+  researcherId,
   selectedParticipants,
   searchData,
   setSelectedStudies,
@@ -66,7 +66,7 @@ export default function Header({
         <SearchBox searchData={searchData} />
         <Box>
           <AddButton
-            researcher={researcher}
+            researcherId={researcherId}
             studies={studies}
             setUpdateCount={setUpdateCount}
             setParticipants={setParticipants}
@@ -80,7 +80,7 @@ export default function Header({
         <Box>
           <StudyFilterList
             studies={studies}
-            researcher={researcher}
+            researcherId={researcherId}
             type="participants"
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}

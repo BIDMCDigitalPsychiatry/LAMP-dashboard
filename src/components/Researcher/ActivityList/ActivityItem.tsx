@@ -42,7 +42,7 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 export default function ActivityItem({
   activity,
-  researcher,
+  researcherId,
   studies,
   activities,
   handleSelectionChange,
@@ -92,7 +92,7 @@ export default function ActivityItem({
               studies={studies}
               setActivities={setActivities}
               profile={0}
-              researcherId={researcher.id}
+              researcherId={researcherId}
             />
             <ScheduleActivity activity={activity} setActivities={setActivities} activities={activities} />
           </CardActions>

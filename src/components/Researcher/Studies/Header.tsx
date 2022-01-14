@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function Header({ studies, researcher, searchData, setParticipants, newStudyObj, ...props }) {
+export default function Header({ studies, researcherId, searchData, setParticipants, newStudyObj, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [popover, setPopover] = useState(null)
@@ -128,7 +128,7 @@ export default function Header({ studies, researcher, searchData, setParticipant
 
         <PatientStudyCreator
           studies={studies}
-          researcher={researcher}
+          researcherId={researcherId}
           onClose={() => setAddParticipantStudy(false)}
           open={addParticipantStudy}
           handleNewStudy={handleNewStudyData}

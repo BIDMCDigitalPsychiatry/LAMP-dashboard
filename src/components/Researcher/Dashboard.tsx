@@ -244,10 +244,11 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }, [studies])
 
   const filterStudies = async (studies) => {
-    if (!!researcher && studies !== null && (studies || []).length > 0) {
+    console.log("here")
+    if (!!researcherId && studies !== null && (studies || []).length > 0) {
       let selected =
-        localStorage.getItem("studies_" + researcher.id) !== null
-          ? JSON.parse(localStorage.getItem("studies_" + researcher.id))
+        localStorage.getItem("studies_" + researcherId) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + researcherId))
           : []
       if (selected.length > 0) {
         let filtered = selected.filter((o) => studies.some(({ name }) => o === name))
@@ -260,6 +261,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
       }
       selected.sort()
       if (!order) selected.reverse()
+      console.log(selected)
       setSelectedStudies(selected)
     }
   }
@@ -361,7 +363,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
               <ParticipantList
                 title={null}
                 onParticipantSelect={onParticipantSelect}
-                researcher={researcher}
+                researcherId={researcherId}
                 studies={studies}
                 notificationColumn={notificationColumn}
                 selectedStudies={selectedStudies}
@@ -375,7 +377,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
             {tab === "activities" && (
               <ActivityList
                 title={null}
-                researcher={researcher}
+                researcherId={researcherId}
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
@@ -387,7 +389,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
             {tab === "sensors" && (
               <SensorsList
                 title={null}
-                researcher={researcher}
+                researcherId={researcherId}
                 studies={studies}
                 selectedStudies={selectedStudies}
                 setSelectedStudies={setSelectedStudies}
@@ -399,7 +401,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
             {tab === "studies" && (
               <StudiesList
                 title={null}
-                researcher={researcher}
+                researcherId={researcherId}
                 studies={studies}
                 upatedDataStudy={(data) => setUpdatedData(data)}
                 deletedDataStudy={(data) => setDeletedData(data)}

@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function SensorsList({
   title,
-  researcher,
+  researcherId,
   studies,
   selectedStudies,
   setSelectedStudies,
@@ -53,7 +53,7 @@ export default function SensorsList({
   ...props
 }: {
   title?: string
-  researcher?: Object
+  researcherId?: string
   studies: Array<any>
   selectedStudies: Array<any>
   setSelectedStudies?: Function
@@ -150,7 +150,7 @@ export default function SensorsList({
       </Backdrop>
       <Header
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         selectedSensors={selectedSensors}
         searchData={handleSearchData}
         setSelectedStudies={setSelectedStudies}

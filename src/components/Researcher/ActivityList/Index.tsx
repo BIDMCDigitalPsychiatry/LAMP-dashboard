@@ -68,7 +68,7 @@ export const games = [
   "lamp.balloon_risk",
 ]
 export default function ActivityList({
-  researcher,
+  researcherId,
   title,
   studies,
   selectedStudies,
@@ -106,10 +106,12 @@ export default function ActivityList({
   }, [])
 
   useEffect(() => {
+    console.log(selected, selectedStudies)
     if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
   useEffect(() => {
+    console.log(selected)
     if ((selected || []).length > 0) {
       searchActivities()
     } else {
@@ -179,7 +181,7 @@ export default function ActivityList({
       </Backdrop>
       <Header
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         activities={allActivities}
         selectedActivities={selectedActivities}
         searchData={handleSearchData}
@@ -197,7 +199,7 @@ export default function ActivityList({
                 <Grid item lg={6} xs={12} key={activity.id}>
                   <ActivityItem
                     activity={activity}
-                    researcher={researcher}
+                    researcherId={researcherId}
                     studies={studies}
                     activities={allActivities}
                     handleSelectionChange={handleChange}
