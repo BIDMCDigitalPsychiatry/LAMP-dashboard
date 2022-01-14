@@ -296,6 +296,10 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
           dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
         }
       })
+      if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
+        summaryData.push({ action: t("Urge to Die by suicide"), count: event.static_data?.urgeForSuicide })
+        summaryData.push({ action: t("Urge to Quit Therapy"), count: event.static_data?.urgeToQuitTheray })
+      }
     })
     Object.keys(dData).forEach(function (key) {
       summaryData.push({ action: key, count: dData[key] })
@@ -435,7 +439,20 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
             }
           }
         })
+        if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
+          inEffectiveData.push({
+            value: event.static_data.urgeForSuicide,
+            date: dateString,
+            symbol: t("Urge to Die by suicide"),
+          })
+          inEffectiveData.push({
+            value: event.static_data.urgeToQuitTheray,
+            date: dateString,
+            symbol: t("Urge to Quit Therapy"),
+          })
+        }
       })
+
       let dates = getDates(timeStamp[1], timeStamp[0])
       dates.map((d) => {
         if (inEffectiveData.length === 0) {
@@ -547,8 +564,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                 selectedEvents={selectedEvents}
                 dateArray={dateArray}
               />
-              
-               {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
+
+              {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
                 <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                   <div className={classes.separator} />
                   <Box width={1} className={classes.graphSubContainer}>
@@ -569,7 +586,7 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
                   </Box>
                 </Box>
               )}
-             
+
               {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
                 <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
                   <div className={classes.separator} />
