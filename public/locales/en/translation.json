@@ -727,5 +727,7 @@
 	"Customize which Tab this Activity appears in":"Customize which Tab this Activity appears in",
 	"This Activity will only appear in the Feed tab if a schedule is configured." : "This Activity will only appear in the Feed tab if a schedule is configured.",
 	"Does not match the password you entered above.":"Does not match the password you entered above." ,
-	"Password is not complex enough and does not comply with organization password requirement.":"Password is not complex enough and does not comply with organization password requirement."
+	"Password is not complex enough and does not comply with organization password requirement.":"Password is not complex enough and does not comply with organization password requirement.",
+	"Urge to Die by suicide": "Urge to Die by suicide",
+	"Urge to Quit Therapy": "Urge to Quit Therapy"
 }
