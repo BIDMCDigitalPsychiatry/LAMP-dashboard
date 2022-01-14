@@ -297,8 +297,12 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         }
       })
       if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
-        summaryData.push({ action: t("Urge to Die by suicide"), count: event.static_data?.urgeForSuicide })
-        summaryData.push({ action: t("Urge to Quit Therapy"), count: event.static_data?.urgeToQuitTheray })
+        dData["Urge to Die by suicide"] = dData["Urge to Die by suicide"]
+          ? dData["Urge to Die by suicide"] + parseInt(event.static_data?.urgeForSuicide)
+          : parseInt(event.static_data?.urgeForSuicide)
+        dData["Urge to Quit Therapy"] = dData["Urge to Quit Therapy"]
+          ? dData["Urge to Quit Therapy"] + parseInt(event.static_data?.urgeToQuitTheray)
+          : parseInt(event.static_data?.urgeToQuitTheray)
       }
     })
     Object.keys(dData).forEach(function (key) {
