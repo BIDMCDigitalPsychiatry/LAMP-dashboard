@@ -727,5 +727,7 @@
 	"Customize which Tab this Activity appears in":"अनुकूलित करें कि यह गतिविधि किस टैब में दिखाई देती है",
 	"This Activity will only appear in the Feed tab if a schedule is configured." : "यह गतिविधि फ़ीड टैब में केवल तभी दिखाई देगी जब कोई शेड्यूल कॉन्फ़िगर किया गया हो.",
 	"Does not match the password you entered above.": "आपके द्वारा ऊपर दर्ज किए गए पासवर्ड से मेल नहीं खाता.",
-	"Password is not complex enough and does not comply with organization password requirement.":"पासवर्ड पर्याप्त जटिल नहीं है और संगठन पासवर्ड आवश्यकता का अनुपालन नहीं करता है"    
+	"Password is not complex enough and does not comply with organization password requirement.":"पासवर्ड पर्याप्त जटिल नहीं है और संगठन पासवर्ड आवश्यकता का अनुपालन नहीं करता है"   ,
+	"Urge to Die by suicide": "आत्महत्या से मरने का आग्रह" ,
+	"Urge to Quit Therapy": "चिकित्सा छोड़ने का आग्रह"
 }

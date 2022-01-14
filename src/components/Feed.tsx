@@ -355,7 +355,7 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
 }
 export default function Feed({
   participant,
-  onComplete,
+  submitSurvey,
   activities,
   visibleActivities,
   setVisibleActivities,
@@ -827,7 +827,17 @@ export default function Feed({
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />
         </Grid>
       </Grid>
-
+      <ActivityPage
+        activity={visibleActivities}
+        participant={participant}
+        setOpenData={setLaunchedActivity}
+        submitSurvey={submitSurvey}
+        showStreak={(participant, activity) => {
+          completeFeed(index)
+          showStreak(participant, activity)
+        }}
+        openData={launchedActivity}
+      />
       <Dialog
         open={openNotImplemented}
         onClose={() => setOpenNotImplemented(false)}
