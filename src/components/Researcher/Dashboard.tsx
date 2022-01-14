@@ -244,7 +244,6 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
   }, [studies])
 
   const filterStudies = async (studies) => {
-    console.log("here")
     if (!!researcherId && studies !== null && (studies || []).length > 0) {
       let selected =
         localStorage.getItem("studies_" + researcherId) !== null
@@ -261,7 +260,6 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
       }
       selected.sort()
       if (!order) selected.reverse()
-      console.log(selected)
       setSelectedStudies(selected)
     }
   }

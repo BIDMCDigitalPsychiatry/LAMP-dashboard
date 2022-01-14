@@ -64,10 +64,12 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function Streak({
   streak,
   activity,
+  popupClose,
   ...props
 }: {
   streak?: number
   activity?: any
+  popupClose?: Function
 } & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   const classes = useStyles()
@@ -86,7 +88,7 @@ export default function Streak({
       }}
     >
       <DialogTitle>
-        <IconButton aria-label="close" className={classes.closeButton} onClick={props.onClose as any}>
+        <IconButton aria-label="close" className={classes.closeButton} onClick={() => popupClose()}>
           <Icon>close</Icon>
         </IconButton>
       </DialogTitle>

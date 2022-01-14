@@ -106,12 +106,10 @@ export default function ActivityList({
   }, [])
 
   useEffect(() => {
-    console.log(selected, selectedStudies)
     if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
   useEffect(() => {
-    console.log(selected)
     if ((selected || []).length > 0) {
       searchActivities()
     } else {

@@ -101,7 +101,6 @@ export default function Activity({
       setStudies(studies)
       Service.getAll("activities").then((activities) => {
         setAllActivities(activities)
-        console.log(id)
         if (!!id) {
           Service.getDataByKey("activities", [id], "id").then((data) => {
             setActivity(data[0])
@@ -113,7 +112,6 @@ export default function Activity({
   }, [])
 
   useEffect(() => {
-    console.log(activity)
     if (!!activity) {
       setLoading(false)
       ;(async () => {

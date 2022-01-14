@@ -128,6 +128,7 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
   }
 
   const showStreak = (participant, activity) => {
+    setLoading(true)
     getImage(activity?.id, activity?.spec).then((tag) => {
       setStreakActivity(tag?.streak ?? null)
       if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
@@ -245,6 +246,10 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
           setOpenComplete(false)
           returnResult()
           setLoading(false)
+        }}
+        popupClose={() => {
+          setOpenComplete(false)
+          setLoading(true)
         }}
         streak={streak}
         activity={streakActivity}
