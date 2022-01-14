@@ -20,6 +20,8 @@ import {
   DialogActions,
   Typography,
   colors,
+  Backdrop,
+  CircularProgress,
   Container,
   Popover,
   Fab,
@@ -181,6 +183,10 @@ const useStyles = makeStyles((theme: Theme) =>
       top: 50,
       height: "calc(100% - 50px)",
     },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
+    },
   })
 )
 
@@ -213,6 +219,7 @@ export default function NavigationLayout({
   const [openMessages, setOpenMessages] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
+  const [loading, setLoading] = useState(true)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
@@ -223,7 +230,6 @@ export default function NavigationLayout({
   const [sensorData, setSensorData] = useState(null)
   const [researcherId, setResId] = useState(null)
   useEffect(() => {
-    refresh()
     if (
       (authType === "researcher" || authType === "admin") &&
       typeof title != "undefined" &&
@@ -231,8 +237,12 @@ export default function NavigationLayout({
     ) {
       Service.getAll("researcher").then((researcher) => {
         setResId(researcher[0]["id"])
+        setLoading(false)
       })
+    } else {
+      setLoading(false)
     }
+    refresh()
     setInterval(refresh, 60000)
   }, [])
 
@@ -311,6 +321,9 @@ export default function NavigationLayout({
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
   return (
     <Box>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
