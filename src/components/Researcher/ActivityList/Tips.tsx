@@ -130,7 +130,6 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
-  activitySpecId,
   study,
   details,
   ...props
@@ -140,7 +139,6 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
-  activitySpecId: string
   study?: string
   details: any
 }) {
@@ -153,7 +151,6 @@ export default function Tips({
   const [categoryArray, setCategoryArray] = useState([])
   const [newTipText, setNewTipText] = useState("")
   const [duplicateTipText, setDuplicateTipText] = useState("")
-  const [selectedCategory, setSelectedCategory]: any = useState({})
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [isDuplicate, setIsDuplicate] = useState(false)
@@ -176,12 +173,11 @@ export default function Tips({
     },
   ]
   const { t } = useTranslation()
-  const [settings, setSettings]: Array<any> = useState(value?.settings ?? [])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
-    spec: value?.spec ?? activitySpecId,
+    spec: value?.spec ?? "lamp.tips",
     schedule: value?.schedule ?? [],
     description: "",
     streak: details?.streak ?? null,
@@ -241,16 +237,12 @@ export default function Tips({
                 existsData.settings = defaultSettingsArray
               }
             }
-            setSelectedCategory(existsData)
             setTipsDataArray(existsData.settings)
-            let newObj = { settings: existsData.settings }
             setData({ ...data, settings: existsData.settings })
           }
         }
       } else {
         if (!value) {
-          let existsData = { settings: defaultSettingsArray }
-          setSelectedCategory(existsData)
           setTipsDataArray(defaultSettingsArray)
           setData({ ...data, settings: defaultSettingsArray })
         }
@@ -264,7 +256,6 @@ export default function Tips({
     ;(async () => {
       setLoading(true)
       if (studyId) {
-        setSelectedCategory([])
         Service.getDataByKey("activities", [studyId], "study_id").then((activitiesObject) => {
           let tipActivities = activitiesObject.filter((x) => x.spec === "lamp.tips")
           setCategoryArray(tipActivities)
@@ -274,15 +265,12 @@ export default function Tips({
         let activitiesData = JSON.parse(JSON.stringify(value))
         setCategory(activitiesData.id)
         if (Object.keys(activitiesData.settings).length > 0) {
-          setSelectedCategory(activitiesData)
           setTipsDataArray(activitiesData.settings)
         }
         let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
         if (iconsData.hasOwnProperty("data")) {
           setCategoryImage(iconsData.data.photo)
         }
-      } else {
-        setSelectedCategory([])
       }
       setLoading(false)
     })()
@@ -456,8 +444,8 @@ export default function Tips({
 
   const validate = () => {
     let validationData = false
-    if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
-      validationData = selectedCategory.settings.some((item) => {
+    if (Object.keys(data.settings).length > 0) {
+      validationData = data.settings.some((item) => {
         let sizeInBytes = 0
         let type = ""
         let imageTypes = ["jpeg", "jpg", "png", "gif", "svg+xml"]
@@ -505,7 +493,7 @@ export default function Tips({
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
       validationData ||
-      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
+      (data.settings && data.settings.length === 0) ||
       duplicates.length > 0
     )
       ? setIsError(true)
@@ -519,7 +507,7 @@ export default function Tips({
       category === null ||
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
-      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
+      (data.settings && data.settings.length === 0) ||
       validationData ||
       duplicates.length > 0
     )
@@ -588,7 +576,6 @@ export default function Tips({
                     value={studyId || ""}
                     onChange={(e) => {
                       setStudyId(e.target.value)
-                      setSelectedCategory({})
                       setCategory("")
                       validate()
                     }}
@@ -707,7 +694,7 @@ export default function Tips({
 
           <ActivityStreak onChange={handleStreakChange} value={details?.streak} />
 
-          {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
+          {data.settings && data.settings.length === 0 && (
             <Grid container spacing={2}>
               <Grid item xs sm={12}>
                 <Alert severity="error">{t("Atleast one tip details required")}</Alert>

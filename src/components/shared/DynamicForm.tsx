@@ -129,7 +129,6 @@ function AutocompleteTextWidget(props) {
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
-  console.log(initialData)
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form
