@@ -19,6 +19,11 @@ import {
   FormControl,
   InputLabel,
   Backdrop,
+  AppBar,
+  Toolbar,
+  Icon,
+  Link,
+  Divider,
   CircularProgress,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
@@ -183,6 +188,14 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     formControl: {
       minWidth: "100%",
+    },
+    backbtnlink: {
+      width: 48,
+      height: 48,
+      color: "rgba(0, 0, 0, 0.54)",
+      padding: 12,
+      borderRadius: "50%",
+      "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
     },
     importList: { padding: "15px", background: "#f4f4f4", borderBottom: "#fff solid 2px" },
   })
@@ -387,6 +400,21 @@ export default function ImportActivity({ ...props }) {
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
+        <Toolbar className={classes.toolbardashboard}>
+          <Link
+            onClick={() => {
+              history.back()
+            }}
+            underline="none"
+            className={classes.backbtnlink}
+          >
+            <Icon>arrow_back</Icon>
+          </Link>
+          <Typography variant="h5">{t("Import activities")}</Typography>
+        </Toolbar>
+      </AppBar>
+      <Divider />
       <Box mt={2} mb={2}>
         <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
       </Box>
