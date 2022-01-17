@@ -18,7 +18,8 @@ import NotificationPage from "./NotificationPage"
 import { useTranslation } from "react-i18next"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
-import Dashboard from "./Researcher/Dashboard"
+import ImportActivity from "./Researcher/ActivityList/ImportActivity"
+
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
   useEffect(() => {
@@ -409,6 +410,26 @@ function AppRouter({ ...props }) {
         }
       />
 
+      <Route
+        exact
+        path="/researcher/:rid/activity/import"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <ImportActivity />
+            </React.Fragment>
+          )
+        }
+      />
       <Route
         exact
         path="/researcher/:rid/activity/add/:type"

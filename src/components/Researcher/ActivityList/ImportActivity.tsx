@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ImportActivity({ studies, setActivities, activities, onClose, ...props }) {
+export default function ImportActivity({ ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -200,6 +200,19 @@ export default function ImportActivity({ studies, setActivities, activities, onC
   const [duplicateExists, setDuplicateExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const inputRef = React.useRef(null)
+  const [studies, setStudies] = useState(null)
+  const [activities, setActivities] = useState(null)
+
+  useEffect(() => {
+    setLoading(true)
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      Service.getAll("activities").then((activities) => {
+        setActivities(activities)
+        setLoading(false)
+      })
+    })
+  }, [])
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
@@ -301,7 +314,6 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       }
     }
     if (status) {
-      setActivities()
       setLoading(false)
       enqueueSnackbar(t("The selected Activities were successfully imported."), {
         variant: "success",
@@ -310,14 +322,14 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       setLoading(false)
       enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
     }
-    onClose()
+    history.back()
   }
 
   const checkDuplicateActivity = (obj, activitiesList, selectedStudyId) => {
     setDuplicateExists(false)
     const objArray = obj
     objArray.map((eachData) => {
-      const nameExists = activities.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
+      const nameExists = (activities || []).some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
       if (nameExists) {
         setDuplicateExists(true)
       }

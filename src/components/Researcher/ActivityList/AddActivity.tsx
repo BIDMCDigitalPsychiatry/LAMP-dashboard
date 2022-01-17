@@ -111,13 +111,10 @@ export default function AddActivity({
   researcherId?: string
 }) {
   const [activitySpecs, setActivitySpecs] = useState([])
-  const [createMenu, setCreateMenu] = useState(false)
-  const [activitySpecId, setActivitySpecId] = useState(null)
-  const [createDialogue, setCreate] = useState(false)
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
-  const [showActivityImport, setShowActivityImport] = useState(false)
+
   const activitiesObj = {
     "lamp.journal": t("Journal"),
     "lamp.scratch_image": t("Scratch card"),
@@ -171,10 +168,7 @@ export default function AddActivity({
           <MenuItem
             divider
             onClick={() => {
-              setPopover(null)
-              setCreate(true)
-              setShowActivityImport(true)
-              setCreateMenu(false)
+              window.location.href = `/#/researcher/${researcherId}/activity/import`
             }}
           >
             <Grid container style={{ marginLeft: "-15px" }}>
