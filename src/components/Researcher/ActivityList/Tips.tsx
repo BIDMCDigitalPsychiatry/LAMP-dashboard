@@ -130,7 +130,6 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
-  activitySpecId,
   study,
   details,
   ...props
@@ -140,7 +139,6 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
-  activitySpecId: string
   study?: string
   details: any
 }) {
@@ -180,7 +178,7 @@ export default function Tips({
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
-    spec: value?.spec ?? activitySpecId,
+    spec: value?.spec ?? "lamp.tips",
     schedule: value?.schedule ?? [],
     description: "",
     streak: details?.streak ?? null,
