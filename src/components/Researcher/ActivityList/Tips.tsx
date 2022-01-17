@@ -173,7 +173,6 @@ export default function Tips({
     },
   ]
   const { t } = useTranslation()
-  const [settings, setSettings]: Array<any> = useState(value?.settings ?? [])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,
