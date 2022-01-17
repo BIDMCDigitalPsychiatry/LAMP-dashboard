@@ -390,7 +390,7 @@ export default function ImportActivity({ studies, setActivities, activities, onC
               setSelectedStudy(event.target.value)
             }}
           >
-            {studies.map((study) => (
+            {(studies || []).map((study) => (
               <MenuItem key={study.id} value={study.id}>
                 {study.name}
               </MenuItem>
