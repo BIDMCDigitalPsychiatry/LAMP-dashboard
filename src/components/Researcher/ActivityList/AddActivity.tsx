@@ -171,10 +171,11 @@ export default function AddActivity({
           <MenuItem
             divider
             onClick={() => {
-              setPopover(null)
-              setCreate(true)
-              setShowActivityImport(true)
-              setCreateMenu(false)
+              window.location.href = `/#/researcher/${researcherId}/activity/import`
+              // setPopover(null)
+              // setCreate(true)
+              // setShowActivityImport(true)
+              // setCreateMenu(false)
             }}
           >
             <Grid container style={{ marginLeft: "-15px" }}>
