@@ -44,13 +44,11 @@ const useStyles = makeStyles((theme) =>
 export default function Activities({
   participant,
   studies,
-  setUpdateCount,
   researcherId,
   ...props
 }: {
   participant: any
   studies: any
-  setUpdateCount?: Function
   researcherId?: string
 }) {
   const classes = useStyles()
@@ -111,18 +109,12 @@ export default function Activities({
             studies={studies}
             studyId={participant.study_id}
             setActivities={onChangeActivities}
-            setUpdateCount={setUpdateCount}
           />
         </Box>
       </Box>
       {(selectedActivities || []).length > 0 && (
         <Box className={classes.optionsMain}>
-          <DeleteActivity
-            activities={selectedActivities}
-            setActivities={onChangeActivities}
-            setUpdateCount={setUpdateCount}
-            profile={true}
-          />
+          <DeleteActivity activities={selectedActivities} setActivities={onChangeActivities} profile={true} />
         </Box>
       )}
       <Grid container spacing={0}>

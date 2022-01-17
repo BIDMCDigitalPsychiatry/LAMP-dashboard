@@ -174,7 +174,7 @@ export default function Tips({
     },
   ]
   const { t } = useTranslation()
-  const [settings, setSettings]: Array<any> = useState([])
+  const [settings, setSettings]: Array<any> = useState(value?.settings ?? [])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,
@@ -183,7 +183,7 @@ export default function Tips({
     schedule: value?.schedule ?? [],
     description: "",
     streak: details?.streak ?? null,
-    settings: settings ?? [],
+    settings: value?.settings ?? [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
   })

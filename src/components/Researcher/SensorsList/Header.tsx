@@ -55,7 +55,6 @@ export default function Header({
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [updateCount, setUpdateCount] = useState(0)
   const { t } = useTranslation()
 
   const handleShowFilterStudies = (data) => {
@@ -73,7 +72,7 @@ export default function Header({
         </Box>
         <SearchBox searchData={searchData} />
         <Box>
-          <AddSensor studies={studies} setSensors={setSensors} setUpdateCount={setUpdateCount} />
+          <AddSensor studies={studies} setSensors={setSensors} />
         </Box>
       </Box>
       {showFilterStudies && (
@@ -85,8 +84,6 @@ export default function Header({
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
             setSelectedStudies={setSelectedStudies}
-            updateCount={updateCount}
-            setUpdateCount={setUpdateCount}
           />
         </Box>
       )}
@@ -94,7 +91,7 @@ export default function Header({
       {(selectedSensors || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
-            <DeleteSensor sensors={selectedSensors} setSensors={setSensors} setUpdateCount={setUpdateCount} />
+            <DeleteSensor sensors={selectedSensors} setSensors={setSensors} />
           </Box>
         </Box>
       )}

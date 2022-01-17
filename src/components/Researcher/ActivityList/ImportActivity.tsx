@@ -188,7 +188,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ImportActivity({ studies, setActivities, activities, onClose, setUpdateCount, ...props }) {
+export default function ImportActivity({ studies, setActivities, activities, onClose, ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -301,7 +301,6 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       }
     }
     if (status) {
-      setUpdateCount(2)
       setActivities()
       setLoading(false)
       enqueueSnackbar(t("The selected Activities were successfully imported."), {

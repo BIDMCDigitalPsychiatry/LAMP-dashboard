@@ -101,7 +101,6 @@ export default function AddActivity({
   studies,
   studyId,
   setActivities,
-  setUpdateCount,
   researcherId,
   ...props
 }: {
@@ -109,7 +108,6 @@ export default function AddActivity({
   studies?: any
   studyId?: string
   setActivities?: Function
-  setUpdateCount?: Function
   researcherId?: string
 }) {
   const [activitySpecs, setActivitySpecs] = useState([])

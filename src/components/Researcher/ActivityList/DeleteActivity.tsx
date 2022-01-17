@@ -33,13 +33,11 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function DeleteActivity({
   activities,
   setActivities,
-  setUpdateCount,
   profile,
   ...props
 }: {
   activities: any
   setActivities?: Function
-  setUpdateCount?: Function
   profile?: boolean
 }) {
   const { enqueueSnackbar } = useSnackbar()
@@ -63,7 +61,6 @@ export default function DeleteActivity({
         Service.updateCount("studies", activity.study_id, "activity_count", 1, 1)
       }
       Service.delete("activities", activityIds)
-      setUpdateCount(2)
       setActivities()
       enqueueSnackbar(t("Successfully deleted the selected Activities."), {
         variant: "success",
