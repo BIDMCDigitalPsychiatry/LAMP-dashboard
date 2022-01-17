@@ -130,6 +130,7 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
+  activitySpecId,
   study,
   details,
   ...props
@@ -139,6 +140,7 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
+  activitySpecId: string
   study?: string
   details: any
 }) {
@@ -174,16 +176,16 @@ export default function Tips({
     },
   ]
   const { t } = useTranslation()
-  const [settings, setSettings]: Array<any> = useState([])
+  const [settings, setSettings]: Array<any> = useState(value?.settings ?? [])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
-    spec: "lamp.tips",
+    spec: value?.spec ?? activitySpecId,
     schedule: value?.schedule ?? [],
     description: "",
     streak: details?.streak ?? null,
-    settings: settings ?? [],
+    settings: value?.settings ?? [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
   })
@@ -242,7 +244,7 @@ export default function Tips({
             setSelectedCategory(existsData)
             setTipsDataArray(existsData.settings)
             let newObj = { settings: existsData.settings }
-            setSettings(newObj)
+            setData({ ...data, settings: existsData.settings })
           }
         }
       } else {
@@ -250,7 +252,7 @@ export default function Tips({
           let existsData = { settings: defaultSettingsArray }
           setSelectedCategory(existsData)
           setTipsDataArray(defaultSettingsArray)
-          setSettings(existsData)
+          setData({ ...data, settings: defaultSettingsArray })
         }
       }
       setNewSchemaList(SchemaList())
@@ -376,7 +378,7 @@ export default function Tips({
         return false
       }
     }
-    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+    let settingsObj = data.settings.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -393,7 +395,7 @@ export default function Tips({
             icon: categoryImage,
             streak: data.streak,
             schedule: value?.schedule ?? [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
             category: data.category,
           },
@@ -407,7 +409,7 @@ export default function Tips({
             icon: categoryImage,
             streak: data.streak,
             schedule: value?.schedule ?? [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
             category: data.category,
           },
@@ -418,7 +420,7 @@ export default function Tips({
 
   const handleSaveTipsData = () => {
     let duplicate = isDuplicate
-    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+    let settingsObj = data.settings.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -523,29 +525,8 @@ export default function Tips({
     )
   }
 
-  const handleTipsDataArray = (data) => {
-    if (data) {
-      validate()
-    }
-  }
-
   const handleType = (val) => {
     val === 1 ? handleSaveTips(isDuplicate) : handleSaveTipsData()
-  }
-
-  const updateSettings = (settingsData) => {
-    setData({ ...data, settings: settingsData })
-    setSettings(settingsData)
-    let newSelectedCategory = selectedCategory
-    settingsData = settingsData.settings.map((x) => {
-      let xVal = x
-      xVal.title = typeof x.title !== "undefined" ? x.title : ""
-      xVal.text = typeof x.text !== "undefined" ? x.text : ""
-      return xVal
-    })
-    newSelectedCategory.settings = settingsData
-    setSelectedCategory(newSelectedCategory)
-    validate()
   }
 
   return (
@@ -619,7 +600,7 @@ export default function Tips({
                     variant="filled"
                     disabled={!!value || !!study ? true : false}
                   >
-                    {(studies || []).map((option) => (
+                    {studies.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {t(option.name)}
                       </MenuItem>
@@ -742,12 +723,16 @@ export default function Tips({
               </Grid>
             </Grid>
           )}
+
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
             Object.keys(newSchemaList).includes("lamp.tips")) && (
             <DynamicForm
               schema={newSchemaList["lamp.tips"]}
-              initialData={settings}
-              onChange={(x) => updateSettings({ ...settings, ...x })}
+              initialData={data}
+              onChange={(x) => {
+                setData(x)
+                validate()
+              }}
             />
           )}
         </Container>

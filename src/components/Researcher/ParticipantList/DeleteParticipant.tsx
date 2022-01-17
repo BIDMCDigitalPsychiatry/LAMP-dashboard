@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function DeleteParticipant({ participants, setParticipants, setUpdateCount, ...props }) {
+export default function DeleteParticipant({ participants, setParticipants, ...props }) {
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
@@ -51,7 +51,6 @@ export default function DeleteParticipant({ participants, setParticipants, setUp
         Service.updateCount("studies", participant.study_id, "participant_count", 1, 1)
       }
       await Service.delete("participants", participantIds)
-      setUpdateCount(1)
       setParticipants()
       enqueueSnackbar(t("Successfully deleted the selected participants."), {
         variant: "success",

@@ -74,6 +74,7 @@ export default function SensorsList({
 
   useInterval(
     () => {
+      setLoading(true)
       getAllStudies()
     },
     studies !== null && (studies || []).length > 0 ? null : 2000,

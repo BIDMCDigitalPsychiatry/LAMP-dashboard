@@ -46,12 +46,7 @@ export default function Header({
 }) {
   const classes = useStyles()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [updateCount, updateStudyCount] = useState(0)
   const { t } = useTranslation()
-
-  const setUpdateCount = (type: number) => {
-    updateStudyCount(type)
-  }
 
   const handleShowFilterStudies = (data) => {
     setShowFilterStudies(data)
@@ -72,7 +67,6 @@ export default function Header({
             activities={activities}
             studies={studies}
             studyId={null}
-            setUpdateCount={setUpdateCount}
             setActivities={setActivities}
             researcherId={researcherId}
           />
@@ -86,19 +80,13 @@ export default function Header({
           showFilterStudies={showFilterStudies}
           selectedStudies={selectedStudies}
           setSelectedStudies={setSelectedStudies}
-          updateCount={updateCount}
-          setUpdateCount={setUpdateCount}
         />
       </Box>
       {(selectedActivities || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
             <ExportActivity activities={selectedActivities} />
-            <DeleteActivity
-              activities={selectedActivities}
-              setActivities={setActivities}
-              setUpdateCount={setUpdateCount}
-            />
+            <DeleteActivity activities={selectedActivities} setActivities={setActivities} />
           </Box>
         </Box>
       )}

@@ -99,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({ researcherId, studies, setUpdateCount, setParticipants, setData, mode, ...props }) {
+export default function AddButton({ researcherId, studies, setParticipants, setData, mode, ...props }) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
@@ -108,7 +108,6 @@ export default function AddButton({ researcherId, studies, setUpdateCount, setPa
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
 
   const handleNewStudyData = (data) => {
-    setUpdateCount(1)
     setData()
   }
 

@@ -42,7 +42,6 @@ export default function DeleteSensor({
   newDeletedIds,
   selectedStudyArray,
   setSensors,
-  setUpdateCount,
   profile,
   ...props
 }: {
@@ -50,7 +49,6 @@ export default function DeleteSensor({
   newDeletedIds?: Function
   selectedStudyArray?: Function
   setSensors?: Function
-  setUpdateCount?: Function
   profile?: boolean
 }) {
   const { enqueueSnackbar } = useSnackbar()
@@ -97,7 +95,6 @@ export default function DeleteSensor({
               ["sensor_count"],
               "id"
             )
-            setUpdateCount(3)
           })
         })
       }

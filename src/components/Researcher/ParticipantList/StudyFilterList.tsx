@@ -61,7 +61,6 @@ export default function StudyFilterList({
   setSelectedStudies,
   selectedStudies,
   updateCount,
-  setUpdateCount,
   ...props
 }: {
   studies?: Array<any>
@@ -71,7 +70,6 @@ export default function StudyFilterList({
   setSelectedStudies?: Function
   selectedStudies?: Array<string>
   updateCount?: number
-  setUpdateCount?: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -97,7 +95,6 @@ export default function StudyFilterList({
       })
       setAllStudies(studiesArray)
     })
-    setUpdateCount(0)
   }
 
   useEffect(() => {
