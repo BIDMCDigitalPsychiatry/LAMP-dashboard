@@ -619,7 +619,7 @@ export default function Tips({
                     variant="filled"
                     disabled={!!value || !!study ? true : false}
                   >
-                    {studies.map((option) => (
+                    {(studies || []).map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {t(option.name)}
                       </MenuItem>

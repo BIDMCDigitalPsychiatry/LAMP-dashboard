@@ -142,7 +142,7 @@ export default function ActivityHeader({
               variant="filled"
               disabled={!!value ? true : false}
             >
-              {studies.map((option) => (
+              {(studies || []).map((option) => (
                 <MenuItem key={option.id} value={option.id}>
                   {t(option.name)}
                 </MenuItem>
