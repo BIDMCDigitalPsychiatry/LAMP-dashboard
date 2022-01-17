@@ -199,7 +199,7 @@ export default function ActivityList({
                     activity={activity}
                     researcherId={researcherId}
                     studies={studies}
-                    activities={allActivities}
+                    activities={activities}
                     handleSelectionChange={handleChange}
                     selectedActivities={selectedActivities}
                     setActivities={searchActivities}

@@ -47,12 +47,10 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
-      if (!!actId) {
-        LAMP.Activity.view(actId).then((activity) => {
-          setCurrentActivity(activity)
-          setLoading(false)
-        })
-      }
+      LAMP.Activity.view(actId).then((activity) => {
+        setCurrentActivity(activity)
+        setLoading(false)
+      })
     }
   }, [index])
 
@@ -62,6 +60,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
 
   useEffect(() => {
     LAMP.Activity.view(activity.id).then((data) => {
+      setIndex(-1)
       setGroupActivities(data.settings)
     })
   }, [])

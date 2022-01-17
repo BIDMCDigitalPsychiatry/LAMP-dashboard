@@ -212,8 +212,7 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
           <GroupActivity
             activity={activity}
             participant={participant}
-            submitSurvey={submitSurvey}
-            onComplete={() => {
+            onComplete={(data) => {
               showStreak(participant, activity)
             }}
             noBack={false}
