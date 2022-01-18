@@ -122,11 +122,19 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
-    let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
-    activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    let response = await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)
-    // let response = await fetch(demoActivities[activity.spec] + ".html.b64")
-    setEmbeddedActivity(atob(await response.text()))
+    let response = "about:blank"
+    let activitySpec = LAMP.ActivitySpec.view(activity.spec) // activity.spec === "lamp.tips" for example
+    // We use ActivitySpec.view() to return the SINGLE ActivitySpec object WITH all image/description/code data.
+    if (activitySpec?.executable?.startsWith("data:")) {
+      response = atob(activitySpec.executable) // TODO strip "data:" URI prefix
+    } else if (activitySpec?.executable?.startsWith("https:")) {
+      response = atob(await (await fetch(activitySpec.executable)).text())
+    } else {
+      let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+      activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      response = atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    }
+    setEmbeddedActivity(response)
     setLoading(false)
   }
 
