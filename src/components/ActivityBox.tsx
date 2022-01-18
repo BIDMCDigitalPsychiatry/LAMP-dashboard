@@ -102,7 +102,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setActivity(data)
       setOpen(true)
       y.spec === "lamp.dbt_diary_card"
-        ? setQuestionCount(8)
+        ? setQuestionCount(7)
         : y.spec === "lamp.survey"
         ? setQuestionCount(data.settings?.length ?? 0)
         : setQuestionCount(0)
