@@ -184,12 +184,6 @@ export default function ActivityPopup({
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [openData, setOpenData] = React.useState(false)
-  const [currentActivity, setCurrentActivity] = React.useState(null)
-
-  useEffect(() => {
-    setCurrentActivity(activity)
-  }, [activity])
 
   return (
     <React.Fragment>

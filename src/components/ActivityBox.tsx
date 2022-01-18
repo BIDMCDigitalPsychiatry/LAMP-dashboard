@@ -93,8 +93,6 @@ const useStyles = makeStyles((theme: Theme) =>
 export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, submitSurvey, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
-  const [spec, setSpec] = useState(null)
-  const [openData, setOpenData] = useState(false)
   const [open, setOpen] = useState(false)
   const [questionCount, setQuestionCount] = React.useState(0)
   const { t } = useTranslation()
@@ -104,7 +102,7 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
       setActivity(data)
       setOpen(true)
       y.spec === "lamp.dbt_diary_card"
-        ? setQuestionCount(6)
+        ? setQuestionCount(8)
         : y.spec === "lamp.survey"
         ? setQuestionCount(data.settings?.length ?? 0)
         : setQuestionCount(0)
@@ -123,7 +121,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
                 md={3}
                 lg={3}
                 onClick={() => {
-                  setSpec(activity.spec)
                   handleClickOpen(activity)
                 }}
                 className={classes.thumbMain}
