@@ -123,10 +123,9 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
-    let activitySpec = LAMP.ActivitySpec.view(activity.spec) // activity.spec === "lamp.tips" for example
-    // We use ActivitySpec.view() to return the SINGLE ActivitySpec object WITH all image/description/code data.
+    let activitySpec = LAMP.ActivitySpec.view(activity.spec)
     if (activitySpec?.executable?.startsWith("data:")) {
-      response = atob(activitySpec.executable) // TODO strip "data:" URI prefix
+      response = atob(activitySpec.executable.split(",")[1])
     } else if (activitySpec?.executable?.startsWith("https:")) {
       response = atob(await (await fetch(activitySpec.executable)).text())
     } else {
