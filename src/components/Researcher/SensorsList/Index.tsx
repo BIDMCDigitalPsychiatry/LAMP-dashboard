@@ -103,9 +103,9 @@ export default function SensorsList({
   }
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    setLoading(true)
-    const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0 && !loading) {
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData.length > 0) {
+      setLoading(true)
       let result = []
       Service.getAll("sensors").then((sensorData) => {
         if ((sensorData || []).length > 0) {
