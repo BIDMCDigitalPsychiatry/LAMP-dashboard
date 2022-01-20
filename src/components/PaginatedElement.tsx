@@ -57,10 +57,6 @@ export default function Pagination({
         count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}
-        labelDisplayedRows={({ from, to, count }) => {
-          console.log(from, to, count)
-          return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
-        }}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={handleRowChange}
         rowsPerPageOptions={rowPerPage ?? [10, 25, 50, 100]}
