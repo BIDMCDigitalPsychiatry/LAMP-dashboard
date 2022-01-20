@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { Grid, TablePagination } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { colorSignalConfig } from "vega-lite/build/src/config"
 
 export default function Pagination({
   data,
@@ -34,12 +33,12 @@ export default function Pagination({
   }
 
   useEffect(() => {
-    updatePage(page, rowCount)
+    updatePage(data.length < page * rowCount ? 0 : page, rowCount)
   }, [page])
 
   useEffect(() => {
-    setPage(page)
-    updatePage(page, rowCount)
+    setPage(data.length < page * rowCount ? 0 : page)
+    updatePage(data.length < page * rowCount ? 0 : page, rowCount)
   }, [rowCount])
 
   useEffect(() => {
@@ -58,6 +57,10 @@ export default function Pagination({
         count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}
+        labelDisplayedRows={({ from, to, count }) => {
+          console.log(from, to, count)
+          return `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
+        }}
         onPageChange={handleChangePage}
         onChangeRowsPerPage={handleRowChange}
         rowsPerPageOptions={rowPerPage ?? [10, 25, 50, 100]}

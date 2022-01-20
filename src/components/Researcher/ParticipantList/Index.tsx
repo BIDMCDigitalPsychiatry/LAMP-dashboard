@@ -225,7 +225,7 @@ export default function ParticipantList({
 
   return (
     <React.Fragment>
-      <Backdrop className={classes.backdrop} open={loading}>
+      <Backdrop className={classes.backdrop} open={loading || participants === null}>
         <CircularProgress color="inherit" />
       </Backdrop>
       <Header

@@ -82,6 +82,12 @@ export default function SensorsList({
   )
 
   useEffect(() => {
+    let params = JSON.parse(localStorage.getItem("sensors"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 40)
+  }, [])
+
+  useEffect(() => {
     if (selected !== selectedStudies) setSelected(selectedStudies)
   }, [selectedStudies])
 
@@ -139,6 +145,7 @@ export default function SensorsList({
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
+    localStorage.setItem("sensors", JSON.stringify({ page: page, rowCount: rowCount }))
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
     setPaginatedSensors(sortData(sensors, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)

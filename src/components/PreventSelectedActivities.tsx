@@ -189,9 +189,9 @@ export const strategies = {
             sum += x.value[val].value
               .map((elt) => {
                 // assure the value can be converted into an integer
-                return parseInt(elt) ? parseInt(elt) : 0
+                return !isNaN(parseInt(elt)) ? parseInt(elt) : 0
               })
-              .reduce((sum, current) => sum + parseInt(current))
+              .reduce((sum, current) => sum + current)
           })
           return sum
         } else return parseInt(x?.value) || 0
