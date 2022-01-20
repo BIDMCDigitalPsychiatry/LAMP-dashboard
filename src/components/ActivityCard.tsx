@@ -46,8 +46,8 @@ export default function ActivityCard({
         if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
           let sum = 0
           Object.keys(t.value).map((val) => {
-            if (!!t.value[val].question) {
-              t.value[val].value.map((elt) => {
+            if (!!t.value[val]?.question) {
+              ;(t.value[val].value || []).map((elt) => {
                 sum = sum + (isNaN(parseInt(elt)) ? elt : parseInt(elt))
               })
               values.push({
