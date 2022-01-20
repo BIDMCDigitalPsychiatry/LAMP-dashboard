@@ -87,7 +87,7 @@ export const effective = {
     x: { field: "date", type: "ordinal", timeUnit: "utcyearmonthdate" },
     y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
-    strokeWidth: { value: 2 },
+    strokeWidth: { value: 2.7 },
     opacity: {
       condition: { selection: "symbol", value: 1 },
       value: 0,

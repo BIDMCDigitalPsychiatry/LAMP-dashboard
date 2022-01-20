@@ -44,8 +44,8 @@ export default function ActivityCard({
     d.temporal_slices.map((t) => {
       if (typeof t.value !== "undefined") {
         if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
-          let sum = 0
           Object.keys(t.value).map((val) => {
+            let sum = 0
             if (!!t.value[val]?.question) {
               ;(t.value[val].value || []).map((elt) => {
                 sum = sum + (isNaN(parseInt(elt)) ? elt : parseInt(elt))

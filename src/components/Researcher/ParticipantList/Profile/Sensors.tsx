@@ -38,34 +38,37 @@ const useStyles = makeStyles((theme) =>
 )
 export default function Sensors({ participant, studies, ...props }: { participant: any; studies: any }) {
   const classes = useStyles()
-  const [sensors, setSensors] = useState([])
-  const { enqueueSnackbar } = useSnackbar()
+  const [sensors, setSensors] = useState(null)
   const { t } = useTranslation()
   const [selectedSensors, setSelectedSensors] = useState([])
   const [paginatedSensors, setPaginatedSensors] = useState([])
   const [rowCount, setRowCount] = useState(10)
   const [page, setPage] = useState(0)
 
+  useEffect(() => {
+    let params = JSON.parse(localStorage.getItem("profile-sensors"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 10)
+    onChangeSensors()
+  }, [])
+
   const onChangeSensors = () => {
-    ;(async () => {
-      Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
-        let result = sortData(sensors, [participant.study_name], "name")
-        setSensors(result)
-        setPaginatedSensors(result.slice(page * rowCount, page * rowCount + rowCount))
-      })
-    })()
+    Service.getDataByKey("sensors", [participant.study_name], "study_name").then((sensors) => {
+      let result = sortData(sensors, [participant.study_name], "name")
+      setSensors(result)
+    })
     setSelectedSensors([])
   }
 
   useEffect(() => {
-    onChangeSensors()
-  }, [])
+    setPaginatedSensors((sensors || []).slice(page * rowCount, page * rowCount + rowCount))
+  }, [sensors])
 
   const deleteSensors = () => {
     const sensorIds = selectedSensors.map((s) => {
       return s.id
     })
-    let newSensors = sensors.filter((i) => sensorIds.includes(i.id))
+    let newSensors = (sensors || []).filter((i) => sensorIds.includes(i.id))
     setSensors(newSensors)
   }
 
@@ -82,6 +85,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
     setPage(page)
+    localStorage.setItem("profile-sensors", JSON.stringify({ page: page, rowCount: rowCount }))
     setPaginatedSensors(sensors.slice(page * rowCount, page * rowCount + rowCount))
   }
 
@@ -144,14 +148,16 @@ export default function Sensors({ participant, studies, ...props }: { participan
                 />
               </Grid>
             ))}
-            <Pagination
-              data={sensors}
-              updatePage={handleChangePage}
-              defaultCount={10}
-              currentRowCount={rowCount}
-              currentPage={page}
-              type={1}
-            />
+            {sensors !== null && (
+              <Pagination
+                data={sensors}
+                updatePage={handleChangePage}
+                defaultCount={10}
+                currentRowCount={rowCount}
+                currentPage={page}
+                type={1}
+              />
+            )}
           </Grid>
         </Grid>
         <Grid item xs={10} sm={2} />
