@@ -102,7 +102,6 @@ export default function PreventNotes({ selectedEvents, dateArray, ...props }) {
 
             <NativeSelect
               onChange={(event) => {
-                console.log(event.target.value)
                 setNotesRange(event.target.value)
               }}
             >

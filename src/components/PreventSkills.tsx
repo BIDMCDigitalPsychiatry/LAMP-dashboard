@@ -275,7 +275,6 @@ export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
   ]
 
   useEffect(() => {
-    console.log(skillRange)
     if (!!skillRange) {
       let skillData = []
       let timeStamp = skillRange.split("-")
