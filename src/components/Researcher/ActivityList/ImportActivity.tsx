@@ -199,6 +199,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     containerWidth: { maxWidth: 1055 },
     importList: { padding: "15px", background: "#f4f4f4", borderBottom: "#fff solid 2px" },
+    dividerHeader: {
+      marginTop: 0,
+    },
   })
 )
 
@@ -415,7 +418,7 @@ export default function ImportActivity({ ...props }) {
           <Typography variant="h5">{t("Import activities")}</Typography>
         </Toolbar>
       </AppBar>
-      <Divider />
+      <Divider className={classes.dividerHeader} />
       <Container className={classes.containerWidth}>
         <Box mt={2} mb={2}>
           <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>

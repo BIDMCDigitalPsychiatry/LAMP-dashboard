@@ -36,10 +36,8 @@ function _hideExperimental() {
 }
 
 export default function PreventData({
-  participant,
   activity,
   events,
-  type,
   graphType,
   earliestDate,
   enableEditMode,
@@ -48,10 +46,8 @@ export default function PreventData({
   onDeleteAction,
   ...props
 }: {
-  participant: ParticipantObj
   activity: any
   events: any
-  type: any
   graphType: number
   earliestDate: any
   enableEditMode: boolean
@@ -61,18 +57,10 @@ export default function PreventData({
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
-
   return (
     <Grid container direction="row" justify="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
-          <Typography variant="h5">
-            <ReactMarkdown
-              source={graphType == 0 ? t(activity.name) : t(activity)}
-              escapeHtml={false}
-              plugins={[gfm, emoji]}
-            />
-          </Typography>
           <Typography variant="h5">{t("Summary")}</Typography>
           <Typography variant="body2">
             {/*You have a good distribution of locations, which means you’re getting out of the house and doing things.
