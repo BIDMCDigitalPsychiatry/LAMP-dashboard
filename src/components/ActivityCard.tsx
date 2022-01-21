@@ -40,6 +40,7 @@ export default function ActivityCard({
     return retValue.substr(0, retValue.length - 2)
   }
   let values = []
+  events = events.sort((a, b) => a.timestamp - b.timestamp)
   events.map((d) =>
     d.temporal_slices.map((t) => {
       if (typeof t.value !== "undefined") {
@@ -79,7 +80,6 @@ export default function ActivityCard({
   values = Object.values(values.reduce((x, y) => x.concat(y), []).groupBy("item"))
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
-
   let eachData = []
   values.map((d, key) => {
     let keys = Object.keys(d)
