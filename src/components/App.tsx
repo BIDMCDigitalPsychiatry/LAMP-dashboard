@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next"
 import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfilePage"
 import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
+import PreventPage from "./PreventPage"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -672,6 +673,58 @@ function AppRouter({ ...props }) {
                   }}
                 />
               </NavigationLayout>
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/participant/:id/portal/activity/:activityId"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : !getParticipant(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PreventPage
+                type="activity"
+                activityId={props.match.params.activityId}
+                participantId={props.match.params.id}
+              />
+            </React.Fragment>
+          )
+        }
+      />
+
+      <Route
+        exact
+        path="/participant/:id/portal/sensor/:spec"
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : !getParticipant(props.match.params.id) ? (
+            <React.Fragment />
+          ) : (
+            <React.Fragment>
+              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PreventPage type="sensor" activityId={props.match.params.spec} participantId={props.match.params.id} />
             </React.Fragment>
           )
         }

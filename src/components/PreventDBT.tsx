@@ -116,7 +116,7 @@ export const getDateString = (date: Date) => {
   )
 }
 
-export default function PreventDBT({ participant, selectedEvents, ...props }) {
+export default function PreventDBT({ selectedEvents, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"), {
     noSsr: true,
@@ -139,60 +139,66 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     let dData = []
     let dateArray = []
     let weekend
-    let start = new Date(selectedEvents[selectedEvents.length - 1].timestamp)
-    let i = 0
-    while (start.getTime() >= selectedEvents[0].timestamp) {
-      weekend = new Date(start)
-      start.setHours(0)
-      start.setMinutes(0)
-      start.setSeconds(30)
-      weekend.setDate(weekend.getDate() - 6)
-      if (weekend.getTime() < selectedEvents[0].timestamp) {
-        weekend = new Date(selectedEvents[0].timestamp)
+    if (selectedEvents.length > 0) {
+      selectedEvents = selectedEvents.sort((a, b) => {
+        return a.timestamp - b.timestamp
+      })
+      let start = new Date(selectedEvents[selectedEvents.length - 1].timestamp)
+      let i = 0
+      while (start >= selectedEvents[0].timestamp) {
+        weekend = new Date(start)
+        start.setHours(23)
+        start.setMinutes(59)
+        start.setSeconds(55)
+
+        weekend.setDate(weekend.getDate() - 6)
+        if (weekend.getTime() < selectedEvents[0].timestamp) {
+          weekend = new Date(selectedEvents[0].timestamp)
+        }
+        weekend.setHours(0)
+        weekend.setMinutes(0)
+        weekend.setSeconds(0)
+        let timestampFormat = start.getTime() + "-" + weekend.getTime()
+        let dateFormat =
+          weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
+        start.setDate(start.getDate() - 7)
+        if (i === 0) {
+          setEmotionrange(timestampFormat)
+          setEffectiverange(timestampFormat)
+          setInEffectiverange(timestampFormat)
+          setActionrange(timestampFormat)
+        }
+        i++
+        dateArray.push({ timestamp: timestampFormat, date: dateFormat })
       }
-      weekend.setHours(0)
-      weekend.setMinutes(0)
-      weekend.setSeconds(30)
-      let timestampFormat = start.getTime() + 86400000 + "-" + weekend.getTime()
-      let dateFormat =
-        weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
-      start.setDate(start.getDate() - 6)
-      if (i === 0) {
-        setEmotionrange(timestampFormat)
-        setEffectiverange(timestampFormat)
-        setInEffectiverange(timestampFormat)
-        setActionrange(timestampFormat)
-      }
-      i++
-      dateArray.push({ timestamp: timestampFormat, date: dateFormat })
-    }
-    setDateArray(dateArray)
-    selectedEvents.map((event) => {
-      event.temporal_slices.map((slice) => {
-        if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
-          dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
+      setDateArray(dateArray)
+      selectedEvents.map((event) => {
+        event.temporal_slices.map((slice) => {
+          if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
+            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
+          }
+        })
+        if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
+          dData["Urge to Die by suicide"] = dData["Urge to Die by suicide"]
+            ? dData["Urge to Die by suicide"] + parseInt(event.static_data?.urgeForSuicide)
+            : parseInt(event.static_data?.urgeForSuicide)
+          dData["Urge to Quit Therapy"] = dData["Urge to Quit Therapy"]
+            ? dData["Urge to Quit Therapy"] + parseInt(event.static_data?.urgeToQuitTheray)
+            : parseInt(event.static_data?.urgeToQuitTheray)
         }
       })
-      if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
-        dData["Urge to Die by suicide"] = dData["Urge to Die by suicide"]
-          ? dData["Urge to Die by suicide"] + parseInt(event.static_data?.urgeForSuicide)
-          : parseInt(event.static_data?.urgeForSuicide)
-        dData["Urge to Quit Therapy"] = dData["Urge to Quit Therapy"]
-          ? dData["Urge to Quit Therapy"] + parseInt(event.static_data?.urgeToQuitTheray)
-          : parseInt(event.static_data?.urgeToQuitTheray)
-      }
-    })
-    Object.keys(dData).forEach(function (key) {
-      summaryData.push({ action: key, count: dData[key] })
-    })
-    let actionsD = actionsData
-    actionsD.data.values = summaryData
-    actionsD.title = t(actionsD.title)
+      Object.keys(dData).forEach(function (key) {
+        summaryData.push({ action: key, count: dData[key] })
+      })
+      let actionsD = actionsData
+      actionsD.data.values = summaryData
+      actionsD.title = t(actionsD.title)
 
-    actionsD.width.step = supportsSidebar ? 100 : 75
-    setActionsData(actionsD)
-    setCalculated(true)
-  }, [])
+      actionsD.width.step = supportsSidebar ? 100 : 75
+      setActionsData(actionsD)
+      setCalculated(true)
+    }
+  }, [selectedEvents])
 
   useEffect(() => {
     if (!!emotionrange) {
@@ -200,8 +206,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = emotionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getUTCDate().toString().padStart(2, "0")
+        var curr_month = (date.getUTCMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {
@@ -236,8 +242,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = effectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getUTCDate().toString().padStart(2, "0")
+        var curr_month = (date.getUTCMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {
@@ -272,8 +278,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = inEffectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getUTCDate().toString().padStart(2, "0")
+        var curr_month = (date.getUTCMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {
@@ -286,20 +292,21 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
             }
           }
         })
-        if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
-          inEffectiveData.push({
-            value: event.static_data.urgeForSuicide,
-            date: dateString,
-            symbol: t("Urge to Die by suicide"),
-          })
-          inEffectiveData.push({
-            value: event.static_data.urgeToQuitTheray,
-            date: dateString,
-            symbol: t("Urge to Quit Therapy"),
-          })
+        if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1])) {
+          if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
+            inEffectiveData.push({
+              value: event.static_data.urgeForSuicide,
+              date: dateString,
+              symbol: t("Urge to Die by suicide"),
+            })
+            inEffectiveData.push({
+              value: event.static_data.urgeToQuitTheray,
+              date: dateString,
+              symbol: t("Urge to Quit Therapy"),
+            })
+          }
         }
       })
-
       let dates = getDates(timeStamp[1], timeStamp[0])
       dates.map((d) => {
         if (inEffectiveData.length === 0) {
@@ -322,8 +329,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       let timeStamp = actionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getUTCDate().toString().padStart(2, "0")
+        var curr_month = (date.getUTCMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
         event.temporal_slices.map((slice) => {

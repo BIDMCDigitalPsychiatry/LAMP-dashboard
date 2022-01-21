@@ -28,7 +28,6 @@ export default function ArrayView({
       }
     })
   })
-
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>

@@ -128,7 +128,7 @@ const getJournals = async (journals: any) => {
   return data
 }
 
-export default function Journals({ participant, selectedEvents, ...props }) {
+export default function Journals({ selectedEvents, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const [journals, setJournals] = useState([])

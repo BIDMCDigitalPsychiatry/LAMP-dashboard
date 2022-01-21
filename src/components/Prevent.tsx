@@ -117,8 +117,8 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 // Perform event coalescing/grouping by sensor or activity type.
-async function getSensorEvents(participant: ParticipantObj): Promise<{ [groupName: string]: SensorEventObj[] }> {
-  let _events = ((await LAMP.SensorEvent.allByParticipant(participant.id)) as any).groupBy("sensor")
+export async function getSensorEvents(participantId: string): Promise<{ [groupName: string]: SensorEventObj[] }> {
+  let _events = ((await LAMP.SensorEvent.allByParticipant(participantId)) as any).groupBy("sensor")
 
   // Perform datetime coalescing to either days or weeks.
   _events["lamp.steps"] = Object.values(
@@ -349,7 +349,7 @@ export default function Prevent({
         LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
           setSelectedSensors(sensors.map((sensor) => sensor.name))
         })
-        getSensorEvents(participant).then((sensorEvents) => {
+        getSensorEvents(participant.id).then((sensorEvents) => {
           let sensorEventCount = getSensorEventCount(sensorEvents)
           setSensorEvents(sensorEvents)
 

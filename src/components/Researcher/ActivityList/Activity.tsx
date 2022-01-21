@@ -63,6 +63,9 @@ const useStyles = makeStyles((theme: Theme) =>
         width: "calc(100% - 96px)",
       },
     },
+    dividerHeader: {
+      marginTop: 0,
+    },
   })
 )
 
@@ -243,7 +246,7 @@ export default function Activity({
               </Typography>
             </Toolbar>
           </AppBar>
-          <Divider />
+          <Divider className={classes.dividerHeader} />
           {(!!type && type === "group") || activity?.spec === "lamp.group" ? (
             <GroupCreator
               activities={allActivities}
