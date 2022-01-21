@@ -133,6 +133,7 @@ export default function ActivityList({
       setLoading(true)
       let result = []
       Service.getAll("activities").then((activitiesData) => {
+        setAllActivities(activitiesData)
         if (!!searchTxt && searchTxt.trim().length > 0) {
           result = result.concat(activitiesData)
           result = result.filter((i) => i.name?.toLowerCase()?.includes(searchTxt?.toLowerCase()))
@@ -144,8 +145,6 @@ export default function ActivityList({
         setPaginatedActivities(
           sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount)
         )
-        setPage(page)
-        setRowCount(rowCount)
         setLoading(false)
       })
     } else {

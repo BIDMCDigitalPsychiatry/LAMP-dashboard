@@ -23,6 +23,8 @@ import {
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { getDates } from "./PreventDBT"
+import { getDateString } from "./PreventDBT"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -199,7 +201,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventSkills({ selectedEvents, skillRange, setSkillRange, dateArray, ...props }) {
+export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [skillData, setSkillData] = useState(null)
@@ -207,6 +209,8 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
   const [expandedSkills, setExpandedSkills] = useState([])
   const [selectedDates, setSelectedDates] = useState(null)
   const [filterChecked, setFilterChecked] = useState(false)
+  const [skillRange, setSkillRange] = useState(dateArray[0]?.timestamp ?? null)
+  const [reasons, setReasons] = useState(null)
   const data = [
     {
       title: t("Mindfulness"),
@@ -274,6 +278,7 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
     if (!!skillRange) {
       let skillData = []
       let timeStamp = skillRange.split("-")
+      let reasonData = []
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
@@ -289,7 +294,16 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
               : (skillData[slice.item] = [curr_month + "/" + curr_date])
           }
         })
+        if (
+          event.static_data.reason?.trim().length > 0 &&
+          event.timestamp <= parseInt(timeStamp[0]) &&
+          event.timestamp >= parseInt(timeStamp[1])
+        ) {
+          reasonData.push({ reason: event.static_data.reason, date: getDateString(new Date(event.timestamp)) })
+        }
       })
+      setReasons(reasonData)
+
       let dates = getDates(timeStamp[1], timeStamp[0])
       let selDates = []
       dates.map((date) => {
@@ -327,7 +341,11 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
                 <Typography variant="h5">Skills used:</Typography>
               </Box>
               <Box>
-                <NativeSelect value={skillRange} onChange={(event) => setSkillRange(event.target.value)}>
+                <NativeSelect
+                  onChange={(event) => {
+                    setSkillRange(event.target.value)
+                  }}
+                >
                   {dateArray.map((dateString) => (
                     <option value={dateString.timestamp}>{dateString.date}</option>
                   ))}
@@ -497,6 +515,27 @@ export default function PreventSkills({ selectedEvents, skillRange, setSkillRang
               )
             })}
           </TableContainer>
+        </Box>
+      )}
+      {!!reasons && (reasons || []).length > 0 && (
+        <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
+          <div className={classes.separator} />
+          <Box width={1} className={classes.graphSubContainer}>
+            <Typography variant="h5">Didn't use skills because...</Typography>
+            {(reasons || []).map(
+              (data) =>
+                !!data.reason && (
+                  <Box className={classes.blueBoxStyle}>
+                    <Typography variant="caption" gutterBottom>
+                      {data.date}
+                    </Typography>
+                    <Typography variant="body2" component="p">
+                      {data.reason}
+                    </Typography>
+                  </Box>
+                )
+            )}
+          </Box>
         </Box>
       )}
     </Box>

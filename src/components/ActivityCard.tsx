@@ -45,15 +45,14 @@ export default function ActivityCard({
       if (typeof t.value !== "undefined") {
         if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
           Object.keys(t.value).map((val) => {
-            if (!!t.value[val].question) {
+            let sum = 0
+            if (!!t.value[val]?.question) {
+              ;(t.value[val].value || []).map((elt) => {
+                sum = sum + (isNaN(parseInt(elt)) ? elt : parseInt(elt))
+              })
               values.push({
                 item: t.item + " - " + t.value[val].question,
-                [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value
-                  .map((elt) => {
-                    // assure the value can be converted into an integer
-                    return parseInt(elt) ? parseInt(elt) : elt
-                  })
-                  .reduce((sum, current) => sum + (parseInt(current) || current)),
+                [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: sum,
               })
             }
           })

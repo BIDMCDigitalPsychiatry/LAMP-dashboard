@@ -316,6 +316,18 @@ export default function NavigationLayout({
     setAnchorEl(null)
   }
 
+  const participantBack = () => {
+    if (researcherId === null) {
+      Service.getAll("researcher").then((researcher) => {
+        setResId(researcher[0]["id"])
+        window.location.href = `/#/researcher/${researcher[0]["id"]}/users`
+        setLoading(false)
+      })
+    } else {
+      window.location.href = `/#/researcher/${researcherId}/users`
+    }
+  }
+
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
@@ -332,12 +344,7 @@ export default function NavigationLayout({
             <Toolbar className={classes.logResearcherToolbar}>
               {typeof title != "undefined" && title.startsWith("Patient") ? (
                 <Box>
-                  <IconButton
-                    className={classes.backbtn}
-                    onClick={() => (window.location.href = `/#/researcher/${researcherId}/users`)}
-                    color="default"
-                    aria-label="Menu"
-                  >
+                  <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
                   {t("Patient View")}: {id}

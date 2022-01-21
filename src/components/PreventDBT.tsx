@@ -1,26 +1,13 @@
 import React, { useEffect, useState } from "react"
 import {
-  Box,
-  Icon,
-  Typography,
   Grid,
-  TableCell,
-  Table,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableContainer,
   makeStyles,
   Theme,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   createStyles,
   NativeSelect,
   useMediaQuery,
   useTheme,
   Backdrop,
-  Chip,
   CircularProgress,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
@@ -31,6 +18,7 @@ import { ineffective } from "./charts/ineffective_chart"
 import { actions } from "./charts/actions_chart"
 import { selfcare } from "./charts/selfcare_chart"
 import PreventSkills from "./PreventSkills"
+import PreventNotes from "./PreventNotes"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
@@ -71,53 +59,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: 0,
       maxWidth: 500,
     },
-    addContainer: {
-      display: "flex",
-      alignItems: "center",
-    },
-    addButtonTitle: {
-      color: "#5784EE",
-      fontWeight: 600,
-      fontSize: 14,
-    },
-    addButton: {
-      marginRight: 19,
-      color: "#5784EE",
-      width: 22,
-      height: 22,
-      marginLeft: 6,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    rangeButton: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 80,
-      height: 32,
-      borderRadius: 16,
-      border: "1px solid #C6C6C6",
-    },
-    rangeTitle: {
-      color: "rgba(0, 0, 0, 0.4)",
-      fontSize: 14,
-      fontWeight: "bold",
-    },
-    rangeButtonSelected: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 80,
-      height: 32,
-      borderRadius: 16,
-      backgroundColor: "#ECF4FF",
-    },
-    rangeTitleSelected: {
-      color: "#4C66D6",
-      fontSize: 14,
-      fontWeight: "bold",
-    },
     selector: {
       display: "fixed",
       marginBottom: -30,
@@ -144,66 +85,6 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
-    heading: {
-      fontSize: 17,
-      fontWeight: 600,
-    },
-    accordionContent: {
-      display: "block",
-      "& > div": {
-        "&:first-child": {
-          "& h6": {
-            borderTop: 0,
-            marginTop: 0,
-            paddingTop: 0,
-          },
-        },
-      },
-    },
-
-    accordionContentSub: {
-      "& h6": { fontSize: 17, borderTop: "#e4e4e4 solid 1px", marginTop: 15, paddingTop: 15 },
-      "& span": { color: "#666" },
-    },
-    noData: {
-      backgroundColor: "#A6A6A6",
-    },
-    mindfulness: {
-      backgroundColor: "#D9E1F2",
-    },
-    Interpersonal: {
-      backgroundColor: "#FCE4D6",
-    },
-    emotion: {
-      backgroundColor: "#E2EFDA",
-    },
-    distress: {
-      backgroundColor: "#FFF2CC",
-    },
-    categoryTitle: {
-      fontSize: "16px",
-      fontWeight: "bold",
-      "& div.MuiAccordionSummary-content": {
-        margin: "0",
-      },
-      "& td": { border: 0 },
-      "& div.MuiAccordionDetails-root": {
-        padding: "0",
-      },
-    },
-    tableDiv: {
-      display: "contents",
-    },
-    tableOuter: {
-      maxWidth: 570,
-      paddingTop: 10,
-    },
-    skillWidth: { maxWidth: "100px" },
-    skillsContainer: { width: "100%", maxWidth: 570 },
-    accSummary: { paddingLeft: 0, paddingRight: 0 },
-    greentxt: { color: "#21a521" },
-    colCheck: { borderLeft: "0.5px solid #f4f4f4" },
-    colDate: { borderLeft: "0.5px solid #c4c4c4" },
   })
 )
 
@@ -221,6 +102,20 @@ export function getDates(startDate, endDate) {
   return dates
 }
 
+export const getDateString = (date: Date) => {
+  var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+  return (
+    weekday[date.getDay()] +
+    " " +
+    monthname[date.getMonth()] +
+    ", " +
+    date.getDate() +
+    " " +
+    date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+  )
+}
+
 export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"), {
@@ -232,29 +127,12 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
   const [ineffectiveData, setIneffectiveData] = useState(null)
   const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
   const [selfcareData, setSelfcareData] = useState(null)
-  const [skillData, setSkillData] = useState(null)
   const [dateArray, setDateArray] = useState([])
   const [emotionrange, setEmotionrange] = useState(null)
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
   const [calculated, setCalculated] = useState(false)
-  const [skillRange, setSkillRange] = useState(null)
-  const [selectedDates, setSelectedDates] = useState(null)
-
-  const getDateString = (date: Date) => {
-    var weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    var monthname = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    return (
-      weekday[date.getDay()] +
-      " " +
-      monthname[date.getMonth()] +
-      ", " +
-      date.getDate() +
-      " " +
-      date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    )
-  }
 
   useEffect(() => {
     let summaryData = []
@@ -267,14 +145,14 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
       weekend = new Date(start)
       start.setHours(0)
       start.setMinutes(0)
-      start.setSeconds(0)
+      start.setSeconds(30)
       weekend.setDate(weekend.getDate() - 6)
       if (weekend.getTime() < selectedEvents[0].timestamp) {
         weekend = new Date(selectedEvents[0].timestamp)
       }
       weekend.setHours(0)
       weekend.setMinutes(0)
-      weekend.setSeconds(0)
+      weekend.setSeconds(30)
       let timestampFormat = start.getTime() + 86400000 + "-" + weekend.getTime()
       let dateFormat =
         weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
@@ -284,7 +162,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
         setEffectiverange(timestampFormat)
         setInEffectiverange(timestampFormat)
         setActionrange(timestampFormat)
-        setSkillRange(timestampFormat)
       }
       i++
       dateArray.push({ timestamp: timestampFormat, date: dateFormat })
@@ -316,40 +193,6 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
     setActionsData(actionsD)
     setCalculated(true)
   }, [])
-
-  useEffect(() => {
-    if (!!skillRange) {
-      let skillData = []
-      let timeStamp = skillRange.split("-")
-      selectedEvents.map((event) => {
-        let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
-        event.temporal_slices.map((slice) => {
-          if (
-            slice.level === "skill" &&
-            event.timestamp <= parseInt(timeStamp[0]) &&
-            event.timestamp >= parseInt(timeStamp[1])
-          ) {
-            !!skillData[slice.item]
-              ? skillData[slice.item].push(curr_month + "/" + curr_date)
-              : (skillData[slice.item] = [curr_month + "/" + curr_date])
-          }
-        })
-      })
-      let dates = getDates(timeStamp[1], timeStamp[0])
-      let selDates = []
-      dates.map((date) => {
-        selDates.push(
-          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
-            "/" +
-            new Date(date).getDate().toString().padStart(2, "0")
-        )
-      })
-      setSelectedDates(selDates)
-      setSkillData(skillData)
-    }
-  }, [skillRange])
 
   useEffect(() => {
     if (!!emotionrange) {
@@ -562,56 +405,8 @@ export default function PreventDBT({ participant, selectedEvents, ...props }) {
               </NativeSelect>
               {selfcareData !== null && <Vega spec={selfcareData} />}
 
-              <PreventSkills
-                skillRange={skillRange}
-                setSkillRange={setSkillRange}
-                selectedEvents={selectedEvents}
-                dateArray={dateArray}
-              />
-
-              {selectedEvents.filter((event) => !!event.static_data.reason).length > 0 && (
-                <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                  <div className={classes.separator} />
-                  <Box width={1} className={classes.graphSubContainer}>
-                    <Typography variant="h5">Didn't use skills because...</Typography>
-                    {selectedEvents.map(
-                      (event) =>
-                        !!event.static_data.reason && (
-                          <Box className={classes.blueBoxStyle}>
-                            <Typography variant="caption" gutterBottom>
-                              {getDateString(new Date(event.timestamp))}
-                            </Typography>
-                            <Typography variant="body2" component="p">
-                              {event.static_data.reason}
-                            </Typography>
-                          </Box>
-                        )
-                    )}
-                  </Box>
-                </Box>
-              )}
-
-              {selectedEvents.filter((event) => !!event.static_data.notes).length > 0 && (
-                <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
-                  <div className={classes.separator} />
-                  <Box width={1} className={classes.graphSubContainer}>
-                    <Typography variant="h5">Optional notes:</Typography>
-                    {selectedEvents.map(
-                      (event) =>
-                        !!event.static_data.notes && (
-                          <Box className={classes.blueBoxStyle}>
-                            <Typography variant="caption" gutterBottom>
-                              {getDateString(new Date(event.timestamp))}
-                            </Typography>
-                            <Typography variant="body2" component="p">
-                              {event.static_data.notes}
-                            </Typography>
-                          </Box>
-                        )
-                    )}
-                  </Box>
-                </Box>
-              )}
+              <PreventSkills selectedEvents={selectedEvents} dateArray={dateArray} />
+              <PreventNotes selectedEvents={selectedEvents} dateArray={dateArray} />
             </div>
           </Grid>
         </Grid>
