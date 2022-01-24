@@ -453,8 +453,8 @@ export default function Feed({
                 ? "learn"
                 : "manage"
             schedule.type = feed.spec
-            schedule.title = feed.name
-            schedule.activityData = JSON.parse(JSON.stringify(feed))
+            schedule.title = feed.name            
+            schedule.activityData = JSON.parse(JSON.stringify(Object.assign({}, feed, { schedule: undefined })))
             schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() <= new Date().getTime()
