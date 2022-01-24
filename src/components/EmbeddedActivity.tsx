@@ -123,7 +123,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
-    let activitySpec = LAMP.ActivitySpec.view(activity.spec)
+    let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
     if (activitySpec?.executable?.startsWith("data:")) {
       response = atob(activitySpec.executable.split(",")[1])
     } else if (activitySpec?.executable?.startsWith("https:")) {
@@ -133,6 +133,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
       response = atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
     }
+
     setEmbeddedActivity(response)
     setLoading(false)
   }
