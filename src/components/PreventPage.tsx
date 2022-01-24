@@ -214,8 +214,8 @@ export default function PreventPage({ activityId, type, participantId, ...props 
   const classes = useStyles()
   const [loading, setLoading] = useState(false)
   const [activity, setActivity] = useState(null)
-  const [activityEvents, setActivityEvents] = useState([])
-  const [sensorEvents, setSensorEvents] = useState({})
+  const [activityEvents, setActivityEvents] = useState(null)
+  const [sensorEvents, setSensorEvents] = useState(null)
   const { t, i18n } = useTranslation()
 
   let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
@@ -347,7 +347,7 @@ export default function PreventPage({ activityId, type, participantId, ...props 
       </AppBar>
 
       <Divider className={classes.dividerHeader} />
-      {type === "sensor" && (
+      {type === "sensor" && !!sensorEvents && (
         <PreventData
           activity={activity}
           events={sensorEvents}
@@ -359,7 +359,7 @@ export default function PreventPage({ activityId, type, participantId, ...props 
           onDeleteAction={(activity, data) => {}}
         />
       )}
-      {!!activity && type === "activity" && (
+      {!!activity && type === "activity" && !!activityEvents && (
         <Box>
           {activity?.spec === "lamp.journal" ? (
             <Journal
