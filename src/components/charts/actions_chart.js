@@ -24,7 +24,7 @@ export const actions = {
   encoding: {
     x: {
       field: "action",
-      type: "nominal",
+      type: "ordinal",
       title: null,
       axis: {
         labelAngle: -90,
