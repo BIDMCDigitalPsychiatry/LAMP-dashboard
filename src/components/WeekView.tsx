@@ -50,6 +50,7 @@ function getDates() {
   let years = []
   let first
   let curr = new Date()
+  if(curr.getDay() === 0) curr.setDate(curr.getDate() - 6)
   for (let i = 1; i < 8; i++) {
     first = curr.getDate() - curr.getDay() + i
     let day = new Date(curr.setDate(first))
