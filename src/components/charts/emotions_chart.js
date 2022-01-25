@@ -123,7 +123,7 @@ export const emotions = {
   },
   encoding: {
     x: { field: "date", axis: { labelAngle: 65 }, type: "ordinal",
-    timeUnit: "utcyearmonthdate" },
+    timeUnit: "date" },
     y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2.7 },
