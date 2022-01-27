@@ -441,6 +441,10 @@ export default function Tips({
           }
     onSave(dataObj, duplicate)
   }
+  
+  useEffect(() => {
+    validate()
+  }, [data])
 
   const validate = () => {
     let validationData = false
