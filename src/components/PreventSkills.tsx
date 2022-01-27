@@ -281,8 +281,8 @@ export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
       let reasonData = []
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getUTCDate().toString().padStart(2, "0")
-        var curr_month = (date.getUTCMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         event.temporal_slices.map((slice) => {
           if (
             slice.level === "skill" &&

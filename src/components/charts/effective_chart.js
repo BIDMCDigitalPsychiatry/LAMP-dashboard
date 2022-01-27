@@ -84,7 +84,7 @@ export const effective = {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend", toggle: "true" },
   },
   encoding: {
-    x: { field: "date", axis: { labelAngle: 65 },type: "ordinal", timeUnit: "date" },
+    x: { field: "date", axis: { labelAngle: 65 },type: "ordinal", timeUnit: "yearmonthdate" },
     y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2.7 },
