@@ -210,7 +210,6 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_year + "-" + curr_month + "-" + curr_date
-        console.log(dateString)
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -230,7 +229,6 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           }
         }
       })
-      console.log(emotionData)
       let emotionsD = JSON.parse(JSON.stringify(emotions))
       emotionsD.data.values = emotionData
       emotionsD.title = t(emotionsD.title)
