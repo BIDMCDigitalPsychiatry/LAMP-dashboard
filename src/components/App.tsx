@@ -118,7 +118,6 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     let query = window.location.hash.split("?")
-    console.log(query)
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
