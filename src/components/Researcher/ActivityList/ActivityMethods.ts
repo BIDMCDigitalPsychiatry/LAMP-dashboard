@@ -624,13 +624,14 @@ dependencies: {
 
                     options: {
                       type: "object",
+                      title: i18n.t("Response Options"),
                       properties: {
                         timePattern: {
                           title:"Time pattern",
                           type: "string",
                           enum: ["standard", "military"],
                           enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
-                          default: true,
+                          default: "standard",
                           "ui:widget": "select",
                         },                      
                       },
@@ -735,7 +736,7 @@ export function spliceActivity({ raw, tag }) {
           options:
             question.options === null
               ? null
-              : question.type !== "matrix"
+              : question.type !== "matrix"  && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
@@ -762,6 +763,7 @@ export function unspliceTipsActivity(x) {
 
 // Un-splice an object into its raw Activity object and ActivityDescription object.
 export function unspliceActivity(x) {
+  console.log(x)
   return {
     raw: {
       id: x.id,
@@ -773,7 +775,7 @@ export function unspliceActivity(x) {
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type,
-        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
+        options: y?.options === null ? null : y?.type !== "matrix" && y?.type !== "time" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
         required: y?.required ?? false,
       })),
     },
@@ -785,7 +787,7 @@ export function unspliceActivity(x) {
         multiselect: y?.type,
         description: y?.description,
         options:
-          y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? "") : null,
+          y?.options === null ? null : y?.type !== "matrix"  && y?.type !== "time" ? y?.options?.map((z) => z?.description ?? "") : null,
       })),
     },
   }
