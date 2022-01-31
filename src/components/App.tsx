@@ -118,6 +118,7 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     let query = window.location.hash.split("?")
+    console.log(query)
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
@@ -125,6 +126,15 @@ function AppRouter({ ...props }) {
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
+        LAMP.Auth.refresh_identity().then((x) => {
+          getAdminType()
+          setState((state) => ({
+            ...state,
+            identity: LAMP.Auth._me,
+            auth: LAMP.Auth._auth,
+            authType: LAMP.Auth._type,
+          }))
+        })
         return
       }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
