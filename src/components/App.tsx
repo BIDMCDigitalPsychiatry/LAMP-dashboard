@@ -126,15 +126,7 @@ function AppRouter({ ...props }) {
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
-        LAMP.Auth.refresh_identity().then((x) => {
-          getAdminType()
-          setState((state) => ({
-            ...state,
-            identity: LAMP.Auth._me,
-            auth: LAMP.Auth._auth,
-            authType: LAMP.Auth._type,
-          }))
-        })
+        refreshPage()
         return
       }
       let a = Object.fromEntries(new URLSearchParams(query[1]))["a"]
@@ -152,18 +144,22 @@ function AppRouter({ ...props }) {
         window.location.href = query[0]
       })
     } else if (!state.identity) {
-      LAMP.Auth.refresh_identity().then((x) => {
-        getAdminType()
-        setState((state) => ({
-          ...state,
-          identity: LAMP.Auth._me,
-          auth: LAMP.Auth._auth,
-          authType: LAMP.Auth._type,
-        }))
-      })
+      refreshPage()
     }
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
+
+  const refreshPage = () => {
+    LAMP.Auth.refresh_identity().then((x) => {
+      getAdminType()
+      setState((state) => ({
+        ...state,
+        identity: LAMP.Auth._me,
+        auth: LAMP.Auth._auth,
+        authType: LAMP.Auth._type,
+      }))
+    })
+  }
 
   const getAdminType = () => {
     LAMP.Type.getAttachment(null, "lamp.dashboard.admin_permissions").then((res: any) => {
