@@ -183,8 +183,6 @@ export default function QueryRender({ height = 0, ...props }) {
             }
           })
           .catch((e) => {
-            console.log(`Something went wrong: ${e}`)
-            console.log(spec)
             return {
               type: "invalid",
             }

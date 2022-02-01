@@ -55,23 +55,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function StudyFilterList({
   studies,
-  researcher,
+  researcherId,
   type,
   showFilterStudies,
   setSelectedStudies,
   selectedStudies,
   updateCount,
-  setUpdateCount,
   ...props
 }: {
   studies?: Array<any>
-  researcher?: Researcher
+  researcherId?: string
   type?: string
   showFilterStudies?: Boolean
   setSelectedStudies?: Function
   selectedStudies?: Array<string>
   updateCount?: number
-  setUpdateCount?: Function
 }) {
   const classes = useStyles()
   const { t } = useTranslation()
@@ -80,7 +78,6 @@ export default function StudyFilterList({
   const [allStudies, setAllStudies] = useState([])
   const [selectAll, setSelectAll] = useState(false)
   const [deSelectAll, setDeselectAll] = useState(false)
-  const [researcherId, setResearcherId] = useState(researcher.id)
 
   useEffect(() => {
     refreshStudies()
@@ -98,7 +95,6 @@ export default function StudyFilterList({
       })
       setAllStudies(studiesArray)
     })
-    setUpdateCount(0)
   }
 
   useEffect(() => {

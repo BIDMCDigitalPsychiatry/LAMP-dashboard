@@ -288,7 +288,7 @@ export default function SensorDialog({
             }
             variant="filled"
           >
-            {studies.map((option) => (
+            {(studies || []).map((option) => (
               <MenuItem key={option.id} value={option.id} data-selected-study-name={t(option.name)}>
                 {t(option.name)}
               </MenuItem>

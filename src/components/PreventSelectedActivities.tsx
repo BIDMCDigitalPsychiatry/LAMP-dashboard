@@ -1,36 +1,16 @@
 // Core Imports
 import React from "react"
-import {
-  Typography,
-  Grid,
-  Card,
-  Icon,
-  Box,
-  IconButton,
-  AppBar,
-  Toolbar,
-  ButtonBase,
-  makeStyles,
-  Theme,
-  createStyles,
-} from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
+import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
-import PreventData from "./PreventData"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
-import Journal from "./Journal"
-import PreventGoalData from "./PreventGoalData"
-import PreventDBT from "./PreventDBT"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
 import en from "javascript-time-ago/locale/en"
-import hi from "javascript-time-ago/locale/hi"
-import es from "javascript-time-ago/locale/es"
 import TimeAgo from "javascript-time-ago"
 import { useTranslation } from "react-i18next"
-import { Vega, VegaLite } from "react-vega"
+import { VegaLite } from "react-vega"
 TimeAgo.addLocale(en)
 const timeAgo = new TimeAgo("en-US")
 
@@ -170,28 +150,26 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
-
 export const strategies = {
   "lamp.survey": (slices, activity, scopedItem) =>
     (slices ?? [])
       .filter((x, idx) => (scopedItem !== undefined ? idx === scopedItem : true))
       .map((x, idx) => {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
-        if (!!question)
+        if (!!question && typeof x?.value !== "undefined")
           return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : parseInt(x.value) || 0
         else if (!!question && !!!question.options) return Math.max(question.options.indexOf(x.value), 0)
         else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
           let sum = 0
           Object.keys(x.value || []).map((val) => {
-            sum += x.value[val].value
-              .map((elt) => {
-                // assure the value can be converted into an integer
-                return parseInt(elt) ? parseInt(elt) : 0
-              })
-              .reduce((sum, current) => sum + parseInt(current))
+            if (!!x.value[val]?.value && x.value[val]?.value.length > 0) {
+              sum += (x.value[val]?.value || [])
+                .map((elt) => {
+                  // assure the value can be converted into an integer
+                  return !isNaN(parseInt(elt)) ? parseInt(elt) : 0
+                })
+                .reduce((sum, current) => sum + current)
+            }
           })
           return sum
         } else return parseInt(x?.value) || 0
@@ -214,13 +192,17 @@ export const strategies = {
   "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
     (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
-    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+    ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
-      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
+      : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
   "lamp.breathe": (slices, activity, scopedItem) =>
-    ((parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+    ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100
-      : (parseInt(slices.duration ?? 0) / 1000).toFixed(1) || 0,
+      : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
+  "lamp.tips": (slices, activity, scopedItem) =>
+    ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
+      ? 100
+      : (parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0,
   __default__: (slices, activity, scopedItem) =>
     slices.map((x) => parseInt(x.item) || 0).reduce((prev, curr) => (prev > curr ? prev : curr), 0),
 }
@@ -249,27 +231,7 @@ export default function PreventSelectedActivities({
   onDeleteAction: (activity: ActivityObj, data: any) => void
 }) {
   const classes = useStyles()
-  const [openData, setOpenData] = React.useState(false)
-  const [activityData, setActivityData] = React.useState(null)
-  const [graphType, setGraphType] = React.useState(0)
   const { t, i18n } = useTranslation()
-
-  const openDetails = (activity: any, data: any, graphType?: number) => {
-    setGraphType(graphType)
-    setSelectedActivity(activity)
-    if (!graphType) {
-      setSelectedActivityName(activity.name)
-    } else {
-      setSelectedActivityName("")
-    }
-    setActivityData(data)
-    setOpenData(true)
-  }
-  const [selectedActivity, setSelectedActivity] = React.useState(null)
-  const [selectedActivityName, setSelectedActivityName] = React.useState(null)
-
-  let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
-  let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
 
   return (
     <React.Fragment>
@@ -285,19 +247,7 @@ export default function PreventSelectedActivities({
                 <Card
                   className={classes.prevent}
                   onClick={() => {
-                    if (activity.spec === "lamp.dbt_diary_card") {
-                      openDetails(activity, activityEvents, 0)
-                    } else {
-                      setSelectedActivity(activityEvents?.[activity.name] ?? null)
-                      setSelectedActivityName(
-                        activity.spec === "lamp.journal"
-                          ? "Journal entries"
-                          : /*: activity.spec === "lamp.recording" // Uncomment if you want to view the Voice Recording Details on Prevent 
-                                ? "Voice Recording entries"*/
-                            "DBT entries"
-                      )
-                      setOpenData(true)
-                    }
+                    window.location.href = `/#/participant/${participant.id}/portal/activity/${activity.id}`
                   }}
                 >
                   <Box display="flex">
@@ -326,7 +276,12 @@ export default function PreventSelectedActivities({
           ) : (
             <Grid item xs={12} sm={6} md={6} lg={6}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
-                <Card className={classes.preventFull} onClick={() => openDetails(activity, activityEvents, 0)}>
+                <Card
+                  className={classes.preventFull}
+                  onClick={() =>
+                    (window.location.href = `/#/participant/${participant.id}/portal/activity/${activity.id}`)
+                  }
+                >
                   <Typography className={classes.preventlabelFull}>
                     <ReactMarkdown
                       source={`${t(activity.name)} (${activityCounts[activity.name]})`}
@@ -346,6 +301,10 @@ export default function PreventSelectedActivities({
                               ? strategies[activity.spec](
                                   activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                                     ? d?.temporal_slices ?? d["temporal_slices"]
+                                    : activity.spec === "lamp.scratch_image" ||
+                                      activity.spec === "lamp.breathe" ||
+                                      activity.spec === "lamp.tips"
+                                    ? d
                                     : d.static_data,
                                   activity,
                                   undefined
@@ -401,56 +360,6 @@ export default function PreventSelectedActivities({
             </Grid>
           )
         )}
-
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={openData}
-        onClose={() => {
-          setOpenData(false)
-        }}
-      >
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => setOpenData(false)}
-              color="default"
-              aria-label="Menu"
-              className={classes.backbtn}
-            >
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5"> {t(selectedActivityName)} </Typography>
-          </Toolbar>
-        </AppBar>
-
-        {selectedActivityName === "Journal entries" ? (
-          <Journal
-            participant={participant}
-            selectedEvents={selectedActivity}
-          /> /* : selectedSpec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
-          <VoiceRecoding participant={participant} selectedEvents={selectedActivity} />
-        ) */
-        ) : selectedActivityName === "Goal: Water" ? (
-          <PreventGoalData />
-        ) : selectedActivity !== null && selectedActivity?.spec === "lamp.dbt_diary_card" ? (
-          <PreventDBT participant={participant} selectedEvents={(activityData || {})[selectedActivityName]} />
-        ) : (
-          <PreventData
-            participant={participant}
-            activity={selectedActivity}
-            type={graphType === 2 ? (selectedActivity === "Environmental Context" ? envContexts : socialContexts) : []}
-            events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
-            graphType={graphType}
-            earliestDate={earliestDate}
-            enableEditMode={!_patientMode()}
-            onEditAction={onEditAction}
-            onCopyAction={onCopyAction}
-            onDeleteAction={onDeleteAction}
-          />
-        )}
-      </ResponsiveDialog>
     </React.Fragment>
   )
 }

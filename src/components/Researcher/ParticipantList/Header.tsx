@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Header({
   studies,
-  researcher,
+  researcherId,
   selectedParticipants,
   searchData,
   setSelectedStudies,
@@ -48,7 +48,6 @@ export default function Header({
   const classes = useStyles()
   const { t } = useTranslation()
   const [showFilterStudies, setShowFilterStudies] = useState(false)
-  const [updateCount, setUpdateCount] = useState(0)
 
   const handleShowFilterStudies = (status) => {
     setShowFilterStudies(status)
@@ -66,9 +65,8 @@ export default function Header({
         <SearchBox searchData={searchData} />
         <Box>
           <AddButton
-            researcher={researcher}
+            researcherId={researcherId}
             studies={studies}
-            setUpdateCount={setUpdateCount}
             setParticipants={setParticipants}
             setSelectedStudies={setSelectedStudies}
             setData={setData}
@@ -80,24 +78,18 @@ export default function Header({
         <Box>
           <StudyFilterList
             studies={studies}
-            researcher={researcher}
+            researcherId={researcherId}
             type="participants"
             showFilterStudies={showFilterStudies}
             selectedStudies={selectedStudies}
             setSelectedStudies={setSelectedStudies}
-            updateCount={updateCount}
-            setUpdateCount={setUpdateCount}
           />
         </Box>
       )}
       {(selectedParticipants || []).length > 0 && (
         <Box className={classes.optionsMain}>
           <Box className={classes.optionsSub}>
-            <DeleteParticipant
-              participants={selectedParticipants}
-              setParticipants={setParticipants}
-              setUpdateCount={setUpdateCount}
-            />
+            <DeleteParticipant participants={selectedParticipants} setParticipants={setParticipants} />
           </Box>
         </Box>
       )}

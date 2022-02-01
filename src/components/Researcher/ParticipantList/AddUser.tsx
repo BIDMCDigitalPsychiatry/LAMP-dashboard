@@ -70,14 +70,14 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function AddUser({
-  researcher,
+  researcherId,
   studies,
   setParticipants,
   handleNewStudy,
   closePopUp,
   ...props
 }: {
-  researcher: any
+  researcherId: any
   studies: any
   setParticipants?: Function
   handleNewStudy: Function

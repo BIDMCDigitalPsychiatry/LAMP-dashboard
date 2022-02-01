@@ -11,12 +11,13 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Steak from "./Steak"
+import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import { getEvents } from "./Participant"
+import { getImage } from "./Manage"
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -37,50 +38,71 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [groupActivities, setGroupActivities] = useState([])
   const [startTime, setStartTime] = useState(new Date().getTime())
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [openComplete, setOpenComplete] = React.useState(false)
-  const [steak, setSteak] = useState(1)
   const [loading, setLoading] = useState(true)
-  const [activityDetails, setActivityDetails] = useState(null)
-  const [activityId, setActivityId] = useState(null)
-  const [activityRun, setActivityRun] = useState(true)
   const { t } = useTranslation()
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(-1)
+  const [data, setResponse] = useState(null)
 
   useEffect(() => {
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
-      if (!!actId) {
-        LAMP.Activity.view(actId).then((activity) => {
-          setCurrentActivity(activity)
-          setLoading(false)
-        })
-      }
+      LAMP.Activity.view(actId).then((activity) => {
+        setCurrentActivity(activity)
+        setLoading(false)
+      })
     }
-  }, [groupActivities, index])
+  }, [index])
 
   useEffect(() => {
-    if (currentActivity !== null) {
-      setActivityId(currentActivity.id)
-      setActivityRun(false)
-    }
-  }, [currentActivity])
+    if (groupActivities.length > 0) setIndex(0)
+  }, [groupActivities])
 
   useEffect(() => {
     LAMP.Activity.view(activity.id).then((data) => {
+      setIndex(-1)
       setGroupActivities(data.settings)
     })
-  }, [activity])
+  }, [])
 
-  const completeActivity = () => {
-    showSteak(participant, currentActivity.id)
-  }
+  useEffect(() => {
+    if (index >= 0 && currentActivity !== null) {
+      setLoading(true)
+      if (
+        (currentActivity?.spec === "lamp.survey" && typeof data.length === "undefined") ||
+        currentActivity?.spec !== "lamp.survey"
+      ) {
+        iterateActivity()
+      } else {
+        const activityId = currentActivity.id
+        let events = data.map((x, idx) => ({
+          timestamp: new Date().getTime(),
+          duration: x.reduce((sum, item) => sum + item.duration, 0),
+          activity: activityId,
+          static_data: {},
+          temporal_slices: (x || []).map((y) => ({
+            item: y !== undefined ? y.item : null,
+            value: y !== undefined ? y.value : null,
+            type: null,
+            level: null,
+            duration: y.duration,
+          })),
+        }))
+        Promise.all(
+          events
+            .filter((x) => x.temporal_slices.length > 0)
+            .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
+        ).then((x) => {
+          iterateActivity()
+        })
+      }
+    }
+  }, [data])
 
   const iterateActivity = () => {
     let val = index + 1
     setCurrentActivity(null)
     setIndex(val)
-    setActivityRun(true)
     if (groupActivities.length === val) {
       LAMP.ActivityEvent.create(participant.id ?? participant, {
         timestamp: new Date().getTime(),
@@ -88,76 +110,17 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         activity: activity.id,
         static_data: {},
       })
-      props.onComplete()
+      props.onComplete({ timestamp: new Date().getTime() })
     }
   }
 
   const submitSurvey = (response) => {
-    setActivityRun(true)
-    setLoading(true)
-    const activityId = currentActivity.id
-    setCurrentActivity(null)
-    if (!!!response || response === null) {
-      props.onComplete()
-      iterateActivity()
-      setLoading(false)
-    } else {
-      let events = response.map((x, idx) => ({
-        timestamp: new Date().getTime(),
-        duration: response.duration,
-        activity: activityId,
-        static_data: {},
-        temporal_slices: (x || []).map((y) => ({
-          item: y !== undefined ? y.item : null,
-          value: y !== undefined ? y.value : null,
-          type: null,
-          level: null,
-          duration: y.duration,
-        })),
-      }))
-      Promise.all(
-        events
-          .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
-      ).then((x) => {
-        completeActivity()
-      })
-    }
+    setResponse(!!!response || response === null ? {} : response)
   }
-
-  const showSteak = (participant, activityId) => {
-    getEvents(participant, activityId).then((steak) => {
-      setSteak(steak)
-      setOpenComplete(true)
-      setTimeout(() => {
-        setOpenComplete(false)
-        iterateActivity()
-        setLoading(false)
-      }, 5000)
-    })
-  }
-
-  useEffect(() => {
-    if (activity !== null) {
-      ;(async () => {
-        let iconData = (await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any
-        let activityData = {
-          id: activity.id,
-          spec: activity.spec,
-          name: activity.name,
-          settings: activity.settings,
-          schedule: activity.schedule,
-          icon: iconData.data ? iconData.data.icon : undefined,
-        }
-        setActivityDetails(activityData)
-      })()
-      setLoading(false)
-    }
-  }, [activity])
 
   return (
     <div style={{ height: "100%" }}>
-      {!activityRun && (
+      {!!currentActivity && (
         <Box>
           {currentActivity?.spec === "lamp.survey" ? (
             <SurveyInstrument
@@ -184,9 +147,8 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
               name={currentActivity?.name}
               activity={currentActivity}
               participant={participant}
-              onComplete={(data) => {
-                if (!!data && data !== null) completeActivity()
-                else iterateActivity()
+              onComplete={(a) => {
+                setResponse({})
               }}
               noBack={noBack}
             />
@@ -202,7 +164,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
                 <Button
                   onClick={() => {
                     setOpenNotImplemented(false)
-                    completeActivity()
+                    iterateActivity()
                   }}
                   color="primary"
                 >
@@ -213,14 +175,6 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
           )}
         </Box>
       )}
-      <Steak
-        open={openComplete}
-        onClose={() => {
-          setOpenComplete(false)
-        }}
-        setOpenComplete={setOpenComplete}
-        steak={steak}
-      />
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>

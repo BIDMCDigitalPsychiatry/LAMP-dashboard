@@ -99,7 +99,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function AddButton({ researcher, studies, setUpdateCount, setParticipants, setData, mode, ...props }) {
+export default function AddButton({ researcherId, studies, setParticipants, setData, mode, ...props }) {
   const [addUser, setAddUser] = useState(false)
   const [addStudy, setAddStudy] = useState(false)
   const { t } = useTranslation()
@@ -108,7 +108,6 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
   const [addParticipantStudy, setAddParticipantStudy] = useState(false)
 
   const handleNewStudyData = (data) => {
-    setUpdateCount(1)
     setData()
   }
 
@@ -186,14 +185,14 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
       </Popover>
       <StudyCreator
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         open={addStudy}
         onClose={() => setAddStudy(false)}
         handleNewStudy={handleNewStudyData}
         closePopUp={handleClosePopUp}
       />
       <AddUser
-        researcher={researcher}
+        researcherId={researcherId}
         studies={studies}
         open={addUser}
         onClose={() => setAddUser(false)}
@@ -203,7 +202,7 @@ export default function AddButton({ researcher, studies, setUpdateCount, setPart
       />
       <PatientStudyCreator
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         onClose={() => setAddParticipantStudy(false)}
         open={addParticipantStudy}
         handleNewStudy={handleNewStudyData}

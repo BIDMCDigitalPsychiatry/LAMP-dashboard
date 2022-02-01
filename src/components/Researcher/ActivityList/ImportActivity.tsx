@@ -19,6 +19,11 @@ import {
   FormControl,
   InputLabel,
   Backdrop,
+  AppBar,
+  Toolbar,
+  Icon,
+  Link,
+  Divider,
   CircularProgress,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
@@ -184,11 +189,23 @@ const useStyles = makeStyles((theme: Theme) =>
     formControl: {
       minWidth: "100%",
     },
+    backbtnlink: {
+      width: 48,
+      height: 48,
+      color: "rgba(0, 0, 0, 0.54)",
+      padding: 12,
+      borderRadius: "50%",
+      "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
+    },
+    containerWidth: { maxWidth: 1055 },
     importList: { padding: "15px", background: "#f4f4f4", borderBottom: "#fff solid 2px" },
+    dividerHeader: {
+      marginTop: 0,
+    },
   })
 )
 
-export default function ImportActivity({ studies, setActivities, activities, onClose, setUpdateCount, ...props }) {
+export default function ImportActivity({ ...props }) {
   const [selectedStudy, setSelectedStudy] = useState(undefined)
   const classes = useStyles()
   const [importFile, setImportFile] = useState<any>()
@@ -200,6 +217,19 @@ export default function ImportActivity({ studies, setActivities, activities, onC
   const [duplicateExists, setDuplicateExists] = useState(false)
   const [loading, setLoading] = useState(false)
   const inputRef = React.useRef(null)
+  const [studies, setStudies] = useState(null)
+  const [activities, setActivities] = useState(null)
+
+  useEffect(() => {
+    setLoading(true)
+    Service.getAll("studies").then((studies) => {
+      setStudies(studies)
+      Service.getAll("activities").then((activities) => {
+        setActivities(activities)
+        setLoading(false)
+      })
+    })
+  }, [])
 
   const handleChangePage = (page: number, rowCount: number) => {
     setRowCount(rowCount)
@@ -301,8 +331,6 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       }
     }
     if (status) {
-      setUpdateCount(2)
-      setActivities()
       setLoading(false)
       enqueueSnackbar(t("The selected Activities were successfully imported."), {
         variant: "success",
@@ -311,14 +339,14 @@ export default function ImportActivity({ studies, setActivities, activities, onC
       setLoading(false)
       enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
     }
-    onClose()
+    history.back()
   }
 
   const checkDuplicateActivity = (obj, activitiesList, selectedStudyId) => {
     setDuplicateExists(false)
     const objArray = obj
     objArray.map((eachData) => {
-      const nameExists = activities.some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
+      const nameExists = (activities || []).some((el) => el.name === eachData.name && el.study_id === selectedStudyId)
       if (nameExists) {
         setDuplicateExists(true)
       }
@@ -372,85 +400,107 @@ export default function ImportActivity({ studies, setActivities, activities, onC
   })
 
   return (
-    <Container>
+    <React.Fragment>
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <Box mt={2} mb={2}>
-        <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
-      </Box>
-      <Grid item lg={4} md={6} xs={12}>
-        <FormControl variant="filled" className={classes.formControl}>
-          <InputLabel id="demo-simple-select-filled-label">{t("Study")}</InputLabel>
-          <Select
-            labelId="demo-simple-select-filled-label"
-            id="demo-simple-select-filled"
-            value={selectedStudy}
-            onChange={(event) => {
-              setSelectedStudy(event.target.value)
+      <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
+        <Toolbar className={classes.toolbardashboard}>
+          <Link
+            onClick={() => {
+              history.back()
             }}
+            underline="none"
+            className={classes.backbtnlink}
           >
-            {studies.map((study) => (
-              <MenuItem key={study.id} value={study.id}>
-                {study.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      {typeof selectedStudy === "undefined" ||
-      (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
-        <Box mt={1}>
-          <Typography className={classes.errorMsg}>{t("Select a Study to import activities.")}</Typography>
+            <Icon>arrow_back</Icon>
+          </Link>
+          <Typography variant="h5">{t("Import activities")}</Typography>
+        </Toolbar>
+      </AppBar>
+      <Divider className={classes.dividerHeader} />
+      <Container className={classes.containerWidth}>
+        <Box mt={2} mb={2}>
+          <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
         </Box>
-      ) : (
-        ""
-      )}
-      <Box
-        {...getRootProps()}
-        py={3}
-        //bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
-        //color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
-        className={classes.dragDrop}
-        onClick={() => inputRef.current?.click()}
-      >
-        <input {...getInputProps()} className={selectedStudy} ref={inputRef} disabled={selectedStudy ? false : true} />
-        <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
-        <Typography className={classes.errorMsg}>{t("The maximum allowed file size is 25 MB.")}</Typography>
-      </Box>
-
-      <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
-        <DialogTitle>{t("Continue importing?")}</DialogTitle>
-        <DialogContent dividers={false}>
-          {(paginatedImported || []).map((activity) => (
-            <Box className={classes.importList}>
-              <Box>{activity.name}</Box>
-            </Box>
-          ))}
-          <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
-          <Typography className={classes.errorMsg}>
-            {t("The Activities having same name under the selected study will be duplicated into new name.")}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Box p={2} pt={1}>
-            <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-              {t("Cancel")}
-            </Button>
-            <Button
-              onClick={() => {
-                importActivities(selectedStudy, importFile)
-                setImportFile(undefined)
+        <Grid item lg={4} md={6} xs={12}>
+          <FormControl variant="filled" className={classes.formControl}>
+            <InputLabel id="demo-simple-select-filled-label">{t("Study")}</InputLabel>
+            <Select
+              labelId="demo-simple-select-filled-label"
+              id="demo-simple-select-filled"
+              value={selectedStudy}
+              onChange={(event) => {
+                setSelectedStudy(event.target.value)
               }}
-              color="primary"
-              autoFocus
             >
-              {t("Import")}
-            </Button>
+              {(studies || []).map((study) => (
+                <MenuItem key={study.id} value={study.id}>
+                  {study.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        {typeof selectedStudy === "undefined" ||
+        (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
+          <Box mt={1}>
+            <Typography className={classes.errorMsg}>{t("Select a Study to import activities.")}</Typography>
           </Box>
-        </DialogActions>
-      </Dialog>
-    </Container>
+        ) : (
+          ""
+        )}
+        <Box
+          {...getRootProps()}
+          py={3}
+          //bgcolor={isDragActive || isDragAccept ? "primary.main" : undefined}
+          //color={!(isDragActive || isDragAccept) ? "primary.main" : "#fff"}
+          className={classes.dragDrop}
+          onClick={() => inputRef.current?.click()}
+        >
+          <input
+            {...getInputProps()}
+            className={selectedStudy}
+            ref={inputRef}
+            disabled={selectedStudy ? false : true}
+          />
+          <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
+          <Typography className={classes.errorMsg}>{t("The maximum allowed file size is 25 MB.")}</Typography>
+        </Box>
+
+        <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
+          <DialogTitle>{t("Continue importing?")}</DialogTitle>
+          <DialogContent dividers={false}>
+            {(paginatedImported || []).map((activity) => (
+              <Box className={classes.importList}>
+                <Box>{activity.name}</Box>
+              </Box>
+            ))}
+            <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
+            <Typography className={classes.errorMsg}>
+              {t("The Activities having same name under the selected study will be duplicated into new name.")}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Box p={2} pt={1}>
+              <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
+                {t("Cancel")}
+              </Button>
+              <Button
+                onClick={() => {
+                  importActivities(selectedStudy, importFile)
+                  setImportFile(undefined)
+                }}
+                color="primary"
+                autoFocus
+              >
+                {t("Import")}
+              </Button>
+            </Box>
+          </DialogActions>
+        </Dialog>
+      </Container>
+    </React.Fragment>
   )
 }

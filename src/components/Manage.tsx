@@ -31,7 +31,7 @@ export async function getImage(activityId: string, spec: string) {
   ].map((y: any) => (!!y.error ? undefined : y.data))[0]
 }
 
-export default function Manage({ participant, activities, showSteak, submitSurvey, ...props }) {
+export default function Manage({ participant, activities, showStreak, submitSurvey, ...props }) {
   const classes = useStyles()
   const [tag, setTag] = useState([])
   const [savedActivities, setSavedActivities] = useState([])
@@ -43,7 +43,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
     let gActivities = activities.filter(
       (x: any) =>
         ((x.spec === "lamp.journal" || x.spec === "lamp.breathe" || x.spec === "lamp.scratch_image") &&
-        (typeof x?.category === "undefined" || x?.category === null)) ||
+          (typeof x?.category === "undefined" || x?.category === null)) ||
         (!!x?.category && x?.category.includes("manage"))
     )
     setSavedActivities(gActivities)
@@ -74,7 +74,7 @@ export default function Manage({ participant, activities, showSteak, submitSurve
         participant={participant}
         savedActivities={savedActivities}
         tag={tag}
-        showSteak={showSteak}
+        showStreak={showStreak}
         submitSurvey={submitSurvey}
         type="Manage"
       />

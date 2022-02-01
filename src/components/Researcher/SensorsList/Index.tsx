@@ -43,21 +43,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function SensorsList({
   title,
-  researcher,
+  researcherId,
   studies,
   selectedStudies,
   setSelectedStudies,
-  getDBStudies,
   setOrder,
+  getAllStudies,
   order,
   ...props
 }: {
   title?: string
-  researcher?: Object
+  researcherId?: string
   studies: Array<any>
   selectedStudies: Array<any>
   setSelectedStudies?: Function
-  getDBStudies?: Function
+  getAllStudies?: Function
   setOrder?: Function
   order?: boolean
 }) {
@@ -71,29 +71,33 @@ export default function SensorsList({
   const [rowCount, setRowCount] = useState(40)
   const [page, setPage] = useState(0)
   const [search, setSearch] = useState(null)
-  const [loadTime, setLoadTime] = useState(false)
-  const [allSensors, setAllSensors] = useState(null)
 
   useInterval(
     () => {
-      getAllSensors()
+      setLoading(true)
+      getAllStudies()
     },
-    allSensors !== null && !!loadTime ? null : 3000,
+    studies !== null && (studies || []).length > 0 ? null : 2000,
     true
   )
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoadTime(true)
-    }, 10000)
+    let params = JSON.parse(localStorage.getItem("sensors"))
+    setPage(params?.page ?? 0)
+    setRowCount(params?.rowCount ?? 40)
   }, [])
 
-  const getAllSensors = () => {
-    Service.getAll("sensors").then((data) => {
-      setAllSensors(data || [])
-      if ((data || []).length > 0) setLoadTime(true)
-    })
-  }
+  useEffect(() => {
+    if (selected !== selectedStudies) setSelected(selectedStudies)
+  }, [selectedStudies])
+
+  useEffect(() => {
+    if ((selected || []).length > 0) {
+      searchFilterSensors()
+    } else {
+      setSensors([])
+    }
+  }, [selected])
 
   const handleChange = (sensorData, checked) => {
     if (checked) {
@@ -103,29 +107,11 @@ export default function SensorsList({
       setSelectedSensors(selected)
     }
   }
-  useEffect(() => {
-    setSelected(selectedStudies)
-  }, [selectedStudies])
-
-  useEffect(() => {
-    setLoadTime(false)
-    if ((selectedStudies || []).length > 0) {
-      setLoadTime(true)
-      searchFilterSensors()
-    } else {
-      setSensors([])
-    }
-  }, [selected])
-
-  useEffect(() => {
-    if (!!loadTime) searchFilterSensors()
-  }, [loadTime])
-
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
-    setLoading(true)
-    const selectedData = selectedStudies.filter((o) => studies.some(({ name }) => o === name))
-    if (selectedData.length > 0 && !loading) {
+    const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
+    if (selectedData.length > 0) {
+      setLoading(true)
       let result = []
       Service.getAll("sensors").then((sensorData) => {
         if ((sensorData || []).length > 0) {
@@ -159,6 +145,7 @@ export default function SensorsList({
     setLoading(true)
     setRowCount(rowCount)
     setPage(page)
+    localStorage.setItem("sensors", JSON.stringify({ page: page, rowCount: rowCount }))
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
     setPaginatedSensors(sortData(sensors, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
     setLoading(false)
@@ -171,7 +158,7 @@ export default function SensorsList({
       </Backdrop>
       <Header
         studies={studies}
-        researcher={researcher}
+        researcherId={researcherId}
         selectedSensors={selectedSensors}
         searchData={handleSearchData}
         setSelectedStudies={setSelectedStudies}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Dialog,
   DialogProps,
@@ -17,6 +17,10 @@ import {
 } from "@material-ui/core"
 import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
+import ReactMarkdown from "react-markdown"
+import emoji from "remark-emoji"
+import gfm from "remark-gfm"
+import { LinkRenderer } from "./ActivityPopup"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -57,13 +61,15 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-export default function Steak({
-  steak,
-  setOpenComplete,
+export default function Streak({
+  streak,
+  activity,
+  popupClose,
   ...props
 }: {
-  steak?: number
-  setOpenComplete?: Function
+  streak?: number
+  activity?: any
+  popupClose?: Function
 } & DialogProps) {
   const sm = useMediaQuery(useTheme().breakpoints.down("sm"))
   const classes = useStyles()
@@ -82,29 +88,41 @@ export default function Steak({
       }}
     >
       <DialogTitle>
-        <IconButton
-          aria-label="close"
-          className={classes.closeButton}
-          onClick={() => {
-            setOpenComplete(false)
-          }}
-        >
+        <IconButton aria-label="close" className={classes.closeButton} onClick={() => popupClose()}>
           <Icon>close</Icon>
         </IconButton>
       </DialogTitle>
       <DialogContent>
         <Box textAlign="center" pb={4} className={classes.niceWork}>
           <Typography variant="h5" gutterBottom>
-            {t("Nice work!")}
+            <ReactMarkdown
+              source={t(
+                !!activity?.streakTitle && activity?.streakTitle.trim().length > 0
+                  ? activity?.streakTitle
+                  : "Nice work!"
+              )}
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+              renderers={{ link: LinkRenderer }}
+            />
           </Typography>
           <Typography className={classes.ribbonText} component="p">
-            {t("You’re on a streak, keep it going")}
+            <ReactMarkdown
+              source={t(
+                !!activity?.streakDesc && activity?.streakDesc.trim().length > 0
+                  ? activity?.streakDesc
+                  : "You’re on a streak, keep it going"
+              )}
+              escapeHtml={false}
+              plugins={[gfm, emoji]}
+              renderers={{ link: LinkRenderer }}
+            />
           </Typography>
           <Box textAlign="center" className={classes.niceWorkbadge}>
             <Ribbon width="170" height="226" />
             <Box className={classes.dayNotification}>
-              <Typography variant="h4"> {steak}</Typography>{" "}
-              <Typography variant="h6">{steak > 1 ? " " + t("days") : t("day")}</Typography>
+              <Typography variant="h4"> {streak}</Typography>{" "}
+              <Typography variant="h6">{streak > 1 ? " " + t("days") : t("day")}</Typography>
             </Box>
           </Box>
         </Box>

@@ -17,6 +17,7 @@ import {
 } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
+import ActivityStreak from "./ActivityStreak"
 import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
@@ -129,9 +130,8 @@ export default function Tips({
   onCancel,
   studies,
   allActivities,
-  activitySpecId,
   study,
-  openWindow,
+  details,
   ...props
 }: {
   value?: any
@@ -139,9 +139,8 @@ export default function Tips({
   onCancel?: Function
   studies?: any
   allActivities?: any
-  activitySpecId: string
   study?: string
-  openWindow: Boolean
+  details: any
 }) {
   const classes = useStyles()
   const { enqueueSnackbar } = useSnackbar()
@@ -152,7 +151,6 @@ export default function Tips({
   const [categoryArray, setCategoryArray] = useState([])
   const [newTipText, setNewTipText] = useState("")
   const [duplicateTipText, setDuplicateTipText] = useState("")
-  const [selectedCategory, setSelectedCategory]: any = useState({})
   const [tipsDataArray, setTipsDataArray] = useState([{ title: "", text: "", image: "" }])
   const [studyId, setStudyId] = useState(!!value ? value.study_id : study)
   const [isDuplicate, setIsDuplicate] = useState(false)
@@ -175,14 +173,15 @@ export default function Tips({
     },
   ]
   const { t } = useTranslation()
-  const [settings, setSettings]: Array<any> = useState([])
+
   const [data, setData] = useState({
     id: value?.id ?? undefined,
     name: value?.name ?? "",
-    spec: value?.spec ?? activitySpecId,
+    spec: value?.spec ?? "lamp.tips",
     schedule: value?.schedule ?? [],
     description: "",
-    settings: settings ?? [],
+    streak: details?.streak ?? null,
+    settings: value?.settings ?? [],
     studyID: !!value ? value.study_id : study,
     category: value?.category ?? [],
   })
@@ -191,9 +190,11 @@ export default function Tips({
     setData({ ...data, category: tab })
     validate()
   }
-  useEffect(() => {
-    setSettings(value)
-  }, [openWindow])
+
+  const handleStreakChange = (val) => {
+    setData({ ...data, streak: val })
+    validate()
+  }
 
   useEffect(() => {
     validate()
@@ -236,18 +237,14 @@ export default function Tips({
                 existsData.settings = defaultSettingsArray
               }
             }
-            setSelectedCategory(existsData)
             setTipsDataArray(existsData.settings)
-            let newObj = { settings: existsData.settings }
-            setSettings(newObj)
+            setData({ ...data, settings: existsData.settings })
           }
         }
       } else {
         if (!value) {
-          let existsData = { settings: defaultSettingsArray }
-          setSelectedCategory(existsData)
           setTipsDataArray(defaultSettingsArray)
-          setSettings(existsData)
+          setData({ ...data, settings: defaultSettingsArray })
         }
       }
       setNewSchemaList(SchemaList())
@@ -259,7 +256,6 @@ export default function Tips({
     ;(async () => {
       setLoading(true)
       if (studyId) {
-        setSelectedCategory([])
         Service.getDataByKey("activities", [studyId], "study_id").then((activitiesObject) => {
           let tipActivities = activitiesObject.filter((x) => x.spec === "lamp.tips")
           setCategoryArray(tipActivities)
@@ -269,15 +265,12 @@ export default function Tips({
         let activitiesData = JSON.parse(JSON.stringify(value))
         setCategory(activitiesData.id)
         if (Object.keys(activitiesData.settings).length > 0) {
-          setSelectedCategory(activitiesData)
           setTipsDataArray(activitiesData.settings)
         }
         let iconsData: any = await LAMP.Type.getAttachment(activitiesData.id, "lamp.dashboard.activity_details")
         if (iconsData.hasOwnProperty("data")) {
           setCategoryImage(iconsData.data.photo)
         }
-      } else {
-        setSelectedCategory([])
       }
       setLoading(false)
     })()
@@ -373,7 +366,7 @@ export default function Tips({
         return false
       }
     }
-    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+    let settingsObj = data.settings.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -388,8 +381,9 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
             category: data.category,
           },
@@ -401,20 +395,20 @@ export default function Tips({
             name: text,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
-            settings: selectedCategory.settings,
+            settings: settingsObj,
             studyID: studyId,
             category: data.category,
           },
           false
         )
-    openWindow = false
     setLoading(true)
   }
 
   const handleSaveTipsData = () => {
     let duplicate = isDuplicate
-    let settingsObj = selectedCategory.settings.reduce((ds, d) => {
+    let settingsObj = data.settings.reduce((ds, d) => {
       let newD = d
       if (d.image === defaultBase64) {
         newD = Object.assign({}, d, { image: "" })
@@ -428,6 +422,7 @@ export default function Tips({
             name: duplicate ? duplicateTipText : newTipText,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -438,6 +433,7 @@ export default function Tips({
             //name: text,
             spec: "lamp.tips",
             icon: categoryImage,
+            streak: data.streak,
             schedule: value?.schedule ?? [],
             settings: settingsObj,
             studyID: studyId,
@@ -445,11 +441,15 @@ export default function Tips({
           }
     onSave(dataObj, duplicate)
   }
+  
+  useEffect(() => {
+    validate()
+  }, [data])
 
   const validate = () => {
     let validationData = false
-    if (Object.keys(selectedCategory).length > 0 && Object.keys(selectedCategory.settings).length > 0) {
-      validationData = selectedCategory.settings.some((item) => {
+    if (Object.keys(data.settings).length > 0) {
+      validationData = data.settings.some((item) => {
         let sizeInBytes = 0
         let type = ""
         let imageTypes = ["jpeg", "jpg", "png", "gif", "svg+xml"]
@@ -497,7 +497,7 @@ export default function Tips({
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
       validationData ||
-      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
+      (data.settings && data.settings.length === 0) ||
       duplicates.length > 0
     )
       ? setIsError(true)
@@ -511,35 +511,14 @@ export default function Tips({
       category === null ||
       category === "" ||
       (category == "add_new" && (newTipText === null || newTipText === "")) ||
-      (selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0) ||
+      (data.settings && data.settings.length === 0) ||
       validationData ||
       duplicates.length > 0
     )
   }
 
-  const handleTipsDataArray = (data) => {
-    if (data) {
-      validate()
-    }
-  }
-
   const handleType = (val) => {
     val === 1 ? handleSaveTips(isDuplicate) : handleSaveTipsData()
-  }
-
-  const updateSettings = (settingsData) => {
-    setData({ ...data, settings: settingsData })
-    setSettings(settingsData)
-    let newSelectedCategory = selectedCategory
-    settingsData = settingsData.settings.map((x) => {
-      let xVal = x
-      xVal.title = typeof x.title !== "undefined" ? x.title : ""
-      xVal.text = typeof x.text !== "undefined" ? x.text : ""
-      return xVal
-    })
-    newSelectedCategory.settings = settingsData
-    setSelectedCategory(newSelectedCategory)
-    validate()
   }
 
   return (
@@ -601,7 +580,6 @@ export default function Tips({
                     value={studyId || ""}
                     onChange={(e) => {
                       setStudyId(e.target.value)
-                      setSelectedCategory({})
                       setCategory("")
                       validate()
                     }}
@@ -620,7 +598,7 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-                <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
+
                 <Grid item lg={6} sm={4} xs={12}>
                   <TextField
                     error={typeof category == "undefined" || category === null || category === "" ? true : false}
@@ -648,8 +626,7 @@ export default function Tips({
                     ))}
                   </TextField>
                 </Grid>
-
-                <Grid item xs sm={6} md={6} lg={6}>
+                <Grid item xs sm={12}>
                   {category === "add_new" ? (
                     <TextField
                       error={category == "add_new" && (newTipText === null || newTipText === "") ? true : false}
@@ -671,8 +648,8 @@ export default function Tips({
                   )}
                 </Grid>
                 {!!value ? (
-                  <Grid container spacing={2}>
-                    <Grid item xs sm={6} md={6} lg={4}>
+                  <Grid container>
+                    <Grid item xs sm={6} md={4} lg={3}>
                       <Box mt={2}>
                         <Checkbox
                           onChange={(event) => {
@@ -685,9 +662,9 @@ export default function Tips({
                         {t("Duplicate")}
                       </Box>
                     </Grid>
-                    <Grid item xs sm={6} md={6} lg={4}>
+                    <Grid item xs sm={6} md={8} lg={9}>
                       {isDuplicate ? (
-                        <Box mb={3}>
+                        <Box mb={3} pr={1}>
                           <TextField
                             fullWidth
                             error={isDuplicate && (duplicateTipText === null || duplicateTipText === "") ? true : false}
@@ -715,9 +692,13 @@ export default function Tips({
                   ""
                 )}
               </Grid>
+              <ActivityTab onChange={handleTabChange} activitySpecId="lamp.tips" value={value} />
             </Grid>
           </Grid>
-          {selectedCategory && selectedCategory.settings && selectedCategory.settings.length === 0 && (
+
+          <ActivityStreak onChange={handleStreakChange} value={details?.streak} />
+
+          {data.settings && data.settings.length === 0 && (
             <Grid container spacing={2}>
               <Grid item xs sm={12}>
                 <Alert severity="error">{t("Atleast one tip details required")}</Alert>
@@ -733,12 +714,16 @@ export default function Tips({
               </Grid>
             </Grid>
           )}
+
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
-            Object.keys(newSchemaList).includes(activitySpecId)) && (
+            Object.keys(newSchemaList).includes("lamp.tips")) && (
             <DynamicForm
-              schema={newSchemaList[activitySpecId]}
-              initialData={settings}
-              onChange={(x) => updateSettings({ ...settings, ...x })}
+              schema={newSchemaList["lamp.tips"]}
+              initialData={data}
+              onChange={(x) => {
+                setData(x)
+                validate()
+              }}
             />
           )}
         </Container>

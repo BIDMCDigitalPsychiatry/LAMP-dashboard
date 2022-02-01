@@ -40,45 +40,46 @@ export default function ActivityCard({
     return retValue.substr(0, retValue.length - 2)
   }
   let values = []
+  events = events.sort((a, b) => a.timestamp - b.timestamp)
   events.map((d) =>
     d.temporal_slices.map((t) => {
-      if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
-        Object.keys(t.value).map((val) => {
-          if (!!t.value[val].question) {
-            values.push({
-              item: t.item + " - " + t.value[val].question,
-              [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: t.value[val].value
-                .map((elt) => {
-                  // assure the value can be converted into an integer
-                  return parseInt(elt) ? parseInt(elt) : elt
-                })
-                .reduce((sum, current) => sum + (parseInt(current) || current)),
-            })
-          }
-        })
-      } else {
-        values.push({
-          item: t.item,
-          [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-              ? typeof t.value === "string"
-                ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
-                  ? 1
-                  : typeof t.value === "string" && ["No", "False"].includes(t.value)
-                  ? 0
+      if (typeof t.value !== "undefined") {
+        if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
+          Object.keys(t.value).map((val) => {
+            let sum = 0
+            if (!!t.value[val]?.question) {
+              ;(t.value[val].value || []).map((elt) => {
+                sum = sum + (isNaN(parseInt(elt)) ? elt : parseInt(elt))
+              })
+              values.push({
+                item: t.item + " - " + t.value[val].question,
+                [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: sum,
+              })
+            }
+          })
+        } else {
+          values.push({
+            item: t.item,
+            [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                ? typeof t.value === "string"
+                  ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
+                    ? 1
+                    : typeof t.value === "string" && ["No", "False"].includes(t.value)
+                    ? 0
+                    : t.value
                   : t.value
-                : t.value
-              : !!t.type
-              ? 1
-              : 0,
-        })
+                : !!t.type
+                ? 1
+                : 0,
+          })
+        }
       }
     })
   )
   values = Object.values(values.reduce((x, y) => x.concat(y), []).groupBy("item"))
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
-
   let eachData = []
   values.map((d, key) => {
     let keys = Object.keys(d)
@@ -168,7 +169,10 @@ export default function ActivityCard({
             }))}
           />
         )
-      ) : showGrid && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
+      ) : showGrid &&
+        activity.spec !== "lamp.scratch_image" &&
+        activity.spec !== "lamp.breathe" &&
+        activity.spec !== "lamp.tips" ? (
         <ArrayView
           hiddenKeys={["x"]}
           hasSpanningRowForIndex={
@@ -200,7 +204,9 @@ export default function ActivityCard({
               ? strategies[activity.spec](
                   activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
                     ? d.temporal_slices
-                    : activity.spec === "lamp.scratch_image" || activity.spec === "lamp.breathe"
+                    : activity.spec === "lamp.scratch_image" ||
+                      activity.spec === "lamp.breathe" ||
+                      activity.spec === "lamp.tips"
                     ? d
                     : d.static_data,
                   selectedActivity,
@@ -213,7 +219,11 @@ export default function ActivityCard({
                 ? d.temporal_slices.filter((z) => [null, "NULL"].includes(z.value)).length > 0
                 : false,
           }))}
-          onClick={(datum) => (activity.spec !== "lamp.scratch_image" ? setVisibleSlice(datum) : setVisibleSlice(null))}
+          onClick={(datum) =>
+            activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" && activity.spec !== "lamp.tips"
+              ? setVisibleSlice(datum)
+              : setVisibleSlice(null)
+          }
         />
       )}
     </React.Fragment>

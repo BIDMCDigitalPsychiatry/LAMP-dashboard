@@ -23,12 +23,7 @@ import {
 import { DatePicker } from "@material-ui/pickers"
 import classnames from "classnames"
 import InfoIcon from "../icons/Info.svg"
-import ResponsiveDialog from "./ResponsiveDialog"
 import WeekView from "./WeekView"
-import SurveyInstrument from "./SurveyInstrument"
-import VoiceRecordingResult from "./VoiceRecordingResult"
-import EmbeddedActivity from "./EmbeddedActivity"
-import GroupActivity from "./GroupActivity"
 import LAMP, {
   Participant as ParticipantObj,
   Activity as ActivityObj,
@@ -213,17 +208,7 @@ const useStyles = makeStyles((theme: Theme) =>
         fill: "#FFD645 !important",
       },
     },
-    goalIcon: {
-      border: "3px solid #FE8470",
-    },
 
-    goalCompletedIcon: {
-      color: "#FE8470 !important",
-      border: "0px solid #FE8470",
-      "& text": {
-        fill: "#FE8470 !important",
-      },
-    },
     customstepper: {
       position: "relative",
       maxWidth: 500,
@@ -329,14 +314,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const games = [
-  "lamp.jewels_a",
-  "lamp.jewels_b",
-  "lamp.spatial_span",
-  "lamp.cats_and_dogs",
-  "lamp.pop_the_bubbles",
-  "lamp.balloon_risk",
-]
 
 function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props }) {
   const classes = useStyles()
@@ -379,11 +356,11 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
 }
 export default function Feed({
   participant,
-  onComplete,
+  submitSurvey,
   activities,
   visibleActivities,
   setVisibleActivities,
-  showSteak,
+  showStreak,
   ...props
 }) {
   const classes = useStyles()
@@ -391,28 +368,15 @@ export default function Feed({
   const [date, changeDate] = useState(new Date())
   const [feeds, setFeeds] = useState([])
   const [selectedDays, setSelectedDays] = useState([])
-  const [launchedActivity, setLaunchedActivity] = useState<string>()
-  const [surveyName, setSurveyName] = useState<string>()
   const [currentFeed, setCurrentFeed] = useState([])
   const triweekly = [1, 3, 5]
   const biweekly = [2, 4]
   const daily = [0, 1, 2, 3, 4, 5, 6]
-  const [details, setDetails] = useState(null)
-  const [title, setTitle] = useState(null)
-  const [icon, setIcon] = useState(null)
-  const [index, setIndex] = useState(null)
   const [events, setEvents] = useState(null)
-  const [activityName, setActivityName] = useState(null)
   const [loading, setLoading] = useState(true)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
 
   const { t } = useTranslation()
-  const completeFeed = (index: number) => {
-    let feed = currentFeed
-    feed[index].completed = true
-    setCurrentFeed(feed)
-  }
 
   useEffect(() => {
     getFeedByDate(new Date())
@@ -431,32 +395,6 @@ export default function Feed({
     var minutes = minute < 10 ? "0" + minute : minute
     var strTime = hours + ":" + minutes + ampm
     return strTime
-  }
-
-  const getDates = (type: any, seldate: Date) => {
-    var curr = new Date(seldate)
-    let month = curr.getMonth()
-    let days = []
-    if (curr.getTime() <= new Date(date).getTime()) {
-      if (curr.getTime() <= new Date(date).getTime() && new Date(date).getMonth() !== month) {
-        curr.setDate(1)
-      }
-      curr.setMonth(new Date(date).getMonth())
-      curr.setFullYear(new Date(date).getFullYear())
-      while (new Date(curr).getMonth() === new Date(date).getMonth()) {
-        if (type === daily) {
-          days.push(new Date(curr).toLocaleDateString())
-        }
-        if (
-          (type === triweekly && triweekly.includes(curr.getDay())) ||
-          (type === biweekly && biweekly.includes(curr.getDay()))
-        ) {
-          days.push(new Date(curr).toLocaleDateString())
-        }
-        curr.setDate(curr.getDate() + 1)
-      }
-    }
-    return days
   }
 
   const getEvents = async (date: Date) => {
@@ -483,21 +421,21 @@ export default function Feed({
         let currentDate = new Date(date)
         let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
-        feed.schedule.map((scheduleData) => {
-          scheduleStartDate = new Date(scheduleData.start_date)
+        feed.schedule.map((schedule) => {
+          scheduleStartDate = new Date(schedule.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
           if (currentDate.getTime() < scheduleStartDate.getTime()) {
-            currentDate = new Date(scheduleData.start_date)
+            currentDate = new Date(schedule.start_date)
           }
           currentDate.setHours(0)
           currentDate.setMinutes(0)
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
-            scheduleTime = getDate(scheduleData.time)
+            scheduleTime = getDate(schedule.time)
             let timeVal = getTimeValue(scheduleTime)
             startD.setHours(scheduleTime.getHours())
             startD.setMinutes(scheduleTime.getMinutes())
@@ -509,22 +447,22 @@ export default function Feed({
             scDate.setSeconds(0)
             scheduledDate.setHours(scheduleTime.getHours())
             scheduledDate.setMinutes(scheduleTime.getMinutes())
-            scheduleData.group =
+            schedule.group =
               feed.spec === "lamp.survey" || feed.spec === "lamp.group"
                 ? "assess"
                 : feed.spec === "lamp.tips"
                 ? "learn"
                 : "manage"
-            scheduleData.type = feed.spec
-            scheduleData.title = feed.name
-            scheduleData.activityData = JSON.parse(JSON.stringify(feed))
-            scheduleData.clickable =
+            schedule.type = feed.spec
+            schedule.title = feed.name            
+            schedule.activityData = JSON.parse(JSON.stringify(Object.assign({}, feed, { schedule: undefined })))
+            schedule.clickable =
               new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
               startD.getTime() <= new Date().getTime()
                 ? true
                 : false
-            scheduleData.timeValue = timeVal
-            scheduleData.timestamp = startD.getTime()
+            schedule.timeValue = timeVal
+            schedule.timestamp = startD.getTime()
             let first = new Date(currentDate)
             first.setHours(0)
             first.setMinutes(0)
@@ -532,11 +470,11 @@ export default function Feed({
             let end = new Date(endDate)
             end.setHours(12)
             let feedCheck = false
-            switch (scheduleData.repeat_interval) {
+            switch (schedule.repeat_interval) {
               case "triweekly":
               case "biweekly":
-                scheduleData.completed = savedData.length > 0 ? true : false
-                let type = scheduleData.repeat_interval === "triweekly" ? triweekly : biweekly
+                schedule.completed = savedData.length > 0 ? true : false
+                let type = schedule.repeat_interval === "triweekly" ? triweekly : biweekly
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
@@ -545,10 +483,10 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(scheduleData)
+                if (feedCheck) currentFeed.push(schedule)
                 break
               case "weekly":
-                scheduleData.completed = savedData.length > 0 ? true : false
+                schedule.completed = savedData.length > 0 ? true : false
                 let dayNo = getDayNumber(new Date(scheduleStartDate))
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
@@ -558,10 +496,10 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(scheduleData)
+                if (feedCheck) currentFeed.push(schedule)
                 break
               case "fortnightly":
-                scheduleData.completed = savedData.length > 0 ? true : false
+                schedule.completed = savedData.length > 0 ? true : false
                 if (first.getTime() > scheduleStartDate.getTime()) {
                   let found = false
                   while (first.getTime() <= end.getTime()) {
@@ -570,7 +508,7 @@ export default function Feed({
                     if (!!found) {
                       selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                       feedCheck = date.getDate() === first.getDate() ? true : false
-                      if (feedCheck) currentFeed.push(scheduleData)
+                      if (feedCheck) currentFeed.push(schedule)
                       first.setDate(first.getDate() + 14)
                     } else {
                       if (weeksBetweenDates % 2 === 0) {
@@ -579,7 +517,7 @@ export default function Feed({
                         if (firstDayNo === dayNo) {
                           selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                           feedCheck = date.getDate() === first.getDate() ? true : false
-                          if (feedCheck) currentFeed.push(scheduleData)
+                          if (feedCheck) currentFeed.push(schedule)
                           first.setDate(first.getDate() + 14)
                           found = true
                           continue
@@ -595,7 +533,7 @@ export default function Feed({
                   while (firstDate.getTime() <= end.getTime()) {
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
                     feedCheck = date.getDate() === firstDate.getDate() ? true : false
-                    if (feedCheck) currentFeed.push(scheduleData)
+                    if (feedCheck) currentFeed.push(schedule)
                     firstDate.setDate(firstDate.getDate() + 14)
                   }
                 }
@@ -607,17 +545,17 @@ export default function Feed({
               case "every12h":
                 while (first.getTime() <= end.getTime()) {
                   if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    if (scheduleData.repeat_interval === "daily") {
-                      scheduleData.completed = savedData.length > 0 ? true : false
-                      currentFeed.push(scheduleData)
+                    if (schedule.repeat_interval === "daily") {
+                      schedule.completed = savedData.length > 0 ? true : false
+                      currentFeed.push(schedule)
                     } else {
                       let startTime = scheduledDate.getTime()
                       const hourVal =
-                        scheduleData.repeat_interval === "hourly"
+                        schedule.repeat_interval === "hourly"
                           ? 1 * 60 * 60 * 1000
-                          : scheduleData.repeat_interval === "every3h"
+                          : schedule.repeat_interval === "every3h"
                           ? 3 * 60 * 60 * 1000
-                          : scheduleData.repeat_interval === "every6h"
+                          : schedule.repeat_interval === "every6h"
                           ? 6 * 60 * 60 * 1000
                           : 12 * 60 * 60 * 1000
 
@@ -648,7 +586,7 @@ export default function Feed({
                               ? true
                               : false
                           let each = {
-                            ...scheduleData,
+                            ...schedule,
                             clickable: clickableVal,
                             completed: completedVal,
                             timeValue: time,
@@ -666,29 +604,29 @@ export default function Feed({
               case "custom":
                 while (first.getTime() <= end.getTime()) {
                   if (date.toLocaleDateString() === first.toLocaleDateString()) {
-                    scheduleData.custom_time.map((time, index) => {
+                    schedule.custom_time.map((time, index) => {
                       let scheduledDate = new Date(first)
                       scheduledDate.setHours(getDate(time).getHours())
                       scheduledDate.setMinutes(getDate(time).getMinutes())
                       let nextScheduleDate = new Date(first)
-                      if (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]) {
-                        nextScheduleDate.setHours(getDate(scheduleData.custom_time[index + 1]).getHours())
-                        nextScheduleDate.setMinutes(getDate(scheduleData.custom_time[index + 1]).getMinutes())
+                      if (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]) {
+                        nextScheduleDate.setHours(getDate(schedule.custom_time[index + 1]).getHours())
+                        nextScheduleDate.setMinutes(getDate(schedule.custom_time[index + 1]).getMinutes())
                       }
                       let filteredData = savedData.filter(
                         (item) =>
                           item.timestamp >= scheduledDate.getTime() &&
-                          (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
                             ? item.timestamp <= nextScheduleDate.getTime()
                             : true)
                       )
                       let completedVal = filteredData.length > 0 ? true : false
                       let each = {
-                        ...scheduleData,
+                        ...schedule,
                         clickable:
                           new Date().toLocaleDateString() === new Date(date).toLocaleDateString() &&
                           scheduledDate.getTime() <= new Date().getTime() &&
-                          (scheduleData.custom_time.length > 0 && !!scheduleData.custom_time[index + 1]
+                          (schedule.custom_time.length > 0 && !!schedule.custom_time[index + 1]
                             ? new Date().getTime() <= nextScheduleDate.getTime()
                             : true),
                         completed: completedVal,
@@ -703,10 +641,10 @@ export default function Feed({
                 }
                 break
               case "monthly":
-                scheduleData.completed = savedData.length > 0 ? true : false
+                schedule.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).getDate() === new Date(scheduleStartDate).getDate()) {
-                    scheduleData.timeValue = getTimeValue(scheduleTime)
+                    schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       new Date(date).getDate() === new Date(scheduleStartDate).getDate() &&
                       date.getTime() >= scDate.getTime()
@@ -716,13 +654,13 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(scheduleData)
+                if (feedCheck) currentFeed.push(schedule)
                 break
               case "bimonthly":
-                scheduleData.completed = savedData.length > 0 ? true : false
+                schedule.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
-                    scheduleData.timeValue = getTimeValue(scheduleTime)
+                    schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       [10, 20].indexOf(new Date(date).getDate()) > -1 && date.getTime() >= scDate.getTime()
                         ? true
@@ -740,13 +678,13 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(scheduleData)
+                if (feedCheck) currentFeed.push(schedule)
                 break
               case "none":
-                scheduleData.completed = savedData.length > 0 ? true : false
+                schedule.completed = savedData.length > 0 ? true : false
                 while (first.getTime() <= end.getTime()) {
                   if (new Date(first).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()) {
-                    scheduleData.timeValue = getTimeValue(scheduleTime)
+                    schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck =
                       new Date(date).toLocaleDateString() === new Date(scheduleStartDate).toLocaleDateString()
                         ? true
@@ -755,7 +693,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
-                if (feedCheck) currentFeed.push(scheduleData)
+                if (feedCheck) currentFeed.push(schedule)
                 break
             }
           }
@@ -787,29 +725,6 @@ export default function Feed({
     getEvents(date).then(setEvents)
   }
 
-  const showFeedDetails = (type) => {
-    ;(async () => {
-      // let iconData = ((await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")) as any) || []
-      // setIcon(iconData.data ? iconData.data.icon : undefined)
-      setLaunchedActivity(type)
-    })()
-  }
-  const submitSurvey = (response) => {
-    completeFeed(index)
-    onComplete(response, visibleActivities[0].id)
-    setLaunchedActivity(undefined)
-  }
-
-  const getActivity = (y: any) => {
-    setLoading(true)
-    LAMP.Activity.view(y).then((data) => {
-      data.spec === "lamp.survey" ? setVisibleActivities([data]) : setVisibleActivities(data)
-      data.spec === "lamp.survey" || data.spec === "lamp.group" ? showFeedDetails(data.spec) : showFeedDetails("game")
-      setLaunchedActivity(data.spec === "lamp.survey" || data.spec === "lamp.group" ? data.spec : "game")
-      setLoading(false)
-    })
-  }
-
   return (
     <div className={classes.root}>
       {!supportsSidebar && <WeekView type="feed" onSelect={getFeedByDate} daysWithdata={selectedDays} />}
@@ -819,18 +734,13 @@ export default function Feed({
       </Backdrop>
       <Grid container className={classes.thumbContainer}>
         <Grid item xs>
-          {loading == false ? (
-            currentFeed.length != 0 ? (
-              ""
-            ) : (
+          {loading == false &&
+            (currentFeed.length === 0 ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
                 <p>{t("There are no scheduled activities available.")}</p>
               </Box>
-            )
-          ) : (
-            " "
-          )}
+            ) : null)}
           <Stepper
             orientation="vertical"
             classes={{ root: classes.customstepper }}
@@ -864,21 +774,7 @@ export default function Feed({
                             (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
                               feed.timestamp <= new Date().getTime()))
                         ) {
-                          setIndex(index)
-                          if (feed.type == "lamp.survey") {
-                            setSurveyName(feed.title)
-                          } else if (
-                            games.includes(feed.type) ||
-                            feed.type === "lamp.journal" ||
-                            feed.type === "lamp.recording" ||
-                            feed.type === "lamp.breathe" ||
-                            feed.type === "lamp.dbt_diary_card" ||
-                            feed.type === "lamp.scratch_image" ||
-                            feed.type === "lamp.tips"
-                          ) {
-                            setActivityName(feed.title)
-                          }
-                          getActivity(feed.activityData.id)
+                          window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
                         }
                       }}
                     >
@@ -930,69 +826,6 @@ export default function Feed({
           <CalendarView selectedDays={selectedDays} date={date} getFeedByDate={getFeedByDate} changeDate={changeDate} />
         </Grid>
       </Grid>
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={!!launchedActivity}
-        onClose={() => {
-          setLaunchedActivity(undefined)
-        }}
-      >
-        {
-          {
-            "lamp.survey": (
-              <SurveyInstrument
-                participant={participant}
-                type={surveyName}
-                fromPrevent={false}
-                group={visibleActivities}
-                onComplete={submitSurvey}
-                noBack={false}
-              />
-            ),
-            game: (
-              <EmbeddedActivity
-                name={activityName}
-                activity={visibleActivities}
-                participant={participant}
-                noBack={false}
-                onComplete={(data) => {
-                  if (visibleActivities?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
-                    if (!!data && !!data?.timestamp) {
-                      setOpenRecordSuccess(true)
-                      setTimeout(function () {
-                        setOpenRecordSuccess(false)
-                        showSteak(participant, visibleActivities.id)
-                        completeFeed(index)
-                        setLaunchedActivity(undefined)
-                      }, 2000)
-                    } else setLaunchedActivity(undefined)
-                  } else {
-                    if (!!data && !!data?.timestamp) {
-                      showSteak(participant, visibleActivities.id)
-                      completeFeed(index)
-                    }
-                    setLaunchedActivity(undefined)
-                  }
-                }}
-              />
-            ),
-            "lamp.group": (
-              <GroupActivity
-                activity={visibleActivities}
-                participant={participant}
-                submitSurvey={submitSurvey}
-                onComplete={() => {
-                  completeFeed(index)
-                  setLaunchedActivity(undefined)
-                }}
-                noBack={true}
-              />
-            ),
-          }[launchedActivity ?? ""]
-        }
-      </ResponsiveDialog>
       <Dialog
         open={openNotImplemented}
         onClose={() => setOpenNotImplemented(false)}
@@ -1006,13 +839,6 @@ export default function Feed({
           </Button>
         </DialogActions>
       </Dialog>
-      <VoiceRecordingResult
-        open={openRecordSuccess}
-        onClose={() => {
-          setOpenRecordSuccess(false)
-        }}
-        setOpenRecordSuccess={setOpenRecordSuccess}
-      />
     </div>
   )
 }

@@ -58,13 +58,13 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PatientStudyCreator({
   studies,
-  researcher,
+  researcherId,
   handleNewStudy,
   closePopUp,
   ...props
 }: {
   studies: any
-  researcher: any
+  researcherId: string
   handleNewStudy: Function
   closePopUp: Function
 } & DialogProps) {
@@ -117,7 +117,7 @@ export default function PatientStudyCreator({
     let study = new Study()
     study.name = studyName
 
-    LAMP.Study.create(researcher.id, study).then(async (res) => {
+    LAMP.Study.create(researcherId, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
       if (!!result.error) {
         enqueueSnackbar(t("Encountered an error: ") + result?.error, {
@@ -203,7 +203,7 @@ export default function PatientStudyCreator({
 
   const createStudy = async (studyName: string) => {
     setLoading(true)
-    let authId = researcher.id
+    let authId = researcherId
     let authString = LAMP.Auth._auth.id + ":" + LAMP.Auth._auth.password
     let bodyData = {
       study_id: duplicateStudyName, //old study id
@@ -291,7 +291,7 @@ export default function PatientStudyCreator({
   }
 
   const studyUpdate = (newStudyData, studyName, createPatient) => {
-    let authId = researcher.id
+    let authId = researcherId
     newStudyData.participant_count = !!createPatient ? 1 : 0
     setLoading(false)
     Service.addData("studies", [newStudyData])
@@ -366,7 +366,7 @@ export default function PatientStudyCreator({
               <MenuItem value="">
                 <em>None</em>
               </MenuItem>
-              {studies.map((study) => (
+              {(studies || []).map((study) => (
                 <MenuItem key={study.id} value={study.id}>
                   {study.name}
                 </MenuItem>

@@ -1,22 +1,7 @@
 // Core Imports
 import React from "react"
-import {
-  Typography,
-  Grid,
-  Card,
-  Icon,
-  Box,
-  AppBar,
-  Toolbar,
-  ButtonBase,
-  makeStyles,
-  Theme,
-  IconButton,
-  createStyles,
-} from "@material-ui/core"
-import ResponsiveDialog from "./ResponsiveDialog"
-import PreventData from "./PreventData"
-import LAMP, { Participant as ParticipantObj, Activity as ActivityObj, SensorEvent as SensorEventObj } from "lamp-core"
+import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
+import { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { VegaLite } from "react-vega"
 
@@ -91,11 +76,6 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-//const { t } = useTranslation()
-
-function _patientMode() {
-  return LAMP.Auth._type === "participant"
-}
 export default function PreventSelectedSensors({
   participant,
   sensorEvents,
@@ -119,101 +99,6 @@ export default function PreventSelectedSensors({
   const classes = useStyles()
   const { t, i18n } = useTranslation()
 
-  const openRadialDetails = (activity: any, events: any, data: any, graphType?: number) => {
-    setGraphType(graphType)
-    setSelectedActivity(activity)
-    if (!graphType) {
-      setSelectedActivityName(activity.name)
-    } else {
-      setSelectedActivityName("")
-    }
-    setActivityData(data)
-    setOpenData(true)
-  }
-  const [openData, setOpenData] = React.useState(false)
-  const [activityData, setActivityData] = React.useState(null)
-  const [graphType, setGraphType] = React.useState(0)
-  const [selectedActivity, setSelectedActivity] = React.useState(null)
-  const [selectedActivityName, setSelectedActivityName] = React.useState(null)
-  let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
-  let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
-
-  const getSocialContextGroups = (gps_events?: SensorEventObj[]) => {
-    gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
-    let events = [
-      {
-        label: t("Alone"),
-        value: gps_events.filter((x) => x.data.context.social === "alone").length,
-      },
-      {
-        label: t("Friends"),
-        value: gps_events.filter((x) => x.data.context.social === "friends").length,
-      },
-      {
-        label: t("Family"),
-        value: gps_events.filter((x) => x.data.context.social === "family").length,
-      },
-      {
-        label: t("Peers"),
-        value: gps_events.filter((x) => x.data.context.social === "peers").length,
-      },
-      {
-        label: t("Crowd"),
-        value: gps_events.filter((x) => x.data.context.social === "crowd").length,
-      },
-    ]
-    return events
-  }
-
-  const getEnvironmentalContextGroups = (gps_events?: SensorEventObj[]) => {
-    gps_events = gps_events?.filter((x) => !!x.data?.context?.environment) ?? [] // Catch missing data.
-    let events = [
-      {
-        label: t("Home"),
-        value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
-          .length,
-      },
-      {
-        label: t("School"),
-        value: gps_events.filter((x) => x.data.context.environment === "school").length,
-      },
-      {
-        label: t("Work"),
-        value: gps_events.filter((x) => x.data.context.environment === "work").length,
-      },
-      {
-        label: t("Hospital"),
-        value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
-      },
-      {
-        label: t("Outside"),
-        value: gps_events.filter((x) => x.data.context.environment === "outside").length,
-      },
-      {
-        label: t("Shopping"),
-        value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
-      },
-      {
-        label: t("Transit"),
-        value: gps_events.filter((x) => x.data.context.environment === "transit").length,
-      },
-    ]
-
-    return events
-  }
-
-  const openDetails = (activity: any, data: any, graphType?: number) => {
-    setGraphType(graphType)
-    setSelectedActivity(activity)
-    if (!graphType) {
-      setSelectedActivityName(activity.name)
-    } else {
-      setSelectedActivityName("")
-    }
-    setActivityData(data)
-    setOpenData(true)
-  }
-
   return (
     <React.Fragment>
       {(selectedSensors || []).includes("Social Context") && sensorCounts["Social Context"] > 0 && (
@@ -222,14 +107,7 @@ export default function PreventSelectedSensors({
             <Card
               className={classes.prevent}
               onClick={() =>
-                openRadialDetails(
-                  "Social Context",
-                  sensorEvents["lamp.gps.contextual"].filter(
-                    (x) => socialContexts.indexOf(x.data.context.environment) >= 0
-                  ),
-                  getSocialContextGroups(sensorEvents["lamp.gps.contextual"]),
-                  1
-                )
+                (window.location.href = `/#/participant/${participant.id}/portal/sensor/social-gps.contextual`)
               }
             >
               <Typography className={classes.preventlabel}>
@@ -254,14 +132,7 @@ export default function PreventSelectedSensors({
             <Card
               className={classes.prevent}
               onClick={() =>
-                openRadialDetails(
-                  "Environmental Context",
-                  sensorEvents["lamp.gps.contextual"].filter(
-                    (x) => envContexts.indexOf(x.data.context.environment) >= 0
-                  ),
-                  getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"]),
-                  1
-                )
+                (window.location.href = `/#/participant/${participant.id}/portal/sensor/env-gps.contextual`)
               }
             >
               <Typography className={classes.preventlabel}>
@@ -286,16 +157,7 @@ export default function PreventSelectedSensors({
           <ButtonBase focusRipple className={classes.fullwidthBtn}>
             <Card
               className={classes.prevent}
-              onClick={() =>
-                openDetails(
-                  "Step Count",
-                  sensorEvents?.["lamp.steps"]?.map((d) => ({
-                    x: new Date(parseInt(d.timestamp)),
-                    y: typeof d.data.value !== "number" ? 0 : d.data.value || 0,
-                  })) ?? [],
-                  2
-                )
-              }
+              onClick={() => (window.location.href = `/#/participant/${participant.id}/portal/sensor/steps`)}
             >
               <Typography className={classes.preventlabel}>
                 {t("Step Count")} <Box component="span">({sensorCounts["Step Count"]})</Box>
@@ -381,43 +243,6 @@ export default function PreventSelectedSensors({
           </ButtonBase>
         </Grid>
       )}
-
-      <ResponsiveDialog
-        transient={false}
-        animate
-        fullScreen
-        open={openData}
-        onClose={() => {
-          setOpenData(false)
-        }}
-      >
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => setOpenData(false)}
-              color="default"
-              aria-label="Menu"
-              className={classes.backbtn}
-            >
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5"> {t(selectedActivityName)} </Typography>
-          </Toolbar>
-        </AppBar>
-
-        <PreventData
-          participant={participant}
-          activity={selectedActivity}
-          type={graphType === 2 ? (selectedActivity === "Environmental Context" ? envContexts : socialContexts) : []}
-          events={graphType === 0 ? (activityData || {})[selectedActivityName] || [] : activityData}
-          graphType={graphType}
-          earliestDate={earliestDate}
-          enableEditMode={!_patientMode()}
-          onEditAction={onEditAction}
-          onCopyAction={onCopyAction}
-          onDeleteAction={onDeleteAction}
-        />
-      </ResponsiveDialog>
     </React.Fragment>
   )
 }

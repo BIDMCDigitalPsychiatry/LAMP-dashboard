@@ -20,6 +20,8 @@ import {
   DialogActions,
   Typography,
   colors,
+  Backdrop,
+  CircularProgress,
   Container,
   Popover,
   Fab,
@@ -35,6 +37,8 @@ import Messages from "./Messages"
 import LAMP from "lamp-core"
 import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
+import { Service } from "./DBService/DBService"
+import Researcher from "./Researcher/Index"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -179,6 +183,10 @@ const useStyles = makeStyles((theme: Theme) =>
       top: 50,
       height: "calc(100% - 50px)",
     },
+    backdrop: {
+      zIndex: 111111,
+      color: "#fff",
+    },
   })
 )
 
@@ -211,6 +219,7 @@ export default function NavigationLayout({
   const [openMessages, setOpenMessages] = useState(false)
   const [conversations, setConversations] = useState({})
   const [msgCount, setMsgCount] = useState(0)
+  const [loading, setLoading] = useState(true)
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
   const print = useMediaQuery("print")
   const classes = useStyles()
@@ -219,8 +228,20 @@ export default function NavigationLayout({
   const dashboardMenus = ["Learn", "Manage", "Assess", "Portal", "Feed", "Researcher"]
   const hideNotifications = ["Researcher", "Administrator"]
   const [sensorData, setSensorData] = useState(null)
-
+  const [researcherId, setResId] = useState(null)
   useEffect(() => {
+    if (
+      (authType === "researcher" || authType === "admin") &&
+      typeof title != "undefined" &&
+      title.startsWith("Patient")
+    ) {
+      Service.getAll("researcher").then((researcher) => {
+        setResId(researcher[0]["id"])
+        setLoading(false)
+      })
+    } else {
+      setLoading(false)
+    }
     refresh()
     setInterval(refresh, 60000)
   }, [])
@@ -295,11 +316,26 @@ export default function NavigationLayout({
     setAnchorEl(null)
   }
 
+  const participantBack = () => {
+    if (researcherId === null) {
+      Service.getAll("researcher").then((researcher) => {
+        setResId(researcher[0]["id"])
+        window.location.href = `/#/researcher/${researcher[0]["id"]}/users`
+        setLoading(false)
+      })
+    } else {
+      window.location.href = `/#/researcher/${researcherId}/users`
+    }
+  }
+
   const open = Boolean(anchorEl)
   const idp = open ? "simple-popover" : undefined
   const roles = ["Administrator", "User Administrator", "Practice Lead"]
   return (
     <Box>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       {!!noToolbar || !!print ? (
         <React.Fragment />
       ) : (
@@ -308,7 +344,7 @@ export default function NavigationLayout({
             <Toolbar className={classes.logResearcherToolbar}>
               {typeof title != "undefined" && title.startsWith("Patient") ? (
                 <Box>
-                  <IconButton className={classes.backbtn} onClick={goBack} color="default" aria-label="Menu">
+                  <IconButton className={classes.backbtn} onClick={participantBack} color="default" aria-label="Menu">
                     <Icon>arrow_back</Icon>
                   </IconButton>
                   {t("Patient View")}: {id}
@@ -317,7 +353,9 @@ export default function NavigationLayout({
                 <Box>
                   {authType === "admin" && !roles.includes(title) && (
                     <IconButton
-                      onClick={goBack}
+                      onClick={() => {
+                        window.location.href = `/#/researcher`
+                      }}
                       color="default"
                       className={classes.backbtn}
                       aria-label="Menu"
@@ -357,7 +395,7 @@ export default function NavigationLayout({
                     <Typography variant="h6">{t("Manage team")}</Typography>
                     <Typography variant="body2">{t("Edit your access for your team.")}</Typography>
                   </MenuItem> */}
-                    {authType === "admin" && (title === "Administrator"  ||  title === "User Administrator") && (
+                    {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{t("Manage Credentials")}</MenuItem>
                     )}
                     {/* <MenuItem>{t("Switch accounts")}</MenuItem> */}

@@ -24,7 +24,7 @@ export const actions = {
   encoding: {
     x: {
       field: "action",
-      type: "nominal",
+      type: "ordinal",
       title: null,
       axis: {
         labelAngle: -90,
@@ -34,7 +34,7 @@ export const actions = {
         labelColor: "rgba(0, 0, 0, 0.4)",
         labelFont: "Inter",
         labelFontWeight: 500,
-        labelFontSize: 10,
+        labelFontSize: 12,
         ticks: false,
         labelPadding: 12,
         gridColor: "#C8C8C8",
@@ -50,7 +50,7 @@ export const actions = {
         labelColor: "rgba(0, 0, 0, 0.4)",
         labelFont: "Inter",
         labelFontWeight: 500,
-        labelFontSize: 10,
+        labelFontSize: 12,
         ticks: false,
         labelPadding: 10,
         tickCount: 6,
