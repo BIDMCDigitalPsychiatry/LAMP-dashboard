@@ -260,18 +260,7 @@ export default function Activity({
               allActivities={allActivities}
               study={activity?.study_id ?? null}
             />
-          ) :
-          //  (!!type && type === "survey") || activity?.spec === "lamp.survey" ? (
-          //   <SurveyCreator
-          //     value={activity ?? null}
-          //     activities={allActivities}
-          //     studies={studies}
-          //     onSave={!!type ? saveActivity : updateActivity}
-          //     study={activity?.study_id ?? null}
-          //     details={details ?? null}
-          //   />
-          // ) :
-           (
+          ) : (
             <GameCreator
               activities={allActivities}
               value={activity ?? null}
