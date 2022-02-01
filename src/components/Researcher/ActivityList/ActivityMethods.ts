@@ -520,203 +520,199 @@ export const SchemaList = () => {
       type: "object",
       properties: {
         settings: {
+          title: i18n.t("Survey Questions"),
+          description: i18n.t("Configure questions, parameters, and options."),
+          type: "array",
 
-      title: i18n.t("Survey Questions"),
-      description: i18n.t("Configure questions, parameters, and options."),
-      type: "array",
+          items: {
+            required: ["text", "type"],
 
-	items:{
-    required: ["text", "type"],
-
-	type:"object",
-dependencies: {
-          type: {
-            oneOf: [
-              {
-                properties: {
-                  type: {
-                    enum: ["text", "boolean", "short_answer"],
+            type: "object",
+            dependencies: {
+              type: {
+                oneOf: [
+                  {
+                    properties: {
+                      type: {
+                        enum: ["text", "boolean", "short_answer"],
+                      },
+                    },
                   },
-                },
-              },
-              {
-                properties: {
-                  type: {
-                    enum: ["matrix"],
-                  },
-                    options:{
-                      type:"object",
-                      title: "Matrix options",
-                      properties:{
-                       multiple:{
-                          title: i18n.t("Enable multiple option selections"),
-                          type: "boolean",
-                          default: false,
-                        },
-                        questions:{
-                          type: "array",
-                          title: i18n.t("Question"),
-                          minItems: 1,
-                          items:{
-                            type:"string",
-                            minLength: 1,
-                            default: "",
-                          }
-                        },
-                        options :{
-                          type: "array",
-                          title:"Options",
-                          minItems: 1,
-                          items: {
-                            type: "object",
-                            properties: {
-                              value: {
-                                title: i18n.t("Option Text"),
-                                type: "string",
-                                minLength: 1,
-                                default: "",
-                              },
-                              description: {
-                                title: i18n.t("Option Description"),
-                                type: "string",
-                                default: "",
+                  {
+                    properties: {
+                      type: {
+                        enum: ["matrix"],
+                      },
+                      options: {
+                        type: "object",
+                        title: "Matrix options",
+                        properties: {
+                          multiple: {
+                            title: i18n.t("Enable multiple option selections"),
+                            type: "boolean",
+                            default: false,
+                          },
+                          questions: {
+                            type: "array",
+                            title: i18n.t("Question"),
+                            minItems: 1,
+                            items: {
+                              type: "string",
+                              minLength: 1,
+                              default: "",
+                            },
+                          },
+                          options: {
+                            type: "array",
+                            title: "Options",
+                            minItems: 1,
+                            items: {
+                              type: "object",
+                              properties: {
+                                value: {
+                                  title: i18n.t("Option Text"),
+                                  type: "string",
+                                  minLength: 1,
+                                  default: "",
+                                },
+                                description: {
+                                  title: i18n.t("Option Description"),
+                                  type: "string",
+                                  default: "",
+                                },
                               },
                             },
                           },
-                      },
-                    // }
-                    }
-                    },
-                  
-                required: ["options"],
-                }
-              },
-              {
-                properties: {
-                  type: {
-                    enum: ["list", "multiselect"],
-                  },
-                  options: {
-                    type: "array",
-                    title: i18n.t("Response Options"),
-                    minItems: 1,
-                    items: {
-                      type: "object",
-                      properties: {
-                        value: {
-                          title: i18n.t("Option Text"),
-                          type: "string",
-                          minLength: 1,
-                          default: "",
-                        },
-                        description: {
-                          title: i18n.t("Option Description"),
-                          type: "string",
-                          default: "",
+                          // }
                         },
                       },
-                    },
-                  },
-                },
-                required: ["options"],
-              },
-              {
-                properties: {
-                  type: {
-                    enum: ["time"],
-                  },
 
-                    options: {
-                      type: "object",
-                      title: i18n.t("Response Options"),
-                      properties: {
-                        timePattern: {
-                          title:"Time pattern",
-                          type: "string",
-                          enum: ["standard", "military"],
-                          enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
-                          default: "standard",
-                          "ui:widget": "select",
-                        },                      
+                      required: ["options"],
+                    },
+                  },
+                  {
+                    properties: {
+                      type: {
+                        enum: ["list", "multiselect"],
+                      },
+                      options: {
+                        type: "array",
+                        title: i18n.t("Response Options"),
+                        minItems: 1,
+                        items: {
+                          type: "object",
+                          properties: {
+                            value: {
+                              title: i18n.t("Option Text"),
+                              type: "string",
+                              minLength: 1,
+                              default: "",
+                            },
+                            description: {
+                              title: i18n.t("Option Description"),
+                              type: "string",
+                              default: "",
+                            },
+                          },
+                        },
                       },
                     },
+                    required: ["options"],
+                  },
+                  {
+                    properties: {
+                      type: {
+                        enum: ["time"],
+                      },
+
+                      options: {
+                        type: "object",
+                        title: i18n.t("Response Options"),
+                        properties: {
+                          timePattern: {
+                            title: "Time pattern",
+                            type: "string",
+                            enum: ["standard", "military"],
+                            enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
+                            default: "standard",
+                            "ui:widget": "select",
+                          },
+                        },
+                      },
+                    },
+                  },
+                  {
+                    properties: {
+                      type: {
+                        enum: ["slider", "rating"],
+                      },
+                      options: {
+                        type: "array",
+                        title: i18n.t("Response Options"),
+                        minItems: 1,
+                        items: {
+                          type: "object",
+                          properties: {
+                            value: {
+                              title: i18n.t("Option Text (Numerical)"),
+                              type: "number",
+                              default: 0,
+                            },
+                            description: {
+                              title: i18n.t("Option Description"),
+                              type: "string",
+                              default: "",
+                            },
+                          },
+                        },
+                      },
+                    },
+                    required: ["options"],
+                  },
+                ],
               },
             },
-              {
-                properties: {
-                  type: {
-                    enum: ["slider", "rating"],
-                  },
-                  options: {
-                    type: "array",
-                    title: i18n.t("Response Options"),
-                    minItems: 1,
-                    items: {
-                      type: "object",
-                      properties: {
-                        value: {
-                          title: i18n.t("Option Text (Numerical)"),
-                          type: "number",
-                          default: 0,
-                        },
-                        description: {
-                          title: i18n.t("Option Description"),
-                          type: "string",
-                          default: "",
-                        },
-                      },
-                    },
-                  },
-                },
-                required: ["options"],
-              },
-            ],
-          },
-        },
-     
-	properties:{
-	text: {
-            type: "string",
-            title: i18n.t("Question Text"),
-            minLength: 1,
-            default: "",
-          },
-          required: {
-            title: i18n.t("Mandatory"),
-            type: "boolean",
-            default: true,
-          },
-          description: {
-            type: "string",
-            title: i18n.t("Question Description"),
-            default: "",
-          },
-          type: {
-            type: "string",
-            title: i18n.t("Question Type"),
-            enum: ["text", "boolean", "list", "multiselect", "slider", "short", "rating", "time", "matrix"],
-            enumNames: [
-              i18n.t("Text"),
-              i18n.t("Boolean"),
-              i18n.t("List"),
-              i18n.t("Multi-Select"),
-              i18n.t("Slider"),
-              i18n.t("Short Answer"),
-              i18n.t("Rating"),
-              i18n.t("Time"),
-              i18n.t("Matrix"),
-            ],
-            default: "text",
-          },
-        },
-	}
 
-}
-      }
-    }
-	
-        
-}
+            properties: {
+              text: {
+                type: "string",
+                title: i18n.t("Question Text"),
+                minLength: 1,
+                default: "",
+              },
+              required: {
+                title: i18n.t("Mandatory"),
+                type: "boolean",
+                default: true,
+              },
+              description: {
+                type: "string",
+                title: i18n.t("Question Description"),
+                default: "",
+              },
+              type: {
+                type: "string",
+                title: i18n.t("Question Type"),
+                enum: ["text", "boolean", "list", "multiselect", "slider", "short", "rating", "time", "matrix"],
+                enumNames: [
+                  i18n.t("Text"),
+                  i18n.t("Boolean"),
+                  i18n.t("List"),
+                  i18n.t("Multi-Select"),
+                  i18n.t("Slider"),
+                  i18n.t("Short Answer"),
+                  i18n.t("Rating"),
+                  i18n.t("Time"),
+                  i18n.t("Matrix"),
+                ],
+                default: "text",
+              },
+            },
+          },
+        },
+      },
+    },
+  }
 }
 
 // Splice a raw Activity object with its ActivityDescription object.
@@ -741,7 +737,7 @@ export function spliceActivity({ raw, tag }) {
           options:
             question.options === null
               ? null
-              : question.type !== "matrix"  && question.type !== "time"
+              : question.type !== "matrix" && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
@@ -780,7 +776,12 @@ export function unspliceActivity(x) {
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type,
-        options: y?.options === null ? null : y?.type !== "matrix" && y?.type !== "time" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
+        options:
+          y?.options === null
+            ? null
+            : y?.type !== "matrix" && y?.type !== "time"
+            ? y?.options?.map((z) => z?.value ?? z)
+            : y?.options,
         required: y?.required ?? false,
       })),
     },
@@ -792,7 +793,11 @@ export function unspliceActivity(x) {
         multiselect: y?.type,
         description: y?.description,
         options:
-          y?.options === null ? null : y?.type !== "matrix"  && y?.type !== "time" ? y?.options?.map((z) => z?.description ?? "") : null,
+          y?.options === null
+            ? null
+            : y?.type !== "matrix" && y?.type !== "time"
+            ? y?.options?.map((z) => z?.description ?? "")
+            : null,
       })),
     },
   }
