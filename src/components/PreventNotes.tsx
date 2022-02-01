@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
       width: "100%",
       marginTop: "30px",
       marginBottom: "30px",
+      maxWidth: 540,
     },
     blueBoxStyle: {
       background: "linear-gradient(0deg, #ECF4FF, #ECF4FF)",
@@ -62,14 +63,22 @@ const useStyles = makeStyles((theme: Theme) =>
       fontSize: 17,
       fontWeight: 600,
     },
-    skillsContainer: { width: "100%", maxWidth: 570 },
+    selector: {
+      display: "fixed",
+      marginBottom: -30,
+      zIndex: 1000,
+      [theme.breakpoints.down("xs")]: {
+        marginBottom: -25,
+      },
+    },
+    skillsContainer: { width: "100%", maxWidth: 500 },
   })
 )
 
-export default function PreventNotes({ selectedEvents, dateArray, ...props }) {
+export default function PreventNotes({ selectedEvents, dateArray, dbtRange,...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
-  const [notesRange, setNotesRange] = useState(dateArray[0]?.timestamp ?? null)
+  const [notesRange, setNotesRange] = useState(dbtRange ?? dateArray[0]?.timestamp ?? null)
   const [notes, setNotes] = useState(null)
 
   useEffect(() => {
@@ -89,6 +98,10 @@ export default function PreventNotes({ selectedEvents, dateArray, ...props }) {
     }
   }, [notesRange])
 
+  useEffect(() => {
+    setNotesRange(dbtRange)
+  }, [dbtRange])
+
   return (
     <Box display="flex" justifyContent="center" width={1} className={classes.graphContainer}>
       <div className={classes.separator} />
@@ -101,6 +114,8 @@ export default function PreventNotes({ selectedEvents, dateArray, ...props }) {
             <Typography variant="h5"></Typography>
 
             <NativeSelect
+              className={classes.selector}
+              value={notesRange}
               onChange={(event) => {
                 setNotesRange(event.target.value)
               }}
