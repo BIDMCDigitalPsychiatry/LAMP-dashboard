@@ -115,7 +115,6 @@ const useStyles = makeStyles((theme: Theme) =>
         lineHeight: "40px",
       },
     },
-
     graphSubContainer: {
       maxWidth: 540,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },

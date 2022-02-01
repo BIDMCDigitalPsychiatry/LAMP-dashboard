@@ -10,7 +10,6 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
       flexDirection: "column",
-
       [theme.breakpoints.down("xs")]: {
         padding: "0 15px",
       },
