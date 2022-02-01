@@ -515,45 +515,21 @@ export const SchemaList = () => {
         },
       },
     },
+
     "lamp.survey": {
+      type: "object",
+      properties: {
+        settings: {
+
       title: i18n.t("Survey Questions"),
       description: i18n.t("Configure questions, parameters, and options."),
       type: "array",
-      items: {
-        title: i18n.t("Question"),
-        description: i18n.t("Configure a question."),
-        type: "object",
-        required: ["title", "type"],
-        properties: {
-          title: {
-            type: "string",
-            title: i18n.t("Question Text"),
-            minLength: 1,
-            default: "",
-          },
-          description: {
-            type: "string",
-            title: i18n.t("Question Description"),
-            default: "",
-          },
-          type: {
-            type: "string",
-            title: i18n.t("Question Type"),
-            enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating", "time"],
-            enumNames: [
-              i18n.t("Text"),
-              i18n.t("Boolean"),
-              i18n.t("List"),
-              i18n.t("Multi-Select"),
-              i18n.t("Slider"),
-              i18n.t("Short Answer"),
-              i18n.t("Rating"),
-              i18n.t("Time"),
-            ],
-            default: "text",
-          },
-        },
-        dependencies: {
+
+	items:{
+    required: ["text", "type"],
+
+	type:"object",
+dependencies: {
           type: {
             oneOf: [
               {
@@ -562,6 +538,54 @@ export const SchemaList = () => {
                     enum: ["text", "boolean", "short_answer"],
                   },
                 },
+              },
+              {
+                properties: {
+                  type: {
+                    enum: ["matrix"],
+                  },
+                    options:{
+                      type:"object",
+                      properties:{
+                       multiple:{
+                          title: i18n.t("Enable multiple option selections"),
+                          type: "boolean",
+                          default: false,
+                        },
+                        questions:{
+                          type: "array",
+                          title: i18n.t("Question"),
+                          default:"",
+                          items:{
+                            type:"string"
+                          }
+                        },
+                        options :{
+                          type: "array",
+                          minItems: 1,
+                          items: {
+                            type: "object",
+                            properties: {
+                              value: {
+                                title: i18n.t("Option Text"),
+                                type: "string",
+                                minLength: 1,
+                                default: "",
+                              },
+                              description: {
+                                title: i18n.t("Option Description"),
+                                type: "string",
+                                default: "",
+                              },
+                            },
+                          },
+                      },
+                    // }
+                    }
+                    },
+                  
+                required: ["options"],
+                }
               },
               {
                 properties: {
@@ -595,6 +619,28 @@ export const SchemaList = () => {
               {
                 properties: {
                   type: {
+                    enum: ["time"],
+                  },
+
+                    options: {
+                      type: "object",
+                      title: i18n.t("Response Options"),
+                      properties: {
+                        timePattern: {
+                          title:"Time pattern",
+                          type: "string",
+                          enum: ["standard", "military"],
+                          enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
+                          default: "standard",
+                          "ui:widget": "select",
+                        },                      
+                      },
+                    },
+              },
+            },
+              {
+                properties: {
+                  type: {
                     enum: ["slider", "rating"],
                   },
                   options: {
@@ -623,200 +669,49 @@ export const SchemaList = () => {
             ],
           },
         },
-      },
-    },
-    "lamp.dbt_diary_card": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-          required: ["livingGoal", "targetEffective", "targetIneffective", "emotions"],
-          properties: {
-            livingGoal: {
-              title: i18n.t("Life worth living goal"),
-              description: i18n.t("300 max characters."),
-              type: "string",
-              default: "",
-              "ui:widget": "textarea",
-              "ui:options": {
-                rows: 10,
-              },
-            },
-            targetEffective: {
-              title: i18n.t("Effective Target Behaviors"),
-              type: "array",
-              items: {
-                type: "object",
-                required: ["target", "measure"],
-                properties: {
-                  target: {
-                    title: i18n.t("Behavior name"),
-                    type: "string",
-                    minLength: 1,
-                  },
-                  measure: {
-                    title: "Measure of Action",
-                    type: "string",
-                    minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
-                  },
-                },
-              },
-            },
-            targetIneffective: {
-              title: i18n.t("Ineffective Target Behaviors"),
-              type: "array",
-              items: {
-                type: "object",
-                required: ["target", "measure"],
-                properties: {
-                  target: {
-                    title: i18n.t("Behavior name"),
-                    type: "string",
-                    minLength: 1,
-                  },
-                  measure: {
-                    title: i18n.t("Measure of action"),
-                    type: "string",
-                    minLength: 1,
-                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
-                  },
-                },
-              },
-            },
-            emotions: {
-              title: i18n.t("Emotions"),
-              description: i18n.t("Both good and bad emotions."),
-              type: "array",
-              items: {
-                type: "object",
-                required: ["emotion"],
-                properties: {
-                  emotion: {
-                    title: i18n.t("Emotions"),
-                    type: "string",
-                    minLength: 1,
-                  },
-                },
-              },
-            },
+     
+	properties:{
+	text: {
+            type: "string",
+            title: i18n.t("Question Text"),
+            minLength: 1,
+            default: "",
+          },
+          required: {
+            title: i18n.t("Optional"),
+            type: "boolean",
+            default: false,
+          },
+          description: {
+            type: "string",
+            title: i18n.t("Question Description"),
+            default: "",
+          },
+          type: {
+            type: "string",
+            title: i18n.t("Question Type"),
+            enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating", "time", "matrix"],
+            enumNames: [
+              i18n.t("Text"),
+              i18n.t("Boolean"),
+              i18n.t("List"),
+              i18n.t("Multi-Select"),
+              i18n.t("Slider"),
+              i18n.t("Short Answer"),
+              i18n.t("Rating"),
+              i18n.t("Time"),
+            ],
+            default: "text",
           },
         },
-      },
-    },
-    "lamp.cats_and_dogs": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-        },
-      },
-    },
-    "lamp.cats_and_dogs_new": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-        },
-      },
-    },
-    "lamp.journal": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-        },
-      },
-    },
-    "lamp.scratch_image": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-          required: ["threshold"],
-          properties: {
-            threshold: {
-              title: i18n.t("Threshold"),
-              description: i18n.t("The scratch threshold percentage."),
-              type: "number",
-              minimum: 1,
-              maximum: 100,
-              default: 80,
-            },
-          },
-        },
-      },
-    },
-    "lamp.tips": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Tip Details"),
-          type: "array",
-          items: {
-            type: "object",
-            required: ["title", "text"],
-            minItems: 1,
-            properties: {
-              title: {
-                title: i18n.t("Tips Title"),
-                type: "string",
-                minLength: 1,
-              },
-              text: {
-                title: i18n.t("Tips Description"),
-                type: "string",
-                minLength: 1,
-                "ui:widget": "textarea",
-                "ui:options": {
-                  rows: 5,
-                },
-              },
-              image: {
-                title: i18n.t("Tips Image"),
-                description: i18n.t(
-                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
-                ),
-                type: "string",
-                format: "data-url",
-              },
-            },
-          },
-        },
-      },
-    },
-    "lamp.breathe": {
-      type: "object",
-      properties: {
-        settings: {
-          title: i18n.t("Activity Settings"),
-          type: "object",
-          properties: {
-            audio_url: {
-              title: i18n.t("Remote Audio URL"),
-              description: i18n.t("Do not provide an audio URL AND upload audio below."),
-              type: "string",
-              format: "url",
-            },
-            audio: {
-              title: i18n.t("Upload audio"),
-              description: i18n.t("Do not upload audio AND provide an audio URL above."),
-              type: "string",
-              format: "data-url",
-              "ui:options": {
-                accept: [".mp3", ".ogg", ".wav"],
-              },
-            },
-          },
-        },
-      },
-    },
-  }
+	}
+
+}
+      }
+    }
+	
+        
+}
 }
 
 // Splice a raw Activity object with its ActivityDescription object.
@@ -841,7 +736,7 @@ export function spliceActivity({ raw, tag }) {
           options:
             question.options === null
               ? null
-              : question.type !== "matrix"
+              : question.type !== "matrix"  && question.type !== "time"
               ? question.options?.map((z, idx2) => ({
                   value: z,
                   description: tag?.questions?.[idx]?.options?.[idx2],
@@ -868,6 +763,7 @@ export function unspliceTipsActivity(x) {
 
 // Un-splice an object into its raw Activity object and ActivityDescription object.
 export function unspliceActivity(x) {
+  console.log(x)
   return {
     raw: {
       id: x.id,
@@ -879,7 +775,7 @@ export function unspliceActivity(x) {
       settings: (x.settings && Array.isArray(x.settings) ? x.settings : [])?.map((y) => ({
         text: y?.text,
         type: y?.type,
-        options: y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
+        options: y?.options === null ? null : y?.type !== "matrix" && y?.type !== "time" ? y?.options?.map((z) => z?.value ?? z) : y?.options,
         required: y?.required ?? false,
       })),
     },
@@ -891,7 +787,7 @@ export function unspliceActivity(x) {
         multiselect: y?.type,
         description: y?.description,
         options:
-          y?.options === null ? null : y?.type !== "matrix" ? y?.options?.map((z) => z?.description ?? "") : null,
+          y?.options === null ? null : y?.type !== "matrix"  && y?.type !== "time" ? y?.options?.map((z) => z?.description ?? "") : null,
       })),
     },
   }

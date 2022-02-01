@@ -162,6 +162,7 @@ export default function Activity({
 
   const saveActivity = async (x) => {
     setLoading(true)
+    console.log(x)
     let newItem =
       x.spec === "lamp.survey"
         ? await saveSurveyActivity(x)
@@ -186,12 +187,6 @@ export default function Activity({
     addActivity(x, studies)
     setLoading(false)
   }
-
-  // const updateActivity = (x, isDuplicated) => {
-  //   setLoading(true)
-  //   onSave(x, isDuplicated)
-  //   setLoading(false)
-  // }
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
@@ -265,16 +260,18 @@ export default function Activity({
               allActivities={allActivities}
               study={activity?.study_id ?? null}
             />
-          ) : (!!type && type === "survey") || activity?.spec === "lamp.survey" ? (
-            <SurveyCreator
-              value={activity ?? null}
-              activities={allActivities}
-              studies={studies}
-              onSave={!!type ? saveActivity : updateActivity}
-              study={activity?.study_id ?? null}
-              details={details ?? null}
-            />
-          ) : (
+          ) :
+          //  (!!type && type === "survey") || activity?.spec === "lamp.survey" ? (
+          //   <SurveyCreator
+          //     value={activity ?? null}
+          //     activities={allActivities}
+          //     studies={studies}
+          //     onSave={!!type ? saveActivity : updateActivity}
+          //     study={activity?.study_id ?? null}
+          //     details={details ?? null}
+          //   />
+          // ) :
+           (
             <GameCreator
               activities={allActivities}
               value={activity ?? null}
