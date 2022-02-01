@@ -81,7 +81,6 @@ export default function GameCreator({
     category: value?.category ?? null,
   })
 
-  
   const validateQuestions = (questions) => {
     let status = 0
     if (!!questions && questions.length > 0) {
@@ -151,8 +150,8 @@ export default function GameCreator({
         enqueueSnackbar("Activity with same name already exist.", { variant: "error" })
       }
     }
-    if(value?.spec === "lamp.survey" || activitySpecId === "lamp.survey" ) {
-      return Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false      
+    if (value?.spec === "lamp.survey" || activitySpecId === "lamp.survey") {
+      return Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
     }
     if (
       (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
@@ -200,10 +199,7 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
-    if (
-      (value?.spec && ["lamp.balloon_risk"].includes(value.spec)) ||
-      ["lamp.balloon_risk"].includes(activitySpecId)
-    ) {
+    if ((value?.spec && ["lamp.balloon_risk"].includes(value.spec)) || ["lamp.balloon_risk"].includes(activitySpecId)) {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
@@ -221,7 +217,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    } 
+    }
     if (
       (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
       ["lamp.pop_the_bubbles"].includes(activitySpecId)
@@ -246,7 +242,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    } 
+    }
     if (["lamp.scratch_image"].includes(activitySpecId)) {
       return !(
         typeof data.studyID == "undefined" ||
@@ -257,7 +253,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    } 
+    }
     if (activitySpecId === "lamp.dbt_diary_card") {
       let validateEffective = false
       if (data.settings && data.settings.targetEffective !== undefined) {
@@ -316,18 +312,18 @@ export default function GameCreator({
         validateInEffective ||
         validateEmotions
       )
-    } 
-      if (activitySpecId === "lamp.breathe") {
-        let fileMB= validateAudioSize()      
-        return !(
-          typeof data.studyID == "undefined" ||
-          data.studyID === null ||
-          data.studyID === "" ||
-          duplicates.length > 0 ||
-          typeof data.name === "undefined" ||
-          (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-          fileMB > breatheFileLimit
-        )
+    }
+    if (activitySpecId === "lamp.breathe") {
+      let fileMB = validateAudioSize()
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+        fileMB > breatheFileLimit
+      )
     }
   }
 
