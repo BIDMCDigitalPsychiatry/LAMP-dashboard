@@ -546,6 +546,7 @@ dependencies: {
                   },
                     options:{
                       type:"object",
+                      title: "Matrix options",
                       properties:{
                        multiple:{
                           title: i18n.t("Enable multiple option selections"),
@@ -555,13 +556,16 @@ dependencies: {
                         questions:{
                           type: "array",
                           title: i18n.t("Question"),
-                          default:"",
+                          minItems: 1,
                           items:{
-                            type:"string"
+                            type:"string",
+                            minLength: 1,
+                            default: "",
                           }
                         },
                         options :{
                           type: "array",
+                          title:"Options",
                           minItems: 1,
                           items: {
                             type: "object",
@@ -678,9 +682,9 @@ dependencies: {
             default: "",
           },
           required: {
-            title: i18n.t("Optional"),
+            title: i18n.t("Mandatory"),
             type: "boolean",
-            default: false,
+            default: true,
           },
           description: {
             type: "string",
@@ -690,7 +694,7 @@ dependencies: {
           type: {
             type: "string",
             title: i18n.t("Question Type"),
-            enum: ["text", "boolean", "list", "multiselect", "slider", "short_answer", "rating", "time", "matrix"],
+            enum: ["text", "boolean", "list", "multiselect", "slider", "short", "rating", "time", "matrix"],
             enumNames: [
               i18n.t("Text"),
               i18n.t("Boolean"),
@@ -700,6 +704,7 @@ dependencies: {
               i18n.t("Short Answer"),
               i18n.t("Rating"),
               i18n.t("Time"),
+              i18n.t("Matrix"),
             ],
             default: "text",
           },
