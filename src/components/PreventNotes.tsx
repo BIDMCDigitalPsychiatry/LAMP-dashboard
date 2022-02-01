@@ -10,6 +10,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
       alignItems: "center",
       flexDirection: "column",
+
       [theme.breakpoints.down("xs")]: {
         padding: "0 15px",
       },
@@ -75,7 +76,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventNotes({ selectedEvents, dateArray, dbtRange,...props }) {
+export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [notesRange, setNotesRange] = useState(dbtRange ?? dateArray[0]?.timestamp ?? null)

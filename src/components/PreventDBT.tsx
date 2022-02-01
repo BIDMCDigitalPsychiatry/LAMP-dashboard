@@ -9,7 +9,7 @@ import {
   useTheme,
   Backdrop,
   CircularProgress,
-  Card
+  Card,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
@@ -86,23 +86,24 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
-    cardHeading: {background: "#f4f4f4",
-    padding: "10px 10px 10px",
-    maxWidth: "526px",
-    margin: "0 auto 20px",
-    boxShadow: "none",
-    
-    "& select":{
-      fontWeight: "600",
-      background: "#fff",
-      padding: 10,
-      width: 150,
-    }
-  },
-  selectorAll: {
-    margin: 0,
-    float: "right"
-  }
+    cardHeading: {
+      background: "#f4f4f4",
+      padding: "10px 10px 10px",
+      maxWidth: "526px",
+      margin: "0 auto 20px",
+      boxShadow: "none",
+
+      "& select": {
+        fontWeight: "600",
+        background: "#fff",
+        padding: 10,
+        width: 150,
+      },
+    },
+    selectorAll: {
+      margin: 0,
+      float: "right",
+    },
   })
 )
 
@@ -151,7 +152,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
   const [calculated, setCalculated] = useState(false)
-  const [dbtrange, setDBTrange]= useState(null)
+  const [dbtrange, setDBTrange] = useState(null)
 
   useEffect(() => {
     let summaryData = []
@@ -388,8 +389,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         <Grid container spacing={0}>
           <Grid item xs={12} sm={3} />
           <Grid item xs={12} sm={6}>
-          <Card className={classes.cardHeading}>
-          <NativeSelect
+            <Card className={classes.cardHeading}>
+              <NativeSelect
                 className={classes.selectorAll}
                 value={dbtrange}
                 onChange={(event) => setDBTrange(event.target.value)}
@@ -398,7 +399,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                   <option value={dateString.timestamp}>{dateString.date}</option>
                 ))}
               </NativeSelect>
-              </Card>
+            </Card>
             <div className={classes.graphContainer}>
               <NativeSelect
                 className={classes.selector}
