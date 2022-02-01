@@ -97,9 +97,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
-      } else if (activitySpec === "lamp.scratch_image" && data.temporal_slices.length === 0) {
-        setSaved(true)
-        onComplete(null)
       } else {
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
           setDataSubmitted(true)
