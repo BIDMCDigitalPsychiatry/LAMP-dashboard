@@ -81,8 +81,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
   useEffect(() => {
-    console.log(new Date().toLocaleDateString(undefined, { timeZoneName: 'long' })
-    )
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -166,16 +164,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       })
   }
   const timezoneVal = () => {
-    
-    var tzo = -new Date().getTimezoneOffset(),
-      dif = tzo >= 0 ? '+' : '-',
-      pad = function(num) {
-          var norm = Math.floor(Math.abs(num));
-          return (norm < 10 ? '0' : '') + norm;
-      };
-
-  return dif + pad(tzo / 60) +
-      ':' + pad(tzo % 60);
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return timezone
   }
 
   return (
