@@ -94,7 +94,7 @@ export default function GameCreator({
             ? questions[idx].options === null || (!!questions[idx].options && questions[idx].options.length === 0)
               ? optionsArray.push(1)
               : (questions[idx].options || []).filter(
-                  (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
+                  (i) => !!i && ((!!i?.value && (i?.value.toString() || "")?.trim().length > 0) || i === "")
                 ).length === (questions[idx].options || []).length
               ? optionsArray.push(0)
               : optionsArray.push(1)
