@@ -251,7 +251,10 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
-    if (["lamp.scratch_image"].includes(activitySpecId)) {
+    if (
+      (value?.spec && ["lamp.scratch_image"].includes(value.spec)) ||
+      ["lamp.scratch_image"].includes(activitySpecId)
+    ) {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
@@ -262,7 +265,21 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
-    if (activitySpecId === "lamp.dbt_diary_card") {
+    if (
+      (value?.spec &&
+        ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
+      ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
+    ) {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
+      )
+    }
+    if ((value?.spec && ["lamp.dbt_diary_card"].includes(value.spec)) || activitySpecId === "lamp.dbt_diary_card") {
       let validateEffective = false
       if (data.settings && data.settings.targetEffective !== undefined) {
         if (data.settings.targetEffective.length > 0) {
@@ -321,7 +338,7 @@ export default function GameCreator({
         validateEmotions
       )
     }
-    if (activitySpecId === "lamp.breathe") {
+    if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       let fileMB = validateAudioSize()
       return !(
         typeof data.studyID == "undefined" ||

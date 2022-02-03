@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react"
-import {
-  Backdrop,
-  CircularProgress,
-  AppBar,
-  Toolbar,
-  Icon,
-  Box,
-  IconButton,
-  Divider,
-  Typography,
-  Link,
-} from "@material-ui/core"
+import { Backdrop, CircularProgress, AppBar, Toolbar, Icon, Box, Divider, Typography, Link } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import Tips from "./Tips"
 import GameCreator from "./GameCreator"
