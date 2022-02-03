@@ -178,7 +178,13 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     skillWidth: { maxWidth: "100px" },
-    skillsContainer: { width: "100%", maxWidth: 570 },
+    skillsContainer: {
+      width: "100%",
+      maxWidth: 570,
+      "& h5": {
+        fontWeight: 600,
+      },
+    },
     accSummary: { paddingLeft: 0, paddingRight: 0 },
     greentxt: { color: "#21a521" },
     colCheck: { borderLeft: "0.5px solid #f4f4f4" },

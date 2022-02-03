@@ -71,7 +71,13 @@ const useStyles = makeStyles((theme: Theme) =>
         marginBottom: -25,
       },
     },
-    skillsContainer: { width: "100%", maxWidth: 500 },
+    skillsContainer: {
+      width: "100%",
+      maxWidth: 500,
+      "& h5": {
+        fontWeight: 600,
+      },
+    },
   })
 )
 

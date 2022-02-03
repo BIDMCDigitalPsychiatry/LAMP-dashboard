@@ -10,6 +10,8 @@ import {
   Backdrop,
   CircularProgress,
   Card,
+  Divider,
+  Typography,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
@@ -87,17 +89,23 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
     cardHeading: {
-      background: "#f4f4f4",
-      padding: "10px 10px 10px",
+      padding: "10px 0px 10px 0px",
       maxWidth: "526px",
       margin: "0 auto 20px",
       boxShadow: "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "end",
+      "& h6": {
+        paddingRight: 15,
+        fontSize: "1.5rem",
+      },
 
       "& select": {
         fontWeight: "600",
         background: "#fff",
         padding: 10,
-        width: 150,
+        width: 100,
       },
     },
     selectorAll: {
@@ -390,6 +398,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           <Grid item xs={12} sm={3} />
           <Grid item xs={12} sm={6}>
             <Card className={classes.cardHeading}>
+              <Typography variant="h6">{t("Date range: ")}</Typography>
               <NativeSelect
                 className={classes.selectorAll}
                 value={dbtrange}
@@ -400,6 +409,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
                 ))}
               </NativeSelect>
             </Card>
+            <Divider />
             <div className={classes.graphContainer}>
               <NativeSelect
                 className={classes.selector}
