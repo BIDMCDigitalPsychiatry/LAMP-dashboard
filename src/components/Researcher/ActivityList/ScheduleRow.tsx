@@ -117,9 +117,9 @@ export default function ScheduleRow({
             InputAdornmentProps={{ position: "end" }}
             value={data.start_date}
             onChange={(date) => {
-              date.setHours(0)
-              date.setMinutes(0)
-              date.setSeconds(0)
+              date.setHours(data.time ? getDate(data.time).getHours() : 0)
+              date.setMinutes(data.time ? getDate(data.time).getMinutes() : 0)
+              date.setSeconds(data.time ? getDate(data.time).getSeconds() : 0)
               date?.isValid() && setData({ ...data, start_date: date })
             }}
           />
@@ -142,7 +142,11 @@ export default function ScheduleRow({
             value={getDate(data.time ?? "")}
             defaultValue={getDate(data.time ?? "")}
             onChange={(date) => {
-              date?.isValid() && setData({ ...data, time: dateInUTCformat(date) })
+              const startDate = new Date(data.start_date)
+              startDate.setHours(date.getHours())
+              startDate.setMinutes(date.getMinutes())
+              startDate.setSeconds(date.getSeconds())
+              date?.isValid() && setData({ ...data, start_date: startDate, time: dateInUTCformat(date) })
             }}
           />
         )}

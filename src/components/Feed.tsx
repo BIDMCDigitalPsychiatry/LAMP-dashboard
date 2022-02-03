@@ -573,8 +573,8 @@ export default function Feed({
                         let newDateVal = new Date(start)
                         if (newDateVal.getDate() === date.getDate()) {
                           time = getTimeValue(newDateVal)
-                          intervalStart = new Date(start).getTime() - hourVal
-                          intervalEnd = new Date(start).getTime()
+                          intervalStart = new Date(start).getTime()
+                          intervalEnd = new Date(start).getTime() + hourVal
                           let filteredData = savedData.filter(
                             (item) => item.timestamp >= intervalStart && item.timestamp <= intervalEnd
                           )
@@ -769,10 +769,7 @@ export default function Feed({
                           (typeof feed.activityData?.category === "undefined" ||
                             feed.activityData?.category === null ||
                             (!!feed.activityData?.category && feed.activityData?.category.length !== 0)) &&
-                          ((["hourly", "every3h", "every6h", "every12h", "custom"].includes(feed.repeat_interval) &&
-                            feed.timestamp >= new Date().getTime()) ||
-                            (!["hourly", "every3h", "every6h", "every12h"].includes(feed.repeat_interval) &&
-                              feed.timestamp <= new Date().getTime()))
+                          feed.timestamp <= new Date().getTime()
                         ) {
                           window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
                         }
