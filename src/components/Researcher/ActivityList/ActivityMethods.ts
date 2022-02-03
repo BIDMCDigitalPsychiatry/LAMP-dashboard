@@ -712,6 +712,197 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.dbt_diary_card": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["livingGoal", "targetEffective", "targetIneffective", "emotions"],
+          properties: {
+            livingGoal: {
+              title: i18n.t("Life worth living goal"),
+              description: i18n.t("300 max characters."),
+              type: "string",
+              default: "",
+              "ui:widget": "textarea",
+              "ui:options": {
+                rows: 10,
+              },
+            },
+            targetEffective: {
+              title: i18n.t("Effective Target Behaviors"),
+              type: "array",
+              items: {
+                type: "object",
+                required: ["target", "measure"],
+                properties: {
+                  target: {
+                    title: i18n.t("Behavior name"),
+                    type: "string",
+                    minLength: 1,
+                  },
+                  measure: {
+                    title: "Measure of Action",
+                    type: "string",
+                    minLength: 1,
+                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                  },
+                },
+              },
+            },
+            targetIneffective: {
+              title: i18n.t("Ineffective Target Behaviors"),
+              type: "array",
+              items: {
+                type: "object",
+                required: ["target", "measure"],
+                properties: {
+                  target: {
+                    title: i18n.t("Behavior name"),
+                    type: "string",
+                    minLength: 1,
+                  },
+                  measure: {
+                    title: i18n.t("Measure of action"),
+                    type: "string",
+                    minLength: 1,
+                    examples: [i18n.t("Times"), i18n.t("Hours"), i18n.t("Minutes"), i18n.t("Amount")],
+                  },
+                },
+              },
+            },
+            emotions: {
+              title: i18n.t("Emotions"),
+              description: i18n.t("Both good and bad emotions."),
+              type: "array",
+              items: {
+                type: "object",
+                required: ["emotion"],
+                properties: {
+                  emotion: {
+                    title: i18n.t("Emotions"),
+                    type: "string",
+                    minLength: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "lamp.cats_and_dogs": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
+    "lamp.cats_and_dogs_new": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
+    "lamp.journal": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+        },
+      },
+    },
+    "lamp.scratch_image": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["threshold"],
+          properties: {
+            threshold: {
+              title: i18n.t("Threshold"),
+              description: i18n.t("The scratch threshold percentage."),
+              type: "number",
+              minimum: 1,
+              maximum: 100,
+              default: 80,
+            },
+          },
+        },
+      },
+    },
+    "lamp.tips": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Tip Details"),
+          type: "array",
+          items: {
+            type: "object",
+            required: ["title", "text"],
+            minItems: 1,
+            properties: {
+              title: {
+                title: i18n.t("Tips Title"),
+                type: "string",
+                minLength: 1,
+              },
+              text: {
+                title: i18n.t("Tips Description"),
+                type: "string",
+                minLength: 1,
+                "ui:widget": "textarea",
+                "ui:options": {
+                  rows: 5,
+                },
+              },
+              image: {
+                title: i18n.t("Tips Image"),
+                description: i18n.t(
+                  "Images should be in the format .jpeg/.png/.gif/.svg and the size should not exceed 4 MB."
+                ),
+                type: "string",
+                format: "data-url",
+              },
+            },
+          },
+        },
+      },
+    },
+    "lamp.breathe": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          properties: {
+            audio_url: {
+              title: i18n.t("Remote Audio URL"),
+              description: i18n.t("Do not provide an audio URL AND upload audio below."),
+              type: "string",
+              format: "url",
+            },
+            audio: {
+              title: i18n.t("Upload audio"),
+              description: i18n.t("Do not upload audio AND provide an audio URL above."),
+              type: "string",
+              format: "data-url",
+              "ui:options": {
+                accept: [".mp3", ".ogg", ".wav"],
+              },
+            },
+          },
+        },
+      },
+    },
   }
 }
 
