@@ -46,13 +46,18 @@ export const manyDates = (items) =>
     : "No custom times"
 
 export const dateInUTCformat = (val) => {
-  // if(isDate?)
+  let month =
+    (val || new Date()).getMonth() + 1 > 9
+      ? (val || new Date()).getMonth() + 1
+      : "0" + ((val || new Date()).getMonth() + 1)
+  let date = (val || new Date()).getDate() > 9 ? (val || new Date()).getDate() : "0" + (val || new Date()).getDate()
+
   const dateVal =
     (val || new Date()).getFullYear() +
     "-" +
-    ((val || new Date()).getMonth() + 1) +
+    month +
     "-" +
-    (val || new Date()).getDate() +
+    date +
     "T" +
     ((val || new Date()).getHours() > 9 ? (val || new Date()).getHours() : "0" + (val || new Date()).getHours()) +
     ":" +
