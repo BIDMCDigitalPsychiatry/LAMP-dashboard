@@ -24,6 +24,7 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "@ampproject/remapping": "^2.0.2",
     "@date-io/date-fns": "^1.3.13",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
