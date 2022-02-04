@@ -398,7 +398,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           <Grid item xs={12} sm={3} />
           <Grid item xs={12} sm={6}>
             <Card className={classes.cardHeading}>
-              <Typography variant="h6">{t("Date range: ")}</Typography>
+              <Typography variant="h6">{t("Select a date range: ")}</Typography>
               <NativeSelect
                 className={classes.selectorAll}
                 value={dbtrange}

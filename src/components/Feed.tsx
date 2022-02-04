@@ -422,13 +422,13 @@ export default function Feed({
         let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
-          scheduleStartDate = new Date(schedule.start_date)
+          scheduleStartDate = getDate(schedule.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
           if (currentDate.getTime() < scheduleStartDate.getTime()) {
-            currentDate = new Date(schedule.start_date)
+            currentDate = getDate(schedule.start_date)
           }
           currentDate.setHours(0)
           currentDate.setMinutes(0)
@@ -483,6 +483,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
+                schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                 if (feedCheck) currentFeed.push(schedule)
                 break
               case "weekly":
@@ -496,6 +497,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
+                schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                 if (feedCheck) currentFeed.push(schedule)
                 break
               case "fortnightly":
@@ -508,6 +510,7 @@ export default function Feed({
                     if (!!found) {
                       selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                       feedCheck = date.getDate() === first.getDate() ? true : false
+                      schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                       if (feedCheck) currentFeed.push(schedule)
                       first.setDate(first.getDate() + 14)
                     } else {
@@ -517,6 +520,7 @@ export default function Feed({
                         if (firstDayNo === dayNo) {
                           selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                           feedCheck = date.getDate() === first.getDate() ? true : false
+                          schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                           if (feedCheck) currentFeed.push(schedule)
                           first.setDate(first.getDate() + 14)
                           found = true
@@ -533,6 +537,7 @@ export default function Feed({
                   while (firstDate.getTime() <= end.getTime()) {
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(firstDate).toLocaleDateString())
                     feedCheck = date.getDate() === firstDate.getDate() ? true : false
+                    schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                     if (feedCheck) currentFeed.push(schedule)
                     firstDate.setDate(firstDate.getDate() + 14)
                   }
@@ -654,6 +659,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
+                schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                 if (feedCheck) currentFeed.push(schedule)
                 break
               case "bimonthly":
@@ -678,6 +684,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
+                schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                 if (feedCheck) currentFeed.push(schedule)
                 break
               case "none":
@@ -693,6 +700,7 @@ export default function Feed({
                   }
                   first.setDate(first.getDate() + 1)
                 }
+                schedule.clickable = scheduledDate.getTime() >= new Date().getTime()
                 if (feedCheck) currentFeed.push(schedule)
                 break
             }
@@ -768,8 +776,7 @@ export default function Feed({
                           feed.clickable &&
                           (typeof feed.activityData?.category === "undefined" ||
                             feed.activityData?.category === null ||
-                            (!!feed.activityData?.category && feed.activityData?.category.length !== 0)) &&
-                          feed.timestamp <= new Date().getTime()
+                            (!!feed.activityData?.category && feed.activityData?.category.length !== 0))
                         ) {
                           window.location.href = `/#/participant/${participant?.id}/activity/${feed.activityData.id}?mode=dashboard`
                         }

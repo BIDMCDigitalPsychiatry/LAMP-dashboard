@@ -117,9 +117,9 @@ export default function ScheduleRow({
             InputAdornmentProps={{ position: "end" }}
             value={data.start_date}
             onChange={(date) => {
-              date.setHours(data.time ? getDate(data.time).getHours() : 0)
-              date.setMinutes(data.time ? getDate(data.time).getMinutes() : 0)
-              date.setSeconds(data.time ? getDate(data.time).getSeconds() : 0)
+              date.setHours(0)
+              date.setMinutes(0)
+              date.setSeconds(0)
               date?.isValid() && setData({ ...data, start_date: date })
             }}
           />
