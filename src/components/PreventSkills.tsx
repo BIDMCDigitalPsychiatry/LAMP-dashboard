@@ -53,7 +53,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     titleContainer: {
       display: "flex",
-      width: 500,
+      width: 540,
       marginBottom: 40,
       justifyContent: "space-between",
     },
@@ -63,7 +63,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: 50,
       marginBottom: 50,
       height: 0,
-      maxWidth: 500,
+      maxWidth: 540,
     },
     rangeButton: {
       display: "flex",
@@ -116,7 +116,7 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     graphSubContainer: {
-      maxWidth: 500,
+      maxWidth: 540,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
     heading: {
@@ -178,7 +178,13 @@ const useStyles = makeStyles((theme: Theme) =>
       },
     },
     skillWidth: { maxWidth: "100px" },
-    skillsContainer: { width: "100%", maxWidth: 570 },
+    skillsContainer: {
+      width: "100%",
+      maxWidth: 570,
+      "& h5": {
+        fontWeight: 600,
+      },
+    },
     accSummary: { paddingLeft: 0, paddingRight: 0 },
     greentxt: { color: "#21a521" },
     colCheck: { borderLeft: "0.5px solid #f4f4f4" },
@@ -201,7 +207,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
+export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...props }) {
   const classes = useStyles()
   const { t } = useTranslation()
   const [skillData, setSkillData] = useState(null)
@@ -330,6 +336,10 @@ export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
     setExpandedSkills([...data])
   }
 
+  useEffect(() => {
+    setSkillRange(dbtRange)
+  }, [dbtRange])
+
   return (
     <Box>
       {skillData !== null && (
@@ -342,6 +352,7 @@ export default function PreventSkills({ selectedEvents, dateArray, ...props }) {
               </Box>
               <Box>
                 <NativeSelect
+                  value={skillRange}
                   onChange={(event) => {
                     setSkillRange(event.target.value)
                   }}

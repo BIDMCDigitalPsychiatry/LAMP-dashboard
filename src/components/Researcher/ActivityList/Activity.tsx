@@ -1,18 +1,6 @@
 import React, { useEffect, useState } from "react"
-import {
-  Backdrop,
-  CircularProgress,
-  AppBar,
-  Toolbar,
-  Icon,
-  Box,
-  IconButton,
-  Divider,
-  Typography,
-  Link,
-} from "@material-ui/core"
+import { Backdrop, CircularProgress, AppBar, Toolbar, Icon, Box, Divider, Typography, Link } from "@material-ui/core"
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
-import SurveyCreator from "./SurveyCreator"
 import GroupCreator from "./GroupCreator"
 import Tips from "./Tips"
 import GameCreator from "./GameCreator"
@@ -162,6 +150,7 @@ export default function Activity({
 
   const saveActivity = async (x) => {
     setLoading(true)
+    console.log(x)
     let newItem =
       x.spec === "lamp.survey"
         ? await saveSurveyActivity(x)
@@ -186,12 +175,6 @@ export default function Activity({
     addActivity(x, studies)
     setLoading(false)
   }
-
-  // const updateActivity = (x, isDuplicated) => {
-  //   setLoading(true)
-  //   onSave(x, isDuplicated)
-  //   setLoading(false)
-  // }
 
   // Commit an update to an Activity object (ONLY DESCRIPTIONS).
   const updateActivity = async (x, isDuplicated) => {
@@ -264,15 +247,6 @@ export default function Activity({
               studies={studies}
               allActivities={allActivities}
               study={activity?.study_id ?? null}
-            />
-          ) : (!!type && type === "survey") || activity?.spec === "lamp.survey" ? (
-            <SurveyCreator
-              value={activity ?? null}
-              activities={allActivities}
-              studies={studies}
-              onSave={!!type ? saveActivity : updateActivity}
-              study={activity?.study_id ?? null}
-              details={details ?? null}
             />
           ) : (
             <GameCreator

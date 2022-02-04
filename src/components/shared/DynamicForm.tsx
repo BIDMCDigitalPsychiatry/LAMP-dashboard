@@ -132,7 +132,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
   return (
     <MuiThemeProvider theme={formTheme}>
       <Form
-        liveValidate
+        // liveValidate
         children={true}
         schema={schema}
         uiSchema={_extract(schema)}

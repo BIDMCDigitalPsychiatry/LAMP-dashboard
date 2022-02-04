@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Button,
@@ -15,22 +15,14 @@ import {
 } from "@material-ui/core"
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
-
+import { getDate, dateInUTCformat, manyDates } from "./ScheduleRow"
 // FIXME: Invalid numbers (i.e. leap year 2/29/19 or 15/65/65) is not considered invalid
 // and needs to be fixed or it will silently rollback.
-
-const manyDates = (items) =>
-  items?.length > 0
-    ? items
-        ?.slice(0, 3)
-        .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
-        .join(", ") + (items?.length > 3 ? ", ..." : "")
-    : "No custom times"
 
 export default function InlineMenu({ customTimes, onChange, ...props }) {
   const [items, setItems] = useState(customTimes ?? [])
   const [open, setOpen] = useState<Element>()
-  const [current, setCurrent] = useState(new Date())
+  const [current, setCurrent] = useState("")
   const { t } = useTranslation()
 
   return (
@@ -54,7 +46,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
         {items?.map((x, idx) => (
           <MenuItem dense disabled key={idx}>
             <Typography variant="overline">
-              {new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
+              {getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
             </Typography>
             <ListItemSecondaryAction>
               <Tooltip title={t("Delete this time from the list.")}>
@@ -87,7 +79,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                     <IconButton
                       edge="end"
                       aria-label="add"
-                      onClick={() => setItems((x) => [...x, current.toJSON()])}
+                      onClick={() => setItems((x) => [...x, current])}
                       onMouseDown={(event) => event.preventDefault()}
                     >
                       <Icon fontSize="small">check</Icon>
@@ -96,9 +88,10 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                 </InputAdornment>
               ),
             }}
-            value={current}
-            onChange={(date) => setCurrent(date)}
-            onAccept={(date) => setCurrent(date)}
+            value={getDate(current ?? "")}
+            defaultValue={getDate(current ?? "")}
+            onChange={(date) => setCurrent(dateInUTCformat(date))}
+            onAccept={(date) => setCurrent(dateInUTCformat(date))}
           />
         </MenuItem>
       </Menu>

@@ -9,6 +9,9 @@ import {
   useTheme,
   Backdrop,
   CircularProgress,
+  Card,
+  Divider,
+  Typography,
 } from "@material-ui/core"
 import { Vega } from "react-vega"
 import { useTranslation } from "react-i18next"
@@ -85,6 +88,30 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: 500,
       "& h5": { fontSize: 25, color: "rgba(0, 0, 0, 0.75)", fontWeight: 600, marginBottom: 30 },
     },
+    cardHeading: {
+      padding: "10px 0px 10px 0px",
+      maxWidth: "526px",
+      margin: "0 auto 20px",
+      boxShadow: "none",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "end",
+      "& h6": {
+        paddingRight: 15,
+        fontSize: "1.5rem",
+      },
+
+      "& select": {
+        fontWeight: "600",
+        background: "#fff",
+        padding: 10,
+        width: 100,
+      },
+    },
+    selectorAll: {
+      margin: 0,
+      float: "right",
+    },
   })
 )
 
@@ -133,6 +160,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
   const [calculated, setCalculated] = useState(false)
+  const [dbtrange, setDBTrange] = useState(null)
 
   useEffect(() => {
     let summaryData = []
@@ -163,10 +191,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           weekend.getMonth() + 1 + "/" + weekend.getDate() + "-" + (start.getMonth() + 1) + "/" + start.getDate()
         start.setDate(start.getDate() - 7)
         if (i === 0) {
-          setEmotionrange(timestampFormat)
-          setEffectiverange(timestampFormat)
-          setInEffectiverange(timestampFormat)
-          setActionrange(timestampFormat)
+          setDBTrange(timestampFormat)
         }
         i++
         dateArray.push({ timestamp: timestampFormat, date: dateFormat })
@@ -194,11 +219,18 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       actionsD.data.values = summaryData
       actionsD.title = t(actionsD.title)
 
-      actionsD.width.step = supportsSidebar ? 100 : 75
+      actionsD.width.step = supportsSidebar ? 80 : 75
       setActionsData(actionsD)
       setCalculated(true)
     }
   }, [selectedEvents])
+
+  useEffect(() => {
+    setEffectiverange(dbtrange)
+    setEmotionrange(dbtrange)
+    setActionrange(dbtrange)
+    setInEffectiverange(dbtrange)
+  }, [dbtrange])
 
   useEffect(() => {
     if (!!emotionrange) {
@@ -365,6 +397,19 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         <Grid container spacing={0}>
           <Grid item xs={12} sm={3} />
           <Grid item xs={12} sm={6}>
+            <Card className={classes.cardHeading}>
+              <Typography variant="h6">{t("Select a date range: ")}</Typography>
+              <NativeSelect
+                className={classes.selectorAll}
+                value={dbtrange}
+                onChange={(event) => setDBTrange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+            </Card>
+            <Divider />
             <div className={classes.graphContainer}>
               <NativeSelect
                 className={classes.selector}
@@ -412,8 +457,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
               </NativeSelect>
               {selfcareData !== null && <Vega spec={selfcareData} />}
 
-              <PreventSkills selectedEvents={selectedEvents} dateArray={dateArray} />
-              <PreventNotes selectedEvents={selectedEvents} dateArray={dateArray} />
+              <PreventSkills selectedEvents={selectedEvents} dateArray={dateArray} dbtRange={dbtrange} />
+              <PreventNotes selectedEvents={selectedEvents} dateArray={dateArray} dbtRange={dbtrange} />
             </div>
           </Grid>
         </Grid>

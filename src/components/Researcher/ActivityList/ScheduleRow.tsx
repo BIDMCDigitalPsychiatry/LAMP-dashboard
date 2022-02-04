@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   MenuItem,
   Icon,
@@ -16,6 +16,7 @@ import {
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
+import { isDate } from "date-fns"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
@@ -24,13 +25,48 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-const manyDates = (items) =>
+export const getDate = (val) => {
+  if ((val || "").length > 0) {
+    const dateVal = val.split("T")
+    const newDate = new Date(dateVal[0])
+    newDate.setHours(dateVal[1].split(":")[0])
+    newDate.setMinutes(dateVal[1].split(":")[1])
+    newDate.setSeconds(0)
+    return newDate
+  }
+  return new Date()
+}
+
+export const manyDates = (items) =>
   items?.length > 0
     ? items
         ?.slice(0, 3)
-        .map((x) => new Date(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
+        .map((x) => getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly")))
         .join(", ") + (items?.length > 3 ? ", ..." : "")
     : "No custom times"
+
+export const dateInUTCformat = (val) => {
+  let month =
+    (val || new Date()).getMonth() + 1 > 9
+      ? (val || new Date()).getMonth() + 1
+      : "0" + ((val || new Date()).getMonth() + 1)
+  let date = (val || new Date()).getDate() > 9 ? (val || new Date()).getDate() : "0" + (val || new Date()).getDate()
+
+  const dateVal =
+    (val || new Date()).getFullYear() +
+    "-" +
+    month +
+    "-" +
+    date +
+    "T" +
+    ((val || new Date()).getHours() > 9 ? (val || new Date()).getHours() : "0" + (val || new Date()).getHours()) +
+    ":" +
+    ((val || new Date()).getMinutes() > 9 ? (val || new Date()).getMinutes() : "0" + (val || new Date()).getMinutes()) +
+    ":" +
+    ((val || new Date()).getSeconds() > 9 ? (val || new Date()).getSeconds() : "0" + (val || new Date()).getSeconds()) +
+    ".000Z"
+  return dateVal
+}
 
 export default function ScheduleRow({
   scheduleRow,
@@ -80,13 +116,18 @@ export default function ScheduleRow({
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.start_date}
-            onChange={(date) => date?.isValid() && setData({ ...data, start_date: date })}
+            onChange={(date) => {
+              date.setHours(0)
+              date.setMinutes(0)
+              date.setSeconds(0)
+              date?.isValid() && setData({ ...data, start_date: date })
+            }}
           />
         )}
       </TableCell>
       <TableCell>
         {!isEdit ? (
-          <span>{new Date(data.time).toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
+          <span>{getDate(data.time ?? "").toLocaleString("en-US", Date.formatStyle("timeOnly"))}</span>
         ) : (
           <KeyboardTimePicker
             className={classes.datePicker}
@@ -98,9 +139,14 @@ export default function ScheduleRow({
             label={t("Time")}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
-            value={data.time}
+            value={getDate(data.time ?? "")}
+            defaultValue={getDate(data.time ?? "")}
             onChange={(date) => {
-              date?.isValid() && setData({ ...data, time: date })
+              const startDate = new Date(data.start_date)
+              startDate.setHours(date.getHours())
+              startDate.setMinutes(date.getMinutes())
+              startDate.setSeconds(date.getSeconds())
+              date?.isValid() && setData({ ...data, start_date: startDate, time: dateInUTCformat(date) })
             }}
           />
         )}

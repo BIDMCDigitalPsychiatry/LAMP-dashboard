@@ -97,9 +97,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       setCurrentActivity(null)
       if (activitySpec === "lamp.survey") {
         onComplete(data.response, data.prefillTimestamp ?? null)
-      } else if (activitySpec === "lamp.scratch_image" && data.temporal_slices.length === 0) {
-        setSaved(true)
-        onComplete(null)
       } else {
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
           setDataSubmitted(true)
@@ -121,6 +118,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
+    console.log(activity)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
     let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
@@ -148,7 +146,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           style={{ flexGrow: 1, border: "none", margin: 0, padding: 0 }}
           allow="accelerometer; ambient-light-sensor; autoplay; battery; camera; display-capture; geolocation; gyroscope; magnetometer; microphone; oversized-images; sync-xhr; usb; wake-lock;X-Frame-Options"
           srcDoc={embeddedActivity}
-          sandbox="allow-same-origin allow-scripts allow-popups allow-top-navigation "
+          sandbox="allow-forms allow-same-origin allow-scripts allow-popups allow-top-navigation "
         />
       )}
       <Backdrop className={classes.backdrop} open={loading}>
