@@ -118,7 +118,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     setSaved(false)
-    console.log(activity)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
     let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
