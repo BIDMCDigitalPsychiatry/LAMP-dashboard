@@ -681,7 +681,7 @@ export const SchemaList = () => {
                 default: "",
               },
               required: {
-                title: i18n.t("Mandatory"),
+                title: i18n.t("Required"),
                 type: "boolean",
                 default: true,
               },
@@ -955,7 +955,6 @@ export function unspliceTipsActivity(x) {
 
 // Un-splice an object into its raw Activity object and ActivityDescription object.
 export function unspliceActivity(x) {
-  console.log(x)
   return {
     raw: {
       id: x.id,
