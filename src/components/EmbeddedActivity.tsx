@@ -130,7 +130,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
       response = atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
     }
-
     setEmbeddedActivity(response)
     setLoading(false)
   }
