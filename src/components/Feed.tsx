@@ -558,7 +558,6 @@ export default function Feed({
                           : schedule.repeat_interval === "every6h"
                           ? 6 * 60 * 60 * 1000
                           : 12 * 60 * 60 * 1000
-
                       let endTime = date.getTime() + 86400000
 
                       startTime =
