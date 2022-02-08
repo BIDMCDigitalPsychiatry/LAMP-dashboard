@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
 export const getDate = (val) => {
   if ((val || "").length > 0) {
     const dateVal = val.split("T")
-    let date = dateVal[0].substring(0, 10).split("-")
+    let date = dateVal[0].split("-")
     date = date[1] + "-" + date[2] + "-" + date[0]
     const newDate = new Date(date)
     newDate.setHours(dateVal[1].split(":")[0])
