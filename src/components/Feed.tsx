@@ -422,6 +422,7 @@ export default function Feed({
         let startD = new Date(date)
         savedData = events.filter((event) => event.activity === feed.id)
         feed.schedule.map((schedule) => {
+          console.log(schedule)
           scheduleStartDate = getDate(schedule.start_date)
           scheduleStartDate.setHours(0)
           scheduleStartDate.setMinutes(0)

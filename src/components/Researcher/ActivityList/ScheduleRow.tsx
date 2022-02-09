@@ -122,7 +122,7 @@ export default function ScheduleRow({
               date.setHours(0)
               date.setMinutes(0)
               date.setSeconds(0)
-              date?.isValid() && setData({ ...data, start_date: date })
+              date?.isValid() && setData({ ...data, start_date: getDate(dateInUTCformat(date)) })
             }}
           />
         )}
