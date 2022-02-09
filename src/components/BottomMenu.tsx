@@ -301,10 +301,6 @@ export default function BottomMenu({ ...props }) {
       : []
   )
 
-  useEffect(() => {
-    sensorEventUpdate(tabVal)
-  }, [])
-
   const sensorEventUpdate = (val) => {
     ;(async () => {
       if (LAMP.Auth._type === "participant") {
@@ -326,8 +322,8 @@ export default function BottomMenu({ ...props }) {
   const tabs = ["learn", "assess", "manage", "prevent", "feed"]
 
   const openTabUpdate = (val) => {
+    sensorEventUpdate(tabVal)
     _setTab(val)
-    sensorEventUpdate(val)
     props.activeTab(val)
     switch (parseInt(val)) {
       case 0:
