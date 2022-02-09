@@ -22,7 +22,7 @@ import {
   Grid,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { getDates } from "./PreventDBT"
+import { getDates, getDateVal } from "./PreventDBT"
 import { getDateString } from "./PreventDBT"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -319,9 +319,9 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
       let selDates = []
       dates.map((date) => {
         selDates.push(
-          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+          (getDateVal(date).getMonth() + 1).toString().padStart(2, "0") +
             "/" +
-            new Date(date).getDate().toString().padStart(2, "0")
+            getDateVal(date).getDate().toString().padStart(2, "0")
         )
       })
       setSelectedDates(selDates)

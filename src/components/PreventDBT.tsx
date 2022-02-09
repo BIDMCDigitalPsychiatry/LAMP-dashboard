@@ -343,12 +343,12 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
             inEffectiveData.push({
               value: event.static_data.urgeForSuicide,
-              date: dateString,
+              date: getDateVal(dateString),
               symbol: t("Urge to Die by suicide"),
             })
             inEffectiveData.push({
               value: event.static_data.urgeToQuitTheray,
-              date: dateString,
+              date: getDateVal(dateString),
               symbol: t("Urge to Quit Therapy"),
             })
           }
@@ -376,9 +376,10 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = actionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate()
-        var curr_month = date.getMonth() + 1
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
+
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
@@ -397,7 +398,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       })
       Object.keys(tData).forEach(function (key) {
         const keys = key.split("~")
-        timelineData.push({ date: keys[0], count: tData[key], action: keys[1] })
+        timelineData.push({ date: getDateVal(keys[0]), count: tData[key], action: keys[1] })
       })
       let selfcareD = JSON.parse(JSON.stringify(selfcare))
       selfcareD.data.values = timelineData
