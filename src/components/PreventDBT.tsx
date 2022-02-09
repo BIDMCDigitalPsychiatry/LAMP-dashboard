@@ -247,8 +247,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = emotionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = date.getMonth() + 1 //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
 
@@ -284,8 +284,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = effectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
@@ -320,8 +320,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = inEffectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
@@ -371,8 +371,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = actionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
