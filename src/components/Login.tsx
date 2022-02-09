@@ -117,6 +117,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     })
       .then((res) => {
         if (res.authType === "participant") {
+          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
           LAMP.SensorEvent.create(res.identity.id, {
             timestamp: Date.now(),
             sensor: "lamp.analytics",
@@ -164,7 +165,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       })
   }
   const timezoneVal = () => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
     return timezone
   }
 

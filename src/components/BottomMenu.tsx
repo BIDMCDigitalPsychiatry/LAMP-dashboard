@@ -301,24 +301,33 @@ export default function BottomMenu({ ...props }) {
       : []
   )
 
+  useEffect(() => {
+    sensorEventUpdate(tabVal)
+  }, [])
+
+  const sensorEventUpdate = (val) => {
+    ;(async () => {
+      if (LAMP.Auth._type === "participant") {
+        await LAMP.SensorEvent.create(props.participant.id, {
+          timestamp: new Date().getTime(),
+          sensor: "lamp.analytics",
+          data: {
+            type: "open_page",
+            page: tabs[val],
+            duration:
+              new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
+          },
+        })
+        localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
+      }
+    })()
+  }
+
   const tabs = ["learn", "assess", "manage", "prevent", "feed"]
 
   const openTabUpdate = (val) => {
     _setTab(val)
-
-    ;(async () => {
-      await LAMP.SensorEvent.create(props.participant.id, {
-        timestamp: new Date().getTime(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "open_page",
-          page: tabs[val],
-          duration:
-            new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
-        },
-      })
-      localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
-    })()
+    sensorEventUpdate(val)
     props.activeTab(val)
     switch (parseInt(val)) {
       case 0:
