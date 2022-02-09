@@ -99,8 +99,13 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h6": {
         paddingRight: 15,
         fontSize: "1.5rem",
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "16px !important",
+        },
       },
-
+      [theme.breakpoints.down("xs")]: {
+        margin: "0 15px 0 15px !important",
+      },
       "& select": {
         fontWeight: "600",
         background: "#fff",
