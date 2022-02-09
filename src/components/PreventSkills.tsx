@@ -176,6 +176,10 @@ const useStyles = makeStyles((theme: Theme) =>
         minWidth: "540px",
         width: "100%",
       },
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        minWidth: "300px",
+      },
     },
     skillWidth: { maxWidth: "100px" },
     skillsContainer: {
@@ -197,7 +201,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: "570px",
       overflow: "auto",
       [theme.breakpoints.down("sm")]: {
-        maxWidth: "300px",
+        width: "100%",
+        minWidth: "300px",
       },
       [theme.breakpoints.up("md")]: {
         minWidth: "540px",
