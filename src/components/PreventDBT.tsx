@@ -122,7 +122,7 @@ export function getDates(startDate, endDate) {
   while (curr.getTime() < end.getTime()) {
     let curMonth = (curr.getMonth() + 1).toString().padStart(2, "0")
     let curDate = curr.getDate().toString().padStart(2, "0")
-    let day = curr.getFullYear() + "-" + curMonth + "-" + curDate
+    let day = curMonth + "-" + curDate + "-" + curr.getFullYear()
     dates.push(day)
     curr.setDate(curr.getDate() + 1)
   }
@@ -241,7 +241,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
+
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -277,7 +278,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -313,7 +314,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
@@ -364,7 +365,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             if (
