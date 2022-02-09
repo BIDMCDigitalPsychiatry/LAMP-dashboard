@@ -143,6 +143,15 @@ export const getDateString = (date: Date) => {
   )
 }
 
+export const getDateVal = (dateVal) => {
+  let date = dateVal.split("-")
+  const newDate = new Date()
+  newDate.setDate(date[1])
+  newDate.setMonth(date[0] - 1)
+  newDate.setFullYear(date[2])
+  return newDate
+}
+
 export default function PreventDBT({ selectedEvents, ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"), {
@@ -239,7 +248,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
         var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_month = date.getMonth() + 1 //Months are zero based
         var curr_year = date.getFullYear()
         let dateString = curr_month + "-" + curr_date + "-" + curr_year
 
@@ -248,7 +257,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
             switch (slice.level) {
               case "emotion":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  emotionData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
@@ -284,7 +293,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
             switch (slice.level) {
               case "target_effective":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  effectivesData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
@@ -320,7 +329,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
             switch (slice.level) {
               case "target_ineffective":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  inEffectiveData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
