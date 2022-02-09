@@ -29,8 +29,10 @@ export const getDate = (val) => {
   if ((val || "").length > 0) {
     const dateVal = val.split("T")
     let date = dateVal[0].split("-")
-    date = date[1] + "-" + date[2] + "-" + date[0]
-    const newDate = new Date(date)
+    const newDate = new Date(dateVal[0])
+    newDate.setDate(date[2])
+    newDate.setMonth(date[1] - 1)
+    newDate.setFullYear(date[0])
     newDate.setHours(dateVal[1].split(":")[0])
     newDate.setMinutes(dateVal[1].split(":")[1])
     newDate.setSeconds(0)
