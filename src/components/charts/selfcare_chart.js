@@ -17,7 +17,7 @@ export const selfcare = {
     ],
   },
   encoding: {
-    x: { field: "date", type: "ordinal", axis: { labelAngle: -90 }, timeUnit: "yearmonthdate" },
+    x: { field: "date", type: "ordinal", axis: { labelAngle: -300 }, timeUnit: "yearmonthdate" },
     y: { field: "count", type: "quantitative" },
     color: {
       field: "action",

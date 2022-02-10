@@ -99,8 +99,13 @@ const useStyles = makeStyles((theme: Theme) =>
       "& h6": {
         paddingRight: 15,
         fontSize: "1.5rem",
+        [theme.breakpoints.down("xs")]: {
+          fontSize: "16px !important",
+        },
       },
-
+      [theme.breakpoints.down("xs")]: {
+        margin: "0 15px 0 15px !important",
+      },
       "& select": {
         fontWeight: "600",
         background: "#fff",
@@ -122,7 +127,7 @@ export function getDates(startDate, endDate) {
   while (curr.getTime() < end.getTime()) {
     let curMonth = (curr.getMonth() + 1).toString().padStart(2, "0")
     let curDate = curr.getDate().toString().padStart(2, "0")
-    let day = curr.getFullYear() + "-" + curMonth + "-" + curDate
+    let day = curMonth + "-" + curDate + "-" + curr.getFullYear()
     dates.push(day)
     curr.setDate(curr.getDate() + 1)
   }
@@ -141,6 +146,15 @@ export const getDateString = (date: Date) => {
     " " +
     date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   )
+}
+
+export const getDateVal = (dateVal) => {
+  let date = dateVal.split("-")
+  const newDate = new Date()
+  newDate.setDate(date[1])
+  newDate.setMonth(date[0] - 1)
+  newDate.setFullYear(date[2])
+  return newDate
 }
 
 export default function PreventDBT({ selectedEvents, ...props }) {
@@ -238,16 +252,17 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = emotionrange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
+
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "emotion":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  emotionData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  emotionData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
@@ -274,16 +289,16 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = effectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "target_effective":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  effectivesData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  effectivesData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
@@ -310,16 +325,16 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let timeStamp = inEffectiverange.split("-")
       selectedEvents.map((event) => {
         let date = new Date(event.timestamp)
-        var curr_date = date.getDate().toString().padStart(2, "0")
-        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_date = date.getDate()
+        var curr_month = date.getMonth() + 1
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (!!slice.value) {
             switch (slice.level) {
               case "target_ineffective":
                 if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1]))
-                  inEffectiveData.push({ value: slice.value, date: dateString, symbol: slice.item })
+                  inEffectiveData.push({ value: slice.value, date: getDateVal(dateString), symbol: slice.item })
                 break
             }
           }
@@ -328,12 +343,12 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
             inEffectiveData.push({
               value: event.static_data.urgeForSuicide,
-              date: dateString,
+              date: getDateVal(dateString),
               symbol: t("Urge to Die by suicide"),
             })
             inEffectiveData.push({
               value: event.static_data.urgeToQuitTheray,
-              date: dateString,
+              date: getDateVal(dateString),
               symbol: t("Urge to Quit Therapy"),
             })
           }
@@ -364,7 +379,8 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         var curr_date = date.getDate().toString().padStart(2, "0")
         var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
         var curr_year = date.getFullYear()
-        let dateString = curr_year + "-" + curr_month + "-" + curr_date
+
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
         event.temporal_slices.map((slice) => {
           if (slice.level === "target_effective" || slice.level === "target_ineffective") {
             if (
@@ -382,7 +398,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       })
       Object.keys(tData).forEach(function (key) {
         const keys = key.split("~")
-        timelineData.push({ date: keys[0], count: tData[key], action: keys[1] })
+        timelineData.push({ date: getDateVal(keys[0]), count: tData[key], action: keys[1] })
       })
       let selfcareD = JSON.parse(JSON.stringify(selfcare))
       selfcareD.data.values = timelineData

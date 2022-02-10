@@ -22,7 +22,7 @@ import {
   Grid,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
-import { getDates } from "./PreventDBT"
+import { getDates, getDateVal } from "./PreventDBT"
 import { getDateString } from "./PreventDBT"
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -176,6 +176,10 @@ const useStyles = makeStyles((theme: Theme) =>
         minWidth: "540px",
         width: "100%",
       },
+      [theme.breakpoints.down("sm")]: {
+        width: "100%",
+        minWidth: "300px",
+      },
     },
     skillWidth: { maxWidth: "100px" },
     skillsContainer: {
@@ -197,7 +201,8 @@ const useStyles = makeStyles((theme: Theme) =>
       maxWidth: "570px",
       overflow: "auto",
       [theme.breakpoints.down("sm")]: {
-        maxWidth: "300px",
+        width: "100%",
+        minWidth: "300px",
       },
       [theme.breakpoints.up("md")]: {
         minWidth: "540px",
@@ -314,9 +319,9 @@ export default function PreventSkills({ selectedEvents, dateArray, dbtRange, ...
       let selDates = []
       dates.map((date) => {
         selDates.push(
-          (new Date(date).getMonth() + 1).toString().padStart(2, "0") +
+          (getDateVal(date).getMonth() + 1).toString().padStart(2, "0") +
             "/" +
-            new Date(date).getDate().toString().padStart(2, "0")
+            getDateVal(date).getDate().toString().padStart(2, "0")
         )
       })
       setSelectedDates(selDates)
