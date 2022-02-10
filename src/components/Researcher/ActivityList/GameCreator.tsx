@@ -266,15 +266,26 @@ export default function GameCreator({
       )
     }
     if (
-      (value?.spec &&
-        ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
-      ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
+      (value?.spec && ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
+      ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
     ) {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
+      )
+    }
+    if ((value?.spec && value.spec === "lamp.recording") || "lamp.recording" === activitySpecId) {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        data.settings?.record_label === "" ||
+        data.settings?.rerecord_label === "" ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
