@@ -278,7 +278,6 @@ export default function NavigationLayout({
           page: "conversations",
         },
       })
-      localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
     }
     let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
     data = data.filter((d) => d.data.page === "conversations")

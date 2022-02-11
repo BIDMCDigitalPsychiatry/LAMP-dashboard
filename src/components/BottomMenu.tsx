@@ -312,7 +312,6 @@ export default function BottomMenu({ ...props }) {
             page: tabs[val],
           },
         })
-        localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
       }
     })()
   }
