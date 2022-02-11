@@ -310,8 +310,6 @@ export default function BottomMenu({ ...props }) {
           data: {
             type: "open_page",
             page: tabs[val],
-            duration:
-              new Date().getTime() - JSON.parse(JSON.stringify(localStorage.getItem("lastTab" + props.participant.id))),
           },
         })
         localStorage.setItem("lastTab" + props.participant.id, JSON.stringify(new Date().getTime()))
