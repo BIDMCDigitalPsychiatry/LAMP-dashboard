@@ -13,7 +13,7 @@ import {
   Theme,
   createStyles,
 } from "@material-ui/core"
-import { KeyboardDatePicker, KeyboardTimePicker, validate } from "@material-ui/pickers"
+import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
 import { isDate } from "date-fns"
