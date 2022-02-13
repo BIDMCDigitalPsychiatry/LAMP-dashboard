@@ -114,6 +114,7 @@ export const ineffective = {
     type: "line",
     interpolate: "cardinal",
     tension: 0.9,
+    point: true,
   },
   selection: {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend", toggle: "true" },
