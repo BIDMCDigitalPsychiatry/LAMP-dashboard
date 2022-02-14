@@ -102,6 +102,10 @@ export default function ScheduleRow({
     { key: "none", value: t("Do not repeat") },
   ]
 
+  useEffect(() => {
+    validate()
+  }, [data])
+
   const validate = () => {
     return !(data.start_date === null || data.time === null || data.repeat_interval === "")
   }
@@ -116,11 +120,11 @@ export default function ScheduleRow({
             className={classes.datePicker}
             size="small"
             autoOk
+            error={!data?.start_date?.isValid() || (data?.start_date || "") === ""}
             animateYearScrolling
             variant="inline"
             inputVariant="outlined"
             format="MM/dd/yyyy"
-            label={t("Start date")}
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.start_date ?? ""}
@@ -146,7 +150,7 @@ export default function ScheduleRow({
             variant="inline"
             inputVariant="outlined"
             format="h:mm a"
-            label={t("Time")}
+            error={data.time === "" || data.time === null}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.time ? getDate(data.time ?? "") : ""}
