@@ -120,7 +120,7 @@ export default function ScheduleRow({
             className={classes.datePicker}
             size="small"
             autoOk
-            error={!data?.start_date?.isValid() || (data?.start_date || "") === ""}
+            error={data?.start_date === null || (data?.start_date || "") === ""}
             animateYearScrolling
             variant="inline"
             inputVariant="outlined"
