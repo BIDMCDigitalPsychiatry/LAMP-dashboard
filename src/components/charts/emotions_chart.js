@@ -117,13 +117,12 @@ export const emotions = {
       grid: false,
     },
   },
-  mark: { type: "line", interpolate: "cardinal", tension: 0.9 },
+  mark: { type: "line", point: true, interpolate: "cardinal", tension: 0.9 },
   selection: {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend", toggle: "true" },
   },
   encoding: {
-    x: { field: "date", axis: { labelAngle: 65 }, type: "ordinal",
-    timeUnit: "yearmonthdate" },
+    x: { field: "date", axis: { labelAngle: 65 }, type: "ordinal", timeUnit: "yearmonthdate" },
     y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2.7 },
