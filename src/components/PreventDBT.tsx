@@ -153,7 +153,7 @@ export const getDateVal = (dateVal) => {
   const newDate = new Date()
   newDate.setFullYear(date[2])
   newDate.setMonth(parseInt(date[0]) - 1)
-  newDate.setDate(date[1])
+  newDate.setDate(parseInt(date[1]))
   return newDate
 }
 
