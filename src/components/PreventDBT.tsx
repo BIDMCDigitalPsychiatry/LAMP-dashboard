@@ -151,9 +151,9 @@ export const getDateString = (date: Date) => {
 export const getDateVal = (dateVal) => {
   let date = dateVal.split("-")
   const newDate = new Date()
-  newDate.setDate(date[1])
-  newDate.setMonth(date[0] - 1)
   newDate.setFullYear(date[2])
+  newDate.setMonth(parseInt(date[0]) - 1)
+  newDate.setDate(date[1])
   return newDate
 }
 
