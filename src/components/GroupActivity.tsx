@@ -76,8 +76,10 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
         iterateActivity()
       } else {
         const activityId = currentActivity.id
+        let timestamp = new Date().getTime()
+        sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activityId, timestamp)
         let events = data.map((x, idx) => ({
-          timestamp: new Date().getTime(),
+          timestamp: timestamp,
           duration: x.reduce((sum, item) => sum + item.duration, 0),
           activity: activityId,
           static_data: {},

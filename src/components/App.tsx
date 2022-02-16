@@ -20,6 +20,7 @@ import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfileP
 import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
+import { sensorEventUpdate } from "./BottomMenu"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -85,11 +86,12 @@ function AppRouter({ ...props }) {
   const search = useLocation().search
 
   // To set page titile for active tab for menu
-  let activeTab = (newTab?: any) => {
+  let activeTab = (newTab?: string, participantId?: string) => {
     setState((state) => ({
       ...state,
       activeTab: newTab,
     }))
+    window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
   }
 
   let changeResearcherType = (type: string) => {
@@ -117,6 +119,16 @@ function AppRouter({ ...props }) {
   const { t } = useTranslation()
 
   useEffect(() => {
+    document.addEventListener("visibilitychange", function logData() {
+      if (document.visibilityState === "hidden") {
+        sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      } else {
+        let hrefloc = window.location.href.split("/")[window.location.href.split("/").length - 1]
+        hrefloc.split("?").length > 1
+          ? sensorEventUpdate(state.activeTab, LAMP.Auth._auth.id, hrefloc.split("?")[0])
+          : sensorEventUpdate(hrefloc.split("?")[0], LAMP.Auth._auth.id, null)
+      }
+    })
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
