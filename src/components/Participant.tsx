@@ -206,7 +206,6 @@ export default function Participant({
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      {console.log(tab)}
       {activities !== null && (
         <Box>
           <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
