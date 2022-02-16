@@ -26,14 +26,12 @@ export default function Learn({
   participant,
   activities,
   showStreak,
-  submitSurvey,
   ...props
 }: {
   participant: ParticipantObj
   activities: any
   activeTab: Function
   showStreak: Function
-  submitSurvey: Function
 }) {
   const classes = useStyles()
   const [loading, setLoading] = useState(true)
@@ -77,7 +75,6 @@ export default function Learn({
         savedActivities={savedActivities}
         tag={tag}
         showStreak={showStreak}
-        submitSurvey={submitSurvey}
         type="Learn"
       />
     </Container>

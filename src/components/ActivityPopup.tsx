@@ -171,7 +171,6 @@ export default function ActivityPopup({
   type,
   participant,
   showStreak,
-  submitSurvey,
   ...props
 }: {
   activity: any
@@ -180,7 +179,6 @@ export default function ActivityPopup({
   type: string
   participant: any
   showStreak: Function
-  submitSurvey: Function
 } & DialogProps) {
   const classes = useStyles()
   const { t } = useTranslation()

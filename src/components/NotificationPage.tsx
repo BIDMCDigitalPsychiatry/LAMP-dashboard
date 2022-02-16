@@ -21,6 +21,8 @@ import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import VoiceRecordingResult from "./VoiceRecordingResult"
 import { getImage } from "./Manage"
+import { sensorEventUpdate } from "./BottomMenu"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -91,8 +93,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const submitSurvey = (response, overwritingTimestamp) => {
     if (!!response) {
       setLoading(true)
+      const timestamp = new Date().getTime()
+      sensorEventUpdate(tab?.toLowerCase() ?? null, participant, activity.id, timestamp)
+
       let events = response.map((x, idx) => ({
-        timestamp: new Date().getTime(),
+        timestamp: timestamp,
         duration: response?.duration,
         activity: activity.id,
         static_data: {},
