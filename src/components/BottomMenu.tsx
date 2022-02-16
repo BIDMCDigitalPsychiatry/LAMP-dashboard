@@ -292,26 +292,17 @@ const FeedTooltip = withStyles((theme: Theme) => ({
 
 export function sensorEventUpdate(val: string, participantId: string, activityId: string, timestamp?: number) {
   ;(async () => {
-    console.log({
-      timestamp: timestamp ?? new Date().getTime(),
-      sensor: "lamp.analytics",
-      data: {
-        type: "open_page",
-        page: val,
-        activity: activityId,
-      },
-    })
-    // if (LAMP.Auth._type === "participant") {
-    //   await LAMP.SensorEvent.create(participantId, {
-    //     timestamp: new Date().getTime(),
-    //     sensor: "lamp.analytics",
-    //     data: {
-    //       type: "open_page",
-    //       page: val,
-    //       activity: activityId,
-    //     },
-    //   })
-    // }
+    if (LAMP.Auth._type === "participant") {
+      await LAMP.SensorEvent.create(participantId, {
+        timestamp: timestamp ?? new Date().getTime(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "open_page",
+          page: val,
+          activity: activityId,
+        },
+      })
+    }
   })()
 }
 
@@ -321,7 +312,6 @@ export default function BottomMenu({ ...props }) {
   const tabs = ["learn", "assess", "manage", "portal", "feed"]
 
   const getTabNum = (tab: string) => {
-    console.log(tab, tabs.indexOf(tab))
     return tabs.indexOf(tab)
   }
   const [tabVal, _setTab] = useState(getTabNum(props.tabValue))
@@ -333,13 +323,10 @@ export default function BottomMenu({ ...props }) {
   )
 
   useEffect(() => {
-    console.log("sf", tabs[tabVal])
-    sensorEventUpdate(tabs[tabVal], props.participant.id, null)
     props.activeTab(tabs[tabVal], props.participant.id)
   }, [])
 
   const openTabUpdate = (val) => {
-    console.log(val)
     sensorEventUpdate(tabs[tabVal], props.participant.id, null)
     props.activeTab(tabs[val], props.participant.id)
     _setTab(val)
