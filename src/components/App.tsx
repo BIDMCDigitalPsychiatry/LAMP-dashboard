@@ -241,22 +241,6 @@ function AppRouter({ ...props }) {
     }
   }, [state])
 
-  let messages = async (identity?: any) => {
-    let allMessages = Object.fromEntries(
-      (
-        await Promise.all(
-          [identity.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )
-    let x = (allMessages || {})[identity.id || ""] || []
-    allMessages = !Array.isArray(x) ? [] : x
-
-    return allMessages.filter((x) => x.type === "message" && x.from === "researcher").length
-  }
-
   let reset = async (identity?: any) => {
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(t("Invalid id or password."), {
@@ -370,27 +354,30 @@ function AppRouter({ ...props }) {
       <Route
         exact
         path="/participant/:id/messages"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
-            <NavigationLayout
-              authType={state.authType}
-              id={props.match.params.id}
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab="Messages"
-              sameLineTitle={true}
-            >
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
               <Messages
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly
-                participant={getParticipant(props.match.params.id).id}
+                participant={getParticipant(props.match.params.id)?.id ?? null}
               />
-            </NavigationLayout>
-          </React.Fragment>
-        )}
+            </React.Fragment>
+          )
+        }
       />
+
       <Route
         exact
         path="/participant/:id/activity/:activityId"
@@ -410,6 +397,7 @@ function AppRouter({ ...props }) {
                 participant={props.match.params.id}
                 activityId={props.match.params.activityId}
                 mode={new URLSearchParams(search).get("mode")}
+                tab={state.activeTab}
               />
             </React.Fragment>
           )

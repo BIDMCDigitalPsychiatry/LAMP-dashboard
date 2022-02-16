@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { sensorEventUpdate } from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,7 +30,7 @@ const demoActivities = {
   "lamp.tips": "tips",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, ...props }) {
+export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -58,6 +59,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     if (iFrame != null) {
+      sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(settings, "*")
       }

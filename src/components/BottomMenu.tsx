@@ -290,6 +290,22 @@ const FeedTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip)
 
+export function sensorEventUpdate(val, participantId, activityId) {
+  ;(async () => {
+    if (LAMP.Auth._type === "participant") {
+      await LAMP.SensorEvent.create(participantId, {
+        timestamp: new Date().getTime(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "open_page",
+          page: val,
+          activity: activityId,
+        },
+      })
+    }
+  })()
+}
+
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
@@ -301,25 +317,10 @@ export default function BottomMenu({ ...props }) {
       : []
   )
 
-  const sensorEventUpdate = (val) => {
-    ;(async () => {
-      if (LAMP.Auth._type === "participant") {
-        await LAMP.SensorEvent.create(props.participant.id, {
-          timestamp: new Date().getTime(),
-          sensor: "lamp.analytics",
-          data: {
-            type: "open_page",
-            page: tabs[val],
-          },
-        })
-      }
-    })()
-  }
-
   const tabs = ["learn", "assess", "manage", "prevent", "feed"]
 
   const openTabUpdate = (val) => {
-    sensorEventUpdate(tabVal)
+    sensorEventUpdate(tabs[tabVal], props.participant.id, null)
     _setTab(val)
     props.activeTab(val)
     switch (parseInt(val)) {

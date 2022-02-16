@@ -65,7 +65,7 @@ function _patientMode() {
   return LAMP.Auth._type === "participant"
 }
 
-export default function SurveyInstrument({ group, onComplete, type, fromPrevent, participant, noBack, ...props }) {
+export default function SurveyInstrument({ group, onComplete, type, fromPrevent, participant, noBack, tab, ...props }) {
   const [survey, setSurvey] = useState<any>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { enqueueSnackbar } = useSnackbar()
@@ -106,6 +106,7 @@ export default function SurveyInstrument({ group, onComplete, type, fromPrevent,
             participant={participant}
             onComplete={onComplete}
             noBack={noBack}
+            tab={tab}
           />
         )}
       </Grid>
