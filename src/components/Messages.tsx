@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Typography,
   makeStyles,
@@ -10,7 +10,7 @@ import {
   AppBar,
   Toolbar,
   Icon,
-  InputBase,
+  Link,
   Divider,
   useTheme,
   useMediaQuery,
@@ -80,7 +80,16 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "600",
       fontSize: 18,
       width: "100%",
+      textTransform: "capitalize",
     },
+  },
+  backbtnlink: {
+    width: 48,
+    height: 48,
+    color: "rgba(0, 0, 0, 0.54)",
+    padding: 12,
+    borderRadius: "50%",
+    "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
   },
   conversationtime: { maxWidth: 75, "& p": { color: "rgba(0, 0, 0, 0.4)", fontSize: 12, lineHeight: "28px" } },
   inlineHeader: {
@@ -157,6 +166,7 @@ export default function Messages({
     !!refresh ? 10 * 1000 /* 10s */ : null,
     true
   )
+
   const duration = (date: Date) => {
     var delta = Math.abs(date.getTime() - new Date().getTime()) / 1000
 
@@ -192,6 +202,10 @@ export default function Messages({
       )
     )
   }
+
+  useEffect(() => {
+    getMessages()
+  }, [conversations])
 
   const getMessages = () => {
     let x = (conversations || {})[participant || ""] || []
@@ -290,66 +304,81 @@ export default function Messages({
     )
   } else {
     return (
-      <Container className={classes.containerWidth}>
-        <Box>
-          {getMessages().filter(
-            (x) =>
-              x.type === "message" &&
-              ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-          ).length > 0 ? (
-            getMessages()
-              .filter(
-                (x) =>
-                  x.type === "message" &&
-                  ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
-              )
-              .map((x) => (
-                <Box
-                  border={0}
-                  className={classes.conversationStyle}
-                  mx={2}
-                  onClick={() => {
-                    refreshMessages()
-                    setSender(x.from)
-                    setOpen(true)
-                  }}
-                  style={{
-                    background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
-                    border: x.status === 0 ? "0" : "1px solid #C6C6C6",
-                  }}
-                >
-                  <Grid container>
-                    <Grid item xs>
-                      <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
-                        {x.from}
-                      </Typography>
+      <Box>
+        <AppBar position="static" className={classes.inlineHeader}>
+          <Toolbar className={classes.toolbardashboard}>
+            <IconButton onClick={() => history.back()} color="default" aria-label="Menu">
+              <Icon>arrow_back</Icon>
+            </IconButton>
+            <Typography
+              variant="h5"
+              style={{
+                marginLeft: supportsSidebar ? 0 : undefined,
+              }}
+            >
+              {t("Conversations")}
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Container className={classes.containerWidth}>
+          <Box>
+            {getMessages().filter(
+              (x) =>
+                x.type === "message" &&
+                ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
+            ).length > 0 ? (
+              getMessages()
+                .filter(
+                  (x) =>
+                    x.type === "message" &&
+                    ((!!participantOnly && x.from === "researcher") || (!participantOnly && x.from === "participant"))
+                )
+                .map((x) => (
+                  <Box
+                    border={0}
+                    className={classes.conversationStyle}
+                    mx={2}
+                    onClick={() => {
+                      refreshMessages()
+                      setSender(x.from)
+                      setOpen(true)
+                    }}
+                    style={{
+                      background: x.status === 0 ? "#F7F7F7" : "#FFFFFF",
+                      border: x.status === 0 ? "0" : "1px solid #C6C6C6",
+                    }}
+                  >
+                    <Grid container>
+                      <Grid item xs>
+                        <Typography variant="h6" style={{ fontWeight: x.status === 0 ? "bold" : "normal" }}>
+                          {x.from}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs className={classes.conversationtime} justify="space-between">
+                        <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs className={classes.conversationtime} justify="space-between">
-                      <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
-                    </Grid>
-                  </Grid>
-                  <Box width={1}>
-                    <Typography>{x.text}</Typography>
+                    <Box width={1}>
+                      <Typography>{x.text}</Typography>
+                    </Box>
                   </Box>
-                </Box>
-              ))[0]
-          ) : (
-            <Box style={{ marginTop: "20px" }}>{messageSection(1)}</Box>
-          )}
-        </Box>
+                ))[0]
+            ) : (
+              <Box style={{ marginTop: "20px" }}>{messageSection(1)}</Box>
+            )}
+          </Box>
 
-        <ResponsiveDialog
-          transient={false}
-          animate
-          fullScreen
-          open={open}
-          onClose={() => {
-            setOpen(false)
-          }}
-        >
-          <AppBar position="static" className={classes.inlineHeader}>
-            <Toolbar className={classes.toolbardashboard}>
-              <Container maxWidth={false} className={classes.thumbContainer}>
+          <ResponsiveDialog
+            transient={false}
+            animate
+            fullScreen
+            open={open}
+            onClose={() => {
+              setOpen(false)
+            }}
+          >
+            <AppBar position="static" className={classes.inlineHeader}>
+              <Toolbar className={classes.toolbardashboard}>
                 <IconButton onClick={() => setOpen(false)} color="default" aria-label="Menu">
                   <Icon>arrow_back</Icon>
                 </IconButton>
@@ -362,16 +391,16 @@ export default function Messages({
                 >
                   {sender}
                 </Typography>
-              </Container>
-            </Toolbar>
-          </AppBar>
-          <Container className={classes.containerWidth}>
-            <Box px={2} style={{ marginTop: "20px" }}>
-              {messageSection(1)}
-            </Box>
-          </Container>
-        </ResponsiveDialog>
-      </Container>
+              </Toolbar>
+            </AppBar>
+            <Container className={classes.containerWidth}>
+              <Box px={2} style={{ marginTop: "20px" }}>
+                {messageSection(1)}
+              </Box>
+            </Container>
+          </ResponsiveDialog>
+        </Container>
+      </Box>
     )
   }
 }

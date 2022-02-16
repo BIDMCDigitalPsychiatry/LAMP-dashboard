@@ -39,6 +39,7 @@ import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
 import Researcher from "./Researcher/Index"
+import { sensorEventUpdate } from "./BottomMenu"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     toolbar: {
@@ -269,20 +270,11 @@ export default function NavigationLayout({
 
   const updateAnalytics = async () => {
     setSensorData(null)
-    if (LAMP.Auth._type === "participant") {
-      await LAMP.SensorEvent.create(id, {
-        timestamp: new Date().getTime(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "open_page",
-          page: "conversations",
-        },
-      })
-    }
+    await sensorEventUpdate("conversations", id, null)
     let data = await LAMP.SensorEvent.allByParticipant(id, "lamp.analytics")
     data = data.filter((d) => d.data.page === "conversations")
     setSensorData(data ? data[0] : [])
-    setOpenMessages(false)
+    window.location.href = `/#/participant/${id}/messages`
   }
 
   const refreshMessages = async () => {
@@ -502,7 +494,7 @@ export default function NavigationLayout({
                         color="primary"
                         onClick={() => {
                           localStorage.setItem("lastTab" + id, JSON.stringify(new Date().getTime()))
-                          setOpenMessages(true)
+                          updateAnalytics()
                         }}
                       >
                         <Icon>comment</Icon>
@@ -637,30 +629,6 @@ export default function NavigationLayout({
           <CredentialManager id={!!id ? id : LAMP.Auth._auth.id} type={title} />
         </DialogContent>
       </Dialog>
-
-      <ResponsiveDialog transient={false} animate fullScreen open={openMessages} onClose={() => setOpenMessages(false)}>
-        <AppBar position="static" className={classes.inlineHeader}>
-          <Toolbar className={classes.toolbardashboard}>
-            <IconButton
-              onClick={() => {
-                updateAnalytics()
-              }}
-              color="default"
-              className={classes.backbtn}
-              aria-label="Menu"
-            >
-              <Icon>arrow_back</Icon>
-            </IconButton>
-            <Typography variant="h5">{t("Conversations")}</Typography>
-          </Toolbar>
-        </AppBar>
-        <Messages
-          style={{ margin: "0px -16px -16px -16px" }}
-          refresh={true}
-          participantOnly={typeof title != "undefined" && title.startsWith("Patient") ? true : false}
-          participant={id}
-        />
-      </ResponsiveDialog>
     </Box>
   )
 }
