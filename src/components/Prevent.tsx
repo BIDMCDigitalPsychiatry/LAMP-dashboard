@@ -265,7 +265,6 @@ export default function Prevent({
   hiddenEvents,
   enableEditMode,
   showStreak,
-  submitSurvey,
   activitySubmitted,
   onEditAction,
   onCopyAction,
@@ -282,7 +281,6 @@ export default function Prevent({
   onEditAction: (activity: ActivityObj, data: any) => void
   onCopyAction: (activity: ActivityObj, data: any) => void
   onDeleteAction: (activity: ActivityObj, data: any) => void
-  submitSurvey: Function
 }) {
   const classes = useStyles()
   const { t, i18n } = useTranslation()
@@ -429,7 +427,6 @@ export default function Prevent({
           loadActivityEvents()
           showStreak(participant, activity)
         }}
-        submitSurvey={submitSurvey}
         type="Portal"
       />
       {!loading && (

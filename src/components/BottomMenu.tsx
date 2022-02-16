@@ -290,11 +290,11 @@ const FeedTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip)
 
-export function sensorEventUpdate(val, participantId, activityId) {
+export function sensorEventUpdate(val: string, participantId: string, activityId: string, timestamp?: number) {
   ;(async () => {
     if (LAMP.Auth._type === "participant") {
       await LAMP.SensorEvent.create(participantId, {
-        timestamp: new Date().getTime(),
+        timestamp: timestamp ?? new Date().getTime(),
         sensor: "lamp.analytics",
         data: {
           type: "open_page",
@@ -309,7 +309,12 @@ export function sensorEventUpdate(val, participantId, activityId) {
 export default function BottomMenu({ ...props }) {
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-  const [tabVal, _setTab] = useState(props.tabValue)
+  const tabs = ["learn", "assess", "manage", "portal", "feed"]
+
+  const getTabNum = (tab: string) => {
+    return tabs.indexOf(tab)
+  }
+  const [tabVal, _setTab] = useState(getTabNum(props.tabValue))
   const { t } = useTranslation()
   const [tabValues, setTabValues] = useState(
     localStorage.getItem("bottom-menu-tabs" + props.participant.id) !== null
@@ -317,29 +322,14 @@ export default function BottomMenu({ ...props }) {
       : []
   )
 
-  const tabs = ["learn", "assess", "manage", "prevent", "feed"]
+  useEffect(() => {
+    props.activeTab(tabs[tabVal], props.participant.id)
+  }, [])
 
   const openTabUpdate = (val) => {
     sensorEventUpdate(tabs[tabVal], props.participant.id, null)
+    props.activeTab(tabs[val], props.participant.id)
     _setTab(val)
-    props.activeTab(val)
-    switch (parseInt(val)) {
-      case 0:
-        window.location.href = `/#/participant/${props.participant.id}/learn`
-        break
-      case 1:
-        window.location.href = `/#/participant/${props.participant.id}/assess`
-        break
-      case 2:
-        window.location.href = `/#/participant/${props.participant.id}/manage`
-        break
-      case 3:
-        window.location.href = `/#/participant/${props.participant.id}/portal`
-        break
-      case 4:
-        window.location.href = `/#/participant/${props.participant.id}/feed`
-        break
-    }
     props.setShowDemoMessage(false)
   }
 
@@ -371,7 +361,7 @@ export default function BottomMenu({ ...props }) {
           }}
         >
           <FeedTooltip
-            open={parseInt(tabVal) == 4 && (typeof tabValues[4] === "undefined" || !!tabValues[4])}
+            open={tabVal == 4 && (typeof tabValues[4] === "undefined" || !!tabValues[4])}
             interactive={true}
             className={classes.btnCursor}
             title={
@@ -388,7 +378,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={parseInt(tabVal) === 4}
+              selected={tabVal === 4}
               label={t("Feed")}
               value={4}
               classes={{
@@ -405,7 +395,7 @@ export default function BottomMenu({ ...props }) {
             />
           </FeedTooltip>
           <LearnTooltip
-            open={parseInt(tabVal) == 0 && (typeof tabValues[0] === "undefined" || !!tabValues[0])}
+            open={tabVal == 0 && (typeof tabValues[0] === "undefined" || !!tabValues[0])}
             interactive={true}
             className={classes.btnCursor}
             title={
@@ -422,7 +412,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={parseInt(tabVal) === 0}
+              selected={tabVal === 0}
               label={t("Learn")}
               value={0}
               classes={{
@@ -435,7 +425,7 @@ export default function BottomMenu({ ...props }) {
             />
           </LearnTooltip>
           <AssesTooltip
-            open={parseInt(tabVal) == 1 && (typeof tabValues[1] === "undefined" || !!tabValues[1])}
+            open={tabVal == 1 && (typeof tabValues[1] === "undefined" || !!tabValues[1])}
             interactive={true}
             className={classes.btnCursor}
             title={
@@ -452,7 +442,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={parseInt(tabVal) === 1}
+              selected={tabVal === 1}
               label={t("Assess")}
               value={1}
               classes={{
@@ -465,7 +455,7 @@ export default function BottomMenu({ ...props }) {
             />
           </AssesTooltip>
           <ManageTooltip
-            open={parseInt(tabVal) == 2 && (typeof tabValues[2] === "undefined" || !!tabValues[2])}
+            open={tabVal == 2 && (typeof tabValues[2] === "undefined" || !!tabValues[2])}
             interactive={true}
             className={classes.btnCursor}
             title={
@@ -482,7 +472,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={parseInt(tabVal) === 2}
+              selected={tabVal === 2}
               label={t("Manage")}
               value={2}
               classes={{
@@ -495,7 +485,7 @@ export default function BottomMenu({ ...props }) {
             />
           </ManageTooltip>
           <PreventTooltip
-            open={parseInt(tabVal) == 3 && (typeof tabValues[3] === "undefined" || !!tabValues[3])}
+            open={tabVal == 3 && (typeof tabValues[3] === "undefined" || !!tabValues[3])}
             interactive={true}
             className={classes.btnCursor}
             title={
@@ -512,7 +502,7 @@ export default function BottomMenu({ ...props }) {
           >
             <BottomNavigationAction
               showLabel
-              selected={parseInt(tabVal) === 3}
+              selected={tabVal === 3}
               label={t("Portal")}
               value={3}
               classes={{

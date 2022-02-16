@@ -31,7 +31,7 @@ export async function getImage(activityId: string, spec: string) {
   ].map((y: any) => (!!y.error ? undefined : y.data))[0]
 }
 
-export default function Manage({ participant, activities, showStreak, submitSurvey, ...props }) {
+export default function Manage({ participant, activities, showStreak, ...props }) {
   const classes = useStyles()
   const [tag, setTag] = useState([])
   const [savedActivities, setSavedActivities] = useState([])
@@ -75,7 +75,6 @@ export default function Manage({ participant, activities, showStreak, submitSurv
         savedActivities={savedActivities}
         tag={tag}
         showStreak={showStreak}
-        submitSurvey={submitSurvey}
         type="Manage"
       />
     </Container>

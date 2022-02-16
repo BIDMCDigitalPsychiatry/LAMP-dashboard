@@ -356,7 +356,6 @@ function CalendarView({ selectedDays, date, changeDate, getFeedByDate, ...props 
 }
 export default function Feed({
   participant,
-  submitSurvey,
   activities,
   visibleActivities,
   setVisibleActivities,

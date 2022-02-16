@@ -59,7 +59,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     if (iFrame != null) {
-      sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(settings, "*")
       }
@@ -103,6 +102,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
           setDataSubmitted(true)
           setTimestamp(data.timestamp)
+          sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, data.timestamp)
+
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               console.dir(e)

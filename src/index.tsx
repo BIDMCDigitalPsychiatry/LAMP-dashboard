@@ -43,11 +43,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
 
 // IE9+ CustomEvent polyfill.
 ;(function () {
-  document.addEventListener("visibilitychange", function logData() {
-    if (document.visibilityState === "hidden") {
-      sensorEventUpdate(null, LAMP.Auth._auth.id, null)
-    }
-  })
   if (typeof window.CustomEvent === "function") return false
   function CustomEvent(event, params) {
     params = params || { bubbles: false, cancelable: false, detail: null }
