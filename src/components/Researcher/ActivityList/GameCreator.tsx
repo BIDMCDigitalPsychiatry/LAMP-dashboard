@@ -163,7 +163,18 @@ export default function GameCreator({
       }
     }
     if (value?.spec === "lamp.survey" || activitySpecId === "lamp.survey") {
-      return Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
+      const status = Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
+      return (
+        status &&
+        !(
+          typeof data.studyID == "undefined" ||
+          data.studyID === null ||
+          data.studyID === "" ||
+          duplicates.length > 0 ||
+          typeof data.name === "undefined" ||
+          (typeof data.name !== "undefined" && data.name?.trim() === "")
+        )
+      )
     }
     if (
       (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
@@ -445,7 +456,6 @@ export default function GameCreator({
             schema={schemaListObj[activitySpecId]}
             initialData={data}
             onChange={(x) => {
-              console.log(x)
               updateSettings(x)
             }}
           />
