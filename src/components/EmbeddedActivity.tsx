@@ -122,7 +122,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
-
     try {
       let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
