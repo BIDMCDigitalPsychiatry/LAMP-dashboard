@@ -87,11 +87,13 @@ function AppRouter({ ...props }) {
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
-    setState((state) => ({
-      ...state,
-      activeTab: newTab,
-    }))
-    window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+    if (LAMP.Auth._type === "participant") {
+      setState((state) => ({
+        ...state,
+        activeTab: newTab,
+      }))
+      window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+    }
   }
 
   let changeResearcherType = (type: string) => {
