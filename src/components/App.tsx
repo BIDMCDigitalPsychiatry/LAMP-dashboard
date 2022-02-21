@@ -87,7 +87,7 @@ function AppRouter({ ...props }) {
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
-    if (LAMP.Auth._type === "participant") {
+    if (window.location.href.indexOf("participant") >= 0) {
       setState((state) => ({
         ...state,
         activeTab: newTab,
@@ -102,6 +102,7 @@ function AppRouter({ ...props }) {
       researcherType: type,
     }))
   }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -258,6 +259,15 @@ function AppRouter({ ...props }) {
   let reset = async (identity?: any) => {
     if (typeof identity === "undefined") {
       sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      LAMP.SensorEvent.create(LAMP.Auth._auth.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "logout",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
     }
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(t("Invalid id or password."), {
