@@ -122,7 +122,6 @@ function AppRouter({ ...props }) {
   const { t } = useTranslation()
 
   useEffect(() => {
-    console.log(props)
     document.addEventListener("visibilitychange", function logData() {
       if (document.visibilityState === "hidden") {
         sensorEventUpdate(null, LAMP.Auth._auth.id, null)
@@ -260,6 +259,15 @@ function AppRouter({ ...props }) {
   let reset = async (identity?: any) => {
     if (typeof identity === "undefined") {
       sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      LAMP.SensorEvent.create(LAMP.Auth._auth.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "logout",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
     }
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(t("Invalid id or password."), {
