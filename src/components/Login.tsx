@@ -122,6 +122,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             timestamp: Date.now(),
             sensor: "lamp.analytics",
             data: {
+              type: "login",
               device_type: "Dashboard",
               user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
             },
