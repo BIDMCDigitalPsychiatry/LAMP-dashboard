@@ -254,6 +254,9 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
+    if (typeof identity === "undefined") {
+      sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+    }
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(t("Invalid id or password."), {
         variant: "error",
