@@ -87,7 +87,7 @@ function AppRouter({ ...props }) {
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
-    if (LAMP.Auth._type === "participant") {
+    if (window.location.href.indexOf("participant") >= 0) {
       setState((state) => ({
         ...state,
         activeTab: newTab,
@@ -102,6 +102,7 @@ function AppRouter({ ...props }) {
       researcherType: type,
     }))
   }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -121,6 +122,7 @@ function AppRouter({ ...props }) {
   const { t } = useTranslation()
 
   useEffect(() => {
+    console.log(props)
     document.addEventListener("visibilitychange", function logData() {
       if (document.visibilityState === "hidden") {
         sensorEventUpdate(null, LAMP.Auth._auth.id, null)
