@@ -323,11 +323,12 @@ export default function BottomMenu({ ...props }) {
   )
 
   useEffect(() => {
+    sensorEventUpdate(tabs[tabVal], props.participant.id, null)
     props.activeTab(tabs[tabVal], props.participant.id)
   }, [])
 
   const openTabUpdate = (val) => {
-    sensorEventUpdate(tabs[tabVal], props.participant.id, null)
+    sensorEventUpdate(tabs[val], props.participant.id, null)
     props.activeTab(tabs[val], props.participant.id)
     _setTab(val)
     props.setShowDemoMessage(false)
