@@ -144,6 +144,30 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.recording": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["microphone_text"],
+          properties: {
+            record_label: {
+              title: i18n.t("Microphone record label"),
+              description: i18n.t("This text will be shown for record"),
+              type: "string",
+              default: "Press the microphone to record",
+            },
+            rerecord_label: {
+              title: i18n.t("Microphone re-record label"),
+              description: i18n.t("To change the default label - 'Click upload or clear to record again'."),
+              type: "string",
+              default: "Click upload or clear to record again",
+            },
+          },
+        },
+      },
+    },
     "lamp.jewels_a": {
       type: "object",
       properties: {

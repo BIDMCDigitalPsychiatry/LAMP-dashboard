@@ -20,6 +20,7 @@ import PatientProfile from "./Researcher/ParticipantList/Profile/PatientProfileP
 import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
+import { sensorEventUpdate } from "./BottomMenu"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -85,11 +86,14 @@ function AppRouter({ ...props }) {
   const search = useLocation().search
 
   // To set page titile for active tab for menu
-  let activeTab = (newTab?: any) => {
-    setState((state) => ({
-      ...state,
-      activeTab: newTab,
-    }))
+  let activeTab = (newTab?: string, participantId?: string) => {
+    if (window.location.href.indexOf("participant") >= 0) {
+      setState((state) => ({
+        ...state,
+        activeTab: newTab,
+      }))
+      window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+    }
   }
 
   let changeResearcherType = (type: string) => {
@@ -98,6 +102,7 @@ function AppRouter({ ...props }) {
       researcherType: type,
     }))
   }
+
   const [state, setState] = useState({
     identity: LAMP.Auth._me,
     auth: LAMP.Auth._auth,
@@ -117,6 +122,16 @@ function AppRouter({ ...props }) {
   const { t } = useTranslation()
 
   useEffect(() => {
+    document.addEventListener("visibilitychange", function logData() {
+      if (document.visibilityState === "hidden") {
+        sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      } else {
+        let hrefloc = window.location.href.split("/")[window.location.href.split("/").length - 1]
+        hrefloc.split("?").length > 1
+          ? sensorEventUpdate(state.activeTab, LAMP.Auth._auth.id, hrefloc.split("?")[0])
+          : sensorEventUpdate(hrefloc.split("?")[0], LAMP.Auth._auth.id, null)
+      }
+    })
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
@@ -241,23 +256,19 @@ function AppRouter({ ...props }) {
     }
   }, [state])
 
-  let messages = async (identity?: any) => {
-    let allMessages = Object.fromEntries(
-      (
-        await Promise.all(
-          [identity.id || ""].map(async (x) => [x, await LAMP.Type.getAttachment(x, "lamp.messaging").catch((e) => [])])
-        )
-      )
-        .filter((x: any) => x[1].message !== "404.object-not-found")
-        .map((x: any) => [x[0], x[1].data])
-    )
-    let x = (allMessages || {})[identity.id || ""] || []
-    allMessages = !Array.isArray(x) ? [] : x
-
-    return allMessages.filter((x) => x.type === "message" && x.from === "researcher").length
-  }
-
   let reset = async (identity?: any) => {
+    if (typeof identity === "undefined") {
+      sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      LAMP.SensorEvent.create(LAMP.Auth._auth.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "logout",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
+    }
     await LAMP.Auth.set_identity(identity).catch((e) => {
       enqueueSnackbar(t("Invalid id or password."), {
         variant: "error",
@@ -370,27 +381,30 @@ function AppRouter({ ...props }) {
       <Route
         exact
         path="/participant/:id/messages"
-        render={(props) => (
-          <React.Fragment>
-            <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
-            <NavigationLayout
-              authType={state.authType}
-              id={props.match.params.id}
-              goBack={props.history.goBack}
-              onLogout={() => reset()}
-              activeTab="Messages"
-              sameLineTitle={true}
-            >
+        render={(props) =>
+          !state.identity ? (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <Login
+                setIdentity={async (identity) => await reset(identity)}
+                lastDomain={state.lastDomain}
+                onComplete={() => props.history.replace("/")}
+              />
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
               <Messages
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
                 participantOnly
-                participant={getParticipant(props.match.params.id).id}
+                participant={getParticipant(props.match.params.id)?.id ?? null}
               />
-            </NavigationLayout>
-          </React.Fragment>
-        )}
+            </React.Fragment>
+          )
+        }
       />
+
       <Route
         exact
         path="/participant/:id/activity/:activityId"
@@ -410,6 +424,7 @@ function AppRouter({ ...props }) {
                 participant={props.match.params.id}
                 activityId={props.match.params.activityId}
                 mode={new URLSearchParams(search).get("mode")}
+                tab={state.activeTab}
               />
             </React.Fragment>
           )

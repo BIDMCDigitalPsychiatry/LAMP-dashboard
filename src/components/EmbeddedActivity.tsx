@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
+import { sensorEventUpdate } from "./BottomMenu"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,7 +30,7 @@ const demoActivities = {
   "lamp.tips": "tips",
 }
 
-export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, ...props }) {
+export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
   const classes = useStyles()
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
@@ -101,6 +102,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
           setDataSubmitted(true)
           setTimestamp(data.timestamp)
+          sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, data.timestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               console.dir(e)
@@ -120,19 +122,28 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     setSaved(false)
     setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
-    let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
-    if (activitySpec?.executable?.startsWith("data:")) {
-      response = atob(activitySpec.executable.split(",")[1])
-    } else if (activitySpec?.executable?.startsWith("https:")) {
-      response = atob(await (await fetch(activitySpec.executable)).text())
-    } else {
-      let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
-      activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      response = atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    try {
+      let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
+      if (activitySpec?.executable?.startsWith("data:")) {
+        response = atob(activitySpec.executable.split(",")[1])
+      } else if (activitySpec?.executable?.startsWith("https:")) {
+        response = atob(await (await fetch(activitySpec.executable)).text())
+      } else {
+        response = await loadFallBack()
+      }
+      setEmbeddedActivity(response)
+      setLoading(false)
+    } catch (e) {
+      response = await loadFallBack()
+      setEmbeddedActivity(response)
+      setLoading(false)
     }
+  }
 
-    setEmbeddedActivity(response)
-    setLoading(false)
+  const loadFallBack = async () => {
+    let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+    activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+    return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
   }
 
   return (

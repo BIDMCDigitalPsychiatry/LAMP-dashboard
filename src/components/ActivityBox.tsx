@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 )
 
-export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, submitSurvey, ...props }) {
+export default function ActivityBox({ type, savedActivities, tag, participant, showStreak, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [open, setOpen] = useState(false)
@@ -182,7 +182,6 @@ export default function ActivityBox({ type, savedActivities, tag, participant, s
         open={open}
         onClose={() => setOpen(false)}
         type={type}
-        submitSurvey={submitSurvey}
         showStreak={showStreak}
         participant={participant}
       />

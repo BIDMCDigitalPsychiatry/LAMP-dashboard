@@ -79,7 +79,9 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                     <IconButton
                       edge="end"
                       aria-label="add"
-                      onClick={() => setItems((x) => [...x, current])}
+                      onClick={() => {
+                        if (current.length > 0) setItems((x) => [...x, current])
+                      }}
                       onMouseDown={(event) => event.preventDefault()}
                     >
                       <Icon fontSize="small">check</Icon>
@@ -88,10 +90,14 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                 </InputAdornment>
               ),
             }}
-            value={getDate(current ?? "")}
-            defaultValue={getDate(current ?? "")}
-            onChange={(date) => setCurrent(dateInUTCformat(date))}
-            onAccept={(date) => setCurrent(dateInUTCformat(date))}
+            value={current ? getDate(current ?? "") : ""}
+            defaultValue={current ? getDate(current ?? "") : ""}
+            onChange={(date) => {
+              if (!!date) setCurrent(dateInUTCformat(date))
+            }}
+            onAccept={(date) => {
+              if (!!date) setCurrent(dateInUTCformat(date))
+            }}
           />
         </MenuItem>
       </Menu>

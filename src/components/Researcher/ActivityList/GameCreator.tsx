@@ -81,6 +81,10 @@ export default function GameCreator({
     category: value?.category ?? null,
   })
 
+  useEffect(() => {
+    validate()
+  }, [data])
+
   const validateQuestions = (questions) => {
     let status = 0
     if (!!questions && questions.length > 0) {
@@ -143,7 +147,18 @@ export default function GameCreator({
       }
     }
     if (value?.spec === "lamp.survey" || activitySpecId === "lamp.survey") {
-      return Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
+      const status = Object.keys(data.settings).length > 0 ? validateQuestions(data.settings) : false
+      return (
+        status &&
+        !(
+          typeof data.studyID == "undefined" ||
+          data.studyID === null ||
+          data.studyID === "" ||
+          duplicates.length > 0 ||
+          typeof data.name === "undefined" ||
+          (typeof data.name !== "undefined" && data.name?.trim() === "")
+        )
+      )
     }
     if (
       (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
@@ -250,15 +265,28 @@ export default function GameCreator({
       )
     }
     if (
-      (value?.spec &&
-        ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
-      ["lamp.recording", "lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
+      (value?.spec && ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
+      ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
     ) {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
         data.studyID === "" ||
         duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
+      )
+    }
+    if ((value?.spec && value.spec === "lamp.recording") || activitySpecId === "lamp.recording") {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.settings?.record_label === "undefined" ||
+        typeof data.settings?.rerecord_label === "undefined" ||
+        data.settings?.record_label === "" ||
+        data.settings?.rerecord_label === "" ||
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )

@@ -14,6 +14,7 @@ import "regenerator-runtime/runtime"
 import "url-search-params-polyfill"
 import "material-icons"
 import "./i18n"
+import { sensorEventUpdate } from "./components/BottomMenu"
 
 // in index.html: <!DOCTYPE html><html></html>
 let root = document.createElement("div")
@@ -53,7 +54,6 @@ input, textarea, .contenteditable, .lamp-editable *, .swagger-ui * {
 })()
 // Initialize the demo DB for "Try It" mode.
 LAMP.initializeDemoDB(demo_db)
-
 // Tie-in for the mobile apps.
 // Login only if we are a participant.
 LAMP.addEventListener("LOGIN", ({ detail }) => {

@@ -13,7 +13,7 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
-
+import { sensorEventUpdate } from "./BottomMenu"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
@@ -124,28 +124,7 @@ export default function Participant({
   const [visibleActivities, setVisibleActivities] = useState([])
   const [streakActivity, setStreakActivity] = useState(null)
   const getTab = () => {
-    let tabNum
-    switch (props.tabValue) {
-      case "learn":
-        tabNum = 0
-        break
-      case "assess":
-        tabNum = 1
-        break
-      case "manage":
-        tabNum = 2
-        break
-      case "portal":
-        tabNum = 3
-        break
-      case "feed":
-        tabNum = 4
-        break
-      default:
-        tabNum = _patientMode() ? 1 : 3
-        break
-    }
-    return tabNum
+    return props.tabValue
   }
 
   const [tab, _setTab] = useState(getTab())
@@ -164,28 +143,6 @@ export default function Participant({
     return supportsSidebar ? "up" : "left"
   }
 
-  const getTabName = (newTab: number) => {
-    let tabName = ""
-    switch (newTab) {
-      case 0:
-        tabName = "Learn"
-        break
-      case 1:
-        tabName = "Assess"
-        break
-      case 2:
-        tabName = "Manage"
-        break
-      case 3:
-        tabName = "Portal"
-        break
-      case 4:
-        tabName = "Feed"
-        break
-    }
-    return tabName
-  }
-
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
@@ -197,8 +154,7 @@ export default function Participant({
     LAMP.Activity.allByParticipant(participant.id, null, !(LAMP.Auth._auth.serverAddress === "demo.lamp.digital")).then(
       (activities) => {
         setActivities(activities)
-        const tabName = getTabName(tab)
-        props.activeTab(tabName)
+        props.activeTab(tab, participant.id)
         let language = !!localStorage.getItem("LAMP_user_" + participant.id)
           ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
           : getSelectedLanguage()
@@ -214,9 +170,8 @@ export default function Participant({
   }, [])
 
   const activeTab = (newTab) => {
+    props.activeTab(newTab, participant.id)
     _setTab(newTab)
-    const tabName = getTabName(newTab)
-    props.activeTab(tabName)
     setVisibleActivities([])
   }
 
@@ -228,39 +183,6 @@ export default function Participant({
     let result = await addHiddenEvent(participant, timestamp, activity)
     if (!!result) {
       setHiddenEvents(result)
-    }
-  }
-
-  const submitSurvey = (response, activity, overwritingTimestamp) => {
-    setLoading(true)
-    if (!!!response || response === null) {
-      setLoading(false)
-      setVisibleActivities([])
-    } else {
-      let events = response.map((x, idx) => ({
-        timestamp: new Date().getTime(),
-        duration: x.reduce((sum, item) => sum + item.duration, 0),
-        activity: activity.id,
-        static_data: {},
-        temporal_slices: (x || []).map((y) => ({
-          item: y !== undefined ? y.item : null,
-          value: y !== undefined ? y.value : null,
-          type: null,
-          level: null,
-          duration: y.duration,
-        })),
-      }))
-      Promise.all(
-        events
-          .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant.id, x).catch((e) => console.dir(e)))
-      ).then((x) => {
-        showStreak(participant, activity)
-        setVisibleActivities([])
-        // If a timestamp was provided to overwrite data, hide the original event too.
-        if (!!overwritingTimestamp) hideEvent(overwritingTimestamp, activity.id)
-        else hideEvent() // trigger a reload of dependent components anyway
-      })
     }
   }
 
@@ -286,44 +208,25 @@ export default function Participant({
       </Backdrop>
       {activities !== null && (
         <Box>
-          <Slide in={tab === 0} direction={tabDirection(0)} mountOnEnter unmountOnExit>
+          <Slide in={tab === "learn"} direction={tabDirection(0)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Learn
-                participant={participant}
-                activities={activities}
-                submitSurvey={submitSurvey}
-                activeTab={activeTab}
-                showStreak={showStreak}
-              />
+              <Learn participant={participant} activities={activities} activeTab={activeTab} showStreak={showStreak} />
             </Box>
           </Slide>
-          <Slide in={tab === 1} direction={tabDirection(1)} mountOnEnter unmountOnExit>
+          <Slide in={tab === "assess"} direction={tabDirection(1)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Survey
-                participant={participant}
-                activities={activities}
-                submitSurvey={submitSurvey}
-                onComplete={submitSurvey}
-                showStreak={showStreak}
-              />
+              <Survey participant={participant} activities={activities} showStreak={showStreak} />
             </Box>
           </Slide>
-          <Slide in={tab === 2} direction={tabDirection(2)} mountOnEnter unmountOnExit>
+          <Slide in={tab === "manage"} direction={tabDirection(2)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
-              <Manage
-                participant={participant}
-                activities={activities}
-                submitSurvey={submitSurvey}
-                activeTab={activeTab}
-                showStreak={showStreak}
-              />
+              <Manage participant={participant} activities={activities} activeTab={activeTab} showStreak={showStreak} />
             </Box>
           </Slide>
-          <Slide in={tab === 3} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+          <Slide in={tab === "portal"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
               <Prevent
                 participant={participant}
-                submitSurvey={submitSurvey}
                 activeTab={activeTab}
                 allActivities={activities}
                 hiddenEvents={hiddenEvents}
@@ -365,14 +268,13 @@ export default function Participant({
               />
             </Box>
           </Slide>
-          <Slide in={tab === 4} direction={tabDirection(3)} mountOnEnter unmountOnExit>
+          <Slide in={tab === "feed"} direction={tabDirection(3)} mountOnEnter unmountOnExit>
             <Box mt={1} mb={4}>
               <Feed
                 participant={participant}
                 activeTab={activeTab}
                 activities={activities}
                 visibleActivities={visibleActivities}
-                submitSurvey={submitSurvey}
                 setVisibleActivities={setVisibleActivities}
                 showStreak={showStreak}
               />

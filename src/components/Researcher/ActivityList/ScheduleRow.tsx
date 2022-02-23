@@ -30,9 +30,9 @@ export const getDate = (val) => {
     const dateVal = val.split("T")
     let date = dateVal[0].split("-")
     const newDate = new Date(dateVal[0])
-    newDate.setDate(date[2])
-    newDate.setMonth(date[1] - 1)
-    newDate.setFullYear(date[0])
+    newDate.setFullYear(parseInt(date[0]))
+    newDate.setMonth(parseInt(date[1]) - 1)
+    newDate.setDate(parseInt(date[2]))
     newDate.setHours(dateVal[1].split(":")[0])
     newDate.setMinutes(dateVal[1].split(":")[1])
     newDate.setSeconds(0)
@@ -102,6 +102,14 @@ export default function ScheduleRow({
     { key: "none", value: t("Do not repeat") },
   ]
 
+  useEffect(() => {
+    validate()
+  }, [data])
+
+  const validate = () => {
+    return !(data.start_date === null || data.time === null || data.repeat_interval === "")
+  }
+
   return (
     <TableRow key={index} style={{ verticalAlign: !isEdit ? "middle" : "top" }}>
       <TableCell component="th" scope="row">
@@ -112,19 +120,21 @@ export default function ScheduleRow({
             className={classes.datePicker}
             size="small"
             autoOk
+            error={data?.start_date === null || (data?.start_date || "") === ""}
             animateYearScrolling
             variant="inline"
             inputVariant="outlined"
             format="MM/dd/yyyy"
-            label={t("Start date")}
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
-            value={data.start_date}
+            value={data.start_date ?? ""}
             onChange={(date) => {
-              date.setHours(0)
-              date.setMinutes(0)
-              date.setSeconds(0)
-              date?.isValid() && setData({ ...data, start_date: getDate(dateInUTCformat(date)) })
+              if (!!date) {
+                date.setHours(0)
+                date.setMinutes(0)
+                date.setSeconds(0)
+              }
+              setData({ ...data, start_date: date?.isValid() ? getDate(dateInUTCformat(date)) : null })
             }}
           />
         )}
@@ -140,17 +150,17 @@ export default function ScheduleRow({
             variant="inline"
             inputVariant="outlined"
             format="h:mm a"
-            label={t("Time")}
+            error={data.time === "" || data.time === null}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
-            value={getDate(data.time ?? "")}
-            defaultValue={getDate(data.time ?? "")}
+            value={data.time ? getDate(data.time ?? "") : ""}
+            defaultValue={data.time ? getDate(data.time ?? "") : ""}
             onChange={(date) => {
               const startDate = new Date(data.start_date)
-              startDate.setHours(date.getHours())
-              startDate.setMinutes(date.getMinutes())
-              startDate.setSeconds(date.getSeconds())
-              date?.isValid() && setData({ ...data, start_date: startDate, time: dateInUTCformat(date) })
+              startDate.setHours((date || new Date()).getHours())
+              startDate.setMinutes((date || new Date()).getMinutes())
+              startDate.setSeconds((date || new Date()).getSeconds())
+              setData({ ...data, start_date: startDate, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />
         )}
@@ -204,8 +214,10 @@ export default function ScheduleRow({
         ) : (
           <IconButton
             onClick={() => {
-              updateActivitySchedule(data, index, "edit")
-              setEdit(false)
+              if (validate()) {
+                updateActivitySchedule(data, index, "edit")
+                setEdit(false)
+              }
             }}
           >
             <Icon>done</Icon>

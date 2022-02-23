@@ -12,17 +12,17 @@ import {
   Backdrop,
   CircularProgress,
 } from "@material-ui/core"
-import { URLSearchParams } from "url"
 import LAMP from "lamp-core"
 import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import VoiceRecordingResult from "./VoiceRecordingResult"
 import { getImage } from "./Manage"
+import { sensorEventUpdate } from "./BottomMenu"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function NotificationPage({ participant, activityId, mode, ...props }) {
+export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
   const [openNotImplemented, setOpenNotImplemented] = useState(false)
@@ -80,11 +80,8 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
   const [response, setResponse] = useState(false)
   const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
-  // const [searchParams] = new URLSearchParams();
 
   useEffect(() => {
-    // let url = new URL(window.location.href)
-    // var params = new URLSearchParams(url.search);
     ;(async () => {
       LAMP.Activity.view(activityId).then((data) => {
         setActivity(data)
@@ -96,8 +93,11 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
   const submitSurvey = (response, overwritingTimestamp) => {
     if (!!response) {
       setLoading(true)
+      const timestamp = new Date().getTime()
+      sensorEventUpdate(tab?.toLowerCase() ?? null, participant, activity.id, timestamp)
+
       let events = response.map((x, idx) => ({
-        timestamp: new Date().getTime(),
+        timestamp: timestamp,
         duration: response?.duration,
         activity: activity.id,
         static_data: {},
@@ -173,6 +173,7 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
             group={[activity]}
             onComplete={submitSurvey}
             noBack={false}
+            tab={tab}
           />
         ) : activity?.spec === "lamp.cats_and_dogs" ||
           activity?.spec === "lamp.jewels_a" ||
@@ -191,6 +192,7 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
             activity={activity}
             participant={participant}
             noBack={false}
+            tab={tab}
             onComplete={(data) => {
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
@@ -216,6 +218,7 @@ export default function NotificationPage({ participant, activityId, mode, ...pro
               showStreak(participant, activity)
             }}
             noBack={false}
+            tab={tab}
           />
         ) : (
           <Dialog

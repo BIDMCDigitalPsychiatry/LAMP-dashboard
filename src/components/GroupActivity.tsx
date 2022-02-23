@@ -11,13 +11,11 @@ import {
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
-import Streak from "./Streak"
 import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
-import { ReactComponent as Ribbon } from "../icons/Ribbon.svg"
 import { useTranslation } from "react-i18next"
-import { getEvents } from "./Participant"
-import { getImage } from "./Manage"
+import { sensorEventUpdate } from "./BottomMenu"
+
 const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
@@ -32,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-export default function GroupActivity({ participant, activity, noBack, ...props }) {
+export default function GroupActivity({ participant, activity, noBack, tab, ...props }) {
   const classes = useStyles()
   const [currentActivity, setCurrentActivity] = useState(null)
   const [groupActivities, setGroupActivities] = useState([])
@@ -44,6 +42,9 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
   const [data, setResponse] = useState(null)
 
   useEffect(() => {
+    if (index === 0) {
+      sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id)
+    }
     if ((groupActivities || []).length > 0 && index <= (groupActivities || []).length - 1) {
       setLoading(true)
       let actId = groupActivities[index]
@@ -75,8 +76,10 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
         iterateActivity()
       } else {
         const activityId = currentActivity.id
+        let timestamp = new Date().getTime()
+        sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activityId, timestamp)
         let events = data.map((x, idx) => ({
-          timestamp: new Date().getTime(),
+          timestamp: timestamp,
           duration: x.reduce((sum, item) => sum + item.duration, 0),
           activity: activityId,
           static_data: {},
@@ -130,6 +133,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
               group={[currentActivity]}
               onComplete={submitSurvey}
               noBack={noBack}
+              tab={tab}
             />
           ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
             currentActivity?.spec === "lamp.jewels_a" ||
@@ -151,6 +155,7 @@ export default function GroupActivity({ participant, activity, noBack, ...props 
                 setResponse({})
               }}
               noBack={noBack}
+              tab={tab}
             />
           ) : (
             <Dialog

@@ -78,13 +78,14 @@ export const effective = {
   mark: {
     type: "line",
     interpolate: "cardinal",
+    point: true,
     tension: 0.9,
   },
   selection: {
     symbol: { type: "multi", fields: ["symbol"], bind: "legend", toggle: "true" },
   },
   encoding: {
-    x: { field: "date", axis: { labelAngle: 65 },type: "ordinal", timeUnit: "yearmonthdate" },
+    x: { field: "date", axis: { labelAngle: 65 }, type: "ordinal", timeUnit: "yearmonthdate" },
     y: { field: "value", title: "Intensity", type: "quantitative" },
     color: { field: "symbol", type: "nominal" },
     strokeWidth: { value: 2.7 },
