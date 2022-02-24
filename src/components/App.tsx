@@ -257,9 +257,9 @@ function AppRouter({ ...props }) {
   }, [state])
 
   let reset = async (identity?: any) => {
-    if (typeof identity === "undefined") {
-      sensorEventUpdate(null, LAMP.Auth._auth.id, null)
-      LAMP.SensorEvent.create(LAMP.Auth._auth.id, {
+    if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
+      await sensorEventUpdate(null, LAMP.Auth._auth.id, null)
+      await LAMP.SensorEvent.create(LAMP.Auth._auth.id, {
         timestamp: Date.now(),
         sensor: "lamp.analytics",
         data: {
@@ -295,7 +295,7 @@ function AppRouter({ ...props }) {
           ? undefined
           : state.auth.serverAddress,
       }))
-      return null
+      window.location.href = "/#/"
     }
   }
 
