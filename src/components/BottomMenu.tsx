@@ -292,7 +292,7 @@ const FeedTooltip = withStyles((theme: Theme) => ({
 
 export async function sensorEventUpdate(val: string, participantId: string, activityId: string, timestamp?: number) {
   if (LAMP.Auth._type === "participant") {
-    await LAMP.SensorEvent.create(participantId, {
+    return await LAMP.SensorEvent.create(participantId, {
       timestamp: timestamp ?? new Date().getTime(),
       sensor: "lamp.analytics",
       data: {
