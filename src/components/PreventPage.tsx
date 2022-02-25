@@ -2,22 +2,10 @@
 import React, { useState, useEffect, useCallback } from "react"
 import {
   Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  MenuItem,
-  DialogTitle,
-  Grid,
-  Container,
   Typography,
-  Popover,
-  Select,
   makeStyles,
   Theme,
   createStyles,
-  FormControl,
-  InputLabel,
   Backdrop,
   AppBar,
   Toolbar,
@@ -26,14 +14,12 @@ import {
   Divider,
   CircularProgress,
 } from "@material-ui/core"
-import { useSnackbar } from "notistack"
-import LAMP, { SensorEvent as SensorEventObj } from "lamp-core"
+import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import Journal from "./Journal"
 import PreventDBT from "./PreventDBT"
 import PreventData from "./PreventData"
 import PreventGoalData from "./PreventGoalData"
-import { getSensorEvents } from "./Prevent"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -215,108 +201,17 @@ export default function PreventPage({ activityId, type, participantId, ...props 
   const [loading, setLoading] = useState(false)
   const [activity, setActivity] = useState(null)
   const [activityEvents, setActivityEvents] = useState(null)
-  const [sensorEvents, setSensorEvents] = useState(null)
   const { t, i18n } = useTranslation()
-
-  let socialContexts = ["Alone", "Friends", "Family", "Peers", "Crowd"]
-  let envContexts = ["Home", "School", "Work", "Hospital", "Outside", "Shopping", "Transit"]
-
-  const getSocialContextGroups = (gps_events?: SensorEventObj[]) => {
-    gps_events = gps_events?.filter((x) => !!x.data?.context?.social) ?? [] // Catch missing data.
-    let events = [
-      {
-        label: t("Alone"),
-        value: gps_events.filter((x) => x.data.context.social === "alone").length,
-      },
-      {
-        label: t("Friends"),
-        value: gps_events.filter((x) => x.data.context.social === "friends").length,
-      },
-      {
-        label: t("Family"),
-        value: gps_events.filter((x) => x.data.context.social === "family").length,
-      },
-      {
-        label: t("Peers"),
-        value: gps_events.filter((x) => x.data.context.social === "peers").length,
-      },
-      {
-        label: t("Crowd"),
-        value: gps_events.filter((x) => x.data.context.social === "crowd").length,
-      },
-    ]
-    return events
-  }
-
-  const getEnvironmentalContextGroups = (gps_events?: SensorEventObj[]) => {
-    gps_events = gps_events?.filter((x) => !!x.data?.context?.environment) ?? [] // Catch missing data.
-    let events = [
-      {
-        label: t("Home"),
-        value: gps_events.filter((x) => x.data.context.environment === "home" || x.data.context.environment === null)
-          .length,
-      },
-      {
-        label: t("School"),
-        value: gps_events.filter((x) => x.data.context.environment === "school").length,
-      },
-      {
-        label: t("Work"),
-        value: gps_events.filter((x) => x.data.context.environment === "work").length,
-      },
-      {
-        label: t("Hospital"),
-        value: gps_events.filter((x) => x.data.context.environment === "hospital").length,
-      },
-      {
-        label: t("Outside"),
-        value: gps_events.filter((x) => x.data.context.environment === "outside").length,
-      },
-      {
-        label: t("Shopping"),
-        value: gps_events.filter((x) => x.data.context.environment === "shopping").length,
-      },
-      {
-        label: t("Transit"),
-        value: gps_events.filter((x) => x.data.context.environment === "transit").length,
-      },
-    ]
-
-    return events
-  }
 
   useEffect(() => {
     setLoading(true)
-    if (type === "sensor") {
-      getSensorEvents(participantId).then((sensorEvents) => {
-        let spec = activityId.split("-")
-        if (spec.length > 1) {
-          const gType = spec[0]
-          setSensorEvents(
-            gType === "env"
-              ? getEnvironmentalContextGroups(sensorEvents["lamp.gps.contextual"])
-              : getSocialContextGroups(sensorEvents["lamp.gps.contextual"])
-          )
-        } else {
-          setSensorEvents(
-            sensorEvents?.["lamp." + activityId]?.map((d) => ({
-              x: new Date(d.timestamp),
-              y: typeof d.data.value !== "number" ? 0 : d?.data.value || 0,
-            })) ?? []
-          )
-        }
-
+    LAMP.Activity.view(activityId).then((data) => {
+      setActivity(data)
+      LAMP.ActivityEvent.allByParticipant(participantId).then((events) => {
+        setActivityEvents(events.filter((event) => event.activity === activityId))
         setLoading(false)
       })
-    } else {
-      LAMP.Activity.view(activityId).then((data) => {
-        setActivity(data)
-        LAMP.ActivityEvent.allByParticipant(participantId).then((events) => {
-          setActivityEvents(events.filter((event) => event.activity === activityId))
-          setLoading(false)
-        })
-      })
-    }
+    })
   }, [])
 
   const earliestDate = () =>
@@ -347,18 +242,6 @@ export default function PreventPage({ activityId, type, participantId, ...props 
       </AppBar>
 
       <Divider className={classes.dividerHeader} />
-      {type === "sensor" && !!sensorEvents && (
-        <PreventData
-          activity={activity}
-          events={sensorEvents}
-          graphType={2}
-          earliestDate={earliestDate}
-          enableEditMode={!_patientMode()}
-          onEditAction={(activity, data) => {}}
-          onCopyAction={(activity, data) => {}}
-          onDeleteAction={(activity, data) => {}}
-        />
-      )}
       {!!activity && type === "activity" && !!activityEvents && (
         <Box>
           {activity?.spec === "lamp.journal" ? (
