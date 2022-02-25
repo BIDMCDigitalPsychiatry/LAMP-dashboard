@@ -290,20 +290,18 @@ const FeedTooltip = withStyles((theme: Theme) => ({
   },
 }))(Tooltip)
 
-export function sensorEventUpdate(val: string, participantId: string, activityId: string, timestamp?: number) {
-  ;(async () => {
-    if (LAMP.Auth._type === "participant") {
-      await LAMP.SensorEvent.create(participantId, {
-        timestamp: timestamp ?? new Date().getTime(),
-        sensor: "lamp.analytics",
-        data: {
-          type: "open_page",
-          page: val,
-          activity: activityId,
-        },
-      })
-    }
-  })()
+export async function sensorEventUpdate(val: string, participantId: string, activityId: string, timestamp?: number) {
+  if (LAMP.Auth._type === "participant") {
+    await LAMP.SensorEvent.create(participantId, {
+      timestamp: timestamp ?? new Date().getTime(),
+      sensor: "lamp.analytics",
+      data: {
+        type: "open_page",
+        page: val,
+        activity: activityId,
+      },
+    })
+  }
 }
 
 export default function BottomMenu({ ...props }) {
