@@ -4,7 +4,6 @@ import {
   Container,
   Typography,
   Grid,
-  Card,
   Icon,
   Box,
   Dialog,
@@ -12,9 +11,6 @@ import {
   DialogContent,
   IconButton,
   DialogActions,
-  AppBar,
-  Toolbar,
-  ButtonBase,
   Link,
   Backdrop,
   CircularProgress,
@@ -32,7 +28,6 @@ import LAMP, {
 import ActivityBox from "./ActivityBox"
 import { useTranslation } from "react-i18next"
 import PreventSelectedActivities from "./PreventSelectedActivities"
-import PreventSelectedSensors from "./PreventSelectedSensors"
 import PreventSelectedExperimental from "./PreventSelectedExperimental"
 import MultipleSelect from "./MultipleSelect"
 
@@ -117,43 +112,6 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 // Perform event coalescing/grouping by sensor or activity type.
-export async function getSensorEvents(participantId: string): Promise<{ [groupName: string]: SensorEventObj[] }> {
-  let _events = ((await LAMP.SensorEvent.allByParticipant(participantId)) as any).groupBy("sensor")
-
-  // Perform datetime coalescing to either days or weeks.
-  _events["lamp.steps"] = Object.values(
-    ((_events || {})["lamp.steps"] || [])
-      .map((x) => ({
-        ...x,
-        timestamp: Math.round(x.timestamp / (24 * 60 * 60 * 1000)) /* days */,
-      }))
-      .groupBy("timestamp")
-  )
-    .map((x: any[]) =>
-      x.reduce(
-        (a, b) =>
-          !!a.timestamp
-            ? {
-                ...a,
-                data: {
-                  value:
-                    (typeof a.data.value !== "number" ? 0 : a.data.value) +
-                    (typeof b.data.value !== "number" ? 0 : b.data.value),
-                  units: "steps",
-                },
-              }
-            : b,
-        {}
-      )
-    )
-    .map((x) => ({
-      ...x,
-      timestamp: x.timestamp * (24 * 60 * 60 * 1000) /* days */,
-    }))
-  return _events
-}
-
-// Perform event coalescing/grouping by sensor or activity type.
 async function getActivityEvents(
   participant: ParticipantObj,
   _activities: ActivityObj[],
@@ -234,16 +192,6 @@ async function getVisualizations(participant: ParticipantObj) {
   return visualizations
 }
 
-// Perform count coalescing on processed events grouped by type.
-function getSensorEventCount(sensor_events: { [groupName: string]: SensorEventObj[] }) {
-  return {
-    "Environmental Context":
-      sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.environment)?.length ?? 0,
-    "Social Context": sensor_events?.["lamp.gps.contextual"]?.filter((x) => !!x.data?.context?.social)?.length ?? 0,
-    "Step Count": sensor_events?.["lamp.steps"]?.length ?? 0,
-  }
-}
-
 async function getSelected(participant: ParticipantObj, type) {
   return (
     Object.fromEntries(
@@ -289,18 +237,15 @@ export default function Prevent({
   const [disabled, setDisabled] = React.useState(true)
   const [open, setOpen] = React.useState(false)
   const [dialogueType, setDialogueType] = React.useState(0)
-
   const [activityCounts, setActivityCounts] = React.useState({})
   const [activities, setActivities] = React.useState([])
-  const [sensorEvents, setSensorEvents] = React.useState({})
-  const [sensorCounts, setSensorCounts] = React.useState({})
+  const [visualCounts, setVisualCounts] = React.useState({})
   const [activityEvents, setActivityEvents] = React.useState({})
   const [timeSpans, setTimeSpans] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [visualizations, setVisualizations] = React.useState({})
   const [cortex, setCortex] = React.useState({})
   const [selectedActivities, setSelectedActivities] = React.useState([])
-  const [selectedSensors, setSelectedSensors] = React.useState([])
   const [selectedExperimental, setSelectedExperimental] = React.useState([])
   const [newEvent, setNewEvent] = React.useState(false)
 
@@ -344,38 +289,23 @@ export default function Prevent({
       setDisabled(disabled)
       if (!disabled) {
         await loadActivityEvents()
-        LAMP.Sensor.allByParticipant(participant.id).then((sensors) => {
-          setSelectedSensors(sensors.map((sensor) => sensor.name))
-        })
-        getSensorEvents(participant.id).then((sensorEvents) => {
-          let sensorEventCount = getSensorEventCount(sensorEvents)
-          setSensorEvents(sensorEvents)
-
-          getVisualizations(participant).then((data) => {
-            setVisualizations(data)
-            let visualizationCount = Object.keys(data)
-              .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-              .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-            setSensorCounts(Object.assign({}, sensorEventCount, visualizationCount))
-            setCortex(
-              [`Environmental Context`, `Step Count`, `Social Context`]
-                .filter((sensor) => sensorEventCount[sensor] > 0)
-                .concat(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
-            )
-            setLoading(false)
-          })
-        })
+        loadVisualizations()
       } else {
-        getVisualizations(participant).then((data) => {
-          setVisualizations(data)
-          let visualizationCount = Object.keys(data)
-            .map((x) => x.replace("lamp.dashboard.experimental.", ""))
-            .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
-          setSensorCounts(Object.assign({}, visualizationCount))
-          setLoading(false)
-        })
+        loadVisualizations()
       }
     })()
+  }
+
+  const loadVisualizations = () => {
+    getVisualizations(participant).then((data) => {
+      setVisualizations(data)
+      let visualizationCount = Object.keys(data)
+        .map((x) => x.replace("lamp.dashboard.experimental.", ""))
+        .reduce((prev, curr) => ({ ...prev, [curr]: 1 }), {})
+      setVisualCounts(Object.assign({}, visualizationCount))
+      setCortex(Object.keys(data).map((x) => x.replace("lamp.dashboard.experimental.", "")))
+      setLoading(false)
+    })
   }
 
   const loadActivityEvents = () => {
@@ -467,17 +397,6 @@ export default function Prevent({
               </Grid>
             </Grid>
             <Grid container spacing={2}>
-              <PreventSelectedSensors
-                participant={participant}
-                selectedSensors={selectedSensors}
-                sensorCounts={sensorCounts}
-                sensorEvents={sensorEvents}
-                onEditAction={onEditAction}
-                onCopyAction={onCopyAction}
-                onDeleteAction={onDeleteAction}
-                earliestDate={earliestDate}
-              />
-
               <Grid container xs={12} spacing={2}>
                 <PreventSelectedExperimental
                   participant={participant}
@@ -521,17 +440,13 @@ export default function Prevent({
               )}
               {dialogueType === 1 && (
                 <MultipleSelect
-                  selected={selectedSensors.concat(selectedExperimental) || []}
+                  selected={selectedExperimental || []}
                   items={cortex}
                   showZeroBadges={false}
-                  badges={sensorCounts}
+                  badges={visualCounts}
                   onChange={(x) => {
-                    if ([`Environmental Context`, `Step Count`, `Social Context`].includes(x[x.length - 1])) {
-                      setSelectedSensors(x)
-                    } else {
-                      LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)
-                      setSelectedExperimental(x)
-                    }
+                    LAMP.Type.setAttachment(participant.id, "me", "lamp.selectedExperimental", x)
+                    setSelectedExperimental(x)
                   }}
                 />
               )}
