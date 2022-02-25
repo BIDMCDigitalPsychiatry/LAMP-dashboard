@@ -4,6 +4,7 @@ import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 import { useTranslation } from "react-i18next"
+import { autoMaxBins } from "vega-lite/build/src/bin"
 
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
@@ -79,6 +80,9 @@ const formTheme = createMuiTheme({
       root: {
         border: 0,
         backgroundColor: "#f4f4f4",
+        "& textarea": {
+          resize: "vertical",
+        },
       },
       underline: {
         "&&&:before": {
@@ -90,7 +94,7 @@ const formTheme = createMuiTheme({
       },
     },
     MuiTypography: {
-      h5: { fontSize: 16, fontWeight: 600, fontFamily: "inter", marginBottom: 10 },
+      h5: { fontSize: 16, fontWeight: 600, marginBottom: 10 },
     },
   },
 })

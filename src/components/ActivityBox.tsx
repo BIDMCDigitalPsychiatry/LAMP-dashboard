@@ -21,11 +21,17 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: 15,
       position: "absolute",
       width: "100%",
+      height: "63px",
+      overflow: "auto",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       [theme.breakpoints.down("sm")]: {
         fontSize: 13,
         padding: "0 5px",
         "& p": { marginBottom: "0", lineHeight: "16px" },
       },
+      "& p": { margin: "0" },
     },
     scratch: {
       "& h2": {
