@@ -10,6 +10,9 @@ import {
   Icon,
   Typography,
   Backdrop,
+  AppBar,
+  Toolbar,
+  IconButton,
   CircularProgress,
 } from "@material-ui/core"
 import LAMP from "lamp-core"
@@ -38,6 +41,41 @@ const useStyles = makeStyles((theme) => ({
   niceWork: {
     marginTop: "20%",
     "& h5": { fontSize: 25, fontWeight: 600, color: "rgba(0, 0, 0, 0.75)" },
+  },
+  toolbardashboard: {
+    minHeight: 65,
+    [theme.breakpoints.up("md")]: {
+      paddingTop: "0 !important",
+      width: "100%",
+      maxWidth: "100% !important",
+    },
+    [theme.breakpoints.down("sm")]: {
+      padding: "0 16px !important",
+    },
+    "& h5": {
+      color: "rgba(0, 0, 0, 0.75)",
+      textAlign: "center",
+      fontWeight: "600",
+      fontSize: 18,
+      width: "100%",
+      textTransform: "capitalize",
+    },
+  },
+  inlineHeader: {
+    background: "#FFFFFF",
+    boxShadow: "none",
+    "& h5": {
+      fontSize: 25,
+      paddingLeft: 20,
+      color: "rgba(0, 0, 0, 0.75)",
+      fontWeight: 600,
+      lineHeight: "47px",
+      textAlign: "left",
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: 16,
+        lineHeight: "normal",
+      },
+    },
   },
   dialogueStyle: {
     display: "flex",
@@ -151,15 +189,24 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   return (
     <div style={{ height: "100%" }}>
       {!!response && (
-        <Box textAlign="center" pb={4} className={classes.niceWork}>
-          <Typography variant="h5" gutterBottom>
-            {t("Success") + "!"}
-          </Typography>
-          <Typography className={classes.ribbonText} component="p">
-            {t("You have successfully completed your activity.")}
-          </Typography>
-          <Box textAlign="center" className={classes.niceWorkbadge}>
-            <Icon>check_circle</Icon>
+        <Box>
+          <AppBar position="static" className={classes.inlineHeader}>
+            <Toolbar className={classes.toolbardashboard}>
+              <IconButton onClick={() => (window.location.href = "/#/")} color="default" aria-label="Menu">
+                <Icon>arrow_back</Icon>
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+          <Box textAlign="center" pb={4} className={classes.niceWork}>
+            <Typography variant="h5" gutterBottom>
+              {t("Success") + "!"}
+            </Typography>
+            <Typography className={classes.ribbonText} component="p">
+              {t("You have successfully completed your activity.")}
+            </Typography>
+            <Box textAlign="center" className={classes.niceWorkbadge}>
+              <Icon>check_circle</Icon>
+            </Box>
           </Box>
         </Box>
       )}
