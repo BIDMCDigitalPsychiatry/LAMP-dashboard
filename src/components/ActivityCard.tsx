@@ -63,7 +63,7 @@ export default function ActivityCard({
       if (k !== "item") {
         eachData[d["item"]].push({
           x: k,
-          y: parseInt(d[k]),
+          y: isNaN(parseInt(d[k])) ? d[k] : parseInt(d[k]),
           missing: [null, "NULL"].includes(d),
         })
       }
@@ -144,7 +144,10 @@ export default function ActivityCard({
             }))}
           />
         )
-      ) : showGrid && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
+      ) : showGrid &&
+        activity.spec !== "lamp.scratch_image" &&
+        activity.spec !== "lamp.tips" &&
+        activity.spec !== "lamp.breathe" ? (
         <ArrayView
           hiddenKeys={["x"]}
           hasSpanningRowForIndex={
