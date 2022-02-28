@@ -20,20 +20,13 @@ export default function ArrayView({
   spanningRowForIndex?: (index: number) => any
 }) {
   const { t } = useTranslation()
-  const keys = ["item"]
-  Object.keys(value).map((val) => {
-    Object.keys(value[val]).map((p) => {
-      if (p !== "item") {
-        if (keys.indexOf(p) < 0) keys.push(p)
-      }
-    })
-  })
+  const displayKeys = () => Object.keys(value[0] || {}).filter((x) => !(hiddenKeys || []).includes(x))
   return (
     <div style={{ overflowX: "auto" }}>
       <Table>
         <TableHead>
           <TableRow>
-            {keys.map((key) => (
+            {displayKeys().map((key) => (
               <TableCell key={key} title={humanize(key)}>
                 {humanize(key)}
               </TableCell>
@@ -44,21 +37,11 @@ export default function ArrayView({
           {value.map((row, index) => (
             <React.Fragment>
               <TableRow hover key={index}>
-                {keys.map((key) =>
+                {displayKeys().map((key) =>
                   Array.isArray(row[key]) ? (
                     <ArrayView value={row[key]} />
                   ) : !!row[key] && typeof row[key] === "object" ? (
-                    !!row[key]?.question ? (
-                      <TableCell key={row[key]}>
-                        <ReactMarkdown
-                          source={t(row[key]?.question) + " : " + row[key].value.join(", ")}
-                          escapeHtml={false}
-                          plugins={[gfm, emoji]}
-                        />
-                      </TableCell>
-                    ) : (
-                      <ArrayView value={[row[key]]} />
-                    )
+                    <ArrayView value={[row[key]]} />
                   ) : (
                     <TableCell key={row[key]}>
                       {typeof row[key] === "string" ? (
@@ -72,7 +55,7 @@ export default function ArrayView({
               </TableRow>
               {hasSpanningRowForIndex?.(index) && (
                 <TableRow key={`${index}-optional`}>
-                  <TableCell colSpan={keys.length}>{spanningRowForIndex?.(row.item)}</TableCell>
+                  <TableCell colSpan={displayKeys().length}>{spanningRowForIndex?.(row.item)}</TableCell>
                 </TableRow>
               )}
             </React.Fragment>
