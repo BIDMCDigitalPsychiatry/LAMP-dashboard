@@ -25,7 +25,7 @@ import BreatheIcon from "../../../icons/Breathe.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    containerWidth: { maxWidth: 1055 },
+    containerWidth: { maxWidth: 1055, marginBottom: "80px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
