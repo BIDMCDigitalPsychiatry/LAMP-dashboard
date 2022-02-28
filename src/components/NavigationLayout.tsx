@@ -462,6 +462,7 @@ export default function NavigationLayout({
                     variant="h5"
                     style={{
                       marginLeft: supportsSidebar ? 35 : undefined,
+                      textTransform: "capitalize",
                     }}
                   >
                     {t(activeTab)}
@@ -474,6 +475,7 @@ export default function NavigationLayout({
                 <Typography
                   variant="h5"
                   style={{
+                    textTransform: "capitalize",
                     marginLeft:
                       supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                   }}
