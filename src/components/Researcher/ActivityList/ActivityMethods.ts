@@ -558,60 +558,8 @@ export const SchemaList = () => {
                   {
                     properties: {
                       type: {
-                        enum: ["text", "boolean", "short_answer"],
+                        enum: ["text", "boolean", "short_answer", "matrix"],
                       },
-                    },
-                  },
-                  {
-                    properties: {
-                      type: {
-                        enum: ["matrix"],
-                      },
-                      options: {
-                        type: "object",
-                        title: "Matrix options",
-                        properties: {
-                          multiple: {
-                            title: i18n.t("Enable multiple option selections"),
-                            type: "boolean",
-                            default: false,
-                          },
-                          questions: {
-                            type: "array",
-                            title: i18n.t("Question"),
-                            minItems: 1,
-                            items: {
-                              type: "string",
-                              minLength: 1,
-                              default: "",
-                            },
-                          },
-                          options: {
-                            type: "array",
-                            title: "Options",
-                            minItems: 1,
-                            items: {
-                              type: "object",
-                              properties: {
-                                value: {
-                                  title: i18n.t("Option Text"),
-                                  type: "string",
-                                  minLength: 1,
-                                  default: "",
-                                },
-                                description: {
-                                  title: i18n.t("Option Description"),
-                                  type: "string",
-                                  default: "",
-                                },
-                              },
-                            },
-                          },
-                          // }
-                        },
-                      },
-
-                      required: ["options"],
                     },
                   },
                   {
