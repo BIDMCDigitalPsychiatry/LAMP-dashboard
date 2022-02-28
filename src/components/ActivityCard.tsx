@@ -29,66 +29,41 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
-
-  const getValue = (val) => {
-    let retValue = ""
-    let index = 1
-    for (let x in val) {
-      retValue += index + ". " + t(val[x]?.question) + ": " + val[x].value.join(", ") + ", "
-      index++
-    }
-    return retValue.substr(0, retValue.length - 2)
-  }
-  let values = []
-  events = events.sort((a, b) => a.timestamp - b.timestamp)
-  events.map((d) =>
-    d.temporal_slices.map((t) => {
-      if (typeof t.value !== "undefined") {
-        if (typeof t.value !== "string" && typeof t.value !== "number" && t.value !== null) {
-          Object.keys(t.value).map((val) => {
-            let sum = 0
-            if (!!t.value[val]?.question) {
-              ;(t.value[val].value || []).map((elt) => {
-                sum = sum + (isNaN(parseInt(elt)) ? elt : parseInt(elt))
-              })
-              values.push({
-                item: t.item + " - " + t.value[val].question,
-                [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]: sum,
-              })
-            }
-          })
-        } else {
-          values.push({
-            item: t.item,
-            [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
-              activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                ? typeof t.value === "string"
-                  ? typeof t.value === "string" && ["Yes", "True"].includes(t.value)
-                    ? 1
-                    : typeof t.value === "string" && ["No", "False"].includes(t.value)
-                    ? 0
-                    : t.value
-                  : t.value
-                : !!t.type
-                ? 1
-                : 0,
-          })
-        }
-      }
-    })
+  let each = Object.values(
+    events
+      .map((d) =>
+        d.temporal_slices.map((t) => ({
+          item: t.item,
+          [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+            activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+              ? typeof t.value === "string"
+                ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
+                  ? 1
+                  : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
+                  ? 0
+                  : isNaN(parseInt(t.value.replace(/\"/g, "")))
+                  ? t.value
+                  : parseInt(t.value.replace(/\"/g, ""))
+                : t.value
+              : !!t.type
+              ? 1
+              : 0,
+        }))
+      )
+      .reduce((x, y) => x.concat(y), [])
+      .groupBy("item")
   )
-  values = Object.values(values.reduce((x, y) => x.concat(y), []).groupBy("item"))
     .map((v: any) => Object.assign({}, ...v))
     .reduce((x, y) => x.concat(y), [])
   let eachData = []
-  values.map((d, key) => {
+  each = each.map((d, key) => {
     let keys = Object.keys(d)
     eachData[d["item"]] = []
     keys.map((k) => {
       if (k !== "item") {
         eachData[d["item"]].push({
           x: k,
-          y: parseInt(d[k]) ?? d[k],
+          y: isNaN(parseInt(d[k])) ? d[k] : parseInt(d[k]),
           missing: [null, "NULL"].includes(d),
         })
       }
@@ -162,17 +137,17 @@ export default function ActivityCard({
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
               value:
-                typeof x.value !== "string" && typeof x.value !== "number"
-                  ? getValue(x.value)
-                  : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
+                typeof x.value === "string" && isNaN(parseInt(x.value.replace(/\"/g, "")))
+                  ? `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, "")
+                  : x.value,
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
         )
       ) : showGrid &&
         activity.spec !== "lamp.scratch_image" &&
-        activity.spec !== "lamp.breathe" &&
-        activity.spec !== "lamp.tips" ? (
+        activity.spec !== "lamp.tips" &&
+        activity.spec !== "lamp.breathe" ? (
         <ArrayView
           hiddenKeys={["x"]}
           hasSpanningRowForIndex={
@@ -188,7 +163,32 @@ export default function ActivityCard({
               onClick={(datum) => setVisibleSlice(datum)}
             />
           )}
-          value={values}
+          value={Object.values(
+            events
+              .map((d) =>
+                d.temporal_slices.map((t) => ({
+                  item: t.item,
+                  [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
+                    activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
+                      ? typeof t.value === "string"
+                        ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
+                          ? 1
+                          : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
+                          ? 0
+                          : isNaN(parseInt(t.value.replace(/\"/g, "")))
+                          ? t.value
+                          : parseInt(t.value.replace(/\"/g, ""))
+                        : t.value
+                      : !!t.type
+                      ? 1
+                      : 0,
+                }))
+              )
+              .reduce((x, y) => x.concat(y), [])
+              .groupBy("item")
+          )
+            .map((v: any) => Object.assign({}, ...v))
+            .reduce((x, y) => x.concat(y), [])}
         />
       ) : (
         <Sparkline
