@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react"
 import {
   Box,
   Tooltip,
-  Typography,
   Grid,
-  Fab,
   Icon,
   TextField,
   Checkbox,
@@ -59,7 +57,7 @@ const theme = createMuiTheme({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    containerWidth: { maxWidth: 1055 },
+    containerWidth: { maxWidth: 1055, marginBottom: "80px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -441,7 +439,7 @@ export default function Tips({
           }
     onSave(dataObj, duplicate)
   }
-  
+
   useEffect(() => {
     validate()
   }, [data])
