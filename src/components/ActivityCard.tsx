@@ -29,6 +29,7 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
+  console.log(events, Number("3"))
   let each = Object.values(
     events
       .map((d) =>
@@ -41,9 +42,9 @@ export default function ActivityCard({
                   ? 1
                   : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
                   ? 0
-                  : isNaN(parseInt(t.value.replace(/\"/g, "")))
-                  ? t.value
-                  : parseInt(t.value.replace(/\"/g, ""))
+                  : !isNaN(Number(t.value.replace(/\"/g, "")))
+                  ? parseInt(t.value.replace(/\"/g, ""))
+                  : t.value
                 : t.value
               : !!t.type
               ? 1
@@ -63,7 +64,7 @@ export default function ActivityCard({
       if (k !== "item") {
         eachData[d["item"]].push({
           x: k,
-          y: isNaN(parseInt(d[k])) ? d[k] : parseInt(d[k]),
+          y: d[k],
           missing: [null, "NULL"].includes(d),
         })
       }
@@ -137,9 +138,9 @@ export default function ActivityCard({
             value={(visibleSlice.slice || []).map((x) => ({
               item: x.item,
               value:
-                typeof x.value === "string" && isNaN(parseInt(x.value.replace(/\"/g, "")))
-                  ? `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, "")
-                  : x.value,
+                typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
+                  ? parseInt(x.value.replace(/\"/g, ""))
+                  : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
           />
@@ -175,9 +176,9 @@ export default function ActivityCard({
                           ? 1
                           : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
                           ? 0
-                          : isNaN(parseInt(t.value.replace(/\"/g, "")))
-                          ? t.value
-                          : parseInt(t.value.replace(/\"/g, ""))
+                          : !isNaN(Number(t.value.replace(/\"/g, "")))
+                          ? parseInt(t.value.replace(/\"/g, ""))
+                          : t.value
                         : t.value
                       : !!t.type
                       ? 1
