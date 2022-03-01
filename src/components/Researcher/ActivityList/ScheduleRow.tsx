@@ -16,7 +16,7 @@ import {
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
-import { isDate } from "date-fns"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     datePicker: {
@@ -114,7 +114,7 @@ export default function ScheduleRow({
     <TableRow key={index} style={{ verticalAlign: !isEdit ? "middle" : "top" }}>
       <TableCell component="th" scope="row">
         {!isEdit ? (
-          <span>{new Date(data.start_date).toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
+          <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
         ) : (
           <KeyboardDatePicker
             className={classes.datePicker}
@@ -127,14 +127,14 @@ export default function ScheduleRow({
             format="MM/dd/yyyy"
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
-            value={data.start_date ?? ""}
+            value={data.start_date ? getDate(data.start_date ?? "") : ""}
             onChange={(date) => {
               if (!!date) {
-                date.setHours(0)
+                date.setHours(1)
                 date.setMinutes(0)
                 date.setSeconds(0)
               }
-              setData({ ...data, start_date: date?.isValid() ? getDate(dateInUTCformat(date)) : null })
+              setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />
         )}
@@ -156,11 +156,7 @@ export default function ScheduleRow({
             value={data.time ? getDate(data.time ?? "") : ""}
             defaultValue={data.time ? getDate(data.time ?? "") : ""}
             onChange={(date) => {
-              const startDate = new Date(data.start_date)
-              startDate.setHours((date || new Date()).getHours())
-              startDate.setMinutes((date || new Date()).getMinutes())
-              startDate.setSeconds((date || new Date()).getSeconds())
-              setData({ ...data, start_date: startDate, time: date?.isValid() ? dateInUTCformat(date) : null })
+              setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />
         )}
