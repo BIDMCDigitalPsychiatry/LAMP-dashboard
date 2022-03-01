@@ -455,8 +455,8 @@ export default function Tips({
         if (base64Img !== "" && base64Img !== undefined) {
           let img = new Image()
           img.src = base64Img
-          type = base64Img.split(";")[0].split("/")[1]
-          let stringLength = base64Img.length - ("data:image/" + type + ";base64,").length
+          type = base64Img?.split(";")[0]?.split("/")[1]
+          let stringLength = base64Img?.length - ("data:image/" + type + ";base64,").length
           sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
           if ((type !== "" && !imageTypes.includes(type)) || sizeInBytes > 4194304) {
             setIsImagError(true)
@@ -712,7 +712,6 @@ export default function Tips({
               </Grid>
             </Grid>
           )}
-
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
             Object.keys(newSchemaList).includes("lamp.tips")) && (
             <DynamicForm

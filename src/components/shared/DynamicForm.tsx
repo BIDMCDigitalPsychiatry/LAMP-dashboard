@@ -1,10 +1,9 @@
-import React from "react"
-import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
+import React, { useEffect } from "react"
+import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider, IconButton, Box } from "@material-ui/core"
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 import { useTranslation } from "react-i18next"
-import { autoMaxBins } from "vega-lite/build/src/bin"
 
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
@@ -130,6 +129,48 @@ function AutocompleteTextWidget(props) {
   )
 }
 
+function processFile(files) {
+  const f = files[0]
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      resolve(event.target.result)
+    }
+    reader.readAsDataURL(f)
+  })
+}
+// Add support for the "examples" array for the property as an auto-complete menu.
+function CustomFileWidget(props) {
+  const ref = React.useRef(props.value)
+
+  const onClick = () => {
+    ref.current.value = ""
+    props.onChange("")
+  }
+  return (
+    <Box>
+      <input
+        type="file"
+        required={props.required}
+        ref={ref}
+        accept="image/*"
+        name="file"
+        onChange={(event) => {
+          processFile(event.target.files).then(props.onChange)
+        }}
+      />
+      {props?.value && (
+        <Box style={{ padding: "20px 0 0 0" }}>
+          <img src={props?.value ?? ""} height="150" />
+          <IconButton onClick={onClick}>
+            <Icon style={{ color: "red" }}>close</Icon>
+          </IconButton>
+        </Box>
+      )}
+    </Box>
+  )
+}
+
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
@@ -145,7 +186,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
           onChange(x.formData)
         }}
         ObjectFieldTemplate={ObjectFieldTemplate}
-        widgets={{ TextWidget: AutocompleteTextWidget }}
+        widgets={{ TextWidget: AutocompleteTextWidget, FileWidget: CustomFileWidget }}
       />
     </MuiThemeProvider>
   )
