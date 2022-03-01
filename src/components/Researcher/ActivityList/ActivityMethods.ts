@@ -843,6 +843,14 @@ export const SchemaList = () => {
                 ),
                 type: "string",
                 format: "data-url",
+                "ui:widget": "file",
+                "clear-button": {
+                  "ui:widget": "clear-button-widget",
+                },
+                "ui:options": {
+                  accept: ".gif,.jpg,.png,.svg",
+                  delete: true,
+                },
               },
             },
           },
@@ -863,7 +871,7 @@ export const SchemaList = () => {
               format: "url",
             },
             audio: {
-              title: i18n.t("Upload audio"),
+              title: i18n.t(""),
               description: i18n.t("Do not upload audio AND provide an audio URL above."),
               type: "string",
               format: "data-url",

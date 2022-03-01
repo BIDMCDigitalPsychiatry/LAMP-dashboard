@@ -141,6 +141,9 @@ function processFile(files) {
 }
 // Add support for the "examples" array for the property as an auto-complete menu.
 function CustomFileWidget(props) {
+  if (!props.options?.delete) {
+    return <Widgets.TextWidget type="file" {...props} />
+  }
   const ref = React.useRef(props.value)
 
   const onClick = () => {
