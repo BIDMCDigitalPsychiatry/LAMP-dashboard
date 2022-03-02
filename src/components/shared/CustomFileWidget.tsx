@@ -32,32 +32,37 @@ function processFile(files) {
 
 export default function CustomFileWidget(props) {
   const classes = useStyles()
-  if (!props.options?.delete) {
-    return <Widgets.TextWidget type="file" {...props} />
-  }
   const ref = React.useRef(props.value)
 
   const onClick = () => {
     ref.current.value = ""
     props.onChange("")
   }
-
   return (
     <Box>
       <input
         type="file"
         required={props.required}
         ref={ref}
-        accept="image/*"
+        accept={
+          props.options.accept.includes(".mp3") ? "audio/*" : props.options.accept.includes(".png") ? "image/*" : "*"
+        }
         name="file"
         onChange={(event) => {
           processFile(event.target.files).then(props.onChange)
         }}
       />
+      <audio src={props?.value ?? ""} />
       {props?.value && (
         <Box className={classes.imgBox}>
           <Box className={classes.imgInnerBox}>
-            <img src={props?.value ?? ""} height="150" />
+            {props.options.accept.includes(".mp3") ? (
+              <audio controls={true}>
+                <source src={props?.value ?? ""} />
+              </audio>
+            ) : (
+              <img src={props?.value ?? ""} height="150" />
+            )}
             <IconButton onClick={onClick} className={classes.closeButton}>
               <Icon className={classes.closeIcon}>close</Icon>
             </IconButton>
