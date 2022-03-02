@@ -846,7 +846,6 @@ export const SchemaList = () => {
                 "ui:widget": "file",
                 "ui:options": {
                   accept: ".gif,.jpg,.png,.svg",
-                  delete: true,
                 },
               },
             },
