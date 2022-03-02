@@ -52,7 +52,6 @@ export default function CustomFileWidget(props) {
           processFile(event.target.files).then(props.onChange)
         }}
       />
-      <audio src={props?.value ?? ""} />
       {props?.value && (
         <Box className={classes.imgBox}>
           <Box className={classes.imgInnerBox}>
