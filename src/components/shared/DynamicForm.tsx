@@ -1,10 +1,10 @@
-import React from "react"
-import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
+import React, { useEffect } from "react"
+import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider, IconButton, Box } from "@material-ui/core"
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 import { useTranslation } from "react-i18next"
-import { autoMaxBins } from "vega-lite/build/src/bin"
+import CustomFileWidget from "./CustomFileWidget"
 
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
@@ -129,7 +129,6 @@ function AutocompleteTextWidget(props) {
     />
   )
 }
-
 // A wrapper Form component to add support for things not available out of the box in RJSF.
 // NOTE: Do not keep resetting the value of `initialData`! Only set this once.
 export default function DynamicForm({ schema, initialData, onChange, ...props }) {
@@ -145,7 +144,7 @@ export default function DynamicForm({ schema, initialData, onChange, ...props })
           onChange(x.formData)
         }}
         ObjectFieldTemplate={ObjectFieldTemplate}
-        widgets={{ TextWidget: AutocompleteTextWidget }}
+        widgets={{ TextWidget: AutocompleteTextWidget, FileWidget: CustomFileWidget }}
       />
     </MuiThemeProvider>
   )
