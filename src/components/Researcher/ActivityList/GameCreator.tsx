@@ -159,8 +159,7 @@ export default function GameCreator({
           (typeof data.name !== "undefined" && data.name?.trim() === "")
         )
       )
-    }
-    if (
+    } else if (
       (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
       ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
     ) {
@@ -205,8 +204,10 @@ export default function GameCreator({
         data.settings?.shape_count < 1 ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if ((value?.spec && ["lamp.balloon_risk"].includes(value.spec)) || ["lamp.balloon_risk"].includes(activitySpecId)) {
+    } else if (
+      (value?.spec && ["lamp.balloon_risk"].includes(value.spec)) ||
+      ["lamp.balloon_risk"].includes(activitySpecId)
+    ) {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
@@ -224,8 +225,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if (
+    } else if (
       (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
       ["lamp.pop_the_bubbles"].includes(activitySpecId)
     ) {
@@ -249,8 +249,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if (
+    } else if (
       (value?.spec && ["lamp.scratch_image"].includes(value.spec)) ||
       ["lamp.scratch_image"].includes(activitySpecId)
     ) {
@@ -263,8 +262,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if (
+    } else if (
       (value?.spec && ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(value.spec)) ||
       ["lamp.spatial_span", "lamp.cats_and_dogs", "lamp.journal"].includes(activitySpecId)
     ) {
@@ -276,8 +274,7 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if ((value?.spec && value.spec === "lamp.recording") || activitySpecId === "lamp.recording") {
+    } else if ((value?.spec && value.spec === "lamp.recording") || activitySpecId === "lamp.recording") {
       return !(
         typeof data.studyID == "undefined" ||
         data.studyID === null ||
@@ -290,8 +287,10 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
-    }
-    if ((value?.spec && ["lamp.dbt_diary_card"].includes(value.spec)) || activitySpecId === "lamp.dbt_diary_card") {
+    } else if (
+      (value?.spec && ["lamp.dbt_diary_card"].includes(value.spec)) ||
+      activitySpecId === "lamp.dbt_diary_card"
+    ) {
       let validateEffective = false
       if (data.settings && data.settings.targetEffective !== undefined) {
         if (data.settings.targetEffective.length > 0) {
@@ -349,8 +348,7 @@ export default function GameCreator({
         validateInEffective ||
         validateEmotions
       )
-    }
-    if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
+    } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
       let fileMB = validateAudioSize()
       return !(
         typeof data.studyID == "undefined" ||
@@ -360,6 +358,15 @@ export default function GameCreator({
         typeof data.name === "undefined" ||
         (typeof data.name !== "undefined" && data.name?.trim() === "") ||
         fileMB > breatheFileLimit
+      )
+    } else {
+      return !(
+        typeof data.studyID == "undefined" ||
+        data.studyID === null ||
+        data.studyID === "" ||
+        duplicates.length > 0 ||
+        typeof data.name === "undefined" ||
+        (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
   }

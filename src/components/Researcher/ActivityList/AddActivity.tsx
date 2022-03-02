@@ -132,9 +132,7 @@ export default function AddActivity({
 
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
-      setActivitySpecs(
-        res.filter((x: any) => availableActivitySpecs.includes(x.id) && !["lamp.group", "lamp.survey"].includes(x.id))
-      )
+      setActivitySpecs(res.filter((x: any) => !["lamp.group", "lamp.survey"].includes(x.id)))
     })
   }, [])
 
@@ -196,7 +194,7 @@ export default function AddActivity({
             </MenuItem>,
             ...activitySpecs.map((x) => (
               <Link href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`} underline="none">
-                {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", ""))}
+                {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
               </Link>
             )),
           ]}

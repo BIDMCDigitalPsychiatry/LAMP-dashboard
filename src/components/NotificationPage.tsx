@@ -222,18 +222,17 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             noBack={false}
             tab={tab}
           />
-        ) : activity?.spec === "lamp.cats_and_dogs" ||
-          activity?.spec === "lamp.jewels_a" ||
-          activity?.spec === "lamp.jewels_b" ||
-          activity?.spec === "lamp.spatial_span" ||
-          activity?.spec === "lamp.pop_the_bubbles" ||
-          activity?.spec === "lamp.balloon_risk" ||
-          activity?.spec === "lamp.dbt_diary_card" ||
-          activity?.spec === "lamp.journal" ||
-          activity?.spec === "lamp.breathe" ||
-          activity?.spec === "lamp.recording" ||
-          activity?.spec === "lamp.scratch_image" ||
-          activity?.spec === "lamp.tips" ? (
+        ) : activity?.spec === "lamp.group" ? (
+          <GroupActivity
+            activity={activity}
+            participant={participant}
+            onComplete={(data) => {
+              showStreak(participant, activity)
+            }}
+            noBack={false}
+            tab={tab}
+          />
+        ) : (
           <EmbeddedActivity
             name={activity?.name}
             activity={activity}
@@ -257,30 +256,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               }
             }}
           />
-        ) : activity?.spec === "lamp.group" ? (
-          <GroupActivity
-            activity={activity}
-            participant={participant}
-            onComplete={(data) => {
-              showStreak(participant, activity)
-            }}
-            noBack={false}
-            tab={tab}
-          />
-        ) : (
-          <Dialog
-            open={openNotImplemented}
-            onClose={() => setOpenNotImplemented(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-                {t("Ok")}
-              </Button>
-            </DialogActions>
-          </Dialog>
         ))}
       <VoiceRecordingResult
         open={openRecordSuccess}

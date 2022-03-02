@@ -149,6 +149,7 @@ export default function Activity({
   }, [activity])
 
   const saveActivity = async (x) => {
+    console.log(x)
     setLoading(true)
     let newItem =
       x.spec === "lamp.survey"

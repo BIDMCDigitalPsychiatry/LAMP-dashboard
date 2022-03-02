@@ -41,18 +41,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
   const [currentActivity, setCurrentActivity] = useState(null)
-  const [dataSubmitted, setDataSubmitted] = useState(false)
   const [timestamp, setTimestamp] = useState(null)
 
   useEffect(() => {
-    setDataSubmitted(false)
     setCurrentActivity(activity)
   }, [activity])
 
   useEffect(() => {
     setActivityId(currentActivity?.id ?? null)
     if (currentActivity !== null && !!currentActivity?.spec) {
-      setDataSubmitted(false)
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
@@ -100,7 +97,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         onComplete(data.response, data.prefillTimestamp ?? null)
       } else {
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
-          setDataSubmitted(true)
           setTimestamp(data.timestamp)
           sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, data.timestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
@@ -141,9 +137,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   const loadFallBack = async () => {
-    let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
-    activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    if (!!demoActivities[activity.spec]) {
+      let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+      activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    } else {
+      return "about:blank"
+    }
   }
 
   return (
