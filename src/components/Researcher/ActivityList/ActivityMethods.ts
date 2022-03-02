@@ -844,9 +844,6 @@ export const SchemaList = () => {
                 type: "string",
                 format: "data-url",
                 "ui:widget": "file",
-                "clear-button": {
-                  "ui:widget": "clear-button-widget",
-                },
                 "ui:options": {
                   accept: ".gif,.jpg,.png,.svg",
                   delete: true,
