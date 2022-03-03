@@ -128,11 +128,13 @@ export default function AddActivity({
     "lamp.pop_the_bubbles": t("Pop the bubbles"),
     "lamp.balloon_risk": t("Balloon Risk"),
     "lamp.recording": t("Voice Recording"),
+    "lamp.survey": t("Survey Instrument"),
+    "lamp.group": t("Activity Group"),
   }
 
   useEffect(() => {
     LAMP.ActivitySpec.all().then((res) => {
-      setActivitySpecs(res.filter((x: any) => !["lamp.group", "lamp.survey"].includes(x.id)))
+      setActivitySpecs(res)
     })
   }, [])
 
@@ -178,25 +180,37 @@ export default function AddActivity({
               </Grid>
             </Grid>
           </MenuItem>
-          <MenuItem disabled divider>
-            <b>{t("Create a new...")}</b>
-          </MenuItem>
-          <Link href={`/#/researcher/${researcherId}/activity/add/group`} underline="none">
-            {t("Activity Group")}
-          </Link>
-          <Link href={`/#/researcher/${researcherId}/activity/add/survey`} underline="none">
-            {t("Survey Instrument")}
-          </Link>
-
+          {activitySpecs.filter((x) => ["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && (
+            <React.Fragment>
+              <MenuItem disabled divider>
+                <b>{t("Create a new...")}</b>
+              </MenuItem>
+              {activitySpecs
+                .filter((x) => ["lamp.group", "lamp.survey"].includes(x.id))
+                .map((x) => (
+                  <Link
+                    href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
+                    underline="none"
+                  >
+                    {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
+                  </Link>
+                ))}
+            </React.Fragment>
+          )}
           {[
             <MenuItem divider key="head" disabled className={classes.borderTop}>
               <b>{t("Smartphone Cognitive Tests")}</b>
             </MenuItem>,
-            ...activitySpecs.map((x) => (
-              <Link href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`} underline="none">
-                {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
-              </Link>
-            )),
+            ...activitySpecs
+              .filter((x) => !["lamp.group", "lamp.survey"].includes(x.id))
+              .map((x) => (
+                <Link
+                  href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
+                  underline="none"
+                >
+                  {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
+                </Link>
+              )),
           ]}
         </React.Fragment>
       </Popover>
