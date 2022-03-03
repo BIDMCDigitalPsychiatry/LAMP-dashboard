@@ -244,7 +244,6 @@ export default function NavigationLayout({
       setLoading(false)
     }
     refresh()
-    setInterval(refresh, 60000)
   }, [])
 
   const refresh = () => {
@@ -256,7 +255,6 @@ export default function NavigationLayout({
           setSensorData(!!data ? data[0] : [])
         })()
       }
-      refreshMessages()
     }
   }
 

@@ -163,7 +163,7 @@ export default function Messages({
     () => {
       refreshMessages()
     },
-    !!refresh ? 60 * 1000 /* 10s */ : null,
+    !!refresh ? 10 * 1000 /* 10s */ : null,
     true
   )
 
