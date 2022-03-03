@@ -25,7 +25,7 @@ import BreatheIcon from "../../../icons/Breathe.svg"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    containerWidth: { maxWidth: 1055 },
+    containerWidth: { maxWidth: 1055, marginBottom: "80px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -110,22 +110,6 @@ export default function GameCreator({
               ? optionsArray.push(0)
               : optionsArray.push(1)
             : optionsArray.push(0)
-          if (questions[idx]?.type === "matrix") {
-            Array.isArray(questions[idx].options) ||
-            questions[idx]?.options?.options === null ||
-            questions[idx]?.options?.questions === null ||
-            (!!questions[idx]?.options?.options && questions[idx]?.options?.options?.length === 0) ||
-            (!!questions[idx]?.options?.questions && questions[idx]?.options?.questions?.length === 0)
-              ? optionsArray.push(1)
-              : (questions[idx]?.options?.questions || []).filter(
-                  (i) => !!i && ((!!i && i?.trim().length > 0) || i === "")
-                ).length === (questions[idx]?.options?.questions || []).length &&
-                (questions[idx]?.options?.options || []).filter(
-                  (i) => !!i && ((!!i.value && i?.value?.trim().length > 0) || i === "")
-                ).length === (questions[idx]?.options?.options || []).length
-              ? optionsArray.push(0)
-              : optionsArray.push(1)
-          }
         })
       }
       if (optionsArray.filter((val) => val !== 0).length > 0) {

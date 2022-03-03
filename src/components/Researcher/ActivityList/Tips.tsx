@@ -3,9 +3,7 @@ import React, { useState, useEffect } from "react"
 import {
   Box,
   Tooltip,
-  Typography,
   Grid,
-  Fab,
   Icon,
   TextField,
   Checkbox,
@@ -59,7 +57,7 @@ const theme = createMuiTheme({
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    containerWidth: { maxWidth: 1055 },
+    containerWidth: { maxWidth: 1055, marginBottom: "80px" },
     backdrop: {
       zIndex: theme.zIndex.drawer + 1,
       color: "#fff",
@@ -441,7 +439,7 @@ export default function Tips({
           }
     onSave(dataObj, duplicate)
   }
-  
+
   useEffect(() => {
     validate()
   }, [data])
@@ -457,8 +455,8 @@ export default function Tips({
         if (base64Img !== "" && base64Img !== undefined) {
           let img = new Image()
           img.src = base64Img
-          type = base64Img.split(";")[0].split("/")[1]
-          let stringLength = base64Img.length - ("data:image/" + type + ";base64,").length
+          type = base64Img?.split(";")[0]?.split("/")[1]
+          let stringLength = base64Img?.length - ("data:image/" + type + ";base64,").length
           sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812
           if ((type !== "" && !imageTypes.includes(type)) || sizeInBytes > 4194304) {
             setIsImagError(true)
@@ -714,7 +712,6 @@ export default function Tips({
               </Grid>
             </Grid>
           )}
-
           {((value?.spec && Object.keys(newSchemaList).includes(value.spec)) ||
             Object.keys(newSchemaList).includes("lamp.tips")) && (
             <DynamicForm
