@@ -22,7 +22,6 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
-import { duplicate } from "vega-lite"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
