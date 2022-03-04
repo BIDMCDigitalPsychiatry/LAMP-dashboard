@@ -113,22 +113,6 @@ export default function Activity({
           let dataActivity = spliceActivity({ raw: activity, tag: tag })
           setActivity(dataActivity)
           setDetails(tag ?? [])
-        } else if (
-          games.includes(activity.spec) ||
-          activity.spec === "lamp.journal" ||
-          activity.spec === "lamp.scratch_image" ||
-          activity.spec === "lamp.breathe" ||
-          activity.spec === "lamp.group" ||
-          activity.spec === "lamp.dbt_diary_card" ||
-          activity.spec === "lamp.recording"
-        ) {
-          if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
-            delete activity.settings.audio
-          }
-          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
-            !!y.error ? undefined : y.data
-          )[0]
-          setDetails(tag ?? [])
         } else if (activity.spec === "lamp.tips") {
           activity.settings = activity.settings.reduce((ds, d) => {
             let newD = d
@@ -141,6 +125,14 @@ export default function Activity({
             !!y.error ? undefined : y.data
           )[0]
           setActivity(activity)
+          setDetails(tag ?? [])
+        } else {
+          if (activity.spec === "lamp.breathe" && activity.settings.audio === null) {
+            delete activity.settings.audio
+          }
+          let tag = [await LAMP.Type.getAttachment(activity.id, "lamp.dashboard.activity_details")].map((y: any) =>
+            !!y.error ? undefined : y.data
+          )[0]
           setDetails(tag ?? [])
         }
         setLoading(false)

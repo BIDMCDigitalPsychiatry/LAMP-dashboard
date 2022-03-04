@@ -132,10 +132,39 @@ export default function AddActivity({
     "lamp.group": t("Activity Group"),
   }
 
+  const getActivitySpec = async (id) => {
+    const spec = await LAMP.ActivitySpec.view(id)
+    if (!!spec && (!!spec.executable || !!spec.settings)) {
+      return spec
+    }
+    return null
+  }
+
+  const setActivitySpecList = async (res, availableSpecs) => {
+    await res
+      .filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
+      .map((x: any) => {
+        if (!!x.id) {
+          ;(async () => {
+            try {
+              const spec = await getActivitySpec(x.id)
+              if (!!spec) availableSpecs.push(spec)
+            } catch (e) {
+              console.dir(e)
+            }
+          })()
+        }
+      })
+    return availableSpecs
+  }
+
   useEffect(() => {
-    LAMP.ActivitySpec.all().then((res) => {
-      setActivitySpecs(res)
-    })
+    ;(async () => {
+      const allSpecs = await LAMP.ActivitySpec.all()
+      let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
+      availableSpecs = await setActivitySpecList(allSpecs, availableSpecs)
+      setActivitySpecs(availableSpecs)
+    })()
   }, [])
 
   return (

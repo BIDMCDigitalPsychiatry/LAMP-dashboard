@@ -22,6 +22,7 @@ import { SchemaList } from "./ActivityMethods"
 import ScratchCard from "../../../icons/ScratchCard.svg"
 import JournalIcon from "../../../icons/Journal.svg"
 import BreatheIcon from "../../../icons/Breathe.svg"
+import { duplicate } from "vega-lite"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -163,92 +164,17 @@ export default function GameCreator({
       (value?.spec && ["lamp.jewels_a", "lamp.jewels_b"].includes(value.spec)) ||
       ["lamp.jewels_a", "lamp.jewels_b"].includes(activitySpecId)
     ) {
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        data.settings?.beginner_seconds > 300 ||
-        data.settings?.beginner_seconds === 0 ||
-        data.settings?.beginner_seconds === "" ||
-        typeof data.settings?.beginner_seconds == "undefined" ||
-        data.settings?.intermediate_seconds > 300 ||
-        data.settings?.intermediate_seconds === 0 ||
-        data.settings?.intermediate_seconds === "" ||
-        typeof data.settings?.intermediate_seconds == "undefined" ||
-        data.settings?.advanced_seconds > 300 ||
-        data.settings?.advanced_seconds === 0 ||
-        data.settings?.advanced_seconds === "" ||
-        typeof data.settings?.advanced_seconds == "undefined" ||
-        data.settings?.expert_seconds > 300 ||
-        data.settings?.expert_seconds === 0 ||
-        data.settings?.expert_seconds === "" ||
-        typeof data.settings?.expert_seconds == "undefined" ||
-        data.settings?.diamond_count > 25 ||
-        data.settings?.diamond_count === 0 ||
-        data.settings?.diamond_count === "" ||
-        data.settings?.bonus_point_count === 0 ||
-        data.settings?.bonus_point_count === "" ||
-        data.settings?.shape_count > 4 ||
-        data.settings?.shape_count === 0 ||
-        data.settings?.shape_count === "" ||
-        typeof data.settings?.shape_count === "undefined" ||
-        typeof data.settings?.bonus_point_count === "undefined" ||
-        typeof data.settings?.diamond_count === "undefined" ||
-        typeof data.name === "undefined" ||
-        data.settings?.beginner_seconds < 30 ||
-        data.settings?.intermediate_seconds < 10 ||
-        data.settings?.expert_seconds < 10 ||
-        data.settings?.advanced_seconds < 10 ||
-        data.settings?.diamond_count < 3 ||
-        data.settings?.shape_count < 1 ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "")
-      )
+      return validateJewels(duplicates)
     } else if (
       (value?.spec && ["lamp.balloon_risk"].includes(value.spec)) ||
       ["lamp.balloon_risk"].includes(activitySpecId)
     ) {
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        data.settings?.balloon_count === 0 ||
-        data.settings?.balloon_count === "" ||
-        data.settings?.breakpoint_mean === 0 ||
-        data.settings?.breakpoint_mean === "" ||
-        data.settings?.breakpoint_std === 0 ||
-        data.settings?.breakpoint_std === "" ||
-        typeof data.settings?.breakpoint_std === "undefined" ||
-        typeof data.settings?.balloon_count === "undefined" ||
-        typeof data.settings?.breakpoint_mean === "undefined" ||
-        typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "")
-      )
+      return validateBallon(duplicates)
     } else if (
       (value?.spec && ["lamp.pop_the_bubbles"].includes(value.spec)) ||
       ["lamp.pop_the_bubbles"].includes(activitySpecId)
     ) {
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        data.settings?.bubble_count === 0 ||
-        data.settings?.bubble_count === "" ||
-        data.settings?.bubble_speed === 0 ||
-        data.settings?.bubble_speed === "" ||
-        data.settings?.intertrial_duration === 0 ||
-        data.settings?.intertrial_duration === "" ||
-        data.settings?.bubble_duration === 0 ||
-        data.settings?.bubble_duration === "" ||
-        typeof data.settings?.bubble_duration === "undefined" ||
-        typeof data.settings?.intertrial_duration === "undefined" ||
-        data.settings?.bubble_count.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
-        data.settings?.bubble_speed.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
-        typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "")
-      )
+      return validatePop(duplicates)
     } else if (
       (value?.spec && ["lamp.scratch_image"].includes(value.spec)) ||
       ["lamp.scratch_image"].includes(activitySpecId)
@@ -275,90 +201,14 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     } else if ((value?.spec && value.spec === "lamp.recording") || activitySpecId === "lamp.recording") {
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        typeof data.settings?.record_label === "undefined" ||
-        typeof data.settings?.rerecord_label === "undefined" ||
-        data.settings?.record_label === "" ||
-        data.settings?.rerecord_label === "" ||
-        typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "")
-      )
+      return validateRecording(duplicates)
     } else if (
       (value?.spec && ["lamp.dbt_diary_card"].includes(value.spec)) ||
       activitySpecId === "lamp.dbt_diary_card"
     ) {
-      let validateEffective = false
-      if (data.settings && data.settings.targetEffective !== undefined) {
-        if (data.settings.targetEffective.length > 0) {
-          validateEffective = data.settings.targetEffective.some((item) => {
-            return (
-              item.target === "" ||
-              typeof item.target === "undefined" ||
-              item.measure === "" ||
-              typeof item.measure === "undefined"
-            )
-          })
-        } else {
-          validateEffective = true
-        }
-      } else {
-        validateEffective = true
-      }
-      let validateInEffective = false
-      if (data.settings && data.settings.targetIneffective !== undefined) {
-        if (data.settings.targetIneffective.length > 0) {
-          validateInEffective = data.settings.targetIneffective.some((item) => {
-            return (
-              item.target === "" ||
-              typeof item.target === "undefined" ||
-              item.measure === "" ||
-              typeof item.measure === "undefined"
-            )
-          })
-        } else {
-          validateInEffective = true
-        }
-      } else {
-        validateInEffective = true
-      }
-      let validateEmotions = false
-      if (data.settings && data.settings.emotions !== undefined) {
-        if (data.settings.emotions.length > 0) {
-          validateEmotions = data.settings.emotions.some((item) => {
-            return item.emotion === "" || typeof item.emotion === "undefined"
-          })
-        } else {
-          validateEmotions = true
-        }
-      } else {
-        validateEmotions = true
-      }
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-        validateEffective ||
-        validateInEffective ||
-        validateEmotions
-      )
+      return validateDBT(duplicates)
     } else if ((value?.spec && ["lamp.breathe"].includes(value.spec)) || activitySpecId === "lamp.breathe") {
-      let fileMB = validateAudioSize()
-      return !(
-        typeof data.studyID == "undefined" ||
-        data.studyID === null ||
-        data.studyID === "" ||
-        duplicates.length > 0 ||
-        typeof data.name === "undefined" ||
-        (typeof data.name !== "undefined" && data.name?.trim() === "") ||
-        fileMB > breatheFileLimit
-      )
+      return validateBreathe(duplicates)
     } else {
       return !(
         typeof data.studyID == "undefined" ||
@@ -369,6 +219,181 @@ export default function GameCreator({
         (typeof data.name !== "undefined" && data.name?.trim() === "")
       )
     }
+  }
+
+  const validateRecording = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      typeof data.settings?.record_label === "undefined" ||
+      typeof data.settings?.rerecord_label === "undefined" ||
+      data.settings?.record_label === "" ||
+      data.settings?.rerecord_label === "" ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validatePop = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      data.settings?.bubble_count === 0 ||
+      data.settings?.bubble_count === "" ||
+      data.settings?.bubble_speed === 0 ||
+      data.settings?.bubble_speed === "" ||
+      data.settings?.intertrial_duration === 0 ||
+      data.settings?.intertrial_duration === "" ||
+      data.settings?.bubble_duration === 0 ||
+      data.settings?.bubble_duration === "" ||
+      typeof data.settings?.bubble_duration === "undefined" ||
+      typeof data.settings?.intertrial_duration === "undefined" ||
+      data.settings?.bubble_count.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+      data.settings?.bubble_speed.filter((d) => typeof d === "undefined" || d === null).length > 0 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validateBallon = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      data.settings?.balloon_count === 0 ||
+      data.settings?.balloon_count === "" ||
+      data.settings?.breakpoint_mean === 0 ||
+      data.settings?.breakpoint_mean === "" ||
+      data.settings?.breakpoint_std === 0 ||
+      data.settings?.breakpoint_std === "" ||
+      typeof data.settings?.breakpoint_std === "undefined" ||
+      typeof data.settings?.balloon_count === "undefined" ||
+      typeof data.settings?.breakpoint_mean === "undefined" ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validateJewels = (duplicates) => {
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      data.settings?.beginner_seconds > 300 ||
+      data.settings?.beginner_seconds === 0 ||
+      data.settings?.beginner_seconds === "" ||
+      typeof data.settings?.beginner_seconds == "undefined" ||
+      data.settings?.intermediate_seconds > 300 ||
+      data.settings?.intermediate_seconds === 0 ||
+      data.settings?.intermediate_seconds === "" ||
+      typeof data.settings?.intermediate_seconds == "undefined" ||
+      data.settings?.advanced_seconds > 300 ||
+      data.settings?.advanced_seconds === 0 ||
+      data.settings?.advanced_seconds === "" ||
+      typeof data.settings?.advanced_seconds == "undefined" ||
+      data.settings?.expert_seconds > 300 ||
+      data.settings?.expert_seconds === 0 ||
+      data.settings?.expert_seconds === "" ||
+      typeof data.settings?.expert_seconds == "undefined" ||
+      data.settings?.diamond_count > 25 ||
+      data.settings?.diamond_count === 0 ||
+      data.settings?.diamond_count === "" ||
+      data.settings?.bonus_point_count === 0 ||
+      data.settings?.bonus_point_count === "" ||
+      data.settings?.shape_count > 4 ||
+      data.settings?.shape_count === 0 ||
+      data.settings?.shape_count === "" ||
+      typeof data.settings?.shape_count === "undefined" ||
+      typeof data.settings?.bonus_point_count === "undefined" ||
+      typeof data.settings?.diamond_count === "undefined" ||
+      typeof data.name === "undefined" ||
+      data.settings?.beginner_seconds < 30 ||
+      data.settings?.intermediate_seconds < 10 ||
+      data.settings?.expert_seconds < 10 ||
+      data.settings?.advanced_seconds < 10 ||
+      data.settings?.diamond_count < 3 ||
+      data.settings?.shape_count < 1 ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "")
+    )
+  }
+
+  const validateDBT = (duplicates) => {
+    let validateEffective = false
+    if (data.settings && data.settings.targetEffective !== undefined) {
+      if (data.settings.targetEffective.length > 0) {
+        validateEffective = data.settings.targetEffective.some((item) => {
+          return (
+            item.target === "" ||
+            typeof item.target === "undefined" ||
+            item.measure === "" ||
+            typeof item.measure === "undefined"
+          )
+        })
+      } else {
+        validateEffective = true
+      }
+    } else {
+      validateEffective = true
+    }
+    let validateInEffective = false
+    if (data.settings && data.settings.targetIneffective !== undefined) {
+      if (data.settings.targetIneffective.length > 0) {
+        validateInEffective = data.settings.targetIneffective.some((item) => {
+          return (
+            item.target === "" ||
+            typeof item.target === "undefined" ||
+            item.measure === "" ||
+            typeof item.measure === "undefined"
+          )
+        })
+      } else {
+        validateInEffective = true
+      }
+    } else {
+      validateInEffective = true
+    }
+    let validateEmotions = false
+    if (data.settings && data.settings.emotions !== undefined) {
+      if (data.settings.emotions.length > 0) {
+        validateEmotions = data.settings.emotions.some((item) => {
+          return item.emotion === "" || typeof item.emotion === "undefined"
+        })
+      } else {
+        validateEmotions = true
+      }
+    } else {
+      validateEmotions = true
+    }
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+      validateEffective ||
+      validateInEffective ||
+      validateEmotions
+    )
+  }
+
+  const validateBreathe = (duplicates) => {
+    let fileMB = validateAudioSize()
+    return !(
+      typeof data.studyID == "undefined" ||
+      data.studyID === null ||
+      data.studyID === "" ||
+      duplicates.length > 0 ||
+      typeof data.name === "undefined" ||
+      (typeof data.name !== "undefined" && data.name?.trim() === "") ||
+      fileMB > breatheFileLimit
+    )
   }
 
   const handleChange = (details) => {
