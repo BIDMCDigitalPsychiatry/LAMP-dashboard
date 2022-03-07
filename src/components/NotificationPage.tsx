@@ -155,14 +155,14 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         showStreak(participant, activity)
       })
     } else {
-      if (mode === null) window.location.href = "/#/"
-      else history.back()
+      returnResult()
     }
   }
 
   const returnResult = () => {
     if (mode === null) setResponse(true)
-    else history.back()
+    else if (tab === null || typeof tab === "undefined") window.location.href = "/#/"
+    else if (!!tab) window.location.href = `/#/participant/${participant}/${tab}`
   }
 
   const showStreak = (participant, activity) => {
