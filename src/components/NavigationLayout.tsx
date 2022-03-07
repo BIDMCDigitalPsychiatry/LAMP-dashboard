@@ -38,7 +38,6 @@ import LAMP from "lamp-core"
 import ModeToggleButton from "./ModeToggleButton"
 import { useTranslation } from "react-i18next"
 import { Service } from "./DBService/DBService"
-import Researcher from "./Researcher/Index"
 import { sensorEventUpdate } from "./BottomMenu"
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
