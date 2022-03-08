@@ -41,22 +41,23 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [loading, setLoading] = useState(true)
   const { t, i18n } = useTranslation()
   const [currentActivity, setCurrentActivity] = useState(null)
-  const [dataSubmitted, setDataSubmitted] = useState(false)
+  const [activityTimestamp, setActivityTimestamp] = useState(0)
   const [timestamp, setTimestamp] = useState(null)
 
   useEffect(() => {
-    setDataSubmitted(false)
     setCurrentActivity(activity)
   }, [activity])
 
   useEffect(() => {
     setActivityId(currentActivity?.id ?? null)
     if (currentActivity !== null && !!currentActivity?.spec) {
-      setDataSubmitted(false)
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
 
+  useEffect(() => {
+    console.log(activityTimestamp)
+  }, [activityTimestamp])
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
@@ -80,7 +81,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
             delete data["activity"]
+            delete data["timestamp"]
             data["activity"] = activityId
+            data["timestamp"] = activityTimestamp
+            console.log(data)
             setData(data)
             setEmbeddedActivity(undefined)
             setSettings(null)
@@ -96,13 +100,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
       const activitySpec = currentActivity?.spec ?? ""
       setCurrentActivity(null)
+      console.log(data)
       if (activitySpec === "lamp.survey") {
-        onComplete(data.response, data.prefillTimestamp ?? null)
+        onComplete(data.response, data.prefillTimestamp ?? activityTimestamp)
       } else {
         if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
-          setDataSubmitted(true)
           setTimestamp(data.timestamp)
-          sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, data.timestamp)
+          sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, activityTimestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               console.dir(e)
@@ -115,6 +119,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           onComplete(null)
         }
       }
+    } else if (embeddedActivity !== undefined) {
+      setActivityTimestamp(new Date().getTime())
     }
   }, [embeddedActivity, data])
 
