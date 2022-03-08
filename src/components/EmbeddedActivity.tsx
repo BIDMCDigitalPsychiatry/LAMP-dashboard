@@ -1,6 +1,16 @@
 // Core Imports
 import React, { useState, useEffect } from "react"
-import { Backdrop, CircularProgress, makeStyles, Theme, createStyles } from "@material-ui/core"
+import {
+  Backdrop,
+  CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Button,
+} from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { sensorEventUpdate } from "./BottomMenu"
@@ -43,6 +53,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [currentActivity, setCurrentActivity] = useState(null)
   const [activityTimestamp, setActivityTimestamp] = useState(0)
   const [timestamp, setTimestamp] = useState(null)
+  const [openNotImplemented, setOpenNotImplemented] = useState(false)
 
   useEffect(() => {
     setCurrentActivity(activity)
@@ -55,9 +66,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [currentActivity])
 
-  useEffect(() => {
-    console.log(activityTimestamp)
-  }, [activityTimestamp])
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
@@ -84,7 +92,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             delete data["timestamp"]
             data["activity"] = activityId
             data["timestamp"] = activityTimestamp
-            console.log(data)
             setData(data)
             setEmbeddedActivity(undefined)
             setSettings(null)
@@ -97,15 +104,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }, [settings])
 
   useEffect(() => {
-    if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
-      const activitySpec = currentActivity?.spec ?? ""
-      setCurrentActivity(null)
-      console.log(data)
-      if (activitySpec === "lamp.survey") {
-        onComplete(data.response, data.prefillTimestamp ?? activityTimestamp)
-      } else {
-        if (!!data?.timestamp && (data?.timestamp ?? 0) !== timestamp) {
-          setTimestamp(data.timestamp)
+    try {
+      if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
+        setCurrentActivity(null)
+        if (!!activityTimestamp && (activityTimestamp ?? 0) !== timestamp) {
+          setTimestamp(activityTimestamp)
           sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, activityTimestamp)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
@@ -118,17 +121,20 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         } else {
           onComplete(null)
         }
+      } else if (embeddedActivity !== undefined) {
+        setActivityTimestamp(new Date().getTime())
       }
-    } else if (embeddedActivity !== undefined) {
-      setActivityTimestamp(new Date().getTime())
+    } catch (e) {
+      setOpenNotImplemented(true)
     }
   }, [embeddedActivity, data])
 
   const activateEmbeddedActivity = async (activity) => {
-    setSaved(false)
-    setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
     let response = "about:blank"
     try {
+      setSaved(false)
+      setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
+
       let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
@@ -147,9 +153,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   const loadFallBack = async () => {
-    let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
-    activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-    return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    if (!!demoActivities[activity.spec]) {
+      let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
+      activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+    } else {
+      return "about:blank"
+    }
   }
 
   return (
@@ -168,6 +178,26 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       <Backdrop className={classes.backdrop} open={loading}>
         <CircularProgress color="inherit" />
       </Backdrop>
+      <Dialog
+        open={openNotImplemented}
+        onClose={() => setOpenNotImplemented(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogContent>{t("An exception occured. The data could not be submitted.")}</DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setLoading(false)
+              setOpenNotImplemented(false)
+              history.back()
+            }}
+            color="primary"
+          >
+            {t("Ok")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   )
 }
