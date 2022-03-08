@@ -133,11 +133,15 @@ export default function AddActivity({
   }
 
   const getActivitySpec = async (id) => {
-    const spec = await LAMP.ActivitySpec.view(id)
-    if (!!spec && (!!spec.executable || !!spec.settings)) {
-      return spec
+    try {
+      const spec = await LAMP.ActivitySpec.view(id)
+      if (!!spec && (!!spec?.executable || !!spec?.settings)) {
+        return spec
+      }
+      return null
+    } catch (e) {
+      return null
     }
-    return null
   }
 
   const setActivitySpecList = async (res, availableSpecs) => {
