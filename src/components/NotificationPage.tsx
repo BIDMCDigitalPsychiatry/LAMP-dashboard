@@ -140,7 +140,6 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const showStreak = (participant, activity) => {
     setLoading(true)
     getImage(activity?.id, activity?.spec).then((tag) => {
-      console.log(tag)
       setStreakActivity(tag?.streak ?? null)
       if (!!tag?.streak?.streak || typeof tag?.streak === "undefined") {
         getEvents(participant, activity.id).then((streak) => {
