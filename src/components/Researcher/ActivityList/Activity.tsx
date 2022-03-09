@@ -26,6 +26,22 @@ export const games = [
   "lamp.balloon_risk",
 ]
 
+const lampActivities = [
+  "spatial_span",
+  "cats_and_dogs",
+  "jewels_a",
+  "jewels_b",
+  "dbt_diary_card",
+  "balloon_risk",
+  "pop_the_bubbles",
+  "journal",
+  "breathe",
+  "recording",
+  "survey",
+  "scratch_image",
+  "tips",
+]
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -246,7 +262,9 @@ export default function Activity({
               details={details ?? null}
               onSave={!!type ? saveActivity : updateActivity}
               studies={studies}
-              activitySpecId={!!type ? "lamp." + type : activity.spec ?? activity.spec}
+              activitySpecId={
+                !!type ? (lampActivities.includes(type) ? "lamp." + type : type) : activity.spec ?? activity.spec
+              }
               study={activity?.study_id ?? null}
             />
           )}
