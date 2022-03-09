@@ -17,7 +17,6 @@ import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
-import VoiceRecordingResult from "./VoiceRecordingResult"
 import { getImage } from "./Manage"
 import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
 
@@ -105,13 +104,11 @@ const useStyles = makeStyles((theme) => ({
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
-  const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
 
   useEffect(() => {
@@ -205,27 +202,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
               if (data === null) {
                 if (mode === null) window.location.href = "/#/"
                 else history.back()
-              } else {
-                if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
-                  if (!!data && !!data?.timestamp) {
-                    setOpenRecordSuccess(true)
-                    setTimeout(function () {
-                      setOpenRecordSuccess(false)
-                      showStreak(participant, activity)
-                    }, 2000)
-                  }
-                } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
-              }
+              } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
             }}
           />
         ))}
-      <VoiceRecordingResult
-        open={openRecordSuccess}
-        onClose={() => {
-          setOpenRecordSuccess(false)
-        }}
-        setOpenRecordSuccess={setOpenRecordSuccess}
-      />
       <Streak
         open={openComplete}
         onClose={() => {
