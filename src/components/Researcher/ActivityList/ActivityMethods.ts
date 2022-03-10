@@ -811,6 +811,54 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.goals": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["unit", "value"],
+          properties: {
+            unit: {
+              title: i18n.t("Unit"),
+              description: "",
+              type: "string",
+              default: "",
+            },
+            value: {
+              title: i18n.t("Value"),
+              description: "",
+              type: "string",
+              default: "",
+            },
+          },
+        },
+      },
+    },
+    "lamp.medications": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["unit", "value"],
+          properties: {
+            unit: {
+              title: i18n.t("Unit"),
+              description: "",
+              type: "string",
+              default: "",
+            },
+            value: {
+              title: i18n.t("Value"),
+              description: "",
+              type: "string",
+              default: "",
+            },
+          },
+        },
+      },
+    },
     "lamp.tips": {
       type: "object",
       properties: {
@@ -1060,7 +1108,13 @@ export async function getDefaultTab(spec) {
     ) {
       return "assess"
     }
-    if (spec === "lamp.journal" || spec === "lamp.breathe" || spec === "lamp.scratch_image") {
+    if (
+      spec === "lamp.goals" ||
+      spec === "lamp.medications" ||
+      spec === "lamp.journal" ||
+      spec === "lamp.breathe" ||
+      spec === "lamp.scratch_image"
+    ) {
       return "manage"
     }
     if (spec === "lamp.tips") return "learn"
