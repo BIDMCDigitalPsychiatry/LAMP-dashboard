@@ -45,7 +45,7 @@
     "jsonata": "^1.8.4",
     "jsonexport": "^3.2.0",
     "jspdf": "^2.3.1",
-    "lamp-core": "^2022.1.21",
+    "lamp-core": "^2022.3.8",
     "material-icons": "^0.5.4",
     "material-ui": "^0.20.2",
     "monaco-editor": "^0.26.1",
@@ -86,7 +86,7 @@
     "colorette": "2.0.16",
     "de-releases": "^1.1.17",
     "@babel/core": "^7.17.5"
- },
+  },
   "scripts": {
     "preinstall": "npx npm-force-resolutions",
     "start": "node buildEnv prod && react-scripts start",

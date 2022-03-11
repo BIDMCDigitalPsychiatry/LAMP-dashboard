@@ -13,7 +13,6 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 // Local Imports
-import { sensorEventUpdate } from "./BottomMenu"
 import LAMP, { Participant as ParticipantObj } from "lamp-core"
 import BottomMenu from "./BottomMenu"
 import Survey from "./Survey"
@@ -23,13 +22,10 @@ import Manage from "./Manage"
 import Welcome from "./Welcome"
 import Learn from "./Learn"
 import Feed from "./Feed"
-import SurveyInstrument from "./SurveyInstrument"
 import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import { getImage } from "./Manage"
-
 import locale_lang from "../locale_map.json"
-import { ShowChart } from "@material-ui/icons"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

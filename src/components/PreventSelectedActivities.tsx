@@ -157,7 +157,7 @@ export const strategies = {
       .map((x, idx) => {
         let question = (Array.isArray(activity.settings) ? activity.settings : []).filter((y) => y.text === x.item)[0]
         if (!!question && typeof x?.value !== "undefined")
-          return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : parseInt(x.value) || 0
+          return ["Yes", "True"].includes(x.value) ? 1 : ["No", "False"].includes(x.value) ? 0 : Number(x.value) || 0
         else if (!!question && !!!question.options) return Math.max(question.options.indexOf(x.value), 0)
         else if (typeof x?.value !== "number" && typeof x?.value !== "string") {
           let sum = 0
@@ -166,13 +166,13 @@ export const strategies = {
               sum += (x.value[val]?.value || [])
                 .map((elt) => {
                   // assure the value can be converted into an integer
-                  return !isNaN(parseInt(elt)) ? parseInt(elt) : 0
+                  return !isNaN(Number(elt)) ? Number(elt) : 0
                 })
                 .reduce((sum, current) => sum + current)
             }
           })
           return sum
-        } else return parseInt(x?.value) || 0
+        } else return Number(x?.value) || 0
       })
       .reduce((prev, curr) => prev + curr, 0),
 
