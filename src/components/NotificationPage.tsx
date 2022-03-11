@@ -2,10 +2,6 @@
 import React, { useEffect, useState } from "react"
 import {
   makeStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Button,
   Box,
   Icon,
   Typography,
@@ -17,14 +13,12 @@ import {
 } from "@material-ui/core"
 import LAMP from "lamp-core"
 import Streak from "./Streak"
-import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
-import VoiceRecordingResult from "./VoiceRecordingResult"
 import { getImage } from "./Manage"
-import { sensorEventUpdate } from "./BottomMenu"
+import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -110,58 +104,33 @@ const useStyles = makeStyles((theme) => ({
 export default function NotificationPage({ participant, activityId, mode, tab, ...props }) {
   const classes = useStyles()
   const [activity, setActivity] = useState(null)
-  const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
   const [response, setResponse] = useState(false)
-  const [openRecordSuccess, setOpenRecordSuccess] = React.useState(false)
   const [streakActivity, setStreakActivity] = useState(null)
 
   useEffect(() => {
     ;(async () => {
-      LAMP.Activity.view(activityId).then((data) => {
-        setActivity(data)
-        setLoading(false)
+      LAMP.Activity.view(activityId).then((data: any) => {
+        if (data.spec === "lamp.survey") {
+          LAMP.Type.getAttachment(activityId, "lamp.dashboard.survey_description").then((tag) => {
+            data = spliceActivity({ raw: data, tag })
+            setActivity(data)
+            setLoading(false)
+          })
+        } else {
+          setActivity(data)
+          setLoading(false)
+        }
       })
     })()
   }, [])
 
-  const submitSurvey = (response, overwritingTimestamp) => {
-    if (!!response) {
-      setLoading(true)
-      const timestamp = new Date().getTime()
-      sensorEventUpdate(tab?.toLowerCase() ?? null, participant, activity.id, timestamp)
-
-      let events = response.map((x, idx) => ({
-        timestamp: timestamp,
-        duration: response?.duration,
-        activity: activity.id,
-        static_data: {},
-        temporal_slices: (x || []).map((y) => ({
-          item: y !== undefined ? y.item : null,
-          value: y !== undefined ? y.value : null,
-          type: null,
-          level: null,
-          duration: y.duration,
-        })),
-      }))
-      Promise.all(
-        events
-          .filter((x) => x.temporal_slices.length > 0)
-          .map((x) => LAMP.ActivityEvent.create(participant, x).catch((e) => console.dir(e)))
-      ).then((x) => {
-        showStreak(participant, activity)
-      })
-    } else {
-      returnResult()
-    }
-  }
-
   const returnResult = () => {
     if (mode === null) setResponse(true)
-    else if (tab === null || typeof tab === "undefined") window.location.href = "/#/"
+    else if (tab === null || typeof tab === "undefined") window.location.href = `/#/participant/${participant}/assess `
     else if (!!tab) window.location.href = `/#/participant/${participant}/${tab}`
   }
 
@@ -212,52 +181,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
       )}
       {!response &&
         !loading &&
-        (activity?.spec === "lamp.survey" ? (
-          <SurveyInstrument
-            participant={participant}
-            type={activity?.name ?? ""}
-            fromPrevent={false}
-            group={[activity]}
-            onComplete={submitSurvey}
-            noBack={false}
-            tab={tab}
-          />
-        ) : activity?.spec === "lamp.cats_and_dogs" ||
-          activity?.spec === "lamp.jewels_a" ||
-          activity?.spec === "lamp.jewels_b" ||
-          activity?.spec === "lamp.spatial_span" ||
-          activity?.spec === "lamp.pop_the_bubbles" ||
-          activity?.spec === "lamp.balloon_risk" ||
-          activity?.spec === "lamp.dbt_diary_card" ||
-          activity?.spec === "lamp.journal" ||
-          activity?.spec === "lamp.breathe" ||
-          activity?.spec === "lamp.recording" ||
-          activity?.spec === "lamp.scratch_image" ||
-          activity?.spec === "lamp.tips" ? (
-          <EmbeddedActivity
-            name={activity?.name}
-            activity={activity}
-            participant={participant}
-            noBack={false}
-            tab={tab}
-            onComplete={(data) => {
-              if (data === null) {
-                if (mode === null) window.location.href = "/#/"
-                else history.back()
-              } else {
-                if (activity?.spec === "lamp.recording" && !!data && !!data?.timestamp) {
-                  if (!!data && !!data?.timestamp) {
-                    setOpenRecordSuccess(true)
-                    setTimeout(function () {
-                      setOpenRecordSuccess(false)
-                      showStreak(participant, activity)
-                    }, 2000)
-                  }
-                } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
-              }
-            }}
-          />
-        ) : activity?.spec === "lamp.group" ? (
+        (activity?.spec === "lamp.group" ? (
           <GroupActivity
             activity={activity}
             participant={participant}
@@ -268,27 +192,20 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
             tab={tab}
           />
         ) : (
-          <Dialog
-            open={openNotImplemented}
-            onClose={() => setOpenNotImplemented(false)}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-                {t("Ok")}
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <EmbeddedActivity
+            name={activity?.name}
+            activity={activity}
+            participant={participant}
+            noBack={false}
+            tab={tab}
+            onComplete={(data) => {
+              if (data === null) {
+                if (mode === null) window.location.href = "/#/"
+                else history.back()
+              } else if (!!data && !!data?.timestamp) showStreak(participant, activity)
+            }}
+          />
         ))}
-      <VoiceRecordingResult
-        open={openRecordSuccess}
-        onClose={() => {
-          setOpenRecordSuccess(false)
-        }}
-        setOpenRecordSuccess={setOpenRecordSuccess}
-      />
       <Streak
         open={openComplete}
         onClose={() => {

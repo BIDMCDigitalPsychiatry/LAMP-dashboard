@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import {
-  Box,
   Select,
   OutlinedInput,
   MenuItem,
@@ -11,18 +10,17 @@ import {
   Theme,
   FormControlLabel,
   Typography,
-  Grid
+  Grid,
 } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import { getDefaultTab } from "./ActivityMethods"
-import classes from "*.module.css"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     menuitemsul: {
       width: "100%",
     },
-    marginTop10 : {marginTop : "10px"}
+    marginTop10: { marginTop: "10px" },
   })
 )
 
@@ -54,7 +52,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   }
 
   useEffect(() => {
-    if((category || []).length === 1 && category[0] === defaultTab) setCustomize(false)
+    if ((category || []).length === 1 && category[0] === defaultTab) setCustomize(false)
     else setCustomize(true)
     onChange(category)
   }, [category])
@@ -62,11 +60,11 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
   useEffect(() => {
     if (category === null) {
       setDefault()
-    }   
+    }
   }, [])
 
   useEffect(() => {
-    if(!customize && category === null) {
+    if (!customize && category === null) {
       setDefault()
     }
   }, [customize])
@@ -97,9 +95,8 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
             }
             label={t("Customize which Tab this Activity appears in")}
           />
-          </Grid>
-          <Grid item lg={6} sm={6} xs={12}>
-
+        </Grid>
+        <Grid item lg={6} sm={6} xs={12}>
           <Select
             labelId="demo-multiple-name-label"
             id="demo-multiple-name"
@@ -124,7 +121,8 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
           {(category || []).length === 0 && (
             <Typography variant="caption">
               {t("This Activity will only appear in the Feed tab if a schedule is configured.")}
-            </Typography>)}
+            </Typography>
+          )}
         </Grid>
       </Grid>
     </Grid>

@@ -27,6 +27,22 @@ export const games = [
   "lamp.balloon_risk",
 ]
 
+const lampActivities = [
+  "spatial_span",
+  "cats_and_dogs",
+  "jewels_a",
+  "jewels_b",
+  "dbt_diary_card",
+  "balloon_risk",
+  "pop_the_bubbles",
+  "journal",
+  "breathe",
+  "recording",
+  "survey",
+  "scratch_image",
+  "tips",
+]
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {
@@ -84,8 +100,6 @@ export default function Activity({
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
-  // Create a new tip activity object & survey descriptions if set.
-  // Create a new Activity object & survey descriptions or activity details if set.
 
   useEffect(() => {
     setLoading(true)

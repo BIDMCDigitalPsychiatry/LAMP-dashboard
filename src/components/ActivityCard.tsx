@@ -29,7 +29,6 @@ export default function ActivityCard({
   const [showGrid, setShowGrid] = useState<boolean>(forceDefaultGrid || Boolean(freeText.length))
   const { t } = useTranslation()
   const selectedActivity = activity
-  console.log(events, Number("3"))
   let each = Object.values(
     events
       .map((d) =>
@@ -43,7 +42,7 @@ export default function ActivityCard({
                   : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
                   ? 0
                   : !isNaN(Number(t.value.replace(/\"/g, "")))
-                  ? parseInt(t.value.replace(/\"/g, ""))
+                  ? Number(t.value.replace(/\"/g, ""))
                   : t.value
                 : t.value
               : !!t.type
@@ -139,7 +138,7 @@ export default function ActivityCard({
               item: x.item,
               value:
                 typeof x.value === "string" && !isNaN(Number(x.value.replace(/\"/g, "")))
-                  ? parseInt(x.value.replace(/\"/g, ""))
+                  ? Number(x.value.replace(/\"/g, ""))
                   : `${x.value}`.replace("NaN", "-").replace("null", "-").replace(/\"/g, ""),
               time_taken: `${(x.duration / 1000).toFixed(1)}s`.replace("NaN", "0.0"),
             }))}
@@ -177,7 +176,7 @@ export default function ActivityCard({
                           : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
                           ? 0
                           : !isNaN(Number(t.value.replace(/\"/g, "")))
-                          ? parseInt(t.value.replace(/\"/g, ""))
+                          ? Number(t.value.replace(/\"/g, ""))
                           : t.value
                         : t.value
                       : !!t.type

@@ -1,20 +1,11 @@
 // Core Imports
 import React, { useEffect, useState } from "react"
-import {
-  makeStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  Button,
-  Box,
-  Backdrop,
-  CircularProgress,
-} from "@material-ui/core"
+import { makeStyles, Box, Backdrop, CircularProgress } from "@material-ui/core"
 import LAMP from "lamp-core"
-import SurveyInstrument from "./SurveyInstrument"
 import EmbeddedActivity from "./EmbeddedActivity"
 import { useTranslation } from "react-i18next"
 import { sensorEventUpdate } from "./BottomMenu"
+import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -35,7 +26,6 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   const [currentActivity, setCurrentActivity] = useState(null)
   const [groupActivities, setGroupActivities] = useState([])
   const [startTime, setStartTime] = useState(new Date().getTime())
-  const [openNotImplemented, setOpenNotImplemented] = useState(false)
   const [loading, setLoading] = useState(true)
   const { t } = useTranslation()
   const [index, setIndex] = useState(-1)
@@ -49,8 +39,16 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
       setLoading(true)
       let actId = groupActivities[index]
       LAMP.Activity.view(actId).then((activity) => {
-        setCurrentActivity(activity)
-        setLoading(false)
+        if (activity.spec === "lamp.survey") {
+          LAMP.Type.getAttachment(actId, "lamp.dashboard.survey_description").then((tag) => {
+            const data = spliceActivity({ raw: activity, tag })
+            setCurrentActivity(data)
+            setLoading(false)
+          })
+        } else {
+          setCurrentActivity(activity)
+          setLoading(false)
+        }
       })
     }
   }, [index])
@@ -69,36 +67,7 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
   useEffect(() => {
     if (index >= 0 && currentActivity !== null) {
       setLoading(true)
-      if (
-        (currentActivity?.spec === "lamp.survey" && typeof data.length === "undefined") ||
-        currentActivity?.spec !== "lamp.survey"
-      ) {
-        iterateActivity()
-      } else {
-        const activityId = currentActivity.id
-        let timestamp = new Date().getTime()
-        sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activityId, timestamp)
-        let events = data.map((x, idx) => ({
-          timestamp: timestamp,
-          duration: x.reduce((sum, item) => sum + item.duration, 0),
-          activity: activityId,
-          static_data: {},
-          temporal_slices: (x || []).map((y) => ({
-            item: y !== undefined ? y.item : null,
-            value: y !== undefined ? y.value : null,
-            type: null,
-            level: null,
-            duration: y.duration,
-          })),
-        }))
-        Promise.all(
-          events
-            .filter((x) => x.temporal_slices.length > 0)
-            .map((x) => LAMP.ActivityEvent.create(participant?.id ?? participant, x).catch((e) => console.log(e)))
-        ).then((x) => {
-          iterateActivity()
-        })
-      }
+      iterateActivity()
     }
   }, [data])
 
@@ -117,67 +86,20 @@ export default function GroupActivity({ participant, activity, noBack, tab, ...p
     }
   }
 
-  const submitSurvey = (response) => {
-    setResponse(!!!response || response === null ? {} : response)
-  }
-
   return (
     <div style={{ height: "100%" }}>
       {!!currentActivity && (
         <Box>
-          {currentActivity?.spec === "lamp.survey" ? (
-            <SurveyInstrument
-              participant={participant}
-              type={currentActivity?.name ?? ""}
-              fromPrevent={false}
-              group={[currentActivity]}
-              onComplete={submitSurvey}
-              noBack={noBack}
-              tab={tab}
-            />
-          ) : currentActivity?.spec === "lamp.cats_and_dogs" ||
-            currentActivity?.spec === "lamp.jewels_a" ||
-            currentActivity?.spec === "lamp.jewels_b" ||
-            currentActivity?.spec === "lamp.spatial_span" ||
-            currentActivity?.spec === "lamp.dbt_diary_card" ||
-            currentActivity?.spec === "lamp.journal" ||
-            currentActivity?.spec === "lamp.breathe" ||
-            currentActivity?.spec === "lamp.pop_the_bubbles" ||
-            currentActivity?.spec === "lamp.balloon_risk" ||
-            currentActivity?.spec === "lamp.recording" ||
-            currentActivity?.spec === "lamp.scratch_image" ||
-            currentActivity?.spec === "lamp.tips" ? (
-            <EmbeddedActivity
-              name={currentActivity?.name}
-              activity={currentActivity}
-              participant={participant}
-              onComplete={(a) => {
-                setResponse({})
-              }}
-              noBack={noBack}
-              tab={tab}
-            />
-          ) : (
-            <Dialog
-              open={openNotImplemented}
-              onClose={() => setOpenNotImplemented(false)}
-              aria-labelledby="alert-dialog-title"
-              aria-describedby="alert-dialog-description"
-            >
-              <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
-              <DialogActions>
-                <Button
-                  onClick={() => {
-                    setOpenNotImplemented(false)
-                    iterateActivity()
-                  }}
-                  color="primary"
-                >
-                  {t("Ok")}
-                </Button>
-              </DialogActions>
-            </Dialog>
-          )}
+          <EmbeddedActivity
+            name={currentActivity?.name}
+            activity={currentActivity}
+            participant={participant}
+            onComplete={(a) => {
+              setResponse({})
+            }}
+            noBack={noBack}
+            tab={tab}
+          />
         </Box>
       )}
       <Backdrop className={classes.backdrop} open={loading}>
