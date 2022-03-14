@@ -16,6 +16,7 @@ import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { Service } from "../../DBService/DBService"
+import { SchemaList } from "./ActivityMethods"
 
 export const games = [
   "lamp.jewels_a",
@@ -99,8 +100,6 @@ export default function Activity({
   const { enqueueSnackbar } = useSnackbar()
   const { t } = useTranslation()
   const classes = useStyles()
-  // Create a new tip activity object & survey descriptions if set.
-  // Create a new Activity object & survey descriptions or activity details if set.
 
   useEffect(() => {
     setLoading(true)
@@ -263,7 +262,11 @@ export default function Activity({
               onSave={!!type ? saveActivity : updateActivity}
               studies={studies}
               activitySpecId={
-                !!type ? (lampActivities.includes(type) ? "lamp." + type : type) : activity.spec ?? activity.spec
+                !!type
+                  ? Object.keys(SchemaList()).includes("lamp." + type)
+                    ? "lamp." + type
+                    : type
+                  : activity.spec ?? activity.spec
               }
               study={activity?.study_id ?? null}
             />

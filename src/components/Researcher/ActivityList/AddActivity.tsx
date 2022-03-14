@@ -74,6 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
         fontSize: "1rem",
         color: "rgba(0, 0, 0, 0.87)",
         padding: "8px 30px",
+        textTransform: "capitalize",
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
     },
