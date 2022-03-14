@@ -828,8 +828,7 @@ export const SchemaList = () => {
             value: {
               title: i18n.t("Value"),
               description: "",
-              type: "string",
-              default: "",
+              type: "number",
             },
           },
         },
@@ -852,8 +851,7 @@ export const SchemaList = () => {
             value: {
               title: i18n.t("Value"),
               description: "",
-              type: "string",
-              default: "",
+              type: "number",
             },
           },
         },
