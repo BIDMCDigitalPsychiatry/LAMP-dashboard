@@ -18,7 +18,7 @@ import { getEvents } from "./Participant"
 import { useTranslation } from "react-i18next"
 import GroupActivity from "./GroupActivity"
 import { getImage } from "./Manage"
-import { spliceActivity } from "./Researcher/ActivityList/ActivityMethods"
+import { spliceActivity, spliceCTActivity } from "./Researcher/ActivityList/ActivityMethods"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -114,16 +114,11 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   useEffect(() => {
     ;(async () => {
       LAMP.Activity.view(activityId).then((data: any) => {
-        if (data.spec === "lamp.survey") {
-          LAMP.Type.getAttachment(activityId, "lamp.dashboard.survey_description").then((tag) => {
-            data = spliceActivity({ raw: data, tag })
-            setActivity(data)
-            setLoading(false)
-          })
-        } else {
+        getImage(activityId, data.spec).then((tag) => {
+          data = data.spec === "lamp.survey" ? spliceActivity({ raw: data, tag }) : spliceCTActivity({ raw: data, tag })
           setActivity(data)
           setLoading(false)
-        }
+        })
       })
     })()
   }, [])

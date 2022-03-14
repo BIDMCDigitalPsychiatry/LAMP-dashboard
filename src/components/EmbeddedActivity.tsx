@@ -38,6 +38,8 @@ const demoActivities = {
   "lamp.survey": "survey",
   "lamp.scratch_image": "scratchimage",
   "lamp.tips": "tips",
+  "lamp.goals": "goals",
+  "lamp.medications": "medicationtracker",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -88,14 +90,19 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             onComplete(null)
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
-            delete data["activity"]
-            delete data["timestamp"]
-            data["activity"] = activityId
-            data["timestamp"] = activityTimestamp
-            setData(data)
-            setEmbeddedActivity(undefined)
-            setSettings(null)
-            setActivityId(null)
+            if (!!data["timestamp"]) {
+              delete data["activity"]
+              delete data["timestamp"]
+              data["activity"] = activityId
+              data["timestamp"] = activityTimestamp
+              setData(data)
+              setEmbeddedActivity(undefined)
+              setSettings(null)
+              setActivityId(null)
+            } else {
+              setSaved(true)
+              onComplete(null)
+            }
           }
         }
       },
