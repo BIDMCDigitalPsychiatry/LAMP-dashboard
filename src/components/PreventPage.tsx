@@ -250,8 +250,12 @@ export default function PreventPage({ activityId, type, participantId, ...props 
             /> /* : selectedSpec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
           <VoiceRecoding participant={participant} selectedEvents={selectedActivity} />
         ) */
-          ) : activity?.spec === "lamp.goals" ? (
-            <PreventGoalData />
+          ) : activity?.spec === "lamp.goals" || activity?.spec === "lamp.medications" ? (
+            <PreventGoalData
+              selectedEvents={activityEvents}
+              participantId={participantId}
+              activity={activity ?? null}
+            />
           ) : activity?.spec === "lamp.dbt_diary_card" ? (
             <PreventDBT selectedEvents={activityEvents} />
           ) : (
