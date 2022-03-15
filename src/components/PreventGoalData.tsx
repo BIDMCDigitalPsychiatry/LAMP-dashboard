@@ -56,7 +56,7 @@ export default function GoalEntries({ ...props }) {
   const classes = useStyles()
   const [date, changeDate] = useState(new Date())
   const [selectedDays, setSelectedDays] = useState([])
-  const [streak, setStreak] = useState(1)
+  const [streak, setStreak] = useState(0)
   const [tag, setTag] = useState(null)
 
   const { t } = useTranslation()
