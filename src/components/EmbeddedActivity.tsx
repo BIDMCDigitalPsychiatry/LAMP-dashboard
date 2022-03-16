@@ -91,6 +91,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           } else if (!saved && activityId !== null && activityId !== "") {
             let data = JSON.parse(e.data)
             if (!!data["timestamp"]) {
+              setLoading(true)
               delete data["activity"]
               delete data["timestamp"]
               data["activity"] = activityId
@@ -124,6 +125,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             .then((x) => {
               setSaved(true)
               onComplete(data)
+              setLoading(false)
             })
         } else {
           onComplete(null)
