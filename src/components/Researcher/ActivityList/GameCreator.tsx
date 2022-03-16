@@ -12,6 +12,7 @@ import {
   Typography,
   Icon,
 } from "@material-ui/core"
+import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import Jewels from "../../../icons/Jewels.svg"
 import { useTranslation } from "react-i18next"
@@ -67,6 +68,24 @@ export default function GameCreator({
   useEffect(() => {
     setSchemaListObj(SchemaList())
   }, [])
+
+  useEffect(() => {
+    if (
+      !(
+        (value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
+        Object.keys(schemaListObj).includes(activitySpecId)
+      )
+    ) {
+      const spec = value?.spec ?? activitySpecId
+      let scheme = []
+      LAMP.ActivitySpec.view(spec).then((ActivitySpec) => {
+        if (!!ActivitySpec?.settings) {
+          scheme[spec] = ActivitySpec?.settings
+          setSchemaListObj(scheme)
+        }
+      })
+    }
+  }, [schemaListObj])
 
   const [data, setData] = useState({
     id: value?.id ?? undefined,

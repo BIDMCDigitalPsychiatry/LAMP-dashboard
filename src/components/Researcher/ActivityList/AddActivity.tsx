@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from "react"
-import { Box, MenuItem, Icon, Grid, Fab, Popover, makeStyles, Theme, createStyles, Link } from "@material-ui/core"
+import {
+  Box,
+  MenuItem,
+  Icon,
+  Grid,
+  Fab,
+  Backdrop,
+  CircularProgress,
+  Popover,
+  makeStyles,
+  Theme,
+  createStyles,
+  Link,
+} from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { availableActivitySpecs } from "./Index"
@@ -78,6 +91,10 @@ const useStyles = makeStyles((theme: Theme) =>
         "&:hover": { backgroundColor: "#ECF4FF" },
       },
     },
+    backdrop: {
+      zIndex: theme.zIndex.drawer + 1,
+      color: "#fff",
+    },
     popexpand: {
       backgroundColor: "#fff",
       color: "#618EF7",
@@ -115,6 +132,7 @@ export default function AddActivity({
   const { t } = useTranslation()
   const classes = useStyles()
   const [popover, setPopover] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   const activitiesObj = {
     "lamp.journal": t("Journal"),
@@ -151,14 +169,15 @@ export default function AddActivity({
       let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
       let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
       let i = 0
-      otherSpecs.map((x: any, index: number) => {
+      await otherSpecs.map(async (x: any, index: number) => {
         if (!!x.id) {
-          getActivitySpec(x.id).then((spec) => {
+          await getActivitySpec(x.id).then((spec) => {
             if (!!spec) availableSpecs.push(spec)
           })
         }
         if (index === otherSpecs.length - 1) {
           setActivitySpecs(availableSpecs)
+          setLoading(false)
         }
       })
     })()
@@ -166,6 +185,9 @@ export default function AddActivity({
 
   return (
     <Box>
+      <Backdrop className={classes.backdrop} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Fab
         variant="extended"
         color="primary"
