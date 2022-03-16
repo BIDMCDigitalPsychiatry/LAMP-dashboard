@@ -1,9 +1,12 @@
 // Core Imports
-import React from "react"
+import React, { useEffect } from "react"
 import { Typography, Grid, Card, Box, ButtonBase, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { ReactComponent as JournalBlue } from "../icons/journal_blue.svg"
 import LAMP, { Participant as ParticipantObj, Activity as ActivityObj } from "lamp-core"
 import { ReactComponent as AssessDbt } from "../icons/AssessDbt.svg"
+import { ReactComponent as PreventMeditation } from "../icons/PreventMeditation.svg"
+import { ReactComponent as PreventCustom } from "../icons/PreventCustom.svg"
+
 import ReactMarkdown from "react-markdown"
 import emoji from "remark-emoji"
 import gfm from "remark-gfm"
@@ -241,7 +244,9 @@ export default function PreventSelectedActivities({
           activity // Uncomment if you want to view the Voice Recording Details on Prevent
         ) =>
           /*activity.spec === "lamp.recording" ||*/ activity.spec === "lamp.journal" ||
-          activity.spec === "lamp.dbt_diary_card" ? (
+          activity.spec === "lamp.dbt_diary_card" ||
+          activity.spec === "lamp.goals" ||
+          activity.spec === "lamp.medications" ? (
             <Grid item xs={6} sm={3} md={3} lg={3}>
               <ButtonBase focusRipple className={classes.fullwidthBtn}>
                 <Card
@@ -255,13 +260,19 @@ export default function PreventSelectedActivities({
                       <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
                     </Box>
                     <Box mr={1} className={classes.preventRightSVG}>
-                      {activity.spec === "lamp.journal" ? (
-                        <JournalBlue /> /*: activity.spec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
-                              <PreventRecording />
-                            )*/
-                      ) : (
-                        <AssessDbt width="50" height="50" />
-                      )}
+                      {
+                        activity.spec === "lamp.goals" ? (
+                          <PreventCustom />
+                        ) : activity.spec === "lamp.medications" ? (
+                          <PreventMeditation />
+                        ) : activity.spec === "lamp.journal" ? (
+                          <JournalBlue />
+                        ) : (
+                          <AssessDbt width="50" height="50" />
+                        ) /*: activity.spec === "lamp.recording" ? ( // Uncomment if you want to view the Voice Recording Details on Prevent 
+                        <PreventRecording />
+                      )*/
+                      }
                     </Box>
                   </Box>
                   <Box className={classes.preventGraph}>
