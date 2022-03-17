@@ -71,6 +71,7 @@ export default function GameCreator({
 
   useEffect(() => {
     if (
+      Object.keys(schemaListObj).length > 0 &&
       !(
         (value?.spec && Object.keys(schemaListObj).includes(value.spec)) ||
         Object.keys(schemaListObj).includes(activitySpecId)
