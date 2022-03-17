@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next"
 import AddActivity from "../../ActivityList/AddActivity"
 import { Service } from "../../../DBService/DBService"
 import ActivityRow from "./ActivityRow"
-import addActivity from "../../ActivityList/Activity"
 import DeleteActivity from "../../ActivityList/DeleteActivity"
 import { sortData } from "../../Dashboard"
 import Pagination from "../../../PaginatedElement"
@@ -37,7 +36,7 @@ const useStyles = makeStyles((theme) =>
       padding: "10px",
     },
     secAdd: {
-      "& *": { position: "relative !important" },
+      "& button": { position: "relative !important" },
     },
   })
 )
