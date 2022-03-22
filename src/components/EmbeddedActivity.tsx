@@ -59,9 +59,11 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     setCurrentActivity(activity)
+    setIframe(null)
   }, [activity])
 
   useEffect(() => {
+    setIframe(null)
     setActivityId(currentActivity?.id ?? null)
     if (currentActivity !== null && !!currentActivity?.spec) {
       activateEmbeddedActivity(currentActivity)

@@ -107,7 +107,10 @@ export default function StudyCreator({
 
   const createNewStudy = (studyName) => {
     let lampAuthId = LAMP.Auth._auth.id
-    if (LAMP.Auth._type === "researcher" && lampAuthId === "researcher@demo.lamp.digital") {
+    if (
+      LAMP.Auth._type === "researcher" &&
+      (lampAuthId === "researcher@demo.lamp.digital" || lampAuthId === "clinician@demo.lamp.digital")
+    ) {
       createDemoStudy(studyName)
     } else {
       createStudy(studyName)
