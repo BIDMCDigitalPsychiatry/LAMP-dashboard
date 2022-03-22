@@ -121,7 +121,7 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
         })
       })
     })()
-  }, [])
+  }, [activityId])
 
   const returnResult = () => {
     if (mode === null) setResponse(true)
