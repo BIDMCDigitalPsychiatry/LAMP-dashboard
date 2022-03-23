@@ -596,18 +596,21 @@ export const SchemaList = () => {
                       type: {
                         enum: ["time"],
                       },
-
                       options: {
-                        type: "object",
+                        type: "array",
                         title: i18n.t("Response Options"),
-                        properties: {
-                          timePattern: {
-                            title: "Time pattern",
-                            type: "string",
-                            enum: ["standard", "military"],
-                            enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
-                            default: "standard",
-                            "ui:widget": "select",
+                        minItems: 1,
+                        maxItems: 1,
+                        items: {
+                          type: "object",
+                          properties: {
+                            value: {
+                              title: "Time pattern",
+                              type: "string",
+                              enum: ["standard", "military"],
+                              enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
+                              default: "standard",
+                            },
                           },
                         },
                       },
