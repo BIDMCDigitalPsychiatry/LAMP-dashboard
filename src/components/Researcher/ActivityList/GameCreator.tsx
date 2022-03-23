@@ -114,7 +114,8 @@ export default function GameCreator({
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
-          questions[idx].type === "rating"
+          questions[idx].type === "rating" ||
+          questions[idx].type === "time"
             ? !Array.isArray(questions[idx].options) ||
               questions[idx].options === null ||
               (!!questions[idx].options && questions[idx].options.length === 0)
@@ -123,7 +124,9 @@ export default function GameCreator({
                   (i) =>
                     (!!i &&
                       (((questions[idx].type === "slider" || questions[idx].type === "rating") && i?.value >= 0) ||
-                        ((questions[idx].type === "list" || questions[idx].type === "multiselect") &&
+                        ((questions[idx].type === "list" ||
+                          questions[idx].type === "multiselect" ||
+                          questions[idx].type === "time") &&
                           ((i?.value || "").toString() || "")?.trim().length > 0))) ||
                     i === ""
                 ).length === (questions[idx].options || []).length
@@ -145,7 +148,7 @@ export default function GameCreator({
     ) {
       return false
     } else if (
-      questions.filter((q) => ["list", "multiselect", "slider", "rating"].includes(q.type)).length > 0 &&
+      questions.filter((q) => ["list", "multiselect", "slider", "rating", "time"].includes(q.type)).length > 0 &&
       status === 1
     ) {
       return false
