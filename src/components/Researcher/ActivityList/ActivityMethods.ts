@@ -614,21 +614,6 @@ export const SchemaList = () => {
                           },
                         },
                       },
-
-                      // options: {
-                      //   type: "object",
-                      //   title: i18n.t("Response Options"),
-                      //   properties: {
-                      //     timePattern: {
-                      //       title: "Time pattern",
-                      //       type: "string",
-                      //       enum: ["standard", "military"],
-                      //       enumNames: [i18n.t("STANDARD TIME"), i18n.t("MILITARY TIME")],
-                      //       default: "standard",
-                      //       "ui:widget": "select",
-                      //     },
-                      //   },
-                      // },
                     },
                   },
                   {
