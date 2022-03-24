@@ -2,6 +2,7 @@
 	"Welcome to React": "Welcome to React - English",
 	"Don't enter a domain if you're not sure what this option does.": "Don't enter a domain if you're not sure what this option does",
 	"Login": "Login",
+  "OAuth Login": "OAuth Login",
 	"Try it": "Try it",
 	"Try mindLAMP out as a...": "Try mindLAMP out as a...",
 	"Researcher": "Researcher",
