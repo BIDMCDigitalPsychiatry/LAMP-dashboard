@@ -794,6 +794,15 @@
     {
       "#type": "Activity",
       "#parent": "study1",
+      "id": "activity45",
+      "spec": "lamp.journal",
+      "name": "Journal",
+      "settings": {},
+      "schedule": []
+    },
+    {
+      "#type": "Activity",
+      "#parent": "study1",
       "id": "activity7",
       "spec": "lamp.nback",
       "name": "N-Back",
@@ -33200,7 +33209,7 @@
     },
     {
       "#type": "Tag",
-      "#parent": "activity30",
+      "#parent": "activity35",
       "target": "me",
       "key": "lamp.dashboard.activity_details",
       "value": {

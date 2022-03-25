@@ -125,6 +125,7 @@ const getJournals = async (journals: any) => {
     Others: others,
     All: journals,
   }
+  console.log(data)
   return data
 }
 
@@ -155,6 +156,7 @@ export default function Journals({ selectedEvents, ...props }) {
   }
 
   useEffect(() => {
+    console.log(selectedEvents)
     setJournals(selectedEvents)
     getJournals(selectedEvents).then(setAllJournals)
     setSelectedDates(selectedEvents.map((journal) => new Date(journal.timestamp).toLocaleDateString()))
@@ -162,6 +164,7 @@ export default function Journals({ selectedEvents, ...props }) {
 
   useEffect(() => {
     if (allJournals !== null) {
+      console.log(allJournals)
       Object.keys(allJournals).map((each) => {
         if (allJournals[each].length > 0 && text.length === 0) {
           allJournals[each].map((journal, index) => {
@@ -184,6 +187,10 @@ export default function Journals({ selectedEvents, ...props }) {
       })
     }
   }, [allJournals])
+
+  useEffect(() => {
+    console.log(text[0] ?? "sdf")
+  }, [text])
 
   useEffect(() => {
     if (journal !== null) {
@@ -225,41 +232,55 @@ export default function Journals({ selectedEvents, ...props }) {
                 <Box fontWeight="fontWeightBold" className={classes.journalday}>
                   This date
                 </Box>
-                {journals
-                  .filter(
-                    (journal) =>
-                      new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
-                  )
-                  .map((journal, index) => (
-                    <Box boxShadow={0}>
-                      <Grid item>
-                        <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
-                          <Typography variant="caption" gutterBottom>
-                            {getDateString(new Date(journal.timestamp))}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            {text[index] ??
-                              (journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
-                                ? journal.static_data.text
-                                : journal.static_data.text
-                                    .substring(0, 80)
-                                    .substr(
-                                      0,
-                                      Math.min(
-                                        journal.static_data.text.substring(0, 80).length,
-                                        journal.static_data.text.substring(0, 80).lastIndexOf(" ")
-                                      )
-                                    ) + "...")}
-                          </Typography>
+                {console.log(journals)}
+                {journals.filter(
+                  (journal) => new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
+                ).length > 0 ? (
+                  <Box>
+                    {journals
+                      .filter(
+                        (journal) =>
+                          new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
+                      )
+                      .map((journal, index) => (
+                        <Box boxShadow={0}>
+                          <Grid item>
+                            <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
+                              <Typography variant="caption" gutterBottom>
+                                {getDateString(new Date(journal.timestamp))}
+                              </Typography>
+                              <Typography variant="body2" component="p">
+                                {journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+                                  ? journal.static_data.text
+                                  : journal.static_data.text
+                                      .substring(0, 80)
+                                      .substr(
+                                        0,
+                                        Math.min(
+                                          journal.static_data.text.substring(0, 80).length,
+                                          journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+                                        )
+                                      ) + "..."}
+                              </Typography>
+                            </Box>
+                          </Grid>
                         </Box>
-                      </Grid>
-                    </Box>
-                  ))}
+                      ))}
+                  </Box>
+                ) : (
+                  <Box>
+                    {" "}
+                    <Typography variant="body2" component="p">
+                      No data
+                    </Typography>
+                  </Box>
+                )}
               </Container>
             </Container>
           ) : (
             <div>
-              {allJournals !== null &&
+              {!!allJournals &&
+                allJournals !== null &&
                 Object.keys(allJournals).map((each) => (
                   <Container>
                     {allJournals[each].length > 0 && (
@@ -274,10 +295,25 @@ export default function Journals({ selectedEvents, ...props }) {
                                 <Typography variant="caption" gutterBottom>
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
-                                <Typography variant="body2" component="p">
-                                  {(text[index] && !!journal) ??
-                                    (journal?.static_data?.text?.substring(0, 80).length ===
+                                {console.log(text[index], journal)}
+                                {console.log(
+                                  journal?.static_data?.text?.substring(0, 80).length ===
                                     journal?.static_data?.text?.length
+                                    ? journal?.static_data?.text
+                                    : journal?.static_data?.text
+                                        ?.substring(0, 80)
+                                        .substr(
+                                          0,
+                                          Math.min(
+                                            journal?.static_data?.text?.substring(0, 80).length,
+                                            journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
+                                          )
+                                        ) + "..."
+                                )}
+                                <Typography variant="body2" component="p">
+                                  {!!text[index] && !!journal
+                                    ? journal?.static_data?.text?.substring(0, 80).length ===
+                                      journal?.static_data?.text?.length
                                       ? journal?.static_data?.text
                                       : journal?.static_data?.text
                                           ?.substring(0, 80)
@@ -287,7 +323,8 @@ export default function Journals({ selectedEvents, ...props }) {
                                               journal?.static_data?.text?.substring(0, 80).length,
                                               journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
                                             )
-                                          ) + "...")}
+                                          ) + "..."
+                                    : ""}
                                 </Typography>
                               </Box>
                             </Grid>
