@@ -33209,7 +33209,7 @@
     },
     {
       "#type": "Tag",
-      "#parent": "activity35",
+      "#parent": "activity30",
       "target": "me",
       "key": "lamp.dashboard.activity_details",
       "value": {
