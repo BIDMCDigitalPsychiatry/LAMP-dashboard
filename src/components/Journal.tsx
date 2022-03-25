@@ -225,41 +225,54 @@ export default function Journals({ selectedEvents, ...props }) {
                 <Box fontWeight="fontWeightBold" className={classes.journalday}>
                   This date
                 </Box>
-                {journals
-                  .filter(
-                    (journal) =>
-                      new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
-                  )
-                  .map((journal, index) => (
-                    <Box boxShadow={0}>
-                      <Grid item>
-                        <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
-                          <Typography variant="caption" gutterBottom>
-                            {getDateString(new Date(journal.timestamp))}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            {text[index] ??
-                              (journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
-                                ? journal.static_data.text
-                                : journal.static_data.text
-                                    .substring(0, 80)
-                                    .substr(
-                                      0,
-                                      Math.min(
-                                        journal.static_data.text.substring(0, 80).length,
-                                        journal.static_data.text.substring(0, 80).lastIndexOf(" ")
-                                      )
-                                    ) + "...")}
-                          </Typography>
+                {journals.filter(
+                  (journal) => new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
+                ).length > 0 ? (
+                  <Box>
+                    {journals
+                      .filter(
+                        (journal) =>
+                          new Date(journal.timestamp).toLocaleDateString() === new Date(date).toLocaleDateString()
+                      )
+                      .map((journal, index) => (
+                        <Box boxShadow={0}>
+                          <Grid item>
+                            <Box className={classes.journalStyle} onClick={() => handleOpen(index, journal)}>
+                              <Typography variant="caption" gutterBottom>
+                                {getDateString(new Date(journal.timestamp))}
+                              </Typography>
+                              <Typography variant="body2" component="p">
+                                {journal.static_data.text.substring(0, 80).length === journal.static_data.text.length
+                                  ? journal.static_data.text
+                                  : journal.static_data.text
+                                      .substring(0, 80)
+                                      .substr(
+                                        0,
+                                        Math.min(
+                                          journal.static_data.text.substring(0, 80).length,
+                                          journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+                                        )
+                                      ) + "..."}
+                              </Typography>
+                            </Box>
+                          </Grid>
                         </Box>
-                      </Grid>
-                    </Box>
-                  ))}
+                      ))}
+                  </Box>
+                ) : (
+                  <Box>
+                    {" "}
+                    <Typography variant="body2" component="p">
+                      No data
+                    </Typography>
+                  </Box>
+                )}
               </Container>
             </Container>
           ) : (
             <div>
-              {allJournals !== null &&
+              {!!allJournals &&
+                allJournals !== null &&
                 Object.keys(allJournals).map((each) => (
                   <Container>
                     {allJournals[each].length > 0 && (
@@ -275,9 +288,9 @@ export default function Journals({ selectedEvents, ...props }) {
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                  {(text[index] && !!journal) ??
-                                    (journal?.static_data?.text?.substring(0, 80).length ===
-                                    journal?.static_data?.text?.length
+                                  {!!text[index] && !!journal
+                                    ? journal?.static_data?.text?.substring(0, 80).length ===
+                                      journal?.static_data?.text?.length
                                       ? journal?.static_data?.text
                                       : journal?.static_data?.text
                                           ?.substring(0, 80)
@@ -287,7 +300,8 @@ export default function Journals({ selectedEvents, ...props }) {
                                               journal?.static_data?.text?.substring(0, 80).length,
                                               journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
                                             )
-                                          ) + "...")}
+                                          ) + "..."
+                                    : ""}
                                 </Typography>
                               </Box>
                             </Grid>
