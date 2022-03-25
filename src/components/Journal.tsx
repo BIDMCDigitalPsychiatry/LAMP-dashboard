@@ -275,17 +275,17 @@ export default function Journals({ selectedEvents, ...props }) {
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                  {text[index] ??
-                                    (journal.static_data.text.substring(0, 80).length ===
-                                    journal.static_data.text.length
-                                      ? journal.static_data.text
-                                      : journal.static_data.text
-                                          .substring(0, 80)
+                                  {(text[index] && !!journal) ??
+                                    (journal?.static_data?.text?.substring(0, 80).length ===
+                                    journal?.static_data?.text?.length
+                                      ? journal?.static_data?.text
+                                      : journal?.static_data?.text
+                                          ?.substring(0, 80)
                                           .substr(
                                             0,
                                             Math.min(
-                                              journal.static_data.text.substring(0, 80).length,
-                                              journal.static_data.text.substring(0, 80).lastIndexOf(" ")
+                                              journal?.static_data?.text?.substring(0, 80).length,
+                                              journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
                                             )
                                           ) + "...")}
                                 </Typography>
@@ -322,8 +322,7 @@ export default function Journals({ selectedEvents, ...props }) {
                 const view = isSelected ? (
                   <div onClick={() => setDate(date)}>
                     <span className={isCurrentDay || isActiveDate ? classes.currentDay : classes.selectedDay}>
-                      {" "}
-                      {dayComponent}{" "}
+                      {dayComponent}
                     </span>
                   </div>
                 ) : isCurrentDay || isActiveDate ? (

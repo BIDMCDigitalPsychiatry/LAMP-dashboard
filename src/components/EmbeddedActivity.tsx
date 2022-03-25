@@ -47,7 +47,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   const [embeddedActivity, setEmbeddedActivity] = useState<string>("")
   const [iFrame, setIframe] = useState(null)
   const [settings, setSettings] = useState(null)
-  const [activityId, setActivityId] = useState(null)
   const [saved, setSaved] = useState(false)
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -59,67 +58,72 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   useEffect(() => {
     setCurrentActivity(activity)
+    setSaved(true)
+    setEmbeddedActivity("")
+    setSettings(null)
+    setActivityTimestamp(0)
     setIframe(null)
   }, [activity])
 
   useEffect(() => {
-    setIframe(null)
-    setActivityId(currentActivity?.id ?? null)
     if (currentActivity !== null && !!currentActivity?.spec) {
+      setLoading(true)
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
+
+  const handleSaveData = (e) => {
+    if (currentActivity !== null && !saved) {
+      if (e.data === null) {
+        setSaved(true)
+        onComplete(null)
+        setLoading(false)
+      } else if (!saved && currentActivity?.id !== null && currentActivity?.id !== "") {
+        let data = JSON.parse(e.data)
+        if (!!data["timestamp"]) {
+          setLoading(true)
+          delete data["activity"]
+          delete data["timestamp"]
+          data["activity"] = currentActivity.id
+          data["timestamp"] = activityTimestamp
+          setData(data)
+          setEmbeddedActivity(undefined)
+          setSettings(null)
+        } else {
+          setSaved(true)
+          onComplete(null)
+          setLoading(false)
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     if (iFrame != null) {
       iFrame.onload = function () {
         iFrame.contentWindow.postMessage(settings, "*")
       }
+      var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
+      var eventer = window[eventMethod]
+      var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
+      // Listen to message from child window
+      eventer(messageEvent, handleSaveData, false)
+      return () => window.removeEventListener(messageEvent, handleSaveData)
     }
   }, [iFrame])
 
   useEffect(() => {
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent"
-    var eventer = window[eventMethod]
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message"
-    // Listen to message from child window
-    eventer(
-      messageEvent,
-      function (e) {
-        if (currentActivity !== null && !saved) {
-          if (e.data === null) {
-            setSaved(true)
-            onComplete(null)
-          } else if (!saved && activityId !== null && activityId !== "") {
-            let data = JSON.parse(e.data)
-            if (!!data["timestamp"]) {
-              setLoading(true)
-              delete data["activity"]
-              delete data["timestamp"]
-              data["activity"] = activityId
-              data["timestamp"] = activityTimestamp
-              setData(data)
-              setEmbeddedActivity(undefined)
-              setSettings(null)
-              setActivityId(null)
-            } else {
-              setSaved(true)
-              onComplete(null)
-            }
-          }
-        }
-      },
-      false
-    )
-  }, [settings])
-
-  useEffect(() => {
     try {
       if (embeddedActivity === undefined && data !== null && !saved && !!currentActivity) {
-        setCurrentActivity(null)
         if (!!activityTimestamp && (activityTimestamp ?? 0) !== timestamp) {
           setTimestamp(activityTimestamp)
-          sensorEventUpdate(tab?.toLowerCase() ?? null, participant?.id ?? participant, activity.id, activityTimestamp)
+          sensorEventUpdate(
+            tab?.toLowerCase() ?? null,
+            participant?.id ?? participant,
+            currentActivity.id,
+            activityTimestamp
+          )
+          setCurrentActivity(null)
           LAMP.ActivityEvent.create(participant?.id ?? participant, data)
             .catch((e) => {
               console.dir(e)
@@ -131,11 +135,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             })
         } else {
           onComplete(null)
+          setLoading(false)
         }
       } else if (embeddedActivity !== undefined) {
         setActivityTimestamp(new Date().getTime())
+        setSaved(false)
+        setLoading(false)
       }
     } catch (e) {
+      setLoading(false)
       setOpenNotImplemented(true)
     }
   }, [embeddedActivity, data])
@@ -144,9 +152,14 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     let response = "about:blank"
     try {
       setSaved(false)
-      setSettings({ ...settings, activity: activity, configuration: { language: i18n.language }, noBack: noBack })
+      setSettings({
+        ...settings,
+        activity: currentActivity,
+        configuration: { language: i18n.language },
+        noBack: noBack,
+      })
 
-      let activitySpec = await LAMP.ActivitySpec.view(activity.spec)
+      let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
       if (activitySpec?.executable?.startsWith("data:")) {
         response = atob(activitySpec.executable.split(",")[1])
       } else if (activitySpec?.executable?.startsWith("https:")) {
@@ -164,10 +177,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   }
 
   const loadFallBack = async () => {
-    if (!!demoActivities[activity.spec]) {
+    if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
-      return atob(await (await fetch(`${activityURL}/${demoActivities[activity.spec]}.html.b64`)).text())
+      return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"
     }
