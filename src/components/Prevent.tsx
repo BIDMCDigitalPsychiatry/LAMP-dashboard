@@ -313,7 +313,6 @@ export default function Prevent({
       ? allActivities.filter((activity) => activity.spec !== "lamp.recording")
       : allActivities.filter((activity) => activity.spec === "lamp.journal" || activity.spec !== "lamp.recording")
     getActivityEvents(participant, activities, hiddenEvents).then((activityEvents) => {
-      console.log(activityEvents)
       let timeSpans = Object.fromEntries(Object.entries(activityEvents || {}).map((x) => [x[0], x[1][x[1].length - 1]]))
       setActivityEvents(activityEvents)
       let activityEventCount = getActivityEventCount(activityEvents)
