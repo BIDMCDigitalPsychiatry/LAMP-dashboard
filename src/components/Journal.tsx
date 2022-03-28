@@ -162,6 +162,7 @@ export default function Journals({ selectedEvents, ...props }) {
 
   useEffect(() => {
     if (allJournals !== null) {
+      let textData = []
       Object.keys(allJournals).map((each) => {
         if (allJournals[each].length > 0 && text.length === 0) {
           allJournals[each].map((journal, index) => {
@@ -178,10 +179,11 @@ export default function Journals({ selectedEvents, ...props }) {
                         journal.static_data.text.substring(0, 80).lastIndexOf(" ")
                       )
                     ) + "..."
-            setText({ ...text, [index]: jText })
+            textData[index] = jText
           })
         }
       })
+      setText(textData)
     }
   }, [allJournals])
 
@@ -288,20 +290,7 @@ export default function Journals({ selectedEvents, ...props }) {
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                  {!!text[index] && !!journal
-                                    ? journal?.static_data?.text?.substring(0, 80).length ===
-                                      journal?.static_data?.text?.length
-                                      ? journal?.static_data?.text
-                                      : journal?.static_data?.text
-                                          ?.substring(0, 80)
-                                          .substr(
-                                            0,
-                                            Math.min(
-                                              journal?.static_data?.text?.substring(0, 80).length,
-                                              journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
-                                            )
-                                          ) + "..."
-                                    : ""}
+                                  {!!text[index] && !!journal && text[index]}
                                 </Typography>
                               </Box>
                             </Grid>
