@@ -290,21 +290,7 @@ export default function Journals({ selectedEvents, ...props }) {
                                   {getDateString(new Date(journal.timestamp))}
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                  {!!text[index] && !!journal
-                                    ? text[index]
-                                    : // journal?.static_data?.text?.substring(0, 80).length ===
-                                      //   journal?.static_data?.text?.length
-                                      //   ? journal?.static_data?.text
-                                      //   : journal?.static_data?.text
-                                      //       ?.substring(0, 80)
-                                      //       .substr(
-                                      //         0,
-                                      //         Math.min(
-                                      //           journal?.static_data?.text?.substring(0, 80).length,
-                                      //           journal?.static_data?.text?.substring(0, 80).lastIndexOf(" ")
-                                      //         )
-                                      //       ) + "..."
-                                      ""}
+                                  {!!text[index] && !!journal && text[index]}
                                 </Typography>
                               </Box>
                             </Grid>
