@@ -170,6 +170,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     return timezone
   }
 
+  let startOAuthFlow = async (_event: any, mode?: string): Promise<void> => {
+    await setIdentity({
+      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
+      password: !!mode ? "demo" : state.password,
+      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+    })
+
+    const url = (await LAMP.OAuth.startOauthFlow()).url
+    window.location.replace(url)
+  }
+
   return (
     <Slide direction="right" in={true} mountOnEnter unmountOnExit>
       <ResponsiveMargin>
@@ -317,6 +328,29 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                     {t("Login")}
                     <input
                       type="submit"
+                      style={{
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        width: "100%",
+                        opacity: 0,
+                      }}
+                      disabled={loginClick}
+                    />
+                  </Fab>
+
+                  <Fab
+                    variant="extended"
+                    style={{ background: "#FF0000", color: "White" }}
+                    onClick={startOAuthFlow}
+                    className={loginClick ? classes.loginDisabled : ""}
+                  >
+                    {t("OAuth Login")}
+                    <input
+                      type="button"
                       style={{
                         cursor: "pointer",
                         position: "absolute",
