@@ -50,6 +50,7 @@
     "material-ui": "^0.20.2",
     "monaco-editor": "^0.26.1",
     "notistack": "^0.9.9",
+    "pkce-challenge": "^2.2.0",
     "qrcode.react": "^1.0.0",
     "react": "^16.14.0",
     "react-beautiful-dnd": "^13.0.0",
