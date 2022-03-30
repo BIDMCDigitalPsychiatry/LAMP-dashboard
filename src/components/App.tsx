@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation, BrowserRouter } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -376,8 +376,15 @@ function AppRouter({ ...props }) {
     }
   }
 
+  function OauthLogin() {
+    let params = useLocation().search
+    const code = new URLSearchParams(params).get("code")
+    return <div>{code}</div>
+  }
+
   return (
     <Switch>
+      <Route exact path="/oauth/login" render={(props) => <OauthLogin />} />
       <Route
         exact
         path="/participant/:id/messages"
@@ -815,9 +822,9 @@ export default function App({ ...props }) {
         <CssBaseline />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <SnackbarProvider>
-            <HashRouter>
+            <BrowserRouter>
               <AppRouter {...props} />
-            </HashRouter>
+            </BrowserRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
         <span
