@@ -379,7 +379,22 @@ function AppRouter({ ...props }) {
   function OauthLogin() {
     let params = useLocation().search
     const code = new URLSearchParams(params).get("code")
-    return <div>{code}</div>
+    const oauthParams = JSON.parse(sessionStorage?.getItem("LAMP._oauth") ?? "")
+
+    if (!oauthParams.codeVerifier) {
+      return <div>Missing code_verifier!</div>
+    }
+
+    LAMP.Auth.set_oauth_params(oauthParams)
+    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier)
+
+    return (
+      <div>
+        <p>Waiting for server to finish authentication...</p>
+        <p>code: {code}</p>
+        <p>code_verifier: {oauthParams.codeVerifier}</p>
+      </div>
+    )
   }
 
   return (
