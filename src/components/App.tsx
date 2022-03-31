@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation, BrowserRouter } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -376,8 +376,30 @@ function AppRouter({ ...props }) {
     }
   }
 
+  function OauthLogin() {
+    let params = useLocation().search
+    const code = new URLSearchParams(params).get("code")
+    const oauthParams = JSON.parse(sessionStorage?.getItem("LAMP._oauth") ?? "")
+
+    if (!oauthParams.codeVerifier) {
+      return <div>Missing code_verifier!</div>
+    }
+
+    LAMP.Auth.set_oauth_params(oauthParams)
+    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier)
+
+    return (
+      <div>
+        <p>Waiting for server to finish authentication...</p>
+        <p>code: {code}</p>
+        <p>code_verifier: {oauthParams.codeVerifier}</p>
+      </div>
+    )
+  }
+
   return (
     <Switch>
+      <Route exact path="/oauth/login" render={(props) => <OauthLogin />} />
       <Route
         exact
         path="/participant/:id/messages"
@@ -815,9 +837,9 @@ export default function App({ ...props }) {
         <CssBaseline />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <SnackbarProvider>
-            <HashRouter>
+            <BrowserRouter>
               <AppRouter {...props} />
-            </HashRouter>
+            </BrowserRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
         <span

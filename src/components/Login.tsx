@@ -175,6 +175,12 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
 
   let startOAuthFlow = async (_event: any, mode?: string): Promise<void> => {
+    const pkce = pkceChallenge(pkceCodeVerifierLength)
+    LAMP.Auth.set_oauth_params({
+      serverAddress: state.serverAddress,
+      codeVerifier: pkce.code_verifier,
+    })
+
     let urlString: string
     try {
       urlString = (await LAMP.OAuth.startOauthFlow()).url
@@ -190,13 +196,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       alert(`Server returned an invalid OAUth start URL: ${urlString}`)
     }
 
-    const pkce = pkceChallenge(pkceCodeVerifierLength)
     url.searchParams.set("code_challenge", pkce.code_challenge)
-
-    LAMP.Auth.set_oauth_params({
-      serverAddress: state.serverAddress,
-      codeVerifier: pkce.code_verifier,
-    })
 
     window.location.replace(url.href)
   }
