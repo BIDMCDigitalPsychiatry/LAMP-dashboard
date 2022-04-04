@@ -379,6 +379,7 @@ function AppRouter({ ...props }) {
   function OauthLogin() {
     let params = useLocation().search
     const code = new URLSearchParams(params).get("code")
+
     const oauthParams = JSON.parse(sessionStorage?.getItem("LAMP._oauth") ?? "")
 
     if (!oauthParams.codeVerifier) {
