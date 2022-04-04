@@ -27,6 +27,8 @@ import { ReactComponent as Logo } from "../icons/Logo.svg"
 import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 
+import pkceChallenge from "pkce-challenge"
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     logoLogin: {
@@ -73,6 +75,8 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
+
+  const pkceCodeVerifierLength = 43
 
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
@@ -171,14 +175,30 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   }
 
   let startOAuthFlow = async (_event: any, mode?: string): Promise<void> => {
-    await setIdentity({
-      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-      password: !!mode ? "demo" : state.password,
-      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
+    const pkce = pkceChallenge(pkceCodeVerifierLength)
+    LAMP.Auth.set_oauth_params({
+      serverAddress: state.serverAddress,
+      codeVerifier: pkce.code_verifier,
     })
 
-    const url = (await LAMP.OAuth.startOauthFlow()).url
-    window.location.replace(url)
+    let urlString: string
+    try {
+      urlString = (await LAMP.OAuth.startOauthFlow()).url
+    } catch (error) {
+      alert(`OAuth start URL could not be retrieved from server: ${error.message}`)
+      return
+    }
+
+    let url: URL
+    try {
+      url = new URL(urlString)
+    } catch {
+      alert(`Server returned an invalid OAUth start URL: ${urlString}`)
+    }
+
+    url.searchParams.set("code_challenge", pkce.code_challenge)
+
+    window.location.replace(url.href)
   }
 
   return (
