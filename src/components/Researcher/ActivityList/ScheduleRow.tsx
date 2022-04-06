@@ -85,6 +85,7 @@ export default function ScheduleRow({
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
   const { t } = useTranslation()
   const [data, setData] = useState(scheduleRow)
+  const [openTimepicker, setOpenTimepicker] = useState(false)
   const intervals = [
     { key: "hourly", value: t("Every hour") },
     { key: "every3h", value: t("Every number hours", { number: 3 }) },
@@ -116,17 +117,7 @@ export default function ScheduleRow({
           <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
         ) : (
           <KeyboardDatePicker
-            className={classes.datePicker}
-            size="small"
-            autoOk
-            error={data?.start_date === null || (data?.start_date || "") === ""}
-            animateYearScrolling
-            variant="inline"
-            inputVariant="outlined"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-            helperText={t("Select the start date.")}
-            InputAdornmentProps={{ position: "end" }}
+            clearable
             value={data?.start_date ? getDate(data.start_date ?? "") : ""}
             onBlur={(event) => {
               const date = new Date(event.target.value)
@@ -145,6 +136,14 @@ export default function ScheduleRow({
               }
               setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
             }}
+            minDate={new Date()}
+            format="MM/dd/yyyy"
+            animateYearScrolling
+            variant="inline"
+            inputVariant="outlined"
+            className={classes.datePicker}
+            helperText={t("Select the start date.")}
+            size="small"
           />
         )}
       </TableCell>
@@ -158,7 +157,9 @@ export default function ScheduleRow({
             autoOk
             variant="inline"
             inputVariant="outlined"
-            format="h:mm a"
+            format="hh:mm a"
+            mask="__:__ _M"
+            placeholder="HH:mm AM"
             error={data.time === "" || data.time === null}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
@@ -168,7 +169,15 @@ export default function ScheduleRow({
               setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
             onBlur={(event) => {
-              const date = new Date(event.target.value)
+              setOpenTimepicker(false)
+              const date = data?.start_date ?? new Date()
+              const value = event.target.value
+              const parts = value.match(/(\d+)\:(\d+) (\w+)/)
+              const hours =
+                /am/i.test(parts[3]) || /AM/i.test(parts[3]) ? parseInt(parts[1], 10) : parseInt(parts[1], 10) + 12
+              const minutes = parseInt(parts[2], 10)
+              date.setHours(hours)
+              date.setMinutes(minutes)
               setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />

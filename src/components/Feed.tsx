@@ -426,7 +426,7 @@ export default function Feed({
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
-          if (currentDate.getTime() < scheduleStartDate.getTime()) {
+          if (currentDate.getTime() < scheduleStartDate.getTime() && scheduleStartDate.getMonth() === date.getMonth()) {
             currentDate = getDate(schedule.start_date)
           }
           currentDate.setHours(0)
