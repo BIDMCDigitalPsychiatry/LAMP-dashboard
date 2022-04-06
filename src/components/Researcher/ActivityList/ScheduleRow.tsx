@@ -27,14 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const getDate = (val) => {
   if ((val || "").length > 0) {
-    const dateVal = val.split("T")
-    let date = dateVal[0].split("-")
-    const newDate = new Date(dateVal[0])
-    newDate.setFullYear(parseInt(date[0]))
-    newDate.setMonth(parseInt(date[1]) - 1)
-    newDate.setDate(parseInt(date[2]))
-    newDate.setHours(dateVal[1].split(":")[0])
-    newDate.setMinutes(dateVal[1].split(":")[1])
+    const dateVal = val.split("T")[0].split("-")
+    const timeVal = val.split("T")[1].split(":")
+    const newDate = new Date()
+    newDate.setFullYear(parseInt(dateVal[0]))
+    newDate.setMonth(parseInt(dateVal[1]) - 1)
+    newDate.setDate(parseInt(dateVal[2]))
+    newDate.setHours(timeVal[0])
+    newDate.setMinutes(timeVal[1])
     newDate.setSeconds(0)
     return newDate
   }
@@ -55,7 +55,6 @@ export const dateInUTCformat = (val) => {
       ? (val || new Date()).getMonth() + 1
       : "0" + ((val || new Date()).getMonth() + 1)
   let date = (val || new Date()).getDate() > 9 ? (val || new Date()).getDate() : "0" + (val || new Date()).getDate()
-
   const dateVal =
     (val || new Date()).getFullYear() +
     "-" +
@@ -125,9 +124,19 @@ export default function ScheduleRow({
             variant="inline"
             inputVariant="outlined"
             format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
             helperText={t("Select the start date.")}
             InputAdornmentProps={{ position: "end" }}
-            value={data.start_date ? getDate(data.start_date ?? "") : ""}
+            value={data?.start_date ? getDate(data.start_date ?? "") : ""}
+            onBlur={(event) => {
+              const date = new Date(event.target.value)
+              if (!!date) {
+                date.setHours(1)
+                date.setMinutes(0)
+                date.setSeconds(0)
+              }
+              setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
+            }}
             onChange={(date) => {
               if (!!date) {
                 date.setHours(1)
@@ -156,6 +165,10 @@ export default function ScheduleRow({
             value={data.time ? getDate(data.time ?? "") : ""}
             defaultValue={data.time ? getDate(data.time ?? "") : ""}
             onChange={(date) => {
+              setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
+            }}
+            onBlur={(event) => {
+              const date = new Date(event.target.value)
               setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />
