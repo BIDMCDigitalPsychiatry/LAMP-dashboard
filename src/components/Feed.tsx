@@ -426,13 +426,20 @@ export default function Feed({
           scheduleStartDate.setMinutes(0)
           scheduleStartDate.setSeconds(0)
           currentDate.setDate(1)
-          if (currentDate.getTime() < scheduleStartDate.getTime() && scheduleStartDate.getMonth() === date.getMonth()) {
+          if (
+            currentDate.getTime() <= scheduleStartDate.getTime() &&
+            scheduleStartDate.getMonth() === date.getMonth() &&
+            scheduleStartDate.getFullYear() === date.getFullYear()
+          ) {
             currentDate = getDate(schedule.start_date)
           }
           currentDate.setHours(0)
           currentDate.setMinutes(0)
           currentDate.setSeconds(0)
           let endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
+          endDate.setHours(23)
+          endDate.setMinutes(59)
+
           if (scheduleStartDate.getTime() <= endDate.getTime()) {
             scheduleTime = getDate(schedule.time)
             let timeVal = getTimeValue(scheduleTime)
@@ -477,7 +484,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (type.indexOf(dayNum) > -1) {
-                    feedCheck = type.indexOf(dayNumber) > -1 && date.getTime() >= scDate.getTime() ? true : false
+                    feedCheck = type.indexOf(dayNumber) > -1 ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)
@@ -490,7 +497,7 @@ export default function Feed({
                 while (first.getTime() <= end.getTime()) {
                   let dayNum = first.getDay()
                   if (dayNo === dayNum) {
-                    feedCheck = dayNo === dayNumber && date.getTime() >= scDate.getTime() ? true : false
+                    feedCheck = dayNo === dayNumber ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(new Date(first).toLocaleDateString())
                   }
                   first.setDate(first.getDate() + 1)

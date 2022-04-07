@@ -159,7 +159,7 @@ export default function ScheduleRow({
             inputVariant="outlined"
             format="hh:mm a"
             mask="__:__ _M"
-            placeholder="HH:mm AM"
+            placeholder="HH:MM AM"
             error={data.time === "" || data.time === null}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
