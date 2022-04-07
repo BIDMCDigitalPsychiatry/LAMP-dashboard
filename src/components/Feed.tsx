@@ -665,12 +665,12 @@ export default function Feed({
                     feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
                     selectedWeekViewDays = selectedWeekViewDays.concat(
                       new Date(
-                        new Date(first).getFullYear + "-" + new Date(first).getMonth + 1 + "-" + 10
+                        new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
                       ).toLocaleDateString()
                     )
                     selectedWeekViewDays = selectedWeekViewDays.concat(
                       new Date(
-                        new Date(first).getFullYear + "-" + new Date(first).getMonth + 1 + "-" + 20
+                        new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
                       ).toLocaleDateString()
                     )
                   }

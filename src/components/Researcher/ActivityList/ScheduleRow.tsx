@@ -85,7 +85,6 @@ export default function ScheduleRow({
   const [isEdit, setEdit] = useState(!!scheduleRow.start_date ? false : true)
   const { t } = useTranslation()
   const [data, setData] = useState(scheduleRow)
-  const [openTimepicker, setOpenTimepicker] = useState(false)
   const intervals = [
     { key: "hourly", value: t("Every hour") },
     { key: "every3h", value: t("Every number hours", { number: 3 }) },
@@ -126,7 +125,11 @@ export default function ScheduleRow({
                 date.setMinutes(0)
                 date.setSeconds(0)
               }
-              setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
+              setData({
+                ...data,
+                start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                time: date?.isValid() ? dateInUTCformat(date) : null,
+              })
             }}
             onChange={(date) => {
               if (!!date) {
@@ -134,7 +137,11 @@ export default function ScheduleRow({
                 date.setMinutes(0)
                 date.setSeconds(0)
               }
-              setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
+              setData({
+                ...data,
+                start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                time: date?.isValid() ? dateInUTCformat(date) : null,
+              })
             }}
             minDate={new Date()}
             format="MM/dd/yyyy"
@@ -169,8 +176,7 @@ export default function ScheduleRow({
               setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
             onBlur={(event) => {
-              setOpenTimepicker(false)
-              const date = data?.start_date ?? new Date()
+              const date = data?.start_date ? new Date(data?.start_date) : new Date()
               const value = event.target.value
               const parts = value.match(/(\d+)\:(\d+) (\w+)/)
               const hours =
