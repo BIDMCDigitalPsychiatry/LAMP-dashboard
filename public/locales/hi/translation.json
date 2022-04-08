@@ -1,6 +1,7 @@
 {
 	"Welcome to React": "प्रतिक्रिया में आपका स्वागत है - भारतीय अंग्रेजी",
 	"Don't enter a domain if you're not sure what this option does.": "डोमेन दर्ज न करें यदि आप सुनिश्चित नहीं हैं कि यह विकल्प क्या है",
+  "Continue": "Continue",
 	"Login": "लॉग इन करें",
   "OAuth Login": "OAuth Login",
 	"Try it": "प्रयास करें",

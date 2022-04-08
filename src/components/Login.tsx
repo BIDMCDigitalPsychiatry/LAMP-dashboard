@@ -1,5 +1,5 @@
 // Core Imports
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import {
   Fab,
   Box,
@@ -67,29 +67,41 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function Login({ setIdentity, lastDomain, onComplete, ...props }) {
   const { t, i18n } = useTranslation()
-  const [state, setState] = useState({ serverAddress: lastDomain, id: undefined, password: undefined })
-  const [srcLocked, setSrcLocked] = useState(false)
-  const [tryitMenu, setTryitMenu] = useState<Element>()
-  const [helpMenu, setHelpMenu] = useState<Element>()
-  const [loginClick, setLoginClick] = useState(false)
-  const { enqueueSnackbar } = useSnackbar()
   const classes = useStyles()
+  const { enqueueSnackbar } = useSnackbar()
+
+  enum Screen {
+    serverAddress,
+    legacyLogin,
+  }
+  const [screen, goToScreen] = useState(Screen.serverAddress)
+
+  const [serverAddress, setServerAddress] = useState("")
+  const defaultServerAddress = "api.lamp.digital"
+
+  const [legacyCredentials, setLegacyCredentials] = useState({
+    id: null,
+    password: null,
+  })
+
   const userLanguages = ["en-US", "es-ES", "hi-IN"]
-
-  const pkceCodeVerifierLength = 43
-
   const getSelectedLanguage = () => {
     const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
     const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
     return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
   }
   const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
+
+  const [srcLocked, setSrcLocked] = useState(false)
+  const [tryitMenu, setTryitMenu] = useState<Element>()
+  const [helpMenu, setHelpMenu] = useState<Element>()
+
   useEffect(() => {
     let query = window.location.hash.split("?")
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
-        setState((state) => ({ ...state, serverAddress: src }))
+        setServerAddress(src)
         setSrcLocked(true)
       }
     }
@@ -98,108 +110,84 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     i18n.changeLanguage(selectedLanguage)
   }, [selectedLanguage])
 
-  let handleChange = (event) =>
-    setState({
-      ...state,
-      [event.target.name]: event.target.type === "checkbox" ? event.target.checked : event.target.value,
-    })
+  let handleSuccess = () => {
+    process.env.REACT_APP_LATEST_LAMP === "true"
+      ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
+      : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
 
-  let handleLogin = (event: any, mode?: string): void => {
-    event.preventDefault()
-    setLoginClick(true)
-    if (mode === undefined && (!state.id || !state.password)) {
-      enqueueSnackbar(t("Incorrect username, password, or server address."), {
-        variant: "error",
+    localStorage.setItem(
+      "LAMP_user_" + legacyCredentials.id,
+      JSON.stringify({
+        language: selectedLanguage,
       })
-      setLoginClick(false)
-      return
-    }
-    setIdentity({
-      id: !!mode ? `${mode}@demo.lamp.digital` : state.id,
-      password: !!mode ? "demo" : state.password,
-      serverAddress: !!mode ? "demo.lamp.digital" : state.serverAddress,
-    })
-      .then((res) => {
-        if (res.authType === "participant") {
-          localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
-          LAMP.SensorEvent.create(res.identity.id, {
-            timestamp: Date.now(),
-            sensor: "lamp.analytics",
-            data: {
-              type: "login",
-              device_type: "Dashboard",
-              user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
-            },
-          } as any).then((res) => console.dir(res))
-          LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
-        }
-        if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
-          let studiesSelected =
-            localStorage.getItem("studies_" + res.identity.id) !== null
-              ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
-              : []
-          if (studiesSelected.length === 0) {
-            let studiesList = [res.identity.name]
-            localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
-            localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
-          }
-        }
-        process.env.REACT_APP_LATEST_LAMP === "true"
-          ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
-          : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
-        localStorage.setItem(
-          "LAMP_user_" + res.identity.id,
-          JSON.stringify({
-            language: selectedLanguage,
-          })
+    )
+    ;(async () => {
+      await Service.deleteDB()
+    })()
+
+    onComplete()
+  }
+
+  const form = useCallback(() => {
+    switch (screen) {
+      case Screen.serverAddress:
+        return (
+          <ServerAddressInput
+            value={serverAddress}
+            defaultValue={defaultServerAddress}
+            locked={srcLocked}
+            onChange={(event: any) => setServerAddress(event.target.value)}
+            onComplete={(isOAuthAvailable: boolean) => {
+              if (isOAuthAvailable) {
+                try {
+                  startOAuthFlow(!serverAddress.length ? defaultServerAddress : serverAddress)
+                } catch (error) {
+                  enqueueSnackbar(error.message, { variant: "error" })
+                }
+              } else {
+                goToScreen(Screen.legacyLogin)
+              }
+            }}
+            onError={(error: Error) => enqueueSnackbar(error.message, { variant: "error" })}
+          />
         )
-        ;(async () => {
-          await Service.deleteDB()
-        })()
-        setLoginClick(false)
-        onComplete()
-      })
-      .catch((err) => {
-        console.warn("error with auth request", err)
-        enqueueSnackbar(t("Incorrect username, password, or server address."), {
-          variant: "error",
-        })
-        if (!srcLocked)
-          enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), { variant: "info" })
-        setLoginClick(false)
-      })
-  }
-  const timezoneVal = () => {
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    return timezone
-  }
+      case Screen.legacyLogin:
+        return (
+          <LegacyLoginInput
+            values={legacyCredentials}
+            onChange={(event: any) =>
+              setLegacyCredentials({
+                ...legacyCredentials,
+                [event.target.name]: event.target.value,
+              })
+            }
+            onSubmit={() => {
+              if (!legacyCredentials.id || !legacyCredentials.password) {
+                enqueueSnackbar("Incorrect username, password, or server address.", {
+                  variant: "error",
+                })
+              }
 
-  let startOAuthFlow = async (_event: any, mode?: string): Promise<void> => {
-    const pkce = pkceChallenge(pkceCodeVerifierLength)
-    LAMP.Auth.set_oauth_params({
-      serverAddress: state.serverAddress,
-      codeVerifier: pkce.code_verifier,
-    })
+              handleLegacyLogin(
+                !serverAddress.length ? defaultServerAddress : serverAddress,
+                legacyCredentials,
+                setIdentity
+              )
+            }}
+            onSuccess={handleSuccess}
+            onError={(error: Error) => {
+              enqueueSnackbar(error.message, { variant: "error" })
 
-    let urlString: string
-    try {
-      urlString = (await LAMP.OAuth.startOauthFlow()).url
-    } catch (error) {
-      alert(`OAuth start URL could not be retrieved from server: ${error.message}`)
-      return
+              if (!srcLocked) {
+                enqueueSnackbar(t("Are you sure you're logging into the right mindLAMP server?"), {
+                  variant: "info",
+                })
+              }
+            }}
+          />
+        )
     }
-
-    let url: URL
-    try {
-      url = new URL(urlString)
-    } catch {
-      alert(`Server returned an invalid OAUth start URL: ${urlString}`)
-    }
-
-    url.searchParams.set("code_challenge", pkce.code_challenge)
-
-    window.location.replace(url.href)
-  }
+  }, [screen, serverAddress, legacyCredentials])
 
   return (
     <Slide direction="right" in={true} mountOnEnter unmountOnExit>
@@ -247,211 +235,368 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
         </Menu>
         <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
-            <form onSubmit={(e) => handleLogin(e)}>
-              <Box>
-                <Box className={classes.logoLogin}>
-                  <Logo />
-                </Box>
-                <Box className={classes.logoText}>
-                  <Logotext />
-                  <div
-                    style={{
-                      height: 6,
-                      marginBottom: 30,
-                      background:
-                        "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
-                    }}
-                  />
-                </Box>
-                <TextField
-                  select
-                  label={t("Select Language")}
-                  style={{ width: "100%" }}
-                  onChange={(event) => {
-                    setSelectedLanguage(event.target.value)
-                  }}
-                  variant="filled"
-                  value={selectedLanguage || ""}
-                >
-                  {Object.keys(locale_lang).map((key, value) => {
-                    if (userLanguages.includes(key)) {
-                      return (
-                        <MenuItem key={key} value={key}>
-                          {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
-                        </MenuItem>
-                      )
-                    }
-                  })}
-                </TextField>
-
-                <TextField
-                  margin="normal"
-                  name="serverAddress"
-                  variant="outlined"
-                  style={{ width: "100%", height: 90 }}
-                  // label="Domain"
-                  placeholder="api.lamp.digital"
-                  helperText={t("Don't enter a domain if you're not sure what this option does.")}
-                  value={state.serverAddress || ""}
-                  onChange={handleChange}
-                  disabled={srcLocked}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                  }}
-                />
-                <TextField
-                  required
-                  name="id"
-                  type="email"
-                  margin="normal"
-                  variant="outlined"
-                  style={{ width: "100%", height: 50 }}
-                  placeholder="my.email@address.com"
-                  value={state.id || ""}
-                  onChange={handleChange}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                    autoCapitalize: "off",
-                  }}
-                />
-
-                <TextField
-                  required
-                  name="password"
-                  type="password"
-                  margin="normal"
-                  variant="outlined"
-                  style={{ width: "100%", height: 50, marginBottom: 40 }}
-                  placeholder="•••••••••"
-                  value={state.password || ""}
-                  onChange={handleChange}
-                  InputProps={{
-                    classes: {
-                      root: classes.textfieldStyle,
-                    },
-                  }}
-                />
-
-                <Box className={classes.buttonNav} width={1} textAlign="center">
-                  <Fab
-                    variant="extended"
-                    type="submit"
-                    style={{ background: "#7599FF", color: "White" }}
-                    onClick={handleLogin}
-                    className={loginClick ? classes.loginDisabled : ""}
-                  >
-                    {t("Login")}
-                    <input
-                      type="submit"
-                      style={{
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        left: 0,
-                        width: "100%",
-                        opacity: 0,
-                      }}
-                      disabled={loginClick}
-                    />
-                  </Fab>
-
-                  <Fab
-                    variant="extended"
-                    style={{ background: "#FF0000", color: "White" }}
-                    onClick={startOAuthFlow}
-                    className={loginClick ? classes.loginDisabled : ""}
-                  >
-                    {t("OAuth Login")}
-                    <input
-                      type="button"
-                      style={{
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        left: 0,
-                        width: "100%",
-                        opacity: 0,
-                      }}
-                      disabled={loginClick}
-                    />
-                  </Fab>
-                </Box>
-
-                <Box textAlign="center" width={1} mt={4} mb={4}>
-                  <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => setTryitMenu(event.currentTarget)}
-                  >
-                    {t("Try it")}
-                  </Link>
-                  <br />
-                  <Link
-                    underline="none"
-                    className={classes.linkBlue}
-                    onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
-                  >
-                    {t("Research studies using mindLAMP")}
-                  </Link>
-                  <Menu
-                    keepMounted
-                    open={Boolean(tryitMenu)}
-                    anchorPosition={tryitMenu?.getBoundingClientRect()}
-                    anchorReference="anchorPosition"
-                    onClose={() => setTryitMenu(undefined)}
-                  >
-                    <MenuItem disabled divider>
-                      <b>{t("Try mindLAMP out as a...")}</b>
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "researcher")
-                      }}
-                    >
-                      {t("Researcher")}
-                    </MenuItem>
-                    <MenuItem
-                      divider
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "clinician")
-                      }}
-                    >
-                      {t("Clinician")}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "participant")
-                      }}
-                    >
-                      {t("Participant")}
-                    </MenuItem>
-                    <MenuItem
-                      onClick={(event) => {
-                        setTryitMenu(undefined)
-                        handleLogin(event, "patient")
-                      }}
-                    >
-                      {t("Patient")}
-                    </MenuItem>
-                  </Menu>
-                </Box>
+            <Box>
+              <Box className={classes.logoLogin}>
+                <Logo />
               </Box>
-            </form>
+              <Box className={classes.logoText}>
+                <Logotext />
+                <div
+                  style={{
+                    height: 6,
+                    marginBottom: 30,
+                    background:
+                      "linear-gradient(90deg, rgba(255,214,69,1) 0%, rgba(255,214,69,1) 25%, rgba(101,206,191,1) 25%, rgba(101,206,191,1) 50%, rgba(255,119,91,1) 50%, rgba(255,119,91,1) 75%, rgba(134,182,255,1) 75%, rgba(134,182,255,1) 100%)",
+                  }}
+                />
+              </Box>
+              <LanguageSelector
+                userLanguages={userLanguages}
+                value={selectedLanguage || ""}
+                onChange={(event: any) => setSelectedLanguage(event.target.value)}
+              />
+
+              {form()}
+
+              <Box textAlign="center" width={1} mt={4} mb={4}>
+                <Link
+                  underline="none"
+                  className={classes.linkBlue}
+                  onClick={(event) => setTryitMenu(event.currentTarget)}
+                >
+                  {t("Try it")}
+                </Link>
+                <br />
+                <Link
+                  underline="none"
+                  className={classes.linkBlue}
+                  onClick={(event) => window.open("https://www.digitalpsych.org/studies.html", "_blank")}
+                >
+                  {t("Research studies using mindLAMP")}
+                </Link>
+                <Menu
+                  keepMounted
+                  open={Boolean(tryitMenu)}
+                  anchorPosition={tryitMenu?.getBoundingClientRect()}
+                  anchorReference="anchorPosition"
+                  onClose={() => setTryitMenu(undefined)}
+                >
+                  <MenuItem disabled divider>
+                    <b>{t("Try mindLAMP out as a...")}</b>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleDemoLogin("researcher", setIdentity)
+                    }}
+                  >
+                    {t("Researcher")}
+                  </MenuItem>
+                  <MenuItem
+                    divider
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleDemoLogin("clinician", setIdentity)
+                    }}
+                  >
+                    {t("Clinician")}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleDemoLogin("participant", setIdentity)
+                    }}
+                  >
+                    {t("Participant")}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setTryitMenu(undefined)
+                      handleDemoLogin("patient", setIdentity)
+                    }}
+                  >
+                    {t("Patient")}
+                  </MenuItem>
+                </Menu>
+              </Box>
+            </Box>
           </Grid>
         </Grid>
       </ResponsiveMargin>
     </Slide>
+  )
+}
+
+function LanguageSelector({ userLanguages, value, onChange }) {
+  const { t } = useTranslation()
+
+  return (
+    <TextField
+      select
+      label={t("Select Language")}
+      style={{ width: "100%" }}
+      onChange={onChange}
+      variant="filled"
+      value={value}
+    >
+      {Object.keys(locale_lang).map((key, value) => {
+        if (userLanguages.includes(key)) {
+          return (
+            <MenuItem key={key} value={key}>
+              {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
+            </MenuItem>
+          )
+        }
+      })}
+    </TextField>
+  )
+}
+
+function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete, onError }) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+
+  const [disabled, setDisabled] = useState(false)
+
+  let handleSubmit = async (event: any) => {
+    event.preventDefault()
+    setDisabled(true)
+
+    let isOAuthAvailable: boolean
+    try {
+      isOAuthAvailable = await checkOAuthAvailability(!value.length ? defaultValue : value)
+    } catch (error) {
+      setDisabled(false)
+      onError(Error(`Could not connect to server at ${value}: ${error.message}`))
+      return
+    }
+
+    onComplete(isOAuthAvailable)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField
+        margin="normal"
+        name="serverAddress"
+        variant="outlined"
+        style={{ width: "100%" }}
+        placeholder={defaultValue}
+        helperText={t("Don't enter a domain if you're not sure what this option does.")}
+        value={value}
+        onChange={onChange}
+        disabled={disabled || locked}
+        InputProps={{
+          classes: {
+            root: classes.textfieldStyle,
+          },
+        }}
+      />
+
+      <Box className={classes.buttonNav} width={1} textAlign="center">
+        <Fab
+          variant="extended"
+          style={{ background: "#7599FF", color: "White" }}
+          className={disabled ? classes.loginDisabled : ""}
+        >
+          {t("Continue")}
+          <input
+            type="submit"
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+              width: "100%",
+              opacity: 0,
+            }}
+            disabled={disabled}
+          />
+        </Fab>
+      </Box>
+    </form>
+  )
+}
+
+function LegacyLoginInput({ values, onChange, onSubmit, onSuccess, onError }) {
+  const { t } = useTranslation()
+  const classes = useStyles()
+
+  const [disabled, setDisabled] = useState(false)
+
+  let handleSubmit = async (event: any) => {
+    event.preventDefault()
+    setDisabled(true)
+
+    try {
+      await onSubmit()
+    } catch (error) {
+      onError(Error(error.message))
+      setDisabled(false)
+      return
+    }
+
+    onSuccess()
+    setDisabled(false)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField
+        required
+        name="id"
+        type="email"
+        margin="normal"
+        variant="outlined"
+        style={{ width: "100%", height: 50 }}
+        placeholder="my.email@address.com"
+        value={values.id || ""}
+        onChange={onChange}
+        disabled={disabled}
+        InputLabelProps={{ shrink: true }}
+        InputProps={{
+          classes: {
+            root: classes.textfieldStyle,
+          },
+          autoCapitalize: "off",
+        }}
+      />
+
+      <TextField
+        required
+        name="password"
+        type="password"
+        margin="normal"
+        variant="outlined"
+        style={{ width: "100%", height: 50, marginBottom: 40 }}
+        placeholder="•••••••••"
+        value={values.password || ""}
+        onChange={onChange}
+        disabled={disabled}
+        InputProps={{
+          classes: {
+            root: classes.textfieldStyle,
+          },
+        }}
+      />
+
+      <Box className={classes.buttonNav} width={1} textAlign="center">
+        <Fab
+          variant="extended"
+          type="submit"
+          style={{ background: "#7599FF", color: "White" }}
+          className={disabled ? classes.loginDisabled : ""}
+        >
+          {t("Login")}
+          <input
+            type="submit"
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+              width: "100%",
+              opacity: 0,
+            }}
+            disabled={disabled}
+          />
+        </Fab>
+      </Box>
+    </form>
+  )
+}
+
+let checkOAuthAvailability = async (serverAddress: string): Promise<boolean> => {
+  const endpoint = new URL("oauth", `https://${serverAddress}`).href
+  const response = await fetch(endpoint, { method: "HEAD" })
+  return response.ok
+}
+
+const pkceCodeVerifierLength = 43
+let startOAuthFlow = async (serverAddress: string): Promise<void> => {
+  const pkce = pkceChallenge(pkceCodeVerifierLength)
+
+  LAMP.Auth.set_oauth_params({
+    serverAddress: `https://${serverAddress}`,
+    codeVerifier: pkce.code_verifier,
+  })
+
+  let urlString: string
+  try {
+    urlString = (await LAMP.OAuth.startOauthFlow()).url
+  } catch (error) {
+    throw Error(`OAuth start URL could not be retrieved from server at ${serverAddress}: ${error.message}`)
+  }
+
+  let url: URL
+  try {
+    url = new URL(urlString)
+  } catch {
+    throw Error(`Server returned an invalid OAUth start URL: ${urlString}`)
+  }
+
+  url.searchParams.set("code_challenge", pkce.code_challenge)
+  window.location.assign(url.href)
+}
+
+let handleLegacyLogin = async (
+  serverAddress: string,
+  credentials: { id: string; password: string },
+  setIdentity
+): Promise<void> => {
+  try {
+    const res = await setIdentity({
+      id: credentials.id,
+      password: credentials.password,
+      serverAddress: serverAddress,
+    })
+
+    if (res.authType === "participant") {
+      localStorage.setItem("lastTab" + res.identity.id, JSON.stringify(new Date().getTime()))
+      LAMP.SensorEvent.create(res.identity.id, {
+        timestamp: Date.now(),
+        sensor: "lamp.analytics",
+        data: {
+          type: "login",
+          device_type: "Dashboard",
+          user_agent: `LAMP-dashboard/${process.env.REACT_APP_GIT_SHA} ${window.navigator.userAgent}`,
+        },
+      } as any).then((res) => console.dir(res))
+      LAMP.Type.setAttachment(res.identity.id, "me", "lamp.participant.timezone", timezoneVal())
+    }
+    if (res.authType === "researcher" && res.auth.serverAddress === "demo.lamp.digital") {
+      let studiesSelected =
+        localStorage.getItem("studies_" + res.identity.id) !== null
+          ? JSON.parse(localStorage.getItem("studies_" + res.identity.id))
+          : []
+      if (studiesSelected.length === 0) {
+        let studiesList = [res.identity.name]
+        localStorage.setItem("studies_" + res.identity.id, JSON.stringify(studiesList))
+        localStorage.setItem("studyFilter_" + res.identity.id, JSON.stringify(1))
+      }
+    }
+  } catch (error) {
+    console.warn("error with auth request", error)
+    throw Error("Incorrect username, password, or server address.")
+  }
+}
+
+const timezoneVal = () => {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return timezone
+}
+
+let handleDemoLogin = async (mode: string, setIdentity) => {
+  await handleLegacyLogin(
+    "demo.lamp.digital",
+    {
+      id: `${mode}@demo.lamp.digital`,
+      password: "demo",
+    },
+    setIdentity
   )
 }
