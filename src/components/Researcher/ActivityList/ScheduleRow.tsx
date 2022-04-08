@@ -177,10 +177,17 @@ export default function ScheduleRow({
             }}
             onBlur={(event) => {
               const date = data?.start_date ? new Date(data?.start_date) : new Date()
+
               const value = event.target.value
               const parts = value.match(/(\d+)\:(\d+) (\w+)/)
               const hours =
-                /am/i.test(parts[3]) || /AM/i.test(parts[3]) ? parseInt(parts[1], 10) : parseInt(parts[1], 10) + 12
+                /am/i.test(parts[3]) || /AM/i.test(parts[3])
+                  ? parseInt(parts[1], 10) === 12
+                    ? 0
+                    : parseInt(parts[1], 10)
+                  : parseInt(parts[1], 10) === 12
+                  ? parseInt(parts[1], 10) + 0
+                  : parseInt(parts[1], 10) + 12
               const minutes = parseInt(parts[2], 10)
               date.setHours(hours)
               date.setMinutes(minutes)
