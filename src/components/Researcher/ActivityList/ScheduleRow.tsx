@@ -27,14 +27,14 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export const getDate = (val) => {
   if ((val || "").length > 0) {
-    const dateVal = val.split("T")
-    let date = dateVal[0].split("-")
-    const newDate = new Date(dateVal[0])
-    newDate.setFullYear(parseInt(date[0]))
-    newDate.setMonth(parseInt(date[1]) - 1)
-    newDate.setDate(parseInt(date[2]))
-    newDate.setHours(dateVal[1].split(":")[0])
-    newDate.setMinutes(dateVal[1].split(":")[1])
+    const dateVal = val.split("T")[0].split("-")
+    const timeVal = val.split("T")[1].split(":")
+    const newDate = new Date()
+    newDate.setFullYear(parseInt(dateVal[0]))
+    newDate.setMonth(parseInt(dateVal[1]) - 1)
+    newDate.setDate(parseInt(dateVal[2]))
+    newDate.setHours(timeVal[0])
+    newDate.setMinutes(timeVal[1])
     newDate.setSeconds(0)
     return newDate
   }
@@ -55,7 +55,6 @@ export const dateInUTCformat = (val) => {
       ? (val || new Date()).getMonth() + 1
       : "0" + ((val || new Date()).getMonth() + 1)
   let date = (val || new Date()).getDate() > 9 ? (val || new Date()).getDate() : "0" + (val || new Date()).getDate()
-
   const dateVal =
     (val || new Date()).getFullYear() +
     "-" +
@@ -117,25 +116,41 @@ export default function ScheduleRow({
           <span>{getDate(data.start_date ?? "").toLocaleString("en-US", Date.formatStyle("dateOnly"))}</span>
         ) : (
           <KeyboardDatePicker
-            className={classes.datePicker}
-            size="small"
-            autoOk
-            error={data?.start_date === null || (data?.start_date || "") === ""}
-            animateYearScrolling
-            variant="inline"
-            inputVariant="outlined"
-            format="MM/dd/yyyy"
-            helperText={t("Select the start date.")}
-            InputAdornmentProps={{ position: "end" }}
-            value={data.start_date ? getDate(data.start_date ?? "") : ""}
+            clearable
+            value={data?.start_date ? getDate(data.start_date ?? "") : ""}
+            onBlur={(event) => {
+              const date = new Date(event.target.value)
+              if (!!date) {
+                date.setHours(1)
+                date.setMinutes(0)
+                date.setSeconds(0)
+              }
+              setData({
+                ...data,
+                start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                time: date?.isValid() ? dateInUTCformat(date) : null,
+              })
+            }}
             onChange={(date) => {
               if (!!date) {
                 date.setHours(1)
                 date.setMinutes(0)
                 date.setSeconds(0)
               }
-              setData({ ...data, start_date: date?.isValid() ? dateInUTCformat(date) : null })
+              setData({
+                ...data,
+                start_date: date?.isValid() ? dateInUTCformat(date) : null,
+                time: date?.isValid() ? dateInUTCformat(date) : null,
+              })
             }}
+            minDate={new Date()}
+            format="MM/dd/yyyy"
+            animateYearScrolling
+            variant="inline"
+            inputVariant="outlined"
+            className={classes.datePicker}
+            helperText={t("Select the start date.")}
+            size="small"
           />
         )}
       </TableCell>
@@ -149,13 +164,26 @@ export default function ScheduleRow({
             autoOk
             variant="inline"
             inputVariant="outlined"
-            format="h:mm a"
+            format="hh:mm a"
+            mask="__:__ _M"
+            placeholder="HH:MM AM"
             error={data.time === "" || data.time === null}
             helperText={t("Select the start time.")}
             InputAdornmentProps={{ position: "end" }}
             value={data.time ? getDate(data.time ?? "") : ""}
             defaultValue={data.time ? getDate(data.time ?? "") : ""}
             onChange={(date) => {
+              setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
+            }}
+            onBlur={(event) => {
+              const date = data?.start_date ? new Date(data?.start_date) : new Date()
+              const value = event.target.value
+              const parts = value.match(/(\d+)\:(\d+) (\w+)/)
+              const hours =
+                /am/i.test(parts[3]) || /AM/i.test(parts[3]) ? parseInt(parts[1], 10) : parseInt(parts[1], 10) + 12
+              const minutes = parseInt(parts[2], 10)
+              date.setHours(hours)
+              date.setMinutes(minutes)
               setData({ ...data, time: date?.isValid() ? dateInUTCformat(date) : null })
             }}
           />
