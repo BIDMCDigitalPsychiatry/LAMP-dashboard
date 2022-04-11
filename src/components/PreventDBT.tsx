@@ -166,19 +166,19 @@ export default function PreventDBT({ selectedEvents, ...props }) {
   const [emotionsData, setEmotionsData] = useState(null)
   const [effectiveData, setEffectiveData] = useState(null)
   const [ineffectiveData, setIneffectiveData] = useState(null)
-  const [actionsData, setActionsData] = useState(JSON.parse(JSON.stringify(actions)))
+  const [actionsData, setActionsData] = useState(null)
   const [selfcareData, setSelfcareData] = useState(null)
   const [dateArray, setDateArray] = useState([])
   const [emotionrange, setEmotionrange] = useState(null)
   const [effectiverange, setEffectiverange] = useState(null)
   const [inEffectiverange, setInEffectiverange] = useState(null)
   const [actionrange, setActionrange] = useState(null)
+  const [summaryRange, setSummaryRange] = useState(null)
+
   const [calculated, setCalculated] = useState(false)
   const [dbtrange, setDBTrange] = useState(null)
 
   useEffect(() => {
-    let summaryData = []
-    let dData = []
     let dateArray = []
     let weekend
     if (selectedEvents.length > 0) {
@@ -211,30 +211,6 @@ export default function PreventDBT({ selectedEvents, ...props }) {
         dateArray.push({ timestamp: timestampFormat, date: dateFormat })
       }
       setDateArray(dateArray)
-      selectedEvents.map((event) => {
-        event.temporal_slices.map((slice) => {
-          if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
-            dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
-          }
-        })
-        if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
-          dData["Urge to Die by suicide"] = dData["Urge to Die by suicide"]
-            ? dData["Urge to Die by suicide"] + parseInt(event.static_data?.urgeForSuicide)
-            : parseInt(event.static_data?.urgeForSuicide)
-          dData["Urge to Quit Therapy"] = dData["Urge to Quit Therapy"]
-            ? dData["Urge to Quit Therapy"] + parseInt(event.static_data?.urgeToQuitTheray)
-            : parseInt(event.static_data?.urgeToQuitTheray)
-        }
-      })
-      Object.keys(dData).forEach(function (key) {
-        summaryData.push({ action: key, count: dData[key] })
-      })
-      let actionsD = actionsData
-      actionsD.data.values = summaryData
-      actionsD.title = t(actionsD.title)
-
-      actionsD.width.step = supportsSidebar ? 80 : 75
-      setActionsData(actionsD)
       setCalculated(true)
     }
   }, [selectedEvents])
@@ -244,7 +220,48 @@ export default function PreventDBT({ selectedEvents, ...props }) {
     setEmotionrange(dbtrange)
     setActionrange(dbtrange)
     setInEffectiverange(dbtrange)
+    setSummaryRange(dbtrange)
   }, [dbtrange])
+
+  useEffect(() => {
+    if (!!summaryRange) {
+      let dData = []
+      let summaryData = []
+
+      let timeStamp = summaryRange.split("-")
+      selectedEvents.map((event) => {
+        if (event.timestamp <= parseInt(timeStamp[0]) && event.timestamp >= parseInt(timeStamp[1])) {
+          event.temporal_slices.map((slice) => {
+            if (!!slice.value) {
+              if ((slice.type !== null && slice.level === "target_effective") || slice.level === "target_ineffective") {
+                dData[slice.item] = dData[slice.item] ? dData[slice.item] + parseInt(slice.type) : parseInt(slice.type)
+              }
+            }
+          })
+          if (!!event.static_data?.urgeForSuicide || !!event.static_data?.urgeToQuitTheray) {
+            dData["Urge to Die by suicide"] = dData["Urge to Die by suicide"]
+              ? dData["Urge to Die by suicide"] + parseInt(event.static_data?.urgeForSuicide)
+              : parseInt(event.static_data?.urgeForSuicide)
+            dData["Urge to Quit Therapy"] = dData["Urge to Quit Therapy"]
+              ? dData["Urge to Quit Therapy"] + parseInt(event.static_data?.urgeToQuitTheray)
+              : parseInt(event.static_data?.urgeToQuitTheray)
+          }
+        }
+      })
+      if (Object.keys(dData).length === 0) {
+        summaryData.push({ action: "", count: 0 })
+      } else {
+        Object.keys(dData).forEach(function (key) {
+          summaryData.push({ action: key, count: dData[key] })
+        })
+      }
+      let actionsD = JSON.parse(JSON.stringify(actions))
+      actionsD.data.values = summaryData
+      actionsD.title = t(actionsD.title)
+      actionsD.width.step = supportsSidebar ? 80 : 75
+      setActionsData(actionsD)
+    }
+  }, [summaryRange])
 
   useEffect(() => {
     if (!!emotionrange) {
@@ -281,7 +298,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       emotionsD.title = t(emotionsD.title)
       setEmotionsData(emotionsD)
     }
-  }, [emotionrange])
+  }, [summaryRange])
 
   useEffect(() => {
     if (!!effectiverange) {
@@ -396,10 +413,19 @@ export default function PreventDBT({ selectedEvents, ...props }) {
           }
         })
       })
-      Object.keys(tData).forEach(function (key) {
-        const keys = key.split("~")
-        timelineData.push({ date: getDateVal(keys[0]), count: tData[key], action: keys[1] })
-      })
+      if (Object.keys(tData).length === 0) {
+        let date = new Date(parseInt(timeStamp[0]))
+        var curr_date = date.getDate().toString().padStart(2, "0")
+        var curr_month = (date.getMonth() + 1).toString().padStart(2, "0") //Months are zero based
+        var curr_year = date.getFullYear()
+        let dateString = curr_month + "-" + curr_date + "-" + curr_year
+        timelineData.push({ date: getDateVal(dateString), count: 0, action: "" })
+      } else {
+        Object.keys(tData).forEach(function (key) {
+          const keys = key.split("~")
+          timelineData.push({ date: getDateVal(keys[0]), count: tData[key], action: keys[1] })
+        })
+      }
       let selfcareD = JSON.parse(JSON.stringify(selfcare))
       selfcareD.data.values = timelineData
       selfcareD.title = t(selfcareD.title)
@@ -460,7 +486,16 @@ export default function PreventDBT({ selectedEvents, ...props }) {
               </NativeSelect>
               {ineffectiveData !== null && <Vega spec={ineffectiveData} />}
               <div className={classes.separator} />
-              <Vega spec={actionsData} />
+              <NativeSelect
+                className={classes.selector}
+                value={summaryRange}
+                onChange={(event) => setSummaryRange(event.target.value)}
+              >
+                {dateArray.map((dateString) => (
+                  <option value={dateString.timestamp}>{dateString.date}</option>
+                ))}
+              </NativeSelect>
+              {actionsData !== null && <Vega spec={actionsData} />}
               <div className={classes.separator} />
               <NativeSelect
                 className={classes.selector}
