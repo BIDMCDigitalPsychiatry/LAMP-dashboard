@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Route, Redirect, Switch, useLocation, BrowserRouter } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation, useHistory, BrowserRouter } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -84,6 +84,7 @@ export const changeCase = (text) => {
 function AppRouter({ ...props }) {
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const search = useLocation().search
+  const history = useHistory()
 
   // To set page titile for active tab for menu
   let activeTab = (newTab?: string, participantId?: string) => {
@@ -92,7 +93,7 @@ function AppRouter({ ...props }) {
         ...state,
         activeTab: newTab,
       }))
-      window.location.href = `/#/participant/${participantId}/${newTab.toLowerCase()}`
+      history.push(`/participant/${participantId}/${newTab.toLowerCase()}`)
     }
   }
 
