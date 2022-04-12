@@ -259,7 +259,7 @@ function AppRouter({ ...props }) {
   let reset = async (identity?: any) => {
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
       await sensorEventUpdate(null, state.identity?.id ?? null, null)
-      await LAMP.SensorEvent.create(state.identity?.id ?? null, {
+      await LAMP.SensorEvent.create(state.identity?.id?.split("@")[0] ?? null, {
         timestamp: Date.now(),
         sensor: "lamp.analytics",
         data: {
