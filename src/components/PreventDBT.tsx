@@ -258,7 +258,6 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       let actionsD = JSON.parse(JSON.stringify(actions))
       actionsD.data.values = summaryData
       actionsD.title = t(actionsD.title)
-      actionsD.width.step = supportsSidebar ? 80 : 75
       setActionsData(actionsD)
     }
   }, [summaryRange])
@@ -298,7 +297,7 @@ export default function PreventDBT({ selectedEvents, ...props }) {
       emotionsD.title = t(emotionsD.title)
       setEmotionsData(emotionsD)
     }
-  }, [summaryRange])
+  }, [emotionrange])
 
   useEffect(() => {
     if (!!effectiverange) {
