@@ -1,6 +1,7 @@
 {
 	"Welcome to React": "Welcome to React - English",
 	"Don't enter a domain if you're not sure what this option does.": "Don't enter a domain if you're not sure what this option does",
+  "Continue": "Continue",
 	"Login": "Login",
   "OAuth Login": "OAuth Login",
 	"Try it": "Try it",
