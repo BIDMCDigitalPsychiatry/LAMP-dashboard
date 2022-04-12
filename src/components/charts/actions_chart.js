@@ -1,7 +1,7 @@
 export const actions = {
   $schema: "https://vega.github.io/schema/vega-lite/v4.json",
   description: "A basic bar chart example, with value labels shown upon mouse hover.",
-  width: { step: 100 },
+  width: 440,
   padding: 5,
   title: "Actions (Summary)",
   data: {
