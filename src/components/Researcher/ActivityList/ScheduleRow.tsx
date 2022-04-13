@@ -16,7 +16,6 @@ import {
 import { KeyboardDatePicker, KeyboardTimePicker } from "@material-ui/pickers"
 import { useTranslation } from "react-i18next"
 import InlineMenu from "./InlineMenu"
-import { red } from "@material-ui/core/colors"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
