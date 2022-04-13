@@ -114,8 +114,7 @@ export default function GameCreator({
           questions[idx].type === "list" ||
           questions[idx].type === "multiselect" ||
           questions[idx].type === "slider" ||
-          questions[idx].type === "rating" ||
-          questions[idx].type === "time"
+          questions[idx].type === "rating"
             ? !Array.isArray(questions[idx].options) ||
               questions[idx].options === null ||
               (!!questions[idx].options && questions[idx].options.length === 0)
@@ -124,9 +123,7 @@ export default function GameCreator({
                   (i) =>
                     (!!i &&
                       (((questions[idx].type === "slider" || questions[idx].type === "rating") && i?.value >= 0) ||
-                        ((questions[idx].type === "list" ||
-                          questions[idx].type === "multiselect" ||
-                          questions[idx].type === "time") &&
+                        ((questions[idx].type === "list" || questions[idx].type === "multiselect") &&
                           ((i?.value || "").toString() || "")?.trim().length > 0))) ||
                     i === ""
                 ).length === (questions[idx].options || []).length
@@ -472,6 +469,20 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
+    ;(settingsData.settings || []).map((x, idx) => {
+      if (
+        !(
+          x.type === "time" ||
+          x.type === "list" ||
+          x.type === "multiselect" ||
+          x.type === "slider" ||
+          x.type === "rating"
+        ) &&
+        typeof x.options !== "undefined"
+      ) {
+        delete settingsData.settings[idx]["options"]
+      }
+    })
     setData({ ...data, settings: settingsData?.settings })
   }
 
@@ -516,6 +527,7 @@ export default function GameCreator({
             schema={schemaListObj[activitySpecId]}
             initialData={data}
             onChange={(x) => {
+              console.log(x)
               updateSettings(x)
             }}
           />
