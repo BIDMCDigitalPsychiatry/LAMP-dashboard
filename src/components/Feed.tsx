@@ -509,6 +509,9 @@ export default function Feed({
                 if (first.getTime() > scheduleStartDate.getTime()) {
                   let found = false
                   while (first.getTime() <= end.getTime()) {
+                    let dayNo = getDayNumber(new Date(scheduleStartDate))
+                    if (first.getDate() === 0) first.setDate(first.getDate() + dayNo)
+                    first.setHours(1)
                     let diff = first.getTime() - new Date(scheduleStartDate).getTime()
                     let weeksBetweenDates = Math.floor(diff / (7 * 24 * 60 * 60 * 1000))
                     if (!!found) {
