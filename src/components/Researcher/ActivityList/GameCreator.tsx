@@ -527,7 +527,6 @@ export default function GameCreator({
             schema={schemaListObj[activitySpecId]}
             initialData={data}
             onChange={(x) => {
-              console.log(x)
               updateSettings(x)
             }}
           />
