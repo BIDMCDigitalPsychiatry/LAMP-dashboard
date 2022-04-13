@@ -124,7 +124,11 @@ export default function GameCreator({
                     (!!i &&
                       (((questions[idx].type === "slider" || questions[idx].type === "rating") && i?.value >= 0) ||
                         ((questions[idx].type === "list" || questions[idx].type === "multiselect") &&
-                          ((i?.value || "").toString() || "")?.trim().length > 0))) ||
+                          (i?.value === 0 ||
+                            i?.value === "0" ||
+                            (i?.value !== 0 &&
+                              i?.value !== "0" &&
+                              ((i?.value || "").toString() || "")?.trim().length > 0))))) ||
                     i === ""
                 ).length === (questions[idx].options || []).length
               ? optionsArray.push(0)
@@ -132,6 +136,7 @@ export default function GameCreator({
             : optionsArray.push(0)
         })
       }
+
       if (optionsArray.filter((val) => val !== 0).length > 0) {
         status = 1
         return false
