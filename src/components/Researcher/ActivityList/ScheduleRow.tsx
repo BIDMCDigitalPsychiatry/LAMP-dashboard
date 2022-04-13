@@ -22,6 +22,9 @@ const useStyles = makeStyles((theme: Theme) =>
     datePicker: {
       "& div": { paddingRight: 0, maxWidth: 175 },
     },
+    error: {
+      color: "red",
+    },
   })
 )
 
@@ -106,7 +109,12 @@ export default function ScheduleRow({
   }, [data])
 
   const validate = () => {
-    return !(data.start_date === null || data.time === null || data.repeat_interval === "")
+    return !(
+      data.start_date === null ||
+      data.time === null ||
+      data.repeat_interval === "" ||
+      data.repeat_interval === null
+    )
   }
 
   return (
@@ -205,6 +213,7 @@ export default function ScheduleRow({
               labelId="demo-simple-select-outlined-label"
               id="demo-simple-select-outlined"
               value={data.repeat_interval}
+              error={data.repeat_interval === "" || data.repeat_interval === null}
               onChange={(event) => {
                 setData({ ...data, repeat_interval: event.target.value })
               }}
@@ -216,7 +225,11 @@ export default function ScheduleRow({
                 </MenuItem>
               ))}
             </Select>
-            <FormHelperText>{t("Select the Repeat interval.")}</FormHelperText>
+            <FormHelperText
+              className={data.repeat_interval === "" || data.repeat_interval === null ? classes.error : ""}
+            >
+              {t("Select the Repeat interval.")}
+            </FormHelperText>
           </FormControl>
         )}
       </TableCell>
