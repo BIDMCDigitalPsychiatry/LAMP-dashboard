@@ -3,13 +3,20 @@ import demo_db from "../../demo_db.json"
 import LAMP from "lamp-core"
 
 export const fetchResult = async (authString, id, type, modal) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "http://api.lamp.digital"
+  const token = LAMP.Auth._auth.accessToken
+  let authorization
+  if (!!token) {
+    authorization = "Bearer " + token
+  } else {
+    authorization = "Basic" + authString
+  }
   let result = await (
-    await fetch(`${baseUrl}/${modal}/${id}/_lookup/${type}`, {
+    await fetch(`http://${baseUrl}/${modal}/${id}/_lookup/${type}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Basic " + authString,
+        Authorization: authorization,
       },
     })
   ).json()
@@ -17,9 +24,9 @@ export const fetchResult = async (authString, id, type, modal) => {
 }
 
 export const fetchPostData = async (authString, id, type, modal, methodType, bodyData) => {
-  const baseUrl = "https://" + (!!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "api.lamp.digital")
+  const baseUrl = !!LAMP.Auth._auth.serverAddress ? LAMP.Auth._auth.serverAddress : "http://api.lamp.digital"
   let result = await (
-    await fetch(`${baseUrl}/${modal}/${id}/${type}`, {
+    await fetch(`http://${baseUrl}/${modal}/${id}/${type}`, {
       method: methodType,
       headers: {
         "Content-Type": "application/json",
