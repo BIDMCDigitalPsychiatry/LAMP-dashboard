@@ -47,7 +47,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
       direction="column"
       alignItems="flex-end"
       spacing={1}
-      style={{ position: "fixed", bottom: 24, right: 24, width: "auto" }}
+      style={{ bottom: 24, right: 24, width: "auto", marginRight: "16px", marginBottom: "15px" }}
     >
       {!!value && (
         <Grid item>
