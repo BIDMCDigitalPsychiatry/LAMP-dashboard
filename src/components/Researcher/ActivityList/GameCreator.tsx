@@ -474,20 +474,25 @@ export default function GameCreator({
   }
 
   const updateSettings = (settingsData) => {
-    ;(settingsData.settings || []).map((x, idx) => {
-      if (
-        !(
-          x.type === "time" ||
-          x.type === "list" ||
-          x.type === "multiselect" ||
-          x.type === "slider" ||
-          x.type === "rating"
-        ) &&
-        typeof x.options !== "undefined"
-      ) {
-        delete settingsData.settings[idx]["options"]
-      }
-    })
+    if (data?.spec === "lamp.survey") {
+      ;(settingsData?.settings || []).map((x, idx) => {
+        if (
+          !(
+            x.type === "time" ||
+            x.type === "list" ||
+            x.type === "multiselect" ||
+            x.type === "slider" ||
+            x.type === "rating"
+          ) &&
+          typeof x.options !== "undefined"
+        ) {
+          delete settingsData.settings[idx]["options"]
+        }
+        if (x.type === "time") {
+          settingsData.settings[idx]["options"] = [{ value: "standard" }]
+        }
+      })
+    }
     setData({ ...data, settings: settingsData?.settings })
   }
 
