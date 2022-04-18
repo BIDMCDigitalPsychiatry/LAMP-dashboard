@@ -68,7 +68,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
   useEffect(() => {
     if (currentActivity !== null && !!currentActivity?.spec) {
       setLoading(true)
-      console.log(currentActivity, new Date().getTime())
       activateEmbeddedActivity(currentActivity)
     }
   }, [currentActivity])
@@ -87,7 +86,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           delete data["timestamp"]
           data["activity"] = currentActivity.id
           data["timestamp"] = activityTimestamp
-          console.log(data)
+          data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           setEmbeddedActivity(undefined)
           setSettings(null)
@@ -150,20 +149,10 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     }
   }, [embeddedActivity, data])
 
-  useEffect(() => {
-    console.log("time", activityTimestamp)
-  }, [activityTimestamp])
-
   const activateEmbeddedActivity = async (activity) => {
     let response = "about:blank"
     try {
       setSaved(false)
-      console.log({
-        ...settings,
-        activity: currentActivity,
-        configuration: { language: i18n.language },
-        noBack: noBack,
-      })
       setSettings({
         ...settings,
         activity: currentActivity,
