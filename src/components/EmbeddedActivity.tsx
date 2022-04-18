@@ -86,7 +86,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
           delete data["timestamp"]
           data["activity"] = currentActivity.id
           data["timestamp"] = activityTimestamp
-          data["duration"] = activityTimestamp - new Date().getTime()
+          data["duration"] = new Date().getTime() - activityTimestamp
           setData(data)
           setEmbeddedActivity(undefined)
           setSettings(null)
