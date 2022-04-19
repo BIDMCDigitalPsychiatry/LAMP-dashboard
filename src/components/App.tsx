@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Route, Redirect, Switch, useLocation, useHistory, BrowserRouter } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation, BrowserRouter, HashRouter } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
@@ -379,7 +379,30 @@ function AppRouter({ ...props }) {
 
   return (
     <Switch>
-      <Route exact path="/oauth/login" render={() => <OAuthLogin />} />
+      <Route
+        path="/*code=*"
+        render={(props) => {
+          let urlParams = window.location.hash.replace("#/", "")
+
+          return (
+            <OAuthLogin
+              searchParameters={() => urlParams}
+              reset={async (identity) => await reset(identity)}
+              onComplete={(auth, type, me) => {
+                setState((state) => {
+                  return {
+                    ...state,
+                    identity: me,
+                    auth: auth,
+                    authType: type,
+                  }
+                })
+                props.history.replace("/")
+              }}
+            />
+          )
+        }}
+      />
 
       <Route
         exact
@@ -756,35 +779,6 @@ function AppRouter({ ...props }) {
   )
 }
 
-function OAuthLogin() {
-  let params = useLocation().search
-  const code = new URLSearchParams(params).get("code")
-
-  let oauthParams: any
-  try {
-    oauthParams = JSON.parse(sessionStorage?.getItem("LAMP._oauth"))
-  } catch {
-    oauthParams = {}
-  }
-
-  if (!oauthParams?.codeVerifier) {
-    return <div>Missing code_verifier!</div>
-  }
-
-  useEffect(() => {
-    LAMP.Auth.set_oauth_params(oauthParams)
-    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier)
-  }, [params])
-
-  return (
-    <div>
-      <p>Waiting for server to finish authentication...</p>
-      <p>code: {code}</p>
-      <p>code_verifier: {oauthParams.codeVerifier}</p>
-    </div>
-  )
-}
-
 export default function App({ ...props }) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -847,9 +841,9 @@ export default function App({ ...props }) {
         <CssBaseline />
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <SnackbarProvider>
-            <BrowserRouter>
+            <HashRouter>
               <AppRouter {...props} />
-            </BrowserRouter>
+            </HashRouter>
           </SnackbarProvider>
         </MuiPickersUtilsProvider>
         <span
@@ -866,5 +860,37 @@ export default function App({ ...props }) {
         </span>
       </ThemeProvider>
     </ErrorBoundary>
+  )
+}
+
+function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
+  let params = searchParameters()
+  const code = new URLSearchParams(params).get("code")
+
+  let oauthParams: any
+  try {
+    oauthParams = JSON.parse(sessionStorage?.getItem("LAMP._oauth"))
+  } catch {
+    oauthParams = {}
+  }
+
+  if (!oauthParams?.codeVerifier) {
+    return <div>Missing code_verifier!</div>
+  }
+
+  useEffect(() => {
+    LAMP.Auth.set_oauth_params(oauthParams)
+    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier).then(async (json) => {
+      await reset({ accessToken: json.access_token })
+      onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
+    })
+  }, [params])
+
+  return (
+    <div>
+      <p>Waiting for server to finish authentication...</p>
+      <p>code: {code}</p>
+      <p>code_verifier: {oauthParams.codeVerifier}</p>
+    </div>
   )
 }
