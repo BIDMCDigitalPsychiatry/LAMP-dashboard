@@ -511,7 +511,7 @@ function LegacyLoginInput({ values, onChange, onSubmit, onSuccess, onError }) {
 }
 
 let checkOAuthAvailability = async (serverAddress: string): Promise<boolean> => {
-  const endpoint = new URL("oauth", `https://${serverAddress}`).href
+  const endpoint = new URL("oauth/start", `http://${serverAddress}`).href
   const response = await fetch(endpoint, { method: "HEAD" })
   return response.ok
 }
@@ -521,7 +521,7 @@ let startOAuthFlow = async (serverAddress: string): Promise<void> => {
   const pkce = pkceChallenge(pkceCodeVerifierLength)
 
   LAMP.Auth.set_oauth_params({
-    serverAddress: `https://${serverAddress}`,
+    serverAddress: serverAddress,
     codeVerifier: pkce.code_verifier,
   })
 

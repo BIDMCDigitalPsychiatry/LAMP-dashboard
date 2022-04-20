@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Route, Redirect, Switch, useLocation, BrowserRouter, HashRouter } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation, useHistory, HashRouter } from "react-router-dom"
 import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
 import DateFnsUtils from "@date-io/date-fns"
-import LAMP from "lamp-core"
+import LAMP, { AuthResponse } from "lamp-core"
 import Login from "./Login"
 import Messages from "./Messages"
 import Root from "./Admin/Index"
@@ -866,6 +866,10 @@ export default function App({ ...props }) {
 function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
   let params = searchParameters()
   const code = new URLSearchParams(params).get("code")
+  const [state, setState] = useState({
+    finished: false,
+    success: false,
+  })
 
   let oauthParams: any
   try {
@@ -880,17 +884,24 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
 
   useEffect(() => {
     LAMP.Auth.set_oauth_params(oauthParams)
-    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier).then(async (json) => {
+    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier).then(async (json: AuthResponse) => {
+      if (!json.success) {
+        setState({ finished: true, success: false })
+        setTimeout(() => {
+          onComplete()
+        })
+      }
       await reset({ accessToken: json.access_token })
       onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
     })
   }, [params])
 
   return (
-    <div>
-      <p>Waiting for server to finish authentication...</p>
-      <p>code: {code}</p>
-      <p>code_verifier: {oauthParams.codeVerifier}</p>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {!state.finished && <p>Authenticating...</p>}
+      {!state.success && state.finished && (
+        <p>An error occured or you don't have the required permissions to log in. Please try again later.</p>
+      )}
     </div>
   )
 }
