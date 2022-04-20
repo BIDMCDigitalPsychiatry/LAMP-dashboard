@@ -124,6 +124,102 @@ export const SchemaList = () => {
         },
       },
     },
+    "lamp.memory_game": {
+      type: "object",
+      properties: {
+        settings: {
+          title: i18n.t("Activity Settings"),
+          type: "object",
+          required: ["reverse_tapping"],
+          properties: {
+            // animationInterval={this.state.settings?.animation_interval ?? 1000}
+            //     animationPersistance={this.state.settings?.animation_persistance ?? 2000}
+            //     cols={this.state.settings?.cols ?? 3}
+            //     encodingTrials={this.state.settings?.encoding_trials ?? 3}
+            //     language={i18n.language}
+            //     retensionInterval={this.state.settings?.retension_interval ?? 1000}
+            //     rows={this.state.settings?.rows ?? 3}
+            //     seqLength={this.state.settings?.sequence_length ?? 3}
+            //     time={this.state.time}
+            //     autoCorrect={this.state.autoCorrect ?? false}
+            sequence_length: {
+              title: i18n.t("Sequence length"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 4,
+              default: 3,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            encoding_trials: {
+              title: i18n.t("Encoding trials"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 3,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            rows: {
+              title: i18n.t("Rows"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 4,
+              default: 3,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            cols: {
+              title: i18n.t("Columns"),
+              description: "",
+              type: "number",
+              minimum: 0,
+              maximum: 4,
+              default: 3,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            retension_interval: {
+              title: i18n.t("Retension interval"),
+              type: "number",
+              minimum: 1,
+              maximum: 5,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            animation_interval: {
+              title: i18n.t("Animation interval"),
+              type: "number",
+              minimum: 1,
+              maximum: 5,
+              default: 1,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+            animation_persistance: {
+              title: i18n.t("Animation persistance"),
+              type: "number",
+              minimum: 2,
+              maximum: 6,
+              default: 2,
+              "ui:grid": {
+                xs: 3,
+              },
+            },
+          },
+        },
+      },
+    },
     "lamp.spatial_span": {
       type: "object",
       properties: {
