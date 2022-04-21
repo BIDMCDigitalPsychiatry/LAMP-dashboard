@@ -151,7 +151,6 @@ export default function ScheduleRow({
                 time: date?.isValid() ? dateInUTCformat(date) : null,
               })
             }}
-            minDate={new Date()}
             format="MM/dd/yyyy"
             animateYearScrolling
             variant="inline"
