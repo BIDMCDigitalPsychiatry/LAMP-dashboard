@@ -489,7 +489,13 @@ export default function GameCreator({
           delete settingsData.settings[idx]["options"]
         }
         if (x.type === "time") {
-          settingsData.settings[idx]["options"] = [{ value: "standard" }]
+          if (!!settingsData.settings[idx]["options"] && settingsData.settings[idx]["options"].length > 1) {
+            settingsData.settings[idx]["options"].map((i, indx) => {
+              if (indx > 0) {
+                settingsData.settings[idx]["options"].splice(indx, 1)
+              }
+            })
+          }
         }
       })
     }
