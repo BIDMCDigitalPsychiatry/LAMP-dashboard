@@ -29,6 +29,7 @@ import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
+import { makeStyles } from '@material-ui/core/styles';
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -871,6 +872,15 @@ export default function App({ ...props }) {
   )
 }
 
+const useStyles = makeStyles({
+  progressBar: {
+    background: "transparent",
+    '& .MuiLinearProgress-bar': {
+      backgroundColor: "#7599FF",
+    },
+  }
+})
+
 function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
   const [state, setState] = useState({
     finished: false,
@@ -878,6 +888,7 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
   })
   const { t } = useTranslation()
   const { enqueueSnackbar } = useSnackbar()
+  const classes = useStyles()
 
   let oauthParams: any
   try {
@@ -892,10 +903,11 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
       return
     }
 
-    LAMP.Auth.set_oauth_params(oauthParams)
+    LAMP.OAuth.params = oauthParams
+    LAMP.Auth.refresh_identity()
 
     const code = searchParameters().get("code")
-    LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier).then(async (json: AuthResponse) => {
+    LAMP.OAuth.request_authorization(code).then(async (json: AuthResponse) => {
       if (!json.success) {
         setState({ finished: true, success: false })
       } else {
@@ -915,12 +927,7 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
   } else {
     return (
       <LinearProgress
-        style={{
-          background: "white",
-          "& .MuiLinearProgress-bar": {
-            backgroundColor: "#7599FF",
-          },
-        }}
+        className={classes.progressBar}
       />
     )
   }

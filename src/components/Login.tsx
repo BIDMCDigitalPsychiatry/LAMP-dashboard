@@ -137,13 +137,10 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             defaultValue={defaultServerAddress}
             locked={srcLocked}
             onChange={(event: any) => setServerAddress(event.target.value)}
-            onComplete={(isOAuthAvailable: boolean) => {
-              if (isOAuthAvailable) {
-                try {
-                  startOAuthFlow(!serverAddress.length ? defaultServerAddress : serverAddress)
-                } catch (error) {
-                  enqueueSnackbar(error.message, { variant: "error" })
-                }
+            onComplete={(startURL?: URL) => {
+              if (!!startURL) {
+                startURL.searchParams.set("code_challenge", LAMP.OAuth.params.codeChallenge)
+                window.location.assign(startURL.href)
               } else {
                 goToScreen(Screen.legacyLogin)
               }
@@ -362,16 +359,25 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     event.preventDefault()
     setDisabled(true)
 
-    let isOAuthAvailable: boolean
+    const pkce = pkceChallenge(pkceCodeVerifierLength)
+    LAMP.OAuth.params = {
+      serverAddress: value,
+      codeVerifier: pkce.code_verifier,
+      codeChallenge: pkce.code_challenge,
+    }
+
+    let url: URL
     try {
-      isOAuthAvailable = await checkOAuthAvailability(!value.length ? defaultValue : value)
+      url = await LAMP.OAuth.start_flow()
     } catch (error) {
       setDisabled(false)
-      onError(Error(`Could not connect to server at ${value}: ${error.message}`))
+      onError(Error(`OAuth start URL could not be retrieved from server at ${value}: ${error.message}`))
       return
     }
 
-    onComplete(isOAuthAvailable)
+    console.log("url", url)
+
+    onComplete(url)
   }
 
   return (
@@ -510,38 +516,7 @@ function LegacyLoginInput({ values, onChange, onSubmit, onSuccess, onError }) {
   )
 }
 
-let checkOAuthAvailability = async (serverAddress: string): Promise<boolean> => {
-  const endpoint = new URL("oauth/start", `http://${serverAddress}`).href
-  const response = await fetch(endpoint, { method: "HEAD" })
-  return response.ok
-}
-
 const pkceCodeVerifierLength = 43
-let startOAuthFlow = async (serverAddress: string): Promise<void> => {
-  const pkce = pkceChallenge(pkceCodeVerifierLength)
-
-  LAMP.Auth.set_oauth_params({
-    serverAddress: serverAddress,
-    codeVerifier: pkce.code_verifier,
-  })
-
-  let urlString: string
-  try {
-    urlString = (await LAMP.OAuth.startOauthFlow()).url
-  } catch (error) {
-    throw Error(`OAuth start URL could not be retrieved from server at ${serverAddress}: ${error.message}`)
-  }
-
-  let url: URL
-  try {
-    url = new URL(urlString)
-  } catch {
-    throw Error(`Server returned an invalid OAUth start URL: ${urlString}`)
-  }
-
-  url.searchParams.set("code_challenge", pkce.code_challenge)
-  window.location.assign(url.href)
-}
 
 let handleLegacyLogin = async (
   serverAddress: string,
