@@ -25,6 +25,7 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
+import { Fab } from "@material-ui/core"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -47,6 +48,8 @@ function compress(file, width, height) {
 }
 
 const checkPasswordRule = async (value: string) => {
+  if (LAMP.OAuth.is_enabled) return true
+
   let rule = (await LAMP.Type.getAttachment(null, "lamp.dashboard.security_preferences")) as any
   if (!!rule.error) return true
   else {
@@ -225,7 +228,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           style={{ marginBottom: 16 }}
         />
       )}
-      {["create-new", "reset-password", "update-profile"].includes(mode) && (
+      {!LAMP.OAuth.is_enabled && ["create-new", "reset-password", "update-profile"].includes(mode) && (
         <Box>
           <TextField
             fullWidth
@@ -316,6 +319,35 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           </Tooltip>
         </Grid>
       )}
+      {
+        <Fab variant="extended" style={{ background: "#7599FF", color: "White" }}>
+          {t("Save")}
+          <input
+            type="submit"
+            style={{
+              cursor: "pointer",
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              right: 0,
+              left: 0,
+              width: "100%",
+              opacity: 0,
+            }}
+            disabled={confirmPassword !== password || !accepted}
+            onClick={() => {
+              onChange({
+                credential,
+                photo,
+                name,
+                role,
+                emailAddress,
+                password,
+              })
+            }}
+          />
+        </Fab>
+      }
     </Grid>
   )
 }
@@ -323,7 +355,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
 export async function updateDetails(id, data, mode, allRoles, type, title) {
   try {
     id = !!title ? null : id
-    if (mode === "reset-password" && !!data.password) {
+    if (mode === "reset-password" && validatePassword(data.password)) {
       if (
         !!((await LAMP.Credential.update(id, data.credential.access_key, {
           ...data.credential,
@@ -331,7 +363,7 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
         })) as any).error
       )
         return -4
-    } else if (mode === "create-new" && !!data.name && !!data.emailAddress && !!data.password) {
+    } else if (mode === "create-new" && !!data.name && !!data.emailAddress && validatePassword(data.password)) {
       let result = (await LAMP.Credential.create(id, data.emailAddress, data.password, data.name)) as any
       if (!!result.error) {
         return result.error
@@ -341,7 +373,7 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
         [data.emailAddress]:
           !data.role && !data.photo && !data.name ? undefined : { role: data.role, name: data.name, photo: data.photo },
       })
-    } else if (mode === "update-profile" && !!data.name && !!data.emailAddress && !!data.password) {
+    } else if (mode === "update-profile" && !!data.name && !!data.emailAddress && validatePassword(data.password)) {
       let result = (await LAMP.Credential.update(id, data.credential.access_key, {
         ...data.credential,
         secret_key: data.password,
@@ -368,6 +400,11 @@ export async function updateDetails(id, data, mode, allRoles, type, title) {
   }
   return 1
 }
+
+function validatePassword(password: string): boolean {
+  return LAMP.OAuth.is_enabled || !!password
+}
+
 export const CredentialManager: React.FunctionComponent<{
   id?: any
   onComplete?: any
@@ -602,7 +639,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          {t("Reset Password")}
+          {!LAMP.OAuth.is_enabled && t("Reset Password")}
         </MenuItem>
         <MenuItem
           onClick={() =>
