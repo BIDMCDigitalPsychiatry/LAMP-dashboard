@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Route, Redirect, Switch, useLocation, useHistory, HashRouter } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
+import {
+  CssBaseline,
+  Button,
+  ThemeProvider,
+  createMuiTheme,
+  colors,
+  Container,
+  LinearProgress,
+} from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
@@ -382,11 +390,11 @@ function AppRouter({ ...props }) {
       <Route
         path="/*code=*"
         render={(props) => {
-          let urlParams = window.location.hash.replace("#/", "")
+          const paramsString = window.location.hash.replace("#/", "")
 
           return (
             <OAuthLogin
-              searchParameters={() => urlParams}
+              searchParameters={() => new URLSearchParams(paramsString)}
               reset={async (identity) => await reset(identity)}
               onComplete={(auth, type, me) => {
                 setState((state) => {
@@ -864,12 +872,12 @@ export default function App({ ...props }) {
 }
 
 function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
-  let params = searchParameters()
-  const code = new URLSearchParams(params).get("code")
   const [state, setState] = useState({
     finished: false,
     success: false,
   })
+  const { t } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
 
   let oauthParams: any
   try {
@@ -878,30 +886,42 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
     oauthParams = {}
   }
 
-  if (!oauthParams?.codeVerifier) {
-    return <div>Missing code_verifier!</div>
-  }
-
   useEffect(() => {
+    if (!oauthParams?.codeVerifier) {
+      setState({ finished: true, success: false })
+      return
+    }
+
     LAMP.Auth.set_oauth_params(oauthParams)
+
+    const code = searchParameters().get("code")
     LAMP.OAuth.requestAuthorization(code, oauthParams.codeVerifier).then(async (json: AuthResponse) => {
       if (!json.success) {
         setState({ finished: true, success: false })
-        setTimeout(() => {
-          onComplete()
-        })
+      } else {
+        await reset({ accessToken: json.access_token })
+        onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
       }
-      await reset({ accessToken: json.access_token })
-      onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
     })
-  }, [params])
+  }, [window.location])
 
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-      {!state.finished && <p>Authenticating...</p>}
-      {!state.success && state.finished && (
-        <p>An error occured or you don't have the required permissions to log in. Please try again later.</p>
-      )}
-    </div>
-  )
+  if (state.finished) {
+    if (!state.success) {
+      enqueueSnackbar(t("An error has occurred or you don't have the required permissions to log in."), {
+        variant: "error",
+      })
+      return <Redirect to="/" />
+    }
+  } else {
+    return (
+      <LinearProgress
+        style={{
+          background: "white",
+          "& .MuiLinearProgress-bar": {
+            backgroundColor: "#7599FF",
+          },
+        }}
+      />
+    )
+  }
 }
