@@ -40,6 +40,7 @@ const demoActivities = {
   "lamp.tips": "tips",
   "lamp.goals": "goals",
   "lamp.medications": "medicationtracker",
+  "lamp.memory_game": "memorygame",
 }
 
 export default function EmbeddedActivity({ participant, activity, name, onComplete, noBack, tab, ...props }) {
@@ -130,6 +131,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
               console.dir(e)
             })
             .then((x) => {
+              localStorage.setItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity.id, "true")
               setSaved(true)
               onComplete(data)
               setLoading(false)
@@ -151,12 +153,15 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
 
   const activateEmbeddedActivity = async (activity) => {
     let response = "about:blank"
+    const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
+
       setSettings({
         ...settings,
         activity: currentActivity,
         configuration: { language: i18n.language },
+        autoCorrect: !(exist === "true"),
         noBack: noBack,
       })
 
