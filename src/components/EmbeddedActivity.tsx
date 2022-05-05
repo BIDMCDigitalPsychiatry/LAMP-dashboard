@@ -156,7 +156,6 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     const exist = localStorage.getItem("first-time-" + (participant?.id ?? participant) + "-" + currentActivity?.id)
     try {
       setSaved(false)
-
       setSettings({
         ...settings,
         activity: currentActivity,
