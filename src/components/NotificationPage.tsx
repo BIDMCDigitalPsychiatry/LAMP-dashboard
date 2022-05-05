@@ -112,6 +112,8 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
   const [streakActivity, setStreakActivity] = useState(null)
 
   useEffect(() => {
+    setLoading(true)
+    setResponse(false)
     ;(async () => {
       LAMP.Activity.view(activityId).then((data: any) => {
         getImage(activityId, data.spec).then((tag) => {
