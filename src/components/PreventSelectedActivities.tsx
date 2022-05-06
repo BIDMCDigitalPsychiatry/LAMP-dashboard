@@ -192,8 +192,8 @@ export const strategies = {
     })
     return temporalSlices.length > 0 && slices.length > 0 ? temporalSlices.length / slices.length : 0
   },
-  "lamp.cats_and_dogs": (slices, activity, scopedItem) =>
-    (parseInt(slices.score ?? 0).toFixed(1) || 0) > 100 ? 100 : parseInt(slices.score ?? 0).toFixed(1) || 0,
+  "lamp.cats_and_dogs": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
+  "lamp.memory_game": (slices, activity, scopedItem) => (slices.correct_answers / slices.total_questions) * 100,
   "lamp.scratch_image": (slices, activity, scopedItem) =>
     ((parseInt(slices?.duration ?? 0) / 1000).toFixed(1) || 0) > 100
       ? 100

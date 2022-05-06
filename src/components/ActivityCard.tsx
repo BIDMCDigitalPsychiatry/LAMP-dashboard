@@ -36,7 +36,7 @@ export default function ActivityCard({
           item: t.item,
           [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
             activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-              ? typeof t.value === "string"
+              ? typeof t.value === "string" && t.value !== null
                 ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                   ? 1
                   : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
@@ -71,6 +71,7 @@ export default function ActivityCard({
   })
   return (
     <React.Fragment>
+      ,
       <Box display="flex" justifyContent="space-between" alignContent="center" p={2}>
         {!Boolean(visibleSlice) && activity.spec !== "lamp.scratch_image" && activity.spec !== "lamp.breathe" ? (
           <Tooltip title={t("Switch Views")}>
@@ -170,7 +171,7 @@ export default function ActivityCard({
                   item: t.item,
                   [new Date(d.timestamp).toLocaleString("en-US", Date.formatStyle("medium"))]:
                     activity.spec === "lamp.survey" || activity.spec === "lamp.pop_the_bubbles"
-                      ? typeof t.value === "string"
+                      ? typeof t.value === "string" && t.value !== null
                         ? typeof t.value === "string" && ["Yes", "True"].includes(t.value.replace(/\"/g, ""))
                           ? 1
                           : typeof t.value === "string" && ["No", "False"].includes(t.value.replace(/\"/g, ""))
