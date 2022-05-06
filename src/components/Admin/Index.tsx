@@ -19,7 +19,6 @@ import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
 import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
-import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
 import DataPortal from "../data_portal/DataPortal"
@@ -135,32 +134,16 @@ const useStyles = makeStyles((theme: Theme) =>
 )
 
 export default function Root({ updateStore, adminType, ...props }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const [currentTab, setCurrentTab] = useState(0)
   const classes = useStyles()
   const supportsSidebar = useMediaQuery(useTheme().breakpoints.up("md"))
-
-  const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
-    return i18n.language ? i18n.language : lang ? lang : "en-US"
-  }
 
   useEffect(() => {
     Service.deleteDB()
     localStorage.setItem("participants", JSON.stringify({ page: 0, rowCount: 40 }))
     localStorage.setItem("activities", JSON.stringify({ page: 0, rowCount: 40 }))
     if (LAMP.Auth._type !== "admin") return
-  }, [])
-
-  useEffect(() => {
-    let authId = LAMP.Auth._auth.id
-    let language = !!localStorage.getItem("LAMP_user_" + authId)
-      ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
-      : getSelectedLanguage()
-      ? getSelectedLanguage()
-      : "en"
-    i18n.changeLanguage(language)
   }, [])
 
   return (
