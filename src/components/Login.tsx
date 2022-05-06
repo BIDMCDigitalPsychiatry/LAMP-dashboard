@@ -359,9 +359,10 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     event.preventDefault()
     setDisabled(true)
 
+    LAMP.Auth.set_identity({ serverAddress: value })
+
     const pkce = pkceChallenge(pkceCodeVerifierLength)
     LAMP.OAuth.params = {
-      serverAddress: value,
       codeVerifier: pkce.code_verifier,
       codeChallenge: pkce.code_challenge,
     }
