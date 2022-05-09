@@ -14,6 +14,7 @@ import {
   ButtonBase,
   Typography,
   InputAdornment,
+  Button,
   useTheme,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
@@ -25,7 +26,6 @@ import { useDropzone } from "react-dropzone"
 // Local Imports
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
-import { Fab } from "@material-ui/core"
 
 function compress(file, width, height) {
   return new Promise((resolve, reject) => {
@@ -64,7 +64,7 @@ const checkPasswordRule = async (value: string) => {
     return true
   }
 }
-export function CredentialEditor({ credential, auxData, mode, onChange, title, permissions }) {
+export function CredentialEditor({ credential, auxData, mode, onSubmit, title, permissions }) {
   const { enqueueSnackbar } = useSnackbar()
   const [photo, setPhoto] = useState(credential?.image ?? "")
   const [name, setName] = useState(credential?.name ?? "")
@@ -116,6 +116,16 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           { value: "view", label: "Practice Lead" },
         ]
 
+  const handleSubmit = () =>
+    onSubmit({
+      credential,
+      photo,
+      name,
+      role,
+      emailAddress,
+      password,
+    })
+
   useEffect(() => {
     ;(async () => {
       const valid = await checkPasswordRule(password)
@@ -124,231 +134,160 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
   }, [password])
 
   return (
-    <Grid container justify="center" alignItems="center">
-      {["create-new", "change-role", "update-profile"].includes(mode) && (
-        <Tooltip
-          title={
-            !photo
-              ? t("Drag a photo or tap to select a photo.")
-              : t("Drag a photo to replace the existing photo or tap to delete the photo.")
-          }
-        >
-          <Box
-            {...getRootProps()}
-            my={2}
-            width={128}
-            height={128}
-            border={1}
-            borderRadius={4}
-            borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-            bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
-            color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
-            style={{
-              background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
-            }}
-          >
-            <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
-              {!photo && <input {...getInputProps()} />}
-              <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
-            </ButtonBase>
-          </Box>
-        </Tooltip>
-      )}
-      {["create-new", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          label={t("Name")}
-          type="text"
-          variant="outlined"
-          helperText={t("Enter the family member or clinician's name here.")}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          style={{ marginBottom: 16 }}
-        />
-      )}
-      {["create-new", "change-role", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          select={!!permissions && !!title ? true : false}
-          label={t("Role")}
-          type="text"
-          variant="outlined"
-          helperText={t(
-            "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
-          )}
-          value={role}
-          onChange={(event) => setRole(event.target.value)}
-          style={{ marginBottom: 16 }}
-          InputProps={{
-            endAdornment: [
-              !["change-role"].includes(mode) ? undefined : (
-                <InputAdornment position="end" key="a">
-                  <Tooltip title={t("Save Role & Photo")}>
-                    <IconButton
-                      edge="end"
-                      aria-label="save role"
-                      onClick={() =>
-                        onChange({
-                          credential,
-                          photo,
-                          name,
-                          role,
-                          emailAddress,
-                          password,
-                        })
-                      }
-                      onMouseDown={(event) => event.preventDefault()}
-                    >
-                      <Icon>check_circle</Icon>
-                    </IconButton>
-                  </Tooltip>
-                </InputAdornment>
-              ),
-            ],
-          }}
-        >
-          {!!permissions &&
-            !!title &&
-            roles.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-        </TextField>
-      )}
-      {["create-new", "update-profile"].includes(mode) && (
-        <TextField
-          fullWidth
-          label={t("Email Address")}
-          type="email"
-          variant="outlined"
-          helperText={t("Enter the email address here.")}
-          value={emailAddress}
-          onChange={(event) => setEmailAddress(event.target.value)}
-          style={{ marginBottom: 16 }}
-        />
-      )}
-      {!LAMP.OAuth.is_enabled && ["create-new", "reset-password", "update-profile"].includes(mode) && (
-        <Box>
-          <TextField
-            fullWidth
-            label={t("Password")}
-            type="password"
-            variant="outlined"
-            error={!accepted ? true : false}
-            helperText={
-              !accepted
-                ? t("Password is not complex enough and does not comply with organization password requirement.")
-                : t(
-                    "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
-                  )
+    <form onSubmit={handleSubmit}>
+      <Grid container justify="center" alignItems="center">
+        {["create-new", "change-role", "update-profile"].includes(mode) && (
+          <Tooltip
+            title={
+              !photo
+                ? t("Drag a photo or tap to select a photo.")
+                : t("Drag a photo to replace the existing photo or tap to delete the photo.")
             }
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            style={{ marginBottom: 16 }}
-            InputProps={{
-              endAdornment: [
-                ["create-new"].includes(mode) ? undefined : (
-                  <InputAdornment position="end" key="a">
-                    <Tooltip
-                      title={t("Copy one-time access link that can be used to log in without entering credentials.")}
-                    >
-                      <IconButton
-                        edge="end"
-                        aria-label="copy link"
-                        onClick={() => setShowLink((showLink) => !showLink)}
-                        onMouseDown={(event) => event.preventDefault()}
-                      >
-                        <Icon>save</Icon>
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-                !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
-                  <InputAdornment position="end" key="b">
-                    <Tooltip title={t("Save Credential")}>
-                      <IconButton
-                        edge="end"
-                        aria-label="submit credential"
-                        disabled={confirmPassword !== password || !accepted}
-                        onClick={() =>
-                          onChange({
-                            credential,
-                            photo,
-                            name,
-                            role,
-                            emailAddress,
-                            password,
-                          })
-                        }
-                        onMouseDown={(event) => event.preventDefault()}
-                      >
-                        <Icon>check_circle</Icon>
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              ],
-            }}
-          />
-          <TextField
-            fullWidth
-            label={t("Confirm Password")}
-            type="password"
-            variant="outlined"
-            error={password !== confirmPassword ? true : false}
-            helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-          />
-        </Box>
-      )}
-      {showLink && password.length > 0 && (
-        <Grid item>
-          <TextField
-            fullWidth
-            style={{ marginTop: 16 }}
-            variant="outlined"
-            value={_qrLink()}
-            onChange={(event) => {}}
-          />
-          <Tooltip title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}>
-            <Grid container justify="center" style={{ padding: 16 }}>
-              <QRCode size={256} level="H" value={_qrLink()} />
-            </Grid>
+          >
+            <Box
+              {...getRootProps()}
+              my={2}
+              width={128}
+              height={128}
+              border={1}
+              borderRadius={4}
+              borderColor={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+              bgcolor={isDragActive || isDragAccept ? "text.secondary" : undefined}
+              color={!(isDragActive || isDragAccept || !!photo) ? "text.secondary" : "#fff"}
+              style={{
+                background: !!photo ? `url(${photo}) center center/contain no-repeat` : undefined,
+              }}
+            >
+              <ButtonBase style={{ width: "100%", height: "100%" }} onClick={() => !!photo && setPhoto(undefined)}>
+                {!photo && <input {...getInputProps()} />}
+                <Icon fontSize="large">{!photo ? "add_a_photo" : "delete_forever"}</Icon>
+              </ButtonBase>
+            </Box>
           </Tooltip>
-        </Grid>
-      )}
-      {
-        <Fab variant="extended" style={{ background: "#7599FF", color: "White" }}>
-          {t("Save")}
-          <input
-            type="submit"
-            style={{
-              cursor: "pointer",
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              right: 0,
-              left: 0,
-              width: "100%",
-              opacity: 0,
-            }}
-            disabled={confirmPassword !== password || !accepted}
-            onClick={() => {
-              onChange({
-                credential,
-                photo,
-                name,
-                role,
-                emailAddress,
-                password,
-              })
-            }}
+        )}
+        {["create-new", "update-profile"].includes(mode) && (
+          <TextField
+            fullWidth
+            label={t("Name")}
+            type="text"
+            required={true}
+            variant="outlined"
+            helperText={t("Enter the family member or clinician's name here.")}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            style={{ marginBottom: 16 }}
           />
-        </Fab>
-      }
-    </Grid>
+        )}
+        {["create-new", "change-role", "update-profile"].includes(mode) && (
+          <TextField
+            fullWidth
+            select={!!permissions && !!title ? true : false}
+            label={t("Role")}
+            type="text"
+            variant="outlined"
+            helperText={t(
+              "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
+            )}
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            style={{ marginBottom: 16 }}
+          >
+            {!!permissions &&
+              !!title &&
+              roles.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+          </TextField>
+        )}
+        {["create-new", "update-profile"].includes(mode) && (
+          <TextField
+            fullWidth
+            label={t("Email Address")}
+            type="email"
+            required={true}
+            variant="outlined"
+            helperText={t("Enter the email address here.")}
+            value={emailAddress}
+            onChange={(event) => setEmailAddress(event.target.value)}
+            style={{ marginBottom: 16 }}
+          />
+        )}
+        {!LAMP.OAuth.is_enabled && ["create-new", "reset-password", "update-profile"].includes(mode) && (
+          <>
+            <TextField
+              fullWidth
+              label={t("Password")}
+              type="password"
+              variant="outlined"
+              required={true}
+              error={!accepted ? true : false}
+              helperText={
+                !accepted
+                  ? t("Password is not complex enough and does not comply with organization password requirement.")
+                  : ""
+              }
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              style={{ marginBottom: 16 }}
+              InputProps={{
+                endAdornment: [
+                  ["create-new"].includes(mode) ? undefined : (
+                    <InputAdornment position="end" key="a">
+                      <Tooltip
+                        title={t("Copy one-time access link that can be used to log in without entering credentials.")}
+                      >
+                        <IconButton
+                          edge="end"
+                          aria-label="copy link"
+                          onClick={() => setShowLink((showLink) => !showLink)}
+                          onMouseDown={(event) => event.preventDefault()}
+                        >
+                          <Icon>save</Icon>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  ),
+                ],
+              }}
+            />
+            <TextField
+              fullWidth
+              label={t("Confirm Password")}
+              type="password"
+              required={true}
+              variant="outlined"
+              error={password !== confirmPassword}
+              helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+            />
+          </>
+        )}
+        {showLink && password.length > 0 && (
+          <Grid item>
+            <TextField
+              fullWidth
+              style={{ marginTop: 16 }}
+              variant="outlined"
+              value={_qrLink()}
+              onChange={(event) => {}}
+            />
+            <Tooltip title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}>
+              <Grid container justify="center" style={{ padding: 16 }}>
+                <QRCode size={256} level="H" value={_qrLink()} />
+              </Grid>
+            </Tooltip>
+          </Grid>
+        )}
+        {
+          <Button variant="contained" color="primary" type="submit">
+            Save
+          </Button>
+        }
+      </Grid>
+    </form>
   )
 }
 
