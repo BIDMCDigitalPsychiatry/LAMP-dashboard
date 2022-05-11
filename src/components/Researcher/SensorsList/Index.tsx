@@ -110,7 +110,6 @@ export default function SensorsList({
   const searchFilterSensors = (searchVal?: string) => {
     const searchTxt = searchVal ?? search
     const selectedData = selected.filter((o) => studies.some(({ name }) => o === name))
-    console.log(selectedData)
     if (selectedData.length > 0) {
       setLoading(true)
       let result = []
@@ -122,7 +121,6 @@ export default function SensorsList({
             setSensors(sortData(result, selectedData, "name"))
           } else {
             result = result.concat(sensorData)
-            console.log(sortData(result, selectedData, "name"))
             setSensors(sortData(result, selectedData, "name"))
           }
           setPaginatedSensors(sortData(result, selectedData, "name").slice(page * rowCount, page * rowCount + rowCount))
