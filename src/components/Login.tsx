@@ -28,6 +28,7 @@ import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 
 import pkceChallenge from "pkce-challenge"
+import { Fetch } from "lamp-core/dist/service/Fetch"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -359,9 +360,10 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     event.preventDefault()
     setDisabled(true)
 
+    await LAMP.Auth.set_identity({ serverAddress: value })
+
     const pkce = pkceChallenge(pkceCodeVerifierLength)
     LAMP.OAuth.params = {
-      serverAddress: value,
       codeVerifier: pkce.code_verifier,
       codeChallenge: pkce.code_challenge,
     }
@@ -374,8 +376,6 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
       onError(Error(`OAuth start URL could not be retrieved from server at ${value}: ${error.message}`))
       return
     }
-
-    console.log("url", url)
 
     onComplete(url)
   }
@@ -523,10 +523,10 @@ let handleLegacyLogin = async (
   credentials: { id: string; password: string },
   setIdentity
 ): Promise<void> => {
+  const identity = await LAMP.Auth.get_legacy_token(credentials)
   try {
     const res = await setIdentity({
-      id: credentials.id,
-      password: credentials.password,
+      ...identity,
       serverAddress: serverAddress,
     })
 
