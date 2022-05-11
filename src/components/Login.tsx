@@ -27,6 +27,7 @@ import { ReactComponent as Logotext } from "../icons/mindLAMP.svg"
 import { useTranslation } from "react-i18next"
 
 import pkceChallenge from "pkce-challenge"
+import { Fetch } from "lamp-core/dist/service/Fetch"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -354,8 +355,6 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
       return
     }
 
-    console.log("url", url)
-
     onComplete(url)
   }
 
@@ -502,10 +501,10 @@ let handleLegacyLogin = async (
   credentials: { id: string; password: string },
   setIdentity
 ): Promise<void> => {
+  const identity = await Fetch.generate_auth(credentials, serverAddress)
   try {
     const res = await setIdentity({
-      id: credentials.id,
-      password: credentials.password,
+      ...identity,
       serverAddress: serverAddress,
     })
 
