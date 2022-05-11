@@ -29,7 +29,7 @@ import Activity from "./Researcher/ActivityList/Activity"
 import ImportActivity from "./Researcher/ActivityList/ImportActivity"
 import PreventPage from "./PreventPage"
 import { sensorEventUpdate } from "./BottomMenu"
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from "@material-ui/core/styles"
 
 function ErrorFallback({ error }) {
   const [trace, setTrace] = useState([])
@@ -875,10 +875,10 @@ export default function App({ ...props }) {
 const useStyles = makeStyles({
   progressBar: {
     background: "transparent",
-    '& .MuiLinearProgress-bar': {
+    "& .MuiLinearProgress-bar": {
       backgroundColor: "#7599FF",
     },
-  }
+  },
 })
 
 function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
@@ -907,14 +907,19 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
     LAMP.Auth.refresh_identity()
 
     const code = searchParameters().get("code")
-    LAMP.OAuth.request_authorization(code).then(async (json: AuthResponse) => {
-      if (!json.success) {
-        setState({ finished: true, success: false })
-      } else {
-        await reset({ accessToken: json.access_token })
-        onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
-      }
-    })
+    LAMP.OAuth.request_authorization(code)
+      .then(async (json: AuthResponse) => {
+        if (!json.success) {
+          setState({ finished: true, success: false })
+        } else {
+          await reset({
+            accessToken: json.access_token,
+            refreshToken: json.refresh_token,
+          })
+          onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
+        }
+      })
+      .catch(() => setState({ finished: true, success: false }))
   }, [window.location])
 
   if (state.finished) {
@@ -925,10 +930,6 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
       return <Redirect to="/" />
     }
   } else {
-    return (
-      <LinearProgress
-        className={classes.progressBar}
-      />
-    )
+    return <LinearProgress className={classes.progressBar} />
   }
 }
