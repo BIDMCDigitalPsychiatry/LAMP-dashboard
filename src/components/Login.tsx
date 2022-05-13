@@ -18,7 +18,6 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
-import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
@@ -84,14 +83,6 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
     password: null,
   })
 
-  const userLanguages = ["en-US", "es-ES", "hi-IN"]
-  const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
-    return i18n.language ? i18n.language : userLanguages.includes(lang) ? lang : "en-US"
-  }
-  const [selectedLanguage, setSelectedLanguage]: any = useState(getSelectedLanguage())
-
   const [srcLocked, setSrcLocked] = useState(false)
   const [tryitMenu, setTryitMenu] = useState<Element>()
   const [helpMenu, setHelpMenu] = useState<Element>()
@@ -106,21 +97,11 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
       }
     }
   }, [])
-  useEffect(() => {
-    i18n.changeLanguage(selectedLanguage)
-  }, [selectedLanguage])
 
   let handleSuccess = () => {
     process.env.REACT_APP_LATEST_LAMP === "true"
       ? enqueueSnackbar(t("Note: This is the latest version of LAMP."), { variant: "info" })
       : enqueueSnackbar(t("Note: This is NOT the latest version of LAMP"), { variant: "info" })
-
-    localStorage.setItem(
-      "LAMP_user_" + legacyCredentials.id,
-      JSON.stringify({
-        language: selectedLanguage,
-      })
-    )
     ;(async () => {
       await Service.deleteDB()
     })()
@@ -247,11 +228,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
                   }}
                 />
               </Box>
-              <LanguageSelector
-                userLanguages={userLanguages}
-                value={selectedLanguage || ""}
-                onChange={(event: any) => setSelectedLanguage(event.target.value)}
-              />
+              <LanguageSelector />
 
               {form()}
 
@@ -324,27 +301,29 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
   )
 }
 
-function LanguageSelector({ userLanguages, value, onChange }) {
-  const { t } = useTranslation()
+function LanguageSelector() {
+  const { i18n, t, ready } = useTranslation()
+
+  if (!ready) return null
 
   return (
     <TextField
       select
       label={t("Select Language")}
       style={{ width: "100%" }}
-      onChange={onChange}
+      onChange={(event: any) => i18n.changeLanguage(event.target.value)}
       variant="filled"
-      value={value}
+      value={i18n.language}
     >
-      {Object.keys(locale_lang).map((key, value) => {
-        if (userLanguages.includes(key)) {
-          return (
-            <MenuItem key={key} value={key}>
-              {locale_lang[key].native + " (" + locale_lang[key].english + ")"}
-            </MenuItem>
-          )
-        }
-      })}
+      {(i18n.options.supportedLngs || []).map((code) =>
+        code === "cimode" ? null : (
+          <MenuItem key={code} value={code}>
+            {`${new Intl.DisplayNames([code], { type: "language" }).of(code)} (${new Intl.DisplayNames(["en"], {
+              type: "language",
+            }).of(code)})`}
+          </MenuItem>
+        )
+      )}
     </TextField>
   )
 }

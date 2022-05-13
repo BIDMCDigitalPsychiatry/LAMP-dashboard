@@ -6,7 +6,6 @@ import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
 import { useTranslation } from "react-i18next"
 import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
-import locale_lang from "../../locale_map.json"
 import Pagination from "../PaginatedElement"
 import ResearcherRow from "./ResearcherRow"
 import Header from "./Header"
@@ -178,14 +177,8 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   const [page, setPage] = useState(0)
   const [rowCount, setRowCount] = useState(40)
   const [search, setSearch] = useState("")
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const classes = useStyles()
-
-  const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
-    return i18n.language ? i18n.language : lang ? lang : "en-US"
-  }
 
   useEffect(() => {
     refreshResearchers()
@@ -209,16 +202,6 @@ export default function Researchers({ history, updateStore, adminType, ...props 
   useEffect(() => {
     refreshResearchers()
   }, [search])
-
-  useEffect(() => {
-    let authId = LAMP.Auth._auth.id
-    let language = !!localStorage.getItem("LAMP_user_" + authId)
-      ? JSON.parse(localStorage.getItem("LAMP_user_" + authId)).language
-      : getSelectedLanguage()
-      ? getSelectedLanguage()
-      : "en-US"
-    i18n.changeLanguage(language)
-  }, [])
 
   const handleChangePage = (page: number, rowCount: number) => {
     setPage(page)

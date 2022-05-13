@@ -22,10 +22,8 @@ import Manage from "./Manage"
 import Welcome from "./Welcome"
 import Learn from "./Learn"
 import Feed from "./Feed"
-import { useTranslation } from "react-i18next"
 import Streak from "./Streak"
 import { getImage } from "./Manage"
-import locale_lang from "../locale_map.json"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -134,15 +132,8 @@ export default function Participant({
   const [loading, setLoading] = useState(false)
   const [openComplete, setOpenComplete] = React.useState(false)
   const [streak, setStreak] = useState(1)
-  const { t, i18n } = useTranslation()
   const tabDirection = (currentTab) => {
     return supportsSidebar ? "up" : "left"
-  }
-
-  const getSelectedLanguage = () => {
-    const matched_codes = Object.keys(locale_lang).filter((code) => code.startsWith(navigator.language))
-    const lang = matched_codes.length > 0 ? matched_codes[0] : "en-US"
-    return i18n.language ? i18n.language : lang ? lang : "en-US"
   }
 
   useEffect(() => {
@@ -151,12 +142,6 @@ export default function Participant({
       (activities) => {
         setActivities(activities)
         props.activeTab(tab, participant.id)
-        let language = !!localStorage.getItem("LAMP_user_" + participant.id)
-          ? JSON.parse(localStorage.getItem("LAMP_user_" + participant.id)).language
-          : getSelectedLanguage()
-          ? getSelectedLanguage()
-          : "en-US"
-        i18n.changeLanguage(language)
         //  getShowWelcome(participant).then(setOpen)
         setLoading(false)
       }
