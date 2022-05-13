@@ -18,7 +18,6 @@ import {
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
-import locale_lang from "../locale_map.json"
 import { Service } from "./DBService/DBService"
 
 // Local Imports
@@ -319,7 +318,9 @@ function LanguageSelector() {
       {(i18n.options.supportedLngs || []).map((code) =>
         code === "cimode" ? null : (
           <MenuItem key={code} value={code}>
-            {`${locale_lang[code].native} (${locale_lang[code].english})`}
+            {`${new Intl.DisplayNames([code], { type: "language" }).of(code)} (${new Intl.DisplayNames(["en"], {
+              type: "language",
+            }).of(code)})`}
           </MenuItem>
         )
       )}
