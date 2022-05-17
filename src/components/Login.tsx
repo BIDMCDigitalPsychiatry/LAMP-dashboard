@@ -339,9 +339,10 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
     event.preventDefault()
     setDisabled(true)
 
+    await LAMP.Auth.set_identity({ serverAddress: value })
+
     const pkce = pkceChallenge(pkceCodeVerifierLength)
     LAMP.OAuth.params = {
-      serverAddress: value,
       codeVerifier: pkce.code_verifier,
       codeChallenge: pkce.code_challenge,
     }
@@ -501,10 +502,9 @@ let handleLegacyLogin = async (
   credentials: { id: string; password: string },
   setIdentity
 ): Promise<void> => {
-  const identity = await Fetch.generate_auth(credentials, serverAddress)
   try {
     const res = await setIdentity({
-      ...identity,
+      ...credentials,
       serverAddress: serverAddress,
     })
 
