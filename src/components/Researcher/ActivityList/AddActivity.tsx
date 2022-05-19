@@ -166,20 +166,20 @@ export default function AddActivity({
   useEffect(() => {
     ;(async () => {
       const allSpecs = await LAMP.ActivitySpec.all()
-      let availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
-      let otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
-      let i = 0
-      await otherSpecs.map(async (x: any, index: number) => {
-        if (!!x.id) {
-          await getActivitySpec(x.id).then((spec) => {
-            if (!!spec) availableSpecs.push(spec)
-          })
-        }
-        if (index === otherSpecs.length - 1) {
-          setActivitySpecs(availableSpecs)
-          setLoading(false)
-        }
-      })
+      const availableSpecs = allSpecs.filter((x: any) => Object.keys(activitiesObj).includes(x?.id))
+      const otherSpecs = allSpecs.filter((x: any) => !Object.keys(activitiesObj).includes(x?.id))
+
+      await Promise.all(
+        otherSpecs.map(async (x: any) => {
+          if (!x.id) return
+
+          const spec = await getActivitySpec(x.id)
+          if (spec) availableSpecs.push(spec)
+        })
+      )
+
+      setActivitySpecs(availableSpecs)
+      setLoading(false)
     })()
   }, [])
 
