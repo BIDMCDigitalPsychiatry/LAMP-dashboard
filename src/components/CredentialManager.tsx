@@ -121,7 +121,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
   }, [password])
 
   return (
-    <Grid container justify="center" alignItems="center">
+    <Grid container justifyContent="center" alignItems="center">
       {["create-new", "change-role", "update-profile"].includes(mode) && (
         <Tooltip
           title={
@@ -312,7 +312,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             onChange={(event) => {}}
           />
           <Tooltip title={`${t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}`}>
-            <Grid container justify="center" style={{ padding: 16 }}>
+            <Grid container justifyContent="center" style={{ padding: 16 }}>
               <QRCode size={256} level="H" value={_qrLink()} />
             </Grid>
           </Tooltip>
@@ -531,7 +531,7 @@ export const CredentialManager: React.FunctionComponent<{
 
   return (
     <Box {...props}>
-      <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
+      <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
             {`${t("Manage Credentials")}`}

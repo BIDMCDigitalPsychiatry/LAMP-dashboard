@@ -431,7 +431,8 @@ export default function NavigationLayout({
                 )}
             </Toolbar>
           )}
-          {authType !== "researcher" && authType !== "admin" && (
+          {((authType !== "researcher" && authType !== "admin") ||
+            ((authType === "researcher" || authType === "admin") && title.startsWith("Patient"))) && (
             <Toolbar
               classes={{
                 root:
@@ -439,9 +440,9 @@ export default function NavigationLayout({
                   (authType === "researcher" || authType === "admin" ? " " + classes.logToolbarResearcher : ""),
               }}
             >
-              {authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0 && (
+              {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
                 <Container className={classes.thumbContainer}>
-                  <IconButton
+                  {/* <IconButton
                     onClick={goBack}
                     color="default"
                     className={classes.backbtn}
@@ -452,22 +453,22 @@ export default function NavigationLayout({
                     }}
                   >
                     <Icon>arrow_back</Icon>
-                  </IconButton>
+                  </IconButton> */}
 
-                  {sameLineTitle && (
-                    <Typography
-                      variant="h5"
-                      style={{
-                        marginLeft: supportsSidebar ? 35 : undefined,
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {`${t(activeTab)}`}
-                    </Typography>
-                  )}
+                  {/* {sameLineTitle && ( */}
+                  <Typography
+                    variant="h5"
+                    style={{
+                      marginLeft: supportsSidebar ? 35 : undefined,
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {`${t(activeTab)}`}
+                  </Typography>
+                  {/* )} */}
                 </Container>
               )}
-              {authType !== "admin" && !sameLineTitle && activeTab !== "Studies" && (
+              {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
                 <Container className={classes.thumbContainer}>
                   <Typography
                     variant="h5"

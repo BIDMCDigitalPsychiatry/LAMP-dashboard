@@ -56,9 +56,9 @@ export default function Pagination({
         labelRowsPerPage={`${t("Rows per page:")}`}
         count={(data || []).length}
         rowsPerPage={rowCount}
-        page={page}
+        page={page ?? 0}
         onPageChange={handleChangePage}
-        onChangeRowsPerPage={handleRowChange}
+        onRowsPerPageChange={handleRowChange}
         rowsPerPageOptions={rowPerPage ?? [10, 25, 50, 100]}
       />
     </Grid>

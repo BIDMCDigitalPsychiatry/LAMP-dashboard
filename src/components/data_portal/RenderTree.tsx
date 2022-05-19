@@ -29,7 +29,7 @@ import LAMP from "lamp-core"
 import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
-// import jsonexport from "jsonexport"
+import * as jsonexport from "jsonexport/dist"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -317,11 +317,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )
       }, [])
     }
-    // jsonexport(resultsPulled, function (err, csv) {
-    //   if (err) return console.log(err)
-    //   const file = new Blob([csv], { type: "text/csv" })
-    //   name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
-    // })
+    jsonexport(resultsPulled, function (err, csv) {
+      if (err) return console.log(err)
+      const file = new Blob([csv], { type: "text/csv" })
+      name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+    })
   }
 
   React.useEffect(() => {

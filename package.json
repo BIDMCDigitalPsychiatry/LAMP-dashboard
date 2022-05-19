@@ -41,6 +41,7 @@
     "idb": "^6.1.5",
     "javascript-time-ago": "^2.3.10",
     "jsonata": "^1.8.4",
+    "jsonexport": "^3.2.0",
     "jspdf": "^2.3.1",
     "lamp-core": "^2022.3.8",
     "material-icons": "^1.10.11",

@@ -58,7 +58,7 @@ export default function PreventData({
   const classes = useStyles()
   const { t } = useTranslation()
   return (
-    <Grid container direction="row" justify="center" alignItems="flex-start">
+    <Grid container direction="row" justifyContent="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
           <Typography variant="h5">{`${t("Summary")}`}</Typography>

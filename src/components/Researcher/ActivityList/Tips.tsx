@@ -16,7 +16,7 @@ import {
 import Alert from "@material-ui/lab/Alert"
 import LAMP from "lamp-core"
 import ActivityStreak from "./ActivityStreak"
-import { makeStyles, Theme, createStyles, createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles, MuiThemeProvider } from "@material-ui/core/styles"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import TipFooter from "./TipFooter"
@@ -24,8 +24,9 @@ import { Service } from "../../DBService/DBService"
 import DynamicForm from "../../shared/DynamicForm"
 import { SchemaList } from "./ActivityMethods"
 import ActivityTab from "./ActivityTab"
+import { createTheme } from "@material-ui/core/styles"
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     secondary: {
       main: "#333",

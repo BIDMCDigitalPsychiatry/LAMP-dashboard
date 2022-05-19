@@ -141,12 +141,14 @@ export default function StudyCreator({
     })
   }
 
+  const handleEnter = () => {
+    setStudyName("")
+  }
+
   return (
     <Dialog
       {...props}
-      onEnter={() => {
-        setStudyName("")
-      }}
+      onEnter={handleEnter}
       scroll="paper"
       aria-labelledby="alert-dialog-slide-title"
       aria-describedby="alert-dialog-slide-description"

@@ -354,7 +354,7 @@ export default function Messages({
                           {x.from}
                         </Typography>
                       </Grid>
-                      <Grid item xs className={classes.conversationtime} justify="space-between">
+                      <Grid item xs className={classes.conversationtime} justifyContent="space-between">
                         <Typography align="right">{duration(new Date(x.date || 0))}</Typography>
                       </Grid>
                     </Grid>

@@ -423,7 +423,7 @@ export default function ParticipantData({
               {x}
             </Typography>
             <Divider style={{ marginBottom: 16 }} />
-            <Grid container justify="center">
+            <Grid container justifyContent="center">
               <img
                 alt={`${t("visualization")}`}
                 src={visualizations["lamp.dashboard.experimental." + x]}

@@ -1,15 +1,6 @@
 import React, { useState } from "react"
-import {
-  Grid,
-  Tooltip,
-  Icon,
-  Fab,
-  makeStyles,
-  Theme,
-  createStyles,
-  createMuiTheme,
-  ThemeProvider,
-} from "@material-ui/core"
+import { Grid, Tooltip, Icon, Fab, makeStyles, Theme, createStyles, ThemeProvider } from "@material-ui/core"
+import { createTheme } from "@material-ui/core/styles"
 import { useTranslation } from "react-i18next"
 import red from "@material-ui/core/colors/red"
 const useStyles = makeStyles((theme: Theme) =>
@@ -28,7 +19,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
   })
 )
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     secondary: {
       main: red[500],

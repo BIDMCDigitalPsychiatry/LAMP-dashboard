@@ -303,15 +303,17 @@ export default function PatientStudyCreator({
     closePopUp(1)
   }
 
+  const handleEnter = () => {
+    setStudyName("")
+    setDuplicateStudyName("")
+    setCreatePatient(false)
+  }
+
   return (
     <React.Fragment>
       <Dialog
         {...props}
-        onEnter={() => {
-          setStudyName("")
-          setDuplicateStudyName("")
-          setCreatePatient(false)
-        }}
+        onEnter={handleEnter}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"

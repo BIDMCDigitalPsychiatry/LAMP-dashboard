@@ -779,7 +779,7 @@ export default function Feed({
                         <Grid
                           xs
                           container
-                          justify="center"
+                          justifyContent="center"
                           direction="column"
                           className={classes.feedtasks}
                           spacing={0}
@@ -797,7 +797,7 @@ export default function Feed({
                           </Box>
                         </Grid>
 
-                        <Grid container justify="center" direction="column" className={classes.image}>
+                        <Grid container justifyContent="center" direction="column" className={classes.image}>
                           <Box
                             style={{
                               margin: "auto",

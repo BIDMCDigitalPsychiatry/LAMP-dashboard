@@ -184,7 +184,7 @@ export default function PatientProfile({
 
           <Grid container spacing={0}>
             <Box mb={4} width={1}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
+              <Grid container direction="row" justifyContent="space-between" alignItems="center">
                 <Grid item lg={6}>
                   <Box>
                     <TextField

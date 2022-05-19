@@ -214,7 +214,7 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             <b style={{ color: colors.grey["600"] }}>{`${t("Contact Us")}`}</b>
           </MenuItem>
         </Menu>
-        <Grid container direction="row" justify="center" alignItems="center" className={classes.loginContainer}>
+        <Grid container direction="row" justifyContent="center" alignItems="center" className={classes.loginContainer}>
           <Grid item className={classes.loginInner}>
             <form onSubmit={(e) => handleLogin(e)}>
               <Box>

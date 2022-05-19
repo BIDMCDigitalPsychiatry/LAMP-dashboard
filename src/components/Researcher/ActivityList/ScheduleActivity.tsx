@@ -1,18 +1,5 @@
 import React, { useState } from "react"
-import {
-  Box,
-  IconButton,
-  Icon,
-  Fab,
-  Dialog,
-  DialogContent,
-  makeStyles,
-  Theme,
-  createStyles,
-  createMuiTheme,
-} from "@material-ui/core"
-import { useSnackbar } from "notistack"
-import LAMP from "lamp-core"
+import { Box, IconButton, Icon, Fab, Dialog, DialogContent, makeStyles, Theme, createStyles } from "@material-ui/core"
 import { useTranslation } from "react-i18next"
 import ActivityScheduler from "./ActivityScheduler"
 const useStyles = makeStyles((theme: Theme) =>

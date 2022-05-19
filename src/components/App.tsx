@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
@@ -757,7 +758,7 @@ export default function App({ ...props }) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider
-        theme={createMuiTheme({
+        theme={createTheme({
           typography: {
             fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },

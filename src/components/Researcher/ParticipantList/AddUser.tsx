@@ -168,13 +168,15 @@ export default function AddUser({
     props.onClose as any
   }
 
+  const handleEnter = () => {
+    setSelectedStudy("")
+  }
+
   return (
     <React.Fragment>
       <Dialog
         {...props}
-        onEnter={() => {
-          setSelectedStudy("")
-        }}
+        onEnter={handleEnter}
         scroll="paper"
         aria-labelledby="alert-dialog-slide-title"
         aria-describedby="alert-dialog-slide-description"

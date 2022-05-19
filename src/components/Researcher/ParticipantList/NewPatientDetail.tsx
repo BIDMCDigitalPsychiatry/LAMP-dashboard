@@ -55,7 +55,7 @@ export default function NewPatientDetail({ id, ...props }: { id: string }) {
                   <Tooltip
                     title={`${t("Scan this QR code on a mobile device to automatically open a user dashboard.")}`}
                   >
-                    <Grid container justify="center" style={{ padding: 16 }}>
+                    <Grid container justifyContent="center" style={{ padding: 16 }}>
                       <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
                     </Grid>
                   </Tooltip>
