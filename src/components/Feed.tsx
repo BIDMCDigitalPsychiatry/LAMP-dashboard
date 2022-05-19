@@ -739,7 +739,7 @@ export default function Feed({
             (currentFeed.length === 0 ? (
               <Box display="flex" className={classes.blankMsg} ml={1}>
                 <Icon>info</Icon>
-                <p>{t("There are no scheduled activities available.")}</p>
+                <p>{`${t("There are no scheduled activities available.")}`}</p>
               </Box>
             ) : null)}
           <Stepper
@@ -790,7 +790,7 @@ export default function Feed({
                                 {feed.timeValue}
                               </Box>
                             </Typography>
-                            <Typography variant="h5">{t(feed.title)}</Typography>
+                            <Typography variant="h5">{`${t(feed.title)}`}</Typography>
                             <Typography className={classes.smalltext} color="textSecondary">
                               {feed.spec}
                             </Typography>
@@ -829,10 +829,10 @@ export default function Feed({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent>{t("This activity is not yet available in mindLAMP 2.")}</DialogContent>
+        <DialogContent>{`${t("This activity is not yet available in mindLAMP 2.")}`}</DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenNotImplemented(false)} color="primary">
-            {t("Ok")}
+            {`${t("Ok")}`}
           </Button>
         </DialogActions>
       </Dialog>

@@ -141,7 +141,7 @@ export default function StudiesList({
                 <Grid item lg={6} xs={12}>
                   <Box display="flex" alignItems="center" className={classes.norecords}>
                     <Icon>info</Icon>
-                    {t("No Records Found")}
+                    {`${t("No Records Found")}`}
                   </Box>
                 </Grid>
               )}

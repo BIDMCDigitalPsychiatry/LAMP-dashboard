@@ -165,13 +165,13 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
       })
 
       let activitySpec = await LAMP.ActivitySpec.view(currentActivity.spec)
-      if (activitySpec?.executable?.startsWith("data:")) {
-        response = atob(activitySpec.executable.split(",")[1])
-      } else if (activitySpec?.executable?.startsWith("https:")) {
-        response = atob(await (await fetch(activitySpec.executable)).text())
-      } else {
-        response = await loadFallBack()
-      }
+      // if (activitySpec?.executable?.startsWith("data:")) {
+      //   response = atob(activitySpec.executable.split(",")[1])
+      // } else if (activitySpec?.executable?.startsWith("https:")) {
+      //   response = atob(await (await fetch(activitySpec.executable)).text())
+      // } else {
+      response = await loadFallBack()
+      // }
       setEmbeddedActivity(response)
       setLoading(false)
     } catch (e) {
@@ -185,6 +185,8 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
     if (!!demoActivities[currentActivity.spec]) {
       let activityURL = "https://raw.githubusercontent.com/BIDMCDigitalPsychiatry/LAMP-activities/"
       activityURL += process.env.REACT_APP_GIT_SHA === "dev" ? "dist/out" : "latest/out"
+      return atob(await (await fetch(`${demoActivities[currentActivity.spec]}.html.b64`)).text())
+
       return atob(await (await fetch(`${activityURL}/${demoActivities[currentActivity.spec]}.html.b64`)).text())
     } else {
       return "about:blank"
@@ -213,7 +215,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogContent>{t("An exception occured. The data could not be submitted.")}</DialogContent>
+        <DialogContent>{`${t("An exception occured. The data could not be submitted.")}`}</DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
@@ -223,7 +225,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }}
             color="primary"
           >
-            {t("Ok")}
+            {`${t("Ok")}`}
           </Button>
         </DialogActions>
       </Dialog>

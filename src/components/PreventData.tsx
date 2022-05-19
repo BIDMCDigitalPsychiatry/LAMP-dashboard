@@ -61,7 +61,7 @@ export default function PreventData({
     <Grid container direction="row" justify="center" alignItems="flex-start">
       <Grid item lg={4} sm={10} xs={12}>
         <CardContent className={classes.moodContent}>
-          <Typography variant="h5">{t("Summary")}</Typography>
+          <Typography variant="h5">{`${t("Summary")}`}</Typography>
           <Typography variant="body2">
             {/*You have a good distribution of locations, which means you’re getting out of the house and doing things.
             Studies show a change of scenery helps keep the mid engaged and positive.*/}
@@ -79,7 +79,7 @@ export default function PreventData({
             <Sparkline
               minWidth={250}
               minHeight={450}
-              XAxisLabel={t("Time")}
+              XAxisLabel={`${t("Time")}`}
               YAxisLabel="  "
               color={colors.blue[500]}
               data={events}

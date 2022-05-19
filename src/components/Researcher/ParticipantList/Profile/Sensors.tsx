@@ -94,7 +94,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
       <Box display="flex" width={1} mt={5}>
         <Box flexGrow={1}>
           <Typography className={classes.sectionTitle} style={{ marginBottom: 34 }}>
-            {t("Sensors")}
+            {`${t("Sensors")}`}
           </Typography>
         </Box>
         <Box className={classes.secAdd}>
@@ -132,7 +132,7 @@ export default function Sensors({ participant, studies, ...props }: { participan
                 <Grid item className={classes.w120}></Grid>
               </Grid>
             ) : (
-              t("No Sensors")
+              `${t("No Sensors.")}`
             )}
           </Box>
           <Grid container>

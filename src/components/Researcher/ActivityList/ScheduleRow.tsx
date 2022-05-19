@@ -89,19 +89,19 @@ export default function ScheduleRow({
   const { t } = useTranslation()
   const [data, setData] = useState(scheduleRow)
   const intervals = [
-    { key: "hourly", value: t("Every hour") },
-    { key: "every3h", value: t("Every number hours", { number: 3 }) },
-    { key: "every6h", value: t("Every number hours", { number: 6 }) },
-    { key: "every12h", value: t("Every number hours", { number: 12 }) },
-    { key: "daily", value: t("Every day") },
-    { key: "biweekly", value: t("Two times every week (Tue, Thurs)") },
-    { key: "triweekly", value: t("Three times every week (Mon, Wed, Fri)") },
-    { key: "weekly", value: t("Every week") },
-    { key: "bimonthly", value: t("Two times every month") },
-    { key: "fortnightly", value: t("Every 2 weeks") },
-    { key: "monthly", value: t("Every month") },
-    { key: "custom", value: t("Use custom times instead") },
-    { key: "none", value: t("Do not repeat") },
+    { key: "hourly", value: `${t("Every hour.")}` },
+    { key: "every3h", value: `${t("Every number hours", { number: 3 })}` },
+    { key: "every6h", value: `${t("Every number hours", { number: 6 })}` },
+    { key: "every12h", value: `${t("Every number hours", { number: 12 })}` },
+    { key: "daily", value: `${t("Every day.")}` },
+    { key: "biweekly", value: `${t("Two times every week (Tue, Thurs).")}` },
+    { key: "triweekly", value: `${t("Three times every week (Mon, Wed, Fri).")}` },
+    { key: "weekly", value: `${t("Every week.")}` },
+    { key: "bimonthly", value: `${t("Two times every month.")}` },
+    { key: "fortnightly", value: `${t("Every 2 weeks.")}` },
+    { key: "monthly", value: `${t("Every month.")}` },
+    { key: "custom", value: `${t("Use custom times instead.")}` },
+    { key: "none", value: `${t("Do not repeat")}` },
   ]
 
   useEffect(() => {
@@ -156,7 +156,7 @@ export default function ScheduleRow({
             variant="inline"
             inputVariant="outlined"
             className={classes.datePicker}
-            helperText={t("Select the start date.")}
+            helperText={`${t("Select the start date.")}`}
             size="small"
           />
         )}
@@ -175,7 +175,7 @@ export default function ScheduleRow({
             mask="__:__ _M"
             placeholder="HH:MM AM"
             error={data.time === "" || data.time === null}
-            helperText={t("Select the start time.")}
+            helperText={`${t("Select the start time.")}`}
             InputAdornmentProps={{ position: "end" }}
             value={data.time ? getDate(data.time ?? "") : ""}
             defaultValue={data.time ? getDate(data.time ?? "") : ""}
@@ -227,7 +227,7 @@ export default function ScheduleRow({
             <FormHelperText
               className={data.repeat_interval === "" || data.repeat_interval === null ? classes.error : ""}
             >
-              {t("Select the Repeat interval.")}
+              {`${t("Select the Repeat interval.")}`}
             </FormHelperText>
           </FormControl>
         )}
@@ -235,13 +235,13 @@ export default function ScheduleRow({
       <TableCell>
         {!isEdit ? (
           <span>
-            {data.repeat_interval === "custom" ? <span>{manyDates(data.custom_time)}</span> : t("No custom times")}
+            {data.repeat_interval === "custom" ? <span>{manyDates(data.custom_time)}</span> : `${t("No custom times")}`}
           </span>
         ) : (
           <span>
             {data.repeat_interval !== "custom" ? (
               <Button variant="outlined" disabled>
-                {t("No custom times")}
+                {`${t("No custom times")}`}
               </Button>
             ) : (
               <InlineMenu customTimes={data.custom_time} onChange={(x) => setData({ ...data, custom_time: x })} />

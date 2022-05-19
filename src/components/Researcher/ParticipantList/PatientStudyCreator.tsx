@@ -123,7 +123,7 @@ export default function PatientStudyCreator({
     LAMP.Study.create(researcherId, study).then(async (res) => {
       let result = JSON.parse(JSON.stringify(res))
       if (!!result.error) {
-        enqueueSnackbar(t("Encountered an error: ") + result?.error, {
+        enqueueSnackbar(`${t("Encountered an error: .")}` + result?.error, {
           variant: "error",
         })
       } else {
@@ -321,7 +321,7 @@ export default function PatientStudyCreator({
           <CircularProgress color="inherit" />
         </Backdrop>
         <DialogTitle id="alert-dialog-slide-title" disableTypography>
-          <Typography variant="h6">{t("Create a new study.")}</Typography>
+          <Typography variant="h6">{`${t("Create a new study.")}`}</Typography>
           <IconButton
             aria-label="close"
             className={classes.closeButton}
@@ -342,14 +342,18 @@ export default function PatientStudyCreator({
               autoFocus
               fullWidth
               variant="outlined"
-              label={t("Study Name")}
+              label={`${t("Study Name")}`}
               value={studyName}
               onChange={(e) => {
                 setStudyName(e.target.value)
               }}
               inputProps={{ maxLength: 80 }}
               helperText={
-                duplicateCnt > 0 ? t("Unique study name required") : !validate() ? t("Please enter study name.") : ""
+                duplicateCnt > 0
+                  ? `${t("Unique study name required")}`
+                  : !validate()
+                  ? `${t("Please enter study name.")}`
+                  : ""
               }
             />
           </Box>
@@ -359,7 +363,7 @@ export default function PatientStudyCreator({
               autoFocus
               fullWidth
               variant="outlined"
-              label={t("Duplicate from")}
+              label={`${t("Duplicate from")}`}
               value={duplicateStudyName}
               onChange={(e) => {
                 setDuplicateStudyName(e.target.value)
@@ -385,10 +389,10 @@ export default function PatientStudyCreator({
               classes={{ checked: classes.checkboxActive }}
               inputProps={{ "aria-label": "primary checkbox" }}
             />
-            {t("Create a new patient under this study")}
+            {`${t("Create a new patient under this study")}`}
           </Box>
           {!!createPatient && (
-            <Typography variant="caption">{t("Study name and patient name will be same.")}</Typography>
+            <Typography variant="caption">{`${t("Study name and patient name will be same.")}`}</Typography>
           )}
         </DialogContent>
         <DialogActions>
@@ -400,7 +404,7 @@ export default function PatientStudyCreator({
                 setCreatePatient(false)
               }}
             >
-              {t("Cancel")}
+              {`${t("Cancel")}`}
             </Button>
             <Button
               onClick={() => {
@@ -410,7 +414,7 @@ export default function PatientStudyCreator({
               autoFocus
               disabled={!validate()}
             >
-              {t("Confirm")}
+              {`${t("Confirm")}`}
             </Button>
           </Box>
         </DialogActions>

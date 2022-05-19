@@ -257,7 +257,7 @@ export default function PreventSelectedActivities({
                 >
                   <Box display="flex">
                     <Box flexGrow={1}>
-                      <Typography className={classes.preventlabel}>{t(activity.name)}</Typography>
+                      <Typography className={classes.preventlabel}>{`${t(activity.name)}`}</Typography>
                     </Box>
                     <Box mr={1} className={classes.preventRightSVG}>
                       {
@@ -279,7 +279,7 @@ export default function PreventSelectedActivities({
                     <Typography variant="h2">{(activityEvents?.[activity.name] || []).length}</Typography>
                   </Box>
                   <Typography variant="h6">
-                    {t("entries")} {timeAgo.format(timeSpans[activity.name].timestamp)}
+                    {`${t("entries")}`} {timeAgo.format(timeSpans[activity.name].timestamp)}
                   </Typography>
                 </Card>
               </ButtonBase>
@@ -295,9 +295,9 @@ export default function PreventSelectedActivities({
                 >
                   <Typography className={classes.preventlabelFull}>
                     <ReactMarkdown
-                      source={`${t(activity.name)} (${activityCounts[activity.name]})`}
-                      escapeHtml={false}
-                      plugins={[gfm, emoji]}
+                      children={`${t(activity.name)} ${activityCounts[activity.name]}`}
+                      skipHtml={false}
+                      remarkPlugins={[gfm, emoji]}
                     />
                   </Typography>
                   <Box className={classes.maxw300}>

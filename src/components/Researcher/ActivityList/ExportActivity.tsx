@@ -3,7 +3,6 @@ import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/co
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import ResponsiveDialog from "../../ResponsiveDialog"
 import { spliceActivity, spliceCTActivity } from "../ActivityList/ActivityMethods"
 import { saveAs } from "file-saver"
 
@@ -62,7 +61,7 @@ export default function ExportActivity({ activities, ...props }) {
       } else data.push({ ...x, tableData: undefined })
     }
     _saveFile(data)
-    enqueueSnackbar(t("The selected Activities were successfully exported."), {
+    enqueueSnackbar(`${t("The selected Activities were successfully exported.")}`, {
       variant: "info",
     })
   }
@@ -82,7 +81,7 @@ export default function ExportActivity({ activities, ...props }) {
       classes={{ root: classes.btnText }}
       onClick={() => downloadActivities(activities)}
     >
-      <Icon>drive_folder_upload</Icon> {t("Export")}
+      <Icon>drive_folder_upload</Icon> {`${t("Export")}`}
     </Fab>
   )
 }

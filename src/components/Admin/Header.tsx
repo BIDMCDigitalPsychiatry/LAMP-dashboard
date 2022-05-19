@@ -1,8 +1,6 @@
-import React, { useState } from "react"
+import React from "react"
 import { Box, Typography, makeStyles, Theme, createStyles, Fab, Icon } from "@material-ui/core"
 import SearchBox from "../SearchBox"
-import LAMP from "lamp-core"
-import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import AddUpdateResearcher from "./AddUpdateResearcher"
 
@@ -48,7 +46,7 @@ export default function Header({ researchers, searchData, refreshResearchers, ad
   return (
     <Box display="flex" alignItems="center" className={classes.header}>
       <Box flexGrow={1}>
-        <Typography variant="h5">{t("Investigators")}</Typography>
+        <Typography variant="h5">{`${t("Investigators")}`}</Typography>
       </Box>
       <SearchBox searchData={searchData} />
       {adminType !== "practice_lead" && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Grid,
   Tooltip,
@@ -51,7 +51,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
     >
       {!!value && (
         <Grid item>
-          <Tooltip title={t("Duplicate this activity and save it with a new title.")}>
+          <Tooltip title={`${t("Duplicate this activity and save it with a new title.")}`}>
             <ThemeProvider theme={theme}>
               <Fab
                 color="secondary"
@@ -70,7 +70,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
                   (value?.name?.trim() === data?.name?.trim() && value.study_id === data.studyID)
                 }
               >
-                {t("Duplicate")}
+                {`${t("Duplicate")}`}
                 <span style={{ width: 8 }} />
                 <Icon>file_copy</Icon>
               </Fab>
@@ -79,7 +79,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
         </Grid>
       )}
       <Grid item>
-        <Tooltip title={t("Save this activity.")}>
+        <Tooltip title={`${t("Save this activity.")}`}>
           <Fab
             className={classes.btnBlue}
             aria-label="Save"
@@ -92,7 +92,7 @@ export default function ActivityFooter({ value, onSave, validate, data, ...props
             }}
             disabled={saveClicked || !validate() || !onSave || !data.name}
           >
-            {t("Save")}
+            {`${t("Save")}`}
             <span style={{ width: 8 }} />
             <Icon>save</Icon>
           </Fab>

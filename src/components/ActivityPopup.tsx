@@ -233,14 +233,14 @@ export default function ActivityPopup({
               }}
             ></Box>
             <Typography variant="body2" align="left">
-              {t(type)}
+              {`${t(type)}`}
             </Typography>
             <Typography variant="h2">
               <ReactMarkdown
-                source={t(activity?.name ?? null)}
-                escapeHtml={false}
-                plugins={[gfm, emoji]}
-                renderers={{ link: LinkRenderer }}
+                children={t(activity?.name ?? null)}
+                skipHtml={false}
+                remarkPlugins={[gfm, emoji]}
+                components={{ link: LinkRenderer }}
               />
             </Typography>
           </div>
@@ -248,24 +248,24 @@ export default function ActivityPopup({
         <DialogContent className={classes.surveytextarea}>
           {activity?.spec === "lamp.tips" && (
             <Typography variant="h4" gutterBottom>
-              {t("Quick Tips to Improve Your")} {t(activity?.name)}
+              {`${t("Quick Tips to Improve Your")}`} {`${t(activity?.name)}`}
             </Typography>
           )}
           {(activity?.spec === "lamp.survey" || activity?.spec === "lamp.dbt_diary_card") && (
             <Typography variant="h4" gutterBottom>
-              {questionCount} {questionCount > 1 ? t(" questions") : t(" question")} {/* (10 mins) */}
+              {questionCount} {questionCount > 1 ? `${t(" questions")}` : `${t(" question")}`} {/* (10 mins) */}
             </Typography>
           )}
           <Typography variant="body2" component="p">
             <ReactMarkdown
-              source={
+              children={
                 activity?.spec !== "lamp.dbt_diary_card"
                   ? t(tag[activity?.id]?.description ?? null)
-                  : t("Daily log of events and related feelings. Track target behaviors and use of skills.")
+                  : `${t("Daily log of events and related feelings. Track target behaviors and use of skills.")}`
               }
-              escapeHtml={false}
-              plugins={[gfm, emoji]}
-              renderers={{ link: LinkRenderer }}
+              skipHtml={false}
+              remarkPlugins={[gfm, emoji]}
+              components={{ link: LinkRenderer }}
             />
           </Typography>
         </DialogContent>
@@ -286,7 +286,7 @@ export default function ActivityPopup({
                   : classes.btnPrevent
               )}
             >
-              {activity?.spec === "lamp.survey" ? t("Start survey") : t("Begin")}
+              {activity?.spec === "lamp.survey" ? `${t("Start survey")}` : `${t("Begin")}`}
             </Link>
           </Box>
         </DialogActions>

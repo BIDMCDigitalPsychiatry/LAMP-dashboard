@@ -165,10 +165,10 @@ export default function NotificationPage({ participant, activityId, mode, tab, .
           </AppBar>
           <Box textAlign="center" pb={4} className={classes.niceWork}>
             <Typography variant="h5" gutterBottom>
-              {t("Success") + "!"}
+              {`${t("Success.")}` + "!"}
             </Typography>
             <Typography className={classes.ribbonText} component="p">
-              {t("You have successfully completed your activity.")}
+              {`${t("You have successfully completed your activity.")}`}
             </Typography>
             <Box textAlign="center" className={classes.niceWorkbadge}>
               <Icon>check_circle</Icon>

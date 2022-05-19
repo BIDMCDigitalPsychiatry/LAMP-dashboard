@@ -135,7 +135,7 @@ export default function StudyFilterList({
       {showFilterStudies === true && (
         <Box mt={1}>
           <Box className={classes.filterChips}>
-            {[t("Select All"), t("Deselect All")].map((item) => (
+            {[`${t("Select All")}`, `${t("Deselect All.")}`].map((item) => (
               <Tooltip key={item} style={{ margin: 4 }} title={item}>
                 <Chip
                   classes={{
@@ -145,7 +145,7 @@ export default function StudyFilterList({
                   }}
                   label={
                     <section>
-                      <b>{t(item)}</b>
+                      <b>{`${t(item)}`}</b>
                     </section>
                   }
                   color={

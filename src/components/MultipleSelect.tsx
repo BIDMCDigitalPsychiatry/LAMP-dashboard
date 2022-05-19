@@ -58,7 +58,7 @@ export default function MultipleSelect({ ...props }) {
             classes={{ root: classes.multiselect, colorPrimary: classes.multiselectPrimary, label: classes.chiplabel }}
             label={
               <section>
-                {t(item)}
+                {`${t(item)}`}
                 <span className={classes.badgeCount}>{(props.badges || {})[item] || props.defaultBadge || 0}</span>
               </section>
             }

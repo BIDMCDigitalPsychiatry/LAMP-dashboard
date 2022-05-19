@@ -48,13 +48,13 @@ export default function ActivityRow({
   const { t } = useTranslation()
 
   const types = {
-    "lamp.survey": t("Survey"),
-    "lamp.group": t("Group"),
-    "lamp.tips": t("Tips"),
-    "lamp.journal": t("Journal"),
-    "lamp.breathe": t("Breathe"),
-    "lamp.dbt_diary_card": t("DBT Diary Card"),
-    "lamp.scratch_image": t("Scratch image"),
+    "lamp.survey": `${t("Survey")}`,
+    "lamp.group": `${t("Group")}`,
+    "lamp.tips": `${t("Tips")}`,
+    "lamp.journal": `${t("Journal")}`,
+    "lamp.breathe": `${t("Breathe")}`,
+    "lamp.dbt_diary_card": `${t("DBT Diary Card")}`,
+    "lamp.scratch_image": `${t("Scratch image")}`,
   }
   const [checked, setChecked] = React.useState(false)
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +79,7 @@ export default function ActivityRow({
         </Grid>
         <Grid item xs>
           <Typography className={classes.contentText} style={{ flex: 1 }}>
-            {types[activity.spec] ?? t("Cognitive Test")}
+            {types[activity.spec] ?? `${t("Cognitive Test")}`}
           </Typography>
         </Grid>
         <Grid item xs>

@@ -29,7 +29,7 @@ import LAMP from "lamp-core"
 import { generate_ids, queryDictionary } from "./DataPortalShared"
 
 import { saveAs } from "file-saver"
-import jsonexport from "jsonexport"
+// import jsonexport from "jsonexport"
 
 export default function RenderTree({ id, type, token, name, onSetQuery, onUpdateGUI, isGUIEditor, ...props }) {
   const [treeDisplay, setTree] = React.useState(null)
@@ -189,10 +189,10 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         id[id.length - 1] === "Researcher"
           ? `$LAMP.Researcher.list()`
           : id[id.length - 1] === "Study"
-          ? `$LAMP.Study.list("${id[id.length - 2]}")`
+          ? `$LAMP.Study.list("${id[id.length - 2]}.")}`
           : id[id.length - 1] === "Participant"
           ? queryDictionary.participantsWithName(id[id.length - 2])
-          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}")`
+          : `$LAMP.${id[id.length - 1]}.list("${id[id.length - 2]}.")}`
       getData(testQuery).then((res) => {
         if (!Array.isArray(res)) res = [res]
         setTree(res)
@@ -203,7 +203,7 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
     //then call the api
     React.useEffect(() => {
       if (!expanded) return
-      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}")`
+      let testQuery = `$LAMP.${id[id.length - 1]}.list("${id.length >= 2 ? id[id.length - 2] : ""}.")}`
       onSetQuery(testQuery)
     }, [expanded])
   }
@@ -317,11 +317,11 @@ export default function RenderTree({ id, type, token, name, onSetQuery, onUpdate
         )
       }, [])
     }
-    jsonexport(resultsPulled, function (err, csv) {
-      if (err) return console.log(err)
-      const file = new Blob([csv], { type: "text/csv" })
-      name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
-    })
+    // jsonexport(resultsPulled, function (err, csv) {
+    //   if (err) return console.log(err)
+    //   const file = new Blob([csv], { type: "text/csv" })
+    //   name.endsWith(".csv") ? saveAs(file, name) : saveAs(file, name + ".csv")
+    // })
   }
 
   React.useEffect(() => {

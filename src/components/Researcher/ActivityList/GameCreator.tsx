@@ -533,7 +533,7 @@ export default function GameCreator({
           <Box my={2} p={2} border={1} borderColor="#0000001f" className={classes.errorcustom}>
             <Typography variant="h6">Errors</Typography>
             <Box alignItems="center" display="flex" p={2}>
-              <Icon>error</Icon> {t("The audio size should not exceed 10 MB.")}
+              <Icon>error</Icon> {`${t("The audio size should not exceed 10 MB.")}`}
             </Box>
           </Box>
         )}

@@ -364,7 +364,7 @@ export default function Prevent({
           <Box className={classes.marginTop10}>
             <Grid container xs={12} spacing={0} className={classes.activityhd}>
               <Grid item xs className={classes.preventHeader}>
-                <Typography variant="h5">{t("Activity")}</Typography>
+                <Typography variant="h5">{`${t("Activity")}`}</Typography>
               </Grid>
               <Grid item xs className={classes.addbtnmain}>
                 <IconButton onClick={() => handleClickOpen(0)}>
@@ -388,7 +388,7 @@ export default function Prevent({
             </Grid>
             <Grid container xs={12} spacing={0} className={classes.sensorhd}>
               <Grid item xs className={classes.preventHeader}>
-                <Typography variant="h5">{t("Cortex")}</Typography>
+                <Typography variant="h5">{`${t("Cortex")}`}</Typography>
               </Grid>
               <Grid item xs className={classes.addbtnmain}>
                 <IconButton onClick={() => handleClickOpen(1)}>
@@ -418,12 +418,12 @@ export default function Prevent({
             }}
           >
             <DialogTitle id="alert-dialog-slide-title">
-              {dialogueType === 0 ? t("Activity data") : t("Cortex data")}
+              {dialogueType === 0 ? `${t("Activity data")}` : `${t("Cortex data")}`}
               <IconButton aria-label="close" className={classes.closeButton} onClick={handleClose}>
                 <Icon>close</Icon>
               </IconButton>
               <Box mt={2}>
-                <Typography>{t("Choose the data you want to see in your dashboard.")}</Typography>
+                <Typography>{`${t("Choose the data you want to see in your dashboard.")}`}</Typography>
               </Box>
             </DialogTitle>
             <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
@@ -454,7 +454,7 @@ export default function Prevent({
             <DialogActions>
               <Box textAlign="center" width={1} mt={3} mb={3}>
                 <Link onClick={handleClose} className={classes.linkBlue}>
-                  {t("Done")}
+                  {`${t("Done")}`}
                 </Link>
               </Box>
             </DialogActions>

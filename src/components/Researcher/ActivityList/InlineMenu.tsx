@@ -40,7 +40,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
         MenuListProps={{ dense: true }}
       >
         <MenuItem disabled divider>
-          <b>{t("Custom Times")}</b>
+          <b>{`${t("Custom Times")}`}</b>
         </MenuItem>
         {items?.map((x, idx) => (
           <MenuItem dense disabled key={idx}>
@@ -48,7 +48,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
               {getDate(x).toLocaleString("en-US", Date.formatStyle("timeOnly"))}
             </Typography>
             <ListItemSecondaryAction>
-              <Tooltip title={t("Delete this time from the list.")}>
+              <Tooltip title={`${t("Delete this time from the list.")}`}>
                 <IconButton
                   edge="end"
                   aria-label="remove"
@@ -79,7 +79,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
               style: { color: "#000" },
               endAdornment: (
                 <InputAdornment position="end">
-                  <Tooltip title={t("Add this time to the list.")}>
+                  <Tooltip title={`${t("Add this time to the list.")}`}>
                     <IconButton
                       edge="end"
                       aria-label="add"
@@ -94,7 +94,7 @@ export default function InlineMenu({ customTimes, onChange, ...props }) {
                 </InputAdornment>
               ),
             }}
-            helperText={t("Add a new custom time.")}
+            helperText={`${t("Add a new custom time.")}`}
           />
         </MenuItem>
       </Menu>

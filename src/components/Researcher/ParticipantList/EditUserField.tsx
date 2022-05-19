@@ -43,10 +43,10 @@ export default function EditUserField({
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to load participantId's alias: errorMessage", {
+          `${t("Failed to load participantId's alias: errorMessage", {
             participantId: participant.id,
             errorMessage: err.message,
-          }),
+          })}`,
           { variant: "error" }
         )
       )
@@ -66,15 +66,15 @@ export default function EditUserField({
         Service.update("participants", { participants: [{ id: participant.id, name: alias }] }, "name", "id")
         updateName(alias.trim() === "" ? participant.id : alias.trim())
         if (alias.trim() === "")
-          enqueueSnackbar(t("Removed participantId's alias.", { participantId: participant.id }), {
+          enqueueSnackbar(`${t("Removed participantId's alias.", { participantId: participant.id })}`, {
             variant: "success",
           })
         else
           enqueueSnackbar(
-            t("Set participantId's alias to participantName", {
+            `${t("Set participantId's alias to participantName", {
               participantId: participant.id,
               participantName: alias,
-            }),
+            })}`,
             {
               variant: "success",
             }
@@ -82,10 +82,10 @@ export default function EditUserField({
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to change participantId's alias: errorMessage", {
+          `${t("Failed to change participantId's alias: errorMessage", {
             participantId: participant.id,
             errorMessage: err.message,
-          }),
+          })}`,
           { variant: "error" }
         )
       )
@@ -129,9 +129,9 @@ export default function EditUserField({
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip
-                  title={t(
+                  title={`${t(
                     "Create or edit the alias for this Participant ID. Saving an empty text box will reset this value."
-                  )}
+                  )}`}
                 >
                   <IconButton
                     edge="end"

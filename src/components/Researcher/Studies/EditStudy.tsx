@@ -70,11 +70,11 @@ export default function EditStudy({ study, upatedDataStudy, allStudies, research
             />
           </Box>
         ) : aliasStudyName && editStudyName === study.id ? (
-          t(aliasStudyName)
+          `${t(aliasStudyName)}`
         ) : studyArray[study.id] ? (
-          t(studyArray[study.id])
+          `${t(studyArray[study.id])}`
         ) : (
-          t(study.name)
+          `${t(study.name)}`
         )}
       </Box>
       <Box>

@@ -53,7 +53,7 @@ export default function Pagination({
     <Grid item xs={12}>
       <TablePagination
         component="div"
-        labelRowsPerPage={t("Rows per page:")}
+        labelRowsPerPage={`${t("Rows per page:")}`}
         count={(data || []).length}
         rowsPerPage={rowCount}
         page={page}

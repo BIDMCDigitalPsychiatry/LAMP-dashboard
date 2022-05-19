@@ -59,7 +59,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
     >
       {!!value ? (
         <Grid item>
-          <Tooltip title={t("Duplicate this activity.")}>
+          <Tooltip title={`${t("Duplicate this activity.")}`}>
             <ThemeProvider theme={theme}>
               <Fab
                 color="secondary"
@@ -70,7 +70,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
                 }}
                 disabled={!isError || (value && !isDuplicate) || duplicateTipText === null || duplicateTipText === ""}
               >
-                {t("Duplicate")}
+                {`${t("Duplicate")}`}
                 <span style={{ width: 8 }} />
                 <Icon>save</Icon>
               </Fab>
@@ -81,7 +81,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
         ""
       )}
       <Grid item>
-        <Tooltip title={t("Save this activity.")}>
+        <Tooltip title={`${t("Save this activity.")}`}>
           <span>
             <Fab
               className={classes.btnBlue}
@@ -92,7 +92,7 @@ export default function TipFooter({ value, isError, isDuplicate, duplicateTipTex
               }}
               disabled={!isError}
             >
-              {t("Save")}
+              {`${t("Save")}`}
               <span style={{ width: 8 }} />
               <Icon>save</Icon>
             </Fab>

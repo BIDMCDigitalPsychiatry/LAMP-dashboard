@@ -78,7 +78,7 @@ export default function AddSensor({
   return (
     <Box>
       <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
-        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+        <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
       </Fab>
       <SensorDialog
         studies={studies}

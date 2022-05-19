@@ -29,8 +29,6 @@ import { Service } from "../DBService/DBService"
 import LAMP from "lamp-core"
 import useInterval from "../useInterval"
 import DataPortal from "../data_portal/DataPortal"
-// import { Researcher } from "../DBService/Types/Researcher"
-// import { Study } from "../DBService/Types/Study"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -297,7 +295,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                   <ListItemIcon className={classes.menuIcon}>
                     <Patients />
                   </ListItemIcon>
-                  <ListItemText primary={t("Users")} />
+                  <ListItemText primary={`${t("Users")}`} />
                 </ListItem>
                 {mode === "researcher" && (
                   <ListItem
@@ -311,7 +309,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemIcon className={classes.menuIcon}>
                       <Activities />
                     </ListItemIcon>
-                    <ListItemText primary={t("Activities")} />
+                    <ListItemText primary={`${t("Activities")}`} />
                   </ListItem>
                 )}
                 {mode === "researcher" && (
@@ -326,7 +324,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemIcon className={classes.menuIcon}>
                       <Sensors />
                     </ListItemIcon>
-                    <ListItemText primary={t("Sensors")} />
+                    <ListItemText primary={`${t("Sensors")}`} />
                   </ListItem>
                 )}
                 {mode === "researcher" && (
@@ -339,7 +337,7 @@ export default function Dashboard({ onParticipantSelect, researcherId, mode, tab
                     <ListItemIcon className={classes.menuIcon}>
                       <Studies />
                     </ListItemIcon>
-                    <ListItemText primary={t("Studies")} />
+                    <ListItemText primary={`${t("Studies")}`} />
                   </ListItem>
                 )}
                 {mode === "researcher" && (

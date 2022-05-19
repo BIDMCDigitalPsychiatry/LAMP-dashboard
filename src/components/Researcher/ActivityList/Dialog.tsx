@@ -159,7 +159,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
     setMeasure("Times")
     setCustomUnit(null)
   }
-  const options = [t("Times"), t("Hours"), t("Minutes".toLowerCase())]
+  const options = [`${t("Times")}`, `${t("Hours")}`, `${t("Minutes".toLowerCase())}`]
   return (
     <Dialog
       classes={{ paper: classes.popWidth }}
@@ -168,18 +168,18 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
       open={dialogOpen != ""}
     >
       <div>
-        <Typography className={classes.dialogTitle}>{t("Add a target behavior")}</Typography>
+        <Typography className={classes.dialogTitle}>{`${t("Add a target behavior")}`}</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
               value={target}
               onChange={(event) => setTarget(event.target.value)}
               inputProps={{ disableunderline: "true", maxLength: 120 }}
-              placeholder={t("Behavior name")}
+              placeholder={`${t("Behavior name")}`}
             />
           </div>
         </div>
-        <Typography className={classes.measureTitle}>{t("Measure of action:")}</Typography>
+        <Typography className={classes.measureTitle}>{`${t("Measure of action:")}`}</Typography>
         <Box display="flex" justifyContent="center" mt={2}>
           <Autocomplete
             className={classes.autoComplete}
@@ -192,7 +192,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
             onInputChange={(event, newInputValue) => {
               setMeasure(newInputValue)
             }}
-            renderInput={(params) => <TextField {...params} label={t("Measure")} variant="filled" />}
+            renderInput={(params) => <TextField {...params} label={`${t("Measure")}`} variant="filled" />}
           />
         </Box>
         <Box textAlign="center" mt={2}>
@@ -201,7 +201,7 @@ export function TargetDialog({ onClose, dialogOpen, ...props }) {
             disabled={measure === "" || target === "" ? true : false}
             className={classes.headerButton}
           >
-            <Typography className={classes.buttonText}>{t("Add")}</Typography>
+            <Typography className={classes.buttonText}>{`${t("Add")}`}</Typography>
           </Button>
         </Box>
       </div>
@@ -228,20 +228,20 @@ export function EmotionDialog({ ...props }) {
       open={dialogOpen}
     >
       <div>
-        <Typography className={classes.dialogTitle}>{t("Add a emotion")}</Typography>
+        <Typography className={classes.dialogTitle}>{`${t("Add a emotion")}`}</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
               value={emotion}
               onChange={(event) => setEmotion(event.target.value)}
               inputProps={{ disableunderline: "true", maxLength: 120 }}
-              placeholder={t("Emotion name")}
+              placeholder={`${t("Emotion name")}`}
             />
           </div>
         </div>
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} disabled={emotion === "" ? true : false} className={classes.headerButton}>
-            <Typography className={classes.buttonText}>{t("Add")}</Typography>
+            <Typography className={classes.buttonText}>{`${t("Add")}`}</Typography>
           </Button>
         </Box>
       </div>
@@ -267,21 +267,21 @@ export function NameDialog({ onClose, dialogOpen, ...props }) {
       open={dialogOpen}
     >
       <div>
-        <Typography className={classes.dialogTitle}>{t("Add Sensor")}</Typography>
+        <Typography className={classes.dialogTitle}>{`${t("Add Sensor")}`}</Typography>
         <div className={classes.inputContainer}>
           <div className={classes.contentContainer}>
             <CssTextField
               value={name}
               onChange={(event) => setName(event.target.value)}
               inputProps={{ disableunderline: "true" }}
-              placeholder={t("Name")}
+              placeholder={`${t("Name")}`}
             />
           </div>
         </div>
 
         <Box textAlign="center" mt={2}>
           <Button onClick={handleClose} disabled={name === "" ? true : false} className={classes.headerButton}>
-            <Typography className={classes.buttonText}>{t("Add")}</Typography>
+            <Typography className={classes.buttonText}>{`${t("Add")}`}</Typography>
           </Button>
         </Box>
       </div>

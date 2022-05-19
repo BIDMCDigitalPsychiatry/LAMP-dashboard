@@ -219,7 +219,7 @@ export default function SensorDialog({
         ["name", "spec"],
         "id"
       )
-      enqueueSnackbar(t("Successfully updated a sensor."), {
+      enqueueSnackbar(`${t("Successfully updated a sensor.")}`, {
         variant: "success",
       })
       setLoading(false)
@@ -253,7 +253,7 @@ export default function SensorDialog({
           ["sensor_count"],
           "id"
         )
-        enqueueSnackbar(t("Successfully created a sensor."), {
+        enqueueSnackbar(`${t("Successfully created a sensor.")}`, {
           variant: "success",
         })
         setLoading(false)
@@ -268,13 +268,15 @@ export default function SensorDialog({
         <Backdrop className={classes.backdrop} open={loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
-        <Typography className={classes.dialogTitle}>{selectedSensor ? t("Update Sensor") : t("Add Sensor")}</Typography>
+        <Typography className={classes.dialogTitle}>
+          {selectedSensor ? `${t("Update Sensor")}` : `${t("Add Sensor")}`}
+        </Typography>
         <Box mt={4}>
           <TextField
             error={typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""}
             id="filled-select-currency"
             select
-            label={t("Study")}
+            label={`${t("Study")}`}
             value={selectedStudy}
             //disabled={!!studyId ? true : false}
             disabled={!!sensor ? true : false}
@@ -283,7 +285,7 @@ export default function SensorDialog({
             }}
             helperText={
               typeof selectedStudy == "undefined" || selectedStudy === null || selectedStudy === ""
-                ? t("Please select the Study")
+                ? `${t("Please select the Study.")}`
                 : ""
             }
             variant="filled"
@@ -304,14 +306,14 @@ export default function SensorDialog({
             }
             value={sensorName}
             variant="filled"
-            label={t("Name")}
+            label={`${t("Name")}`}
             onChange={(event) => setSensorName(event.target.value)}
-            placeholder={t("Name")}
+            placeholder={`${t("Name")}`}
             helperText={
               duplicateCnt > 0
-                ? t("Unique name required")
+                ? `${t("Unique name required.")}`
                 : typeof sensorName == "undefined" || sensorName === null || sensorName.trim() === ""
-                ? t("Please enter name.")
+                ? `${t("Please enter name.")}`
                 : ""
             }
           />
@@ -321,14 +323,14 @@ export default function SensorDialog({
             error={typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === "" ? true : false}
             id="filled-select-currency"
             select
-            label={t("Sensor spec")}
+            label={`${t("Sensor spec")}`}
             value={sensorSpec}
             onChange={(e) => {
               setSensorSpec(e.target.value)
             }}
             helperText={
               typeof sensorSpec == "undefined" || sensorSpec === null || sensorSpec === ""
-                ? t("Please select the sensor spec")
+                ? `${t("Please select the sensor spec.")}`
                 : ""
             }
             variant="filled"
@@ -347,7 +349,7 @@ export default function SensorDialog({
             disabled={!validate()}
             className={!validate() ? classes.disabled + " " + classes.PopupButton : classes.PopupButton}
           >
-            <Typography className={classes.buttonText}>{selectedSensor ? t("Update") : t("Add")}</Typography>
+            <Typography className={classes.buttonText}>{selectedSensor ? `${t("Update")}` : `${t("Add")}`}</Typography>
           </Button>
         </Box>
       </div>

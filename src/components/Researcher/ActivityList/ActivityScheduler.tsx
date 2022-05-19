@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import {
   Icon,
-  IconButton,
   TableContainer,
   Paper,
   TableBody,
@@ -82,17 +81,17 @@ export default function ActivityScheduler({ activity, activities, setActivities,
     <TableContainer component={Paper} elevation={0}>
       <Box mt={3}>
         <Fab variant="extended" color="primary" className={classes.btnBlue} onClick={() => addRow()}>
-          <Icon>add</Icon> {t("Add")}
+          <Icon>add</Icon> {`${t("Add")}`}
         </Fab>
       </Box>
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>{t("Start date")}</TableCell>
-            <TableCell>{t("Time")}</TableCell>
-            <TableCell>{t("Repeat Interval")}</TableCell>
-            <TableCell>{t("Custom Times")}</TableCell>
-            <TableCell>{t("Actions")}</TableCell>
+            <TableCell>{`${t("Start date")}`}</TableCell>
+            <TableCell>{`${t("Time")}`}</TableCell>
+            <TableCell>{`${t("Repeat Interval")}`}</TableCell>
+            <TableCell>{`${t("Custom Times")}`}</TableCell>
+            <TableCell>{`${t("Actions")}`}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

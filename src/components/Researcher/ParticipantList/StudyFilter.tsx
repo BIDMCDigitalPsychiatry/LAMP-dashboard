@@ -53,7 +53,7 @@ export default function StudyFilter({ setShowFilterStudies, setOrder, order, ...
         }}
       >
         <Icon>filter_alt</Icon>
-        <span className={classes.filterText}>{t("Filter results")}</span>{" "}
+        <span className={classes.filterText}>{`${t("Filter results")}`}</span>{" "}
         {showFilter === true ? <Icon>arrow_drop_up</Icon> : <Icon>arrow_drop_down</Icon>}
       </Fab>
       <Fab

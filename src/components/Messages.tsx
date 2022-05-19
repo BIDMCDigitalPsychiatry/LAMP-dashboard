@@ -172,7 +172,7 @@ export default function Messages({
 
     var days = Math.floor(delta / 86400)
     delta -= days * 86400
-    if (days > 0) return days + (days > 1 ? " " + t("days") : t("day"))
+    if (days > 0) return days + (days > 1 ? " " + `${t("days")}` : `${t("day")}`)
 
     var hours = Math.floor(delta / 3600) % 24
     if (hours > 0) return hours + (hours > 1 ? " hrs" : "hr")
@@ -271,7 +271,7 @@ export default function Messages({
         <Box my={2} display="flex" className={classes.composeMsg}>
           <Box width="100%" className={classes.composeTextarea}>
             <TextareaAutosize
-              placeholder={t("text")}
+              placeholder={`${t("text")}`}
               value={currentMessage || ""}
               onChange={(event) => setCurrentMessage(event.target.value)}
               style={{ display: addMsg ? "block" : "none" }}
@@ -316,7 +316,7 @@ export default function Messages({
                 marginLeft: supportsSidebar ? 0 : undefined,
               }}
             >
-              {t("Conversations")}
+              {`${t("Conversations")}`}
             </Typography>
           </Toolbar>
         </AppBar>

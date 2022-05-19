@@ -12,7 +12,7 @@ import {
   createStyles,
 } from "@material-ui/core"
 import { useSnackbar } from "notistack"
-import LAMP, { Study } from "lamp-core"
+import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
 
@@ -63,11 +63,11 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
             : []
         let data = selectedStudies.filter((d) => d !== study.name)
         localStorage.setItem("studies_" + researcherId, JSON.stringify(data))
-        enqueueSnackbar(t("Successfully deleted study.", { studyId: studyId }), { variant: "success" })
+        enqueueSnackbar(`${t("Successfully deleted study.", { studyId: studyId })}`, { variant: "success" })
       })
       .catch((error) => {
         deletedStudy("")
-        enqueueSnackbar(t("An error occured while deleting. Please try again."), { variant: "error" })
+        enqueueSnackbar(`${t("An error occured while deleting. Please try again.")}`, { variant: "error" })
       })
   }
 
@@ -102,12 +102,12 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
       >
         <DialogContent dividers={false} classes={{ root: classes.activityContent }}>
           <Box mt={2} mb={2}>
-            {t("Are you sure you want to delete this study?")}
+            {`${t("Are you sure you want to delete this study?")}`}
           </Box>
           <DialogActions>
             <Box textAlign="center" width={1} mb={3}>
               <Button onClick={() => deleteStudy(studyIdDelete)} color="primary" autoFocus>
-                {t("Delete")}
+                {`${t("Delete")}`}
               </Button>
 
               <Button
@@ -115,7 +115,7 @@ export default function DeleteStudy({ study, deletedStudy, researcherId, ...prop
                   handleCloseDeleteStudy()
                 }}
               >
-                {t("Cancel")}
+                {`${t("Cancel")}`}
               </Button>
             </Box>
           </DialogActions>

@@ -17,14 +17,11 @@ import {
   Link,
 } from "@material-ui/core"
 // Local Imports
-import LAMP from "lamp-core"
 import ParticipantName from "./ParticipantName"
 import Passive from "./PassiveBubble"
 import Active from "./ActiveBubble"
 import NotificationSettings from "./NotificationSettings"
-import DeleteParticipant from "./DeleteParticipant"
 import Credentials from "../../Credentials"
-import { Service } from "../../DBService/DBService"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

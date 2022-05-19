@@ -129,7 +129,7 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
         classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
         onClick={(event) => setPopover(event.currentTarget)}
       >
-        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+        <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
       </Fab>
 
       <Popover
@@ -156,8 +156,8 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
                 setAddUser(true)
               }}
             >
-              <Typography variant="h6">{t("Add a patient")}</Typography>
-              <Typography variant="body2">{t("Create a new entry in this group.")}</Typography>
+              <Typography variant="h6">{`${t("Add a patient")}`}</Typography>
+              <Typography variant="body2">{`${t("Create a new entry in this group.")}`}</Typography>
             </MenuItem>
           )}
           {mode === "researcher" && (
@@ -167,8 +167,8 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
                 setAddStudy(true)
               }}
             >
-              <Typography variant="h6">{t("Add a new study")}</Typography>
-              <Typography variant="body2">{t("Create a new study.")}</Typography>
+              <Typography variant="h6">{`${t("Add a new study")}`}</Typography>
+              <Typography variant="body2">{`${t("Create a new study.")}`}</Typography>
             </MenuItem>
           )}
           <MenuItem
@@ -178,8 +178,8 @@ export default function AddButton({ researcherId, studies, setParticipants, setD
               setAddParticipantStudy(true)
             }}
           >
-            <Typography variant="h6">{t("Add a new patient and study.")}</Typography>
-            <Typography variant="body2">{t("Create a patient under their own study.")}</Typography>
+            <Typography variant="h6">{`${t("Add a new patient and study.")}`}</Typography>
+            <Typography variant="body2">{`${t("Create a patient under their own study.")}`}</Typography>
           </MenuItem>
         </React.Fragment>
       </Popover>
