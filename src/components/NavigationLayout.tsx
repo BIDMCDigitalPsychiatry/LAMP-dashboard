@@ -107,7 +107,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
       height: "100%",
-      /*overflowY: "scroll",*/
       overflowY: "auto",
       left: 0,
       top: 0,
@@ -379,14 +378,9 @@ export default function NavigationLayout({
                       horizontal: "left",
                     }}
                   >
-                    {/* <MenuItem>
-                    <Typography variant="h6">{`${t("Manage team")}</Typography>
-                    <Typography variant="body2">{`${t("Edit your access for your team.")}</Typography>
-                  </MenuItem> */}
                     {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{`${t("Manage Credentials")}`}</MenuItem>
                     )}
-                    {/* <MenuItem>{`${t("Switch accounts")}`}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
                     </MenuItem>
@@ -442,20 +436,6 @@ export default function NavigationLayout({
             >
               {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
                 <Container className={classes.thumbContainer}>
-                  {/* <IconButton
-                    onClick={goBack}
-                    color="default"
-                    className={classes.backbtn}
-                    aria-label="Menu"
-                    style={{
-                      marginLeft:
-                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
-                    }}
-                  >
-                    <Icon>arrow_back</Icon>
-                  </IconButton> */}
-
-                  {/* {sameLineTitle && ( */}
                   <Typography
                     variant="h5"
                     style={{
@@ -463,9 +443,8 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {`${t(activeTab)}`}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
-                  {/* )} */}
                 </Container>
               )}
               {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
@@ -478,7 +457,7 @@ export default function NavigationLayout({
                         supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                     }}
                   >
-                    {`${t(activeTab)}`}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
                 </Container>
               )}
@@ -514,7 +493,6 @@ export default function NavigationLayout({
                       onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                       color="default"
                     >
-                      {/* <User /> */}
                       <Icon>account_circle</Icon>
                     </IconButton>
                   </Tooltip>

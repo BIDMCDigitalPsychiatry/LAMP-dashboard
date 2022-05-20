@@ -126,7 +126,7 @@ export default function DataPortalHome({ token, onLogout, ...props }) {
         >
           <Grid container className={classes.treeColumn} direction={"column"} item xs={3} lg={2}>
             <SelectionWindow
-              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor} ? "GUI" : "Terminal")`}
+              openButtonText={`Change Viewing Mode (Currently ${isGUIEditor ? "GUI" : "Terminal"})`}
               displaySubmitButton={true}
               handleResult={() => {
                 toggleEditorStyle(!viewModeSwitch)
