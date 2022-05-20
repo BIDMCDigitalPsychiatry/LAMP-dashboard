@@ -116,7 +116,8 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
           { value: "view", label: "Practice Lead" },
         ]
 
-  const handleSubmit = () =>
+  const handleSubmit = (event: any) => {
+    event.preventDefault()
     onSubmit({
       credential,
       photo,
@@ -125,6 +126,7 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
       emailAddress,
       password,
     })
+  }
 
   useEffect(() => {
     ;(async () => {
@@ -262,6 +264,7 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
               helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
+              style={{ marginBottom: 16 }}
             />
           </>
         )}
@@ -281,11 +284,9 @@ export function CredentialEditor({ credential, auxData, mode, onSubmit, title, p
             </Tooltip>
           </Grid>
         )}
-        {
-          <Button variant="contained" color="primary" type="submit">
-            Save
-          </Button>
-        }
+        <Button variant="contained" color="primary" type="submit">
+          {t("Save")}
+        </Button>
       </Grid>
     </form>
   )
@@ -600,7 +601,7 @@ export const CredentialManager: React.FunctionComponent<{
           credential={selected.credential}
           auxData={allRoles[(selected.credential || {}).access_key] || {}}
           mode={selected.mode}
-          onChange={(data) => _submitCredential(data)}
+          onSubmit={(data) => _submitCredential(data)}
           title={type ?? null}
           permissions={permissions}
         />
