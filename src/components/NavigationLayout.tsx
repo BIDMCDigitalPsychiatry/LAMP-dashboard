@@ -107,7 +107,6 @@ const useStyles = makeStyles((theme: Theme) =>
       position: "absolute",
       width: "100%",
       height: "100%",
-      /*overflowY: "scroll",*/
       overflowY: "auto",
       left: 0,
       top: 0,
@@ -379,14 +378,9 @@ export default function NavigationLayout({
                       horizontal: "left",
                     }}
                   >
-                    {/* <MenuItem>
-                    <Typography variant="h6">{`${t("Manage team")}</Typography>
-                    <Typography variant="body2">{`${t("Edit your access for your team.")}</Typography>
-                  </MenuItem> */}
                     {authType === "admin" && (title === "Administrator" || title === "User Administrator") && (
                       <MenuItem onClick={() => setPasswordChange(true)}>{`${t("Manage Credentials")}`}</MenuItem>
                     )}
-                    {/* <MenuItem>{`${t("Switch accounts")}`}</MenuItem> */}
                     <MenuItem divider onClick={() => setConfirmLogout(true)}>
                       {`${t("Logout")}`}
                     </MenuItem>
@@ -449,10 +443,8 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {console.log(typeof activeTab === "string", activeTab, parseInt(activeTab))}
                     {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
-                  {/* )} */}
                 </Container>
               )}
               {((authType !== "admin" && !sameLineTitle && activeTab !== "Studies") || title.startsWith("Patient")) && (
@@ -501,7 +493,6 @@ export default function NavigationLayout({
                       onClick={(event) => setShowCustomizeMenu(event.currentTarget)}
                       color="default"
                     >
-                      {/* <User /> */}
                       <Icon>account_circle</Icon>
                     </IconButton>
                   </Tooltip>
