@@ -222,7 +222,7 @@ export default function EmbeddedActivity({ participant, activity, name, onComple
             }}
             color="primary"
           >
-            {t("Ok")}
+            {`${t("Ok")}`}
           </Button>
         </DialogActions>
       </Dialog>

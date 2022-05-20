@@ -442,20 +442,6 @@ export default function NavigationLayout({
             >
               {((authType !== "admin" && dashboardMenus.indexOf(activeTab) < 0) || title.startsWith("Patient")) && (
                 <Container className={classes.thumbContainer}>
-                  {/* <IconButton
-                    onClick={goBack}
-                    color="default"
-                    className={classes.backbtn}
-                    aria-label="Menu"
-                    style={{
-                      marginLeft:
-                        supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
-                    }}
-                  >
-                    <Icon>arrow_back</Icon>
-                  </IconButton> */}
-
-                  {/* {sameLineTitle && ( */}
                   <Typography
                     variant="h5"
                     style={{
@@ -463,7 +449,8 @@ export default function NavigationLayout({
                       textTransform: "capitalize",
                     }}
                   >
-                    {`${t(activeTab)}`}
+                    {console.log(typeof activeTab === "string", activeTab, parseInt(activeTab))}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
                   {/* )} */}
                 </Container>
@@ -478,7 +465,7 @@ export default function NavigationLayout({
                         supportsSidebar && typeof title != "undefined" && title.startsWith("Patient") ? 0 : undefined,
                     }}
                   >
-                    {`${t(activeTab)}`}
+                    {typeof activeTab === "string" ? `${t(activeTab)}` : ""}
                   </Typography>
                 </Container>
               )}
