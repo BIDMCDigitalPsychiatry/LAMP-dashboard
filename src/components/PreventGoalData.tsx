@@ -99,11 +99,11 @@ export default function GoalEntries({ ...props }) {
         </Box>
         <Box display="flex" py={5} className={classes.streakDetails}>
           <Box flexShrink={1}>
-            <Typography variant="h6">{t("Current streak:")}</Typography>
+            <Typography variant="h6">{`${t("Current streak:")}`}</Typography>
           </Box>
           <Box width="100%" pl={1}>
             <Typography variant="h5" color="primary">
-              {streak} {t("days")}
+              {streak} {`${t("days")}`}
             </Typography>
           </Box>
         </Box>

@@ -83,7 +83,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
     <Box>
       <Box display="flex" className={classes.header}>
         <Box flexGrow={1} pt={1}>
-          <Typography variant="h5">{t("Studies")}</Typography>
+          <Typography variant="h5">{`${t("Studies")}`}</Typography>
         </Box>
         <Box>
           <SearchBox searchData={searchData} />
@@ -95,7 +95,7 @@ export default function Header({ studies, researcherId, searchData, setParticipa
             classes={{ root: classes.btnBlue + " " + (!!popover ? classes.popexpand : "") }}
             onClick={(event) => setPopover(event.currentTarget)}
           >
-            <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+            <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
           </Fab>
         </Box>
         <Popover
@@ -120,8 +120,8 @@ export default function Header({ studies, researcherId, searchData, setParticipa
                 setAddParticipantStudy(true)
               }}
             >
-              <Typography variant="h6">{t("Add a new study")}</Typography>
-              <Typography variant="body2">{t("Create a new study.")}</Typography>
+              <Typography variant="h6">{`${t("Add a new study")}`}</Typography>
+              <Typography variant="body2">{`${t("Create a new study.")}`}</Typography>
             </MenuItem>
           </React.Fragment>
         </Popover>

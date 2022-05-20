@@ -1,16 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react"
-import {
-  Grid,
-  ButtonBase,
-  Icon,
-  TextField,
-  Tooltip,
-  Box,
-  MenuItem,
-  Select,
-  OutlinedInput,
-  Divider,
-} from "@material-ui/core"
+import { Grid, ButtonBase, Icon, TextField, Tooltip, Box, MenuItem } from "@material-ui/core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
 import { useDropzone } from "react-dropzone"
@@ -85,9 +74,9 @@ export default function ActivityHeader({
     }, []),
     onDropRejected: useCallback((rejectedFiles) => {
       if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+        enqueueSnackbar(`${t("Image size should not exceed 5 MB.")}`, { variant: "error" })
       } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+        enqueueSnackbar(`${t("Not supported image type.")}`, { variant: "error" })
       }
     }, []),
     accept: "image/*",
@@ -100,8 +89,8 @@ export default function ActivityHeader({
         <Tooltip
           title={
             !photo
-              ? t("Drag a photo or tap to select a photo.")
-              : t("Drag a photo to replace the existing photo or tap to delete the photo.")
+              ? `${t("Drag a photo or tap to select a photo.")}`
+              : `${t("Drag a photo to replace the existing photo or tap to delete the photo.")}`
           }
         >
           <Box
@@ -131,13 +120,15 @@ export default function ActivityHeader({
               error={typeof studyId == "undefined" || studyId === null || studyId === "" ? true : false}
               id="filled-select-currency"
               select
-              label={t("Study")}
+              label={`${t("Study")}`}
               value={studyId}
               onChange={(e) => {
                 setStudyId(e.target.value)
               }}
               helperText={
-                typeof studyId == "undefined" || studyId === null || studyId === "" ? t("Please select the Study") : ""
+                typeof studyId == "undefined" || studyId === null || studyId === ""
+                  ? `${t("Please select the Study")}`
+                  : ""
               }
               variant="filled"
               disabled={!!value ? true : false}
@@ -154,7 +145,7 @@ export default function ActivityHeader({
               error={typeof text === "undefined" || (typeof text !== "undefined" && text?.trim() === "") ? true : false}
               fullWidth
               variant="filled"
-              label={t("Activity Title")}
+              label={`${t("Activity Title")}`}
               defaultValue={text}
               onChange={(event) => setText(removeExtraSpace(event.target.value))}
               inputProps={{ maxLength: 80 }}
@@ -166,7 +157,7 @@ export default function ActivityHeader({
           <TextField
             fullWidth
             multiline
-            label={t("Activity Description")}
+            label={`${t("Activity Description")}`}
             variant="filled"
             rows={2}
             defaultValue={description}

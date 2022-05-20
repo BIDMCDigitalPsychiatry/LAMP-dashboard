@@ -91,10 +91,12 @@ export function getTimeAgo(language) {
 }
 
 const daysSinceLast = (passive, timeAgo, t) => ({
-  gpsString: passive?.gps?.timestamp ? timeAgo.format(new Date(((passive || {}).gps || {}).timestamp)) : t("Never"),
+  gpsString: passive?.gps?.timestamp
+    ? timeAgo.format(new Date(((passive || {}).gps || {}).timestamp))
+    : `${t("Never")}`,
   accelString: passive?.accel?.timestamp
     ? timeAgo.format(new Date(((passive || {}).accel || {}).timestamp))
-    : t("Never"),
+    : `${t("Never")}`,
   gps:
     (new Date().getTime() - new Date(parseInt(((passive || {}).gps || {}).timestamp)).getTime()) / (1000 * 3600 * 24),
   accel:
@@ -103,9 +105,9 @@ const daysSinceLast = (passive, timeAgo, t) => ({
 
 export const dataQuality = (passive, timeAgo, t, classes) => ({
   title:
-    t("GPS") +
+    `${t("GPS.")}` +
     `: ${daysSinceLast(passive, timeAgo, t).gpsString}, ` +
-    t("Accelerometer") +
+    `${t("Accelerometer.")}` +
     `: ${daysSinceLast(passive, timeAgo, t).accelString}`,
   class:
     daysSinceLast(passive, timeAgo, t).gps <= 2 && daysSinceLast(passive, timeAgo, t).accel <= 2
@@ -270,7 +272,7 @@ export default function ParticipantList({
             <Box className={classes.norecordsmain}>
               <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
                 <Icon>info</Icon>
-                {t("No Records Found")}
+                {`${t("No Records Found")}`}
               </Box>
             </Box>
           )}

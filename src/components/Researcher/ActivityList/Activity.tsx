@@ -164,13 +164,13 @@ export default function Activity({
         ? await saveTipActivity(x)
         : await saveCTestActivity(x)
     if (!!newItem.error)
-      enqueueSnackbar(t("Failed to create a new Activity."), {
+      enqueueSnackbar(`${t("Failed to create a new Activity.")}`, {
         variant: "error",
       })
     else {
       x["id"] = newItem["data"]
       updateDb(x)
-      enqueueSnackbar(t("Successfully created a new Activity."), {
+      enqueueSnackbar(`${t("Successfully created a new Activity.")}`, {
         variant: "success",
       })
       history.back()
@@ -187,14 +187,14 @@ export default function Activity({
     setLoading(true)
     let result = await updateActivityData(x, isDuplicated, activity)
     if (!!result.error)
-      enqueueSnackbar(t("Encountered an error: ") + result?.error, {
+      enqueueSnackbar(`${t("Encountered an error: .")}` + result?.error, {
         variant: "error",
       })
     else {
       if (isDuplicated || (!x.id && x.name)) {
         x["id"] = result.data
         addActivity(x, studies)
-        enqueueSnackbar(t("Successfully duplicated the Activity."), {
+        enqueueSnackbar(`${t("Successfully duplicated the Activity.")}`, {
           variant: "success",
         })
         history.back()
@@ -203,7 +203,7 @@ export default function Activity({
         x["study_name"] = studies.filter((study) => study.id === x.studyID)[0]?.name
         delete x["studyID"]
         Service.updateMultipleKeys("activities", { activities: [x] }, Object.keys(x), "id")
-        enqueueSnackbar(t("Successfully updated the Activity."), {
+        enqueueSnackbar(`${t("Successfully updated the Activity.")}`, {
           variant: "success",
         })
         history.back()
@@ -231,7 +231,7 @@ export default function Activity({
                 <Icon>arrow_back</Icon>
               </Link>
               <Typography variant="h5">
-                {!!type ? t("Create a new activity") : t("Modify an existing activity")}
+                {!!type ? `${t("Create a new activity")}` : `${t("Modify an existing activity")}`}
               </Typography>
             </Toolbar>
           </AppBar>

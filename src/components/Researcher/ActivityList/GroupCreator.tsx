@@ -52,7 +52,9 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
         <Box ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <Tooltip
             enterDelay={1000}
-            title={t("Drag the handle on the left to change the order in which this Activity appears in the group.")}
+            title={`${t(
+              "Drag the handle on the left to change the order in which this Activity appears in the group."
+            )}`}
           >
             <ButtonGroup style={{ background: "#fff", marginBottom: 8 }}>
               <Button disabled variant="outlined" color={_selected?.name ? "primary" : "secondary"}>
@@ -63,7 +65,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
                 color={_selected?.name ? "primary" : "secondary"}
                 onClick={(e) => setAnchorEl(e.currentTarget)}
               >
-                {t(_selected?.name ?? "No selection")}
+                {`${t(_selected?.name ?? "No selection")}`}
               </Button>
 
               <Button
@@ -83,7 +85,7 @@ function ActivitySelector({ activities, selected, onSave, onDelete, index, ...pr
                   setSelected(activity)
                 }}
               >
-                {t(activity.name)}
+                {`${t(activity.name)}`}
               </MenuItem>
             ))}
           </Menu>
@@ -199,7 +201,7 @@ export default function GroupCreator({
             <Divider />
           </Box>
           <Grid item xs={12}>
-            <Typography variant="h6">{t("Configure activities and options.")}</Typography>
+            <Typography variant="h6">{`${t("Configure activities and options.")}`}</Typography>
           </Grid>
           <Grid item>
             <DragDropContext onDragEnd={onDragEnd}>
@@ -249,7 +251,7 @@ export default function GroupCreator({
                 onClick={() => setItems((items) => [...items, null])}
                 disabled={!data.studyID || studyActivities.length === 0}
               >
-                {t("Add Activity")}
+                {`${t("Add Activity")}`}
               </Button>
             </ButtonGroup>
           </Grid>

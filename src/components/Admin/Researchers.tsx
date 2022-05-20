@@ -5,7 +5,7 @@ import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
 import { CredentialManager } from "../CredentialManager"
 import { useTranslation } from "react-i18next"
-import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import { MuiThemeProvider, makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import Pagination from "../PaginatedElement"
 import ResearcherRow from "./ResearcherRow"
@@ -256,7 +256,7 @@ export default function Researchers({ history, updateStore, adminType, ...props 
             <Grid item lg={6} xs={12}>
               <Box display="flex" alignItems="center" className={classes.norecords}>
                 <Icon>info</Icon>
-                {t("No Records Found")}
+                {`${t("No Records Found")}`}
               </Box>
             </Grid>
           )}

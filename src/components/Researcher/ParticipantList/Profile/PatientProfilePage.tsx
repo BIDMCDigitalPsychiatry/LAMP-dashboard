@@ -156,7 +156,7 @@ export default function PatientProfile({
 
   const updateName = () => {
     LAMP.Type.setAttachment(participantId, "me", "lamp.name", nickname ?? null)
-    enqueueSnackbar(t("Successfully updated user profile."), {
+    enqueueSnackbar(`${t("Successfully updated user profile.")}`, {
       variant: "success",
     })
     Service.update("participants", { participants: [{ name: nickname ?? null, id: participantId }] }, "name", "id")
@@ -171,7 +171,7 @@ export default function PatientProfile({
             <Icon>arrow_back</Icon>
           </Link>
           <Typography variant="h5">
-            {t("Profile")} {participant?.id ?? ""}
+            {`${t("Profile")}`} {participant?.id ?? ""}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -179,17 +179,17 @@ export default function PatientProfile({
       <Box py={8} px={4}>
         <Container className={classes.containerWidth}>
           <Button className={classes.headerButton} onClick={() => updateName()}>
-            <Typography className={classes.buttonText}>{t("Save")}</Typography>
+            <Typography className={classes.buttonText}>{`${t("Save")}`}</Typography>
           </Button>
 
           <Grid container spacing={0}>
             <Box mb={4} width={1}>
-              <Grid container direction="row" justify="space-between" alignItems="center">
+              <Grid container direction="row" justifyContent="space-between" alignItems="center">
                 <Grid item lg={6}>
                   <Box>
                     <TextField
                       fullWidth
-                      label={t("Nickname(optional)")}
+                      label={`${t("Nickname(optional)")}`}
                       variant="filled"
                       value={nickname}
                       defaultValue={nickname}
@@ -209,11 +209,11 @@ export default function PatientProfile({
             {!!participant && <Sensors participant={participant} studies={studies} />}
             <div className={classes.buttonsContainer}>
               <Button className={classes.buttonContainer} onClick={() => updateName()}>
-                <Typography className={classes.buttonText}>{t("Save")}</Typography>
+                <Typography className={classes.buttonText}>{`${t("Save")}`}</Typography>
               </Button>
               <Button className={classes.backContainer}>
                 {/* onClick={() => onClose(nickname ?? "")} */}
-                <Typography className={classes.backText}>{t("Cancel")}</Typography>
+                <Typography className={classes.backText}>{`${t("Cancel")}`}</Typography>
               </Button>
             </div>
           </Grid>

@@ -63,7 +63,7 @@ export default function PreventSelectedExperimental({
             <Typography component="h6" variant="h6">
               {x}
             </Typography>
-            <Grid container justify="center">
+            <Grid container justifyContent="center">
               {typeof visualizations["lamp.dashboard.experimental." + x] === "object" &&
               visualizations["lamp.dashboard.experimental." + x] !== null ? (
                 <Box className={classes.vega}>

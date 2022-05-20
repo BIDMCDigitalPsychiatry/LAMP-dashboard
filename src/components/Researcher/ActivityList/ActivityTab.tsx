@@ -93,7 +93,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
                 color="primary"
               />
             }
-            label={t("Customize which Tab this Activity appears in")}
+            label={`${t("Customize which Tab this Activity appears in")}`}
           />
         </Grid>
         <Grid item lg={6} sm={6} xs={12}>
@@ -120,7 +120,7 @@ export default function ActivityTab({ value, activitySpecId, onChange, ...props 
           </Select>
           {(category || []).length === 0 && (
             <Typography variant="caption">
-              {t("This Activity will only appear in the Feed tab if a schedule is configured.")}
+              {`${t("This Activity will only appear in the Feed tab if a schedule is configured.")}`}
             </Typography>
           )}
         </Grid>

@@ -3,7 +3,6 @@ import { Box, Icon, Fab, makeStyles, Theme, createStyles } from "@material-ui/co
 import LAMP from "lamp-core"
 import { useSnackbar } from "notistack"
 import { useTranslation } from "react-i18next"
-import ResponsiveDialog from "../../ResponsiveDialog"
 import ConfirmationDialog from "../../ConfirmationDialog"
 import { Service } from "../../DBService/DBService"
 
@@ -52,7 +51,7 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
       }
       await Service.delete("participants", participantIds)
       setParticipants()
-      enqueueSnackbar(t("Successfully deleted the selected participants."), {
+      enqueueSnackbar(`${t("Successfully deleted the selected participants.")}`, {
         variant: "success",
       })
     }
@@ -66,14 +65,14 @@ export default function DeleteParticipant({ participants, setParticipants, ...pr
         classes={{ root: classes.btnText }}
         onClick={(event) => setConfirmationDialog(7)}
       >
-        <Icon>delete_outline</Icon> {t("Delete")}
+        <Icon>delete_outline</Icon> {`${t("Delete")}`}
       </Fab>
       <ConfirmationDialog
         confirmationDialog={confirmationDialog}
         open={confirmationDialog > 0 ? true : false}
         onClose={() => setConfirmationDialog(0)}
         confirmAction={deleteParticipants}
-        confirmationMsg={"Are you sure you want to delete this Participant?"}
+        confirmationMsg={`${t("Are you sure you want to delete this Participant?")}`}
       />
     </span>
   )

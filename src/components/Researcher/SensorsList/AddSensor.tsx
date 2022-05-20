@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Box, Fab, Icon, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core"
+import { Box, Fab, Icon, makeStyles, createStyles } from "@material-ui/core"
 import LAMP from "lamp-core"
 import { useTranslation } from "react-i18next"
 import { Service } from "../../DBService/DBService"
@@ -78,7 +78,7 @@ export default function AddSensor({
   return (
     <Box>
       <Fab variant="extended" color="primary" classes={{ root: classes.btnBlue }} onClick={() => setSensorDialog(true)}>
-        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+        <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
       </Fab>
       <SensorDialog
         studies={studies}

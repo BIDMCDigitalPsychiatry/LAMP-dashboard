@@ -43,12 +43,12 @@ export default function DeleteResearcher({
             LAMP.Credential.delete(researcher.id, each["access_key"])
           })
         })
-        enqueueSnackbar(t("Successfully deleted the investigator."), {
+        enqueueSnackbar(`${t("Successfully deleted the investigator.")}`, {
           variant: "success",
         })
         refreshResearchers()
       } else {
-        enqueueSnackbar(t("Failed to delete the investigator."), {
+        enqueueSnackbar(`${t("Failed to delete the investigator.")}`, {
           variant: "error",
         })
       }

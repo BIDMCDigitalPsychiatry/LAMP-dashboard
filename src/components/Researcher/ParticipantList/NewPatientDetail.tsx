@@ -24,9 +24,12 @@ export default function NewPatientDetail({ id, ...props }: { id: string }) {
     <React.Fragment>
       {!shown &&
         enqueueSnackbar(
-          t("Successfully created Participant id. Tap the expand icon on the right to see credentials and details.", {
-            id: id,
-          }),
+          `${t(
+            "Successfully created Participant id. Tap the expand icon on the right to see credentials and details.",
+            {
+              id: id,
+            }
+          )}`,
           {
             variant: "success",
             persist: true,
@@ -35,22 +38,24 @@ export default function NewPatientDetail({ id, ...props }: { id: string }) {
                 <TextField
                   variant="outlined"
                   size="small"
-                  label={t("Temporary email address")}
+                  label={`${t("Temporary email address")}`}
                   value={`${id}@lamp.com`}
                 />
                 <Box style={{ height: 16 }} />
-                <TextField variant="outlined" size="small" label={t("Temporary password")} value={`${id}`} />
+                <TextField variant="outlined" size="small" label={`${t("Temporary password")}`} value={`${id}`} />
                 <Grid item>
                   <TextField
                     fullWidth
-                    label={t("One-time login link")}
+                    label={`${t("One-time login link")}`}
                     style={{ marginTop: 16 }}
                     variant="outlined"
                     value={_qrLink(`${id}@lamp.com`, id)}
                     onChange={(event) => {}}
                   />
-                  <Tooltip title={t("Scan this QR code on a mobile device to automatically open a user dashboard.")}>
-                    <Grid container justify="center" style={{ padding: 16 }}>
+                  <Tooltip
+                    title={`${t("Scan this QR code on a mobile device to automatically open a user dashboard.")}`}
+                  >
+                    <Grid container justifyContent="center" style={{ padding: 16 }}>
                       <QRCode size={256} level="H" value={_qrLink(`${id}@lamp.com`, id)} />
                     </Grid>
                   </Tooltip>

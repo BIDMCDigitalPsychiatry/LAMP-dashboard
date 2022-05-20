@@ -14,7 +14,6 @@ import {
 import { useTranslation } from "react-i18next"
 import LAMP from "lamp-core"
 import { sensorEventUpdate } from "./BottomMenu"
-
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     backdrop: {

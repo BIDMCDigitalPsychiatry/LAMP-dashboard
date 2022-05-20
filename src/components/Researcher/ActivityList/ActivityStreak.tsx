@@ -37,7 +37,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
 
   return (
     <Grid item lg={12} md={9} xs={12}>
-      <Typography variant="h6">{t("Streak popup settings")}</Typography>
+      <Typography variant="h6">{`${t("Streak popup settings")}`}</Typography>
       <Divider classes={{ root: classes.dividerRoot }} />
       <Grid container spacing={2}>
         <Grid item alignItems="center" lg={3} sm={3} xs={12} className={classes.gridFlex}>
@@ -49,7 +49,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
         <Grid item lg={9} sm={9} xs={12}>
           <TextField
             fullWidth
-            label={t("Streak title")}
+            label={`${t("Streak title")}`}
             variant="filled"
             defaultValue={streakTitle}
             disabled={!streak}
@@ -61,7 +61,7 @@ export default function ActivityStreak({ value, onChange, ...props }) {
           <TextField
             fullWidth
             multiline
-            label={t("Streak Description")}
+            label={`${t("Streak Description")}`}
             variant="filled"
             rows={2}
             disabled={!streak}

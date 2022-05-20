@@ -114,7 +114,7 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...p
       <div style={{ width: "100%" }} className={classes.skillsContainer}>
         <Box sx={{ display: "flex" }}>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h5">{t("Optional notes:")}</Typography>
+            <Typography variant="h5">{`${t("Optional notes:")}`}</Typography>
           </Box>
           <Box>
             <Typography variant="h5"></Typography>
@@ -151,7 +151,7 @@ export default function PreventNotes({ selectedEvents, dateArray, dbtRange, ...p
         </Box>
       ) : (
         <Box className={classes.fullWidth}>
-          <Typography variant="subtitle1">{t("No notes added")}</Typography>
+          <Typography variant="subtitle1">{`${t("No notes added")}`}</Typography>
         </Box>
       )}
     </Box>

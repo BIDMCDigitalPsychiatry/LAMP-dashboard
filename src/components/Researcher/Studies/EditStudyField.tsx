@@ -49,10 +49,10 @@ export default function EditStudyField({
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to load study's alias: errorMessage", {
+          `${t("Failed to load study's alias: errorMessage", {
             alias: study,
             errorMessage: err.message,
-          }),
+          })}`,
           { variant: "error" }
         )
       )
@@ -79,16 +79,16 @@ export default function EditStudyField({
         selectedStudies[index] = aliasStudyName
         localStorage.setItem("studies_" + researcherId, JSON.stringify(selectedStudies))
         updateName(aliasStudyName === "" ? studyName : aliasStudyName)
-        enqueueSnackbar(t("Study name updated"), {
+        enqueueSnackbar(`${t("Study name updated")}`, {
           variant: "success",
         })
         callbackModal()
       })
       .catch((err) =>
         enqueueSnackbar(
-          t("Failed to change study name : errorMessage", {
+          `${t("Failed to change study name : errorMessage", {
             errorMessage: err.message,
-          }),
+          })}`,
           { variant: "error" }
         )
       ) //}
@@ -139,17 +139,17 @@ export default function EditStudyField({
     let status = true
     if (studyDuplicateCount > 0) {
       enqueueSnackbar(
-        t("Failed to change participantId's alias: Study name already exist", {
+        `${t("Failed to change participantId's alias: Study name already exist", {
           participantId: study,
-        }),
+        })}`,
         { variant: "error" }
       )
       status = false
     } else if (val?.trim().length === 0) {
       enqueueSnackbar(
-        t("Failed to change participantId's alias: Study name required", {
+        `${t("Failed to change participantId's alias: Study name required", {
           participantId: study,
-        }),
+        })}`,
         { variant: "error" }
       )
       status = false
@@ -164,8 +164,8 @@ export default function EditStudyField({
           inputRef={inputRef}
           variant="outlined"
           margin="dense"
-          label={t(studyName)}
-          value={t(aliasStudyName) || ""}
+          label={`${t(studyName)}`}
+          value={`${t(aliasStudyName)}` || ""}
           onChange={(event) => {
             setAliasStudyName(event.target.value)
           }}
@@ -179,7 +179,7 @@ export default function EditStudyField({
             style: { color: "#000" },
             endAdornment: (
               <InputAdornment position="end">
-                <Tooltip title={t("Update Study name. Saving an empty text box will reset this value.")}>
+                <Tooltip title={`${t("Update Study name. Saving an empty text box will reset this value.")}`}>
                   <IconButton
                     edge="end"
                     aria-label="save edit"
@@ -196,7 +196,7 @@ export default function EditStudyField({
           }}
         />
       ) : aliasStudyName ? (
-        t(aliasStudyName)
+        `${t(aliasStudyName)}`
       ) : (
         study
       )}

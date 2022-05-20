@@ -39,7 +39,7 @@ export default function Passive({ participant, ...props }) {
   return (
     <Tooltip title={dataQuality(passive, timeAgo, t, classes).title}>
       <Chip
-        label={t("Last Passive")}
+        label={`${t("Last Passive")}`}
         className={classes.dataQuality + " " + dataQuality(passive, timeAgo, t, classes).class}
       />
     </Tooltip>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { HashRouter, Route, Redirect, Switch, useLocation } from "react-router-dom"
-import { CssBaseline, Button, ThemeProvider, createMuiTheme, colors, Container } from "@material-ui/core"
+import { CssBaseline, Button, ThemeProvider, colors, Container } from "@material-ui/core"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import { createTheme } from "@material-ui/core/styles"
 import { SnackbarProvider, useSnackbar } from "notistack"
 import { ErrorBoundary } from "react-error-boundary"
 import StackTrace from "stacktrace-js"
@@ -70,7 +71,7 @@ function PageTitle({ children, ...props }) {
   useEffect(() => {
     document.title = `${typeof children === "string" ? children : ""}`
   })
-  return <React.Fragment />
+  return <React.Fragment>{null}</React.Fragment>
 }
 export const changeCase = (text) => {
   if (!!text) {
@@ -126,7 +127,7 @@ function AppRouter({ ...props }) {
     if (!!query && query.length > 1) {
       let src = Object.fromEntries(new URLSearchParams(query[1]))["src"]
       if (typeof src === "string" && src.length > 0) {
-        enqueueSnackbar(t("You're using the src server to log into mindLAMP.", { src: src }), { variant: "info" })
+        enqueueSnackbar(`${t("You're using the src server to log into mindLAMP.", { src: src })}`, { variant: "info" })
       }
       let values = Object.fromEntries(new URLSearchParams(query[1]))
       if (!!values["mode"]) {
@@ -152,12 +153,12 @@ function AppRouter({ ...props }) {
     }
     document.addEventListener("visibilitychange", function logData() {
       if (document.visibilityState === "hidden") {
-        sensorEventUpdate(null, LAMP.Auth._me.id, null)
+        sensorEventUpdate(null, (LAMP.Auth._me as any)?.id, null)
       } else {
         let hrefloc = window.location.href.split("/")[window.location.href.split("/").length - 1]
         hrefloc.split("?").length > 1
-          ? sensorEventUpdate(state.activeTab, LAMP.Auth._me.id, hrefloc.split("?")[0])
-          : sensorEventUpdate(hrefloc.split("?")[0], LAMP.Auth._me.id, null)
+          ? sensorEventUpdate(state.activeTab, (LAMP.Auth._me as any)?.id, hrefloc.split("?")[0])
+          : sensorEventUpdate(hrefloc.split("?")[0], (LAMP.Auth._me as any).id, null)
       }
     })
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
@@ -180,7 +181,7 @@ function AppRouter({ ...props }) {
       if (!!res.data) {
         let checked = false
         Object.keys(res.data).map((key) => {
-          if (res.data[key].hasOwnProperty(LAMP.Auth._auth.id)) {
+          if (res.data[key].hasOwnProperty((LAMP.Auth._auth as any).id)) {
             const id = Object.keys(res.data[key])[0]
             checked = true
             setState((state) => ({
@@ -207,16 +208,16 @@ function AppRouter({ ...props }) {
 
   useEffect(() => {
     if (!deferredPrompt) return
-    enqueueSnackbar(t("Add mindLAMP to your home screen?"), {
+    enqueueSnackbar(`${t("Add mindLAMP to your home screen?")}`, {
       variant: "info",
       persist: true,
       action: (key) => (
         <React.Fragment>
           <Button style={{ color: "#fff" }} onClick={promptInstall}>
-            {t("Install")}
+            {`${t("Install")}`}
           </Button>
           <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-            {t("Dismiss")}
+            {`${t("Dismiss")}`}
           </Button>
         </React.Fragment>
       ),
@@ -227,20 +228,20 @@ function AppRouter({ ...props }) {
     closeSnackbar("admin")
     if (!showDemoMessage) closeSnackbar("demo")
     if (!!state.identity && state.authType === "admin") {
-      enqueueSnackbar(t("Proceed with caution: you are logged in as the administrator."), {
+      enqueueSnackbar(`${t("Proceed with caution: you are logged in as the administrator.")}`, {
         key: "admin",
         variant: "info",
         persist: true,
         preventDuplicate: true,
         action: (key) => (
           <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-            {t("Dismiss")}
+            {`${t("Dismiss")}`}
           </Button>
         ),
       })
     } else if (showDemoMessage && state.auth?.serverAddress === "demo.lamp.digital") {
       enqueueSnackbar(
-        t("You're logged into a demo account. Any changes you make will be reset when you restart the app."),
+        `${t("You're logged into a demo account. Any changes you make will be reset when you restart the app.")}`,
         {
           key: "demo",
           variant: "info",
@@ -248,7 +249,7 @@ function AppRouter({ ...props }) {
           preventDuplicate: true,
           action: (key) => (
             <Button style={{ color: "#fff" }} onClick={() => closeSnackbar(key)}>
-              {t("Dismiss")}
+              {`${t("Dismiss")}`}
             </Button>
           ),
         }
@@ -258,8 +259,8 @@ function AppRouter({ ...props }) {
 
   let reset = async (identity?: any) => {
     if (typeof identity === "undefined" && LAMP.Auth._type === "participant") {
-      await sensorEventUpdate(null, state.identity?.id ?? null, null)
-      await LAMP.SensorEvent.create(state.identity?.id ?? null, {
+      await sensorEventUpdate(null, (state.identity as any)?.id ?? null, null)
+      await LAMP.SensorEvent.create((state.identity as any)?.id ?? null, {
         timestamp: Date.now(),
         sensor: "lamp.analytics",
         data: {
@@ -270,7 +271,7 @@ function AppRouter({ ...props }) {
       } as any).then((res) => console.dir(res))
     }
     await LAMP.Auth.set_identity(identity).catch((e) => {
-      enqueueSnackbar(t("Invalid id or password."), {
+      enqueueSnackbar(`${t("Invalid id or password.")}`, {
         variant: "error",
       })
       return
@@ -353,11 +354,11 @@ function AppRouter({ ...props }) {
     deferredPrompt.prompt()
     deferredPrompt.userChoice.then((c) => {
       if (c.outcome === "accepted") {
-        enqueueSnackbar(t("mindLAMP will be installed on your device."), {
+        enqueueSnackbar(`${t("mindLAMP will be installed on your device.")}`, {
           variant: "info",
         })
       } else {
-        enqueueSnackbar(t("mindLAMP will not be installed on your device."), {
+        enqueueSnackbar(`${t("mindLAMP will not be installed on your device.")}`, {
           variant: "warning",
         })
       }
@@ -384,7 +385,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -393,7 +394,7 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Messages")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Messages")}`}</PageTitle>
               <Messages
                 style={{ margin: "0px -16px -16px -16px" }}
                 refresh={true}
@@ -437,7 +438,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -457,7 +458,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -478,7 +479,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -498,7 +499,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -520,7 +521,7 @@ function AppRouter({ ...props }) {
           !(window.location.hash.split("?").length > 1 && !state.identity) ? (
             !state.identity ? (
               <React.Fragment>
-                <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+                <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
                 <Login
                   setIdentity={async (identity) => await reset(identity)}
                   lastDomain={state.lastDomain}
@@ -547,7 +548,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity || state.authType !== "admin" ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -556,7 +557,7 @@ function AppRouter({ ...props }) {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <PageTitle>{t("Administrator")}</PageTitle>
+              <PageTitle>{`${t("Administrator")}`}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
                 title={
@@ -581,7 +582,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -627,7 +628,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity || (state.authType !== "admin" && state.authType !== "researcher") ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -662,7 +663,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -673,7 +674,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <NavigationLayout
                 authType={state.authType}
                 id={props.match.params.id}
@@ -704,7 +705,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -715,7 +716,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <PreventPage
                 type="activity"
                 activityId={props.match.params.activityId}
@@ -732,7 +733,7 @@ function AppRouter({ ...props }) {
         render={(props) =>
           !state.identity ? (
             <React.Fragment>
-              <PageTitle>mindLAMP | {t("Login")}</PageTitle>
+              <PageTitle>mindLAMP | {`${t("Login")}`}</PageTitle>
               <Login
                 setIdentity={async (identity) => await reset(identity)}
                 lastDomain={state.lastDomain}
@@ -743,7 +744,7 @@ function AppRouter({ ...props }) {
             <React.Fragment />
           ) : (
             <React.Fragment>
-              <PageTitle>{t("Patient") + " " + getParticipant(props.match.params.id).id}</PageTitle>
+              <PageTitle>{`${t("Patient")}` + " " + getParticipant(props.match.params.id).id}</PageTitle>
               <PreventPage type="sensor" activityId={props.match.params.spec} participantId={props.match.params.id} />
             </React.Fragment>
           )
@@ -757,7 +758,7 @@ export default function App({ ...props }) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider
-        theme={createMuiTheme({
+        theme={createTheme({
           typography: {
             fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(","),
           },
@@ -830,7 +831,7 @@ export default function App({ ...props }) {
             opacity: 0.1,
           }}
         >
-          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})`}
+          {`v${process.env.REACT_APP_GIT_NUM} (${process.env.REACT_APP_GIT_SHA})}`}
         </span>
       </ThemeProvider>
     </ErrorBoundary>

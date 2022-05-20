@@ -11,14 +11,12 @@ import {
   useTheme,
 } from "@material-ui/core"
 
-import { useSnackbar } from "notistack"
 import LAMP from "lamp-core"
-import { CredentialManager } from "../CredentialManager"
 import { ResponsivePaper } from "../Utils"
 import { useTranslation } from "react-i18next"
 import { ReactComponent as Researcher } from "../../icons/Researcher.svg"
 import { ReactComponent as DataPortalIcon } from "../../icons/DataPortal.svg"
-import { MuiThemeProvider, makeStyles, Theme, createStyles, createMuiTheme } from "@material-ui/core/styles"
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles"
 import locale_lang from "../../locale_map.json"
 import { Service } from "../DBService/DBService"
 import Researchers from "./Researchers"
@@ -193,7 +191,7 @@ export default function Root({ updateStore, adminType, ...props }) {
                 <ListItemIcon className={classes.menuIcon}>
                   <Researcher />
                 </ListItemIcon>
-                <ListItemText primary={t("Investigators")} />
+                <ListItemText primary={`${t("Investigators")}`} />
               </ListItem>
               {adminType === "admin" && (
                 <ListItem

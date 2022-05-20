@@ -135,20 +135,20 @@ export default function AddActivity({
   const [loading, setLoading] = useState(true)
 
   const activitiesObj = {
-    "lamp.journal": t("Journal"),
-    "lamp.scratch_image": t("Scratch card"),
-    "lamp.breathe": t("Breathe"),
-    "lamp.tips": t("Tip"),
-    "lamp.dbt_diary_card": t("DBT Diary Card"),
-    "lamp.cats_and_dogs": t("Cats and Dogs"),
-    "lamp.jewels_a": t("Jewels A"),
-    "lamp.jewels_b": t("Jewels B"),
-    "lamp.spatial_span": t("Spatial Span"),
-    "lamp.pop_the_bubbles": t("Pop the bubbles"),
-    "lamp.balloon_risk": t("Balloon Risk"),
-    "lamp.recording": t("Voice Recording"),
-    "lamp.survey": t("Survey Instrument"),
-    "lamp.group": t("Activity Group"),
+    "lamp.journal": `${t("Journal")}`,
+    "lamp.scratch_image": `${t("Scratch card")}`,
+    "lamp.breathe": `${t("Breathe")}`,
+    "lamp.tips": `${t("Tip")}`,
+    "lamp.dbt_diary_card": `${t("DBT Diary Card")}`,
+    "lamp.cats_and_dogs": `${t("Cats and Dogs")}`,
+    "lamp.jewels_a": `${t("Jewels A")}`,
+    "lamp.jewels_b": `${t("Jewels B")}`,
+    "lamp.spatial_span": `${t("Spatial Span")}`,
+    "lamp.pop_the_bubbles": `${t("Pop the bubbles")}`,
+    "lamp.balloon_risk": `${t("Balloon Risk")}`,
+    "lamp.recording": `${t("Voice Recording")}`,
+    "lamp.survey": `${t("Survey Instrument")}`,
+    "lamp.group": `${t("Activity Group")}`,
   }
 
   const getActivitySpec = async (id) => {
@@ -194,7 +194,7 @@ export default function AddActivity({
         classes={{ root: classes.btnBlue + " " + (popover ? classes.popexpand : "") }}
         onClick={(event) => setPopover(event.currentTarget)}
       >
-        <Icon>add</Icon> <span className={classes.addText}>{t("Add")}</span>
+        <Icon>add</Icon> <span className={classes.addText}>{`${t("Add")}`}</span>
       </Fab>
       <Popover
         open={!!popover ? true : false}
@@ -224,14 +224,14 @@ export default function AddActivity({
                 <Icon>cloud_upload</Icon>
               </Grid>
               <Grid item xs={10}>
-                {t("Import activities")}
+                {`${t("Import activities")}`}
               </Grid>
             </Grid>
           </MenuItem>
           {activitySpecs.filter((x) => ["lamp.group", "lamp.survey"].includes(x.id)).length > 0 && (
             <React.Fragment>
               <MenuItem disabled divider>
-                <b>{t("Create a new...")}</b>
+                <b>{`${t("Create a new...")}`}</b>
               </MenuItem>
               {activitySpecs
                 .filter((x) => ["lamp.group", "lamp.survey"].includes(x.id))
@@ -240,14 +240,16 @@ export default function AddActivity({
                     href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
                     underline="none"
                   >
-                    {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
+                    {activitiesObj[x.id]
+                      ? `${t(activitiesObj[x.id])}`
+                      : `${t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}`}
                   </Link>
                 ))}
             </React.Fragment>
           )}
           {[
             <MenuItem divider key="head" disabled className={classes.borderTop}>
-              <b>{t("Smartphone Cognitive Tests")}</b>
+              <b>{`${t("Smartphone Cognitive Tests")}`}</b>
             </MenuItem>,
             ...activitySpecs
               .filter((x) => !["lamp.group", "lamp.survey"].includes(x.id))
@@ -256,7 +258,9 @@ export default function AddActivity({
                   href={`/#/researcher/${researcherId}/activity/add/${x?.id?.replace("lamp.", "")}`}
                   underline="none"
                 >
-                  {activitiesObj[x.id] ? t(activitiesObj[x.id]) : t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}
+                  {activitiesObj[x.id]
+                    ? `${t(activitiesObj[x.id])}`
+                    : `${t(x?.id?.replace("lamp.", "").replaceAll("_", " "))}`}
                 </Link>
               )),
           ]}

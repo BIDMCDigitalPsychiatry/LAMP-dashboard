@@ -218,7 +218,7 @@ export default function ActivityList({
             <Box className={classes.norecordsmain}>
               <Box display="flex" p={2} alignItems="center" className={classes.norecords}>
                 <Icon>info</Icon>
-                {t("No Records Found")}
+                {`${t("No Records Found")}`}
               </Box>
             </Box>
           )}

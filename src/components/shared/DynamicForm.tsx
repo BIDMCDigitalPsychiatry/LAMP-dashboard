@@ -1,11 +1,11 @@
 import React from "react"
-import { Grid, Button, Icon, createMuiTheme, MuiThemeProvider } from "@material-ui/core"
+import { Grid, Button, Icon, MuiThemeProvider } from "@material-ui/core"
 import { Autocomplete } from "@material-ui/lab"
 import Form, { Widgets } from "@rjsf/material-ui"
 import { ObjectFieldTemplateProps, utils } from "@rjsf/core"
 import { useTranslation } from "react-i18next"
 import CustomFileWidget from "./CustomFileWidget"
-
+import { createTheme } from "@material-ui/core/styles"
 // By customizing the ObjectFieldTemplate used by React-JSONSchema-Form, we add support for the new
 // "ui:grid" parameter, which allows customizing grid placement (flexbox) in Material-UI (containers and items).
 // Supported container props: alignContent, alignItems, direction, justify, spacing, wrap
@@ -46,7 +46,7 @@ const ObjectFieldTemplate = ({
           </Grid>
         ))}
         {utils.canExpand(schema, uiSchema, formData) && (
-          <Grid container justify="flex-end">
+          <Grid container justifyContent="flex-end">
             <Grid item={true}>
               <Button
                 className="object-property-expand"
@@ -65,7 +65,7 @@ const ObjectFieldTemplate = ({
 }
 
 // By default, the React-JSONSchema-Form does not link correctly to the main UI theme, so declare it here.
-const formTheme = createMuiTheme({
+const formTheme = createTheme({
   props: {
     MuiTextField: {
       variant: "filled",

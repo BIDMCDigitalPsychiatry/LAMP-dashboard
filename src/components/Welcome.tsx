@@ -8,11 +8,11 @@ export default function Welcome({ activities, onClose, ...props }) {
     <Container maxWidth="md">
       <Slide direction="left" in={checked === 0} mountOnEnter unmountOnExit>
         <Box p={4} my={4} width="100%">
-          <Typography variant="h1">{t("Welcome to mindLAMP!")} </Typography>
+          <Typography variant="h1">{`${t("Welcome to mindLAMP!")}`} </Typography>
           <Typography variant="h4">
-            {t(
+            {`${t(
               "With the mindLAMP smartphone app, you can collect information about your health. You can learn about symptoms, brain health, and check your thinking. You can also learn about your steps and sleep and how they may relate to how you feel. You can use mindLAMP as part of a research study, part of your care if a clinician ask you to try it, or on your own."
-            )}
+            )}`}
           </Typography>
           <br />
           <Fab color="primary" onClick={() => setChecked(1)}>
@@ -22,9 +22,9 @@ export default function Welcome({ activities, onClose, ...props }) {
       </Slide>
       <Slide direction="left" in={checked === 1} mountOnEnter unmountOnExit>
         <Box p={4} my={4} width="100%">
-          <Typography variant="h1">{t("Activities")} </Typography>
+          <Typography variant="h1">{`${t("Activities")}`} </Typography>
           <Typography variant="h4">
-            {t("Here are all the activities you'll receive notifications for when you use mindLAMP.")}
+            {`${t("Here are all the activities you'll receive notifications for when you use mindLAMP.")}`}
           </Typography>
           <br />
           <Grid container direction="row" spacing={4}>
@@ -53,8 +53,8 @@ export default function Welcome({ activities, onClose, ...props }) {
       </Slide>
       <Slide direction="left" in={checked === 2} mountOnEnter unmountOnExit>
         <Box p={4} my={4} width="100%">
-          <Typography variant="h1">{t("Let's go!")} </Typography>
-          <Typography variant="h4">{t("You're ready to start using mindLAMP.")}</Typography>
+          <Typography variant="h1">{`${t("Let's go!")}`} </Typography>
+          <Typography variant="h4">{`${t("You're ready to start using mindLAMP.")}`}</Typography>
           <br />
           <Fab color="primary" onClick={() => setChecked(1)}>
             <Icon>arrow_backward</Icon>

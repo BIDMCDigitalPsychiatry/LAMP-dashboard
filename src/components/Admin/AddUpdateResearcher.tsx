@@ -98,7 +98,7 @@ export default function AddUpdateResearcher({
         : x.name?.toLowerCase() === name?.trim().toLowerCase()
     )
     if (duplicates.length > 0) {
-      enqueueSnackbar("Investigator with same name already exist.", {
+      enqueueSnackbar(`${t("Investigator with same name already exist.")}`, {
         variant: "error",
       })
       setResearcherName(!!researcher ? researcher.name : "")
@@ -119,14 +119,16 @@ export default function AddUpdateResearcher({
           refreshResearchers()
         }
         enqueueSnackbar(
-          !!researcher ? t("Successfully updated a new investigator.") : t("Successfully created a new investigator."),
+          !!researcher
+            ? `${t("Successfully updated a new investigator.")}`
+            : `${t("Successfully created a new investigator.")}`,
           {
             variant: "success",
           }
         )
         setOpen(false)
       } else
-        enqueueSnackbar(t(`Failed to create a new investigator.`), {
+        enqueueSnackbar(`${t("Failed to create a new investigator.")}`, {
           variant: "error",
         })
     }
@@ -140,7 +142,7 @@ export default function AddUpdateResearcher({
         </Fab>
       ) : (
         <Fab variant="extended" classes={{ root: classes.btnBlue }} onClick={() => setOpen(true)}>
-          <Icon>add</Icon> {t("Add")}
+          <Icon>add</Icon> {`${t("Add")}`}
         </Fab>
       )}
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="form-dialog-title">
@@ -149,11 +151,13 @@ export default function AddUpdateResearcher({
             autoFocus
             margin="dense"
             id="name"
-            label={t("Name")}
+            label={`${t("Name")}`}
             fullWidth
             onChange={(event) => setResearcherName(event.target.value)}
             value={name}
-            helperText={typeof name == "undefined" || name === null || name.trim() === "" ? t("Please enter name") : ""}
+            helperText={
+              typeof name == "undefined" || name === null || name.trim() === "" ? `${t("Please enter name")}` : ""
+            }
           />
         </DialogContent>
         <DialogActions>
@@ -164,14 +168,14 @@ export default function AddUpdateResearcher({
             }}
             color="primary"
           >
-            {t("Cancel")}
+            {`${t("Cancel")}`}
           </Button>
           <Button
             onClick={() => addResearcher()}
             color="primary"
             disabled={typeof name == "undefined" || name === null || name.trim() === "" ? true : false}
           >
-            {!!researcher ? t("Update") : t("Add")}
+            {!!researcher ? `${t("Update")}` : `${t("Add")}`}
           </Button>
         </DialogActions>
       </Dialog>

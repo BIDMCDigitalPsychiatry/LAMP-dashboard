@@ -83,9 +83,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
     }, []),
     onDropRejected: useCallback((rejectedFiles) => {
       if (rejectedFiles[0].size / 1024 / 1024 > 5) {
-        enqueueSnackbar(t("Image size should not exceed 5 MB."), { variant: "error" })
+        enqueueSnackbar(`${t("Image size should not exceed 5 MB.")}`, { variant: "error" })
       } else if ("image" !== rejectedFiles[0].type.split("/")[0]) {
-        enqueueSnackbar(t("Not supported image type."), { variant: "error" })
+        enqueueSnackbar(`${t("Not supported image type.")}`, { variant: "error" })
       }
     }, []),
     accept: "image/*",
@@ -121,13 +121,13 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
   }, [password])
 
   return (
-    <Grid container justify="center" alignItems="center">
+    <Grid container justifyContent="center" alignItems="center">
       {["create-new", "change-role", "update-profile"].includes(mode) && (
         <Tooltip
           title={
             !photo
-              ? t("Drag a photo or tap to select a photo.")
-              : t("Drag a photo to replace the existing photo or tap to delete the photo.")
+              ? `${t("Drag a photo or tap to select a photo.")}`
+              : `${t("Drag a photo to replace the existing photo or tap to delete the photo.")}`
           }
         >
           <Box
@@ -154,10 +154,10 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
-          label={t("Name")}
+          label={`${t("Name")}`}
           type="text"
           variant="outlined"
-          helperText={t("Enter the family member or clinician's name here.")}
+          helperText={`${t("Enter the family member or clinician's name here.")}`}
           value={name}
           onChange={(event) => setName(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -167,12 +167,12 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
         <TextField
           fullWidth
           select={!!permissions && !!title ? true : false}
-          label={t("Role")}
+          label={`${t("Role")}`}
           type="text"
           variant="outlined"
-          helperText={t(
+          helperText={`${t(
             "Enter the family member or clinician's role here. For this credential to appear as a care team member, either a photo or role MUST be saved."
-          )}
+          )}`}
           value={role}
           onChange={(event) => setRole(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -180,7 +180,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             endAdornment: [
               !["change-role"].includes(mode) ? undefined : (
                 <InputAdornment position="end" key="a">
-                  <Tooltip title={t("Save Role & Photo")}>
+                  <Tooltip title={`${t("Save Role & Photo")}`}>
                     <IconButton
                       edge="end"
                       aria-label="save role"
@@ -216,10 +216,10 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
       {["create-new", "update-profile"].includes(mode) && (
         <TextField
           fullWidth
-          label={t("Email Address")}
+          label={`${t("Email Address")}`}
           type="email"
           variant="outlined"
-          helperText={t("Enter the email address here.")}
+          helperText={`${t("Enter the email address here.")}`}
           value={emailAddress}
           onChange={(event) => setEmailAddress(event.target.value)}
           style={{ marginBottom: 16 }}
@@ -229,16 +229,16 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
         <Box>
           <TextField
             fullWidth
-            label={t("Password")}
+            label={`${t("Password")}`}
             type="password"
             variant="outlined"
             error={!accepted ? true : false}
             helperText={
               !accepted
-                ? t("Password is not complex enough and does not comply with organization password requirement.")
-                : t(
+                ? `${t("Password is not complex enough and does not comply with organization password requirement.")}`
+                : `${t(
                     "Enter the new password here, and press the done button to the right of the box. Tap away if you don't want to change the password."
-                  )
+                  )}`
             }
             value={password}
             onChange={(event) => setPassword(event.target.value)}
@@ -248,7 +248,9 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
                 ["create-new"].includes(mode) ? undefined : (
                   <InputAdornment position="end" key="a">
                     <Tooltip
-                      title={t("Copy one-time access link that can be used to log in without entering credentials.")}
+                      title={`${t(
+                        "Copy one-time access link that can be used to log in without entering credentials."
+                      )}`}
                     >
                       <IconButton
                         edge="end"
@@ -263,7 +265,7 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
                 ),
                 !["reset-password", "create-new", "update-profile"].includes(mode) ? undefined : (
                   <InputAdornment position="end" key="b">
-                    <Tooltip title={t("Save Credential")}>
+                    <Tooltip title={`${t("Save Credential")}`}>
                       <IconButton
                         edge="end"
                         aria-label="submit credential"
@@ -290,11 +292,11 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
           />
           <TextField
             fullWidth
-            label={t("Confirm Password")}
+            label={`${t("Confirm Password")}`}
             type="password"
             variant="outlined"
             error={password !== confirmPassword ? true : false}
-            helperText={password !== confirmPassword ? t("Does not match the password you entered above.") : ""}
+            helperText={password !== confirmPassword ? `${t("Does not match the password you entered above.")}` : ""}
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
           />
@@ -309,8 +311,8 @@ export function CredentialEditor({ credential, auxData, mode, onChange, title, p
             value={_qrLink()}
             onChange={(event) => {}}
           />
-          <Tooltip title={t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}>
-            <Grid container justify="center" style={{ padding: 16 }}>
+          <Tooltip title={`${t("Scan this QR code on a mobile device to automatically open a patient dashboard.")}`}>
+            <Grid container justifyContent="center" style={{ padding: 16 }}>
               <QRCode size={256} level="H" value={_qrLink()} />
             </Grid>
           </Tooltip>
@@ -472,22 +474,22 @@ export const CredentialManager: React.FunctionComponent<{
       LAMP.Type.setAttachment(null, "me", "lamp.dashboard.admin_permissions", dataPermissions)
     }
     if (result === -4) {
-      return enqueueSnackbar(t("Could not change password."), {
+      return enqueueSnackbar(`${t("Could not change password.")}`, {
         variant: "error",
       })
     }
     if (result === -1) {
-      enqueueSnackbar(t("Could not perform operation for an unknown reason."), {
+      enqueueSnackbar(`${t("Could not perform operation for an unknown reason.")}`, {
         variant: "error",
       })
     }
     if (typeof result === "string") {
-      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
+      enqueueSnackbar(`${t("Credential management failed. The email address could be in use already.")}`, {
         variant: "error",
       })
     }
     if (result === -2) {
-      enqueueSnackbar(t("Credential management failed. The email address could be in use already."), {
+      enqueueSnackbar(`${t("Credential management failed. The email address could be in use already.")}`, {
         variant: "error",
       })
     }
@@ -510,13 +512,13 @@ export const CredentialManager: React.FunctionComponent<{
     try {
       id = !!type ? null : id
       if (!!((await LAMP.Credential.delete(id, credential.access_key)) as any).error)
-        return enqueueSnackbar(t("Could not delete."), { variant: "error" })
+        return enqueueSnackbar(`${t("Could not delete.")}`, { variant: "error" })
       await LAMP.Type.setAttachment(id, "me", "lamp.dashboard.credential_roles", {
         ...allRoles,
         [credential.access_key]: undefined,
       })
     } catch (err) {
-      enqueueSnackbar(t("Credential management failed."), { variant: "error" })
+      enqueueSnackbar(`${t("Credential management failed.")}`, { variant: "error" })
     }
     LAMP.Credential.list(id).then((cred) => {
       cred = cred.filter((c) => c.hasOwnProperty("origin"))
@@ -529,10 +531,10 @@ export const CredentialManager: React.FunctionComponent<{
 
   return (
     <Box {...props}>
-      <Grid container justify="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
+      <Grid container justifyContent="center" alignItems="center" spacing={1} style={{ marginBottom: 16 }}>
         <Grid item xs={12}>
           <Typography variant="h6" align="center">
-            {t("Manage Credentials")}
+            {`${t("Manage Credentials")}`}
           </Typography>
         </Grid>
         {allCreds.map((x, idx) => (
@@ -566,7 +568,7 @@ export const CredentialManager: React.FunctionComponent<{
           </Grid>
         ))}
         <Grid item>
-          <Tooltip title={t("Add a new member of your care team.")}>
+          <Tooltip title={`${t("Add a new member of your care team.")}`}>
             <IconButton
               onClick={() =>
                 setSelected((selected) => ({
@@ -591,7 +593,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          {t("Update Photo & Role")}
+          {`${t("Update Photo & Role")}`}
         </MenuItem>
         <MenuItem
           onClick={() =>
@@ -602,7 +604,7 @@ export const CredentialManager: React.FunctionComponent<{
             }))
           }
         >
-          {t("Reset Password")}
+          {`${t("Reset Password")}`}
         </MenuItem>
         <MenuItem
           onClick={() =>
@@ -615,7 +617,7 @@ export const CredentialManager: React.FunctionComponent<{
             )
           }
         >
-          <b>{t("Delete")}</b>
+          <b>{`${t("Delete")}`}</b>
         </MenuItem>
       </Menu>
       {!!selected.mode && <Divider style={{ margin: "0px -24px 32px -24px" }} />}

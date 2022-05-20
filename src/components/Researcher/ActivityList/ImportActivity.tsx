@@ -247,7 +247,7 @@ export default function ImportActivity({ ...props }) {
       .filter((activity) => activity.spec === "lamp.group")
       .filter((activity) => activity.settings.filter((x) => !Object.keys(allIDs).includes(x)).length > 0).length
     if (brokenGroupsCount > 0) {
-      enqueueSnackbar(t("Couldn't import the Activities because some Activities are misconfigured or missing."), {
+      enqueueSnackbar(`${t("Couldn't import the Activities because some Activities are misconfigured or missing.")}`, {
         variant: "error",
       })
       setLoading(false)
@@ -332,12 +332,12 @@ export default function ImportActivity({ ...props }) {
     }
     if (status) {
       setLoading(false)
-      enqueueSnackbar(t("The selected Activities were successfully imported."), {
+      enqueueSnackbar(`${t("The selected Activities were successfully imported.")}`, {
         variant: "success",
       })
     } else {
       setLoading(false)
-      enqueueSnackbar(t("Couldn't import one of the selected Activity groups."), { variant: "error" })
+      enqueueSnackbar(`${t("Couldn't import one of the selected Activity groups.")}`, { variant: "error" })
     }
     history.back()
   }
@@ -374,8 +374,8 @@ export default function ImportActivity({ ...props }) {
 
   const onDrop = useCallback((acceptedFiles, event) => {
     const reader = new FileReader()
-    reader.onabort = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
-    reader.onerror = () => enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
+    reader.onabort = () => enqueueSnackbar(`${t("Couldn't import the Activities.")}`, { variant: "error" })
+    reader.onerror = () => enqueueSnackbar(`${t("Couldn't import the Activities.")}`, { variant: "error" })
     reader.onload = () => {
       let obj = JSON.parse(decodeURIComponent(escape(atob(reader.result as string))))
       if (
@@ -386,7 +386,7 @@ export default function ImportActivity({ ...props }) {
         setPaginatedImported(obj.slice(page * rowCount, page * rowCount + rowCount))
         setImportFile(obj)
       } else {
-        enqueueSnackbar(t("Couldn't import the Activities."), { variant: "error" })
+        enqueueSnackbar(`${t("Couldn't import the Activities.")}`, { variant: "error" })
       }
     }
     acceptedFiles.forEach((file) => reader.readAsText(file))
@@ -415,17 +415,17 @@ export default function ImportActivity({ ...props }) {
           >
             <Icon>arrow_back</Icon>
           </Link>
-          <Typography variant="h5">{t("Import activities")}</Typography>
+          <Typography variant="h5">{`${t("Import activities")}`}</Typography>
         </Toolbar>
       </AppBar>
       <Divider className={classes.dividerHeader} />
       <Container className={classes.containerWidth}>
         <Box mt={2} mb={2}>
-          <Typography variant="h6">{t("Choose the Study you want to import activities.")}</Typography>
+          <Typography variant="h6">{`${t("Choose the Study you want to import activities.")}`}</Typography>
         </Box>
         <Grid item lg={4} md={6} xs={12}>
           <FormControl variant="filled" className={classes.formControl}>
-            <InputLabel id="demo-simple-select-filled-label">{t("Study")}</InputLabel>
+            <InputLabel id="demo-simple-select-filled-label">{`${t("Study")}`}</InputLabel>
             <Select
               labelId="demo-simple-select-filled-label"
               id="demo-simple-select-filled"
@@ -446,7 +446,7 @@ export default function ImportActivity({ ...props }) {
         {typeof selectedStudy === "undefined" ||
         (typeof selectedStudy !== "undefined" && selectedStudy?.trim() === "") ? (
           <Box mt={1}>
-            <Typography className={classes.errorMsg}>{t("Select a Study to import activities.")}</Typography>
+            <Typography className={classes.errorMsg}>{`${t("Select a Study to import activities.")}`}</Typography>
           </Box>
         ) : (
           ""
@@ -465,12 +465,12 @@ export default function ImportActivity({ ...props }) {
             ref={inputRef}
             disabled={selectedStudy ? false : true}
           />
-          <Typography variant="h6">{t("Drag files here, or click to select files.")}</Typography>
-          <Typography className={classes.errorMsg}>{t("The maximum allowed file size is 25 MB.")}</Typography>
+          <Typography variant="h6">{`${t("Drag files here, or click to select files.")}`}</Typography>
+          <Typography className={classes.errorMsg}>{`${t("The maximum allowed file size is 25 MB.")}`}</Typography>
         </Box>
 
         <Dialog open={!!importFile} onClose={() => setImportFile(undefined)}>
-          <DialogTitle>{t("Continue importing?")}</DialogTitle>
+          <DialogTitle>{`${t("Continue importing?")}`}</DialogTitle>
           <DialogContent dividers={false}>
             {(paginatedImported || []).map((activity) => (
               <Box className={classes.importList}>
@@ -479,13 +479,13 @@ export default function ImportActivity({ ...props }) {
             ))}
             <Pagination data={importFile} updatePage={handleChangePage} rowPerPage={[5, 10]} defaultCount={5} />
             <Typography className={classes.errorMsg}>
-              {t("The Activities having same name under the selected study will be duplicated into new name.")}
+              {`${t("The Activities having same name under the selected study will be duplicated into new name.")}`}
             </Typography>
           </DialogContent>
           <DialogActions>
             <Box p={2} pt={1}>
               <Button onClick={() => setImportFile(undefined)} color="secondary" autoFocus>
-                {t("Cancel")}
+                {`${t("Cancel")}`}
               </Button>
               <Button
                 onClick={() => {
@@ -495,7 +495,7 @@ export default function ImportActivity({ ...props }) {
                 color="primary"
                 autoFocus
               >
-                {t("Import")}
+                {`${t("Import")}`}
               </Button>
             </Box>
           </DialogActions>

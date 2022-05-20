@@ -368,8 +368,8 @@ export default function BottomMenu({ ...props }) {
                 <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(4)}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Typography variant="h6">{t("Welcome to the Feed section")}</Typography>
-                <Typography variant="body1">{t("Review today's activities.")}</Typography>
+                <Typography variant="h6">{`${t("Welcome to the Feed section")}`}</Typography>
+                <Typography variant="body1">{`${t("Review today's activities.")}`}</Typography>
               </React.Fragment>
             }
             arrow={true}
@@ -378,7 +378,7 @@ export default function BottomMenu({ ...props }) {
             <BottomNavigationAction
               showLabel
               selected={tabVal === 4}
-              label={t("Feed")}
+              label={`${t("Feed")}`}
               value={4}
               classes={{
                 root: classes.navigation,
@@ -402,8 +402,10 @@ export default function BottomMenu({ ...props }) {
                 <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(0)}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Typography variant="h6">{t("Welcome to the Learn section")}</Typography>
-                <Typography variant="body1">{t("Find useful information and practice healthy habits.")}</Typography>
+                <Typography variant="h6">{`${t("Welcome to the Learn section")}`}</Typography>
+                <Typography variant="body1">{`${t(
+                  "Find useful information and practice healthy habits."
+                )}`}</Typography>
               </React.Fragment>
             }
             arrow={true}
@@ -412,7 +414,7 @@ export default function BottomMenu({ ...props }) {
             <BottomNavigationAction
               showLabel
               selected={tabVal === 0}
-              label={t("Learn")}
+              label={`${t("Learn")}`}
               value={0}
               classes={{
                 root: classes.navigation,
@@ -432,8 +434,8 @@ export default function BottomMenu({ ...props }) {
                 <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(1)}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Typography variant="h6">{t("Welcome to the Assess section")}</Typography>
-                <Typography variant="body1">{t("Log feelings, behavior, and activity.")}</Typography>
+                <Typography variant="h6">{`${t("Welcome to the Assess section")}`}</Typography>
+                <Typography variant="body1">{`${t("Log feelings, behavior, and activity.")}`}</Typography>
               </React.Fragment>
             }
             arrow={true}
@@ -442,7 +444,7 @@ export default function BottomMenu({ ...props }) {
             <BottomNavigationAction
               showLabel
               selected={tabVal === 1}
-              label={t("Assess")}
+              label={`${t("Assess")}`}
               value={1}
               classes={{
                 root: classes.navigation,
@@ -462,8 +464,8 @@ export default function BottomMenu({ ...props }) {
                 <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(2)}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Typography variant="h6">{t("Welcome to the Manage section")}</Typography>
-                <Typography variant="body1">{t("Take steps to refocus, reflect, and recover.")}</Typography>
+                <Typography variant="h6">{`${t("Welcome to the Manage section")}`}</Typography>
+                <Typography variant="body1">{`${t("Take steps to refocus, reflect, and recover.")}`}</Typography>
               </React.Fragment>
             }
             arrow={true}
@@ -472,7 +474,7 @@ export default function BottomMenu({ ...props }) {
             <BottomNavigationAction
               showLabel
               selected={tabVal === 2}
-              label={t("Manage")}
+              label={`${t("Manage")}`}
               value={2}
               classes={{
                 root: classes.navigation,
@@ -492,8 +494,8 @@ export default function BottomMenu({ ...props }) {
                 <IconButton aria-label="close" className={classes.closeButton} onClick={() => updateLocalStorage(3)}>
                   <Icon>close</Icon>
                 </IconButton>
-                <Typography variant="h6">{t("Welcome to the Portal section")}</Typography>
-                <Typography variant="body1">{t("Track progress and make connections.")}</Typography>
+                <Typography variant="h6">{`${t("Welcome to the Portal section")}`}</Typography>
+                <Typography variant="body1">{`${t("Track progress and make connections.")}`}</Typography>
               </React.Fragment>
             }
             arrow={true}
@@ -502,7 +504,7 @@ export default function BottomMenu({ ...props }) {
             <BottomNavigationAction
               showLabel
               selected={tabVal === 3}
-              label={t("Portal")}
+              label={`${t("Portal")}`}
               value={3}
               classes={{
                 root: classes.navigation,
