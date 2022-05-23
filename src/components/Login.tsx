@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next"
 
 import pkceChallenge from "pkce-challenge"
 import { Fetch } from "lamp-core/dist/service/Fetch"
+import { StartFlowResponse } from "lamp-core/dist/service/OAuth.service"
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -119,10 +120,17 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             defaultValue={defaultServerAddress}
             locked={srcLocked}
             onChange={(event: any) => setServerAddress(event.target.value)}
-            onComplete={(startURL?: URL) => {
-              if (!!startURL) {
-                startURL.searchParams.set("code_challenge", LAMP.OAuth.params.codeChallenge)
-                window.location.assign(startURL.href)
+            onComplete={(urls: StartFlowResponse) => {
+              if (urls.logoutURL) {
+                urls.logoutURL.searchParams.set("post_logout_redirect_uri", window.location.origin)
+                sessionStorage.setItem("logout_url", urls.logoutURL.href)
+              } else {
+                sessionStorage.removeItem("logout_url")
+              }
+
+              if (urls.loginURL) {
+                urls.loginURL.searchParams.set("code_challenge", LAMP.OAuth.params.codeChallenge)
+                window.location.assign(urls.loginURL.href)
               } else {
                 goToScreen(Screen.legacyLogin)
               }
@@ -347,16 +355,16 @@ function ServerAddressInput({ value, defaultValue, locked, onChange, onComplete,
       codeChallenge: pkce.code_challenge,
     }
 
-    let url: URL
+    let urls: StartFlowResponse
     try {
-      url = await LAMP.OAuth.start_flow()
+      urls = await LAMP.OAuth.start_flow()
     } catch (error) {
       setDisabled(false)
       onError(Error(`OAuth start URL could not be retrieved from server at ${value}: ${error.message}`))
       return
     }
 
-    onComplete(url)
+    onComplete(urls)
   }
 
   return (
