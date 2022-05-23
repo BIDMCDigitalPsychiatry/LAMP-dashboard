@@ -173,6 +173,14 @@ function AppRouter({ ...props }) {
     window.addEventListener("beforeinstallprompt", (e) => setDeferredPrompt(e))
   }, [])
 
+  // Log out if access token expired and refresh token request failed
+  useEffect(() => {
+    LAMP.addEventListener("TOKEN_REFRESH_FAILED", () => {
+      reset()
+      enqueueSnackbar(t("Please log in again."), { variant: "default" })
+    })
+  }, [])
+
   const refreshPage = () => {
     LAMP.Auth.refresh_identity().then((x) => {
       getAdminType()
