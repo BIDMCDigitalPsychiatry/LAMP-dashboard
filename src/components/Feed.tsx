@@ -666,16 +666,28 @@ export default function Feed({
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
                     schedule.timeValue = getTimeValue(scheduleTime)
                     feedCheck = [10, 20].indexOf(new Date(date).getDate()) > -1 ? true : false
-                    selectedWeekViewDays = selectedWeekViewDays.concat(
+                    if (
+                      first.getTime() <=
                       new Date(
                         new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
-                      ).toLocaleDateString()
+                      ).getTime()
                     )
-                    selectedWeekViewDays = selectedWeekViewDays.concat(
+                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                        new Date(
+                          new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 10
+                        ).toLocaleDateString()
+                      )
+                    if (
+                      first.getTime() <=
                       new Date(
                         new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
-                      ).toLocaleDateString()
+                      ).getTime()
                     )
+                      selectedWeekViewDays = selectedWeekViewDays.concat(
+                        new Date(
+                          new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
+                        ).toLocaleDateString()
+                      )
                   }
                   first.setDate(first.getDate() + 1)
                 }
