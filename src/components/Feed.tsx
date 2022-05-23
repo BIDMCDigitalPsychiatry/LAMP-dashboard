@@ -662,12 +662,6 @@ export default function Feed({
                 break
               case "bimonthly":
                 schedule.completed = savedData.length > 0 ? true : false
-                console.log(
-                  first.getTime() <=
-                    new Date(
-                      new Date(first).getFullYear() + "-" + (new Date(first).getMonth() + 1) + "-" + 20
-                    ).getTime()
-                )
                 while (first.getTime() <= end.getTime()) {
                   if ([10, 20].indexOf(new Date(first).getDate()) > -1) {
                     schedule.timeValue = getTimeValue(scheduleTime)
