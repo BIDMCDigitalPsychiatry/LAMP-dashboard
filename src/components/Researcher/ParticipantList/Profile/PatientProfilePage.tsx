@@ -101,14 +101,6 @@ const useStyles = makeStyles((theme) =>
       "&:hover": { background: "#5680f9" },
     },
     containerWidth: { maxWidth: 1055 },
-    backbtnlink: {
-      width: 48,
-      height: 48,
-      color: "rgba(0, 0, 0, 0.54)",
-      padding: 12,
-      borderRadius: "50%",
-      "&:hover": { background: "rgba(0, 0, 0, 0.04)" },
-    },
   })
 )
 
@@ -163,13 +155,17 @@ export default function PatientProfile({
     history.back()
   }
 
+  const onClose = () => {
+    window.location.href = `/#/researcher/${researcherId}/users`
+  }
+
   return (
     <div className={classes.root}>
       <AppBar position="static" style={{ background: "#FFF", boxShadow: "none" }}>
         <Toolbar className={classes.toolbardashboard}>
-          <Link href={`/#/researcher/${researcherId}/users`} underline="none" className={classes.backbtnlink}>
+          <IconButton onClick={onClose}>
             <Icon>arrow_back</Icon>
-          </Link>
+          </IconButton>
           <Typography variant="h5">
             {t("Profile")} {participant?.id ?? ""}
           </Typography>
@@ -211,8 +207,7 @@ export default function PatientProfile({
               <Button className={classes.buttonContainer} onClick={() => updateName()}>
                 <Typography className={classes.buttonText}>{t("Save")}</Typography>
               </Button>
-              <Button className={classes.backContainer}>
-                {/* onClick={() => onClose(nickname ?? "")} */}
+              <Button className={classes.backContainer} onClick={onClose}>
                 <Typography className={classes.backText}>{t("Cancel")}</Typography>
               </Button>
             </div>
