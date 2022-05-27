@@ -302,19 +302,26 @@ function AppRouter({ ...props }) {
       }
       setState((state) => ({ ...state, ...type }))
       return type
-    } else {
-      setState((state) => ({
-        ...state,
-        identity: null,
-        auth: null,
-        authType: null,
-        activeTab: null,
-        lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
-          ? undefined
-          : state.auth.serverAddress,
-      }))
-      window.location.href = "/#/"
     }
+
+    let logoutURL = sessionStorage.getItem("logout_url")
+    if (logoutURL) {
+      window.location.href = logoutURL
+      return
+    }
+
+    setState((state) => ({
+      ...state,
+      identity: null,
+      auth: null,
+      authType: null,
+      activeTab: null,
+      lastDomain: ["api.lamp.digital", "demo.lamp.digital"].includes(state.auth.serverAddress)
+        ? undefined
+        : state.auth.serverAddress,
+    }))
+
+    window.location.href = "/"
   }
 
   let getResearcher = (id) => {
@@ -927,7 +934,9 @@ function OAuthLogin({ reset, onComplete, searchParameters, ...props }) {
           onComplete(LAMP.Auth._auth, LAMP.Auth._type, LAMP.Auth._me)
         }
       })
-      .catch(() => setState({ finished: true, success: false }))
+      .catch(() => {
+        setState({ finished: true, success: false })
+      })
   }, [window.location])
 
   if (state.finished) {
