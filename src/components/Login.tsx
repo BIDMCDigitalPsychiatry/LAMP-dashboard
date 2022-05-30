@@ -120,15 +120,15 @@ export default function Login({ setIdentity, lastDomain, onComplete, ...props })
             defaultValue={defaultServerAddress}
             locked={srcLocked}
             onChange={(event: any) => setServerAddress(event.target.value)}
-            onComplete={(urls: StartFlowResponse) => {
-              if (urls.logoutURL) {
+            onComplete={(urls?: StartFlowResponse) => {
+              if (urls?.logoutURL) {
                 urls.logoutURL.searchParams.set("post_logout_redirect_uri", window.location.origin)
                 sessionStorage.setItem("logout_url", urls.logoutURL.href)
               } else {
                 sessionStorage.removeItem("logout_url")
               }
 
-              if (urls.loginURL) {
+              if (urls?.loginURL) {
                 urls.loginURL.searchParams.set("code_challenge", LAMP.OAuth.params.codeChallenge)
                 window.location.assign(urls.loginURL.href)
               } else {
